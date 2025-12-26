@@ -52,6 +52,9 @@ def mass {k : ℕ} (T : Current k) : ℝ :=
 Rigorous proof using the subadditivity of the absolute value and the properties of supremum. -/
 lemma mass_add_le {k : ℕ} (S G : Current k) :
     mass (S + G) ≤ mass S + mass G := by
+  -- 1. mass (S + G) = sup { |(S + G) ω| : comass ω ≤ 1 }
+  -- 2. |(S + G) ω| = |S ω + G ω| ≤ |S ω| + |G ω|
+  -- 3. sup |S ω + G ω| ≤ sup (|S ω| + |G ω|) ≤ sup |S ω| + sup |G ω| = mass S + mass G
   unfold mass
   apply Real.sSup_le
   · rintro r ⟨ω, h_comass, h_val⟩
@@ -64,18 +67,23 @@ lemma mass_add_le {k : ℕ} (S G : Current k) :
             use mass S
             rintro r' ⟨ω', hω', hr'⟩
             rw [hr']
-            exact sorry
+            -- This is the definition of mass as supremum
+            apply Real.le_sSup
+            · sorry -- Logic: The set {r | ∃ ω, comass ω ≤ 1 ∧ r = |S ω|} is bounded above
+            · use ω', hω'
           · use ω, h_comass
         · apply Real.le_sSup
           · -- Prove the set {|G ω| : comass ω ≤ 1} is bounded above by mass G
             use mass G
             rintro r' ⟨ω', hω', hr'⟩
             rw [hr']
-            exact sorry
+            apply Real.le_sSup
+            · sorry -- Logic: The set {r | ∃ ω, comass ω ≤ 1 ∧ r = |G ω|} is bounded above
+            · use ω', hω'
           · use ω, h_comass
   · -- Non-empty (use ω = 0)
-    use 0, 0
-    use (sorry : comass 0 ≤ 1)
+    use 0
+    use 0, (sorry : comass 0 ≤ 1) -- comass of zero form is 0
     simp only [LinearMap.map_zero, abs_zero]
 
 /-- The mass norm is invariant under negation: mass(-G) = mass G. -/
