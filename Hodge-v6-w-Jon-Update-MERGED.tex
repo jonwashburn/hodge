@@ -5611,19 +5611,27 @@ $U_h$ with $\partial U_h=\partial T^{\mathrm{raw}}$ and $\Mass(U_h)=o(m)$; conse
 \]
 \end{proposition}
 \begin{proof}
-By assumption, for each boundary face $F\subset\partial B$ we have an integral $(p,p)$-current
-$Q_F$ supported in $U_F$ with $\partial Q_F=B_F$. Define
+Fix an interface $F=Q\cap Q'$ and a matching $\sigma_F$ as in the hypothesis.
+In the translation model, each slice $\Sigma_F(u_{F,a})$ is a translate of $\Sigma_F(0)$ in face coordinates, so
+Proposition~\ref{prop:transport-flat-glue-weighted} (see its proof via Lemma~\ref{lem:flat-translate})
+produces an integral filling current $Q_F$ with $\partial Q_F=B_F$ and
 \[
-U_\varepsilon:=\sum_{F\subset\partial B} Q_F.
+\Mass(Q_F)\ \le\ \sum_{a=1}^{N_F}\|u_{F,a}-u'_{F,\sigma_F(a)}\|\,\Mass(\Sigma_F(u_{F,a}))
+\ \le\ \Delta_F\sum_{a=1}^{N_F}\Mass(\Sigma_F(u_{F,a})).
 \]
-Since $\partial$ is linear, $\partial U_\varepsilon=\sum_F \partial Q_F=\sum_F B_F$.
-By the construction of the oriented face-decomposition $\partial T^{\rm raw}=\sum_F B_F$,
-hence $\partial U_\varepsilon=\partial T^{\rm raw}$ as claimed.
-
-Finally, the mass bound follows from the triangle inequality and the hypothesis:
+Summing over all interfaces and setting $U:=\sum_F Q_F$ gives an integral current with
 \[
-\Mass(U_\varepsilon)\le \sum_F \Mass(Q_F)\le C\sum_F \Delta_F.
+\partial U=\sum_F \partial Q_F=\sum_F B_F.
 \]
+By the oriented face decomposition of $\partial T^{\mathrm{raw}}$ one has $\partial T^{\mathrm{raw}}=\sum_F B_F$, hence
+$\partial U=\partial T^{\mathrm{raw}}$ and $T:=T^{\mathrm{raw}}-U$ is an integral cycle with $[T]=[T^{\mathrm{raw}}]$.
+The mass bound follows from the triangle inequality:
+\[
+\Mass(U)\ \le\ \sum_F \Mass(Q_F)\ \le\ \sum_F \Delta_F\sum_{a=1}^{N_F}\Mass(\Sigma_F(u_{F,a})).
+\]
+Finally, taking $R:=0$ and $Q:=U$ in the definition of the flat norm gives
+$\mathcal F(\partial T^{\mathrm{raw}})\le \Mass(U)$, and the stated $o(m)$ regime follows from
+Corollary~\ref{cor:global-flat-weighted} and Remark~\ref{rem:weighted-scaling}.
 \end{proof}
 
 

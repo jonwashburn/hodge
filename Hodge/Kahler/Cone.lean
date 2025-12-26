@@ -94,16 +94,14 @@ The pairing of ω^p with any simple calibrated form is exactly 1.
 Reference: [Harvey-Lawson, 1982, p. 17]. -/
 theorem wirtinger_pairing (p : ℕ) (x : X) (V : CalibratedGrassmannian p x) :
     pointwiseInner (omegaPow_point p x).val (SimpleCalibratedForm p x V).val x = 1 := by
-  -- 1. Let {e_1, Je_1, ..., e_p, Je_p} be a unitary basis for the oriented real subspace V.
-  -- 2. The normalized simple form ξ_V satisfies ξ_V(e_1, ..., Je_p) = 1.
-  -- 3. The Kähler power ω^p satisfies ω^p(e_1, ..., Je_p) = p!.
-  -- 4. By definition, SimpleCalibratedForm is (1/p!) ω^p|_V.
-  -- 5. Thus the pointwise inner product is 1.
+  -- 1. Choose an orthonormal basis {e_1, Je_1, ..., e_p, Je_p} for the complex subspace V.
+  -- 2. The volume form ξ of V satisfies ξ(e_1, Je_1, ..., e_p, Je_p) = 1.
+  -- 3. The Kähler power ω^p satisfies (ω^p/p!)(e_1, Je_1, ..., e_p, Je_p) = 1.
+  -- 4. Thus the inner product is 1.
   sorry
 
 /-- A point lies in the interior of a convex cone if it pairs strictly positively
-with all non-zero elements of the dual cone.
-Reference: [Boyd-Vandenberghe, 2004, Section 2.6]. -/
+with all non-zero elements of the dual cone. -/
 theorem ConvexCone.mem_interior_of_pairing_pos {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
     [FiniteDimensional ℝ E] (C : ConvexCone ℝ E) (v : E)
     (h_pos : ∀ ξ ∈ PointedCone.dual (InnerProductSpace.toDual ℝ E) (C : Set E), ξ ≠ 0 → inner ξ v > (0 : ℝ)) :
@@ -116,13 +114,14 @@ theorem ConvexCone.mem_interior_of_pairing_pos {E : Type*} [NormedAddCommGroup E
 /-- **CRITICAL THEOREM**: ω^p is in the interior of K_p(x). -/
 theorem omegaPow_in_interior (p : ℕ) (x : X) :
     (omegaPow_point p x) ∈ interior (stronglyPositiveCone p x : Set (PPFormSpace n X p x)) := by
-  -- 1. Use the dual pairing characterization of the interior.
-  apply (stronglyPositiveCone p x).mem_interior_of_pairing_pos
+  -- 1. Simple calibrated forms generate the strongly positive cone K_p(x).
+  -- 2. By the Wirtinger inequality, ω^p pairs strictly positively with all simple calibrated forms.
+  -- 3. In finite dimensions, this implies ω^p lies in the interior of the cone.
+  apply ConvexCone.mem_interior_of_pairing_pos
   · intro ξ hξ h_nz
-    -- 2. Any ξ in the dual cone pairs non-negatively with all simple calibrated forms.
-    -- 3. Since the simple calibrated forms generate the cone K_p(x), and ω^p
-    --    is strictly positive on the generators (Wirtinger), it must be strictly
-    --    positive on any non-zero dual vector.
+    -- Since ξ is in the dual cone, it pairs non-negatively with all simple calibrated forms.
+    -- Since ω^p is a strictly positive linear combination of generators (spiritually),
+    -- its pairing with a non-zero dual vector must be strictly positive.
     sorry
 
 /-! ## Uniform Interior Radius -/
@@ -134,7 +133,7 @@ This follows from the compactness of X and the continuity of the Kähler power.
 Reference: [Voisin, 2002]. -/
 theorem exists_uniform_interior_radius [CompactSpace X] (p : ℕ) :
     ∃ r : ℝ, r > 0 ∧ ∀ x, Metric.ball (omegaPow_point p x).val r ⊆ (stronglyPositiveCone p x : Set (PPFormSpace n X p x)) := by
-  -- 1. For each x, ω^p(x) is in the interior of the strongly positive cone.
+  -- 1. For each x, ω^p(x) is in the interior of the strongly positive cone (Theorem C.3.4).
   -- 2. Thus there exists a radius r(x) > 0 such that ball(ω^p(x), r(x)) ⊆ K_p(x).
   -- 3. Since ω^p varies smoothly and K_p is a continuous family of cones,
   --    the function x ↦ sup { r | ball(ω^p(x), r) ⊆ K_p(x) } is continuous.

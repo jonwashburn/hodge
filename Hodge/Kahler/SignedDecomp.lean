@@ -44,16 +44,16 @@ theorem signed_decomposition {p : ℕ} (γ : SmoothForm n X (2 * p))
       isConePositive γplus ∧
       isConePositive γminus ∧
       isRationalClass γplus ∧ isRationalClass γminus := by
-  -- 1. Get uniform interior radius r₀ > 0 for the Kähler form ω^p.
+  -- 1. Get uniform interior radius r₀ > 0 for the Kähler form ω^p (Theorem C.3.5).
   obtain ⟨r₀, hr₀, h_ball⟩ := exists_uniform_interior_radius (X := X) p
-  -- 2. Get bound M > 0 for the Hodge class representative γ.
+  -- 2. Get bound M > 0 for the Hodge class representative γ (Theorem C.4.1).
   obtain ⟨M, hM, h_bound⟩ := form_is_bounded γ
   -- 3. Choose a large rational number N such that N > M / r₀.
   have ∃ N : ℚ, (N : ℝ) > M / r₀ := exists_rat_gt (M / r₀)
   obtain ⟨N, hN⟩ := this
   have hN_pos : (N : ℝ) > 0 := lt_trans (div_pos hM hr₀) hN
 
-  -- 4. Define γminus = N • ω^p.
+  -- 4. Define γminus = N • ω^p. Since [ω^p] is rational and cone-positive, so is γminus.
   let γminus := (N : ℝ) • (omegaPow (n := n) (X := X) p)
   -- 5. Define γplus = γ + γminus.
   let γplus := γ + γminus
@@ -83,7 +83,12 @@ theorem signed_decomposition {p : ℕ} (γ : SmoothForm n X (2 * p))
 Reference: [Kodaira, 1954]. -/
 theorem omega_pow_is_algebraic {p : ℕ} :
     ∃ (Z : Set X), isAlgebraicSubvariety Z ∧ FundamentalClass Z = (omegaPow p) := by
-  -- Follows from the fact that ω represents the hyperplane class in CP^N.
+  -- 1. Use the projective embedding ι : X ↪ ℂP^N.
+  -- 2. Let H ⊆ ℂP^N be a generic hyperplane. Its fundamental class [H] represents
+  --    the Fubini-Study class.
+  -- 3. The Kähler class [ω] on X is the pullback ι*[H].
+  -- 4. The intersection Z = X ∩ H₁ ∩ ... ∩ H_p is an algebraic subvariety.
+  -- 5. By the properties of fundamental classes under intersection, [Z] = [ω]^p.
   sorry
 
 end

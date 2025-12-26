@@ -38,9 +38,15 @@ def comass {k : ℕ} (α : SmoothForm n X k) : ℝ :=
   ⨆ x, pointwiseComass α x
 
 /-- **Theorem: Continuity of Pointwise Comass**
-The supremum of smoothly varying bounded linear functionals over unit balls is continuous. -/
+The pointwise comass is continuous because it is the supremum of a family of
+smooth functions (the evaluations on unit vectors) over a compact fiber (the unit ball).
+This is a standard application of the Berge Maximum Theorem. -/
 theorem pointwiseComass_continuous {k : ℕ} (α : SmoothForm n X k) :
-    Continuous (pointwiseComass α) :=
+    Continuous (pointwiseComass α) := by
+  -- 1. The evaluation map (x, v) ↦ |α(x)(v)| is continuous on the unit ball bundle.
+  -- 2. The unit ball bundle is a compact fiber bundle over X.
+  -- 3. The maximum of a continuous function over a compact-valued continuous correspondence
+  --    is continuous (Berge Maximum Theorem).
   sorry
 
 /-- Comass is non-negative. -/
@@ -112,6 +118,26 @@ theorem comass_smul {k : ℕ} (r : ℝ) (α : SmoothForm n X k) :
       rw [h_val_t] at h_eq
       rw [abs_mul, ← h_eq, mul_comm]
 
+instance (k : ℕ) : NormedAddCommGroup (SmoothForm n X k) where
+  norm α := comass α
+  dist α β := comass (α - β)
+  dist_self α := by simp [comass_zero]
+  dist_comm α β := by
+    simp only
+    rw [show α - β = -(β - α) by abel, comass_neg]
+  dist_triangle α β γ := by
+    simp only
+    calc comass (α - γ) = comass ((α - β) + (β - γ)) := by abel
+      _ ≤ comass (α - β) + comass (β - γ) := comass_add_le _ _
+  edist α β := ENNReal.ofReal (comass (α - β))
+  edist_dist α β := by simp [comass_nonneg]
+
+instance (k : ℕ) : NormedSpace ℝ (SmoothForm n X k) where
+  norm_smul_le r α := by
+    simp only [norm_eq_abs]
+    rw [comass_smul]
+    exact le_refl _
+
 /-- On a compact manifold, the comass is finite. -/
 theorem comass_finite {k : ℕ} (α : SmoothForm n X k) :
     ∃ M : ℝ, ∀ x, pointwiseComass α x ≤ M := by
@@ -121,16 +147,43 @@ theorem comass_finite {k : ℕ} (α : SmoothForm n X k) :
   use pointwiseComass α x_max
   intro x; exact h_max x (Set.mem_univ x)
 
+/-- The metric on the cotangent space induced by the Kähler metric. -/
+def kahlerMetricDual (x : X) (u v : CotangentSpace 𝓒(Complex, n) x) : ℝ :=
+  -- Characterized by g^*(u, v) = g(u#, v#) where # is the sharp isomorphism.
+  sorry
+
+/-- The pointwise inner product of two k-forms.
+Induced by the Kähler metric on the cotangent bundle. -/
+def pointwiseInner {k : ℕ} (α β : SmoothForm n X k) (x : X) : ℝ :=
+  -- Determinant of the matrix of inner products of the dual basis elements.
+  sorry
+
+/-- The pointwise norm of a k-form. -/
+def pointwiseNorm {k : ℕ} (α : SmoothForm n X k) (x : X) : ℝ :=
+  Real.sqrt (pointwiseInner α α x)
+
 /-! ## L2 Norm -/
 
 /-- The Dirichlet energy (L2 norm squared) of a form. -/
 def energy {k : ℕ} (α : SmoothForm n X k) : ℝ :=
-  -- Integration requires a measure induced by the volume form.
-  -- ∫ x, (pointwiseNorm α x)^2 ∂(volumeForm.toMeasure)
-  sorry
+  ∫ x, (pointwiseNorm α x)^2 ∂(volumeForm.toMeasure)
 
 /-- The L2 norm of a form. -/
 def normL2 {k : ℕ} (α : SmoothForm n X k) : ℝ :=
   Real.sqrt (energy α)
+
+/-- **Energy Minimizer Property**
+Harmonic forms are energy minimizers in their cohomology class.
+Proof: ‖γ + dη‖² = ‖γ‖² + ‖dη‖² + 2⟨γ, dη⟩.
+Using duality, ⟨γ, dη⟩ = ⟨d*γ, η⟩. Since γ is harmonic, d*γ = 0, so the cross term vanishes. -/
+theorem energy_minimizer {k : ℕ} (α γ_harm : SmoothForm n X k) :
+    isClosed α → isHarmonic γ_harm → (∃ η, α = γ_harm + extDeriv η) →
+    energy α = energy γ_harm + energy (α - γ_harm) := by
+  intro h_closed h_harm ⟨η, h_coh⟩
+  -- 1. energy α = innerL2 α α
+  -- 2. innerL2 (γ + dη) (γ + dη) = innerL2 γ γ + innerL2 (dη) (dη) + 2 * innerL2 γ (dη)
+  -- 3. innerL2 γ (dη) = innerL2 (adjointDeriv γ) η = innerL2 0 η = 0
+  --    because harmonic implies d*γ = 0.
+  sorry
 
 end

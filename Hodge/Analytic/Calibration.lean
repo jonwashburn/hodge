@@ -50,10 +50,39 @@ def KählerCalibration (k : ℕ) [K : KahlerManifold n X] : CalibratingForm k wh
     | _ => 0 -- Only even degrees are calibrated by Kähler powers
   is_closed := by
     -- ω^p is closed because ω is closed.
-    sorry
+    cases h_parity : k % 2
+    · -- k is even, k = 2p
+      let p := k / 2
+      induction p with
+      | zero =>
+          unfold omegaPow
+          -- L^0 = 1, d(1) = 0
+          sorry -- Need d(1) = 0
+      | succ p' ih =>
+          unfold omegaPow
+          rw [d_wedge]
+          -- d(ω ∧ ω^p) = dω ∧ ω^p + (-1)^2 ω ∧ d(ω^p)
+          -- dω = 0 and d(ω^p) = 0 (by IH)
+          sorry -- Need to handle the coercion and dω = 0
+    · -- k is odd, form is 0
+      simp only [extDeriv, map_zero]
+      sorry
   comass_le_one := by
-    -- Wirtinger's inequality: comass(ω^p / p!) = 1.
-    sorry
+    -- Wirtinger's inequality: comass(ω^p / p!) ≤ 1.
+    -- Equality holds at every point where the tangent space is a complex subspace.
+    cases h_parity : k % 2
+    · -- k is even, k = 2p
+      let p := k / 2
+      -- By Wirtinger's theorem, the comass of ω^p/p! is exactly 1.
+      -- Proof sketch:
+      -- 1. Pointwise, ω is a sum of dz_i ∧ dz̄_i.
+      -- 2. ω^p/p! is a sum of products of dz_i ∧ dz̄_i.
+      -- 3. The maximum value of this form on unit p-planes is achieved on complex p-planes.
+      -- 4. For a complex p-plane, the value is exactly 1.
+      sorry
+    · -- k is odd, form is 0
+      simp only [comass_zero]
+      exact zero_le_one
 
 /-! ## Calibrated Currents -/
 
@@ -193,9 +222,32 @@ theorem mass_lsc {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k)
     Tendsto (fun n => flatNorm (T n - T_limit)) atTop (nhds 0) →
     T_limit.mass ≤ liminf (fun n => (T n).mass) atTop := by
   intro h_conv
+  -- 1. mass T = sup { |T ψ| : comass ψ ≤ 1 }
+  -- 2. Each pairing T ↦ T ψ is continuous in flat norm if comass(dψ) is also bounded.
+  --    For a fixed smooth form ψ, |(T_n - T_limit) ψ| ≤ flatNorm(T_n - T_limit) * C.
+  -- 3. Since T_n(ψ) → T_limit(ψ), and T_n(ψ) ≤ mass(T_n),
+  --    we have T_limit(ψ) = lim T_n(ψ) ≤ liminf mass(T_n).
+  -- 4. Taking the supremum over all ψ with comass ≤ 1 gives the result.
   unfold Current.mass
-  -- This follows from the definition of mass as a supremum of linear pairings.
-  sorry
+  apply Real.le_liminf_of_le
+  · -- Pairing continuity
+    intro ψ hψ
+    -- For smooth forms on a compact manifold X, comass(dψ) is always bounded.
+    let C := max (comass ψ) (comass (extDeriv ψ))
+    have h_pair : Tendsto (fun n => (T n) ψ) atTop (nhds (T_limit ψ)) := by
+      rw [tendsto_iff_norm_tendsto_zero]
+      simp only [sub_zero, norm_eq_abs, ← LinearMap.sub_apply]
+      have h_bound : ∀ n, |(T n - T_limit) ψ| ≤ flatNorm (T n - T_limit) * C :=
+        fun n => eval_le_flatNorm (T n - T_limit) ψ
+      exact tendsto_of_tendsto_of_tendsto_of_le_of_le (tendsto_const_nhds)
+        (Tendsto.mul_const C h_conv) (fun n => abs_nonneg _) h_bound
+    -- Thus T_limit(ψ) = lim T_n(ψ)
+    have : T_limit ψ ≤ liminf (fun n => (T n) ψ) atTop := h_pair.liminf_eq.le
+    -- And T_n(ψ) ≤ mass(T_n)
+    have h_mass_n : ∀ n, (T n) ψ ≤ (T n).mass := fun n => (T n).le_opNorm ψ
+    exact le_trans this (Real.liminf_le_liminf (fun n => h_mass_n n))
+  · -- mass is non-negative
+    intro n; apply Current.mass_nonneg
 
 /-- **Limit Calibration Theorem**
 

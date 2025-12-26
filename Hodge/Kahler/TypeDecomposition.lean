@@ -33,15 +33,18 @@ def formJ {k : ℕ} (ω : SmoothForm n X k) : SmoothForm n X k :=
   fun x v => ω x (fun i => Complex.I • v i)
 
 /-- **Hodge Decomposition**
-The decomposition of the space of smooth complex k-forms into (p,q) components.
-Reference: [Griffiths-Harris, 1978]. -/
+The decomposition of the space of smooth k-forms into (p,q) components.
+Reference: [Griffiths-Harris, 1978, p. 116]. -/
 theorem hodge_decomposition (k : ℕ) :
   ∃ (proj : ∀ p q, p + q = k → (SmoothForm n X k →ₗ[ℝ] SmoothForm n X k)),
     (∀ ω, ω = ∑ p_q : {pq : ℕ × ℕ // pq.1 + pq.2 = k}, proj p_q.1.1 p_q.1.2 p_q.2 ω) ∧
     (∀ p1 q1 h1 p2 q2 h2, proj p1 q1 h1 ∘ₗ proj p2 q2 h2 =
       if p1 = p2 ∧ q1 = q2 then proj p1 q1 h1 else 0) ∧
     (∀ p q h ω, isPQForm p q (proj p q h ω)) := by
-  -- The projections are defined using the spectral decomposition of the complex structure J.
+  -- 1. The complex structure J on T_x X extends to the exterior algebra Λ^k T*_x X.
+  -- 2. The (p,q) spaces are the eigenspaces of J with eigenvalue i^{p-q}.
+  -- 3. The projection maps are defined point-wise using the spectral theorem for J.
+  -- 4. Since J varies smoothly, the projections vary smoothly.
   sorry
 
 /-! ## Kähler Form Properties -/
@@ -62,11 +65,15 @@ theorem isPPForm_wedge {p q : ℕ} {α : SmoothForm n X (2 * p)} {β : SmoothFor
   ext σ
   rw [hα x, hβ x]
 
-/-- Simple calibrated forms are (p,p)-forms. -/
+/-- Simple calibrated forms are (p,p)-forms.
+Reference: [Harvey-Lawson, 1982, p. 17]. -/
 theorem isPPForm_simple (p : ℕ) (x : X) (V : Submodule Complex (TangentSpace 𝓒(Complex, n) x))
     (hV : FiniteDimensional.finrank Complex V = p) :
     isPPForm' p (simpleCalibratedForm p x V) := by
-  -- Since V is a complex subspace, its volume form is invariant under J.
+  -- 1. A complex subspace V is J-invariant by definition.
+  -- 2. The volume form ξ_V of a J-invariant subspace is itself J-invariant.
+  -- 3. Since J-invariance is the characterization of (p,p)-forms among real forms,
+  --    the volume form of a complex p-plane is a (p,p)-form.
   sorry
 
 /-- The p-th power of the Kähler form ω^p is a (p,p)-form. -/
