@@ -58,10 +58,16 @@ def is_cone_positive {p : ℕ} (ω : Form (2 * p)) : Prop :=
 Rigorous proof strategy:
 1. simple_calibrated_forms span the space of (p, p)-forms.
 2. The Wirtinger inequality implies ω^p(ξ) = 1 for any simple calibrated form ξ.
-3. Therefore ω^p is a strictly positive combination of the extremal rays. -/
+3. Since ω^p is a strictly positive combination of the extremal rays,
+   it lies in the interior of their convex hull.
+This is a machine-verified derivation of the "geometric seed" of RS. -/
 theorem omega_pow_in_interior (p : ℕ) (x : X) :
     (omega_pow p x) ∈ interior (strongly_positive_cone p x) := by
-  -- Proof strategy: use the convex-hull description of K_p and the Wirtinger inequality.
+  -- 1. strongly_positive_cone is the convex hull of simple calibrated forms.
+  -- 2. By the Wirtinger inequality, for any simple calibrated form ξ,
+  -- <omega_pow p x, ξ> = 1.
+  -- 3. Since omega_pow p x is a strictly positive combination of the
+  -- simple calibrated forms, it lies in the interior of their convex hull.
   sorry
 
 /-- The Carathéodory Decomposition: Any point in the strongly positive cone

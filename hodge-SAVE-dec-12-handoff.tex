@@ -181,12 +181,12 @@
 \begin{editconeblock}
 We reduce the Hodge problem to a \emph{realization/microstructure} statement for smooth closed strongly positive $(p,p)$--forms.
 The key algebraic reduction is that any rational Hodge class
-\[
-\gamma \in H^{2p}(X,\Q)\cap H^{p,p}(X)
-\]
+	\[
+	\gamma \in H^{2p}(X,\Q)\cap H^{p,p}(X)
+	\]
 admits a signed decomposition $\gamma=\gamma^+-\gamma^-$ with $\gamma^- = N[\omega^p]$ algebraic (complete intersections) and
 $\gamma^+=\gamma+N[\omega^p]$ \emph{effective} (admitting a smooth closed cone-valued representative) for $N\gg1$.
-
+	
 For an effective class with cone-valued representative $\beta$, the main construction produces $\psi$--calibrated integral cycles $T_k$
 in the fixed class $\mathrm{PD}(m[\gamma^+])$ whose masses converge to the cohomological lower bound
 $\Mass(T_k)\to m\int_X \beta\wedge\psi$.
@@ -266,9 +266,9 @@ calibrated $(p,p)$ currents.
 \begin{theorem}[Calibration--coercivity (cone-valued harmonic classes)]\label{thm:cal-coercivity-intro}
 \editcone{Assume the $\omega$--harmonic representative satisfies $\gamma_{\harm}(x)\in K_p(x)$ for all $x\in X$.}
 \editcone{Then for every smooth closed $2p$--form $\alpha \in [\gamma]$,}
-\[
+	\[
 \editcone{E(\alpha) - E(\gamma_{\harm})\ \ge\ \Def_{\cone}(\alpha).}
-\]
+	\]
 \end{theorem}
 \editcone{\editref{(See Theorem~\ref{thm:cal-coercivity} in Section~\ref{sec:cal-coercivity} for the proof; this hypothesis is exactly the CPM--bridge assumption that the energy minimizer already lies in the structured cone.)}}
 
@@ -1840,46 +1840,46 @@ Assume either $p=1$ or $p=n-1$.
 Then the calibrated/strongly-positive cone $K_p(x)$ identifies with the full PSD cone in the Hermitian model
 (Remark~\ref{rem:cone-not-full-psd}).
 In particular, for every $x\in X$ and every $\alpha_x\in\Lambda^{2p}T_x^*X$, writing the orthogonal type splitting
-\[
-\alpha_{x} 
-= 
-\alpha_{x}^{(p+1,p-1)}
-\;\perp\;
-\alpha_{x}^{(p,p)}
-\;\perp\;
+	\[
+	\alpha_{x} 
+	= 
+	\alpha_{x}^{(p+1,p-1)}
+	\;\perp\;
+	\alpha_{x}^{(p,p)}
+	\;\perp\;
 \alpha_{x}^{(p-1,p+1)},
-\]
+	\]
 and setting
-\[
+	\[
 H(x) := \mathcal{I}\!\left(\alpha_{x}^{(p,p)}\right)\in \Herm(\mathcal{H}),
-\qquad
-d := \binom{n}{p},
-\qquad
+	\qquad
+	d := \binom{n}{p},
+	\qquad
 \mu(x) := \tfrac{1}{d}\operatorname{tr} H(x),
-\]
+	\]
 one has, with $H_-(x)$ the negative part in the spectral decomposition,
-\begin{equation}\label{eq:cone-dist-H}
+	\begin{equation}\label{eq:cone-dist-H}
+		\mathrm{dist}_{\mathrm{cone}}(\alpha_{x})^{2}
+		=
+		\|\alpha_{x}^{(p+1,p-1)}\|^{2}
+		+\|\alpha_{x}^{(p-1,p+1)}\|^{2}
+		+\| H_{-}(x)\|_{\mathrm{HS}}^{2}.
+		\tag{25}
+	\end{equation}
+Moreover, using the orthogonal trace--traceless splitting
+	\[
+	\|H(x)\|_{\mathrm{HS}}^{2}
+	= \|H(x)-\mu(x) I\|_{\mathrm{HS}}^{2} + d\,\mu(x)^{2},
+	\]
+one obtains the bound
+	\[
 	\mathrm{dist}_{\mathrm{cone}}(\alpha_{x})^{2}
-	=
+	\;\le\;
 	\|\alpha_{x}^{(p+1,p-1)}\|^{2}
 	+\|\alpha_{x}^{(p-1,p+1)}\|^{2}
-	+\| H_{-}(x)\|_{\mathrm{HS}}^{2}.
-	\tag{25}
-\end{equation}
-Moreover, using the orthogonal trace--traceless splitting
-\[
-\|H(x)\|_{\mathrm{HS}}^{2}
-= \|H(x)-\mu(x) I\|_{\mathrm{HS}}^{2} + d\,\mu(x)^{2},
-\]
-one obtains the bound
-\[
-\mathrm{dist}_{\mathrm{cone}}(\alpha_{x})^{2}
-\;\le\;
-\|\alpha_{x}^{(p+1,p-1)}\|^{2}
-+\|\alpha_{x}^{(p-1,p+1)}\|^{2}
 +\|(\alpha_{x}^{(p,p)})_{\prim}\|^{2}
-+ d\,\mu(x)^{2}.
-\]
+	+ d\,\mu(x)^{2}.
+	\]
 \end{proposition}
 
 \begin{proof}
@@ -1957,10 +1957,10 @@ Since $\alpha$ and $\gharm$ represent the same class and are closed, Hodge ortho
 E(\alpha)-E(\gharm)=\|\alpha-\gharm\|_{L^2}^2.
 \]
 Pointwise, because $\gharm(x)\in K_p(x)$ and $K_p(x)$ is a cone,
-\[
+	\[
 \distcone(\alpha_x)\ =\ \inf_{\beta_x\in K_p(x)}\|\alpha_x-\beta_x\|
 \ \le\ \|\alpha_x-\gharm(x)\|.
-\]
+	\]
 Squaring and integrating yields $\Defcone(\alpha)\le \|\alpha-\gharm\|_{L^2}^2$, hence \eqref{eq:global-coercivity}.
 \end{proof}
 

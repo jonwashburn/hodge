@@ -71,25 +71,35 @@ lemma mass_add_le {k : ℕ} (S G : Current k) :
     mass (S + G) ≤ mass S + mass G := by
   unfold mass
   apply Real.sSup_le
-  · -- Prove that mass S + mass G is an upper bound for the set
-    rintro r ⟨ω, h_comass, h_val⟩
+  · rintro r ⟨ω, h_comass, h_val⟩
     rw [h_val, LinearMap.add_apply]
     calc |S ω + G ω| ≤ |S ω| + |G ω| : abs_add (S ω) (G ω)
       _ ≤ mass S + mass G : by
         apply add_le_add
         · -- Show |S ω| ≤ mass S
           apply Real.le_sSup
-          · -- The set {|S ω| : comass ω ≤ 1} is bounded above by its supremum (mass S)
-            -- This is a tautology in the definition of Sup
-            sorry
+          · -- The set {|S ω'| : comass ω' ≤ 1} is bounded above by its supremum (mass S)
+            use mass S
+            rintro r' ⟨ω', hω', hr'⟩
+            rw [hr']
+            -- Property of Sup: x ≤ sup(set)
+            apply Real.le_sSup
+            · -- We assume the mass is finite for smooth forms on compact manifolds
+              sorry -- Logic: bounded linear functionals have finite norms
+            · use ω', hω'
           · use ω, h_comass
         · -- Show |G ω| ≤ mass G
           apply Real.le_sSup
-          · sorry
+          · use mass G
+            rintro r' ⟨ω', hω', hr'⟩
+            rw [hr']
+            apply Real.le_sSup
+            · sorry
+            · use ω', hω'
           · use ω, h_comass
   · -- Non-empty (use ω = 0)
     use 0
-    use 0, (sorry : comass 0 ≤ 1)
+    use 0, (supr_le (λ x => sorry)) -- Logic: comass of zero form is 0
     simp only [LinearMap.map_zero, abs_zero]
 
 /-- A set `S ⊆ X` is `k`-rectifiable if it is the image of a compact set in `ℝ^k`

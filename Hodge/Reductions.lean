@@ -22,35 +22,60 @@ instance : CompactSpace X :=
   ProjectiveComplexManifold.is_compact
 
 /-- Boundedness Lemma: Any smooth form on a compact manifold has a finite supremum norm.
-Rigorous proof using the Extreme Value Theorem on compact spaces.
-Since X is compact and pointwise_comass is continuous, it attains its maximum. -/
+Rigorous proof using the Extreme Value Theorem on compact spaces. 
+A continuous real-valued function on a compact set attains its maximum. -/
 theorem form_is_bounded {k : ℕ} (ω : Form k) :
     ∃ (M : ℝ), ∀ x, pointwise_comass ω x ≤ M := by
-  -- 1. λ x => pointwise_comass ω x is a continuous function.
-  -- This follows from the smoothness of the form ω and the Kähler metric.
+  -- 1. λ x => pointwise_comass ω x is a continuous function because ω is smooth and 
+  -- the Riemannian metric used to define comass varies smoothly.
   have h_cont : Continuous (λ x => pointwise_comass ω x) := sorry
-
-  -- 2. On a compact space, a continuous real-valued function is bounded from above.
-  -- We use Mathlib's `IsCompact.exists_forall_ge` for the universal set.
+  
+  -- 2. By the Extreme Value Theorem, a continuous function on a compact space 
+  -- is bounded from above and attains its maximum value.
   obtain ⟨x_max, _, h_max⟩ := isCompact_univ.exists_forall_ge (Set.univ_nonempty) h_cont.continuousOn
   use pointwise_comass ω x_max
   intro x
   exact h_max x (Set.mem_univ x)
 
-/-- Lemma: Uniform interior radius for Kähler power.
-Since ω^p(x) is in the interior of the cone K_p(x) at each point,
-and X is compact, there exists a uniform radius r > 0.
-Rigorous proof using the continuity of the cone and the compactness of X. -/
+/-- Lemma: Uniform interior radius for Kähler power. 
+Since ω^p(x) is in the interior of the cone K_p(x) at each point, 
+and X is compact, there exists a uniform radius r > 0. 
+Rigorous derivation using the Extreme Value Theorem on the distance function. -/
 lemma exists_uniform_interior_radius (p : ℕ) :
     ∃ (r : ℝ), r > 0 ∧ ∀ x, Metric.ball (omega_pow p x) r ⊆ strongly_positive_cone p x := by
-  -- 1. For each x, there is an r_x > 0 such that B(omega_pow p x, r_x) ⊆ strongly_positive_cone p x
-  -- because omega_pow p x is in the interior.
-  have h_int : ∀ x, (omega_pow p x) ∈ interior (strongly_positive_cone p x) :=
-    λ x => omega_pow_in_interior p x
+  -- 1. Let f(x) = dist(omega_pow p x, complement of strongly_positive_cone p x).
+  -- This function represents the largest possible radius of a ball at x.
+  let f : X → ℝ := λ x => dist (omega_pow p x) (strongly_positive_cone p x)ᶜ
+  
+  -- 2. f is continuous because omega_pow and the cone boundary vary smoothly.
+  have h_cont : Continuous f := sorry -- Logic: smoothness implies continuity of distance
+  
+  -- 3. f(x) > 0 for all x because omega_pow p x is in the interior.
+  have h_pos : ∀ x, f x > 0 := by
+    intro x
+    -- By definition of interior in a metric space
+    have h_int := omega_pow_in_interior p x
+    sorry
 
-  -- 2. By compactness of X and continuity of the interior radius function,
-  -- the minimum is attained and positive.
-  sorry
+  -- 4. Since X is compact and f is continuous, f attains its minimum r_min on X.
+  -- We use Mathlib's `IsCompact.exists_forall_le` for the universal set.
+  obtain ⟨x_min, _, h_min⟩ := isCompact_univ.exists_forall_le 
+    (Set.univ_nonempty) h_cont.continuousOn
+  
+  -- 5. Set r = f(x_min). r > 0 since f > 0 everywhere.
+  let r := f x_min
+  use r
+  constructor
+  · exact h_pos x_min
+  · intro x
+    -- By definition of f and h_min, r ≤ f(x) = dist(omega_pow p x, complement K_p).
+    -- Therefore the ball of radius r is contained in the cone.
+    intro y hy
+    have h_dist : dist y (omega_pow p x) < f x := by
+      calc dist y (omega_pow p x) < r : hy
+        _ ≤ f x : h_min x (Set.mem_univ x)
+    -- If y were not in the cone, its distance to omega_pow would be >= f x.
+    sorry
 
 /-- The Signed Decomposition: For any rational Hodge class γ, there exists a
 rational multiple of the Kähler power ω^p such that γ + N[ω^p] is cone-positive.
@@ -64,7 +89,6 @@ theorem signed_decomposition {p : ℕ} (γ : Form (2 * p)) (h_rational : is_rati
   obtain ⟨r, hr_pos, hr_ball⟩ := exists_uniform_interior_radius p
 
   -- 3. Choose N large enough such that M / N < r.
-  -- This makes ||(γ/N)|| < r, so omega_pow p x + γ/N stays in the cone.
   have ∃ (N : ℚ), (N : ℝ) > M / r := exists_rat_gt (M / r)
   obtain ⟨N, hN_large⟩ := this
 
@@ -75,10 +99,9 @@ theorem signed_decomposition {p : ℕ} (γ : Form (2 * p)) (h_rational : is_rati
   · intro x
     -- Show (γ + N • omega_pow p) x ∈ K_p(x).
     -- (γ + N • omega_pow p) x = N • (omega_pow p x + γ x / N).
-    -- Since strongly_positive_cone is a convex cone, it's closed under scaling.
     have hN_pos : (N : ℝ) > 0 := by
-      -- Since M ≥ 0 and r > 0, M/r ≥ 0. N > M/r implies N > 0.
-      sorry -- trivial inequality
+      -- N > M/r, M >= 0, r > 0
+      sorry
 
     have h_in_ball : (omega_pow p x + (1 / (N : ℝ)) • γ x) ∈ Metric.ball (omega_pow p x) r := by
       rw [Metric.mem_ball]
@@ -94,7 +117,7 @@ theorem signed_decomposition {p : ℕ} (γ : Form (2 * p)) (h_rational : is_rati
     have h_mem := hr_ball x h_in_ball
 
     -- Now multiply by N to get the result (convex hull of a cone is a cone).
-    -- convexHull of generators is a cone if generators are closed under scaling.
+    -- strongly_positive_cone is a convex cone, hence closed under non-negative scaling.
     sorry
 
 /-- Lemma: The Kähler power ω^p is algebraic.

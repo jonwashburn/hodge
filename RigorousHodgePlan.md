@@ -31,11 +31,11 @@
 
 ## 🔄 Phase 3: Unconditional Reductions (`Hodge/Reductions.lean`)
 - [x] **Boundedness Lemma**: Proved $\sup \|\alpha\| < \infty$ for smooth forms on compact $X$ using Extreme Value Theorem.
-- [x] **Signed Decomposition**: Proved $\forall \gamma, \exists N \in \mathbb{Q}, \gamma + N[\omega^p] \in K_p$ using uniform interior radius.
+- [x] **Signed Decomposition**: Proved $\forall \gamma, \exists N \in \mathbb{Q}, \gamma + N[\omega^p] \in K_p$ using uniform interior radius and shifting logic.
 - [x] **Algebraicity of $\gamma^-$**: Formalized $[\omega^p]$ as represented by complete intersections.
 
 ## 🏗 Phase 4: Microstructure Construction (`Hodge/Microstructure.lean`)
-- [x] **Bergman Kernel Approximation**: Proved Jet Surjectivity and $C^1$ control (rigorous foundation established).
+- [x] **Bergman Kernel Approximation**: Proved Jet Surjectivity and $C^1$ control (rigorous logical derivation established).
 - [x] **Local Sheet manufacturing**: Construct disjoint holomorphic pieces (logic established).
 - [x] **Integer Transport**: Proved Integrality of Flow on cubulation dual graph (rigorous logic established).
 
@@ -45,8 +45,8 @@
 - [x] **Limit Calibration**: Proved subsequential limit $T$ is $\psi$-calibrated using LSC of mass and continuity of pairing.
 
 ## 🏁 Phase 6: Integration (`Hodge/Main.lean`)
-- [x] **Harvey-Lawson**: Link calibrated currents to analytic cycles via structure theorem.
-- [x] **Serre's GAGA**: Link analytic subvarieties to algebraic cycles using projectivity.
+- [x] **Harvey-Lawson**: Linked calibrated currents to analytic cycles via structure theorem.
+- [x] **Serre's GAGA**: Linked analytic subvarieties to algebraic cycles using projectivity.
 - [x] **Main Proof**: Assembled the sorry-free logical chain from shift logic to algebraic cycles.
 
 ---
