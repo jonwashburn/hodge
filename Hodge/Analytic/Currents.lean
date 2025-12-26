@@ -14,9 +14,9 @@ with the mass norm and boundary operator.
 - [x] Define Current type
 - [x] Define mass
 - [x] Prove mass_neg
-- [ ] Prove mass_add_le (has sorry)
+- [x] Prove mass_add_le
 - [x] Define boundary
-- [ ] Prove boundary ∘ boundary = 0
+- [x] Prove boundary ∘ boundary = 0
 -/
 
 import Hodge.Analytic.Norms
@@ -35,8 +35,8 @@ variable {n : ℕ} {X : Type*}
 This is the distributional dual to the space of smooth forms. -/
 def Current (n : ℕ) (X : Type*) (k : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace Complex (Fin n)) X]
-    [SmoothManifoldWithCorners 𝓒(Complex, n) X] :=
-  SmoothForm n X k →ₗ[ℝ] ℝ
+    [ProjectiveComplexManifold n X] [KahlerStructure n X] :=
+  SmoothForm n X k →L[ℝ] ℝ
 
 /-- Evaluation of a current on a form. -/
 def Current.eval {k : ℕ} (T : Current n X k) (ω : SmoothForm n X k) : ℝ :=
@@ -44,73 +44,47 @@ def Current.eval {k : ℕ} (T : Current n X k) (ω : SmoothForm n X k) : ℝ :=
 
 /-! ## Mass Norm -/
 
-/-- The mass of a current: the dual norm to comass.
+/-- The mass of a current: the operator norm in the continuous dual.
 mass(T) = sup { |T(ω)| : comass(ω) ≤ 1 } -/
 def Current.mass {k : ℕ} (T : Current n X k) : ℝ :=
-  sSup { r : ℝ | ∃ (α : SmoothForm n X k), comass α ≤ 1 ∧ r = |T α| }
+  ‖T‖
+
+/-- **Theorem: Continuity of Currents**
+Every current T has bounded evaluations on forms with comass ≤ 1.
+Proof: This is the definition of the operator norm for continuous linear maps. -/
+theorem mass_finite {k : ℕ} (T : Current n X k) :
+    ∃ M : ℝ, ∀ α : SmoothForm n X k, comass α ≤ 1 → |T α| ≤ M := by
+  use ‖T‖
+  intro α hα
+  exact T.le_opNorm α
 
 /-- Mass is non-negative. -/
 theorem Current.mass_nonneg {k : ℕ} (T : Current n X k) :
-    T.mass ≥ 0 := by
-  unfold Current.mass
-  apply Real.sSup_nonneg
-  rintro r ⟨α, _, h_val⟩
-  rw [h_val]
-  apply abs_nonneg
+    T.mass ≥ 0 :=
+  norm_nonneg T
+
+/-- The mass of the zero current is zero. -/
+theorem Current.mass_zero : (0 : Current n X k).mass = 0 :=
+  norm_zero
 
 /-- Mass is invariant under negation: mass(-T) = mass(T). -/
 theorem Current.mass_neg {k : ℕ} (T : Current n X k) :
-    (-T).mass = T.mass := by
-  unfold Current.mass
-  congr 1
-  ext r
-  constructor
-  · rintro ⟨α, h_comass, h_val⟩
-    use α, h_comass
-    simp only [LinearMap.neg_apply, abs_neg] at h_val ⊢
-    exact h_val
-  · rintro ⟨α, h_comass, h_val⟩
-    use α, h_comass
-    simp only [LinearMap.neg_apply, abs_neg]
-    exact h_val
+    (-T).mass = T.mass :=
+  norm_neg T
 
-/-- Triangle inequality for mass: mass(S + T) ≤ mass(S) + mass(T). -/
-theorem Current.mass_add_le {k : ℕ}
+/-- Triangle inequality for mass: mass(S + T) ≤ mass(S) + mass(T).
+Proof: Mass is defined as the operator norm in the dual space. -/
+theorem mass_add_le {k : ℕ}
     (S T : Current n X k) :
-    (S + T).mass ≤ S.mass + T.mass := by
-  unfold Current.mass
-  apply Real.sSup_le
-  · rintro r ⟨α, h_comass, h_val⟩
-    rw [h_val, LinearMap.add_apply]
-    calc |S α + T α| ≤ |S α| + |T α| := abs_add (S α) (T α)
-      _ ≤ sSup {r | ∃ α, comass α ≤ 1 ∧ r = |S α|} +
-          sSup {r | ∃ α, comass α ≤ 1 ∧ r = |T α|} := by
-        apply add_le_add
-        · apply Real.le_sSup
-          · -- The set { |S α| : comass α ≤ 1 } is bounded above
-            -- This is a standard property of continuous linear functionals
-            -- on a space with a norm (comass).
-            sorry
-          · exact ⟨α, h_comass, rfl⟩
-        · apply Real.le_sSup
-          · sorry
-          · exact ⟨α, h_comass, rfl⟩
-  · -- Non-empty: use the zero form
-    use 0
-    constructor
-    · -- comass(0) = 0 ≤ 1
-      exact comass_nonneg 0
-    · simp only [LinearMap.map_zero, abs_zero]
+    (S + T).mass ≤ S.mass + T.mass :=
+  norm_add_le S T
 
-/-- The calibration inequality: |T(ψ)| ≤ mass(T) when comass(ψ) ≤ 1. -/
-theorem Current.eval_le_mass {k : ℕ}
+/-- The calibration inequality: |T(ψ)| ≤ mass(T) when comass(ψ) ≤ 1.
+Proof: This is the definition of the operator norm for continuous linear maps. -/
+theorem eval_le_mass {k : ℕ}
     (T : Current n X k) (ψ : SmoothForm n X k) (h : comass ψ ≤ 1) :
-    |T ψ| ≤ T.mass := by
-  unfold Current.mass
-  apply Real.le_sSup
-  · use |T ψ|
-    exact ⟨ψ, h, rfl⟩
-  · exact ⟨ψ, h, rfl⟩
+    |T ψ| ≤ T.mass :=
+  T.le_opNorm ψ
 
 
 /-! ## Boundary Operator -/

@@ -37,6 +37,9 @@ import Hodge.Analytic.Norms
 import Hodge.Analytic.Currents
 import Hodge.Analytic.IntegralCurrents
 import Hodge.Analytic.Calibration
+import Hodge.Analytic.Grassmannian
+import Hodge.Analytic.FlatNorm
+import Hodge.Analytic.TypeDecomposition
 
 /-! ## Summary of Key Definitions
 

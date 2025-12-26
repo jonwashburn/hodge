@@ -35,7 +35,7 @@ import Hodge.Kahler.Manifolds
 import Hodge.Kahler.Cone
 import Hodge.Kahler.SignedDecomp
 import Hodge.Kahler.Microstructure
-import Hodge.Kahler.MainTheorem
+import Hodge.Kahler.Main
 
 /-! ## Summary of Key Definitions
 
