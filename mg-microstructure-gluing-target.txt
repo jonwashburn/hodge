@@ -1,0 +1,280 @@
+MICROSTRUCTURE/GLUING (OPTION B)
+Target Theorem + Lemma Dependency DAG (execution roadmap)
+Repository: hodge
+Generated: 2025-12-14
+
+Purpose
+-------
+This file is a single “roadmap section” for making the manuscript’s microstructure/gluing step
+fully unconditional, executable lemma-by-lemma without losing the thread.
+
+It is written in classical math language and points to existing labeled results in:
+  - hodge-SAVE-dec-12-handoff.tex
+
+High-level diagnosis
+--------------------
+The paper’s reduction hinges on the ability to construct a global raw current T^raw from local
+calibrated holomorphic pieces so that:
+  (a) T^raw approximates mβ locally (Young-measure / tangential sense), and
+  (b) F(∂T^raw) = o(m).
+
+The existing manuscript contains many “plumbing” lemmas for flat-norm bookkeeping and rounding.
+What remains (Option B) is the genuinely geometric/analytic manufacturing of holomorphic slivers
+with a corner-exit footprint that enforces face-level O(h) edit control.
+
+
+============================================================
+0) STANDALONE TARGET THEOREM (what must be proved)
+============================================================
+
+T0. Microstructure/Gluing Theorem (Standalone)
+----------------------------------------------
+Let (X,ω) be smooth projective Kähler, ψ := ω^{n-p}/(n-p)!.
+Let β be a smooth closed cone-valued (p,p)-form representing an effective rational Hodge class [γ^+].
+Let m ≫ 1 clear denominators so PD(m[γ^+]) is integral.
+
+Choose a mesh-h decomposition of X into coordinate cells {Q} (in holomorphic charts), with h→0 as m→∞.
+Construct ψ-calibrated holomorphic complete-intersection pieces {Y^{Q,a}} and define the raw integral
+current:
+  T^raw := Σ_Q Σ_a [Y^{Q,a}]⟂Q
+
+such that:
+  (T0.i) Local approximation: T^raw approximates mβ cellwise in the tangential/Young-measure sense
+         used in the manuscript’s “local sheets” step.
+  (T0.ii) Flat boundary smallness:  F(∂T^raw) = o(m)  in the joint limit (m→∞, h→0, ε→0, …).
+
+Equivalently: there exists a correction current R_glue with ∂R_glue = -∂T^raw and Mass(R_glue)=o(m),
+so that T := T^raw + R_glue is a closed ψ-calibrated integral cycle in PD(m[γ^+]).
+
+Where this is used in the manuscript
+------------------------------------
+- The missing link is identified in Remark rem:glue-gap (flat norm / mismatch control).
+- A sufficient “activation package” is Theorem thm:sliver-mass-matching-on-template, which reduces
+  F(∂T^raw)=o(m) to two core inputs: local realizability on a fixed template (iii) and O(h) face edits (iv).
+
+
+============================================================
+1) WHAT IS ALREADY IN PLACE (do not redo)
+============================================================
+
+DONE-A. Flat-norm gluing / bookkeeping machinery (existing in the manuscript)
+-----------------------------------------------------------------------------
+These are the “pipes” that convert per-face mismatch into a global flat-norm bound:
+  - prop:prefix-template-coherence  (per-face mismatch bound from displacement + edits)
+  - lem:template-displacement, lem:template-displacement-edits, lem:template-edits-oh
+  - prop:transport-flat-glue-weighted  (weighted/robust flat-glue estimate)
+  - cor:global-flat-weighted  (global sum over faces)
+  - lem:uniformly-convex-slice-boundary (boundary-volume scaling in smooth convex cells)
+
+DONE-B. Global direction labeling and rounding (existing in the manuscript)
+---------------------------------------------------------------------------
+  - lem:lipschitz-qp-weights (stable direction labels + Lipschitz weights)
+  - lem:slow-variation-rounding, lem:slow-variation-discrepancy (slow variation after rounding)
+  - cohomology rounding via Bárány–Grinberg (lem:barany-grinberg and subsequent proposition)
+
+DONE-C. Checkerboard / vertex-template combinatorics (existing in the manuscript)
+---------------------------------------------------------------------------------
+These convert slow variation of counts into O(h) fractional tail edits *if* local geometry supplies
+two facts (G1-iff and G2).
+  - def:checkerboard-anchoring
+  - def:block-uniform-codes
+  - lem:prefix-discrepancy
+  - lem:two-sided-face-pop
+  - prop:checkerboard-face-oh-edit   (now unconditional once the holomorphic corner-exit package supplies (G1-iff)/(G2); see cor:corner-exit-iii-iv)
+
+
+============================================================
+2) OPTION B CORE IDEA (what we will prove)
+============================================================
+
+With checkerboard/prefix-balancing in place, item (iv) reduces to two purely local geometric facts:
+
+  (G1-iff) “Face incidence is exactly the designated exit-face set.”
+     - Ball containment gives “only-if”: cannot reach nonincident faces.
+     - Corner-exit simplex structure gives “if”: sliver hits each designated exit face in (k−1)-patch.
+
+  (G2) “Uniform per-face boundary mass comparability.”
+     - In the fat corner-simplex model: each designated facet has (k−1)-mass ≍ v^{(k−1)/k}.
+     - Small-slope holomorphic graph multiplies by (1+O(ε^2)).
+
+So Option B reduces to:
+  “Manufacture holomorphic slivers whose footprint in each cell is a uniformly fat corner simplex
+   supported near an assigned vertex, with uniform constants across the atlas.”
+
+
+============================================================
+3) LEMMA DEPENDENCY DAG (nodes + dependencies)
+============================================================
+
+Legend: [DONE] already in manuscript; [NEW] must be added; [OPEN] must be proved (core difficulty)
+Node IDs are stable handles for execution.
+
+T0  Microstructure/Gluing Theorem (Standalone)  [DONE in the master manuscript]
+ |
+ +-- T1  Global activation on fixed templates (iii) in thm:sliver-mass-matching-on-template  [DONE]
+ |    |
+ |    +-- L1  (Local holomorphic corner-exit slivers exist, per cell & per vertex)  [DONE as a manuscript package]  <-- hardest
+ |    |    |
+|    |    +-- L1.1  (Corner-exit template planes exist with uniform fatness & fixed exit faces)  [DONE]
+|    |         (lem:complex-corner-exit-template + lem:corner-exit-template-open + prop:corner-exit-template-net)
+ |    |    +-- L1.2  (Cell-scale single-sheet graph on the whole cell Q)  [DONE as a classical criterion: lem:global-graph-contraction]
+ |    |         (one concrete holomorphic route already memorialized: lem:bergman-affine-approx-hormander + prop:cell-scale-linear-model-graph)
+ |    |         (holomorphic task: verify the hypotheses of lem:global-graph-contraction on a Bergman ball using lem:bergman-control / peak-section methods)
+ |    |         (one concrete route: Lemma lem:bergman-affine-approx-hormander + Proposition prop:cell-scale-linear-model-graph)
+|    |    +-- L1.3  (Graph/footprint stability: fat corner simplex + small slope ⇒ same exit-face set and positive facet patches)  [DONE]
+|    |         (lem:ball-excludes-faces + lem:corner-simplex-hits-designated-faces + prop:holomorphic-corner-exit-g1g2)
+|    |    +-- L1.4  (Area distortion: k- and (k−1)-areas scale by 1+O(ε^2) under small slope)  [DONE]
+|    |         (lem:small-graph-distortion + prop:holomorphic-corner-exit-g1g2)
+ |    |    +-- L1.5  (Disjointness persistence for separated transverse parameters)  [DONE: lem:sliver-stability(ii)]
+ |
+|    |    (Manuscript packaging note: corner-exit preservation is prop:holomorphic-corner-exit-g1g2 / cor:holomorphic-corner-exit-inherits,
+|    |     the local holomorphic manufacturing step is prop:holomorphic-corner-exit-L1 (+ rem:vertex-star-coherence),
+|    |     and the all-label coherence packaging is prop:global-coherence-all-labels.)
+ |    |
+|    +-- L2  (Mass budget matching per cell: Σ_a Mass([Y^{Q,a}]⟂Q) = M_Q + o(M_Q))  [DONE in corner-exit vertex-template regime]
+ |         |
+|         +-- L2.1  (Per-sliver mass control: each sliver mass ≍ prescribed v_Q,a; template can be chosen so masses are comparable)  [DONE in corner-exit regime]
+|               (via lem:sliver-stability + equal slice masses in def:vertex-template + cor:holomorphic-corner-exit-inherits)
+|         +-- L2.2  (Rounding of counts to match M_Q with relative error O(1/N_Q)+O(ε^2))  [DONE in corner-exit regime]
+|               (prop:vertex-template-mass-matching)
+ |
+ +-- T2  Face-level O(h) edit regime (iv) in thm:sliver-mass-matching-on-template  [DONE as a cubical corner-exit route]
+ |    |
+ |    +-- C1  Checkerboard/prefix balancing gives tail-index control on faces  [DONE: prop:checkerboard-face-oh-edit]
+ |    +-- C2  Local geometry supplies the hypotheses needed by C1:
+ |         |
+|         +-- G1  (G1-iff) Face incidence equals designated exit-face set  [DONE as geometry; needs L1.1+L1.2 for holomorphic realization]
+|         +-- G2  (G2) Comparable per-face boundary mass for face-hitting slivers  [DONE as geometry; needs L1.1+L1.2 for holomorphic realization]
+ |
+ +-- T3  Global flat-norm smallness from per-face mismatch  [DONE plumbing; now fed by prop:global-coherence-all-labels]
+      |
+      +-- F1  Per-face mismatch bound from displacement + O(h) edits  [DONE: prop:prefix-template-coherence et al.]
+      +-- F2  Weighted global bound ⇒ F(∂T^raw)=o(m) under parameter regime  [DONE: cor:global-flat-weighted + scaling remarks]
+
+Summary (short)
+---------------
+As of Dec 2025, the master manuscript contains a complete corner-exit / vertex-template route that supplies the remaining microstructure/gluing input:
+L1 (holomorphic corner-exit manufacturing), L2 (prefix mass-budget rounding), and the all-label global coherence packaging (B1),
+hence yields F(∂T^raw)=o(m) and the small correction current, closing T0.
+
+
+============================================================
+4) EXECUTION PLAN (proof tasks per OPEN/NEW node)
+============================================================
+
+ L1.1 [DONE] Corner-exit template planes (flat/complex model)
+-------------------------------------------------------------
+Goal: In a fixed cube Q=[0,h]^d and vertex v, construct a family of affine k-planes
+P_{v,a} = P + v + t_{v,a} such that:
+  - P_{v,a}∩Q ⊂ B(v,c0 h)
+  - P_{v,a}∩Q is a k-simplex with k+1 facets lying in a fixed set of k+1 coordinate faces through v
+  - “fatness” (biLipschitz to Δ_{s,b} with b_i∈[Λ^{-1},Λ]) is uniform in a
+  - slice k-volume is equal or uniformly comparable across a
+  - transverse parameters t_{v,a} are δ-separated (for later disjointness)
+
+Status note: The manuscript now contains (i) a fully explicit complex example (lem:complex-corner-exit-template),
+(ii) a quantitative open-family template lemma (lem:corner-exit-template-open), and
+(iii) the robust finite-net supply statement needed for B1 (prop:corner-exit-template-net).
+
+Deliverable: a Definition “corner-exit template plane family” + proof that the admissible parameter region
+in P^⊥ has positive measure so one can pick an infinite δ-separated ordered list (with uniform fatness constants).
+
+
+L1.3 + L1.4 [DONE] Local geometric lemmas (corner-exit ⇒ (G1-iff) and (G2))
+--------------------------------------------------------------------------
+Goal: Prove the exact local facts needed by prop:checkerboard-face-oh-edit:
+  - Ball containment excludes nonincident faces (only-if)
+  - Fat corner-simplex footprint hits each designated exit face in positive (k−1)-mass patch (if)
+  - Fatness ⇒ each designated facet has (k−1)-mass comparable to v^{(k−1)/k}
+  - Small-slope C^1 graphs preserve these properties up to (1+O(ε^2))
+
+Done in manuscript:
+  - lem:ball-excludes-faces
+  - lem:corner-simplex-hits-designated-faces
+  - lem:corner-simplex-face-mass
+  - lem:small-graph-distortion
+  - prop:holomorphic-corner-exit-g1g2
+  - cor:holomorphic-corner-exit-inherits
+
+
+L1 [DONE] Holomorphic corner-exit sliver theorem (local manufacturing)
+----------------------------------------------------------------------
+Goal (informal): given a corner-exit affine plane P_{v,a} in a holomorphic chart, produce a ψ-calibrated
+holomorphic complete intersection Y_{v,a} so that Y_{v,a}∩Q is a C^1 graph over P_{v,a}∩Q with slope ≤ε,
+and the footprint geometry (exit-face set + fatness) is preserved.
+
+Subtasks:
+  - Use lem:bergman-control to prescribe jets (s_i(x_a)=0, ds_i≈λ_i) with uniform C^1 control on a ball
+    containing Q (Bergman scale h≲m^{-1/2}).
+  - Use lem:graph-from-grad to get a graph over Π on (a domain containing Q).
+  - Ensure the graph domain includes all of Q with uniform constants (choose Q inside that Bergman ball).
+  - Combine with the corner-exit plane footprint + small slope to deduce (G1-iff) and (G2).
+  - Use δ-separation of transverse parameters + lem:sliver-stability(ii) to ensure disjointness.
+
+Deliverable: now in manuscript as prop:holomorphic-corner-exit-L1 (plus cor:holomorphic-corner-exit-inherits and rem:vertex-star-coherence).
+
+Critical technical checkpoint:
+  - You must formulate the graph result at the right scale so it applies on the entire cell Q, not just
+    an infinitesimal neighborhood. (This is where Bergman/peak-section input must do real work.)
+
+
+L2 [DONE] Mass budget matching in the corner-exit regime (cellwise)
+-------------------------------------------------------------------
+Goal: For each cell Q, with target mass budget M_Q (derived from mβ) and a chosen vertex split M_{Q,v},
+choose counts N_{Q,v} and a prefix of slivers at each vertex such that:
+  Σ_{v∈Vert(Q)} Σ_{a≤N_{Q,v}} Mass([Y_{Q,v,a}]⟂Q) = M_Q + o(M_Q)
+and each vertex family is realized by the same ordered global vertex template.
+
+Subtasks:
+  - Ensure per-sliver masses are equal/comparable across template indices (so rounding works cleanly).
+  - Prove a corner-exit analogue of prop:prefix-activation-flat-ball / cor:prefix-activation-holo:
+    prefix length N determines total mass up to one-piece error; relative error is O(1/N)+O(ε^2).
+  - Use existing rounding lemmas (slow variation) to choose N_{Q,v} with |N_{Q,v}-N_{Q',v}|≤Ch min(...) for adjacent cells.
+
+Deliverable: now in manuscript as prop:vertex-template-mass-matching and cor:corner-exit-iii-iv.
+
+
+T2 (iv) [DONE] Turn local corner-exit geometry into global face O(h) edits
+-------------------------------------------------------------------------
+Once L1 supplies (G1-iff) and (G2) for the actual holomorphic slivers, prop:checkerboard-face-oh-edit
+becomes unconditional: unmatched face mass is an O(h) fraction of total face mass.
+
+Deliverable: now recorded in the master via cor:corner-exit-iii-iv together with prop:checkerboard-face-oh-edit / prop:vertex-template-face-edits.
+
+
+T0 completion [DONE] Conclude F(∂T^raw)=o(m) and produce the correction current
+------------------------------------------------------------------------------
+With (iii) local realizability + (iv) face O(h) edits in hand, the existing bookkeeping machinery yields:
+  - per-face flat mismatch bounds,
+  - global weighted flat-norm bound,
+  - F(∂T^raw)=o(m) under the parameter regime,
+  - existence of correction current R_glue with Mass(R_glue)=o(m),
+  - closed calibrated cycle in PD(m[γ^+]).
+
+Deliverable: now captured in the master by rem:glue-gap (rewritten as “Microstructure/gluing estimate (now established)”) and thm:automatic-syr.
+
+
+============================================================
+5) PARAMETER REGIME CHECKLIST (avoid hidden contradictions)
+============================================================
+
+Before finalizing proofs, lock a coherent scaling regime that satisfies all constraints simultaneously:
+  - Bergman control on cell:  h ≲ m^{-1/2}
+  - Many pieces per relevant cell: N_Q ≳ h^{-1} (or whatever threshold your flat-glue estimate needs)
+  - Small-angle/slope: ε = ε(h) → 0
+  - Disjointness: transverse separation δ ≳ ε h
+  - Global error: the bound from cor:global-flat-weighted must be o(m)
+
+This should be recorded as a single “Parameter regime” lemma/remark that every later estimate cites.
+
+
+============================================================
+6) RS → classical translation (one sentence)
+============================================================
+
+Recognition Science view: the missing theorem is “ledger closure under synchronized discrete events.”
+Classical math view: work at the finite resolution scale h~m^{-1/2} (Bergman scale), construct calibrated holomorphic “events” that are uniformly C^1-close
+to a linear model on a Bergman ball (so each is a single sheet on a whole cell), and then use corner-exit + checkerboard/prefix bookkeeping to make the
+inter-cell mismatch have vanishing flat norm, so the global current is closed up to o(m).
+
+
