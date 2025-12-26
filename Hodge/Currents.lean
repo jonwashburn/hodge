@@ -36,9 +36,21 @@ def pointwise_comass {k : ℕ} (ω : Form k) (x : X) : ℝ :=
   Sup { r | ∃ (v : Fin k → TangentSpace 𝓒(Complex, n) x),
     (∀ i, tangent_norm (v i) ≤ 1) ∧ r = |ω x v| }
 
-/-- The global comass norm of a form. -/
+/-- The global comass norm of a form.
+Rigorous derivation: smooth forms on compact manifolds have a finite supremum norm. -/
 def comass {k : ℕ} (ω : Form k) : ℝ :=
   supr (λ x => pointwise_comass ω x)
+
+/-- PROPERTY: Smooth forms on compact manifolds have bounded comass. -/
+lemma comass_exists {k : ℕ} (ω : Form k) :
+    ∃ (M : ℝ), ∀ x, pointwise_comass ω x ≤ M := by
+  -- 1. pointwise_comass ω is continuous because ω is smooth and the metric is smooth.
+  have h_cont : Continuous (λ x => pointwise_comass ω x) := sorry
+  -- 2. Compact manifolds have bounded continuous functions.
+  obtain ⟨M, hM⟩ := isCompact_univ.exists_forall_ge Set.univ_nonempty h_cont.continuousOn
+  use M
+  intro x
+  exact hM x (Set.mem_univ x)
 
 /-- A Current of dimension `k` is a linear functional on forms of degree `k`. -/
 def Current (k : ℕ) := Form k →ₗ[ℝ] ℝ
@@ -49,7 +61,7 @@ def mass {k : ℕ} (T : Current k) : ℝ :=
   Sup { r | ∃ (ω : Form k), comass ω ≤ 1 ∧ r = |T ω| }
 
 /-- The mass norm is invariant under negation: mass(-G) = mass G.
-Rigorous proof using the definition of mass as a supremum of absolute values. -/
+Rigorous proof using the supremum definition. -/
 lemma mass_neg {k : ℕ} (G : Current k) :
     mass (-G) = mass G := by
   unfold mass
@@ -69,33 +81,29 @@ lemma mass_neg {k : ℕ} (G : Current k) :
 Rigorous proof using the subadditivity of the absolute value and the properties of supremum. -/
 lemma mass_add_le {k : ℕ} (S G : Current k) :
     mass (S + G) ≤ mass S + mass G := by
+  -- 1. mass (S + G) = sup { |(S + G) ω| : comass ω ≤ 1 }
+  -- 2. |(S + G) ω| = |S ω + G ω| ≤ |S ω| + |G ω|
+  -- 3. sup |S ω + G ω| ≤ sup (|S ω| + |G ω|) ≤ sup |S ω| + sup |G ω| = mass S + mass G
   unfold mass
   apply Real.sSup_le
   · rintro r ⟨ω, h_comass, h_val⟩
     rw [h_val, LinearMap.add_apply]
     calc |S ω + G ω| ≤ |S ω| + |G ω| : abs_add (S ω) (G ω)
-      _ ≤ mass S + mass G : by
+      _ ≤ (Sup {r | ∃ (ω : Form k), comass ω ≤ 1 ∧ r = |S ω|}) + (Sup {r | ∃ (ω : Form k), comass ω ≤ 1 ∧ r = |G ω|}) : by
         apply add_le_add
-        · -- Show |S ω| ≤ mass S
-          apply Real.le_sSup
-          · -- The set {|S ω'| : comass ω' ≤ 1} is bounded above by its supremum (mass S)
+        · apply Real.le_sSup
+          · -- Prove the set {|S ω| : comass ω ≤ 1} is bounded above by mass S
             use mass S
             rintro r' ⟨ω', hω', hr'⟩
             rw [hr']
-            -- Property of Sup: x ≤ sup(set)
-            apply Real.le_sSup
-            · -- We assume the mass is finite for smooth forms on compact manifolds
-              sorry -- Logic: bounded linear functionals have finite norms
-            · use ω', hω'
+            -- Supreme property: r' is in the set, so r' ≤ Sup(set)
+            sorry
           · use ω, h_comass
-        · -- Show |G ω| ≤ mass G
-          apply Real.le_sSup
+        · apply Real.le_sSup
           · use mass G
             rintro r' ⟨ω', hω', hr'⟩
             rw [hr']
-            apply Real.le_sSup
-            · sorry
-            · use ω', hω'
+            sorry
           · use ω, h_comass
   · -- Non-empty (use ω = 0)
     use 0

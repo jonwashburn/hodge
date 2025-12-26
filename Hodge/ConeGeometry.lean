@@ -59,15 +59,10 @@ Rigorous proof strategy:
 1. simple_calibrated_forms span the space of (p, p)-forms.
 2. The Wirtinger inequality implies ω^p(ξ) = 1 for any simple calibrated form ξ.
 3. Since ω^p is a strictly positive combination of the extremal rays,
-   it lies in the interior of their convex hull.
-This is a machine-verified derivation of the "geometric seed" of RS. -/
+   it lies in the interior of their convex hull. -/
 theorem omega_pow_in_interior (p : ℕ) (x : X) :
     (omega_pow p x) ∈ interior (strongly_positive_cone p x) := by
-  -- 1. strongly_positive_cone is the convex hull of simple calibrated forms.
-  -- 2. By the Wirtinger inequality, for any simple calibrated form ξ,
-  -- <omega_pow p x, ξ> = 1.
-  -- 3. Since omega_pow p x is a strictly positive combination of the
-  -- simple calibrated forms, it lies in the interior of their convex hull.
+  -- Proof follows from the fact that ω^p is the center of the calibrated Grassmannian hull.
   sorry
 
 /-- The Carathéodory Decomposition: Any point in the strongly positive cone
@@ -80,17 +75,27 @@ def caratheodory_decomposition {p : ℕ} (x : X) (β : MultilinearMap ℝ (λ _ 
       β = ∑ i, θ i • ξ i := by
   intro h
   -- strongly_positive_cone is defined as convexHull ℝ (simple_calibrated_forms p x)
-  -- Mathlib's Carathéodory theorem (convexHull_eq_existence_finset) guarantees
-  -- that any point in the hull is a finite convex combination of the generators.
   rw [strongly_positive_cone, convexHull_eq_existence_finset] at h
   obtain ⟨s, h_sub, h_conv⟩ := h
-  -- s is a Finset of generators. Let N be its cardinality.
+  -- h_conv says that β can be written as a convex combination of elements in s.
+  -- Finset.centerMass s w i = (∑ i in s, w i • i) / (∑ i in s, w i).
+  -- For a convex combination, ∑ i in s, w i = 1 and w i ≥ 0.
+  obtain ⟨w, h_w_pos, h_w_sum, h_w_center⟩ := h_conv
   let N := s.card
-  -- We now map the Finset 's' to 'Fin N' using the equivalence between finsets and Fin cards.
   let f := s.equivFin.symm
   use N
-  -- The coefficients θ_i are extracted from the convex combination h_conv.
-  -- The generators ξ_i are the elements of the Finset.
-  sorry
+  use (λ i => w (f i))
+  use (λ i => f i)
+  constructor
+  · intro i; exact h_w_pos (f i) (f i).2
+  · constructor
+    · -- Using the sum over Fin N vs Finset s
+      rw [← h_w_sum]
+      sorry
+    · constructor
+      · intro i; exact h_sub (f i).2
+      · -- Using centerMass definition
+        rw [h_w_center]
+        sorry
 
 end

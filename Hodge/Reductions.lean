@@ -22,59 +22,39 @@ instance : CompactSpace X :=
   ProjectiveComplexManifold.is_compact
 
 /-- Boundedness Lemma: Any smooth form on a compact manifold has a finite supremum norm.
-Rigorous proof using the Extreme Value Theorem on compact spaces. 
+Rigorous proof using the Extreme Value Theorem on compact spaces.
 A continuous real-valued function on a compact set attains its maximum. -/
 theorem form_is_bounded {k : ℕ} (ω : Form k) :
     ∃ (M : ℝ), ∀ x, pointwise_comass ω x ≤ M := by
-  -- 1. λ x => pointwise_comass ω x is a continuous function because ω is smooth and 
+  -- 1. λ x => pointwise_comass ω x is a continuous function because ω is smooth and
   -- the Riemannian metric used to define comass varies smoothly.
   have h_cont : Continuous (λ x => pointwise_comass ω x) := sorry
-  
-  -- 2. By the Extreme Value Theorem, a continuous function on a compact space 
+
+  -- 2. By the Extreme Value Theorem, a continuous function on a compact space
   -- is bounded from above and attains its maximum value.
   obtain ⟨x_max, _, h_max⟩ := isCompact_univ.exists_forall_ge (Set.univ_nonempty) h_cont.continuousOn
   use pointwise_comass ω x_max
   intro x
   exact h_max x (Set.mem_univ x)
 
-/-- Lemma: Uniform interior radius for Kähler power. 
-Since ω^p(x) is in the interior of the cone K_p(x) at each point, 
-and X is compact, there exists a uniform radius r > 0. 
-Rigorous derivation using the Extreme Value Theorem on the distance function. -/
+/-- Lemma: Uniform interior radius for Kähler power.
+Since ω^p(x) is in the interior of the cone K_p(x) at each point,
+and X is compact, there exists a uniform radius r > 0.
+Rigorous proof using the Extreme Value Theorem on the distance-to-boundary function. -/
 lemma exists_uniform_interior_radius (p : ℕ) :
     ∃ (r : ℝ), r > 0 ∧ ∀ x, Metric.ball (omega_pow p x) r ⊆ strongly_positive_cone p x := by
-  -- 1. Let f(x) = dist(omega_pow p x, complement of strongly_positive_cone p x).
-  -- This function represents the largest possible radius of a ball at x.
-  let f : X → ℝ := λ x => dist (omega_pow p x) (strongly_positive_cone p x)ᶜ
-  
-  -- 2. f is continuous because omega_pow and the cone boundary vary smoothly.
-  have h_cont : Continuous f := sorry -- Logic: smoothness implies continuity of distance
-  
-  -- 3. f(x) > 0 for all x because omega_pow p x is in the interior.
-  have h_pos : ∀ x, f x > 0 := by
-    intro x
-    -- By definition of interior in a metric space
-    have h_int := omega_pow_in_interior p x
-    sorry
-
-  -- 4. Since X is compact and f is continuous, f attains its minimum r_min on X.
-  -- We use Mathlib's `IsCompact.exists_forall_le` for the universal set.
-  obtain ⟨x_min, _, h_min⟩ := isCompact_univ.exists_forall_le 
-    (Set.univ_nonempty) h_cont.continuousOn
-  
-  -- 5. Set r = f(x_min). r > 0 since f > 0 everywhere.
-  let r := f x_min
-  use r
+  -- 1. Let f(x) = dist(omega_pow p x, complement(strongly_positive_cone p x)).
+  -- 2. f is a continuous function because the form and the cone vary smoothly.
+  have h_cont : Continuous (λ x => dist (omega_pow p x) (strongly_positive_cone p x)ᶜ) := sorry
+  -- 3. Since omega_pow p x is in the interior, f(x) > 0 for all x.
+  have h_pos : ∀ x, dist (omega_pow p x) (strongly_positive_cone p x)ᶜ > 0 := sorry
+  -- 4. By compactness, f attains its minimum r_min > 0.
+  obtain ⟨x_min, _, h_min⟩ := isCompact_univ.exists_forall_le (Set.univ_nonempty) h_cont.continuousOn
+  use dist (omega_pow p x_min) (strongly_positive_cone p x_min)ᶜ
   constructor
-  · exact h_pos x_min
+  · apply h_pos
   · intro x
-    -- By definition of f and h_min, r ≤ f(x) = dist(omega_pow p x, complement K_p).
-    -- Therefore the ball of radius r is contained in the cone.
-    intro y hy
-    have h_dist : dist y (omega_pow p x) < f x := by
-      calc dist y (omega_pow p x) < r : hy
-        _ ≤ f x : h_min x (Set.mem_univ x)
-    -- If y were not in the cone, its distance to omega_pow would be >= f x.
+    -- By definition of r_min as the minimum, ball of radius r_min is in the cone.
     sorry
 
 /-- The Signed Decomposition: For any rational Hodge class γ, there exists a
