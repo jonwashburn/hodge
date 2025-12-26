@@ -15,13 +15,22 @@ open Classical
 
 variable {n : ℕ} {X : Type*}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-  [ProjectiveComplexManifold n X] [KahlerManifold n X]
+  [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
 
 /--- The Kähler metric is symmetric. -/
 theorem kahlerMetric_symm (x : X) (v w : TangentSpace (𝓒_complex n) x) :
-    (KahlerManifold.omega x v (Complex.I • w)).re = (KahlerManifold.omega x w (Complex.I • v)).re := by
-  -- Follows from J-invariance and skew-symmetry of omega
-  sorry
+    (K.omega x v (Complex.I • w)).re = (K.omega x w (Complex.I • v)).re := by
+  -- 1. Use the alternating property: ω(v, Jw) = -ω(Jw, v)
+  have h_skew := (K.omega x).map_swap v (Complex.I • w)
+  -- 2. Use J-invariance: ω(Jw, v) = ω(J(Jw), Jv) = ω(-w, Jv) = -ω(w, Jv)
+  have h_j_inv := K.is_j_invariant x (Complex.I • w) v
+  have h_j2 : Complex.I • (Complex.I • w) = -w := by
+    simp only [← mul_smul, Complex.I_mul_I, neg_smul, one_smul]
+  rw [← h_j_inv, h_j2]
+  simp only [map_neg]
+  -- 3. Combine: ω(v, Jw) = -(-ω(w, Jv)) = ω(w, Jv)
+  rw [h_skew]
+  simp only [neg_neg]
 
 /-! ## Rationality -/
 

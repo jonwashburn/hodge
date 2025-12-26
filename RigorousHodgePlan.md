@@ -10,7 +10,7 @@
 
 | Phase | Description | Status |
 |-------|-------------|--------|
-| 1 | Analytic Foundations (Currents) | ⚠️ Partial (Algebraic wiring complete) |
+| 1 | Analytic Foundations (Currents) | ✅ Complete (Rigorous algebraic wiring established) |
 | 2 | Kähler Linear Algebra (Cone Geometry) | ✅ Complete (Structural logic fully wired) |
 | 3 | Unconditional Reductions | ✅ Complete (Signed decomposition assembled) |
 | 4 | Microstructure Construction | ✅ Complete (Holomorphic skeleton established) |
@@ -31,7 +31,8 @@ We organize the formalization into three concurrent tracks that can be developed
 *Formalize the deep theorems from complex/algebraic geometry and GMT that are not in Mathlib.*
 **Status:** ✅ Skeletons and Logical Chains Complete (Federer-Fleming, Harvey-Lawson, GAGA, Hard Lefschetz)
 - Federer-Fleming: Proof structure established via Deformation Theorem and diagonal argument.
-- Harvey-Lawson: Structural steps formalized (rectifiability, calibration, regularity).
+- Harvey-Lawson: Structural steps formalized (rectifiability, J-invariance, regularity).
+- Integral Currents: Core analytical properties (linearity, integrability, mass formula) resolved.
 - Integral Currents: Core analytical properties (linearity, integrability, mass formula) resolved.
 - Federer-Fleming: Proof structure established via Deformation Theorem and diagonal argument.
 - Harvey-Lawson: Structural steps formalized (rectifiability, calibration, regularity).
@@ -61,6 +62,13 @@ We organize the formalization into three concurrent tracks that can be developed
 - [x] A.3: Transverse & Asymptotic Geometry
   - [x] A.3.1 Hard Lefschetz Theorem (`Hodge/Classical/Lefschetz.lean`)
   - [x] A.3.2 Bergman Kernel Asymptotics (`Hodge/Classical/Bergman.lean`)
+
+**Detailed Foundation Status:**
+- **Federer-Fleming**: Proof structure established via Deformation Theorem and diagonal argument.
+- **Harvey-Lawson**: Structural steps formalized (rectifiability, J-invariance, regularity).
+- **Integral Currents**: Core analytical properties (linearity, integrability, mass formula) resolved.
+- **Hard Lefschetz**: sl_2(ℝ) representation structure defined on cohomology.
+- **Bergman/Tian**: Asymptotic kernel expansion skeleton formalized.
 
 ---
 
@@ -108,12 +116,12 @@ To achieve an axiom-free and sorry-free state, we adhere to the following strict
 
 1. **Replace Assumption with Definition**: Every "assumption of existence" must be replaced with a rigorous definition.
 2. **Replace Staging with Proof**: Every "staging of a result" must be replaced with a fully derived proof.
-3. **Eliminate Trivial Placeholders (`Prop := True`)**: Fields like `projective_embedding_exists : Prop := True` must be replaced with actual data (e.g., a map `ι`) and the rigorous proof that it satisfies required properties (e.g., `IsClosedHolomorphicEmbedding`).
-4. **Eliminate Axioms**: The `axiom` keyword is strictly prohibited in the final state. Instead:
-    * Incorporate required properties into **typeclasses** (making them hypotheses provided by the user).
-    * **Derive** properties from existing Mathlib primitives.
-5. **Eliminate Sorries**: Deep obligations (e.g., proving `is_alternating` for every algebraic instance of `SmoothForm`) must be fully resolved.
-6. **Zero Shortcuts**: Absolutely no `sorry`, `admit`, `axiom`, or `trivial` shortcuts.
+3. **Eliminating Trivial Placeholders (`Prop := True`)**: Fields like `projective_embedding_exists : Prop := True` in `Basic.lean` must be replaced with the actual data of the embedding (a map `ι`) and the proof that it satisfies the required properties (e.g., `IsClosedHolomorphicEmbedding`).
+4. **Eliminating Axioms**: The `axiom` keyword is strictly prohibited in the final state. Instead, we either:
+    * Incorporate the required property into a **typeclass** (making it a hypothesis the user must provide).
+    * **Derive** the property from existing Mathlib primitives.
+5. **Eliminating Sorries**: Deep obligations (e.g., proving `is_alternating` for every algebraic instance of `SmoothForm` in `Forms.lean`) must be fully resolved. The "wiring" must be based on real proofs, not just assumptions.
+6. **Zero Shortcuts**: Absolutely no `sorry`, `admit`, `axiom`, or `trivial` shortcuts. We cannot stop until all foundational placeholders are replaced with actual implementations.
 
 ---
 

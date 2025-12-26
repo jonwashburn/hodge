@@ -56,10 +56,13 @@ def analyticOrientation {p : ℕ} (V : AnalyticSubvariety n X) (hV : V.codim = p
       let j := i.val / 2
       -- Pointwise, every complex subspace of dimension m has a unitary basis.
       -- This is a standard result in Hermitian linear algebra.
+      -- We use the Gram-Schmidt process on the Hermitian inner product h(u, v) = g(u, v) + i ω(u, v).
       have h_basis : ∃ (e : Fin m → TangentSpace (𝓒_complex n) x),
         (∀ k l, kahlerMetric x (e k) (e l) = if k = l then 1 else 0) ∧
         (∀ k l, K.omega_form x (e k) (e l) = 0) := by
-        -- Gram-Schmidt process for Hermitian inner products
+        -- Every complex subspace V ⊆ T_x X inherits a Hermitian inner product.
+        -- By the spectral theorem or Gram-Schmidt, there exists a unitary basis.
+        -- Such a basis is orthonormal for the Riemannian metric g and satisfies ω(e_k, e_l) = 0.
         sorry
       let e := Classical.choose h_basis
       if i.val % 2 = 0 then e ⟨j, sorry⟩ else (Complex.I : ℂ) • e ⟨j, sorry⟩,
@@ -72,12 +75,21 @@ def analyticOrientation {p : ℕ} (V : AnalyticSubvariety n X) (hV : V.codim = p
         rw [h_prop ⟨i.val / 2, sorry⟩ ⟨i.val / 2, sorry⟩, Real.sqrt_one]
         simp
       · -- |Je| = |e| since J is an isometry for the Kähler metric
-        sorry ⟩
+        have h_prop := (Classical.choose_spec (sorry : ∃ (e : Fin (n-p) → _), _)).1
+        unfold tangentNorm
+        -- g(Je, Je) = ω(Je, J²e) = ω(Je, -e) = -ω(Je, e) = ω(e, Je) = g(e, e)
+        rw [kahlerMetric_isometry]
+        · rw [h_prop ⟨i.val / 2, sorry⟩ ⟨i.val / 2, sorry⟩, Real.sqrt_one]
+          simp
+        · exact Complex.I
+        · -- multiplication by I is the complex structure J
+          sorry ⟩
 
 /-- Every complex analytic variety is rectifiable.
 Reference: [Lelong, "Intégration sur un ensemble analytique complexe", Bull. Soc. Math. France 1957]. -/
 theorem analytic_rectifiable (V : AnalyticSubvariety n X) :
-    isRectifiable (2 * n - 2 * V.codim) V.carrier :=
+    isRectifiable (2 * n - 2 * V.codim) V.carrier := by
+  -- Analytic varieties are locally finite unions of smooth strata.
   sorry
 
 /-- The current of integration along an analytic subvariety. -/
@@ -130,23 +142,28 @@ structure HarveyLawsonConclusion (p : ℕ) (hyp : HarveyLawsonHypothesis p) wher
 /-- **Theorem: Harvey-Lawson Structure Theorem** -/
 theorem harvey_lawson_theorem {p : ℕ} (hyp : HarveyLawsonHypothesis p) :
     HarveyLawsonConclusion p hyp := by
-  -- 1. Existence of unique tangent plane at almost every point:
-  -- Since hyp.T is an integral current, it is rectifiable. By Federer's theorem,
-  -- it admits a unique approximate tangent plane at H^k-a.e. point in its support.
-
-  -- 2. Calibration equality implies tangent planes are complex subspaces:
-  -- Let ψ = ω^p / p!. The pairing ⟨ψ, ξ⟩ = 1 for a unit k-vector ξ (k=2n-2p)
-  -- holds if and only if the k-plane associated to ξ is a complex subspace
-  -- of the tangent space T_x X. This is a property of the Kähler form.
-
+  -- 1. Rectifiability and Unique Tangent Planes:
+  -- Since hyp.T is an integral current, by Track B.4, it is k-rectifiable.
+  -- Federer's theorem implies it has a unique approximate tangent plane T_x at a.e. point x.
+  
+  -- 2. Calibration Equality implies Complex Tangent Planes:
+  -- The condition M(T) = T(ψ) where ψ = ω^p / p! implies that at a.e. point x, 
+  -- the tangent plane T_x satisfies ⟨ψ(x), ξ(x)⟩ = 1 for the orientation vector ξ(x).
+  -- By Wirtinger's inequality, this holds if and only if T_x is a complex subspace
+  -- of the tangent space T_x X.
+  
   -- 3. Regularity of Support (Lelong-King Theorem):
-  -- A k-rectifiable cycle T whose tangent planes are complex subspaces
-  -- is supported on a complex analytic variety.
-
-  -- 4. Multiplicities are constant on irreducible components:
-  -- The closedness of T implies that the multiplicity function θ is locally constant
-  -- on the regular part of the support. By the monotonicity formula for calibrated
-  -- currents, θ is a positive integer on each irreducible component.
+  -- A k-rectifiable current whose tangent planes are complex subspaces is supported
+  -- on a complex analytic subvariety V of codimension p.
+  
+  -- 4. Constant Integer Multiplicities:
+  -- The closedness of T (∂T = 0) implies that the multiplicity function θ is locally constant
+  -- on the regular part of V. Since multiplicities are integers, they must be positive integers
+  -- on each irreducible component of the support.
+  
+  -- 5. Final Representation:
+  -- Since T is supported on an analytic variety V and has constant integer multiplicities
+  -- on irreducible components V_i, T = ∑ mult_i [V_i].
   sorry
 
 end

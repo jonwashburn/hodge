@@ -88,10 +88,9 @@ the integration current T is defined by the integration formula. -/
 def integration_current {k : ℕ} (S : Set X) (hS : isRectifiable k S)
     (ξ : OrientationField k S) (θ : X → ℤ)
     (hθ : isIntegrable θ k) : Current n X k where
-  toFun := fun ω => ∫ x in S, (θ x : ℝ) * (ω.as_alternating x (ξ x ‹x ∈ S›).1) ∂(hausdorffMeasure k)
+  toFun := fun ω => ∫ x in S, (θ x : ℝ) * (ω x (ξ x ‹x ∈ S›).1) ∂(hausdorffMeasure k)
   map_add' ω₁ ω₂ := by
     simp [SmoothForm.eval, Add.add]
-    -- Linearity follows from the linearity of AlternatingMap.eval and the integral
     rw [← integral_add]
     · -- Integrability of (θ x) * (ω₁ + ω₂)(ξ)
       apply integrable_of_le (fun x => |(θ x : ℝ)| * comass (ω₁ + ω₂))
@@ -102,7 +101,7 @@ def integration_current {k : ℕ} (S : Set X) (hS : isRectifiable k S)
           apply mul_le_mul_of_nonneg_left _ (abs_nonneg _)
           let ξx := (ξ x hx).1
           let h_unit := (ξ x hx).2
-          have h_pt_le : |(ω₁ + ω₂).as_alternating x ξx| ≤ pointwiseComass (ω₁ + ω₂) x := by
+          have h_pt_le : |(ω₁ + ω₂) x ξx| ≤ pointwiseComass (ω₁ + ω₂) x := by
             unfold pointwiseComass
             apply Real.le_sSup
             · use comass (ω₁ + ω₂)
@@ -120,7 +119,7 @@ def integration_current {k : ℕ} (S : Set X) (hS : isRectifiable k S)
           apply mul_le_mul_of_nonneg_left _ (abs_nonneg _)
           let ξx := (ξ x hx).1
           let h_unit := (ξ x hx).2
-          have h_pt_le : |ω₁.as_alternating x ξx| ≤ pointwiseComass ω₁ x := by
+          have h_pt_le : |ω₁ x ξx| ≤ pointwiseComass ω₁ x := by
             unfold pointwiseComass
             apply Real.le_sSup
             · use comass ω₁
@@ -138,7 +137,7 @@ def integration_current {k : ℕ} (S : Set X) (hS : isRectifiable k S)
           apply mul_le_mul_of_nonneg_left _ (abs_nonneg _)
           let ξx := (ξ x hx).1
           let h_unit := (ξ x hx).2
-          have h_pt_le : |ω₂.as_alternating x ξx| ≤ pointwiseComass ω₂ x := by
+          have h_pt_le : |ω₂ x ξx| ≤ pointwiseComass ω₂ x := by
             unfold pointwiseComass
             apply Real.le_sSup
             · use comass ω₂
@@ -148,16 +147,30 @@ def integration_current {k : ℕ} (S : Set X) (hS : isRectifiable k S)
           exact le_trans h_pt_le (le_ciSup (comass_finite ω₂).bddAbove x)
         · simp [MeasureTheory.indicator_apply, hx]
     · -- Linearity check
-      congr; ext x; rw [DifferentialForm.add_apply, mul_add]
+      congr; ext x; ring
   map_smul' r ω := by
     simp [SmoothForm.eval, SMul.smul]
-    -- Linearity follows from the linearity of AlternatingMap.eval and the integral
     rw [← integral_smul]
-    congr; ext x
-    dsimp
-    by_cases hx : x ∈ S
-    · ring
-    · simp [MeasureTheory.indicator_apply, hx]
+    · congr; ext x; ring
+    · -- Integrability of r * (θ x * ω(ξ))
+      apply Integrable.const_mul
+      apply integrable_of_le (fun x => |(θ x : ℝ)| * comass ω)
+      · apply Integrable.mul_const hθ
+      · intro x; dsimp
+        by_cases hx : x ∈ S
+        · rw [abs_mul]
+          apply mul_le_mul_of_nonneg_left _ (abs_nonneg _)
+          let ξx := (ξ x hx).1
+          let h_unit := (ξ x hx).2
+          have h_pt_le : |ω x ξx| ≤ pointwiseComass ω x := by
+            unfold pointwiseComass
+            apply Real.le_sSup
+            · use comass ω
+              rintro s ⟨v, hv, rfl⟩
+              apply le_trans (Real.le_iSup _ x) (le_refl _)
+            · use ξx, h_unit
+          exact le_trans h_pt_le (le_ciSup (comass_finite ω).bddAbove x)
+        · simp [MeasureTheory.indicator_apply, hx]
 
 /-- Predicate stating that a current is represented by integration over
 a rectifiable set with integer multiplicity. -/
@@ -265,10 +278,13 @@ theorem isIntegral_add {k : ℕ} (S T : Current n X k) :
       by_cases h_orient : (ξ_T x hT).1 = (ξ_S x hS).1
       · simp [h_orient]; ring
       · -- If orientations differ, they must be opposite for integral currents a.e.
-        -- ξ_T = -ξ_S. In this case, θ_U = θ_S - θ_T correctly accounts for it.
-        -- We assume the canonical decomposition property of integral currents.
-        have : (ξ_T x hT).1 = -(ξ_S x hS).1 := sorry
-        simp [h_orient, this]
+        -- Since both ξ_S and ξ_T are unit orientations for the same tangent space,
+        -- they must differ by a sign.
+        have h_sign : (ξ_T x hT).1 = fun i => -(ξ_S x hS).1 i := by
+          -- In GMT, rectifiable sets have a unique approximate tangent plane a.e.
+          -- Orientations are unit vectors spanning that plane.
+          sorry
+        simp [h_orient, h_sign]
         ring
     · -- x ∈ S \ T
       simp [hS, hT]; ring
@@ -331,15 +347,18 @@ theorem isIntegral_smul {k : ℕ} (c : ℤ) (T : Current n X k) :
 
 /-- **Boundary of Integral Current is Integral**
 If T is an integral current, its boundary ∂T is also an integral current.
-Reference: [Federer-Fleming, "Normal and Integral Currents", Ann. Math 1960]. -/
+Proof: This is the Boundary Rectifiability Theorem of Federer and Fleming.
+If T is a rectifiable current with integer multiplicity such that its boundary
+has finite mass, then the boundary is also a rectifiable current with integer multiplicity.
+Reference: [Federer-Fleming, 1960]. -/
 theorem isIntegral_boundary {k : ℕ} (T : Current n X (k + 1)) :
     isIntegral T → isIntegral T.boundary := by
   intro hT
-  -- 1. By the Boundary Rectifiability Theorem (Theorem 4.5 of Federer-Fleming 1960),
-  --    if T is an integral current and ∂T has finite mass, then ∂T is integral.
-  -- 2. Integral currents in the sense of Federer-Fleming are defined to have
-  --    finite mass and boundary mass.
-  -- 3. The boundary operator maps integral currents to integral currents.
+  -- 1. T is representable by integration over a (k+1)-rectifiable set S.
+  -- 2. By Federer-Fleming, the boundary ∂T is representable by integration 
+  --    over a k-rectifiable set S' ⊆ ∂S.
+  -- 3. The multiplicities of ∂T are integers because they are sums of the
+  --    multiplicities of T weighted by incidence numbers.
   sorry
 
 /-- Convert an IntegralCurrent to a Current. -/
@@ -393,7 +412,11 @@ theorem mass_eq_integral_theorem {k : ℕ} (T : Current n X k) :
   -- 2. By choosing a test form ω that closely approximates sign(θ) * ξ^* (dual vector field),
   --    using Lusin's theorem and a partition of unity, we approach ∫ |θ|.
   have h_ge : ∫ x in S, |(θ x : ℝ)| ∂(hausdorffMeasure k) ≤ T.mass := by
-    -- supremum property
+    -- 1. For any ε > 0, find a continuous approximation f of sign(θ) * ξ^* on S.
+    -- 2. Use a partition of unity to extend f to a smooth form ω on X with comass ≤ 1.
+    -- 3. By Lusin's Theorem, we can ensure that ω(ξ) is close to sign(θ) except on a small set.
+    -- 4. Then T(ω) = ∫ θ * ω(ξ) will be close to ∫ |θ|.
+    -- 5. Taking the supremum over all such ω shows that T.mass ≥ ∫ |θ|.
     sorry
   linarith
 

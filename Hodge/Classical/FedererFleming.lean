@@ -138,6 +138,13 @@ theorem federer_fleming_compactness {k : ℕ}
     -- A bounded subset of ℤ^N is finite.
     -- By the pigeonhole principle, any sequence in a finite set has a constant subsequence.
     -- A constant subsequence clearly converges in flat norm.
+    let cells := L.cells
+    -- We assume the number of cells is finite for a compact manifold X.
+    have h_finite_cells : Finite cells := sorry
+    -- Representation as ℤ^N
+    let coeff (j : ℕ) : cells → ℤ := sorry
+    have h_coeff_bound : ∀ j c, |coeff j c| * ε_val^k ≤ M_val := sorry
+    -- Sequence in a finite set has a constant subsequence
     sorry
 
   -- 3. Diagonal Argument: Combine discretization and polyhedral compactness.
