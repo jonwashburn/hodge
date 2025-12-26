@@ -55,7 +55,7 @@ lemma exists_uniform_interior_radius (p : ℕ) :
 /-- The Signed Decomposition: For any rational Hodge class γ, there exists a
 rational multiple of the Kähler power ω^p such that γ + N[ω^p] is cone-positive.
 Rigorous proof using the shifting logic into the interior of the cone. -/
-theorem signed_decomposition {p : ℕ} (γ : Form (2 * p)) (h_rational : sorry) :
+theorem signed_decomposition {p : ℕ} (γ : Form (2 * p)) (h_rational : is_rational γ) :
     ∃ (N : ℚ), is_cone_positive (γ + (N : ℝ) • omega_pow p) := by
   -- 1. Let M be the bound for γ.
   obtain ⟨M, hM⟩ := form_is_bounded γ
