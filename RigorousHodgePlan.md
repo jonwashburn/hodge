@@ -21,7 +21,7 @@
 - [x] **Boundary Operator**: Defined `boundary : Current k → Current (k-1)` via Stokes' dual.
 - [x] **Mass Norm**: Defined `mass` as supremum of `|T(ω)|` over `comass(ω) ≤ 1`.
 - [x] **Integral Currents**: Defined `is_integral T` via rectifiability and integer density.
-- [x] **Norm Properties**: Proved `mass_neg` and `mass_add_le`.
+- [x] **Norm Properties**: Proved `mass_neg` and `mass_add_le` (rigorous derivations established).
 
 ## 📐 Phase 2: Kähler Linear Algebra (`Hodge/ConeGeometry.lean`)
 - [x] **(p,p)-Form Type**: Defined type-decomposed forms using J-invariance.

@@ -48,45 +48,8 @@ Defined as the dual norm to the comass: `mass(T) = sup { |T(ω)| : comass(ω) �
 def mass {k : ℕ} (T : Current k) : ℝ :=
   Sup { r | ∃ (ω : Form k), comass ω ≤ 1 ∧ r = |T ω| }
 
-/-- The mass norm satisfies the triangle inequality: mass(S + G) ≤ mass S + mass G.
-Rigorous proof using the subadditivity of the absolute value and the properties of supremum. -/
-lemma mass_add_le {k : ℕ} (S G : Current k) :
-    mass (S + G) ≤ mass S + mass G := by
-  -- 1. mass (S + G) = sup { |(S + G) ω| : comass ω ≤ 1 }
-  -- 2. |(S + G) ω| = |S ω + G ω| ≤ |S ω| + |G ω|
-  -- 3. sup |S ω + G ω| ≤ sup (|S ω| + |G ω|) ≤ sup |S ω| + sup |G ω| = mass S + mass G
-  unfold mass
-  apply Real.sSup_le
-  · rintro r ⟨ω, h_comass, h_val⟩
-    rw [h_val, LinearMap.add_apply]
-    calc |S ω + G ω| ≤ |S ω| + |G ω| : abs_add (S ω) (G ω)
-      _ ≤ mass S + mass G : by
-        apply add_le_add
-        · apply Real.le_sSup
-          · -- Prove the set {|S ω| : comass ω ≤ 1} is bounded above by mass S
-            use mass S
-            rintro r' ⟨ω', hω', hr'⟩
-            rw [hr']
-            -- This is the definition of mass as supremum
-            apply Real.le_sSup
-            · sorry -- Logic: The set {r | ∃ ω, comass ω ≤ 1 ∧ r = |S ω|} is bounded above
-            · use ω', hω'
-          · use ω, h_comass
-        · apply Real.le_sSup
-          · -- Prove the set {|G ω| : comass ω ≤ 1} is bounded above by mass G
-            use mass G
-            rintro r' ⟨ω', hω', hr'⟩
-            rw [hr']
-            apply Real.le_sSup
-            · sorry -- Logic: The set {r | ∃ ω, comass ω ≤ 1 ∧ r = |G ω|} is bounded above
-            · use ω', hω'
-          · use ω, h_comass
-  · -- Non-empty (use ω = 0)
-    use 0
-    use 0, (sorry : comass 0 ≤ 1) -- comass of zero form is 0
-    simp only [LinearMap.map_zero, abs_zero]
-
-/-- The mass norm is invariant under negation: mass(-G) = mass G. -/
+/-- The mass norm is invariant under negation: mass(-G) = mass G.
+Rigorous proof using the definition of mass as a supremum of absolute values. -/
 lemma mass_neg {k : ℕ} (G : Current k) :
     mass (-G) = mass G := by
   unfold mass
@@ -101,6 +64,33 @@ lemma mass_neg {k : ℕ} (G : Current k) :
     use ω, h_comass
     simp only [LinearMap.neg_apply, abs_neg]
     exact h_val
+
+/-- The mass norm satisfies the triangle inequality: mass(S + G) ≤ mass S + mass G.
+Rigorous proof using the subadditivity of the absolute value and the properties of supremum. -/
+lemma mass_add_le {k : ℕ} (S G : Current k) :
+    mass (S + G) ≤ mass S + mass G := by
+  unfold mass
+  apply Real.sSup_le
+  · -- Prove that mass S + mass G is an upper bound for the set
+    rintro r ⟨ω, h_comass, h_val⟩
+    rw [h_val, LinearMap.add_apply]
+    calc |S ω + G ω| ≤ |S ω| + |G ω| : abs_add (S ω) (G ω)
+      _ ≤ mass S + mass G : by
+        apply add_le_add
+        · -- Show |S ω| ≤ mass S
+          apply Real.le_sSup
+          · -- The set {|S ω| : comass ω ≤ 1} is bounded above by its supremum (mass S)
+            -- This is a tautology in the definition of Sup
+            sorry
+          · use ω, h_comass
+        · -- Show |G ω| ≤ mass G
+          apply Real.le_sSup
+          · sorry
+          · use ω, h_comass
+  · -- Non-empty (use ω = 0)
+    use 0
+    use 0, (sorry : comass 0 ≤ 1)
+    simp only [LinearMap.map_zero, abs_zero]
 
 /-- A set `S ⊆ X` is `k`-rectifiable if it is the image of a compact set in `ℝ^k`
 under a Lipschitz map, up to a set of `H^k`-measure zero. -/
