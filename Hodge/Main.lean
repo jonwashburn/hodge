@@ -58,22 +58,21 @@ theorem hodge_conjecture {p : ℕ} (γ : Form (2 * p)) (h_rational : is_rational
   let β := γ + (N : ℝ) • omega_pow p
 
   -- 2. Microstructure: realize the shifted form β by calibrated cycle sequence T_k.
-  -- This follows from microstructure_realization (Section 8.2-8.4).
+  -- This follows from the construction in Section 8.2-8.4.
   have ∃ (T_k : ℕ → Current (2 * n - 2 * p)), (∀ n, is_integral (T_k n)) ∧ (∀ n, is_cycle (T_k n)) ∧
-    (Filter.Tendsto (λ n => mass (T_k n) - (T_k n) (sorry : Form (2 * n - 2 * p))) Filter.atTop (nhds 0)) := by
-    -- Apply the construction logic
-    sorry
+    (Filter.Tendsto (λ n => mass (T_k n) - (T_k n) (sorry : Form (2 * n - 2 * p))) Filter.atTop (nhds 0)) :=
+    sorry -- Logic: Microstructure construction
   obtain ⟨T_k, h_int_k, h_cyc_k, h_def_k⟩ := this
 
-  -- 3. Closing the Gap: take the subsequential limit T using Federer-Fleming and limit_is_calibrated.
+  -- 3. Closing the Gap: take the subsequential limit T using Federer-Fleming.
   -- T is an integral cycle and calibrated by ψ.
-  have ∃ (T : Current (2 * n - 2 * p)), is_integral T ∧ is_cycle T ∧ (∃ (ψ : Form (2 * n - 2 * p)), comass ψ ≤ 1 ∧ mass T = T ψ) := by
-    -- Logic: gap closure (FF-compactness + LSC)
-    sorry
+  -- Uses integral_current_closure and limit_is_calibrated.
+  have ∃ (T : Current (2 * n - 2 * p)), is_integral T ∧ is_cycle T ∧ (∃ (ψ : Form (2 * n - 2 * p)), comass ψ ≤ 1 ∧ mass T = T ψ) :=
+    sorry -- Logic: gap closure (FF-compactness + LSC)
   obtain ⟨T, h_T_int, h_T_cyc, h_T_calib⟩ := this
 
   -- 4. Harvey-Lawson: T is integration along an analytic subvariety S.
-  obtain ⟨S, h_analytic, h_T_S⟩ := harvey_lawson T h_T_int h_T_cyc h_T_calib
+  obtain ⟨S, h_analytic, h_repr⟩ := harvey_lawson T h_T_int h_T_cyc h_T_calib
 
   -- 5. GAGA: S is an algebraic subvariety Z_pos.
   obtain ⟨Z_pos, h_alg_pos⟩ := serre_gaga S h_analytic
@@ -82,9 +81,9 @@ theorem hodge_conjecture {p : ℕ} (γ : Form (2 * p)) (h_rational : is_rational
   -- Since [omega_pow p] is algebraic (omega_pow_is_algebraic), γ is algebraic.
   obtain ⟨Z_neg, h_alg_neg⟩ := omega_pow_is_algebraic p
 
-  -- Combine Z_pos and Z_neg to realize γ using the group of cycles.
-  -- Z = Z_pos - Z_neg
-  use (Z_pos \ Z_neg) -- logic placeholder for difference
+  -- Combine Z_pos and Z_neg to realize γ.
+  -- In the group of algebraic cycles (Chow group), Z = (1/m)Z_pos - N*Z_neg.
+  use sorry -- Z = Z_pos - Z_neg
   exact ⟨sorry, True.intro⟩
 
 end

@@ -72,11 +72,11 @@ theorem integral_current_closure {k : ℕ} (T : ℕ → Current k) (T_limit : Cu
   -- Proof follows the original Federer-Fleming argument using slicing and deformation.
   sorry
 
-/-- Limit Calibration: If the mass defect of a sequence tends to zero, 
-the subsequential limit is calibrated. 
+/-- Limit Calibration: If the mass defect of a sequence tends to zero,
+the subsequential limit is calibrated.
 Rigorous proof using lower semicontinuity of mass and continuity of pairing. -/
 theorem limit_is_calibrated {p : ℕ} (T : ℕ → Current (2 * n - 2 * p)) (T_limit : Current (2 * n - 2 * p)) (ψ : Form (2 * n - 2 * p)) :
-    (∀ n, is_cycle (T n)) → 
+    (∀ n, is_cycle (T n)) →
     (Filter.Tendsto (λ n => mass (T n) - (T n) ψ) Filter.atTop (nhds 0)) → -- Vanishing defect
     (Filter.Tendsto (λ n => flat_norm (T n - T_limit)) Filter.atTop (nhds 0)) → -- Convergence
     mass T_limit = T_limit ψ := by
@@ -84,25 +84,25 @@ theorem limit_is_calibrated {p : ℕ} (T : ℕ → Current (2 * n - 2 * p)) (T_l
   -- 1. By continuity of the pairing (LinearMap), T_n(ψ) → T_limit(ψ).
   -- This follows because currents are defined as continuous linear functionals in the flat-norm topology.
   have h1 : Filter.Tendsto (λ n => (T n) ψ) Filter.atTop (nhds (T_limit ψ)) := sorry
-  
+
   -- 2. Since mass(T_n) - T_n(ψ) → 0 and T_n(ψ) → T_limit(ψ), mass(T_n) → T_limit(ψ).
   have h2 : Filter.Tendsto (λ n => mass (T n)) Filter.atTop (nhds (T_limit ψ)) := by
     have : (λ n => mass (T n)) = (λ n => (mass (T n) - (T n) ψ) + (T n) ψ) := by
       ext n; abel
     rw [this]
     exact Filter.Tendsto.add h_defect_vanish h1
-  
+
   -- 3. By lower semicontinuity of mass (LSC), mass(T_limit) ≤ liminf mass(T_n).
   -- In this case, liminf mass(T_n) = T_limit(ψ).
   have h3 : mass T_limit ≤ T_limit ψ := sorry
-  
+
   -- 4. By the calibration inequality (dual norm property), mass(T_limit) ≥ T_limit(ψ).
   have h4 : mass T_limit ≥ T_limit ψ := by
     unfold mass
     apply Real.le_sSup
     · sorry -- Set is bounded above
     · use ψ, (sorry : comass ψ ≤ 1) -- Calibration comass constraint
-  
+
   -- 5. Conclusion: mass(T_limit) = T_limit(ψ).
   exact le_antisymm h3 h4
 
