@@ -1,16 +1,3 @@
-/-!
-# Track B.7: Calibrated Grassmannian
-
-This file defines the calibrated Grassmannian G_p(x) and the calibrated cone
-in the space of forms, as described in Section 3 of the manuscript.
-
-## Contents
-- Calibrated Grassmannian G_p(x) (complex p-planes)
-- Normalized calibrated simple forms
-- Calibrated cone C_x
-- Pointwise distance to the cone
--/
-
 import Hodge.Analytic.Norms
 
 noncomputable section
@@ -31,7 +18,12 @@ It satisfies φ_V(v₁, Jv₁, ..., v_p, Jv_p) = 1 for any orthonormal basis.
 Reference: Section 3 of the manuscript. -/
 def simpleCalibratedForm (p : ℕ) (x : X) (V : Submodule Complex (TangentSpace 𝓒(Complex, n) x)) :
     SmoothForm n X (2 * p) :=
-  sorry
+  fun x' =>
+    if h : x' = x then
+      -- The volume form of the oriented subspace V.
+      -- Characterized by its action on an orthonormal basis.
+      sorry -- defined via the exterior power of the projection to V
+    else 0
 
 /-- The set of all simple calibrated (p,p)-forms at a point x. -/
 def simpleCalibratedForms (p : ℕ) (x : X) : Set (SmoothForm n X (2 * p)) :=

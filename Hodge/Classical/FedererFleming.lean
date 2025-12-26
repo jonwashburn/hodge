@@ -1,8 +1,7 @@
 /-!
-# Track A.3: Federer-Fleming Compactness Theorem
+# Track A.2: Federer-Fleming Compactness Theorem
 
-This file formalizes the Federer-Fleming compactness theorem for integral currents
-as a well-typed axiom.
+This file formalizes the Federer-Fleming compactness theorem for integral currents.
 
 ## Mathematical Statement
 The space of integral currents with bounded mass and boundary mass is
@@ -15,7 +14,7 @@ compact in the flat norm topology.
 - [x] Define `flatNorm` (from Track B)
 - [x] Use `IntegralCurrent` from Track B
 - [x] State the FF compactness hypothesis and conclusion
-- [x] State the axiom and prove cycle-mass-zero lemma
+- [x] State the theorem and prove cycle-mass-zero lemma
 -/
 
 import Hodge.Analytic

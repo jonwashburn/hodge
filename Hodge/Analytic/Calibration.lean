@@ -41,6 +41,20 @@ structure CalibratingForm (k : ℕ) where
   /-- The comass is at most 1 -/
   comass_le_one : comass form ≤ 1
 
+/-- **Definition: Kähler Calibration**
+The p-th power of the Kähler form (normalized) is a calibrating form.
+Reference: [Harvey-Lawson, 1982]. -/
+def KählerCalibration (k : ℕ) [K : KahlerManifold n X] : CalibratingForm k where
+  form := match k % 2 with
+    | 0 => (1 / Nat.factorial (k / 2) : ℝ) • (omegaPow (k / 2))
+    | _ => 0 -- Only even degrees are calibrated by Kähler powers
+  is_closed := by
+    -- ω^p is closed because ω is closed.
+    sorry
+  comass_le_one := by
+    -- Wirtinger's inequality: comass(ω^p / p!) = 1.
+    sorry
+
 /-! ## Calibrated Currents -/
 
 /-- A current T is calibrated by ψ if mass(T) = T(ψ).
