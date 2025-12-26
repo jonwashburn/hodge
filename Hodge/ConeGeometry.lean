@@ -83,19 +83,11 @@ def caratheodory_decomposition {p : ℕ} (x : X) (β : MultilinearMap ℝ (λ _ 
   obtain ⟨s, h_sub, h_conv⟩ := h
   -- s is a Finset of generators. Let N be its cardinality.
   let N := s.card
-  -- We now map the Finset 's' to 'Fin N' using equivFin
+  -- We now map the Finset 's' to 'Fin N' using the equivalence between finsets and Fin cards.
   let f := s.equivFin.symm
   use N
-  use (λ i => sorry) -- Logic: coefficients from h_conv
-  use (λ i => f i)
-  constructor
-  · sorry -- θ_i ≥ 0
-  · constructor
-    · sorry -- ∑ θ_i = 1
-    · constructor
-      · intro i
-        apply h_sub
-        exact (f i).2
-      · sorry -- β = ∑ θ_i ξ_i
+  -- The coefficients θ_i are extracted from the convex combination h_conv.
+  -- The generators ξ_i are the elements of the Finset.
+  sorry
 
 end
