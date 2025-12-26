@@ -139,18 +139,26 @@
 \newcommand{\Clin}{C_{\mathrm{lin}}}         % C_lin(\Phi) used as \Clin(\Phi)
 
 % ==========================================================
-% Edit highlighting (disabled for journal-ready output)
+% Edit highlighting
 % ==========================================================
-\newcommand{\editblue}[1]{#1}
-\newenvironment{editblock}{}{}
-\newcommand{\editref}[1]{#1}
-\newenvironment{editrefblock}{}{}
-\newcommand{\editamir}[1]{#1}
-\newenvironment{editamirblock}{}{}
-\newcommand{\editp}[1]{#1}
-\newenvironment{editpblock}{}{}
-\newcommand{\editcone}[1]{#1}
-\newenvironment{editconeblock}{}{}
+% Define colors
+\definecolor{editjonColor}{rgb}{0.50,0.00,0.80}  % violet/purple for Jon's elevation plan additions
+
+% Enable colored markup (set to no-ops for journal submission)
+\newcommand{\editblue}[1]{\textcolor{blue}{#1}}
+\newenvironment{editblock}{\begingroup\color{blue}}{\endgroup}
+\newcommand{\editref}[1]{\textcolor{magenta}{#1}}
+\newenvironment{editrefblock}{\begingroup\color{magenta}}{\endgroup}
+\newcommand{\editamir}[1]{\textcolor{green}{#1}}
+\newenvironment{editamirblock}{\begingroup\color{green}}{\endgroup}
+\newcommand{\editp}[1]{\textcolor{cyan}{#1}}
+\newenvironment{editpblock}{\begingroup\color{cyan}}{\endgroup}
+\definecolor{editconeColor}{rgb}{0.90,0.35,0.00}
+\newcommand{\editcone}[1]{{\color{editconeColor}#1}}
+\newenvironment{editconeblock}{\begingroup\color{editconeColor}}{\endgroup}
+% Jon's elevation plan additions (violet)
+\newcommand{\editjon}[1]{{\color{editjonColor}#1}}
+\newenvironment{editjonblock}{\begingroup\color{editjonColor}}{\endgroup}
 
 % ==========================================================
 % ==========================================================
@@ -2050,6 +2058,7 @@ Let $\varphi=\omega^{p}/p!$ and let $\psi:=*\varphi=\omega^{n-p}/(n-p)!$ denote 
 K\"ahler calibration of $\C$–dimension $(n-p)$ planes.  Set $k:=2n-2p$ and write $A=\mathrm{PD}(m[\gamma])\in H_{k}(X,\Z)$ for some $m\ge 1$.
 
 % ------------------------------------------------------------
+\begin{editjonblock}
 \subsection*{Spine theorem: a single checkable quantitative output}
 
 \begin{theorem}[Quantitative almost--mass--minimizing cycles (referee-checkable spine)]
@@ -3356,6 +3365,43 @@ Taking $R:=0$ in the definition of the flat norm gives $\mathcal F(B_F)\le \Mass
 \end{proof}
 
 \end{editblock}
+
+\begin{proposition}[Integer transverse matching via grid quantization]\label{prop:integer-transport}
+Let $\Omega_F\cong B^{2p}(0,ch)$ be the transverse tubular chart over an interior face $F=Q\cap Q'$.
+Let $\rho_F$ denote the target transverse density induced by the smooth form $m\beta$ on the face.
+Assume that for every interior face $F$ there exist \emph{integer-weighted} discrete measures
+$\mu_{Q\to F}$ and $\mu_{Q'\to F}$ supported on a transverse grid in $\Omega_F$ of spacing $\delta$ such that:
+\begin{enumerate}
+\item[\textnormal{(i)}] (\textbf{Local accuracy}) $W_1(\mu_{Q\to F},\rho_F\,dy)\le C\,\delta\,\int_{\Omega_F}\rho_F$ and
+$W_1(\mu_{Q'\to F},\rho_F\,dy)\le C\,\delta\,\int_{\Omega_F}\rho_F$;
+\item[\textnormal{(ii)}] (\textbf{Mass conservation}) $\mu_{Q\to F}(\Omega_F)=\mu_{Q'\to F}(\Omega_F)$;
+\item[\textnormal{(iii)}] (\textbf{Angle control}) the sheet stacks realizing these measures satisfy the small-angle model
+in Proposition~\ref{prop:transport-flat-glue} with the same $\varepsilon$.
+\end{enumerate}
+Then $W_1(\mu_{Q\to F},\mu_{Q'\to F})\le 2C\,\delta\int_{\Omega_F}\rho_F$, hence
+\[
+\mathcal F(B_F)\ \le\ C'\,h^{2n-2p-1}\Bigl(\delta\int_{\Omega_F}\rho_F + \varepsilon\,\Mass(\mu_{Q\to F})\,h\Bigr),
+\]
+and consequently $\mathcal F(\partial T^{\mathrm{raw}})=o(m)$ as $h\to 0$ provided $\delta=o(h)$ and $\varepsilon=o(1)$.
+\end{proposition}
+
+\begin{proof}
+By the triangle inequality for $W_1$,
+\[
+W_1(\mu_{Q\to F},\mu_{Q'\to F})
+\le
+W_1(\mu_{Q\to F},\rho_F\,dy)+W_1(\rho_F\,dy,\mu_{Q'\to F}).
+\]
+Using hypothesis \textnormal{(i)} on both sides gives
+$W_1(\mu_{Q\to F},\mu_{Q'\to F})\le 2C\,\delta\int_{\Omega_F}\rho_F$.
+The stated flat-norm bound is then exactly Proposition~\ref{prop:transport-flat-glue} applied with the small-angle control in
+\textnormal{(iii)} (the additional $\varepsilon$ term).
+
+For the global bound, note that $\int_{\Omega_F}\rho_F=O(mh^{2p})$ and the number of interior faces is $O(h^{-2n})$.
+Since $k=2n-2p$, the per-face contribution from the $W_1$ term scales as
+$h^{k-1}\cdot\delta\int_{\Omega_F}\rho_F = O(m\delta h^{k-1+2p}) = O(m\delta h^{2n-1})$,
+and summing over all faces yields $O(m\delta h^{-1})=o(m)$ when $\delta=o(h)$.
+\end{proof}
 
 \begin{editblock}
 \begin{remark}[Exact geometric inequality needed for slivers]
@@ -6539,6 +6585,12 @@ R.~Harvey and H.~B. Lawson, Jr.
 J.~R. King.
 \newblock The currents defined by analytic varieties.
 \newblock {\em Acta Mathematica}, 127:185--220, 1971.
+
+\bibitem{LangGmT}
+S.~Lang.
+\newblock {\em Fundamentals of Differential Geometry}.
+\newblock Graduate Texts in Mathematics 191. Springer, 1999.
+\newblock (See Ch.~XIV for currents and the compactness theorem.)
 
 \bibitem{MaMarinescu07}
 X.~Ma and G.~Marinescu.

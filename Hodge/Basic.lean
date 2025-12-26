@@ -26,7 +26,9 @@ class KahlerStructure (n : ℕ) (X : Type*)
   [ProjectiveComplexManifold n X] where
   omega : (x : X) → (TangentSpace 𝓒(Complex, n) x) →ₗ[ℝ] (TangentSpace 𝓒(Complex, n) x) →ₗ[ℝ] ℝ
   is_closed : Prop -- dω = 0
-  is_positive : Prop -- ω(v, Jv) > 0
+  is_positive : ∀ x (v : TangentSpace 𝓒(Complex, n) x), v ≠ 0 → omega x v (I • v) > 0
+  is_j_invariant : ∀ x (u v : TangentSpace 𝓒(Complex, n) x), omega x (I • u) (I • v) = omega x u v
+  is_skew : ∀ x (u v : TangentSpace 𝓒(Complex, n) x), omega x u v = -omega x v u
 
 /-- A property stating that a form represents a rational cohomology class. -/
 def is_rational {k : ℕ} {X : Type*}
