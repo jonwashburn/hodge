@@ -120,21 +120,39 @@ theorem d_wedge {n : ℕ} {X : Type*} {k l : ℕ}
     extDeriv (wedge ω η) = wedge (extDeriv ω) η + (-1 : ℤ) ^ k • wedge ω (extDeriv η) := by
   sorry -- Needs Mathlib's Leibniz rule
 
-/-- The Hodge star operator * : Ω^k → Ω^{2n-k}.
-This depends on the Kähler metric g.
-α ∧ *β = ⟨α, β⟩ dvol -/
-def hodgeStar {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace Complex (Fin n)) X]
-    [SmoothManifoldWithCorners 𝓒(Complex, n) X]
-    (ω : SmoothForm n X k) : SmoothForm n X (2 * n - k) :=
-  sorry -- Needs Riemannian metric instance from the Kähler structure
-
 /-- The volume form dvol = ω^n / n!. -/
 def volumeForm {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace Complex (Fin n)) X]
-    [SmoothManifoldWithCorners 𝓒(Complex, n) X]
-    [K : KahlerStructure n X] : SmoothForm n X (2 * n) :=
-  -- This would be (K.omega ^ n) / n!
+    [ProjectiveComplexManifold n X] [K : KahlerStructure n X] : SmoothForm n X (2 * n) :=
+  -- This is (1 / n!) * ω^n
+  (1 / Nat.factorial n : ℝ) • (omegaPow' n)
+
+/-- The pointwise inner product on k-forms at x.
+This is induced by the Kähler metric g on T*X. -/
+def pointwiseInner {k : ℕ} {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace Complex (Fin n)) X]
+    [ProjectiveComplexManifold n X] [KahlerStructure n X]
+    (α β : SmoothForm n X k) (x : X) : ℝ :=
+  -- This is the inner product on the k-th exterior power of the cotangent space
+  sorry
+
+/-- The Hodge star operator * : Ω^k → Ω^{2n-k}.
+Defined by α ∧ *β = ⟨α, β⟩ dvol. -/
+def hodgeStar {n : ℕ} {X : Type*} {k : ℕ}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace Complex (Fin n)) X]
+    [ProjectiveComplexManifold n X] [K : KahlerStructure n X]
+    (ω : SmoothForm n X k) : SmoothForm n X (2 * n - k) :=
+  -- Characterized by: ∀ η : SmoothForm n X k, η ∧ hodgeStar ω = (pointwiseInner η ω) • volumeForm
+  sorry
+
+/-- The formal adjoint of d: d* : Ω^k → Ω^{k-1}.
+d* = -* d * -/
+def adjointDeriv {n : ℕ} {X : Type*} {k : ℕ}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace Complex (Fin n)) X]
+    [ProjectiveComplexManifold n X] [K : KahlerStructure n X]
+    (ω : SmoothForm n X k) : SmoothForm n X (k - 1) :=
+  let n2 := 2 * n
+  -- This operator is defined using the Hodge star
   sorry
 
 end
