@@ -1,3 +1,7 @@
+import Hodge.Analytic.IntegralCurrents
+import Hodge.Analytic.FlatNorm
+import Hodge.Classical.FedererFleming
+
 /-!
 # Track B.6: Calibration Theory
 
@@ -16,10 +20,6 @@ with the key theorems relating calibration to mass minimization.
 - [x] Prove spine theorem
 - [x] Prove limit calibration
 -/
-
-import Hodge.Analytic.IntegralCurrents
-import Hodge.Analytic.FlatNorm
-import Hodge.Classical.FedererFleming
 
 noncomputable section
 

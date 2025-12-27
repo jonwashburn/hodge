@@ -103,15 +103,16 @@ def jetSkyscraperSheaf (x_point : X) (k : ℕ) : CoherentSheaf n X where
     (Continuous.of_discreteTopology (f := fun _ => x_point))
   is_locally_presented := sorry
 
-/-- **Theorem: Jet Surjectivity** -/
+/-- **Theorem: Jet Surjectivity**
+For an ample line bundle L, there exists M₀ such that for all M ≥ M₀,
+the k-jet evaluation map from H^0(X, L^M) to k-jets at any point x is surjective.
+This follows from Serre vanishing applied to the ideal sheaf m_x^{k+1}. -/
 theorem jet_surjectivity_from_serre (L : HolomorphicLineBundle n X) [IsAmple L]
     (x : X) (k : ℕ) :
-    ∃ M₀ : ℕ, ∀ M ≥ M₀, Function.Surjective (jet_eval (L := L.power M) x k) := by
+    ∃ M₀ : ℕ, ∀ M ≥ M₀, ∀ (target : Fin (Nat.choose (n + k) k) → ℂ),
+      ∃ (s : HolomorphicSection (L.power M)), jet_eval x k s = target := by
   -- 1. For large M, H^1(X, L^M ⊗ m_x^{k+1}) = 0 by Serre Vanishing.
-  obtain ⟨M₀, hM₀⟩ := serre_vanishing L (idealSheaf x k) 1 (by linarith)
-  use M₀
-  intro M hM
-  have h_vanish : isZero (SheafCohomology (tensorWithSheaf (L.power M) (idealSheaf x k)) 1) := hM₀ M hM
-
-  -- 2. Long exact sequence argument as in manuscript Section 8.
+  -- 2. Long exact sequence: 0 → m_x^{k+1} → O → O/m_x^{k+1} → 0
+  -- 3. Tensoring with L^M gives exact sequence on global sections.
+  -- 4. When H^1 vanishes, the jet map is surjective.
   sorry

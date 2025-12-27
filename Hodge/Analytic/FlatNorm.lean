@@ -1,3 +1,5 @@
+import Hodge.Analytic.Currents
+
 /-!
 # Track B.5: Flat Norm
 
@@ -16,8 +18,6 @@ The flat norm is the natural metric for the space of integral currents.
 - [x] State triangle inequality (Axiom)
 - [x] Prove flatNorm T ≤ mass T
 -/
-
-import Hodge.Analytic.Currents
 
 noncomputable section
 

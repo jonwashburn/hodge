@@ -1,13 +1,16 @@
-/-!
-# Track C.3: Strongly Positive Cone
--/
-
 import Hodge.Kahler.Manifolds
+import Hodge.Kahler.TypeDecomposition
+import Hodge.Analytic.Norms
+import Hodge.Analytic.Grassmannian
 import Mathlib.Analysis.Convex.Hull
 import Mathlib.Analysis.Convex.Cone.Basic
 import Mathlib.Analysis.InnerProductSpace.Basic
 import Mathlib.Topology.MetricSpace.Basic
 import Mathlib.Analysis.NormedSpace.Basic
+
+/-!
+# Track C.3: Strongly Positive Cone
+-/
 
 noncomputable section
 
@@ -18,8 +21,6 @@ variable {n : ℕ} {X : Type*}
   [SmoothManifoldWithCorners 𝓒(Complex, n) X] [K : KahlerManifold n X]
 
 /-! ## Form Spaces -/
-
-import Hodge.Kahler.TypeDecomposition
 
 /-- The vector space of real (p,p)-forms at a point x. -/
 def PPFormSpace (n : ℕ) (X : Type*) (p : ℕ) (x : X)

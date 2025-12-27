@@ -1,9 +1,9 @@
+import Hodge.Kahler.Manifolds
+import Hodge.Analytic.Forms
+
 /-!
 # Track C.2: Type Decomposition
 -/
-
-import Hodge.Kahler.Manifolds
-import Hodge.Analytic.Forms
 
 noncomputable section
 

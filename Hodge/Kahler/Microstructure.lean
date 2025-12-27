@@ -1,11 +1,11 @@
-/-!
-# Track C.5: Microstructure Construction
--/
-
 import Hodge.Kahler.Cone
 import Hodge.Classical.Bergman
 import Hodge.Classical.SerreVanishing
 import Mathlib.Combinatorics.SimpleGraph.Basic
+
+/-!
+# Track C.5: Microstructure Construction
+-/
 
 noncomputable section
 
