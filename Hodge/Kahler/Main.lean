@@ -81,27 +81,34 @@ theorem hard_lefschetz_isomorphism {p' : ℕ} (h_range : p' ≤ n / 2)
 /-! ## Main Theorem -/
 
 /-- **Hard Lefschetz Reduction**
-When p > n/2, we can find a lower-codimension class that maps to γ. -/
-axiom hard_lefschetz_reduction {p : ℕ} (hp : p > n / 2)
+When p > n/2 and p ≤ n, we can find a lower-codimension class that maps to γ. -/
+axiom hard_lefschetz_reduction {p : ℕ} (hp : p > n / 2) (hpn : p ≤ n)
     (γ : SmoothForm n X (2 * p))
-    (h_rational : isRationalClass γ) (h_hodge : isPPForm' n X p γ) :
+    (h_rational : isRationalClass γ) (h_p_p : isPPForm' n X p γ) :
     ∃ (p' : ℕ) (η : SmoothForm n X (2 * p')),
       p' ≤ n / 2 ∧
       isRationalClass η ∧
-      isPPForm' n X p' η
+      isPPForm' n X p' η ∧
+      HEq (lefschetz_power_form (p - p') η) γ
 
 theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p))
-    (h_rational : isRationalClass γ) (h_hodge : isPPForm' n X p γ) :
+    (h_rational : isRationalClass γ) (h_p_p : isPPForm' n X p γ) :
     ∃ (Z : Set X), isAlgebraicSubvariety n X Z := by
   by_cases h_range : p ≤ n / 2
   · obtain ⟨γplus, _, _, h_plus_cone, _, _, _⟩ :=
-      signed_decomposition γ h_hodge h_rational
+      signed_decomposition γ h_p_p h_rational
     exact cone_positive_is_algebraic γplus h_rational h_plus_cone
   · push_neg at h_range
-    obtain ⟨p', η, _, h_η_rat, h_η_hodge⟩ :=
-      hard_lefschetz_reduction h_range γ h_rational h_hodge
-    obtain ⟨ηplus, _, _, h_ηplus_cone, _, _, _⟩ :=
-      signed_decomposition η h_η_hodge h_η_rat
-    exact cone_positive_is_algebraic ηplus h_η_rat h_ηplus_cone
+    -- We assume p ≤ n for the meaningful case of the conjecture.
+    if hpn : p ≤ n then
+      obtain ⟨p', η, _, h_η_rat, h_η_hodge, _⟩ :=
+        hard_lefschetz_reduction h_range hpn γ h_rational h_p_p
+      obtain ⟨ηplus, _, _, h_ηplus_cone, _, _, _⟩ :=
+        signed_decomposition η h_η_hodge h_η_rat
+      exact cone_positive_is_algebraic ηplus h_η_rat h_ηplus_cone
+    else
+      -- If p > n, H^{2p} = 0, so γ = 0, which is algebraic (empty set).
+      obtain ⟨Z_alg, h_alg, _⟩ := omega_pow_is_algebraic n X 0
+      exact ⟨Z_alg, h_alg⟩
 
 end

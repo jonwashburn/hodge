@@ -73,12 +73,22 @@ def divergence {h : ℝ} {C : Cubulation n X h} (f : Flow C) (Q : C.cubes) : ℝ
 
 /-- **Theorem: Integer Transport Theorem**
 Given a real-valued flow on the dual graph of a cubulation, we can construct
-an integer-valued flow. This construction uses rounding of the real flow values.
+an integer-valued flow that approximates it. This construction uses rounding 
+of the real flow values.
+
+Paper reference: Uses Bárány-Grinberg rounding (Proposition 7.Z / Lemma lem:barany-grinberg).
+In the discrete case, rounding to the nearest integer provides a direct estimate.
 Reference: [Federer-Fleming, 1960, Section 7] -/
 theorem integer_transport (_p : ℕ) {h : ℝ} (C : Cubulation n X h) (target : Flow C) :
-    ∃ (int_flow : DirectedEdge C → ℤ), True :=
-  -- Existence established via rounding the real flow values to the nearest integer.
-  ⟨fun e => Int.floor (target e), trivial⟩
+    ∃ (int_flow : DirectedEdge C → ℤ), ∀ e, |(int_flow e : ℝ) - target e| < 1 := by
+  use fun e => Int.floor (target e)
+  intro e
+  have h1 : (Int.floor (target e) : ℝ) ≤ target e := Int.floor_le (target e)
+  have h2 : target e < (Int.floor (target e) : ℝ) + 1 := Int.lt_floor_add_one (target e)
+  rw [abs_lt]
+  constructor
+  · linarith
+  · linarith
 
 /-! ## Microstructure Gluing -/
 

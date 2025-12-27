@@ -201,12 +201,12 @@ theorem isAlgebraicSubvariety_intersection_power (n : ℕ) (X : Type*)
 
 /-! ## Fundamental Class and Lefschetz -/
 
-/-- **Axiom: Fundamental Class of Intersection** -/
-axiom FundamentalClassSet_intersection_power_eq {n : ℕ} {X : Type*}
+/-- **Axiom: Fundamental Class Set and Intersection Power** -/
+axiom FundamentalClassSet_intersection_power_eq (p k : ℕ) {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X]
-    {p k : ℕ} (Z : Set X) (hZ : isAlgebraicSubvariety n X Z) :
+    (Z : Set X) (hZ : isAlgebraicSubvariety n X Z) :
     FundamentalClassSet n X (p + k) (algebraic_intersection_power n X Z k) =
     (show SmoothForm n X (2 * p + 2 * k) = SmoothForm n X (2 * (p + k)) from by ring_nf) ▸
     lefschetz_power_form k (FundamentalClassSet n X p Z)

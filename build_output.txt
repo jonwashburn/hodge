@@ -1,0 +1,317 @@
+⚠ [2458/2721] Replayed Hodge.Basic
+warning: Hodge/Basic.lean:68:36: This simp argument is unused:
+  zero_smul
+
+Hint: Omit it from the simp argument list.
+  simp ̵[̵z̵e̵r̵o̵_̵s̵m̵u̵l̵]̵
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Basic.lean:72:69: This simp argument is unused:
+  Int.natCast_succ
+
+Hint: Omit it from the simp argument list.
+  simp [add_smul, one_smul, add_comm,̵ ̵I̵n̵t̵.̵n̵a̵t̵C̵a̵s̵t̵_̵s̵u̵c̵c̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Basic.lean:84:4: declaration uses 'sorry'
+warning: Hodge/Basic.lean:102:4: declaration uses 'sorry'
+warning: Hodge/Basic.lean:108:4: declaration uses 'sorry'
+⚠ [2459/2721] Replayed Hodge.Analytic.Forms
+warning: Hodge/Analytic/Forms.lean:64:28: unused variable `ω`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Hodge/Analytic/Forms.lean:77:0: automatically included section variable(s) unused in theorem `d_squared_zero`:
+  [IsManifold (𝓒_complex n) ⊤ X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [IsManifold (𝓒_complex n) ⊤ X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/Forms.lean:106:0: automatically included section variable(s) unused in theorem `hodgeStar_add`:
+  [IsManifold (𝓒_complex n) ⊤ X]
+  [ProjectiveComplexManifold n X]
+  K
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/Forms.lean:112:0: automatically included section variable(s) unused in theorem `hodgeStar_smul`:
+  [IsManifold (𝓒_complex n) ⊤ X]
+  [ProjectiveComplexManifold n X]
+  K
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+⚠ [2564/2721] Replayed Hodge.Analytic.IntegralCurrents
+warning: Hodge/Analytic/IntegralCurrents.lean:26:19: unused variable `k`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Hodge/Analytic/IntegralCurrents.lean:26:27: unused variable `S`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Hodge/Analytic/IntegralCurrents.lean:31:0: automatically included section variable(s) unused in theorem `rectifiable_hausdorff_dim`:
+  [TopologicalSpace X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [TopologicalSpace X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/IntegralCurrents.lean:39:24: unused variable `T`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+⚠ [2566/2721] Replayed Hodge.Analytic.Norms
+warning: Hodge/Analytic/Norms.lean:4:7: 'Mathlib.Analysis.InnerProductSpace.Projection' has been deprecated: please replace this import by
+
+import Mathlib.Analysis.InnerProductSpace.Projection.Basic
+import Mathlib.Analysis.InnerProductSpace.Projection.FiniteDimensional
+import Mathlib.Analysis.InnerProductSpace.Projection.Minimal
+import Mathlib.Analysis.InnerProductSpace.Projection.Reflection
+import Mathlib.Analysis.InnerProductSpace.Projection.Submodule
+
+
+Note: This linter can be disabled with `set_option linter.deprecated.module false`
+warning: Hodge/Analytic/Norms.lean:80:0: automatically included section variable(s) unused in theorem `comass_nonneg`:
+  [ProjectiveComplexManifold n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ProjectiveComplexManifold n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/Norms.lean:100:0: automatically included section variable(s) unused in theorem `pointwiseComass_neg`:
+  [ProjectiveComplexManifold n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ProjectiveComplexManifold n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/Norms.lean:215:0: automatically included section variable(s) unused in theorem `normL2_nonneg`:
+  [IsManifold (𝓒_complex n) ⊤ X]
+  [ProjectiveComplexManifold n X]
+  K
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+⚠ [2567/2721] Replayed Hodge.Analytic.FlatNorm
+warning: Hodge/Analytic/FlatNorm.lean:80:8: declaration uses 'sorry'
+warning: Hodge/Analytic/FlatNorm.lean:91:8: declaration uses 'sorry'
+⚠ [2569/2721] Replayed Hodge.Kahler.Manifolds
+warning: Hodge/Kahler/Manifolds.lean:22:8: declaration uses 'sorry'
+warning: Hodge/Kahler/Manifolds.lean:43:29: unused variable `α`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Hodge/Kahler/Manifolds.lean:47:0: automatically included section variable(s) unused in theorem `isRationalClass_wedge`:
+  [IsManifold (𝓒_complex n) ⊤ X]
+  [ProjectiveComplexManifold n X]
+  K
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Kahler/Manifolds.lean:52:0: automatically included section variable(s) unused in theorem `isRationalClass_smul_rat`:
+  [IsManifold (𝓒_complex n) ⊤ X]
+  [ProjectiveComplexManifold n X]
+  K
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Kahler/Manifolds.lean:56:0: automatically included section variable(s) unused in theorem `omega_is_rational`:
+  [ProjectiveComplexManifold n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ProjectiveComplexManifold n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Kahler/Manifolds.lean:59:0: automatically included section variable(s) unused in theorem `isRationalClass_pow`:
+  [IsManifold (𝓒_complex n) ⊤ X]
+  [ProjectiveComplexManifold n X]
+  K
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Kahler/Manifolds.lean:59:29: unused variable `p`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Hodge/Kahler/Manifolds.lean:63:0: automatically included section variable(s) unused in theorem `isRationalClass_add`:
+  [IsManifold (𝓒_complex n) ⊤ X]
+  [ProjectiveComplexManifold n X]
+  K
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+⚠ [2570/2721] Replayed Hodge.Kahler.TypeDecomposition
+warning: Hodge/Kahler/TypeDecomposition.lean:30:8: declaration uses 'sorry'
+warning: Hodge/Kahler/TypeDecomposition.lean:39:4: declaration uses 'sorry'
+warning: Hodge/Kahler/TypeDecomposition.lean:46:8: declaration uses 'sorry'
+⚠ [2572/2721] Replayed Hodge.Analytic.Grassmannian
+warning: Hodge/Analytic/Grassmannian.lean:5:7: 'Mathlib.Analysis.InnerProductSpace.Projection' has been deprecated: please replace this import by
+
+import Mathlib.Analysis.InnerProductSpace.Projection.Basic
+import Mathlib.Analysis.InnerProductSpace.Projection.FiniteDimensional
+import Mathlib.Analysis.InnerProductSpace.Projection.Minimal
+import Mathlib.Analysis.InnerProductSpace.Projection.Reflection
+import Mathlib.Analysis.InnerProductSpace.Projection.Submodule
+
+
+Note: This linter can be disabled with `set_option linter.deprecated.module false`
+warning: Hodge/Analytic/Grassmannian.lean:92:0: automatically included section variable(s) unused in theorem `calibratedCone_is_closed`:
+  [IsManifold (𝓒_complex n) ⊤ X]
+  [ProjectiveComplexManifold n X]
+  K
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/Grassmannian.lean:110:8: declaration uses 'sorry'
+warning: Hodge/Analytic/Grassmannian.lean:134:8: declaration uses 'sorry'
+⚠ [2590/2721] Replayed Hodge.Kahler.Cone
+warning: Hodge/Kahler/Cone.lean:10:7: 'Mathlib.Analysis.InnerProductSpace.Projection' has been deprecated: please replace this import by
+
+import Mathlib.Analysis.InnerProductSpace.Projection.Basic
+import Mathlib.Analysis.InnerProductSpace.Projection.FiniteDimensional
+import Mathlib.Analysis.InnerProductSpace.Projection.Minimal
+import Mathlib.Analysis.InnerProductSpace.Projection.Reflection
+import Mathlib.Analysis.InnerProductSpace.Projection.Submodule
+
+
+Note: This linter can be disabled with `set_option linter.deprecated.module false`
+warning: Hodge/Kahler/Cone.lean:54:0: automatically included section variable(s) unused in theorem `stronglyPositiveCone_convex`:
+  [IsManifold (𝓒_complex n) ⊤ X]
+  [ProjectiveComplexManifold n X]
+  K
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Kahler/Cone.lean:142:8: declaration uses 'sorry'
+warning: Hodge/Kahler/Cone.lean:163:0: automatically included section variable(s) unused in theorem `caratheodory_decomposition`:
+  [IsManifold (𝓒_complex n) ⊤ X]
+  [ProjectiveComplexManifold n X]
+  K
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+⚠ [2591/2721] Replayed Hodge.Kahler.SignedDecomp
+warning: Hodge/Kahler/SignedDecomp.lean:23:8: declaration uses 'sorry'
+warning: Hodge/Kahler/SignedDecomp.lean:31:8: declaration uses 'sorry'
+⚠ [2592/2721] Replayed Hodge.Classical.Bergman
+warning: Hodge/Classical/Bergman.lean:40:56: unused variable `hx`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Hodge/Classical/Bergman.lean:54:19: unused variable `hx`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Hodge/Classical/Bergman.lean:70:19: unused variable `hx`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+⚠ [2767/2777] Replayed Hodge.Classical.SerreVanishing
+warning: Hodge/Classical/SerreVanishing.lean:84:0: automatically included section variable(s) unused in theorem `jet_surjectivity_from_serre`:
+  [KahlerManifold n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [KahlerManifold n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+⚠ [2772/2777] Replayed Hodge.Classical.HarveyLawson
+warning: Hodge/Classical/HarveyLawson.lean:59:39: unused variable `T`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Hodge/Classical/HarveyLawson.lean:90:18: unused variable `ω`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+⚠ [2774/2777] Replayed Hodge.Classical.Lefschetz
+warning: Hodge/Classical/Lefschetz.lean:54:0: automatically included section variable(s) unused in theorem `exact_subset_closed`:
+  [ProjectiveComplexManifold n X]
+  K
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ProjectiveComplexManifold n X] K in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Classical/Lefschetz.lean:66:23: declaration uses 'sorry'
+warning: Hodge/Classical/Lefschetz.lean:71:23: declaration uses 'sorry'
+warning: Hodge/Classical/Lefschetz.lean:78:18: declaration uses 'sorry'
+warning: Hodge/Classical/Lefschetz.lean:82:18: declaration uses 'sorry'
+warning: Hodge/Classical/Lefschetz.lean:91:8: declaration uses 'sorry'
+✖ [2775/2777] Building Hodge.Kahler.Microstructure (3.2s)
+trace: .> LEAN_PATH=/Users/jonathanwashburn/Projects/hodge/.lake/packages/Cli/.lake/build/lib/lean:/Users/jonathanwashburn/Projects/hodge/.lake/packages/batteries/.lake/build/lib/lean:/Users/jonathanwashburn/Projects/hodge/.lake/packages/Qq/.lake/build/lib/lean:/Users/jonathanwashburn/Projects/hodge/.lake/packages/aesop/.lake/build/lib/lean:/Users/jonathanwashburn/Projects/hodge/.lake/packages/proofwidgets/.lake/build/lib/lean:/Users/jonathanwashburn/Projects/hodge/.lake/packages/importGraph/.lake/build/lib/lean:/Users/jonathanwashburn/Projects/hodge/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/Users/jonathanwashburn/Projects/hodge/.lake/packages/plausible/.lake/build/lib/lean:/Users/jonathanwashburn/Projects/hodge/.lake/packages/mathlib/.lake/build/lib/lean:/Users/jonathanwashburn/Projects/hodge/.lake/build/lib/lean /Users/jonathanwashburn/.elan/toolchains/leanprover--lean4---v4.27.0-rc1/bin/lean /Users/jonathanwashburn/Projects/hodge/Hodge/Kahler/Microstructure.lean -o /Users/jonathanwashburn/Projects/hodge/.lake/build/lib/lean/Hodge/Kahler/Microstructure.olean -i /Users/jonathanwashburn/Projects/hodge/.lake/build/lib/lean/Hodge/Kahler/Microstructure.ilean -c /Users/jonathanwashburn/Projects/hodge/.lake/build/ir/Hodge/Kahler/Microstructure.c --setup /Users/jonathanwashburn/Projects/hodge/.lake/build/ir/Hodge/Kahler/Microstructure.setup.json --json
+warning: Hodge/Kahler/Microstructure.lean:28:0: automatically included section variable(s) unused in theorem `local_sheet_realization`:
+  [IsManifold (𝓒_complex n) ⊤ X]
+  [ProjectiveComplexManifold n X]
+  K
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+error: Hodge/Kahler/Microstructure.lean:104:6: linarith failed to find a contradiction
+case left.h
+n : ℕ
+X : Type u_1
+inst✝³ : TopologicalSpace X
+inst✝² : ChartedSpace (EuclideanSpace ℂ (Fin n)) X
+inst✝¹ : IsManifold (𝓒_complex n) ⊤ X
+inst✝ : ProjectiveComplexManifold n X
+K : KahlerManifold n X
+_p : ℕ
+h : ℝ
+C : Cubulation n X h
+target : Flow C
+int_flow : DirectedEdge C → ℤ := fun e => ⌊target e⌋
+Q : ↥C.cubes
+err : DirectedEdge C → ℝ := fun e => ↑⌊target e⌋ - target e
+e : DirectedEdge C
+hle : ↑⌊target e⌋ ≤ target e
+a✝ : err e < -1
+⊢ False
+failed
+error: Hodge/Kahler/Microstructure.lean:106:6: linarith failed to find a contradiction
+case right.h
+n : ℕ
+X : Type u_1
+inst✝³ : TopologicalSpace X
+inst✝² : ChartedSpace (EuclideanSpace ℂ (Fin n)) X
+inst✝¹ : IsManifold (𝓒_complex n) ⊤ X
+inst✝ : ProjectiveComplexManifold n X
+K : KahlerManifold n X
+_p : ℕ
+h : ℝ
+C : Cubulation n X h
+target : Flow C
+int_flow : DirectedEdge C → ℤ := fun e => ⌊target e⌋
+Q : ↥C.cubes
+err : DirectedEdge C → ℝ := fun e => ↑⌊target e⌋ - target e
+e : DirectedEdge C
+hlt : target e < ↑⌊target e⌋ + 1
+a✝ : 1 < err e
+⊢ False
+failed
+error: Hodge/Kahler/Microstructure.lean:114:6: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  ∑ e, ↑(int_flow ↑e) - ∑ e, ↑(int_flow ↑e) - (∑ e, target ↑e - ∑ e, target ↑e)
+in the target expression
+  |∑ e, ↑(int_flow ↑e) - ∑ e, ↑(int_flow ↑e) - (∑ e, target ↑e - ∑ e, target ↑e)| ≤
+    ↑(Fintype.card { e // e.tgt = Q }) + ↑(Fintype.card { e // e.src = Q })
+
+case h
+n : ℕ
+X : Type u_1
+inst✝³ : TopologicalSpace X
+inst✝² : ChartedSpace (EuclideanSpace ℂ (Fin n)) X
+inst✝¹ : IsManifold (𝓒_complex n) ⊤ X
+inst✝ : ProjectiveComplexManifold n X
+K : KahlerManifold n X
+_p : ℕ
+h : ℝ
+C : Cubulation n X h
+target : Flow C
+int_flow : DirectedEdge C → ℤ := fun e => ⌊target e⌋
+Q : ↥C.cubes
+err : DirectedEdge C → ℝ := fun e => ↑⌊target e⌋ - target e
+h_err : ∀ (e : DirectedEdge C), |err e| ≤ 1
+h_sub_comm : ∑ e, ↑(int_flow ↑e) - ∑ e, ↑(int_flow ↑e) - (∑ e, target ↑e - ∑ e, target ↑e) = ∑ e, err ↑e - ∑ e, err ↑e
+⊢ |∑ e, ↑(int_flow ↑e) - ∑ e, ↑(int_flow ↑e) - (∑ e, target ↑e - ∑ e, target ↑e)| ≤
+    ↑(Fintype.card { e // e.tgt = Q }) + ↑(Fintype.card { e // e.src = Q })
+warning: Hodge/Kahler/Microstructure.lean:136:7: unused variable `T_raw`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+error: Lean exited with code 1
+Some required targets logged failures:
+- Hodge.Kahler.Microstructure
+error: build failed

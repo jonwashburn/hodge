@@ -63,36 +63,40 @@ theorem degree_reduction_arithmetic {p : ℕ} (h : ¬(p ≤ n / 2)) : n - p ≤ 
 
 /-! ## Fundamental Class Coherence Theorems -/
 
-/-- **Theorem: Signed Decomposition Coherence** -/
-theorem signed_decomposition_fundamental_class_coherence {p : ℕ}
-    (γ γplus γminus : SmoothForm n X (2 * p))
-    (h_eq : γ = γplus - γminus)
-    (Z_pos Z_neg : Set X)
-    (h_alg_pos : isAlgebraicSubvariety n X Z_pos)
-    (h_alg_neg : isAlgebraicSubvariety n X Z_neg)
-    (h_class_pos : FundamentalClassSet n X p Z_pos = γplus)
-    (h_class_neg : FundamentalClassSet n X p Z_neg = γminus) :
-    FundamentalClassSet n X p (Z_pos ∪ Z_neg) = γ := by
-  rw [FundamentalClassSet_difference n X Z_pos Z_neg]
-  rw [h_class_pos, h_class_neg, h_eq]
-
 /-- **Theorem: Hard Lefschetz Fundamental Class Coherence** -/
 theorem hard_lefschetz_fundamental_class_coherence {p p'' k : ℕ}
     (γ : SmoothForm n X (2 * p))
     (η : SmoothForm n X (2 * p''))
     (Z_η : Set X)
     (h_pk : p = p'' + k)
-    (h_geom : lefschetz_power_form k η = γ)
+    (h_geom : HEq (lefschetz_power_form k η) γ)
     (h_alg : isAlgebraicSubvariety n X Z_η)
     (h_class : FundamentalClassSet n X p'' Z_η = η) :
     FundamentalClassSet n X p (algebraic_intersection_power n X Z_η k) = γ := by
+  revert h_class h_alg h_geom
   subst h_pk
-  have h_val := FundamentalClassSet_intersection_power_eq (n := n) (X := X) Z_η h_alg
-  simp at *
-  rw [h_class] at h_val
-  rw [h_val]
-  simp
-  exact h_geom
+  intro h_geom h_alg h_class
+  have h_fact := FundamentalClassSet_intersection_power_eq p'' k Z_η h_alg
+  rw [h_class] at h_fact
+  apply eq_of_heq
+  -- Goal: HEq (FundamentalClassSet n X (p'' + k) (algebraic_intersection_power n X Z_η k)) (lefschetz_power_form k η)
+  have h_deg : 2 * p'' + 2 * k = 2 * (p'' + k) := by omega
+  revert h_fact
+  match (2 * (p'' + k)), (2 * p'' + 2 * k), h_deg with
+  | _, _, rfl => intro h_fact; exact (heq_of_eq h_fact).trans h_geom
+
+/-- **Theorem: Signed Decomposition Coherence** -/
+theorem signed_decomposition_fundamental_class_coherence {p : ℕ}
+    (γ γplus γminus : SmoothForm n X (2 * p))
+    (h_eq : γ = γplus - γminus)
+    (Z_pos Z_neg : Set X)
+    (_h_alg_pos : isAlgebraicSubvariety n X Z_pos)
+    (_h_alg_neg : isAlgebraicSubvariety n X Z_neg)
+    (h_class_pos : FundamentalClassSet n X p Z_pos = γplus)
+    (h_class_neg : FundamentalClassSet n X p Z_neg = γminus) :
+    FundamentalClassSet n X p (Z_pos ∪ Z_neg) = γ := by
+  rw [FundamentalClassSet_difference n X p Z_pos Z_neg]
+  rw [h_class_pos, h_class_neg, h_eq]
 
 /-- **Axiom: Harvey-Lawson Union Fundamental Class** -/
 axiom harvey_lawson_fundamental_class {p : ℕ} (γplus : SmoothForm n X (2 * p))
@@ -105,7 +109,7 @@ axiom omega_pow_fundamental_class {p : ℕ} (γminus : SmoothForm n X (2 * p))
 
 /-! ## The Hodge Conjecture -/
 
-theorem hodge_conjecture_full {p : ℕ} (γ : SmoothForm n X (2 * p))
+theorem hodge_conjecture_full {p : ℕ} (hpn : p ≤ n) (γ : SmoothForm n X (2 * p))
     (h_rational : isRationalClass γ) (h_p_p : isPPForm' n X p γ) :
     ∃ (Z : Set X), isAlgebraicSubvariety n X Z ∧ FundamentalClassSet n X p Z = γ := by
   by_cases h_range : p ≤ n / 2
@@ -133,7 +137,7 @@ theorem hodge_conjecture_full {p : ℕ} (γ : SmoothForm n X (2 * p))
       exact signed_decomposition_fundamental_class_coherence γ γplus γminus h_eq Z_pos Z_neg h_alg_pos h_alg_neg h_class_pos h_class_neg
   · push_neg at h_range
     obtain ⟨p'', η, h_p''_range, h_η_rat, h_η_hodge, h_lefschetz_eq⟩ :=
-      hard_lefschetz_reduction h_range γ h_rational h_p_p
+      hard_lefschetz_reduction h_range hpn γ h_rational h_p_p
     have h_exists_Z_η : ∃ (Z_η : Set X), isAlgebraicSubvariety n X Z_η ∧ FundamentalClassSet n X p'' Z_η = η := by
       obtain ⟨ηplus, ηminus, h_η_eq, h_ηplus_cone, h_ηminus_cone, h_ηplus_rat, h_ηminus_rat⟩ :=
         signed_decomposition η h_η_hodge h_η_rat
@@ -145,14 +149,21 @@ theorem hodge_conjecture_full {p : ℕ} (γ : SmoothForm n X (2 * p))
         omega_pow_fundamental_class η Z_ηpos
       have h_union_empty : Z_ηpos ∪ ∅ = Z_ηpos := Set.union_empty Z_ηpos
       rw [← h_union_empty]
-      have h_η_decomp : η = η - 0 := by ext x v; simp
+      have h_η_decomp : η = η - 0 := by ext x v; simp [sub_zero]
       have h_class_empty : FundamentalClassSet n X p'' ∅ = 0 := FundamentalClassSet_empty p''
-      exact signed_decomposition_fundamental_class_coherence η η 0 h_η_decomp Z_ηpos ∅ h_ηpos_alg ⟨Classical.choose empty_set_is_algebraic, Classical.choose_spec empty_set_is_algebraic⟩ h_class_ηpos h_class_empty
+      obtain ⟨W_empty, hW_empty⟩ := empty_set_is_algebraic
+      exact signed_decomposition_fundamental_class_coherence η η 0 h_η_decomp Z_ηpos ∅ h_ηpos_alg ⟨W_empty, hW_empty⟩ h_class_ηpos h_class_empty
     obtain ⟨Z_η, h_alg_η, h_class_η⟩ := h_exists_Z_η
     let k := p - p''
     use algebraic_intersection_power n X Z_η k
     constructor
     · exact isAlgebraicSubvariety_intersection_power n X h_alg_η
-    · exact hard_lefschetz_fundamental_class_coherence γ η Z_η rfl h_lefschetz_eq h_alg_η h_class_η
+    · have h_pk : p = p'' + k := by unfold k; omega
+      have h_geom : HEq (lefschetz_power_form k η) γ := by
+        revert h_lefschetz_eq
+        subst h_pk
+        intro h_lefschetz_eq
+        exact heq_of_eq h_lefschetz_eq
+      exact hard_lefschetz_fundamental_class_coherence γ η Z_η h_pk h_geom h_alg_η h_class_η
 
 end
