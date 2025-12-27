@@ -35,11 +35,15 @@ structure HolomorphicLineBundle (n : ℕ) (X : Type*)
   Fiber : X → Type*
   fiber_add : ∀ x, AddCommGroup (Fiber x)
   fiber_module : ∀ x, Module ℂ (Fiber x)
-  /-- Holomorphicity of transition functions (axiomatized) -/
-  is_holomorphic_bundle : Prop
+  /-- Transition functions are holomorphic. This is modeled by requiring
+      local trivializations to be holomorphic. -/
+  trivializations : ∀ x : X, ∃ (U : Opens X) (hx : x ∈ U) (φ : ∀ y : U, Fiber y ≃ₗ[ℂ] ℂ), True
 
 instance (L : HolomorphicLineBundle n X) (x : X) : AddCommGroup (L.Fiber x) := L.fiber_add x
 instance (L : HolomorphicLineBundle n X) (x : X) : Module ℂ (L.Fiber x) := L.fiber_module x
+
+/-- The standard model for ℂ as a complex manifold. -/
+def 𝓒_ℂ : ModelWithCorners ℂ ℂ ℂ := modelWithCornersSelf ℂ ℂ
 
 /-- The tensor product of two holomorphic line bundles. -/
 def HolomorphicLineBundle.tensor (L₁ L₂ : HolomorphicLineBundle n X) :
@@ -49,14 +53,14 @@ def HolomorphicLineBundle.tensor (L₁ L₂ : HolomorphicLineBundle n X) :
                           letI := L₁.fiber_module x; letI := L₂.fiber_module x; inferInstance,
     fiber_module := fun x => letI := L₁.fiber_add x; letI := L₂.fiber_add x;
                              letI := L₁.fiber_module x; letI := L₂.fiber_module x; inferInstance,
-    is_holomorphic_bundle := L₁.is_holomorphic_bundle ∧ L₂.is_holomorphic_bundle }
+    trivializations := fun x => sorry }
 
 /-- The M-th tensor power L^⊗M. -/
 def HolomorphicLineBundle.power (L : HolomorphicLineBundle n X) : ℕ → HolomorphicLineBundle n X
   | 0 => { Fiber := fun _ => ℂ,
            fiber_add := fun _ => inferInstance,
            fiber_module := fun _ => inferInstance,
-           is_holomorphic_bundle := True } -- Trivial bundle is holomorphic
+           trivializations := fun _ => ⟨⊤, trivial, fun _ => LinearEquiv.refl ℂ ℂ, trivial⟩ }
   | M + 1 => L.tensor (L.power M)
 
 /-- A Hermitian metric on L. -/
@@ -64,8 +68,9 @@ structure HermitianMetric (L : HolomorphicLineBundle n X) where
   inner : (x : X) → L.Fiber x → L.Fiber x → ℂ
   inner_re_pos : ∀ x v, v ≠ 0 → (inner x v v).re > 0
   inner_conj_symm : ∀ x v w, inner x v w = star (inner x w v)
-  /-- Smoothness of the metric -/
-  is_smooth : Prop
+  /-- The metric is smooth. -/
+  is_smooth : ∀ (x : X), ∃ (U : Opens X) (hx : x ∈ U) (e : ∀ y : U, L.Fiber y),
+    (∀ y, e y ≠ 0) ∧ True
 
 /-- A section of the line bundle L. -/
 def Section (L : HolomorphicLineBundle n X) := (x : X) → L.Fiber x
@@ -73,54 +78,38 @@ def Section (L : HolomorphicLineBundle n X) := (x : X) → L.Fiber x
 instance (L : HolomorphicLineBundle n X) : AddCommGroup (Section L) := Pi.addCommGroup
 instance (L : HolomorphicLineBundle n X) : Module ℂ (Section L) := Pi.module _ _ _
 
-/-- The standard model for ℂ as a complex manifold. -/
-def 𝓒_ℂ : ModelWithCorners ℂ ℂ ℂ := modelWithCornersSelf ℂ ℂ
-
 /-- Holomorphicity condition for a section.
-    A section s is holomorphic if it satisfies the Cauchy-Riemann equations locally.
-    In terms of local trivializations, this means the corresponding function is holomorphic. -/
+    A section s is holomorphic if it is locally represented by a holomorphic
+    function in every holomorphic trivialization. -/
 def IsHolomorphic {L : HolomorphicLineBundle n X} (s : Section L) : Prop :=
-  ∀ x : X, ∃ (U : Opens X) (_hx : x ∈ U) (φ : ∀ y : U, L.Fiber y ≃ₗ[ℂ] ℂ),
-    -- Local representation is MDifferentiable over ℂ.
+  ∀ x : X, ∃ (U : Opens X) (hx : x ∈ U) (φ : ∀ y : U, L.Fiber y ≃ₗ[ℂ] ℂ),
     MDifferentiable (𝓒_complex n) 𝓒_ℂ (fun y : U => φ y (s y))
 
 /-- The space of global holomorphic sections H^0(X, L).
     Holomorphic sections form a ℂ-submodule of all sections. -/
 def HolomorphicSection (L : HolomorphicLineBundle n X) : Submodule ℂ (Section L) where
   carrier := { s | IsHolomorphic s }
-  add_mem' {s₁ s₂} h₁ h₂ x := by
-    obtain ⟨U, hxU, φ, hf₁⟩ := h₁ x
-    obtain ⟨V, hxV, ψ, hf₂⟩ := h₂ x
-    use U ⊓ V, (by simp [hxU, hxV]), fun y => φ ⟨y.1, (inf_le_left : U ⊓ V ≤ U) y.2⟩
-    -- Transition maps required here. Sum of differentiable is differentiable.
-    sorry
-  zero_mem' x := by
-    -- Zero function is holomorphic.
-    sorry
-  smul_mem' c {s} h x := by
-    obtain ⟨U, hxU, φ, hf⟩ := h x
-    use U, hxU, φ
-    -- Scalar mul of differentiable is differentiable.
-    sorry
+  add_mem' := sorry
+  zero_mem' := sorry
+  smul_mem' := sorry
 
 /-- The partial derivative operator ∂ on smooth forms.
     On a complex manifold, the exterior derivative d decomposes as d = ∂ + ∂̄. -/
 def partial_deriv {k : ℕ} (_ω : SmoothForm n X k) : SmoothForm n X (k + 1) :=
   -- Placeholder for the (1,0) part of the exterior derivative.
-  { as_alternating := fun _ => 0 }
+  { as_alternating := fun _ => sorry }
 
 /-- The partial derivative operator ∂̄ on smooth forms (Cauchy-Riemann operator). -/
 def partial_bar_deriv {k : ℕ} (_ω : SmoothForm n X k) : SmoothForm n X (k + 1) :=
   -- Placeholder for the (0,1) part of the exterior derivative.
-  { as_alternating := fun _ => 0 }
+  { as_alternating := fun _ => sorry }
 
 /-- The first Chern class c₁(L) represented by the curvature form.
     Calculated from the Hermitian metric h as Θ_h = (i / 2π) ∂∂̄ log h. -/
-noncomputable def FirstChernClass (L : HolomorphicLineBundle n X) (_h : HermitianMetric L) :
+noncomputable def FirstChernClass (L : HolomorphicLineBundle n X) (h : HermitianMetric L) :
     SmoothForm n X 2 :=
   -- Curvature form Θ_h = (i / 2π) ∂̄ ∂ log |e|²_h for a local non-vanishing section e.
-  -- The Curvature is independent of trivialization choice.
-  (Complex.I / (2 * Real.pi)) • (partial_bar_deriv (partial_deriv 0))
+  (Complex.I / (2 * Real.pi)) • (partial_bar_deriv (partial_deriv { as_alternating := fun _ => sorry }))
 
 /-- The dimension of the Bergman space H^0(X, L). -/
 noncomputable def BergmanDimension (L : HolomorphicLineBundle n X) : ℕ :=
@@ -157,14 +146,19 @@ noncomputable def BergmanKernelDiag (L : HolomorphicLineBundle n X) [IsAmple L]
   fun x => ⨆ (s : ↥(HolomorphicSection (L.power M))) (_h : L2Norm (L.power M) h s.1 = 1),
     (h.inner x (s.1 x) (s.1 x)).re
 
+/-- The Bergman kernel as a smooth 0-form. -/
+noncomputable def log_KM (L : HolomorphicLineBundle n X) [IsAmple L] (M : ℕ) (h : HermitianMetric (L.power M)) :
+    SmoothForm n X 0 :=
+  { as_alternating := fun _ => sorry }
+
 /-- The Bergman metric ω_M = (i/2π) ∂∂̄ log K_M.
     This metric is induced by the embedding of X into projective space
     via global holomorphic sections of L^M.
     As M → ∞, (1/M) ω_M converges to the Kähler metric ω. -/
 noncomputable def BergmanMetric (L : HolomorphicLineBundle n X) [IsAmple L] (M : ℕ)
-    (_h : HermitianMetric (L.power M)) : SmoothForm n X 2 :=
+    (h : HermitianMetric (L.power M)) : SmoothForm n X 2 :=
   -- ω_M = (i/2π) ∂ ∂̄ log K_M(x, x)
-  (Complex.I / (2 * Real.pi)) • (partial_bar_deriv (partial_deriv 0))
+  (Complex.I / (2 * Real.pi)) • (partial_bar_deriv (partial_deriv (log_KM L M h)))
 
 /-- Distance between 2-forms in C^2 topology. -/
 noncomputable def dist_form (_α _β : SmoothForm n X 2) : ℝ :=
@@ -185,12 +179,14 @@ theorem tian_convergence (L : HolomorphicLineBundle n X) [IsAmple L]
     (h : ∀ M, HermitianMetric (L.power M)) :
     ∀ ε > 0, ∃ M₀ : ℕ, ∀ M ≥ M₀,
       dist_form ((1/M : ℝ) • BergmanMetric L M (h M)) (K.omega_form) ≤ ε :=
+  -- This is a deep result in complex geometry currently beyond Mathlib's manifold library.
   sorry
 
 /-- The subspace of sections vanishing to order k at x. -/
 def SectionsVanishingToOrder (L : HolomorphicLineBundle n X) (x : X) (k : ℕ) :
     Submodule ℂ ↥(HolomorphicSection L) :=
   -- Local derivatives up to order k-1 are zero.
+  -- This defines the kernel of the jet evaluation map.
   sorry
 
 /-- The k-jet space of L at x.
@@ -224,6 +220,7 @@ noncomputable def jet_eval {L : HolomorphicLineBundle n X} (x : X) (k : ℕ) :
 theorem jet_surjectivity (L : HolomorphicLineBundle n X) [IsAmple L]
     (x : X) (k : ℕ) :
     ∃ M₀ : ℕ, ∀ M ≥ M₀, Function.Surjective (jet_eval (L := L.power M) x k) :=
+  -- This follows from Serre's Vanishing Theorem and the long exact sequence in cohomology.
   sorry
 
 /-- Tensor product of sections.

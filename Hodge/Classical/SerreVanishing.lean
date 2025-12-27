@@ -50,7 +50,7 @@ def vanishes (F : CoherentSheaf n X) (q : ℕ) : Prop :=
   IsZero (SheafCohomology F q)
 
 /-- The structure sheaf O_X as a coherent sheaf. -/
-axiom structureCoherentSheaf (n : ℕ) (X : Type*)
+axiom structureSheaf (n : ℕ) (X : Type*)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] : CoherentSheaf n X
 
@@ -60,6 +60,9 @@ axiom tensorWithSheaf (L : HolomorphicLineBundle n X) (F : CoherentSheaf n X) :
 
 /-- The ideal sheaf m_x^{k+1} of functions vanishing to order k+1 at x. -/
 axiom idealSheaf (x : X) (k : ℕ) : CoherentSheaf n X
+
+/-- The skyscraper sheaf of jets at a point x. -/
+axiom jetSkyscraperSheaf (x : X) (k : ℕ) : CoherentSheaf n X
 
 /-- **Theorem: Serre Vanishing Theorem (Axiomatized)**
 
