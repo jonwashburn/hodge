@@ -38,80 +38,26 @@ instance smoothFormSMul (k : ℕ) : SMul ℝ (SmoothForm n X k) where
 instance smoothFormSMulComplex (k : ℕ) : SMul ℂ (SmoothForm n X k) where
   smul := fun c α => ⟨fun x => c • α.as_alternating x⟩
 
+instance smoothFormSub (k : ℕ) : Sub (SmoothForm n X k) where
+  sub := fun α β => ⟨fun x => α.as_alternating x - β.as_alternating x⟩
+
 instance (k : ℕ) : AddCommGroup (SmoothForm n X k) where
-  add_assoc α β γ := by
-    ext x v
-    show (α.as_alternating x + β.as_alternating x + γ.as_alternating x) v =
-         (α.as_alternating x + (β.as_alternating x + γ.as_alternating x)) v
-    simp only [AlternatingMap.add_apply, add_assoc]
-  zero_add α := by
-    ext x v
-    show ((0 : AlternatingMap ℂ _ ℂ (Fin k)) + α.as_alternating x) v = α.as_alternating x v
-    simp only [AlternatingMap.add_apply, AlternatingMap.zero_apply, zero_add]
-  add_zero α := by
-    ext x v
-    show (α.as_alternating x + (0 : AlternatingMap ℂ _ ℂ (Fin k))) v = α.as_alternating x v
-    simp only [AlternatingMap.add_apply, AlternatingMap.zero_apply, add_zero]
-  neg_add_cancel α := by
-    ext x v
-    show (-α.as_alternating x + α.as_alternating x) v = (0 : AlternatingMap ℂ _ ℂ (Fin k)) v
-    simp only [AlternatingMap.add_apply, AlternatingMap.neg_apply, AlternatingMap.zero_apply, neg_add_cancel]
-  add_comm α β := by
-    ext x v
-    show (α.as_alternating x + β.as_alternating x) v = (β.as_alternating x + α.as_alternating x) v
-    simp only [AlternatingMap.add_apply, add_comm]
+  add_assoc := by intros; ext; simp only [Add.add]; rw [add_assoc]
+  zero_add := by intros; ext; simp only [Add.add, Zero.zero]; rw [zero_add]
+  add_zero := by intros; ext; simp only [Add.add, Zero.zero]; rw [add_zero]
+  neg_add_cancel := by intros; ext; simp only [Add.add, Neg.neg, Zero.zero]; rw [neg_add_cancel]
+  add_comm := by intros; ext; simp only [Add.add]; rw [add_comm]
+  sub_eq_add_neg := by intros; ext; simp only [Sub.sub, Add.add, Neg.neg]; rw [sub_eq_add_neg]
   nsmul n_idx α := ⟨fun x => n_idx • α.as_alternating x⟩
-  nsmul_zero α := by
-    ext x v
-    show (0 • α.as_alternating x) v = (0 : AlternatingMap ℂ _ ℂ (Fin k)) v
-    simp only [zero_smul, AlternatingMap.zero_apply]
-  nsmul_succ n_idx α := by
-    ext x v
-    show ((n_idx + 1) • α.as_alternating x) v = (α.as_alternating x + n_idx • α.as_alternating x) v
-    simp only [add_smul, one_smul, AlternatingMap.add_apply, AlternatingMap.coe_smul, Pi.smul_apply]
   zsmul z α := ⟨fun x => z • α.as_alternating x⟩
-  zsmul_zero' α := by
-    ext x v
-    show ((0 : ℤ) • α.as_alternating x) v = (0 : AlternatingMap ℂ _ ℂ (Fin k)) v
-    simp only [zero_smul, AlternatingMap.zero_apply]
-  zsmul_succ' n_idx α := by
-    ext x v
-    show (Int.ofNat n_idx.succ • α.as_alternating x) v = (α.as_alternating x + Int.ofNat n_idx • α.as_alternating x) v
-    simp only [Int.ofNat_eq_coe, Nat.succ_eq_add_one, Int.ofNat_add, Int.ofNat_one]
-    simp only [AlternatingMap.add_apply, add_smul, one_smul, AlternatingMap.coe_smul, Pi.smul_apply]
-  zsmul_neg' n_idx α := by
-    ext x v
-    show (Int.negSucc n_idx • α.as_alternating x) v = (-(Int.ofNat n_idx.succ • α.as_alternating x)) v
-    simp only [Int.negSucc_eq, AlternatingMap.neg_apply, AlternatingMap.coe_smul, Pi.smul_apply]
-    simp only [neg_smul, Int.ofNat_eq_coe, Nat.succ_eq_add_one, Int.ofNat_add, Int.ofNat_one]
 
 instance (k : ℕ) : Module ℝ (SmoothForm n X k) where
-  one_smul α := by
-    ext x v
-    show ((1 : ℂ) • α.as_alternating x) v = α.as_alternating x v
-    simp only [one_smul]
-  mul_smul r s α := by
-    ext x v
-    show (((r * s : ℝ) : ℂ) • α.as_alternating x) v = ((r : ℂ) • ((s : ℂ) • α.as_alternating x)) v
-    simp only [Complex.ofReal_mul, mul_smul, AlternatingMap.coe_smul, Pi.smul_apply]
-  smul_zero r := by
-    ext x v
-    show ((r : ℂ) • (0 : AlternatingMap ℂ _ ℂ (Fin k))) v = (0 : AlternatingMap ℂ _ ℂ (Fin k)) v
-    simp only [smul_zero, AlternatingMap.zero_apply]
-  smul_add r α β := by
-    ext x v
-    show ((r : ℂ) • (α.as_alternating x + β.as_alternating x)) v =
-         (((r : ℂ) • α.as_alternating x) + ((r : ℂ) • β.as_alternating x)) v
-    simp only [smul_add, AlternatingMap.add_apply, AlternatingMap.coe_smul, Pi.smul_apply]
-  add_smul r s α := by
-    ext x v
-    show (((r + s : ℝ) : ℂ) • α.as_alternating x) v =
-         (((r : ℂ) • α.as_alternating x) + ((s : ℂ) • α.as_alternating x)) v
-    simp only [Complex.ofReal_add, add_smul, AlternatingMap.add_apply, AlternatingMap.coe_smul, Pi.smul_apply]
-  zero_smul α := by
-    ext x v
-    show ((0 : ℂ) • α.as_alternating x) v = (0 : AlternatingMap ℂ _ ℂ (Fin k)) v
-    simp only [zero_smul, AlternatingMap.zero_apply]
+  one_smul := by intros; ext; simp only [HSMul.hSMul]; rw [one_smul]
+  mul_smul := by intros; ext; simp only [HSMul.hSMul]; rw [← mul_smul]; congr 1; simp [Complex.ofReal_mul]
+  smul_zero := by intros; ext; simp only [HSMul.hSMul, Zero.zero]; rw [smul_zero]
+  smul_add := by intros; ext; simp only [HSMul.hSMul, Add.add]; rw [smul_add]
+  add_smul := by intros; ext; simp only [HSMul.hSMul, Add.add]; rw [← add_smul]; congr 1; simp
+  zero_smul := by intros; ext; simp only [HSMul.hSMul, Zero.zero]; rw [zero_smul]
 
 /-! ## Exterior Derivative -/
 
@@ -120,8 +66,7 @@ def extDeriv {k : ℕ} (_ω : SmoothForm n X k) : SmoothForm n X (k + 1) :=
   ⟨fun _ => 0⟩
 
 /-- d ∘ d = 0. -/
-theorem d_squared_zero {k : ℕ} (ω : SmoothForm n X k) : extDeriv (extDeriv ω) = 0 := by
-  ext x v; simp only [extDeriv, AlternatingMap.zero_apply]
+theorem d_squared_zero {k : ℕ} (ω : SmoothForm n X k) : extDeriv (extDeriv ω) = 0 := rfl
 
 /-! ## Wedge Product -/
 
@@ -148,13 +93,11 @@ def hodgeStar {k : ℕ} (_α : SmoothForm n X k) : SmoothForm n X (2 * n - k) :=
 
 /-- Hodge Star is linear (add). -/
 theorem hodgeStar_add {k : ℕ} (α β : SmoothForm n X k) :
-    hodgeStar (α + β) = hodgeStar α + hodgeStar β := by
-  ext x v; simp only [hodgeStar, AlternatingMap.zero_apply, AlternatingMap.add_apply, add_zero]
+    hodgeStar (α + β) = hodgeStar α + hodgeStar β := rfl
 
 /-- Hodge Star is linear (smul). -/
 theorem hodgeStar_smul {k : ℕ} (r : ℝ) (α : SmoothForm n X k) :
-    hodgeStar (r • α) = r • hodgeStar α := by
-  ext x v; simp only [hodgeStar, AlternatingMap.zero_apply, AlternatingMap.coe_smul, Pi.smul_apply, smul_zero]
+    hodgeStar (r • α) = r • hodgeStar α := rfl
 
 /-! ## Adjoint Derivative and Laplacian -/
 
