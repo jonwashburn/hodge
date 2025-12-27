@@ -37,16 +37,15 @@ On a complex manifold, a k-form ω with k = p + q is of type (p,q) if in local
 holomorphic coordinates (z₁, ..., zₙ), it can be written as:
   ω = ∑_{|I|=p, |J|=q} ω_{I,J} dz^I ∧ dz̄^J
 
-This is a fundamental property in complex geometry that governs how forms
-transform under the complex structure. -/
+Note: The current SmoothForm model uses ℂ-linear alternating maps on the complex
+tangent space, which correspond to (k,0)-forms. For (p,q)-forms with q > 0,
+a more general model using ℂ-valued alternating maps on the real tangent space
+is required. For the purpose of this plumbing track, we define this as a
+placeholder property. -/
 def isPQForm (n : ℕ) (X : Type*)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     (p q : ℕ) {k : ℕ} (_h : p + q = k) (_ω : SmoothForm n X k) : Prop :=
-  -- A form is (p,q) if it has p holomorphic and q anti-holomorphic indices
-  -- This is definitionally true for our axiomatized forms, as the structure
-  -- is carried by the type system. The actual verification would require
-  -- checking local coordinate expressions.
   True
 
 /-- A (p,p)-form is a form of type (p,p). -/

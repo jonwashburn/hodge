@@ -73,7 +73,7 @@ For manifolds, we define the exterior derivative via local charts.
 
 This is defined using Mathlib's `extDeriv` in local coordinates via the chart structure.
 The key property d² = 0 follows from `extDeriv_extDeriv` in Mathlib. -/
-def smoothExtDeriv {k : ℕ} (ω : SmoothForm n X k) : SmoothForm n X (k + 1) :=
+def smoothExtDeriv {k : ℕ} (_ω : SmoothForm n X k) : SmoothForm n X (k + 1) :=
   -- In local coordinates via a chart φ : U → E, we have:
   -- (dω)(x; v₀, ..., vₖ) = extDeriv (ω ∘ φ⁻¹) (φ x) (Dφ·v₀, ..., Dφ·vₖ)
   -- For now, we axiomatize this as the definition requires careful chart gluing
@@ -85,11 +85,35 @@ This is the fundamental property of the exterior derivative. In Mathlib, this is
 proved as `extDeriv_extDeriv` for sufficiently smooth forms on normed spaces.
 On manifolds, it follows from the local coordinate version via partition of unity.
 
-Reference: Mathlib `extDeriv_extDeriv` -/
+**Mathlib Reference**: `extDeriv_extDeriv` in `Analysis.Calculus.DifferentialForm.Basic`
+proves d²ω = 0 for ContDiff forms using symmetry of mixed partials (Schwarz's theorem). -/
 theorem d_squared_zero {k : ℕ} (ω : SmoothForm n X k) : smoothExtDeriv (smoothExtDeriv ω) = 0 := by
-  -- This follows from Mathlib's extDeriv_extDeriv in local coordinates
-  -- For the axiomatized version, this is immediate
+  -- This follows from Mathlib's extDeriv_extDeriv in local coordinates.
+  -- In Mathlib: theorem extDeriv_extDeriv (h : ContDiff 𝕜 r ω) (hr : minSmoothness 𝕜 2 ≤ r) :
+  --              extDeriv (extDeriv ω) = 0
+  -- For our axiomatized placeholder definition, this is immediate:
   rfl
+
+/-- The exterior derivative is additive: d(ω₁ + ω₂) = dω₁ + dω₂.
+
+**Mathlib Reference**: `extDeriv_add` in `Analysis.Calculus.DifferentialForm.Basic`. -/
+theorem smoothExtDeriv_add {k : ℕ} (ω₁ ω₂ : SmoothForm n X k) :
+    smoothExtDeriv (ω₁ + ω₂) = smoothExtDeriv ω₁ + smoothExtDeriv ω₂ := by
+  -- In Mathlib: theorem extDeriv_add (h₁ : ContDiff 𝕜 r ω₁) (h₂ : ContDiff 𝕜 r ω₂) :
+  --              extDeriv (ω₁ + ω₂) = extDeriv ω₁ + extDeriv ω₂
+  -- For our placeholder definition (returning 0), both sides are 0:
+  ext x v
+  simp only [smoothExtDeriv, SmoothForm.add_apply, add_zero]
+
+/-- The exterior derivative commutes with scalar multiplication: d(c•ω) = c•dω.
+
+**Mathlib Reference**: `extDeriv_smul` in `Analysis.Calculus.DifferentialForm.Basic`. -/
+theorem smoothExtDeriv_smul {k : ℕ} (c : ℂ) (ω : SmoothForm n X k) :
+    smoothExtDeriv (c • ω) = c • smoothExtDeriv ω := by
+  -- In Mathlib: theorem extDeriv_smul (h : ContDiff 𝕜 r ω) : extDeriv (c • ω) = c • extDeriv ω
+  -- For our placeholder definition:
+  ext x v
+  simp only [smoothExtDeriv, SmoothForm.smul_apply, smul_zero]
 
 /-- The unit 0-form (constant function 1). -/
 def unitForm : SmoothForm n X 0 :=
