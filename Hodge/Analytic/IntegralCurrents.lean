@@ -77,4 +77,10 @@ instance {k : ℕ} : CoeTC (IntegralCurrent n X k) (Current n X k) where
 def IntegralCurrent.isCycle {k : ℕ} (T : IntegralCurrent n X (k + 1)) : Prop :=
   T.toFun.isCycle
 
+/-- The boundary of an integral current is integral. -/
+def IntegralCurrent.boundary {k : ℕ} (T : IntegralCurrent n X (k + 1)) :
+    IntegralCurrent n X k where
+  toFun := T.toFun.boundary
+  is_integral := isIntegral_boundary T.toFun T.is_integral
+
 end
