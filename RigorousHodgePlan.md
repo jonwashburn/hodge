@@ -2,7 +2,7 @@
 
 **Goal:** Machine-verified proof with **zero** `sorry`, `admit`, or `axiom` statements.
 
-**Current Status:** 63 sorries across 13 files
+**Current Status:** 94 sorries + 5 True placeholders across 18 files ⚠️
 
 ---
 
@@ -67,27 +67,40 @@ Each agent works on isolated files to minimize build conflicts. Just prompt:
 
 ---
 
-### Track A1: Serre Vanishing (0 sorries) ✅
+### Track A1: Serre Vanishing (13 sorries + 1 True placeholder) ⚠️ NEEDS QUALITY FIX
 
 **File:** `Hodge/Classical/SerreVanishing.lean`
 
 **Build command:** `lake build Hodge.Classical.SerreVanishing`
 
-**Sorries to resolve:**
-- `def SheafCohomology` — define via derived functors
-- `theorem serre_vanishing` — prove H^q vanishes for large M
-- `def tensorWithSheaf` — tensor product of line bundle with coherent sheaf
-- `def idealSheaf` — sheaf of functions vanishing at x to order k
-- `def jetSkyscraperSheaf` — skyscraper sheaf of jets
-- `def structureSheaf` — cokernel presentation
-- `theorem jet_surjectivity_from_serre` — derive from vanishing + LES
+**⚠️ QUALITY ISSUES TO FIX:**
+
+| Line | Issue | What's Wrong |
+|------|-------|--------------|
+| 35 | `sorry` in `holomorphicSheaf.map` | MDifferentiable composition not proved |
+| 39 | `sorry` in `holomorphicSheaf.cond` | Sheaf condition not proved |
+| 50 | `True` placeholder | `is_locally_presented` returns trivial `True` — **FORBIDDEN** |
+| 56 | `sorry` in `structureSheaf.sheaf` | No actual sheaf construction |
+| 57 | `sorry` in `structureSheaf.is_locally_presented` | No presentation proof |
+| 63-64 | `sorry` in `tensorWithSheaf` | Both fields are sorry |
+| 68-69 | `sorry` in `idealSheaf` | Both fields are sorry |
+| 73-74 | `sorry` in `jetSkyscraperSheaf` | Both fields are sorry |
+| 80 | `sorry` in `SheafCohomology` | Definition is literally `sorry` — **VACUOUS** |
+| 98 | `sorry` in `serre_vanishing` | Theorem not proved |
+| 120 | `sorry` in `jet_surjectivity_from_serre` | Theorem not proved |
+
+**What needs to happen:**
+1. **Remove the `True` placeholder** on line 50 — replace with actual presentation data
+2. **Define `SheafCohomology` properly** — use Mathlib's `Sheaf.H` or derived functors
+3. **Build real sheaf constructions** for `structureSheaf`, `tensorWithSheaf`, `idealSheaf`, `jetSkyscraperSheaf`
+4. **Prove the theorems** or document genuine Mathlib gaps
 
 **YOUR FILE:** `Classical/SerreVanishing.lean` — ONLY edit this file
 **DO NOT EDIT:** Everything else, especially `Bergman.lean`, `GAGA.lean`, `FedererFleming.lean`
 
 ---
 
-### Track A2: Bergman Kernels (12 sorries)
+### Track A2: Bergman Kernels (15 sorries + 1 True placeholder) ⚠️ NEEDS QUALITY FIX
 
 **File:** `Hodge/Classical/Bergman.lean`
 
@@ -101,16 +114,18 @@ Each agent works on isolated files to minimize build conflicts. Just prompt:
 - `theorem tian_convergence` — Bergman → Kähler in C^2
 - `theorem jet_surjectivity` — jets are surjective for large M
 
+**⚠️ Check for True placeholders and vacuous definitions**
+
 **YOUR FILE:** `Classical/Bergman.lean` — ONLY edit this file
 **DO NOT EDIT:** Everything else, especially `SerreVanishing.lean`, `GAGA.lean`, `FedererFleming.lean`
 
 ---
 
-### Track A3: GAGA + Federer-Fleming (11 sorries)
+### Track A3: GAGA + Federer-Fleming (9 sorries)
 
 **Files:** 
 - `Hodge/Classical/GAGA.lean` (7 sorries)
-- `Hodge/Classical/FedererFleming.lean` (4 sorries)
+- `Hodge/Classical/FedererFleming.lean` (2 sorries)
 
 **Build commands:**
 ```bash
@@ -134,12 +149,12 @@ lake build Hodge.Classical.FedererFleming
 
 ---
 
-### Track A4: Analytic Core (10 sorries)
+### Track A4: Analytic Core (25 sorries)
 
 **Files:**
-- `Hodge/Analytic/Calibration.lean` (4 sorries)
-- `Hodge/Analytic/Norms.lean` (3 sorries)
-- `Hodge/Analytic/Grassmannian.lean` (3 sorries)
+- `Hodge/Analytic/Norms.lean` (15 sorries)
+- `Hodge/Analytic/Calibration.lean` (6 sorries)
+- `Hodge/Analytic/Grassmannian.lean` (4 sorries)
 
 **Build commands:**
 ```bash
@@ -166,12 +181,12 @@ lake build Hodge.Analytic.Grassmannian
 
 ---
 
-### Track A5: Kähler Geometry (9 sorries)
+### Track A5: Kähler Geometry (8 sorries + 2 True placeholders)
 
 **Files:**
-- `Hodge/Kahler/Cone.lean` (5 sorries)
+- `Hodge/Kahler/Cone.lean` (4 sorries)
 - `Hodge/Kahler/Microstructure.lean` (3 sorries)
-- `Hodge/Kahler/TypeDecomposition.lean` (1 sorry)
+- `Hodge/Kahler/TypeDecomposition.lean` (1 sorry + 2 True placeholders)
 
 **Build commands:**
 ```bash
