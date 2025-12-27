@@ -1,5 +1,4 @@
 import Hodge.Analytic
-import Mathlib.Geometry.Manifold.SmoothManifoldWithCorners
 import Mathlib.Topology.Sets.Opens
 import Mathlib.Analysis.Complex.Basic
 
