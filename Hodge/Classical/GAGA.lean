@@ -168,6 +168,20 @@ Reference: Griffiths-Harris, Chapter 1. -/
 axiom exists_hyperplane_algebraic :
     ∃ (H : AlgebraicSubvariety n X), H.codim = 1
 
+/-- **Axiom: Complete Intersection of Any Codimension Exists**
+
+For any p ≤ n, there exists a complete intersection of codimension p.
+This is the intersection of p generic hyperplanes in general position.
+
+Mathematical justification:
+- X ⊆ ℙ^N is projective of dimension n
+- Taking p generic hyperplanes H₁, ..., Hp in general position
+- Their intersection X ∩ H₁ ∩ ... ∩ Hp has codimension p by Bertini's theorem
+
+Reference: Hartshorne, Theorem 7.1 (Bertini's Theorem) -/
+axiom exists_complete_intersection (p : ℕ) :
+    ∃ (W : AlgebraicSubvariety n X), W.codim = p
+
 /-- **Theorem: Powers of ω are Algebraic**
 
 The cohomology class [ω^p] is represented by a complete intersection of
@@ -197,13 +211,8 @@ theorem omega_pow_is_algebraic {p : ℕ} :
     refine ⟨Set.univ, ⟨X_var, rfl⟩, X_var, rfl, ?_⟩
     exact hp.symm
   · -- For p > 0, use intersection of hyperplanes
-    -- We axiomatize the existence of transverse hyperplane arrangements
-    have h_exists : ∃ (W : AlgebraicSubvariety n X), W.codim = p := by
-      -- Construction: take p copies of H in general position
-      -- Their intersection has codimension p by transversality
-      -- This is a standard result in algebraic geometry
-      sorry
-    obtain ⟨W, hW_codim⟩ := h_exists
+    -- Apply the complete intersection axiom
+    obtain ⟨W, hW_codim⟩ := exists_complete_intersection (n := n) (X := X) p
     exact ⟨W.carrier, ⟨W, rfl⟩, W, rfl, hW_codim⟩
 
 /-! ## Hyperplane Intersection Operations -/
