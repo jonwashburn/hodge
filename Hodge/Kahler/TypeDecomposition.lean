@@ -81,7 +81,7 @@ theorem omega_is_1_1 (n : ℕ) (X : Type*)
 
 This is defined recursively:
 - ω^0 = 1 (the unit form)
-- ω^{p+1} = ω ∧ ω^p
+- ω^{p+1} = ω ⋀ ω^p
 
 The form ω^p is a (p,p)-form of degree 2p. -/
 def omegaPow (n : ℕ) (X : Type*)
@@ -90,18 +90,18 @@ def omegaPow (n : ℕ) (X : Type*)
     [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
     (p : ℕ) : SmoothForm n X (2 * p) :=
   match p with
-  | 0 => ⟨fun _ => 0⟩  -- The unit form (identity under wedge)
+  | 0 => unitForm
   | p + 1 =>
-    -- ω^{p+1} = ω ∧ ω^p
+    -- ω^{p+1} = ω ⋀ ω^p
     -- We need to cast since ω has degree 2 and ω^p has degree 2p
     have h_eq : 2 * (p + 1) = 2 + 2 * p := by ring
-    h_eq ▸ wedge K.omega_form (omegaPow n X p)
+    h_eq ▸ (K.omega_form ⋀ omegaPow n X p)
 
 /-- The p-th power of the Kähler form ω^p is a (p,p)-form.
 
 Proof: By induction on p.
 - Base case: ω^0 = 1 is a (0,0)-form
-- Inductive step: If ω^p is (p,p), then ω ∧ ω^p is (1,1) ∧ (p,p) = (p+1,p+1) -/
+- Inductive step: If ω^p is (p,p), then ω ⋀ ω^p is (1,1) ⋀ (p,p) = (p+1,p+1) -/
 theorem omega_pow_is_p_p (n : ℕ) (X : Type*)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]

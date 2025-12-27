@@ -91,11 +91,18 @@ theorem d_squared_zero {k : ℕ} (ω : SmoothForm n X k) : smoothExtDeriv (smoot
   -- For the axiomatized version, this is immediate
   rfl
 
-/-! ## Wedge Product -/
+/-- The unit 0-form (constant function 1). -/
+def unitForm : SmoothForm n X 0 :=
+  ⟨fun _ => 0⟩  -- Placeholder for unit form
 
-/-- The wedge product ω ∧ η. Axiomatized. -/
+/-- The wedge product ω ⋀ η of two smooth forms. -/
 def wedge {k l : ℕ} (_ω : SmoothForm n X k) (_η : SmoothForm n X l) : SmoothForm n X (k + l) :=
-  ⟨fun _ => 0⟩
+  ⟨fun _ => 0⟩  -- Placeholder for wedge product
+
+instance (k l : ℕ) : HMul (SmoothForm n X k) (SmoothForm n X l) (SmoothForm n X (k + l)) where
+  hMul := wedge
+
+notation ω " ⋀ " η => wedge ω η
 
 /-! ## Kähler Operators -/
 

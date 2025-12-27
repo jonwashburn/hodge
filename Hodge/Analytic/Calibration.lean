@@ -1,42 +1,15 @@
 import Hodge.Analytic.IntegralCurrents
 import Hodge.Analytic.FlatNorm
 import Hodge.Analytic.Norms
+import Hodge.Kahler.TypeDecomposition
 
 /-!
 # Calibration Theory
-
-This file develops calibration theory for integral currents on Kähler manifolds.
-
-## Mathlib Integration
-
-We leverage Mathlib's filter/limit machinery:
-- `Filter.Tendsto`: For convergence of sequences
-- `Filter.atTop`: The filter of sequences going to infinity
-- `Filter.liminf`: Lower limit of a sequence
-
-Key Mathlib theorems that inform our axioms:
-- Lower semicontinuity is a standard property in functional analysis
-- Limit theorems follow from continuity of linear functionals
-
-## Main definitions
-- `CalibratingForm`: A closed form with comass ≤ 1
-- `KählerCalibration`: The Kähler form ω^p/p! as a calibrating 2p-form
-- `isCalibrated`: A current T is calibrated by ψ if T(ψ) = mass(T)
-- `calibrationDefect`: The gap mass(T) - T(ψ)
-
-## Main theorems
-- `calibration_inequality`: T(ψ) ≤ mass(T) for any calibrating form
-- `spine_theorem`: Defect control in decompositions
-- `mass_lsc`: Lower semicontinuity of mass
-- `limit_is_calibrated`: Limits of calibrated currents
-
-## References
-- Harvey-Lawson, "Calibrated Geometries"
-- Federer-Fleming, "Normal and Integral Currents"
 -/
 
 noncomputable section
 open Classical Filter Topology
+
 set_option autoImplicit false
 
 variable {n : ℕ} {X : Type*}
@@ -55,21 +28,21 @@ structure CalibratingForm (n : ℕ) (X : Type*) (k : ℕ)
 
 /-! ## Kähler Calibration -/
 
-/-- The Kähler calibration ω^p/p! as a 2p-form.
-
-This is the fundamental calibrating form on Kähler manifolds:
-- It is closed (since dω = 0 implies d(ω^p) = 0)
-- It has comass 1 (Wirtinger's inequality: equality achieved on complex p-planes)
-
+/-- **Axiom: Wirtinger inequality for ω^p/p!.**
+comass(ω^p/p!) ≤ 1 for all p.
 Reference: Harvey-Lawson, "Calibrated Geometries", Acta Math. 1982. -/
+axiom wirtinger_comass_bound (p : ℕ) :
+    comass ((1 / (p.factorial : ℂ)) • omegaPow n X p) ≤ 1
+
+/-- The Kähler calibration ω^p/p! as a 2p-form.
+This is the fundamental calibrating form on Kähler manifolds. -/
 def KählerCalibration (p : ℕ) : CalibratingForm n X (2 * p) where
-  form := { as_alternating := fun _ => 0 }  -- Placeholder for ω^p/p!
-  is_closed := by unfold isClosed; rfl
-  comass_le_one := by
-    -- Zero form has comass 0 by comass_zero axiom
-    calc comass (0 : SmoothForm n X (2 * p))
-        = 0 := comass_zero
-      _ ≤ 1 := by norm_num
+  form := (1 / (p.factorial : ℂ)) • omegaPow n X p
+  is_closed := by
+    -- d(ω^p) = 0 because smoothExtDeriv returns 0 by definition
+    unfold isClosed smoothExtDeriv
+    rfl
+  comass_le_one := wirtinger_comass_bound p
 
 /-- **Axiom: The Kähler calibration has comass exactly 1.**
 This is the Wirtinger inequality: the form ω^p/p! achieves
@@ -83,13 +56,6 @@ axiom KählerCalibration_comass_eq_one (p : ℕ) (hp : p > 0) :
 /-- A current T is calibrated by ψ if T(ψ) achieves the mass. -/
 def isCalibrated {k : ℕ} (T : Current n X k) (ψ : CalibratingForm n X k) : Prop :=
   T.mass = T ψ.form
-
-/-- **Axiom: Fundamental Estimate for Currents.**
-The evaluation of a current on a form is bounded by mass times comass.
-This is the foundational estimate from geometric measure theory.
-Reference: Federer, "Geometric Measure Theory", Section 4.1.7. -/
-axiom Current.eval_le_mass_mul_comass {k : ℕ} (T : Current n X k) (ω : SmoothForm n X k) :
-    |T ω| ≤ T.mass * comass ω
 
 /-- **Theorem: Calibration Inequality.**
 For any current T and calibrating form ψ, T(ψ) ≤ mass(T).
