@@ -54,7 +54,7 @@ theorem harvey_lawson_union_is_algebraic {k : ℕ}
       obtain ⟨W, hW_carrier, _⟩ := serre_gaga v rfl
       exact ⟨W, hW_carrier⟩
     have h_rest_alg : isAlgebraicSubvariety n X (⋃ w ∈ vs, w.carrier) := ih
-    exact isAlgebraicSubvariety_union n X h_v_alg h_rest_alg
+    exact isAlgebraicSubvariety_union h_v_alg h_rest_alg
 
 /-- **Lemma: Degree Reduction Arithmetic** -/
 theorem degree_reduction_arithmetic {p : ℕ} (h : ¬(p ≤ n / 2)) : n - p ≤ n / 2 := by
@@ -83,15 +83,15 @@ theorem hard_lefschetz_fundamental_class_coherence {p p'' k : ℕ}
     (h_pk : p = p'' + k)
     (h_geom : HEq (lefschetz_power_form k η) γ)
     (h_alg : isAlgebraicSubvariety n X Z_η)
-    (h_class : FundamentalClassSet n X p'' Z_η = η) :
-    FundamentalClassSet n X p (algebraic_intersection_power n X Z_η k) = γ := by
+    (h_class : FundamentalClassSet p'' Z_η = η) :
+    FundamentalClassSet p (algebraic_intersection_power Z_η k) = γ := by
   revert h_class h_alg h_geom
   subst h_pk
   intro h_geom h_alg h_class
   have h_fact := FundamentalClassSet_intersection_power_eq p'' k Z_η h_alg
   rw [h_class] at h_fact
   apply eq_of_heq
-  have : HEq (FundamentalClassSet n X (p'' + k) (algebraic_intersection_power n X Z_η k))
+  have : HEq (FundamentalClassSet (p'' + k) (algebraic_intersection_power Z_η k))
              (lefschetz_power_form k η) := by
     rw [h_fact]
     apply cast_heq
@@ -110,8 +110,8 @@ theorem signed_decomposition_fundamental_class_coherence {p : ℕ}
     (Z_pos Z_neg : Set X)
     (h_alg_pos : isAlgebraicSubvariety n X Z_pos)
     (h_alg_neg : isAlgebraicSubvariety n X Z_neg)
-    (h_class_pos : FundamentalClassSet n X p Z_pos = γplus)
-    (h_class_neg : FundamentalClassSet n X p Z_neg = γminus) :
+    (h_class_pos : FundamentalClassSet p Z_pos = γplus)
+    (h_class_neg : FundamentalClassSet p Z_neg = γminus) :
     (SignedAlgebraicCycle.mk Z_pos Z_neg h_alg_pos h_alg_neg).fundamentalClass p = γ := by
   unfold SignedAlgebraicCycle.fundamentalClass
   rw [h_class_pos, h_class_neg, h_eq]
@@ -129,7 +129,7 @@ axiom harvey_lawson_fundamental_class {p : ℕ}
     (hγ : isConePositive γplus)
     (hl_concl : HarveyLawsonConclusion n X (2 * (n - p)))
     (h_represents : True) :  -- Placeholder for: the Harvey-Lawson varieties represent γplus
-    FundamentalClassSet n X p (⋃ v ∈ hl_concl.varieties, v.carrier) = γplus
+    FundamentalClassSet p (⋃ v ∈ hl_concl.varieties, v.carrier) = γplus
 
 /-- **Axiom: Complete Intersection Fundamental Class**
 A complete intersection of p hyperplanes in general position has
@@ -140,7 +140,7 @@ is a positive rational multiple of ω^p. -/
 axiom complete_intersection_fundamental_class {p : ℕ}
     (W : AlgebraicSubvariety n X)
     (hW_codim : W.codim = p) :
-    ∃ (c : ℚ), c > 0 ∧ FundamentalClassSet n X p W.carrier = (c : ℝ) • omegaPow n X p
+    ∃ (c : ℚ), c > 0 ∧ FundamentalClassSet p W.carrier = (c : ℝ) • omegaPow n X p
 
 /-! ## The Hodge Conjecture -/
 
@@ -176,14 +176,14 @@ theorem hodge_conjecture_full {p : ℕ} (γ : SmoothForm n X (2 * p))
     let Z_pos := ⋃ v ∈ hl_concl.varieties, v.carrier
     have h_alg_pos : isAlgebraicSubvariety n X Z_pos := harvey_lawson_union_is_algebraic hl_concl
     -- Get algebraic variety for γ⁻ (complete intersection)
-    obtain ⟨Z_neg, h_alg_neg, _⟩ := omega_pow_is_algebraic n X p
+    obtain ⟨Z_neg, h_alg_neg, _⟩ := omega_pow_is_algebraic p
     -- Construct signed cycle
     let Z : SignedAlgebraicCycle n X := ⟨Z_pos, Z_neg, h_alg_pos, h_alg_neg⟩
     use Z
     -- Prove fundamental class equals γ
-    have h_class_pos : FundamentalClassSet n X p Z_pos = γplus :=
+    have h_class_pos : FundamentalClassSet p Z_pos = γplus :=
       harvey_lawson_fundamental_class γplus h_plus_cone hl_concl trivial
-    have h_class_neg : FundamentalClassSet n X p Z_neg = γminus := by
+    have h_class_neg : FundamentalClassSet p Z_neg = γminus := by
       -- This follows from the complete intersection having the right class
       -- Axiomatized: any complete intersection can represent any rational positive class
       exact complete_intersection_represents_class γminus Z_neg h_alg_neg
@@ -204,7 +204,7 @@ theorem hodge_conjecture_full {p : ℕ} (γ : SmoothForm n X (2 * p))
     let hl_concl_η := harvey_lawson_theorem { T := T_η, ψ := ψ_η, is_cycle := h_T_η_cycle, is_calibrated := h_T_η_calib }
     let Z_η_pos := ⋃ v ∈ hl_concl_η.varieties, v.carrier
     have h_alg_η_pos : isAlgebraicSubvariety n X Z_η_pos := harvey_lawson_union_is_algebraic hl_concl_η
-    obtain ⟨Z_η_neg, h_alg_η_neg, _⟩ := omega_pow_is_algebraic n X p''
+    obtain ⟨Z_η_neg, h_alg_η_neg, _⟩ := omega_pow_is_algebraic p''
     -- The signed cycle for η
     let Z_η : SignedAlgebraicCycle n X := ⟨Z_η_pos, Z_η_neg, h_alg_η_pos, h_alg_η_neg⟩
     -- Use Lefschetz to lift Z_η to a cycle representing γ
@@ -215,7 +215,7 @@ theorem hodge_conjecture_full {p : ℕ} (γ : SmoothForm n X (2 * p))
 axiom complete_intersection_represents_class {p : ℕ}
     (γ : SmoothForm n X (2 * p)) (Z : Set X)
     (hZ : isAlgebraicSubvariety n X Z) :
-    FundamentalClassSet n X p Z = γ
+    FundamentalClassSet p Z = γ
 
 /-- Axiom: Lefschetz lift for signed cycles.
 If Z_η represents η at degree 2p'', then intersecting with hyperplanes gives

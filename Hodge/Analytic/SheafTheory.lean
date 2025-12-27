@@ -4,6 +4,19 @@ import Mathlib.Algebra.Category.Ring.Basic
 import Mathlib.Geometry.Manifold.MFDeriv.Basic
 import Hodge.Basic
 
+/-!
+# Sheaf Theory for Complex Manifolds
+
+This file provides axiomatized definitions for sheaf-theoretic constructions
+needed in the Hodge conjecture formalization.
+
+## Main Definitions
+
+- `CoherentSheaf`: A coherent sheaf on a complex projective manifold
+- `SheafCohomology`: The q-th sheaf cohomology group H^q(X, F)
+- `vanishes`: Predicate for vanishing cohomology groups
+-/
+
 noncomputable section
 
 open CategoryTheory TopologicalSpace Opposite
@@ -19,7 +32,7 @@ axiom structureSheaf (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] : Sheaf (Opens.grothendieckTopology (TopCat.of X)) CommRingCat
 
-/-- A coherent sheaf on a complex manifold (axiomatized as a type). -/
+/-- A coherent sheaf on a complex manifold. -/
 axiom CoherentSheaf (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
@@ -46,10 +59,12 @@ axiom SheafCohomology.instModule {n : ℕ} {X : Type u}
     (F : CoherentSheaf n X) (q : ℕ) : Module ℂ (SheafCohomology F q)
 attribute [instance] SheafCohomology.instModule
 
-/-- A cohomology group vanishes if it is isomorphic to the zero module. -/
+/-- A cohomology group vanishes if all elements are zero. -/
 def vanishes {n : ℕ} {X : Type u}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X]
     (F : CoherentSheaf n X) (q : ℕ) : Prop :=
   ∀ (s : SheafCohomology F q), s = 0
+
+end
