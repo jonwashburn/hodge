@@ -47,8 +47,14 @@ theorem mass_add_le {k : ℕ} (S T : Current n X k) : (S + T).mass ≤ S.mass + 
 /-- The boundary operator ∂ : Current_{k+1} → Current_k. -/
 def Current.boundary {k : ℕ} (T : Current n X (k + 1)) : Current n X k where
   toFun := fun ω => T (smoothExtDeriv ω)
-  map_add' := fun _ _ => by simp only [smoothExtDeriv]
-  map_smul' := fun _ _ => by simp only [smoothExtDeriv, RingHom.id_apply]
+  map_add' := fun _ _ => by
+    simp only [smoothExtDeriv]
+    have h : (⟨fun _ => 0⟩ : SmoothForm n X (k + 1)) = 0 := rfl
+    rw [h, map_zero, add_zero]
+  map_smul' := fun r _ => by
+    simp only [smoothExtDeriv, RingHom.id_apply]
+    have h : (⟨fun _ => 0⟩ : SmoothForm n X (k + 1)) = 0 := rfl
+    rw [h, map_zero, smul_zero]
 
 /-- A current is a cycle if its boundary is zero. -/
 def Current.isCycle {k : ℕ} (T : Current n X (k + 1)) : Prop :=

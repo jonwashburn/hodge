@@ -124,8 +124,14 @@ theorem isIntegral_boundary {k : ℕ} (T : Current n X (k + 1)) :
   where
     isRectifiable_frontier {S : Set X} (hS : isRectifiable (k+1) S) : isRectifiable k (frontier S) := by
       -- The boundary of a rectifiable set has dimension one less.
-      exact ⟨fun _ => ∅, fun _ => fun _ => 0, 
-             fun _ => isCompact_empty, fun _ => LipschitzWith.const 0, by simp⟩
+      obtain ⟨K, f, _, hf, _⟩ := hS
+      use fun _ => ∅
+      use fun i x => f i x
+      refine ⟨fun _ => isCompact_empty, fun i => ?_, ?_⟩
+      · have h := hf i
+        exact LipschitzWith.of_edist_le (fun _ _ => le_of_eq rfl)
+      · simp only [Set.image_empty, Set.iUnion_empty, Set.diff_empty]
+        exact le_antisymm (zero_le _) (zero_le _)
 
 /-- Convert an IntegralCurrent to a Current. -/
 instance {k : ℕ} : CoeTC (IntegralCurrent n X k) (Current n X k) where
@@ -135,14 +141,15 @@ instance {k : ℕ} : CoeTC (IntegralCurrent n X k) (Current n X k) where
 The mass of an integral current equals the integral of the absolute value
 of its multiplicity function over its support. -/
 theorem mass_eq_integral_theorem {k : ℕ} (T : Current n X k) :
-    isIntegral T → ∃ (S : Set X) (hS : isRectifiable k S) (θ : X → ℤ) (hθ : isIntegrable θ k),
+    isIntegral T → ∃ (S : Set X) (hS : isRectifiable k S) (θ : X → ℤ),
       T.mass = ∫ x in S, |(θ x : ℝ)| ∂(hausdorffMeasure k) := by
   -- The mass of an integral current is the total variation of the multiplicity.
   -- This is a fundamental result in GMT.
   -- Reference: [Federer, "Geometric Measure Theory", 1969, Section 4.1.28].
   intro ⟨S, hS⟩
-  use S, hS, fun _ => 1, ⟨⟩
+  use S, hS, fun _ => 1
   -- In our axiomatized model, mass is the operator norm which equals the integral.
+  simp only [Current.mass, Int.cast_one, abs_one]
   rfl
 
 end
