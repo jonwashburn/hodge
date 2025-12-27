@@ -40,6 +40,33 @@ Each agent works on isolated files to minimize build conflicts. Just prompt:
 
 ---
 
+## 🔒 FILE OWNERSHIP (STRICT - NO EXCEPTIONS)
+
+**Each file belongs to exactly ONE track. Do not edit files owned by other tracks.**
+
+| Track | EXCLUSIVE Files (only this track may edit) |
+|-------|-------------------------------------------|
+| **A1** | `Classical/SerreVanishing.lean` |
+| **A2** | `Classical/Bergman.lean` |
+| **A3** | `Classical/GAGA.lean`, `Classical/FedererFleming.lean` |
+| **A4** | `Analytic/Calibration.lean`, `Analytic/Norms.lean`, `Analytic/Grassmannian.lean` |
+| **A5** | `Kahler/Cone.lean`, `Kahler/Microstructure.lean`, `Kahler/TypeDecomposition.lean` |
+
+**NOBODY touches until Phase 2:**
+- `Basic.lean`
+- `Main.lean`
+- `Kahler/Main.lean`
+- `Classical/HarveyLawson.lean`
+- `Classical/Lefschetz.lean`
+- `Analytic/IntegralCurrents.lean`
+- `Analytic/Forms.lean`
+- `Analytic/Currents.lean`
+- `Analytic/FlatNorm.lean`
+- `Kahler/Manifolds.lean`
+- `Kahler/SignedDecomp.lean`
+
+---
+
 ### Track A1: Serre Vanishing (14 sorries)
 
 **File:** `Hodge/Classical/SerreVanishing.lean`
@@ -55,7 +82,8 @@ Each agent works on isolated files to minimize build conflicts. Just prompt:
 - `def structureSheaf` — cokernel presentation
 - `theorem jet_surjectivity_from_serre` — derive from vanishing + LES
 
-**DO NOT EDIT:** `Basic.lean`, `Main.lean`, any file outside `Classical/`
+**YOUR FILE:** `Classical/SerreVanishing.lean` — ONLY edit this file
+**DO NOT EDIT:** Everything else, especially `Bergman.lean`, `GAGA.lean`, `FedererFleming.lean`
 
 ---
 
@@ -73,7 +101,8 @@ Each agent works on isolated files to minimize build conflicts. Just prompt:
 - `theorem tian_convergence` — Bergman → Kähler in C^2
 - `theorem jet_surjectivity` — jets are surjective for large M
 
-**DO NOT EDIT:** `Basic.lean`, `Main.lean`, any file outside `Classical/`
+**YOUR FILE:** `Classical/Bergman.lean` — ONLY edit this file
+**DO NOT EDIT:** Everything else, especially `SerreVanishing.lean`, `GAGA.lean`, `FedererFleming.lean`
 
 ---
 
@@ -100,7 +129,8 @@ lake build Hodge.Classical.FedererFleming
 - `theorem deformation_theorem` — polyhedral approximation
 - `theorem federer_fleming_compactness` — diagonal argument + completeness
 
-**DO NOT EDIT:** `Basic.lean`, `Main.lean`, `HarveyLawson.lean`
+**YOUR FILES:** `Classical/GAGA.lean`, `Classical/FedererFleming.lean` — ONLY edit these files
+**DO NOT EDIT:** Everything else, especially `SerreVanishing.lean`, `Bergman.lean`, `HarveyLawson.lean`
 
 ---
 
@@ -131,7 +161,8 @@ lake build Hodge.Analytic.Grassmannian
 - `theorem calibratedCone_is_closed` — cone closure
 - `theorem radial_minimization` — projection onto ray
 
-**DO NOT EDIT:** `Basic.lean`, `Main.lean`, `IntegralCurrents.lean`
+**YOUR FILES:** `Analytic/Calibration.lean`, `Analytic/Norms.lean`, `Analytic/Grassmannian.lean` — ONLY edit these files
+**DO NOT EDIT:** Everything else, especially `IntegralCurrents.lean`, `Forms.lean`, `Currents.lean`, any `Classical/` or `Kahler/` file
 
 ---
 
@@ -164,7 +195,8 @@ lake build Hodge.Kahler.TypeDecomposition
 **TypeDecomposition sorries:**
 - `theorem hodge_decomposition` — spectral projections
 
-**DO NOT EDIT:** `Basic.lean`, `Main.lean`, `Kahler/Main.lean`
+**YOUR FILES:** `Kahler/Cone.lean`, `Kahler/Microstructure.lean`, `Kahler/TypeDecomposition.lean` — ONLY edit these files
+**DO NOT EDIT:** Everything else, especially `Kahler/Main.lean`, `Kahler/Manifolds.lean`, `Kahler/SignedDecomp.lean`, any `Classical/` or `Analytic/` file
 
 ---
 
