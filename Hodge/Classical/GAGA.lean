@@ -12,11 +12,16 @@ set_option autoImplicit false
 # Track A.3: Serre's GAGA Theorem and Algebraic Subvarieties
 -/
 
+variable {n : ℕ} {X : Type*}
+  [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+  [IsManifold (𝓒_complex n) ⊤ X]
+  [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
+
 /-- An algebraic subvariety of a projective variety X. -/
 structure AlgebraicSubvariety (n : ℕ) (X : Type*)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] where
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] where
   carrier : Set X
   codim : ℕ
   defining_sections : ∃ (L : HolomorphicLineBundle n X) (_hL : IsAmple L) (M : ℕ),
@@ -27,22 +32,15 @@ structure AlgebraicSubvariety (n : ℕ) (X : Type*)
 def isAlgebraicSubvariety (n : ℕ) (X : Type*)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] (Z : Set X) : Prop :=
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] (Z : Set X) : Prop :=
   ∃ (W : AlgebraicSubvariety n X), W.carrier = Z
 
 /-- **Theorem: GAGA (Serre, 1956)** -/
-axiom serre_gaga {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X]
-    {p : ℕ} (V : AnalyticSubvariety n X) (hV_codim : V.codim = p) :
+axiom serre_gaga {p : ℕ} (V : AnalyticSubvariety n X) (hV_codim : V.codim = p) :
     ∃ (W : AlgebraicSubvariety n X), W.carrier = V.carrier ∧ W.codim = p
 
 /-- The union of two algebraic subvarieties is algebraic. -/
-theorem isAlgebraicSubvariety_union (n : ℕ) (X : Type*)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] {Z₁ Z₂ : Set X}
+theorem isAlgebraicSubvariety_union {Z₁ Z₂ : Set X}
     (h1 : isAlgebraicSubvariety n X Z₁) (h2 : isAlgebraicSubvariety n X Z₂) :
     isAlgebraicSubvariety n X (Z₁ ∪ Z₂) := by
   obtain ⟨W1, rfl⟩ := h1
@@ -56,10 +54,7 @@ theorem isAlgebraicSubvariety_union (n : ℕ) (X : Type*)
   exact ⟨W_u, hW_u_carrier⟩
 
 /-- The intersection of two algebraic subvarieties is algebraic. -/
-theorem isAlgebraicSubvariety_intersection (n : ℕ) (X : Type*)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] {Z₁ Z₂ : Set X}
+theorem isAlgebraicSubvariety_intersection {Z₁ Z₂ : Set X}
     (h1 : isAlgebraicSubvariety n X Z₁) (h2 : isAlgebraicSubvariety n X Z₂) :
     isAlgebraicSubvariety n X (Z₁ ∩ Z₂) := by
   obtain ⟨W1, rfl⟩ := h1
@@ -74,71 +69,44 @@ theorem isAlgebraicSubvariety_intersection (n : ℕ) (X : Type*)
 
 /-! ## Fundamental Class -/
 
-axiom exists_fundamental_form {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] (W : AlgebraicSubvariety n X) :
+axiom exists_fundamental_form (W : AlgebraicSubvariety n X) :
     ∃ (η : SmoothForm n X (2 * W.codim)), isClosed η
 
-noncomputable def FundamentalClass {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] (W : AlgebraicSubvariety n X) : SmoothForm n X (2 * W.codim) :=
+noncomputable def FundamentalClass (W : AlgebraicSubvariety n X) : SmoothForm n X (2 * W.codim) :=
   Classical.choose (exists_fundamental_form W)
 
-theorem FundamentalClass_isClosed {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] (W : AlgebraicSubvariety n X) :
+theorem FundamentalClass_isClosed (W : AlgebraicSubvariety n X) :
     isClosed (FundamentalClass W) :=
   (Classical.choose_spec (exists_fundamental_form W))
 
 /-! ## Fundamental Class for Sets -/
 
-axiom exists_fundamental_form_set {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] (p : ℕ) (Z : Set X) (h : isAlgebraicSubvariety n X Z) :
+axiom exists_fundamental_form_set (p : ℕ) (Z : Set X) (h : isAlgebraicSubvariety n X Z) :
     ∃ (η : SmoothForm n X (2 * p)), isClosed η
 
-noncomputable def FundamentalClassSet (n : ℕ) (X : Type*)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] (p : ℕ) (Z : Set X) : SmoothForm n X (2 * p) :=
+noncomputable def FundamentalClassSet (p : ℕ) (Z : Set X) : SmoothForm n X (2 * p) :=
   if h : isAlgebraicSubvariety n X Z then
     Classical.choose (exists_fundamental_form_set p Z h)
   else
     0
 
-axiom FundamentalClassSet_eq_FundamentalClass {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] (W : AlgebraicSubvariety n X) :
-    FundamentalClassSet n X W.codim W.carrier = FundamentalClass W
+axiom FundamentalClassSet_eq_FundamentalClass (W : AlgebraicSubvariety n X) :
+    FundamentalClassSet W.codim W.carrier = FundamentalClass W
 
-axiom FundamentalClassSet_empty {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] (p : ℕ) : FundamentalClassSet n X p (∅ : Set X) = 0
+axiom FundamentalClassSet_empty (p : ℕ) : FundamentalClassSet p (∅ : Set X) = 0
 
 /-! ## ω^p is Algebraic (Complete Intersections) -/
 
-axiom exists_hyperplane_algebraic (n : ℕ) (X : Type*)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] :
+axiom exists_hyperplane_algebraic :
     ∃ (H : AlgebraicSubvariety n X), H.codim = 1
 
-axiom exists_complete_intersection (n : ℕ) (X : Type*)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] (p : ℕ) :
+axiom exists_complete_intersection (p : ℕ) :
     ∃ (W : AlgebraicSubvariety n X), W.codim = p
 
-theorem omega_pow_is_algebraic (n : ℕ) (X : Type*)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] (p : ℕ) :
+theorem omega_pow_is_algebraic (p : ℕ) :
     ∃ (Z : Set X), isAlgebraicSubvariety n X Z ∧
     ∃ (W : AlgebraicSubvariety n X), W.carrier = Z ∧ W.codim = p := by
-  obtain ⟨H, _⟩ := exists_hyperplane_algebraic n X
+  obtain ⟨H, _⟩ := @exists_hyperplane_algebraic n X _ _ _ _ K
   by_cases hp : p = 0
   · let X_var : AlgebraicSubvariety n X := {
       carrier := Set.univ
@@ -149,77 +117,73 @@ theorem omega_pow_is_algebraic (n : ℕ) (X : Type*)
     }
     refine ⟨Set.univ, ⟨X_var, rfl⟩, X_var, rfl, ?_⟩
     exact hp.symm
-  · obtain ⟨W, hW_codim⟩ := exists_complete_intersection n X p
+  · obtain ⟨W, hW_codim⟩ := @exists_complete_intersection n X _ _ _ _ K p
     exact ⟨W.carrier, ⟨W, rfl⟩, W, rfl, hW_codim⟩
 
 /-! ## Hyperplane Intersection Operations -/
 
-noncomputable def hyperplaneClass (n : ℕ) (X : Type*)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] : AlgebraicSubvariety n X :=
-  Classical.choose (exists_hyperplane_algebraic n X)
+noncomputable def hyperplaneClass : AlgebraicSubvariety n X :=
+  Classical.choose (@exists_hyperplane_algebraic n X _ _ _ _ K)
 
-theorem hyperplaneClass_codim (n : ℕ) (X : Type*)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] : (hyperplaneClass n X).codim = 1 :=
-  Classical.choose_spec (exists_hyperplane_algebraic n X)
+theorem hyperplaneClass_codim : (hyperplaneClass (n := n) (X := X)).codim = 1 :=
+  Classical.choose_spec (@exists_hyperplane_algebraic n X _ _ _ _ K)
 
-noncomputable def algebraic_intersection_power (n : ℕ) (X : Type*)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X]
-    (Z : Set X) (k : ℕ) : Set X :=
+noncomputable def algebraic_intersection_power (Z : Set X) (k : ℕ) : Set X :=
   if k = 0 then Z
-  else Z ∩ (hyperplaneClass n X).carrier
+  else Z ∩ hyperplaneClass.carrier
 
-theorem isAlgebraicSubvariety_intersection_power (n : ℕ) (X : Type*)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X]
-    {Z : Set X} {k : ℕ}
+theorem isAlgebraicSubvariety_intersection_power {Z : Set X} {k : ℕ}
     (h : isAlgebraicSubvariety n X Z) :
-    isAlgebraicSubvariety n X (algebraic_intersection_power n X Z k) := by
+    isAlgebraicSubvariety n X (algebraic_intersection_power Z k) := by
   unfold algebraic_intersection_power
   split_ifs with hk
   · exact h
-  · apply isAlgebraicSubvariety_intersection n X h
-    exact ⟨hyperplaneClass n X, rfl⟩
+  · apply isAlgebraicSubvariety_intersection h
+    exact ⟨hyperplaneClass, rfl⟩
 
 /-! ## Fundamental Class and Lefschetz -/
 
-axiom FundamentalClass_intersection_power_eq {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X]
-    {p k : ℕ}
+axiom FundamentalClass_intersection_power_eq {p k : ℕ}
     (W : AlgebraicSubvariety n X) (_hW : W.codim = p) :
     ∃ (W' : AlgebraicSubvariety n X),
-      W'.carrier = algebraic_intersection_power n X W.carrier k ∧
+      W'.carrier = algebraic_intersection_power W.carrier k ∧
       W'.codim = p + k
 
 /-- The fundamental class of an intersection with k hyperplanes equals L^k of the original. -/
-axiom FundamentalClassSet_intersection_power_eq {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    (p k : ℕ) (Z : Set X) (hZ : isAlgebraicSubvariety n X Z) :
-    FundamentalClassSet n X (p + k) (algebraic_intersection_power n X Z k) =
+axiom FundamentalClassSet_intersection_power_eq (p k : ℕ) (Z : Set X)
+    (hZ : isAlgebraicSubvariety n X Z) :
+    FundamentalClassSet (p + k) (algebraic_intersection_power Z k) =
     (show SmoothForm n X (2 * p + 2 * k) = SmoothForm n X (2 * (p + k)) from by ring_nf) ▸
-    lefschetz_power_form k (FundamentalClassSet n X p Z)
+    lefschetz_power_form k (FundamentalClassSet p Z)
 
 /-! ## Functoriality of Fundamental Class -/
 
-axiom FundamentalClassSet_additive {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X]
-    {p : ℕ} (Z₁ Z₂ : Set X) :
-    FundamentalClassSet n X p (Z₁ ∪ Z₂) = FundamentalClassSet n X p Z₁ + FundamentalClassSet n X p Z₂
+axiom FundamentalClassSet_additive {p : ℕ} (Z₁ Z₂ : Set X) (h_disjoint : Z₁ ∩ Z₂ = ∅) :
+    FundamentalClassSet p (Z₁ ∪ Z₂) = FundamentalClassSet p Z₁ + FundamentalClassSet p Z₂
 
-axiom FundamentalClassSet_difference {n : ℕ} {X : Type*}
+/-! ## Signed Algebraic Cycles -/
+
+/-- A signed algebraic cycle: a formal difference Z⁺ - Z⁻ of effective cycles. -/
+structure SignedAlgebraicCycle (n : ℕ) (X : Type*)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X]
-    {p : ℕ} (Z_pos Z_neg : Set X) :
-    FundamentalClassSet n X p (Z_pos ∪ Z_neg) = FundamentalClassSet n X p Z_pos - FundamentalClassSet n X p Z_neg
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] where
+  pos : Set X
+  neg : Set X
+  pos_alg : isAlgebraicSubvariety n X pos
+  neg_alg : isAlgebraicSubvariety n X neg
+
+/-- The fundamental class of a signed cycle is the difference of fundamental classes. -/
+noncomputable def SignedAlgebraicCycle.fundamentalClass (p : ℕ)
+    (Z : SignedAlgebraicCycle n X) : SmoothForm n X (2 * p) :=
+  FundamentalClassSet p Z.pos - FundamentalClassSet p Z.neg
+
+/-- The support of a signed cycle is Z⁺ ∪ Z⁻. -/
+def SignedAlgebraicCycle.support (Z : SignedAlgebraicCycle n X) : Set X := Z.pos ∪ Z.neg
+
+/-- The support of a signed cycle is algebraic. -/
+theorem SignedAlgebraicCycle.support_is_algebraic (Z : SignedAlgebraicCycle n X) :
+    isAlgebraicSubvariety n X Z.support :=
+  isAlgebraicSubvariety_union Z.pos_alg Z.neg_alg
 
 end
