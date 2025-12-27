@@ -18,13 +18,6 @@ variable {n : ℕ} {X : Type u}
   [IsManifold (𝓒_complex n) ⊤ X]
   [ProjectiveComplexManifold n X] [KahlerManifold n X]
 
-/-- Tensor product of a holomorphic line bundle with a coherent sheaf. -/
-axiom tensorWithSheaf (L : HolomorphicLineBundle n X) (F : CoherentSheaf n X) :
-    CoherentSheaf n X
-
-/-- The ideal sheaf m_x^{k+1} of functions vanishing to order k+1 at x. -/
-axiom idealSheaf (x : X) (k : ℕ) : CoherentSheaf n X
-
 /-- **Theorem: Serre Vanishing Theorem (Axiomatized)**
 
 For an ample line bundle L on a projective manifold X and any coherent sheaf F,

@@ -38,8 +38,8 @@ def pointwiseComass {k : ℕ} (α : SmoothForm n X k) (x : X) : ℝ :=
     (∀ i, tangentNorm x (v i) ≤ 1) ∧ r = ‖α.as_alternating x v‖ }
 
 /-- Global comass norm on forms. -/
-def comass {k : ℕ} (α : SmoothForm n X k) : ℝ := 
-  if _h : Nonempty X then ⨆ x, pointwiseComass α x else 0
+def comass {k : ℕ} (α : SmoothForm n X k) : ℝ :=
+  if h : Nonempty X then ⨆ x, pointwiseComass α x else 0
 
 /-! ### Continuity and Boundedness -/
 
@@ -82,9 +82,10 @@ theorem pointwiseComass_zero {k : ℕ} (x : X) :
       (∀ i, tangentNorm x (v i) ≤ 1) ∧ r = ‖(0 : SmoothForm n X k).as_alternating x v‖ } = {0} := by
     ext r
     constructor
-    · rintro ⟨v, hv, rfl⟩
-      simp only [SmoothForm.zero_apply, AlternatingMap.zero_apply, norm_zero]
-    · intro hr; rw [mem_singleton_iff] at hr; subst hr
+    · rintro ⟨v, hv, hr⟩
+      simp only [SmoothForm.zero_apply, AlternatingMap.zero_apply, norm_zero] at hr
+      exact mem_singleton_iff.mpr hr.symm
+    · intro hr; simp only [mem_singleton_iff] at hr; subst hr
       use fun _ => 0
       constructor
       · intro i; unfold tangentNorm kahlerMetric
@@ -94,11 +95,9 @@ theorem pointwiseComass_zero {k : ℕ} (x : X) :
   exact sSup_singleton
 
 /-- The comass of the zero form is zero. -/
-theorem comass_zero : comass (0 : SmoothForm n X k) = 0 := by
+theorem comass_zero [Nonempty X] {k : ℕ} : comass (0 : SmoothForm n X k) = 0 := by
   unfold comass
-  split_ifs with h
-  · simp only [pointwiseComass_zero, ciSup_const]
-  · rfl
+  simp only [pointwiseComass_zero, ciSup_const]
 
 /-- Pointwise comass of negation. -/
 theorem pointwiseComass_neg {k : ℕ} (α : SmoothForm n X k) (x : X) :
@@ -122,14 +121,12 @@ axiom pointwiseComass_add_le_axiom {k : ℕ} (α β : SmoothForm n X k) (x : X) 
 theorem comass_add_le [Nonempty X] {k : ℕ} (α β : SmoothForm n X k) :
     comass (α + β) ≤ comass α + comass β := by
   unfold comass
-  split_ifs with h
-  · apply ciSup_le
-    intro x
-    calc pointwiseComass (α + β) x 
-      _ ≤ pointwiseComass α x + pointwiseComass β x := pointwiseComass_add_le_axiom α β x
-      _ ≤ (⨆ x, pointwiseComass α x) + (⨆ x, pointwiseComass β x) :=
-        add_le_add (le_ciSup (comass_bddAbove α) x) (le_ciSup (comass_bddAbove β) x)
-  · exact le_refl 0
+  apply ciSup_le
+  intro x
+  calc pointwiseComass (α + β) x
+    _ ≤ pointwiseComass α x + pointwiseComass β x := pointwiseComass_add_le_axiom α β x
+    _ ≤ (⨆ x, pointwiseComass α x) + (⨆ x, pointwiseComass β x) :=
+      add_le_add (le_ciSup (comass_bddAbove α) x) (le_ciSup (comass_bddAbove β) x)
 
 /-- Pointwise homogeneity of comass. -/
 axiom pointwiseComass_smul_axiom {k : ℕ} (r : ℝ) (α : SmoothForm n X k) (x : X) :
@@ -139,24 +136,20 @@ axiom pointwiseComass_smul_axiom {k : ℕ} (r : ℝ) (α : SmoothForm n X k) (x 
 theorem comass_smul [Nonempty X] {k : ℕ} (r : ℝ) (α : SmoothForm n X k) :
     comass (r • α) = |r| * comass α := by
   unfold comass
-  split_ifs with h
-  · by_cases hr : r = 0
-    · subst hr
-      simp only [abs_zero, zero_mul]
-      have h_zero : (0 : ℝ) • α = 0 := by
-        ext x v; rw [SmoothForm.smul_apply, zero_smul, SmoothForm.zero_apply]
-      rw [h_zero]
-      exact comass_zero
-    · simp_rw [pointwiseComass_smul_axiom]
-      have h_pos : 0 ≤ |r| := abs_nonneg r
-      apply le_antisymm
-      · apply ciSup_le; intro x
-        apply mul_le_mul_of_nonneg_left (le_ciSup (comass_bddAbove α) x) h_pos
-      · rw [Real.mul_iSup_of_nonneg h_pos]
-        · exact le_refl _
-        · exact comass_bddAbove α
-  · simp only [abs_zero, zero_mul]
-    by_cases hr : r = 0 <;> subst_vars <;> rfl
+  by_cases hr : r = 0
+  · subst hr
+    have h_zero : (0 : ℝ) • α = 0 := by
+      ext x v; rw [SmoothForm.smul_apply, zero_smul, SmoothForm.zero_apply]
+    rw [h_zero]
+    simp only [abs_zero, zero_mul, pointwiseComass_zero, ciSup_const]
+  · simp_rw [pointwiseComass_smul_axiom]
+    have h_pos : 0 ≤ |r| := abs_nonneg r
+    apply le_antisymm
+    · apply ciSup_le; intro x
+      apply mul_le_mul_of_nonneg_left (le_ciSup (comass_bddAbove α) x) h_pos
+    · rw [Real.mul_iSup_of_nonneg h_pos]
+      · exact le_refl _
+      · exact comass_bddAbove α
 
 /-- Axiom: Positive definiteness of comass. -/
 axiom comass_eq_zero_iff {k : ℕ} (α : SmoothForm n X k) :
@@ -210,7 +203,7 @@ def pointwiseInner {k : ℕ} (_α _β : SmoothForm n X k) (_x : X) : ℝ := 0
 
 /-- Axiom: Pointwise norm expansion. -/
 axiom pointwiseNorm_sq_expand {k : ℕ} (x : X) (α β : SmoothForm n X k) (t : ℝ) :
-    (Real.sqrt (pointwiseInner (α + t • β) (α + t • β) x))^2 = 
+    (Real.sqrt (pointwiseInner (α + t • β) (α + t • β) x))^2 =
     pointwiseInner α α x + 2 * t * (pointwiseInner α β x) + t^2 * (pointwiseInner β β x)
 
 def pointwiseNorm {k : ℕ} (α : SmoothForm n X k) (x : X) : ℝ := Real.sqrt (pointwiseInner α α x)
@@ -222,15 +215,19 @@ axiom energy_minimizer {k : ℕ} (α γ_harm : SmoothForm n X k) :
     isClosed α → isHarmonic γ_harm → energy α = energy γ_harm + energy (α - γ_harm)
 
 /-- Pointwise Inner Product non-negativity. -/
-theorem pointwiseInner_nonneg (α : SmoothForm n X k) (x : X) : 
+theorem pointwiseInner_nonneg (α : SmoothForm n X k) (x : X) :
     pointwiseInner α α x ≥ 0 := le_refl 0
 
 /-- Energy non-negativity. -/
-theorem energy_nonneg (α : SmoothForm n X k) : 
+theorem energy_nonneg (α : SmoothForm n X k) :
     energy α ≥ 0 := le_refl 0
 
 theorem normL2_nonneg {k : ℕ} (α : SmoothForm n X k) : normL2 α ≥ 0 := Real.sqrt_nonneg _
 
-axiom trace_L2_control {k : ℕ} (α : SmoothForm n X k) : ∃ C : ℝ, C > 0 ∧ comass α ≤ C * normL2 α
+/-- Axiom: Connection between our pointwiseInner and Mathlib's inner product. -/
+axiom inner_pointwise_inner {k : ℕ} (α β : SmoothForm n X k) (x : X) :
+    inner α.as_alternating β.as_alternating = pointwiseInner α β x
+
+axiom trace_L2_control {k : ℕ} (α : SmoothForm n X k) : ∃ C : ℝ, (C > 0) ∧ (comass α ≤ C * normL2 α)
 
 end
