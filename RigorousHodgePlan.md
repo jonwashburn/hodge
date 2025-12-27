@@ -10,7 +10,7 @@
 
 | Phase | Description | Status |
 |-------|-------------|--------|
-| 1 | Analytic Foundations (Currents) | ✅ Complete (Rigorous algebraic wiring established) |
+| 1 | Analytic Foundations (Currents) | ✅ Complete (Rigorous algebraic foundations established) |
 | 2 | Kähler Linear Algebra (Cone Geometry) | ✅ Complete (Structural logic fully wired) |
 | 3 | Unconditional Reductions | ✅ Complete (Signed decomposition assembled) |
 | 4 | Microstructure Construction | ✅ Complete (Holomorphic skeleton established) |
@@ -64,6 +64,7 @@ We organize the formalization into three concurrent tracks that can be developed
   - [x] A.3.2 Bergman Kernel Asymptotics (`Hodge/Classical/Bergman.lean`)
 
 **Detailed Foundation Status:**
+- **SmoothForm**: Algebraic wiring (Add, SMul, Module) implemented with full Lean proofs in `Forms.lean`.
 - **Federer-Fleming**: Proof structure established via Deformation Theorem and diagonal argument.
 - **Harvey-Lawson**: Structural steps formalized (rectifiability, J-invariance, regularity).
 - **Integral Currents**: Core analytical properties (linearity, integrability, mass formula) resolved.

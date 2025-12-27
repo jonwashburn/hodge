@@ -51,10 +51,9 @@ def structureSheaf (n : ℕ) (X : Type*)
   is_locally_presented := fun x => by
     use ⊤, Set.mem_univ x, 0, 1
     -- f : O^0 -> O^1 is the zero map
-    let f : (holomorphicSheaf n X).val.obj (op ⊤) ^ 0 → (holomorphicSheaf n X).val.obj (op ⊤) ^ 1 := 0
+    let f : (holomorphicSheaf n X).val.obj (op ⊤) ^ 0 ⟶ (holomorphicSheaf n X).val.obj (op ⊤) ^ 1 := 0
     use f
-    -- The cokernel of the zero map from 0 is the object itself.
-    -- In the category of modules or rings, this is standard.
+    -- The cokernel of 0 : 0 -> O is O.
     sorry
 }
 
@@ -72,8 +71,6 @@ def isZero (G : Type*) [AddCommGroup G] : Prop :=
 theorem serre_vanishing (L : HolomorphicLineBundle n X) [IsAmple L] (F : CoherentSheaf n X) (q : ℕ) (hq : q > 0) :
     ∃ M₀ : ℕ, ∀ M ≥ M₀,
       isZero (SheafCohomology (tensorWithSheaf (L.power M) F) q) :=
-  -- This deep result is the cornerstone of projective geometry.
-  -- Reference: Serre (1955).
   sorry
 
 /-- Tensor product of a line bundle with a coherent sheaf. -/
@@ -88,7 +85,8 @@ def idealSheaf (x_point : X) (k : ℕ) : CoherentSheaf n X where
 
 /-- The skyscraper sheaf of jets at a point x. -/
 def jetSkyscraperSheaf (x_point : X) (k : ℕ) : CoherentSheaf n X where
-  sheaf := sorry -- Skyscraper sheaf J^k_x(O_X)
+  sheaf := TopCat.Sheaf.pushforward (TopCat.of {x_point}) (TopCat.of (Fin (Nat.choose (n + k) k) → ℂ)) 
+    (Continuous.of_discreteTopology (f := fun _ => x_point))
   is_locally_presented := sorry
 
 /-- **Theorem: Jet Surjectivity** -/

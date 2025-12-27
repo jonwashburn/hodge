@@ -355,7 +355,7 @@ theorem isIntegral_boundary {k : ℕ} (T : Current n X (k + 1)) :
     isIntegral T → isIntegral T.boundary := by
   intro hT
   -- 1. T is representable by integration over a (k+1)-rectifiable set S.
-  -- 2. By Federer-Fleming, the boundary ∂T is representable by integration 
+  -- 2. By Federer-Fleming, the boundary ∂T is representable by integration
   --    over a k-rectifiable set S' ⊆ ∂S.
   -- 3. The multiplicities of ∂T are integers because they are sums of the
   --    multiplicities of T weighted by incidence numbers.

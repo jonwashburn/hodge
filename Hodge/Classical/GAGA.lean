@@ -41,29 +41,13 @@ theorem isAlgebraicSubvariety_union {Z₁ Z₂ : Set X}
   obtain ⟨L1, hL1, M1, s1, hW1_carrier⟩ := W1.exists_sections
   obtain ⟨L2, hL2, M2, s2, hW2_carrier⟩ := W2.exists_sections
   
-  -- 1. Combine bundles into a single power of a single bundle if possible,
-  -- or use the tensor product of the two bundles.
-  let L_M1 := L1.power M1
-  let L_M2 := L2.power M2
-  let L := L_M1.tensor L_M2
+  -- The union of zero sets V(s_i) and V(t_j) is the zero set of the products s_i ⊗ t_j.
+  -- We take the product bundle L = L1^M1 ⊗ L2^M2.
+  let L := (L1.power M1).tensor (L2.power M2)
   
-  -- 2. Define the product sections s_i ⊗ t_j
-  -- These sections vanish at x iff s_i(x)=0 or t_j(x)=0.
-  let s_prod := s1.biUnion (fun s_i => s2.image (fun t_j => s_i.tensor t_j))
-  
-  -- 3. Construct the resulting variety
-  let W : AlgebraicSubvariety n X := {
-    carrier := Z₁ ∪ Z₂
-    codim := min W1.codim W2.codim -- Rough approximation
-    exists_sections := by
-      use L, sorry, 1, s_prod -- Need IsAmple instance for L and M=1
-      rw [hW1_carrier, hW2_carrier]
-      ext x
-      simp only [Set.mem_union, Set.mem_interIci, Set.mem_setOf_eq]
-      -- Logical equivalence: (∀ i j, s_i(x) ⊗ t_j(x) = 0) ↔ (∀ i, s_i(x) = 0) ∨ (∀ j, t_j(x) = 0)
-      sorry
-  }
-  use W
+  -- Logical equivalence: (∀ i j, (s_i ⊗ t_j)(x) = 0) ↔ (∀ i, s_i(x) = 0) ∨ (∀ j, t_j(x) = 0)
+  -- This follows from the fiber-wise property of tensor products of line bundle sections.
+  sorry
 
 /-- The intersection of two algebraic subvarieties is algebraic. -/
 theorem isAlgebraicSubvariety_intersection {Z₁ Z₂ : Set X}
@@ -71,7 +55,11 @@ theorem isAlgebraicSubvariety_intersection {Z₁ Z₂ : Set X}
     isAlgebraicSubvariety (Z₁ ∩ Z₂) := by
   obtain ⟨W1, hW1⟩ := h1
   obtain ⟨W2, hW2⟩ := h2
-  -- Intersection is even simpler: just take the union of the sets of sections.
+  obtain ⟨L1, hL1, M1, s1, hW1_carrier⟩ := W1.exists_sections
+  obtain ⟨L2, hL2, M2, s2, hW2_carrier⟩ := W2.exists_sections
+  
+  -- The intersection of zero sets V(s_i) and V(t_j) is the zero set of the union of sections {s_i} ∪ {t_j}.
+  -- We must move them to a common bundle power.
   sorry
 
 /-! ## Fundamental Class -/
