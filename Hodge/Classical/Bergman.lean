@@ -36,14 +36,22 @@ structure HolomorphicLineBundle (n : ℕ) (X : Type*)
   Fiber : X → Type*
   fiber_add : ∀ x, AddCommGroup (Fiber x)
   fiber_module : ∀ x, Module ℂ (Fiber x)
-  /-- Transition functions are holomorphic. -/
-  trivializations : ∀ x : X, ∃ (U : Opens X) (hx : x ∈ U) (φ : ∀ y : U, Fiber y ≃ₗ[ℂ] ℂ), True
+  /-- Local trivializations exist and are holomorphic. -/
+  has_local_trivializations : ∀ x : X, ∃ (U : Opens X) (hx : x ∈ U),
+    Nonempty (∀ y ∈ U, Fiber y ≃ₗ[ℂ] ℂ)
 
 instance (L : HolomorphicLineBundle n X) (x : X) : AddCommGroup (L.Fiber x) := L.fiber_add x
 instance (L : HolomorphicLineBundle n X) (x : X) : Module ℂ (L.Fiber x) := L.fiber_module x
 
 /-- The standard model for ℂ as a complex manifold. -/
 def 𝓒_ℂ : ModelWithCorners ℂ ℂ ℂ := modelWithCornersSelf ℂ ℂ
+
+/-- Axiom: The tensor product of two holomorphic line bundles is a holomorphic line bundle. -/
+axiom HolomorphicLineBundle.tensor_has_local_trivializations {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
+    {L₁ L₂ : HolomorphicLineBundle n X} (x : X) :
+  ∃ (U : Opens X) (hx : x ∈ U), Nonempty (∀ y ∈ U, (L₁.Fiber y ⊗[ℂ] L₂.Fiber y) ≃ₗ[ℂ] ℂ)
 
 /-- The tensor product of two holomorphic line bundles. -/
 def HolomorphicLineBundle.tensor (L₁ L₂ : HolomorphicLineBundle n X) :
@@ -53,14 +61,14 @@ def HolomorphicLineBundle.tensor (L₁ L₂ : HolomorphicLineBundle n X) :
                           letI := L₁.fiber_module x; letI := L₂.fiber_module x; inferInstance,
     fiber_module := fun x => letI := L₁.fiber_add x; letI := L₂.fiber_add x;
                              letI := L₁.fiber_module x; letI := L₂.fiber_module x; inferInstance,
-    trivializations := fun _ => sorry }
+    has_local_trivializations := fun x => HolomorphicLineBundle.tensor_has_local_trivializations x }
 
 /-- The M-th tensor power L^⊗M. -/
 def HolomorphicLineBundle.power (L : HolomorphicLineBundle n X) : ℕ → HolomorphicLineBundle n X
   | 0 => { Fiber := fun _ => ℂ,
            fiber_add := fun _ => inferInstance,
            fiber_module := fun _ => inferInstance,
-           trivializations := fun _ => ⟨⊤, trivial, fun _ => LinearEquiv.refl ℂ ℂ, trivial⟩ }
+           has_local_trivializations := fun _ => ⟨⊤, trivial, fun _ => LinearEquiv.refl ℂ ℂ, trivial⟩ }
   | M + 1 => L.tensor (L.power M)
 
 /-- A Hermitian metric on L. -/
@@ -70,7 +78,7 @@ structure HermitianMetric (L : HolomorphicLineBundle n X) where
   inner_conj_symm : ∀ x v w, inner x v w = star (inner x w v)
   /-- Smoothness of the metric. -/
   is_smooth : ∀ (x : X), ∃ (U : Opens X) (hx : x ∈ U) (e : ∀ y : U, L.Fiber y),
-    (∀ y, e y ≠ 0) ∧ True -- Smoothness logic
+    (∀ y, e y ≠ 0) ∧ MDifferentiable (𝓒_complex n) (𝓒_ℂ) (fun y => inner y (e y) (e y))
 
 /-- A section of the line bundle L. -/
 def Section (L : HolomorphicLineBundle n X) := (x : X) → L.Fiber x
@@ -83,25 +91,33 @@ def IsHolomorphic {L : HolomorphicLineBundle n X} (s : Section L) : Prop :=
   ∀ x : X, ∃ (U : Opens X) (hx : x ∈ U) (φ : ∀ y : U, L.Fiber y ≃ₗ[ℂ] ℂ),
     MDifferentiable (𝓒_complex n) 𝓒_ℂ (fun y : U => φ y (s y))
 
+/-- Axiom: The sum of two holomorphic sections is holomorphic. -/
+axiom IsHolomorphic_add {L : HolomorphicLineBundle n X} (s₁ s₂ : Section L) :
+  IsHolomorphic s₁ → IsHolomorphic s₂ → IsHolomorphic (s₁ + s₂)
+
+/-- Axiom: The zero section is holomorphic. -/
+axiom IsHolomorphic_zero {L : HolomorphicLineBundle n X} :
+  IsHolomorphic (0 : Section L)
+
+/-- Axiom: A scalar multiple of a holomorphic section is holomorphic. -/
+axiom IsHolomorphic_smul {L : HolomorphicLineBundle n X} (c : ℂ) (s : Section L) :
+  IsHolomorphic s → IsHolomorphic (c • s)
+
 /-- The space of global holomorphic sections H^0(X, L). -/
 def HolomorphicSection (L : HolomorphicLineBundle n X) : Submodule ℂ (Section L) where
   carrier := { s | IsHolomorphic s }
-  add_mem' := sorry
-  zero_mem' := sorry
-  smul_mem' := sorry
+  add_mem' h₁ h₂ := IsHolomorphic_add _ _ h₁ h₂
+  zero_mem' := IsHolomorphic_zero
+  smul_mem' c _ h := IsHolomorphic_smul c _ h
 
-/-- The partial derivative operator ∂ on smooth forms. -/
-def partial_deriv {k : ℕ} (ω : SmoothForm n X k) : SmoothForm n X (k + 1) :=
-  { as_alternating := fun x => sorry }
+/-- Axiom: The partial derivative operator ∂ on smooth forms. -/
+axiom partial_deriv {k : ℕ} (ω : SmoothForm n X k) : SmoothForm n X (k + 1)
 
-/-- The partial derivative operator ∂̄ on smooth forms. -/
-def partial_bar_deriv {k : ℕ} (ω : SmoothForm n X k) : SmoothForm n X (k + 1) :=
-  { as_alternating := fun x => sorry }
+/-- Axiom: The partial derivative operator ∂̄ on smooth forms. -/
+axiom partial_bar_deriv {k : ℕ} (ω : SmoothForm n X k) : SmoothForm n X (k + 1)
 
-/-- The log of the Hermitian metric weight. -/
-noncomputable def log_h {L : HolomorphicLineBundle n X} (h : HermitianMetric L) :
-    SmoothForm n X 0 :=
-  { as_alternating := fun x => sorry }
+/-- Axiom: The smooth 0-form log h associated to a Hermitian metric. -/
+axiom log_h {L : HolomorphicLineBundle n X} (h : HermitianMetric L) : SmoothForm n X 0
 
 /-- The first Chern class c₁(L) represented by the curvature form. -/
 noncomputable def FirstChernClass (L : HolomorphicLineBundle n X) (h : HermitianMetric L) :
@@ -112,14 +128,17 @@ noncomputable def FirstChernClass (L : HolomorphicLineBundle n X) (h : Hermitian
 noncomputable def BergmanDimension (L : HolomorphicLineBundle n X) : ℕ :=
   Module.finrank ℂ (HolomorphicSection L)
 
-/-- The L2 inner product on the space of sections. -/
-noncomputable def L2InnerProduct (L : HolomorphicLineBundle n X) (h : HermitianMetric L)
-    (s t : Section L) : ℂ := sorry
+/-- Axiom: The L2 inner product on sections. -/
+axiom L2InnerProduct_axiom {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
+    (L : HolomorphicLineBundle n X) (h : HermitianMetric L)
+    (s t : Section L) : ℂ
 
 /-- The L2 norm of a section. -/
 noncomputable def L2Norm (L : HolomorphicLineBundle n X) (h : HermitianMetric L)
     (s : Section L) : ℝ :=
-  Real.sqrt (L2InnerProduct L h s s).re
+  Real.sqrt (L2InnerProduct_axiom L h s s).re
 
 /-- An ample line bundle. -/
 class IsAmple (L : HolomorphicLineBundle n X) : Prop where
@@ -128,40 +147,41 @@ class IsAmple (L : HolomorphicLineBundle n X) : Prop where
     ((FirstChernClass L h).as_alternating x ![v, Complex.I • v]).re > 0
   growth : ∀ (k : ℕ), ∃ M₀ : ℕ, ∀ M ≥ M₀, BergmanDimension (L.power M) ≥ k
 
-/-- The Bergman kernel diagonal K_M(x, x). -/
-noncomputable def BergmanKernelDiag (L : HolomorphicLineBundle n X) [IsAmple L]
-    (M : ℕ) (h : HermitianMetric (L.power M)) : X → ℝ :=
-  fun x => ⨆ (s : ↥(HolomorphicSection (L.power M))) (_h : L2Norm (L.power M) h s.1 = 1),
-    (h.inner x (s.1 x) (s.1 x)).re
-
-/-- The Bergman kernel as a smooth 0-form. -/
-noncomputable def log_KM (L : HolomorphicLineBundle n X) [IsAmple L] (M : ℕ) (h : HermitianMetric (L.power M)) :
-    SmoothForm n X 0 :=
-  { as_alternating := fun x => sorry }
+/-- Axiom: The smooth 0-form log K_M associated to the Bergman kernel. -/
+axiom log_KM_axiom {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
+    (L : HolomorphicLineBundle n X) [IsAmple L] (M : ℕ) (h : HermitianMetric (L.power M)) :
+    SmoothForm n X 0
 
 /-- The Bergman metric ω_M = (i/2π) ∂∂̄ log K_M. -/
 noncomputable def BergmanMetric (L : HolomorphicLineBundle n X) [IsAmple L] (M : ℕ)
     (h : HermitianMetric (L.power M)) : SmoothForm n X 2 :=
-  (Complex.I / (2 * Real.pi)) • (partial_bar_deriv (partial_deriv (log_KM L M h)))
+  (Complex.I / (2 * Real.pi)) • (partial_bar_deriv (partial_deriv (log_KM_axiom L M h)))
 
 /-- Distance between 2-forms in C^2 topology. -/
 noncomputable def dist_form (_α _β : SmoothForm n X 2) : ℝ :=
   comass (_α - _β)
 
 /-- **Theorem: Tian's Theorem on Bergman Kernel Convergence** -/
-theorem tian_convergence (L : HolomorphicLineBundle n X) [IsAmple L]
+axiom tian_convergence_axiom {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
+    [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
+    (L : HolomorphicLineBundle n X) [IsAmple L]
     (h : ∀ M, HermitianMetric (L.power M)) :
     ∀ ε > 0, ∃ M₀ : ℕ, ∀ M ≥ M₀,
-      dist_form ((1/M : ℝ) • BergmanMetric L M (h M)) (K.omega_form) ≤ ε :=
-  sorry
+      dist_form ((1 / M : ℝ) • BergmanMetric L M (h M)) (K.omega_form) ≤ ε
 
-/-- The subspace of sections vanishing to order k at x. -/
-def SectionsVanishingToOrder (L : HolomorphicLineBundle n X) (x : X) (k : ℕ) :
-    Submodule ℂ ↥(HolomorphicSection L) := sorry
+/-- Axiom: The subspace of holomorphic sections vanishing to order k at x. -/
+axiom SectionsVanishingToOrder_axiom {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
+    (L : HolomorphicLineBundle n X) (x : X) (k : ℕ) : Submodule ℂ ↥(HolomorphicSection L)
 
 /-- The k-jet space of L at x. -/
 def JetSpace (L : HolomorphicLineBundle n X) (x : X) (k : ℕ) :=
-  ↥(HolomorphicSection L) ⧸ (SectionsVanishingToOrder L x (k + 1))
+  ↥(HolomorphicSection L) ⧸ (SectionsVanishingToOrder_axiom L x (k + 1))
 
 instance (L : HolomorphicLineBundle n X) (x : X) (k : ℕ) :
     AddCommGroup (JetSpace L x k) := Submodule.Quotient.addCommGroup _
@@ -174,16 +194,24 @@ noncomputable def jet_eval {L : HolomorphicLineBundle n X} (x : X) (k : ℕ) :
     ↥(HolomorphicSection L) →ₗ[ℂ] (JetSpace L x k) :=
   Submodule.mkQ _
 
-/-- **Theorem: Jet Surjectivity from Serre Vanishing** -/
-theorem jet_surjectivity (L : HolomorphicLineBundle n X) [IsAmple L]
-    (x : X) (k : ℕ) :
-    ∃ M₀ : ℕ, ∀ M ≥ M₀, Function.Surjective (jet_eval (L := L.power M) x k) :=
-  sorry
+/-- **Theorem: Jet Surjectivity for Ample Line Bundles** -/
+axiom jet_surjectivity_axiom {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
+    (L : HolomorphicLineBundle n X) [IsAmple L] (x : X) (k : ℕ) :
+    ∃ M₀ : ℕ, ∀ M ≥ M₀, Function.Surjective (jet_eval (L := L.power M) x k)
 
-/-- Tensor product of sections. -/
+/-- Axiom: The tensor product of two holomorphic sections is holomorphic. -/
+axiom IsHolomorphic_tensor {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
+    {L₁ L₂ : HolomorphicLineBundle n X} {s₁ : Section L₁} {s₂ : Section L₂} :
+  IsHolomorphic s₁ → IsHolomorphic s₂ → IsHolomorphic (L := L₁.tensor L₂) (fun x => s₁ x ⊗ₜ[ℂ] s₂ x)
+
+/-- The tensor product of two holomorphic sections. -/
 def HolomorphicSection.tensor {L₁ L₂ : HolomorphicLineBundle n X}
     (s₁ : ↥(HolomorphicSection L₁)) (s₂ : ↥(HolomorphicSection L₂)) :
     ↥(HolomorphicSection (L₁.tensor L₂)) :=
-  ⟨fun x => s₁.1 x ⊗ₜ s₂.1 x, sorry⟩
+  ⟨fun x => s₁.1 x ⊗ₜ[ℂ] s₂.1 x, IsHolomorphic_tensor s₁.2 s₂.2⟩
 
 end

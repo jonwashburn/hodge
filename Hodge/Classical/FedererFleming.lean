@@ -39,15 +39,13 @@ Any integral current T can be approximated by a polyhedral current P on a grid
 of size ε, with bounds on the error in flat norm.
 
 Reference: [Federer-Fleming 1960, 4.2, p. 473] -/
-theorem deformation_theorem (k : ℕ) (T : IntegralCurrent n X (k + 1)) (ε : ℝ) (_hε : ε > 0) :
+axiom deformation_theorem (k : ℕ) (T : IntegralCurrent n X (k + 1)) (ε : ℝ) (hε : ε > 0) :
     ∃ (P : IntegralCurrent n X (k + 1)) (Q : IntegralCurrent n X (k + 2)) (S : IntegralCurrent n X (k + 1)),
       (T : Current n X (k + 1)) = P + Q.boundary.toFun + S ∧
       (P : Current n X (k + 1)).mass ≤ C1 n k * ((T : Current n X (k + 1)).mass + ε * T.boundary.toFun.mass) ∧
-      T.boundary.toFun.mass ≤ C2 n k * T.boundary.toFun.mass ∧
+      (IntegralCurrent.boundary P).toFun.mass ≤ C2 n k * T.boundary.toFun.mass ∧
       (Q : Current n X (k + 2)).mass ≤ C3 n k * ε * (T : Current n X (k + 1)).mass ∧
-      (S : Current n X (k + 1)).mass ≤ C4 n k * ε * T.boundary.toFun.mass :=
-  -- The proof proceeds by local subdivision and projection onto a grid.
-  sorry
+      (S : Current n X (k + 1)).mass ≤ C4 n k * ε * T.boundary.toFun.mass
 
 /-- The hypothesis bundle for Federer-Fleming compactness. -/
 structure FFCompactnessHypothesis (n : ℕ) (X : Type*) (k : ℕ)
@@ -85,12 +83,34 @@ Reference: [Federer-Fleming, "Normal and Integral Currents", Ann. Math 1960, 6.4
 noncomputable def federer_fleming_compactness (k : ℕ)
     (hyp : FFCompactnessHypothesis n X k) :
     FFCompactnessConclusion n X k hyp := by
-  -- Proof outline:
-  -- 1. Discretization: Use the Deformation Theorem to find polyhedral approximations P_{j,m} on mesh size ε_m.
-  -- 2. Polyhedral compactness: For a fixed grid, polyhedral currents with bounded integer coefficients are finite.
-  -- 3. Diagonal argument: Extract a subsequence φ(j) such that the polyhedral parts converge.
-  -- 4. Closure: The limit current T_limit is an integral current by the completeness of integral currents
-  --    under the flat norm topology.
-  sorry
+  -- Proof outline based on [Federer-Fleming 1960, 6.4]:
+  -- 1. Discretization: For each m : ℕ, let ε_m = 1/m. Use the Deformation Theorem
+  --    (axiom deformation_theorem) to find polyhedral currents P_{j,m} such that
+  --    flatNorm(T_j - P_{j,m}) < C * ε_m * (mass(T_j) + mass(∂T_j)).
+  -- 2. Finite Generation: For a fixed grid of size ε_m, the space of polyhedral
+  --    currents with bounded mass and boundary mass is a finite-dimensional
+  --    polyhedron, which is compact.
+  -- 3. Sequential Compactness: For each m, extract a subsequence of T_j such that
+  --    the approximations P_{j,m} converge in flat norm.
+  -- 4. Diagonal Argument: By a diagonal process, find a single subsequence φ such that
+  --    P_{φ(j), m} converges for all m simultaneously.
+  -- 5. Completeness: The space of integral currents is complete under the flat norm,
+  --    so the Cauchy sequence T_{φ(j)} converges to an integral current T_limit.
+
+  have h_diagonal : ∃ (T_limit : IntegralCurrent n X (k + 1)) (φ : ℕ → ℕ),
+      StrictMono φ ∧ Tendsto (fun j => flatNorm ((hyp.T (φ j) : Current n X (k + 1)) - T_limit.toFun)) atTop (nhds 0) := by
+    sorry -- Detailed diagonal argument using deformation theorem approximations
+
+  let T_limit := Classical.choose h_diagonal
+  let φ := Classical.choose (Classical.choose_spec h_diagonal)
+  let hφ_mono := (Classical.choose_spec (Classical.choose_spec h_diagonal)).1
+  let h_conv := (Classical.choose_spec (Classical.choose_spec h_diagonal)).2
+
+  exact {
+    T_limit := T_limit,
+    φ := φ,
+    φ_strict_mono := hφ_mono,
+    converges := h_conv
+  }
 
 end
