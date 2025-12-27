@@ -6,7 +6,29 @@
 
 ---
 
-## ⚠️ PROOF QUALITY STANDARDS (READ FIRST)
+## 🚨🚨🚨 STOP! READ YOUR TRACK ASSIGNMENT FIRST 🚨🚨🚨
+
+**YOU MAY ONLY EDIT THE FILES ASSIGNED TO YOUR TRACK. NO EXCEPTIONS.**
+
+| If you are... | You may ONLY edit these files | DO NOT TOUCH |
+|---------------|------------------------------|--------------|
+| **Track A1** | `Classical/SerreVanishing.lean` | Everything else |
+| **Track A2** | `Classical/Bergman.lean` | Everything else |
+| **Track A3** | `Classical/GAGA.lean`, `Classical/FedererFleming.lean` | Everything else |
+| **Track A4** | `Analytic/Calibration.lean`, `Analytic/Norms.lean`, `Analytic/Grassmannian.lean` | Everything else |
+| **Track A5** | `Kahler/Cone.lean`, `Kahler/Microstructure.lean`, `Kahler/TypeDecomposition.lean` | Everything else |
+
+### ❌ IF YOU SEE AN ERROR IN ANOTHER FILE:
+- **DO NOT FIX IT** — that's another agent's job
+- **DO NOT EDIT IT** — you will create merge conflicts
+- **ONLY WORK ON YOUR ASSIGNED FILES**
+
+### ❌ THESE FILES ARE OFF-LIMITS TO EVERYONE:
+`Basic.lean`, `Main.lean`, `Kahler/Main.lean`, `HarveyLawson.lean`, `Lefschetz.lean`, `IntegralCurrents.lean`, `Forms.lean`, `Currents.lean`, `FlatNorm.lean`, `Manifolds.lean`, `SignedDecomp.lean`
+
+---
+
+## ⚠️ PROOF QUALITY STANDARDS
 
 **This is a quality proof, not a checkbox exercise.** Every definition and theorem must be mathematically meaningful.
 
@@ -37,33 +59,6 @@ Before claiming a `sorry` is resolved, ask yourself:
 
 Each agent works on isolated files to minimize build conflicts. Just prompt:
 > "Work on @RigorousHodgePlan.md Track A1"
-
----
-
-## 🔒 FILE OWNERSHIP (STRICT - NO EXCEPTIONS)
-
-**Each file belongs to exactly ONE track. Do not edit files owned by other tracks.**
-
-| Track | EXCLUSIVE Files (only this track may edit) |
-|-------|-------------------------------------------|
-| **A1** | `Classical/SerreVanishing.lean` |
-| **A2** | `Classical/Bergman.lean` |
-| **A3** | `Classical/GAGA.lean`, `Classical/FedererFleming.lean` |
-| **A4** | `Analytic/Calibration.lean`, `Analytic/Norms.lean`, `Analytic/Grassmannian.lean` |
-| **A5** | `Kahler/Cone.lean`, `Kahler/Microstructure.lean`, `Kahler/TypeDecomposition.lean` |
-
-**NOBODY touches until Phase 2:**
-- `Basic.lean`
-- `Main.lean`
-- `Kahler/Main.lean`
-- `Classical/HarveyLawson.lean`
-- `Classical/Lefschetz.lean`
-- `Analytic/IntegralCurrents.lean`
-- `Analytic/Forms.lean`
-- `Analytic/Currents.lean`
-- `Analytic/FlatNorm.lean`
-- `Kahler/Manifolds.lean`
-- `Kahler/SignedDecomp.lean`
 
 ---
 
