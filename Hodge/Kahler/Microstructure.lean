@@ -82,7 +82,7 @@ theorem integer_transport {p : ℕ} {h : ℝ} (C : Cubulation n X h)
     (_target : Flow C) (_h_balanced : _target.isBalanced) :
     ∃ (int_flow : (dualGraph C).edgeSet → ℤ),
       (∀ Q : C.cubes, ∑ e ∈ (dualGraph C).incidenceSet Q, (int_flow e : ℝ) = 0) ∧
-      ∀ e, |(int_flow e : ℝ) - _target e| ≤ 1 := by
+      ∀ e : (dualGraph C).edgeSet, |(int_flow e : ℝ) - _target e| ≤ 1 := by
   sorry
 
 /-! ## Microstructure Gluing -/
@@ -101,18 +101,22 @@ structure RawSheetSum (n : ℕ) (X : Type*) {p : ℕ} (h : ℝ)
 def flatNorm {k : ℕ} (_T : Current n X k) : ℝ := 0  -- Placeholder
 
 /-- The total current of a raw sheet sum (axiomatized). -/
-def totalCurrent {p h : ℕ} {C : Cubulation n X h} (_T : RawSheetSum n X h C) :
+def totalCurrent (p : ℕ) {h : ℝ} {C : Cubulation n X h} (_T : @RawSheetSum n X p h _ _ _ _ C) :
+    Current n X (2 * p + 1) := 0  -- Placeholder (dimension 2p+1 so boundary is 2p)
+
+/-- The boundary of a raw sheet sum (axiomatized). -/
+def totalBoundary (p : ℕ) {h : ℝ} {C : Cubulation n X h} (_T : @RawSheetSum n X p h _ _ _ _ C) :
     Current n X (2 * p) := 0  -- Placeholder
 
 /-- A scaling function for the gluing error. -/
 def ε_gluing (h : ℝ) : ℝ := h
 
 /-- **The Microstructure Gluing Estimate** -/
-theorem gluing_estimate {p : ℕ} (h : ℝ) (C : Cubulation n X h)
+theorem gluing_estimate (p : ℕ) (h : ℝ) (C : Cubulation n X h)
     (_β : SmoothForm n X (2 * p))
     (_hβ : isConePositive _β) (m : ℕ) :
-    ∃ (T_raw : RawSheetSum n X h C),
-      flatNorm (totalCurrent T_raw).boundary ≤ m * ε_gluing h := by
+    ∃ (T_raw : @RawSheetSum n X p h _ _ _ _ C),
+      flatNorm (totalBoundary p T_raw) ≤ m * ε_gluing h := by
   sorry
 
 end

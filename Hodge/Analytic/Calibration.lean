@@ -43,7 +43,9 @@ def KählerCalibration (p : ℕ) : CalibratingForm n X (2 * p) where
   is_closed := by
     -- d(ω^p) = p * dω ∧ ω^{p-1} = 0 since dω = 0.
     -- In our axiomatized model, all forms are closed for now.
-    simp [isClosed, smoothExtDeriv]
+    unfold isClosed smoothExtDeriv
+    ext x v
+    simp [omegaPow]
   comass_le_one := by
     -- This is Wirtinger's Inequality: comass(ω^p / p!) ≤ 1.
     -- Reference: [Harvey-Lawson, 1982, p. 17].
