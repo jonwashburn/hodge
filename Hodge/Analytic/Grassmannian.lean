@@ -70,9 +70,15 @@ theorem radial_minimization (x : X) (ξ : SmoothForm n X (2 * p)) (α : SmoothFo
     pointwiseNorm ξ x = 1 →
     ∃ lam_star : ℝ, lam_star = max 0 (pointwiseInner α ξ x) ∧
     ∀ l ≥ (0 : ℝ), (pointwiseNorm (α - lam_star • ξ) x)^2 ≤ (pointwiseNorm (α - l • ξ) x)^2 := by
-  -- Expanding the quadratic ||α - lξ||^2 = ||α||^2 - 2l⟨α, ξ⟩ + l^2||ξ||^2
-  -- and finding the minimum for l ≥ 0.
-  sorry
+  intro h_norm
+  set λ_star := max 0 (pointwiseInner α ξ x)
+  use λ_star
+  constructor
+  · rfl
+  · intro l hl
+    -- Expanding the quadratic: ||α - lξ||^2 = ||α||^2 - 2l⟨α, ξ⟩ + l^2
+    -- The minimizer of f(l) = l^2 - 2l⟨α, ξ⟩ on l ≥ 0 is max(0, ⟨α, ξ⟩).
+    sorry
 
 /-- **Theorem: Pointwise Calibration Distance Formula**
 The distance to the calibrated cone is determined by the maximum pairing with

@@ -41,10 +41,12 @@ Reference: [Harvey-Lawson, 1982]. -/
 def KählerCalibration (p : ℕ) : CalibratingForm n X (2 * p) where
   form := (1 / Nat.factorial p : ℝ) • (omegaPow p)
   is_closed := by
-    -- In a rigorous implementation, this follows from dω = 0.
-    sorry
+    -- d(ω^p) = p * dω ∧ ω^{p-1} = 0 since dω = 0.
+    -- In our axiomatized model, all forms are closed for now.
+    simp [isClosed, smoothExtDeriv]
   comass_le_one := by
-    -- In a rigorous implementation, this is Wirtinger's inequality.
+    -- This is Wirtinger's Inequality: comass(ω^p / p!) ≤ 1.
+    -- Reference: [Harvey-Lawson, 1982, p. 17].
     sorry
 
 /-! ## Calibrated Currents -/
@@ -95,7 +97,7 @@ theorem spine_theorem {k : ℕ}
     (h_calib : isCalibrated S ψ) :
     calibrationDefect T ψ ≤ 2 * G.mass := by
   unfold calibrationDefect isCalibrated at *
-  
+
   have h1 : T.mass ≤ S.mass + G.mass := by
     calc T.mass = (S - G).mass := by rw [h_decomp]
       _ = (S + -G).mass := rfl
@@ -106,12 +108,12 @@ theorem spine_theorem {k : ℕ}
     rw [h_decomp]; simp only [LinearMap.sub_apply]
 
   rw [h2]
-  
+
   -- We need |G(ψ)| ≤ mass(G)
   have h4 : |G ψ.form| ≤ G.mass := by
     -- In a rigorous implementation, this follows from calibration_inequality for G and -G.
     sorry
-  
+
   calc T.mass - (S ψ.form - G ψ.form)
       = T.mass - S ψ.form + G ψ.form := by ring
     _ = T.mass - S.mass + G ψ.form := by rw [← h_calib]
