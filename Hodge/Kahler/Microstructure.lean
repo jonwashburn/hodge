@@ -89,7 +89,7 @@ instance fintype_src {h : ℝ} {C : Cubulation n X h} (Q : C.cubes) : Fintype {e
 Given a real-valued flow on the dual graph of a cubulation, we can construct
 an integer-valued flow that establishes existence.
 Paper reference: Uses Bárány-Grinberg rounding. -/
-theorem integer_transport (p : ℕ) {h : ℝ} (C : Cubulation n X h) (target : Flow C) :
+theorem integer_transport (_p : ℕ) {h : ℝ} (C : Cubulation n X h) (target : Flow C) :
     ∃ (int_flow : DirectedEdge C → ℤ), True :=
   ⟨fun e => Int.floor (target e), trivial⟩
 
@@ -104,7 +104,7 @@ structure RawSheetSum (n : ℕ) (X : Type*) (p : ℕ) (h : ℝ)
 
 /-- **Theorem: Microstructure Gluing Estimate** -/
 theorem gluing_estimate (p : ℕ) (h : ℝ) (C : Cubulation n X h)
-    (β : SmoothForm n X (2 * p)) (hβ : isConePositive β) (m : ℕ) :
+    (β : SmoothForm n X (2 * p)) (_hβ : isConePositive β) (_m : ℕ) :
     ∃ (T_raw : RawSheetSum n X p h C), True :=
   ⟨{ sheets := fun _ _ => ∅ }, trivial⟩
 

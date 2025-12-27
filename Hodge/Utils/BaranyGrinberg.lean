@@ -24,9 +24,9 @@ theorem barany_grinberg (v : ι → (Fin d → ℝ)) (hv : ∀ i j, |v i j| ≤ 
       ∀ j, |∑ i, (ε i - a i) * v i j| ≤ d := by
   let x := fun j => ∑ i, a i * v i j
   let P := { t : ι → ℝ | (∀ i, 0 ≤ t i ∧ t i ≤ 1) ∧ ∀ j, (∑ i, t i * v i j) = x j }
-  
+
   have haP : a ∈ P := ⟨ha, fun _ => rfl⟩
-  
+
   have hP_convex : Convex ℝ P := by
     apply Convex.inter
     · intro t1 ht1 t2 ht2 w1 w2 hw1 hw2 hw_sum i
@@ -40,7 +40,7 @@ theorem barany_grinberg (v : ι → (Fin d → ℝ)) (hv : ∀ i j, |v i j| ≤ 
       rw [Finset.sum_add_distrib]
       simp only [mul_add, ← Finset.mul_sum]
       rw [ht1.2 j, ht2.2 j, ← add_mul, hw_sum, one_mul]
-      
+
   have hP_compact : IsCompact P := by
     let K := Set.pi univ (fun _ : ι => Icc (0 : ℝ) 1)
     have hK : IsCompact K := isCompact_univ_pi (fun _ => isCompact_Icc 0 1)
@@ -58,7 +58,7 @@ theorem barany_grinberg (v : ι → (Fin d → ℝ)) (hv : ∀ i j, |v i j| ≤ 
   by_cases h_ι : Nonempty ι
   · obtain ⟨t, htP, ht_ext⟩ := hP_compact.exists_extreme_point (nonempty_of_mem haP)
     let F_set := { i | 0 < t i ∧ t i < 1 }
-    
+
     have h_lin_indep : LinearIndependent ℝ (fun i : F_set => v i.val) := by
       rw [linearIndependent_iff']
       intro s c hc
@@ -72,9 +72,9 @@ theorem barany_grinberg (v : ι → (Fin d → ℝ)) (hv : ∀ i j, |v i j| ≤ 
       have hdim : FiniteDimensional.finrank ℝ V = d := by simp
       rw [← hdim]
       apply FiniteDimensional.finrank_le_of_linearIndependent h_lin_indep
-      
+
     let ε_sol := fun i => if hi : i ∈ F_set then (0 : ℝ) else t i
-    
+
     use ε_sol
     constructor
     · intro i
@@ -105,7 +105,7 @@ theorem barany_grinberg (v : ι → (Fin d → ℝ)) (hv : ∀ i j, |v i j| ≤ 
             have hεt : |ε_sol i - t i| ≤ 1 := by
               simp [ε_sol, hiF]; have := htP.1 i; constructor <;> linarith
             apply mul_le_mul hεt (hv i j) (abs_nonneg _) (by linarith)
-        _ = Fintype.card F_set := by 
+        _ = Fintype.card F_set := by
             simp only [Finset.sum_const, nsmul_eq_mul, mul_one]
             exact Set.toFinset_card F_set
         _ ≤ d := hF_card

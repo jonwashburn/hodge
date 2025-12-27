@@ -54,10 +54,8 @@ def Current.boundary {k : ℕ} (T : Current n X (k + 1)) : Current n X k where
   toFun := fun ω => T (smoothExtDeriv ω)
   map_add' := fun α β => by
     simp only [smoothExtDeriv_add, map_add]
-    rfl
   map_smul' := fun r α => by
     simp only [smoothExtDeriv_smul_real, map_smul, RingHom.id_apply]
-    rfl
 
 /-- A current is a cycle if its boundary is zero. -/
 def Current.isCycle {k : ℕ} (T : Current n X (k + 1)) : Prop :=
