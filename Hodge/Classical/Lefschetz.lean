@@ -42,6 +42,13 @@ def exactForms (n X k : ℕ) [TopologicalSpace X] [ChartedSpace (EuclideanSpace 
   zero_mem' := sorry
   smul_mem' := sorry
 
+/-- Proof that every exact form is closed. -/
+theorem exact_subset_closed (k : ℕ) : exactForms n X k ≤ closedForms n X k := by
+  intro ω hω x v
+  obtain ⟨η, hη⟩ := hω
+  -- Follows from d^2 = 0
+  sorry
+
 /-- de Rham cohomology group H^k(X, ℂ).
     Defined as the quotient of closed forms by exact forms. -/
 def DeRhamCohomology (n : ℕ) (X : Type*) (k : ℕ)
@@ -53,9 +60,14 @@ def DeRhamCohomology (n : ℕ) (X : Type*) (k : ℕ)
     is the linear map induced by wedging with the Kähler form. -/
 def lefschetz_operator {p : ℕ} [K : KahlerManifold n X] :
     DeRhamCohomology n X p →ₗ[ℂ] DeRhamCohomology n X (p + 2) :=
-  -- Lifting the wedge product with omega_form to cohomology.
-  -- Since omega_form is closed, wedging with it maps closed forms to closed forms
-  -- and exact forms to exact forms.
+  -- We define the map on forms first
+  let L_form : SmoothForm n X p →ₗ[ℂ] SmoothForm n X (p + 2) := {
+    toFun := fun η => wedge K.omega_form η
+    map_add' := fun α β => by ext; simp [wedge]
+    map_smul' := fun c α => by ext; simp [wedge]
+  }
+  -- Then show it maps closed forms to closed forms and exact to exact
+  -- Finally lift to quotient
   sorry
 
 /-- The iterated Lefschetz map L^k : H^p(X) → H^{p+2k}(X). -/
@@ -79,10 +91,7 @@ the map L^{n-p} : H^p(X) → H^{2n-p}(X) is an isomorphism for p ≤ n.
 Reference: [Griffiths-Harris, 1978]. -/
 theorem hard_lefschetz {p : ℕ} (hp : p ≤ n) :
     Function.Bijective (lefschetz_power p (n - p)) := by
-  -- Proof strategy:
-  -- 1. Use the Hodge Decomposition to identify cohomology with harmonic forms.
-  -- 2. Harmonic forms carry a representation of the Lie algebra sl_2(ℂ).
-  -- 3. The weight space theory of sl_2 implies that L^k is an isomorphism.
+  -- Proof via sl_2(ℂ) representation theory
   sorry
 
 end
