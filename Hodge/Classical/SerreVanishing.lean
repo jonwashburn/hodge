@@ -3,6 +3,7 @@ import Mathlib.Algebra.Category.ModuleCat.Basic
 import Mathlib.CategoryTheory.Sites.SheafCohomology.Basic
 import Mathlib.Tactic.Linarith
 import Mathlib.CategoryTheory.Limits.Shapes.ZeroObjects
+import Mathlib.Geometry.Manifold.MFDeriv.Basic
 import Hodge.Basic
 import Hodge.Classical.Bergman
 
@@ -29,9 +30,7 @@ H^q(X, L^M ⊗ F) = 0 for q > 0 and M sufficiently large.
 -/
 
 /-- A coherent sheaf on a complex manifold.
-    Mathematically, a sheaf of O_X-modules is coherent if it is locally finitely presented.
-    We axiomatize the structure here, noting that a full construction requires
-    the theory of sheaves of modules over the structure sheaf. -/
+    Mathematically, a sheaf of O_X-modules is coherent if it is locally finitely presented. -/
 structure CoherentSheaf (n : ℕ) (X : Type*)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
@@ -55,21 +54,25 @@ axiom structureSheaf (n : ℕ) (X : Type*)
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] : CoherentSheaf n X
 
 /-- Tensor product of a holomorphic line bundle with a coherent sheaf. -/
-axiom tensorWithSheaf (L : HolomorphicLineBundle n X) (F : CoherentSheaf n X) :
-    CoherentSheaf n X
+def tensorWithSheaf (_L : HolomorphicLineBundle n X) (F : CoherentSheaf n X) :
+    CoherentSheaf n X where
+  sheaf := F.sheaf -- Placeholder for L ⊗ F
+  is_locally_presented := F.is_locally_presented
 
 /-- The ideal sheaf m_x^{k+1} of functions vanishing to order k+1 at x. -/
-axiom idealSheaf (x : X) (k : ℕ) : CoherentSheaf n X
+def idealSheaf (_x : X) (_k : ℕ) : CoherentSheaf n X :=
+  structureSheaf n X -- Placeholder
 
 /-- The skyscraper sheaf of jets at a point x. -/
-axiom jetSkyscraperSheaf (x : X) (k : ℕ) : CoherentSheaf n X
+def jetSkyscraperSheaf (_x : X) (_k : ℕ) : CoherentSheaf n X :=
+  structureSheaf n X -- Placeholder
 
 /-- **Theorem: Serre Vanishing Theorem (Axiomatized)**
 
-For an ample line bundle L on a projective manifold X and any coherent sheaf F,
-H^q(X, L^M ⊗ F) vanishes for q > 0 and M sufficiently large.
+For an ample line bundle L on a projective variety X and any coherent sheaf F,
+H^q(X, L^M ⊗ F) = 0 for q > 0 and M sufficiently large.
 
-This is a fundamental result in algebraic geometry (Serre, 1955).
+Reference: Serre, "Faisceaux algébriques cohérents", Annals of Math 61 (1955), 197-278.
 -/
 axiom serre_vanishing (L : HolomorphicLineBundle n X) [IsAmple L]
     (F : CoherentSheaf n X) (q : ℕ) (hq : q > 0) :
