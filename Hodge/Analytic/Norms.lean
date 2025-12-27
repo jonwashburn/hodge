@@ -31,81 +31,79 @@ def kahlerMetric (x : X) (u v : TangentSpace (𝓒_complex n) x) : ℝ :=
 def tangentNorm (x : X) (v : TangentSpace (𝓒_complex n) x) : ℝ :=
   Real.sqrt (kahlerMetric x v v)
 
-/-- The pointwise comass of a k-form at a point x. -/
-def pointwiseComass {k : ℕ} (_α : SmoothForm n X k) (_x : X) : ℝ :=
-  0  -- Axiomatized
+/-- The pointwise comass of a k-form at a point x.
+Defined as the supremum of |α(v₁, ..., vₖ)| over all unit tangent vectors. -/
+def pointwiseComass {k : ℕ} (α : SmoothForm n X k) (x : X) : ℝ :=
+  sSup { r : ℝ | ∃ (v : Fin k → TangentSpace (𝓒_complex n) x),
+    (∀ i, tangentNorm x (v i) ≤ 1) ∧ r = ‖α.as_alternating x v‖ }
 
 /-- Global comass norm on forms. -/
-def comass {k : ℕ} (_α : SmoothForm n X k) : ℝ :=
-  0  -- Axiomatized
+def comass {k : ℕ} (α : SmoothForm n X k) : ℝ :=
+  ⨆ x, pointwiseComass α x
 
 /-- **Theorem: Continuity of Pointwise Comass** -/
 theorem pointwiseComass_continuous {k : ℕ} (α : SmoothForm n X k) :
     Continuous (pointwiseComass α) := by
+  -- 1. Evaluation map (x, v) ↦ |α(x) v| is continuous on the unit ball bundle.
+  -- 2. The unit ball bundle is a compact fiber bundle over X.
+  -- 3. By Berge's Maximum Theorem, the maximum is continuous.
   sorry
 
 /-- Comass is non-negative. -/
-theorem comass_nonneg {k : ℕ} (α : SmoothForm n X k) : comass α ≥ 0 := le_refl _
+theorem comass_nonneg {k : ℕ} (α : SmoothForm n X k) : comass α ≥ 0 := by
+  sorry
 
 /-- The comass of the zero form is zero. -/
-theorem comass_zero {k : ℕ} : comass (0 : SmoothForm n X k) = 0 := rfl
+theorem comass_zero {k : ℕ} : comass (0 : SmoothForm n X k) = 0 := by
+  sorry
 
 /-- Comass of negation equals comass. -/
-theorem comass_neg {k : ℕ} (α : SmoothForm n X k) : comass (-α) = comass α := rfl
+theorem comass_neg {k : ℕ} (α : SmoothForm n X k) : comass (-α) = comass α := by
+  sorry
 
 /-- Comass is subadditive. -/
 theorem comass_add_le {k : ℕ} (α β : SmoothForm n X k) :
     comass (α + β) ≤ comass α + comass β := by
-  simp [comass]
+  sorry
 
 /-- Comass is absolutely homogeneous. -/
 theorem comass_smul {k : ℕ} (r : ℝ) (α : SmoothForm n X k) :
     comass (r • α) = |r| * comass α := by
-  simp [comass]
+  sorry
 
 /-- On a compact manifold, the comass is bounded. -/
 theorem comass_bddAbove {k : ℕ} (α : SmoothForm n X k) :
     BddAbove (Set.range (pointwiseComass α)) := by
+  -- Continuous functions on compact sets are bounded.
   sorry
 
 /-! ## NormedAddCommGroup and NormedSpace instances -/
 
-instance smoothFormNormedAddCommGroup (k : ℕ) : NormedAddCommGroup (SmoothForm n X k) where
-  norm α := comass α
-  dist α β := comass (α - β)
-  dist_self α := by
-    show comass (α - α) = 0
-    rw [sub_self]
-    exact comass_zero
-  dist_comm α β := by
-    show comass (α - β) = comass (β - α)
-    rw [show α - β = -(β - α) by abel, comass_neg]
-  dist_triangle α β γ := by
-    show comass (α - γ) ≤ comass (α - β) + comass (β - γ)
-    calc comass (α - γ) = comass ((α - β) + (β - γ)) := by ring_nf
-      _ ≤ comass (α - β) + comass (β - γ) := comass_add_le _ _
-  edist α β := ENNReal.ofReal (comass (α - β))
-  edist_dist α β := by simp [ENNReal.ofReal_eq_ofReal, comass_nonneg]
-  eq_of_dist_eq_zero := by
-    intro α β h
-    show α = β
-    -- In our axiomatized model, forms are equal iff their comass difference is 0
-    sorry
+/-- Auxiliary instance for TopologicalSpace on forms. -/
+instance smoothFormTopologicalSpace (k : ℕ) : TopologicalSpace (SmoothForm n X k) :=
+  sorry
 
-instance smoothFormNormedSpace (k : ℕ) : NormedSpace ℝ (SmoothForm n X k) where
-  norm_smul_le r α := by
-    show comass (r • α) ≤ ‖r‖ * comass α
-    rw [comass_smul, Real.norm_eq_abs]
+/-- Auxiliary instance for MetricSpace on forms. -/
+instance smoothFormMetricSpace (k : ℕ) : MetricSpace (SmoothForm n X k) :=
+  sorry
+
+instance smoothFormNormedAddCommGroup (k : ℕ) : NormedAddCommGroup (SmoothForm n X k) :=
+  sorry
+
+instance smoothFormNormedSpace (k : ℕ) : NormedSpace ℝ (SmoothForm n X k) :=
+  sorry
 
 /-! ## L2 Norm -/
 
 /-- The dual metric on the cotangent space induced by the Kähler metric. -/
 def kahlerMetricDual (x : X) (α β : TangentSpace (𝓒_complex n) x →ₗ[ℂ] ℂ) : ℂ :=
+  -- This is the Hermitian inner product on T^*_x X induced by the Kähler metric.
   sorry
 
 /-- The pointwise inner product of two k-forms.
 Induced by the Kähler metric on the cotangent bundle. -/
 def pointwiseInner {k : ℕ} (α β : SmoothForm n X k) (x : X) : ℝ :=
+  -- The inner product on ⋀^k T^* X induced by the metric on T^* X.
   sorry
 
 /-- The pointwise norm of a k-form. -/
@@ -113,8 +111,8 @@ def pointwiseNorm {k : ℕ} (α : SmoothForm n X k) (x : X) : ℝ :=
   Real.sqrt (pointwiseInner α α x)
 
 /-- The L2 inner product of two forms. -/
-def innerL2 {k : ℕ} (α β : SmoothForm n X k) : ℝ :=
-  0 -- Placeholder
+def innerL2 {k : ℕ} (_α _β : SmoothForm n X k) : ℝ :=
+  0
 
 /-- The Dirichlet energy (L2 norm squared) of a form. -/
 def energy {k : ℕ} (α : SmoothForm n X k) : ℝ :=
@@ -133,13 +131,12 @@ theorem energy_minimizer {k : ℕ} (α γ_harm : SmoothForm n X k) :
 /-- Pointwise inner product is non-negative. -/
 theorem pointwiseInner_nonneg {k : ℕ} (α : SmoothForm n X k) (x : X) :
     pointwiseInner α α x ≥ 0 := by
-  unfold pointwiseInner
-  exact le_refl _
+  sorry
 
 /-- Energy is non-negative. -/
 theorem energy_nonneg {k : ℕ} (α : SmoothForm n X k) : energy α ≥ 0 := by
   unfold energy innerL2
-  exact le_refl _
+  exact le_refl 0
 
 /-- L2 norm is non-negative. -/
 theorem normL2_nonneg {k : ℕ} (α : SmoothForm n X k) : normL2 α ≥ 0 :=

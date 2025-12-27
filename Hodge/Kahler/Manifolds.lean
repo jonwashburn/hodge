@@ -20,7 +20,7 @@ variable {n : ℕ} {X : Type*}
 
 /--- The Kähler metric is symmetric. -/
 theorem kahlerMetric_symm (x : X) (v w : TangentSpace (𝓒_complex n) x) :
-    (K.omega_form.as_alternating x ![v, Complex.I • w]).re = 
+    (K.omega_form.as_alternating x ![v, Complex.I • w]).re =
     (K.omega_form.as_alternating x ![w, Complex.I • v]).re := by
   -- This follows from J-invariance and antisymmetry of the Kähler form
   sorry

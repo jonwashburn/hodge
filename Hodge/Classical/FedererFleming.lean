@@ -15,7 +15,7 @@ variable {n : ℕ} {X : Type*}
   [ProjectiveComplexManifold n X] [KahlerManifold n X]
 
 /-!
-# Track A.2: Federer-Fleming Compactness Theorem
+# Track A.3: Federer-Fleming Compactness Theorem
 
 This file formalizes the Federer-Fleming compactness theorem for integral currents.
 
@@ -36,7 +36,9 @@ noncomputable def C4 (_n _k : ℕ) : ℝ := 2
 
 /-- **The Deformation Theorem** (Federer-Fleming 1960, 4.2)
 Any integral current T can be approximated by a polyhedral current P on a grid
-of size ε, with bounds on the error in flat norm. -/
+of size ε, with bounds on the error in flat norm.
+
+Reference: [Federer-Fleming 1960, 4.2, p. 473] -/
 theorem deformation_theorem (k : ℕ) (T : IntegralCurrent n X (k + 1)) (ε : ℝ) (_hε : ε > 0) :
     ∃ (P : IntegralCurrent n X (k + 1)) (Q : IntegralCurrent n X (k + 2)) (S : IntegralCurrent n X (k + 1)),
       (T : Current n X (k + 1)) = P + Q.boundary.toFun + S ∧
@@ -44,6 +46,7 @@ theorem deformation_theorem (k : ℕ) (T : IntegralCurrent n X (k + 1)) (ε : �
       T.boundary.toFun.mass ≤ C2 n k * T.boundary.toFun.mass ∧
       (Q : Current n X (k + 2)).mass ≤ C3 n k * ε * (T : Current n X (k + 1)).mass ∧
       (S : Current n X (k + 1)).mass ≤ C4 n k * ε * T.boundary.toFun.mass :=
+  -- The proof proceeds by local subdivision and projection onto a grid.
   sorry
 
 /-- The hypothesis bundle for Federer-Fleming compactness. -/
@@ -78,20 +81,16 @@ structure FFCompactnessConclusion (n : ℕ) (X : Type*) (k : ℕ)
 The space of integral currents with bounded mass and boundary mass is
 compact in the flat norm topology.
 
-Proof outline:
-1. Discretization: Use the Deformation Theorem to find polyhedral approximations.
-2. Polyhedral compactness: Bounded polyhedral currents on a fixed lattice form a finite set.
-3. Diagonal argument: Extract a subsequence converging in flat norm.
-4. Closure: The limit is an integral current by completeness.
-
-Reference: [Federer-Fleming, "Normal and Integral Currents", Ann. Math 1960] -/
+Reference: [Federer-Fleming, "Normal and Integral Currents", Ann. Math 1960, 6.4] -/
 noncomputable def federer_fleming_compactness (k : ℕ)
     (hyp : FFCompactnessHypothesis n X k) :
     FFCompactnessConclusion n X k hyp := by
-  -- The proof requires the diagonal argument combining:
-  -- - Deformation theorem for polyhedral approximation
-  -- - Finiteness of polyhedral currents with bounded integer coefficients
-  -- - Completeness of integral currents in flat norm topology
+  -- Proof outline:
+  -- 1. Discretization: Use the Deformation Theorem to find polyhedral approximations P_{j,m} on mesh size ε_m.
+  -- 2. Polyhedral compactness: For a fixed grid, polyhedral currents with bounded integer coefficients are finite.
+  -- 3. Diagonal argument: Extract a subsequence φ(j) such that the polyhedral parts converge.
+  -- 4. Closure: The limit current T_limit is an integral current by the completeness of integral currents
+  --    under the flat norm topology.
   sorry
 
 end

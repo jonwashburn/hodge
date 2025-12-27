@@ -3,6 +3,7 @@ import Hodge.Classical.Bergman
 import Hodge.Classical.SerreVanishing
 import Mathlib.Combinatorics.SimpleGraph.Basic
 import Mathlib.Topology.MetricSpace.Defs
+import Hodge.Analytic.Currents
 
 /-!
 # Track C.5: Microstructure Construction
@@ -28,21 +29,26 @@ structure AmpleLineBundle (n : ℕ) (X : Type*)
   bundle : HolomorphicLineBundle n X
   /-- The bundle is ample -/
   is_ample : IsAmple bundle
-  /-- The curvature equals the Kähler form (axiomatized) -/
-  curvature_eq_omega : Prop  -- Axiomatized: curvature matches Kähler form
+  /-- The curvature equals the Kähler form (represented by FirstChernClass) -/
+  metric : HermitianMetric bundle
+  curvature_eq_omega : FirstChernClass bundle metric = K.omega_form
 
 /-! ## Local Sheet Realization -/
 
-/-- Given a point x and a calibrated direction in K_p(x), we can construct
-a smooth complex submanifold Y passing through x with tangent plane close to
-the given direction. -/
-theorem local_sheet_realization (L : AmpleLineBundle n X) {p : ℕ}
-    (x : X) (Pi : PPFormSpace n X p x)
-    (_hPi : Pi ∈ stronglyPositiveCone p x)
+/-- Given a point x and a calibrated direction, we can construct
+a smooth complex submanifold Y passing through x with tangent plane close to the direction. -/
+theorem local_sheet_realization (L : AmpleLineBundle n X) (p : ℕ)
+    (x : X) (ξ : SmoothForm n X (2 * p))
+    (hξ : ξ ∈ simpleCalibratedForms p x)
     (ε : ℝ) (_hε : ε > 0) :
     ∃ (M : ℕ) (Y : Set X),
       x ∈ Y ∧
-      IsComplexSubmanifold Y p := by
+      IsComplexSubmanifold Y p ∧
+      ∃ (V : Submodule ℂ (TangentSpace (𝓒_complex n) x)),
+        Module.finrank ℂ V = p ∧ dist (simpleCalibratedForm p x V) ξ < ε := by
+  -- 1. Use jet surjectivity (Theorem A.2.14) to find sections with given jets.
+  -- 2. Construct local holomorphic sheets as zero sets of these sections.
+  -- 3. The tangent plane to the sheet at x is determined by the 1-jet of the sections.
   sorry
 
 /-! ## Cubulation -/
@@ -53,8 +59,8 @@ structure Cubulation (n : ℕ) (X : Type*)
     (h : ℝ) where
   /-- The collection of cubes -/
   cubes : Finset (Set X)
-  /-- Each cube has diameter ≤ h (axiomatized) -/
-  diameter_bound : Prop  -- Axiomatized: diameter Q ≤ h for Q ∈ cubes
+  /-- Each cube has diameter ≤ h -/
+  diameter_bound : ∀ Q ∈ cubes, ∀ x y ∈ Q, dist x y ≤ h
   /-- The cubes cover X -/
   covers : ⋃ Q ∈ cubes, Q = Set.univ
   /-- Controlled overlap -/
@@ -78,17 +84,20 @@ def Flow.isBalanced {h : ℝ} {C : Cubulation n X h} (f : Flow C) : Prop :=
 /-- **Integer Transport Theorem**
 Given a balanced real flow on the dual graph of a cubulation, there exists
 an integer flow that is balanced and stays within distance 1 of the real flow. -/
-theorem integer_transport {p : ℕ} {h : ℝ} (C : Cubulation n X h)
-    (_target : Flow C) (_h_balanced : _target.isBalanced) :
+theorem integer_transport (p : ℕ) {h : ℝ} (C : Cubulation n X h)
+    (target : Flow C) (h_balanced : target.isBalanced) :
     ∃ (int_flow : (dualGraph C).edgeSet → ℤ),
       (∀ Q : C.cubes, ∑ e ∈ (dualGraph C).incidenceSet Q, (int_flow e : ℝ) = 0) ∧
-      ∀ e : (dualGraph C).edgeSet, |(int_flow e : ℝ) - _target e| ≤ 1 := by
+      ∀ e : (dualGraph C).edgeSet, |(int_flow e : ℝ) - target e| ≤ 1 := by
+  -- 1. The dual graph of a cubulation is a graph where vertices are cubes.
+  -- 2. A balanced real flow can be approximated by a balanced integer flow.
+  -- 3. This is a consequence of the Integrality Theorem for flows or total unimodularity.
   sorry
 
 /-! ## Microstructure Gluing -/
 
 /-- The raw sheet sum on a mesh: local holomorphic pieces in each cube. -/
-structure RawSheetSum (n : ℕ) (X : Type*) {p : ℕ} (h : ℝ)
+structure RawSheetSum (n : ℕ) (X : Type*) (p : ℕ) (h : ℝ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace Complex (Fin n)) X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     (C : Cubulation n X h) where
@@ -97,26 +106,24 @@ structure RawSheetSum (n : ℕ) (X : Type*) {p : ℕ} (h : ℝ)
   /-- Each sheet is a complex submanifold of codimension p -/
   is_holomorphic : ∀ Q hQ, IsComplexSubmanifold (sheets Q hQ) p
 
-/-- The flat norm of a current (axiomatized). -/
-def flatNorm {k : ℕ} (_T : Current n X k) : ℝ := 0  -- Placeholder
-
-/-- The total current of a raw sheet sum (axiomatized). -/
-def totalCurrent (p : ℕ) {h : ℝ} {C : Cubulation n X h} (_T : @RawSheetSum n X p h _ _ _ _ C) :
-    Current n X (2 * p + 1) := 0  -- Placeholder (dimension 2p+1 so boundary is 2p)
-
-/-- The boundary of a raw sheet sum (axiomatized). -/
-def totalBoundary (p : ℕ) {h : ℝ} {C : Cubulation n X h} (_T : @RawSheetSum n X p h _ _ _ _ C) :
-    Current n X (2 * p) := 0  -- Placeholder
+/-- The total boundary current of a raw sheet sum. -/
+def totalBoundary (p : ℕ) {h : ℝ} {C : Cubulation n X h}
+    (_T : RawSheetSum n X p h C) : Current n X (2 * p) :=
+  -- This is the sum of boundaries of the local sheets, which should cancel out.
+  sorry
 
 /-- A scaling function for the gluing error. -/
 def ε_gluing (h : ℝ) : ℝ := h
 
 /-- **The Microstructure Gluing Estimate** -/
 theorem gluing_estimate (p : ℕ) (h : ℝ) (C : Cubulation n X h)
-    (_β : SmoothForm n X (2 * p))
-    (_hβ : isConePositive _β) (m : ℕ) :
-    ∃ (T_raw : @RawSheetSum n X p h _ _ _ _ C),
+    (β : SmoothForm n X (2 * p))
+    (hβ : isConePositive β) (m : ℕ) :
+    ∃ (T_raw : RawSheetSum n X p h C),
       flatNorm (totalBoundary p T_raw) ≤ m * ε_gluing h := by
+  -- 1. Construct local sheets in each cube using local_sheet_realization.
+  -- 2. Use integer_transport to match the number of sheets across cube boundaries.
+  -- 3. The flat norm of the boundary measures the failure of these sheets to glue.
   sorry
 
 end
