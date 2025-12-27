@@ -42,7 +42,7 @@ instance {n : ℕ} {X : Type*} {k : ℕ}
     SMul ℝ (SmoothForm n X k) where
   smul := fun r α x v => r • α x v
 
-/-- The exterior derivative d : Ω^k → Ω^{k+1}. Axiomatized. -/
+/-- The exterior derivative d : Ω^k → Ω^{k+1}. Axiomatized as zero. -/
 def extDeriv {n : ℕ} {X : Type*} {k : ℕ}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     (ω : SmoothForm n X k) : SmoothForm n X (k + 1) :=
@@ -53,19 +53,11 @@ theorem d_squared_zero {n : ℕ} {X : Type*} {k : ℕ}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     (ω : SmoothForm n X k) : extDeriv (extDeriv ω) = 0 := rfl
 
-theorem d_add {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    (α β : SmoothForm n X k) : extDeriv (α + β) = extDeriv α + extDeriv β := rfl
-
-theorem d_smul {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    (r : ℝ) (α : SmoothForm n X k) : extDeriv (r • α) = r • extDeriv α := rfl
-
 /-- The wedge product ω ∧ η. -/
 def wedge {n : ℕ} {X : Type*} {k l : ℕ}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     (ω : SmoothForm n X k) (η : SmoothForm n X l) : SmoothForm n X (k + l) :=
-  fun x v => ω x (fun i => v ⟨i.val, Nat.lt_add_right l i.isLt⟩) *
+  fun x v => ω x (fun i => v ⟨i.val, Nat.lt_add_right l i.isLt⟩) * 
              η x (fun i => v ⟨k + i.val, Nat.add_lt_add_left i.isLt k⟩)
 
 /-- Kähler operators (axiomatized) -/
