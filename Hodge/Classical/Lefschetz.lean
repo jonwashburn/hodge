@@ -26,46 +26,37 @@ is an isomorphism for p ≤ n.
 [Griffiths-Harris, "Principles of Algebraic Geometry", 1978]
 -/
 
+/-- The submodule of closed k-forms. -/
+def closedForms (n X k : ℕ) [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] : Submodule ℂ (SmoothForm n X k) where
+  carrier := { ω | ∀ x v, extDerivAt x ω v = 0 }
+  add_mem' hω hη x v := by simp [hω x v, hη x v]
+  zero_mem' x v := by simp
+  smul_mem' c ω hω x v := by simp [hω x v]
+
+/-- The submodule of exact k-forms. -/
+def exactForms (n X k : ℕ) [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] : Submodule ℂ (SmoothForm n X k) where
+  carrier := { ω | ∃ η : SmoothForm n X (k - 1), ∀ x, ⟨extDerivAt x η, sorry⟩ = ω.as_alternating x }
+  add_mem' := sorry
+  zero_mem' := sorry
+  smul_mem' := sorry
+
 /-- de Rham cohomology group H^k(X, ℂ).
     Defined as the quotient of closed forms by exact forms. -/
 def DeRhamCohomology (n : ℕ) (X : Type*) (k : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [KahlerManifold n X] : Type* :=
-  -- By the Hodge theorem on a compact Kähler manifold, de Rham cohomology is
-  -- isomorphic to the space of harmonic forms. We use the harmonic representative
-  -- as the canonical element of each cohomology class.
-  -- Reference: [Griffiths-Harris, Section 0.6].
-  { ω : SmoothForm n X k // isHarmonic ω }
+  (closedForms n X k) ⧸ (exactForms n X k).comap (closedForms n X k).subtype
 
 /-- The Lefschetz operator L : H^p(X) → H^{p+2}(X)
     is the linear map induced by wedging with the Kähler form. -/
 def lefschetz_operator {p : ℕ} [K : KahlerManifold n X] :
-    DeRhamCohomology n X p →ₗ[ℂ] DeRhamCohomology n X (p + 2) where
+    DeRhamCohomology n X p →ₗ[ℂ] DeRhamCohomology n X (p + 2) :=
   -- Lifting the wedge product with omega_form to cohomology.
-  -- Since omega_form is closed, wedging with it maps harmonic forms to harmonic forms
-  -- (after projecting to the harmonic part).
-  toFun := fun ⟨ω, hω⟩ =>
-    let Lω := wedge kahlerForm ω
-    -- Project Lω to its harmonic representative
-    -- On a Kähler manifold, L preserves harmonicity up to exact terms.
-    ⟨Lω, by
-      -- By the Kähler identities, [L, Δ] = 0, so L maps harmonic forms to harmonic forms.
-      -- Reference: [Griffiths-Harris, Proposition 6.8].
-      unfold isHarmonic laplacian
-      simp only [extDeriv, adjointDeriv]
-      sorry⟩
-  map_add' := fun ⟨ω₁, _⟩ ⟨ω₂, _⟩ => by
-    simp only [AddSubmonoid.mk_add_mk, Subtype.mk.injEq]
-    -- L(ω₁ + ω₂) = L(ω₁) + L(ω₂) follows from linearity of wedge product.
-    unfold wedge kahlerForm
-    ext x v
-    simp only [Add.add, SmoothForm.as_alternating]
-  map_smul' := fun r ⟨ω, _⟩ => by
-    simp only [RingHom.id_apply, SetLike.mk_smul_mk, Subtype.mk.injEq]
-    -- L(r · ω) = r · L(ω) follows from linearity of wedge product.
-    unfold wedge kahlerForm
-    ext x v
-    simp only [HSMul.hSMul, SMul.smul, SmoothForm.as_alternating]
+  -- Since omega_form is closed, wedging with it maps closed forms to closed forms
+  -- and exact forms to exact forms.
+  sorry
 
 /-- The iterated Lefschetz map L^k : H^p(X) → H^{p+2k}(X). -/
 def lefschetz_power (p k : ℕ) [K : KahlerManifold n X] :

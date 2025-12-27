@@ -41,23 +41,80 @@ instance smoothFormSMulComplex (k : ℕ) : SMul ℂ (SmoothForm n X k) where
 instance smoothFormSub (k : ℕ) : Sub (SmoothForm n X k) where
   sub := fun α β => ⟨fun x => α.as_alternating x - β.as_alternating x⟩
 
-instance (k : ℕ) : AddCommGroup (SmoothForm n X k) where
-  add_assoc := by intros; ext; simp only [Add.add]; rw [add_assoc]
-  zero_add := by intros; ext; simp only [Add.add, Zero.zero]; rw [zero_add]
-  add_zero := by intros; ext; simp only [Add.add, Zero.zero]; rw [add_zero]
-  neg_add_cancel := by intros; ext; simp only [Add.add, Neg.neg, Zero.zero]; rw [neg_add_cancel]
-  add_comm := by intros; ext; simp only [Add.add]; rw [add_comm]
-  sub_eq_add_neg := by intros; ext; simp only [Sub.sub, Add.add, Neg.neg]; rw [sub_eq_add_neg]
+instance smoothFormAddCommGroup (k : ℕ) : AddCommGroup (SmoothForm n X k) where
+  add_assoc := fun α β γ => by
+    apply SmoothForm.ext; intro x; ext v
+    simp only [smoothFormAdd, Add.add]
+    exact add_assoc _ _ _
+  zero_add := fun α => by
+    apply SmoothForm.ext; intro x; ext v
+    simp only [smoothFormAdd, smoothFormZero, Add.add, Zero.zero]
+    exact zero_add _
+  add_zero := fun α => by
+    apply SmoothForm.ext; intro x; ext v
+    simp only [smoothFormAdd, smoothFormZero, Add.add, Zero.zero]
+    exact add_zero _
+  neg_add_cancel := fun α => by
+    apply SmoothForm.ext; intro x; ext v
+    simp only [smoothFormAdd, smoothFormNeg, smoothFormZero, Add.add, Neg.neg, Zero.zero]
+    exact neg_add_cancel _
+  add_comm := fun α β => by
+    apply SmoothForm.ext; intro x; ext v
+    simp only [smoothFormAdd, Add.add]
+    exact add_comm _ _
+  sub_eq_add_neg := fun α β => by
+    apply SmoothForm.ext; intro x; ext v
+    simp only [smoothFormSub, smoothFormAdd, smoothFormNeg, Sub.sub, Add.add, Neg.neg]
+    exact sub_eq_add_neg _ _
   nsmul n_idx α := ⟨fun x => n_idx • α.as_alternating x⟩
+  nsmul_zero α := by
+    apply SmoothForm.ext; intro x; ext v
+    simp only [smoothFormZero, Zero.zero]
+    exact zero_smul _ _
+  nsmul_succ n_idx α := by
+    apply SmoothForm.ext; intro x; ext v
+    simp only [smoothFormAdd, Add.add]
+    exact succ_nsmul _ _
   zsmul z α := ⟨fun x => z • α.as_alternating x⟩
+  zsmul_zero' α := by
+    apply SmoothForm.ext; intro x; ext v
+    simp only [smoothFormZero, Zero.zero]
+    exact zero_zsmul _
+  zsmul_succ' n_idx α := by
+    apply SmoothForm.ext; intro x; ext v
+    simp only [smoothFormAdd, Add.add]
+    simp only [Int.ofNat_eq_coe, Nat.succ_eq_add_one, Int.ofNat_add, Int.ofNat_one]
+    rw [add_zsmul, one_zsmul]
+  zsmul_neg' n_idx α := by
+    apply SmoothForm.ext; intro x; ext v
+    simp only [smoothFormNeg, Neg.neg]
+    simp only [Int.negSucc_eq, neg_smul, Nat.succ_eq_add_one, Int.ofNat_add, Int.ofNat_one]
 
-instance (k : ℕ) : Module ℝ (SmoothForm n X k) where
-  one_smul := by intros; ext; simp only [HSMul.hSMul]; rw [one_smul]
-  mul_smul := by intros; ext; simp only [HSMul.hSMul]; rw [← mul_smul]; congr 1; simp [Complex.ofReal_mul]
-  smul_zero := by intros; ext; simp only [HSMul.hSMul, Zero.zero]; rw [smul_zero]
-  smul_add := by intros; ext; simp only [HSMul.hSMul, Add.add]; rw [smul_add]
-  add_smul := by intros; ext; simp only [HSMul.hSMul, Add.add]; rw [← add_smul]; congr 1; simp
-  zero_smul := by intros; ext; simp only [HSMul.hSMul, Zero.zero]; rw [zero_smul]
+instance smoothFormModule (k : ℕ) : Module ℝ (SmoothForm n X k) where
+  one_smul α := by
+    apply SmoothForm.ext; intro x; ext v
+    simp only [smoothFormSMul, HSMul.hSMul, SMul.smul]
+    simp only [Complex.ofReal_one, one_smul]
+  mul_smul r s α := by
+    apply SmoothForm.ext; intro x; ext v
+    simp only [smoothFormSMul, HSMul.hSMul, SMul.smul]
+    simp only [Complex.ofReal_mul, mul_smul]
+  smul_zero r := by
+    apply SmoothForm.ext; intro x; ext v
+    simp only [smoothFormSMul, smoothFormZero, HSMul.hSMul, SMul.smul, Zero.zero]
+    simp only [AlternatingMap.zero_apply, smul_zero]
+  smul_add r α β := by
+    apply SmoothForm.ext; intro x; ext v
+    simp only [smoothFormSMul, smoothFormAdd, HSMul.hSMul, SMul.smul, Add.add]
+    simp only [AlternatingMap.add_apply, smul_add]
+  add_smul r s α := by
+    apply SmoothForm.ext; intro x; ext v
+    simp only [smoothFormSMul, smoothFormAdd, HSMul.hSMul, SMul.smul, Add.add]
+    simp only [Complex.ofReal_add, add_smul, AlternatingMap.add_apply]
+  zero_smul α := by
+    apply SmoothForm.ext; intro x; ext v
+    simp only [smoothFormSMul, smoothFormZero, HSMul.hSMul, SMul.smul, Zero.zero]
+    simp only [Complex.ofReal_zero, zero_smul, AlternatingMap.zero_apply]
 
 /-! ## Exterior Derivative -/
 
@@ -66,6 +123,7 @@ def extDeriv {k : ℕ} (_ω : SmoothForm n X k) : SmoothForm n X (k + 1) :=
   ⟨fun _ => 0⟩
 
 /-- d ∘ d = 0. -/
+omit [IsManifold (𝓒_complex n) ⊤ X] in
 theorem d_squared_zero {k : ℕ} (ω : SmoothForm n X k) : extDeriv (extDeriv ω) = 0 := rfl
 
 /-! ## Wedge Product -/
@@ -93,11 +151,17 @@ def hodgeStar {k : ℕ} (_α : SmoothForm n X k) : SmoothForm n X (2 * n - k) :=
 
 /-- Hodge Star is linear (add). -/
 theorem hodgeStar_add {k : ℕ} (α β : SmoothForm n X k) :
-    hodgeStar (α + β) = hodgeStar α + hodgeStar β := rfl
+    hodgeStar (α + β) = hodgeStar α + hodgeStar β := by
+  apply SmoothForm.ext; intro x; ext v
+  simp only [hodgeStar, smoothFormAdd, Add.add]
+  rfl
 
 /-- Hodge Star is linear (smul). -/
 theorem hodgeStar_smul {k : ℕ} (r : ℝ) (α : SmoothForm n X k) :
-    hodgeStar (r • α) = r • hodgeStar α := rfl
+    hodgeStar (r • α) = r • hodgeStar α := by
+  apply SmoothForm.ext; intro x; ext v
+  simp only [hodgeStar, smoothFormSMul, HSMul.hSMul, SMul.smul]
+  simp only [AlternatingMap.zero_apply, smul_zero]
 
 /-! ## Adjoint Derivative and Laplacian -/
 

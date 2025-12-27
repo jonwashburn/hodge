@@ -70,11 +70,19 @@ Reference: [Harvey-Lawson, 1982, p. 17]. -/
 theorem isPPForm_simple (p : ℕ) (x : X) (V : Submodule Complex (TangentSpace 𝓒(Complex, n) x))
     (hV : FiniteDimensional.finrank Complex V = p) :
     isPPForm' p (simpleCalibratedForm p x V) := by
-  -- 1. A complex subspace V is J-invariant by definition.
-  -- 2. The volume form ξ_V of a J-invariant subspace is itself J-invariant.
+  -- Proof:
+  -- 1. A complex subspace V is J-invariant by definition: Jv ∈ V for all v ∈ V.
+  -- 2. The volume form ξ_V of a J-invariant subspace is itself J-invariant:
+  --    ξ_V(Jv₁, ..., Jvₖ) = det(J|_V)^{k/2} ξ_V(v₁, ..., vₖ) = ξ_V(v₁, ..., vₖ).
   -- 3. Since J-invariance is the characterization of (p,p)-forms among real forms,
   --    the volume form of a complex p-plane is a (p,p)-form.
-  sorry
+  intro x' v
+  unfold simpleCalibratedForm
+  simp only [dite_eq_ite]
+  split_ifs with h
+  · -- At the point x, verify J-invariance of the volume form
+    rfl
+  · rfl
 
 /-- The p-th power of the Kähler form ω^p is a (p,p)-form. -/
 theorem omega_pow_is_p_p (p : ℕ) :
