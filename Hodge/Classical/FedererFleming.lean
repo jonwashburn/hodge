@@ -1,4 +1,5 @@
-import Hodge.Analytic
+import Hodge.Analytic.IntegralCurrents
+import Hodge.Analytic.FlatNorm
 import Mathlib.Topology.MetricSpace.Basic
 import Mathlib.Order.Filter.Basic
 

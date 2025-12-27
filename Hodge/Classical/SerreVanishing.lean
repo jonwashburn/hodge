@@ -68,16 +68,6 @@ theorem serre_vanishing (L : HolomorphicLineBundle n X) [IsAmple L]
   intro M _hM
   trivial
 
-/-- Axiomatized: Given vanishing of H^1, the jet evaluation is surjective.
-    This encapsulates the long exact sequence argument. -/
-axiom jet_eval_surjective_aux {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    (L : HolomorphicLineBundle n X) [IsAmple L] (x : X) (k M : ℕ)
-    (_h_vanish : isZero (SheafCohomology (tensorWithSheaf (L.power M) (idealSheaf x k)) 1))
-    (target : Fin (Nat.choose (n + k) k) → ℂ) :
-    Nonempty { s : HolomorphicSection (L.power M) // jet_eval x k s = target }
-
 /-- **Theorem: Jet Surjectivity from Serre Vanishing**
 For an ample line bundle L, there exists M₀ such that for all M ≥ M₀,
 the k-jet evaluation map from H^0(X, L^M) to k-jets at any point x is surjective.
@@ -87,16 +77,9 @@ theorem jet_surjectivity_from_serre (L : HolomorphicLineBundle n X) [IsAmple L]
     ∃ M₀ : ℕ, ∀ M ≥ M₀, ∀ (target : Fin (Nat.choose (n + k) k) → ℂ),
       ∃ (s : HolomorphicSection (L.power M)), jet_eval x k s = target := by
   -- 1. For large M, H^1(X, L^M ⊗ m_x^{k+1}) = 0 by Serre Vanishing.
-  obtain ⟨M₀, hM₀⟩ := serre_vanishing L (idealSheaf x k) 1 (by omega : 1 > 0)
-  use M₀
-  intro M hM target
   -- 2. Long exact sequence: 0 → m_x^{k+1} → O → O/m_x^{k+1} → 0
   -- 3. Tensoring with L^M gives exact sequence on global sections.
   -- 4. When H^1 vanishes, the jet map is surjective.
-  have h_vanish : isZero (SheafCohomology (tensorWithSheaf (L.power M) (idealSheaf x k)) 1) :=
-    hM₀ M hM
-  -- The section exists by the long exact sequence argument.
-  -- We use the axiomatized jet_eval_surjective_aux.
-  exact Classical.choice (jet_eval_surjective_aux L x k M h_vanish target)
+  sorry
 
 end
