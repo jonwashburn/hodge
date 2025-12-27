@@ -52,14 +52,12 @@ theorem mass_add_le {k : ℕ} (S T : Current n X k) : (S + T).mass ≤ S.mass + 
 /-- The boundary operator ∂ : Current_{k+1} → Current_k. -/
 def Current.boundary {k : ℕ} (T : Current n X (k + 1)) : Current n X k where
   toFun := fun ω => T (smoothExtDeriv ω)
-  map_add' := fun _ _ => by
-    simp only [smoothExtDeriv]
-    have h : (⟨fun _ => 0⟩ : SmoothForm n X (k + 1)) = 0 := rfl
-    rw [h, map_zero, add_zero]
-  map_smul' := fun r _ => by
-    simp only [smoothExtDeriv, RingHom.id_apply]
-    have h : (⟨fun _ => 0⟩ : SmoothForm n X (k + 1)) = 0 := rfl
-    rw [h, map_zero, smul_zero]
+  map_add' := fun α β => by
+    simp only [smoothExtDeriv_add, map_add]
+    rfl
+  map_smul' := fun r α => by
+    simp only [smoothExtDeriv_smul_real, map_smul, RingHom.id_apply]
+    rfl
 
 /-- A current is a cycle if its boundary is zero. -/
 def Current.isCycle {k : ℕ} (T : Current n X (k + 1)) : Prop :=
@@ -71,7 +69,7 @@ theorem Current.boundary_boundary {k : ℕ} (T : Current n X (k + 2)) : T.bounda
   intro ω
   simp only [Current.boundary, LinearMap.coe_mk, AddHom.coe_mk, LinearMap.zero_apply]
   -- T.boundary.boundary(ω) = T.boundary(dω) = T(d(dω)) = T(0) = 0
-  have h : smoothExtDeriv (smoothExtDeriv ω) = 0 := d_squared_zero ω
+  have h := d_squared_zero ω
   rw [h]
   exact map_zero T
 

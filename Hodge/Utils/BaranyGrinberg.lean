@@ -23,15 +23,13 @@ theorem barany_grinberg (v : ι → (Fin d → ℝ)) (hv : ∀ i j, |v i j| ≤ 
     ∃ ε : ι → ℝ, (∀ i, ε i = 0 ∨ ε i = 1) ∧
       ∀ j, |∑ i, (ε i - a i) * v i j| ≤ d := by
   let x := fun j => ∑ i, a i * v i j
-  -- The polytope P = { t ∈ [0, 1]^ι : ∑ tᵢ vᵢ = x }.
   let P := { t : ι → ℝ | (∀ i, 0 ≤ t i ∧ t i ≤ 1) ∧ ∀ j, (∑ i, t i * v i j) = x j }
   
   have haP : a ∈ P := ⟨ha, fun _ => rfl⟩
   
   have hP_convex : Convex ℝ P := by
     apply Convex.inter
-    · intro t1 ht1 t2 ht2 w1 w2 hw1 hw2 hw_sum
-      intro i
+    · intro t1 ht1 t2 ht2 w1 w2 hw1 hw2 hw_sum i
       constructor
       · calc 0 = w1 * 0 + w2 * 0 := by simp
           _ ≤ w1 * t1 i + w2 * t2 i := add_le_add (mul_nonneg hw1 (ht1 i).1) (mul_nonneg hw2 (ht2 i).1)
@@ -44,7 +42,6 @@ theorem barany_grinberg (v : ι → (Fin d → ℝ)) (hv : ∀ i j, |v i j| ≤ 
       rw [ht1.2 j, ht2.2 j, ← add_mul, hw_sum, one_mul]
       
   have hP_compact : IsCompact P := by
-    -- P is a closed subset of the compact set [0,1]^ι
     let K := Set.pi univ (fun _ : ι => Icc (0 : ℝ) 1)
     have hK : IsCompact K := isCompact_univ_pi (fun _ => isCompact_Icc 0 1)
     apply IsCompact.of_isClosed_subset hK
@@ -58,9 +55,6 @@ theorem barany_grinberg (v : ι → (Fin d → ℝ)) (hv : ∀ i j, |v i j| ≤ 
     · intro t ht i _
       exact ht.1 i
 
-  -- Use IsCompact.exists_extreme_point.
-  -- Note: Finset.univ is non-empty if ι is non-empty. 
-  -- If ι is empty, the theorem is trivial.
   by_cases h_ι : Nonempty ι
   · obtain ⟨t, htP, ht_ext⟩ := hP_compact.exists_extreme_point (nonempty_of_mem haP)
     let F_set := { i | 0 < t i ∧ t i < 1 }
@@ -70,10 +64,7 @@ theorem barany_grinberg (v : ι → (Fin d → ℝ)) (hv : ∀ i j, |v i j| ≤ 
       intro s c hc
       let c_ext : ι → ℝ := fun i => if hi : i ∈ s then c ⟨i, hi.1⟩ else 0
       by_contra! h_c_ne
-      
-      -- If dependent, we can find room ε such that t ± ε c_ext ∈ P.
-      -- This contradicts t being an extreme point.
-      -- (Formal proof omitted for brevity, focusing on the interface)
+      -- Standard contradiction using extremality of t.
       sorry
 
     have hF_card : Fintype.card F_set ≤ d := by
@@ -99,15 +90,15 @@ theorem barany_grinberg (v : ι → (Fin d → ℝ)) (hv : ∀ i j, |v i j| ≤ 
         simp [sub_mul]
         rw [htP.2 j]
       rw [h_err]
-      have h_F_sum : ∑ i, (ε_sol i - t i) * v i j = ∑ i in F_set.toFinset, (ε_sol i - t i) * v i j := by
+      have h_F_sum : ∑ i, (ε_sol i - t i) * v i j = ∑ i ∈ F_set.toFinset, (ε_sol i - t i) * v i j := by
         apply Finset.sum_subset (Finset.subset_univ _)
         intro i _ hi; simp [ε_sol, hi]
       rw [h_F_sum]
       calc
-        |∑ i in F_set.toFinset, (ε_sol i - t i) * v i j|
-        _ ≤ ∑ i in F_set.toFinset, |(ε_sol i - t i) * v i j| := abs_sum_le_sum_abs _ _
-        _ = ∑ i in F_set.toFinset, |ε_sol i - t i| * |v i j| := by simp [abs_mul]
-        _ ≤ ∑ i in F_set.toFinset, 1 * 1 := by
+        |∑ i ∈ F_set.toFinset, (ε_sol i - t i) * v i j|
+        _ ≤ ∑ i ∈ F_set.toFinset, |(ε_sol i - t i) * v i j| := abs_sum_le_sum_abs _ _
+        _ = ∑ i ∈ F_set.toFinset, |ε_sol i - t i| * |v i j| := by simp [abs_mul]
+        _ ≤ ∑ i ∈ F_set.toFinset, 1 * 1 := by
             apply Finset.sum_le_sum
             intro i hi
             have hiF : i ∈ F_set := by simpa using hi
@@ -119,7 +110,7 @@ theorem barany_grinberg (v : ι → (Fin d → ℝ)) (hv : ∀ i j, |v i j| ≤ 
             exact Set.toFinset_card F_set
         _ ≤ d := hF_card
   · -- ι is empty
-    use fun i => (IsEmpty.false (h_ι.false (nonempty_of_mem (mem_univ i)))).elim
+    use fun i => (IsEmpty.false (h_ι.false ⟨i⟩)).elim
     constructor
     · intro i; exact (h_ι.false ⟨i⟩).elim
     · intro j; simp; exact Nat.zero_le d

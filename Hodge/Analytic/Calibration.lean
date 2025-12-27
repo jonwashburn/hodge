@@ -2,9 +2,19 @@ import Hodge.Analytic.IntegralCurrents
 import Hodge.Analytic.FlatNorm
 import Hodge.Analytic.Norms
 import Hodge.Kahler.TypeDecomposition
+import Mathlib.Topology.Order.LiminfLimsup
 
 /-!
 # Calibration Theory
+
+## Mathlib Integration
+
+We leverage several Mathlib results for limits and liminf:
+- `Filter.Tendsto.liminf_eq`: If f → a, then liminf f = a
+- `Filter.liminf_le_of_le`: Bounds for liminf
+- `Filter.le_liminf_of_le`: Lower bounds for liminf
+
+These help prove properties about calibrated limits.
 -/
 
 noncomputable section

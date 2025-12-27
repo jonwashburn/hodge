@@ -71,6 +71,8 @@ instance (k : ℕ) : AddCommGroup (SmoothForm n X k) where
   zsmul_zero' α := by ext x v; simp [zero_smul]
   zsmul_succ' n α := by ext x v; simp [add_smul, one_smul, add_comm, Int.natCast_succ]
   zsmul_neg' n α := by ext x v; simp [Int.negSucc_eq]; ring
+  sub α β := α + -β
+  sub_eq_add_neg α β := rfl
 
 instance (k : ℕ) : Module ℂ (SmoothForm n X k) where
   one_smul α := by ext x v; simp [one_smul]

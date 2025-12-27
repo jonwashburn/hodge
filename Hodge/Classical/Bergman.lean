@@ -132,9 +132,22 @@ theorem IsHolomorphic_zero {L : HolomorphicLineBundle n X} :
   -- The constant zero function is MDifferentiable
   exact mdifferentiable_const (I := 𝓒_complex n) (I' := 𝓒_ℂ)
 
-/-- Axiom: A scalar multiple of a holomorphic section is holomorphic. -/
-axiom IsHolomorphic_smul {L : HolomorphicLineBundle n X} (c : ℂ) (s : Section L) :
-  IsHolomorphic s → IsHolomorphic (c • s)
+/-- A scalar multiple of a holomorphic section is holomorphic. -/
+theorem IsHolomorphic_smul {L : HolomorphicLineBundle n X} (c : ℂ) (s : Section L) :
+    IsHolomorphic s → IsHolomorphic (c • s) := by
+  intro hs x
+  -- Get a trivialization where s is MDifferentiable
+  obtain ⟨U, hx, ⟨φ, hφ⟩⟩ := hs x
+  refine ⟨U, hx, ⟨φ, ?_⟩⟩
+  -- Show that φ(c • s(·)) = c • φ(s(·)) is MDifferentiable
+  have h_eq : (fun y : ↥U => φ y.1 y.2 ((c • s) y.1)) =
+              (fun y : ↥U => c • φ y.1 y.2 (s y.1)) := by
+    ext y
+    show φ y.1 y.2 ((c • s) y.1) = c • φ y.1 y.2 (s y.1)
+    exact (φ y.1 y.2).map_smul c (s y.1)
+  rw [h_eq]
+  -- Scalar multiple of MDifferentiable is MDifferentiable
+  exact hφ.const_smul c
 
 /-- The space of global holomorphic sections H^0(X, L). -/
 def HolomorphicSection (L : HolomorphicLineBundle n X) : Submodule ℂ (Section L) where
@@ -161,11 +174,10 @@ noncomputable def FirstChernClass (L : HolomorphicLineBundle n X) (h : Hermitian
 noncomputable def BergmanDimension (L : HolomorphicLineBundle n X) : ℕ :=
   Module.finrank ℂ (HolomorphicSection L)
 
-/-- Axiom: The L2 inner product on sections. -/
-axiom L2InnerProduct {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
-    (L : HolomorphicLineBundle n X) (h : HermitianMetric L)
+/-- Axiom: The L2 inner product on sections.
+    Definition: ⟨s, t⟩_{L²} = ∫_X h(s(x), t(x)) vol where vol is the Kähler volume form.
+    This requires measure theory infrastructure. -/
+axiom L2InnerProduct (L : HolomorphicLineBundle n X) (h : HermitianMetric L)
     (s t : Section L) : ℂ
 
 /-- The L2 norm of a section. -/
@@ -193,12 +205,9 @@ noncomputable def BergmanMetric (L : HolomorphicLineBundle n X) [IsAmple L] (M :
 noncomputable def dist_form (_α _β : SmoothForm n X 2) : ℝ :=
   comass (_α - _β)
 
-/-- **Theorem: Tian's Theorem on Bergman Kernel Convergence** -/
-axiom tian_convergence {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
-    (L : HolomorphicLineBundle n X) [IsAmple L]
+/-- **Theorem: Tian's Theorem on Bergman Kernel Convergence**
+    Deep result from 1990: (1/M)·ω_M → ω in C^∞ topology as M → ∞. -/
+axiom tian_convergence (L : HolomorphicLineBundle n X) [IsAmple L]
     (h : ∀ M, HermitianMetric (L.power M)) :
     ∀ ε > 0, ∃ M₀ : ℕ, ∀ M ≥ M₀,
       dist_form ((1 / M : ℝ) • BergmanMetric L M (h M)) (K.omega_form) ≤ ε
@@ -226,11 +235,9 @@ noncomputable def jet_eval (L : HolomorphicLineBundle n X) (x : X) (k : ℕ) :
 axiom jet_surjectivity (L : HolomorphicLineBundle n X) [IsAmple L] (x : X) (k : ℕ) :
     ∃ M₀ : ℕ, ∀ M ≥ M₀, Function.Surjective (jet_eval (L.power M) x k)
 
-/-- Axiom: The tensor product of two holomorphic sections is holomorphic. -/
-axiom IsHolomorphic_tensor {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
-    {L₁ L₂ : HolomorphicLineBundle n X} {s₁ : Section L₁} {s₂ : Section L₂} :
+/-- Axiom: The tensor product of two holomorphic sections is holomorphic.
+    Product of holomorphic functions is holomorphic. Requires transition function theory. -/
+axiom IsHolomorphic_tensor {L₁ L₂ : HolomorphicLineBundle n X} {s₁ : Section L₁} {s₂ : Section L₂} :
   IsHolomorphic s₁ → IsHolomorphic s₂ → IsHolomorphic (L := L₁.tensor L₂) (fun x => s₁ x ⊗ₜ[ℂ] s₂ x)
 
 /-- The tensor product of two holomorphic sections. -/

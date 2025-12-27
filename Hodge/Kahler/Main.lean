@@ -26,7 +26,15 @@ variable {n : ℕ} {X : Type*}
 
 /-- **Theorem: Microstructure Construction Core**
     Constructs a sequence of integral cycles with vanishing calibration defect
-    that converge to a calibrated integral cycle. -/
+    that converge to a calibrated integral cycle.
+
+    This is Theorem 7.1 (Automatic SYR) from the manuscript.
+
+    Proof structure:
+    1. Use `microstructureSequence` to generate the approximating sequence
+    2. Use `microstructureSequence_flat_limit_exists` (Federer-Fleming compactness) for the limit
+    3. Use `microstructureSequence_are_cycles` for the cycle property
+    4. Use `microstructureSequence_defect_vanishes` for the calibration defect convergence -/
 theorem microstructure_construction_core {p : ℕ} (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
     ∃ (T_seq : ℕ → IntegralCurrent n X (2 * (n - p)))
@@ -36,39 +44,23 @@ theorem microstructure_construction_core {p : ℕ} (γ : SmoothForm n X (2 * p))
         Filter.atTop (nhds 0) ∧
       Filter.Tendsto (fun i => calibrationDefect (T_seq i).toFun ψ)
         Filter.atTop (nhds 0) := by
-  -- 1. Generate the initial microstructure sequence
-  let T_raw_seq := microstructureSequence p γ hγ ψ
-  -- 2. Extract uniform mass bounds for Federer-Fleming compactness
-  obtain ⟨M, hM⟩ := microstructureSequence_mass_bound p γ hγ ψ
-  -- We also need a bound on the boundary mass.
-  -- But microstructureSequence already returns cycles (isCycleAt), so boundary is zero.
-  have h_bdry : ∀ k, (T_raw_seq k).boundary.toFun.mass = 0 := by
-    intro k
-    exact microstructureSequence_are_cycles p γ hγ ψ k
-
-  let hyp : FFCompactnessHypothesis n X (2 * (n - p) - 1) := {
-    T := T_raw_seq,
-    M := M + 1, -- Add room for boundary mass (which is 0)
-    mass_bound := fun j => by
-      simp only [h_bdry j, add_zero]
-      exact le_trans (hM j) (le_add_of_nonneg_right zero_le_one)
-  }
-  -- 3. Apply the compactness theorem to obtain a convergent subsequence
-  let conclusion := federer_fleming_compactness _ hyp
-  -- 4. Define the sequence and limit from the conclusion
-  let T_subseq := fun j => T_raw_seq (conclusion.φ j)
-  let T_limit := conclusion.T_limit
-  -- 5. Provide the witnesses
+  -- Step 1: Apply Federer-Fleming compactness to get limit and extraction
+  obtain ⟨T_limit, φ, hφ_mono, h_flat_conv⟩ :=
+    microstructureSequence_flat_limit_exists p γ hγ ψ
+  -- Step 2: Define the extracted subsequence
+  let T_subseq := fun j => microstructureSequence p γ hγ ψ (φ j)
+  -- Step 3: Provide the witnesses
   use T_subseq, T_limit
   constructor
-  · -- Show that every element in the sequence is a cycle
-    intro i; apply microstructureSequence_are_cycles
-  · constructor
-    · -- Show flat norm convergence (provided by Federer-Fleming)
-      exact conclusion.converges
-    · -- Show calibration defect vanishes for the subsequence
-      have h_full_defect := microstructureSequence_defect_vanishes p γ hγ ψ
-      exact Filter.Tendsto.comp h_full_defect conclusion.φ_strict_mono.tendsto_atTop
+  · -- Each element in the subsequence is a cycle
+    intro i
+    exact microstructureSequence_are_cycles p γ hγ ψ (φ i)
+  constructor
+  · -- Flat norm convergence (from compactness axiom)
+    exact h_flat_conv
+  · -- Calibration defect vanishes along the subsequence
+    have h_full_defect := microstructureSequence_defect_vanishes p γ hγ ψ
+    exact Filter.Tendsto.comp h_full_defect hφ_mono.tendsto_atTop
 
 theorem microstructure_approximation {p : ℕ} (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
