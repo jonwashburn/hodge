@@ -155,11 +155,12 @@ theorem hard_lefschetz_reduction {p : ℕ} (hp : p > n / 2)
     ∃ (p' : ℕ) (η : SmoothForm n X (2 * p')),
       p' ≤ n / 2 ∧
       isRationalClass η ∧
-      isPPForm' n X p' η := by
+      isPPForm' n X p' η ∧
+      lefschetz_power_form (p - p') η = γ := by
   -- Let p' be the complementary codimension
   let p' := n - p
   -- Apply the Hard Lefschetz isomorphism at the form level
-  obtain ⟨η, h_η_hodge, h_η_rat, _⟩ := hard_lefschetz_inverse_form hp γ h_hodge h_rational
+  obtain ⟨η, h_η_hodge, h_η_rat, h_η_eq⟩ := hard_lefschetz_inverse_form hp γ h_hodge h_rational
   -- Provide p' and η as the witnesses
   use p', η
   constructor
@@ -178,7 +179,17 @@ theorem hard_lefschetz_reduction {p : ℕ} (hp : p > n / 2)
       have h_p' : p' = 0 := Nat.sub_eq_zero_of_le (Nat.le_of_lt h_pn)
       rw [h_p']
       apply Nat.zero_le
-  · exact ⟨h_η_rat, h_η_hodge⟩
+  · constructor
+    · exact h_η_rat
+    · constructor
+      · exact h_η_hodge
+      · -- Show lefschetz_power_form (p - p') η = γ
+        -- p - p' = p - (n - p) = 2p - n
+        have h_k_eq : p - p' = 2 * p - n := by
+          unfold p'
+          omega
+        rw [h_k_eq]
+        exact h_η_eq
 
 /--
 **THE HODGE CONJECTURE** (Theorem 8.1)

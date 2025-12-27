@@ -141,6 +141,14 @@ def lefschetzL {k : ℕ} (_η : SmoothForm n X k) : SmoothForm n X (k + 2) :=
 def lefschetzLambda {k : ℕ} (_η : SmoothForm n X k) : SmoothForm n X (k - 2) :=
   ⟨fun _ => 0⟩
 
+/-- Iterated Lefschetz operator L^k. -/
+def lefschetz_power_form (k : ℕ) {p : ℕ} (η : SmoothForm n X p) : SmoothForm n X (p + 2 * k) :=
+  match k with
+  | 0 => η
+  | k + 1 =>
+    have h_eq : p + 2 * (k + 1) = (p + 2 * k) + 2 := by ring
+    h_eq ▸ lefschetzL (lefschetz_power_form k η)
+
 /-- The grading operator H : Ω^k → Ω^k. -/
 def gradingH {k : ℕ} (α : SmoothForm n X k) : SmoothForm n X k :=
   ((k : ℝ) - (n : ℝ)) • α
