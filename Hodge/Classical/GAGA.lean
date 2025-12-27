@@ -111,7 +111,7 @@ def complexDimension (W : AlgebraicSubvariety n X) : ℕ := n - W.codim
     a representative closed form in de Rham cohomology. -/
 axiom exists_fundamental_form (W : AlgebraicSubvariety n X) :
     ∃ (η : SmoothForm n X (2 * W.codim)), isClosed η ∧
-    ∀ (_ω : SmoothForm n X (2 * (n - W.codim))), True -- η represents the Poincaré dual
+    DeRhamCohomologyClass.mk η = FundamentalClassCoho n X W.codim W
 
 /-- The fundamental class [Z] of an algebraic subvariety Z.
     Mathematically, this is the Poincaré dual of the cycle Z in cohomology.
