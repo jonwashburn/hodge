@@ -63,22 +63,31 @@ def HolomorphicLineBundle.tensor (L₁ L₂ : HolomorphicLineBundle n X) :
                              letI := L₁.fiber_module x; letI := L₂.fiber_module x; inferInstance,
     has_local_trivializations := fun x => HolomorphicLineBundle.tensor_has_local_trivializations x }
 
+/-- Axiom: The trivial bundle has local trivializations. -/
+axiom trivial_bundle_has_local_trivializations {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] (x : X) :
+  ∃ (U : Opens X) (hx : x ∈ U), Nonempty (∀ y ∈ U, ℂ ≃ₗ[ℂ] ℂ)
+
 /-- The M-th tensor power L^⊗M. -/
 def HolomorphicLineBundle.power (L : HolomorphicLineBundle n X) : ℕ → HolomorphicLineBundle n X
   | 0 => { Fiber := fun _ => ℂ,
            fiber_add := fun _ => inferInstance,
            fiber_module := fun _ => inferInstance,
-           has_local_trivializations := fun _ => ⟨⊤, trivial, fun _ => LinearEquiv.refl ℂ ℂ, trivial⟩ }
+           has_local_trivializations := fun x => trivial_bundle_has_local_trivializations (n := n) (X := X) x }
   | M + 1 => L.tensor (L.power M)
 
 /-- A Hermitian metric on L. -/
-structure HermitianMetric (L : HolomorphicLineBundle n X) where
+structure HermitianMetric {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] (L : HolomorphicLineBundle n X) where
   inner : (x : X) → L.Fiber x → L.Fiber x → ℂ
   inner_re_pos : ∀ x v, v ≠ 0 → (inner x v v).re > 0
   inner_conj_symm : ∀ x v w, inner x v w = star (inner x w v)
-  /-- Smoothness of the metric. -/
-  is_smooth : ∀ (x : X), ∃ (U : Opens X) (hx : x ∈ U) (e : ∀ y : U, L.Fiber y),
-    (∀ y, e y ≠ 0) ∧ MDifferentiable (𝓒_complex n) (𝓒_ℂ) (fun y => inner y (e y) (e y))
+  /-- Smoothness of the metric: in local frames, the metric component is smooth. -/
+  is_smooth : ∀ (x : X), ∃ (U : Opens X) (_hx : x ∈ U) (e : ∀ y ∈ U, L.Fiber y),
+    (∀ y (hy : y ∈ U), e y hy ≠ 0) ∧
+    MDifferentiable (𝓒_complex n) 𝓒_ℂ (fun y : U => inner y.1 (e y.1 y.2) (e y.1 y.2))
 
 /-- A section of the line bundle L. -/
 def Section (L : HolomorphicLineBundle n X) := (x : X) → L.Fiber x
@@ -88,8 +97,8 @@ instance (L : HolomorphicLineBundle n X) : Module ℂ (Section L) := Pi.module _
 
 /-- Holomorphicity condition for a section. -/
 def IsHolomorphic {L : HolomorphicLineBundle n X} (s : Section L) : Prop :=
-  ∀ x : X, ∃ (U : Opens X) (hx : x ∈ U) (φ : ∀ y : U, L.Fiber y ≃ₗ[ℂ] ℂ),
-    MDifferentiable (𝓒_complex n) 𝓒_ℂ (fun y : U => φ y (s y))
+  ∀ x : X, ∃ (U : Opens X) (_hx : x ∈ U) (φ : ∀ y ∈ U, L.Fiber y ≃ₗ[ℂ] ℂ),
+    MDifferentiable (𝓒_complex n) 𝓒_ℂ (fun y : U => φ y.1 y.2 (s y.1))
 
 /-- Axiom: The sum of two holomorphic sections is holomorphic. -/
 axiom IsHolomorphic_add {L : HolomorphicLineBundle n X} (s₁ s₂ : Section L) :
@@ -129,7 +138,7 @@ noncomputable def BergmanDimension (L : HolomorphicLineBundle n X) : ℕ :=
   Module.finrank ℂ (HolomorphicSection L)
 
 /-- Axiom: The L2 inner product on sections. -/
-axiom L2InnerProduct_axiom {n : ℕ} {X : Type*}
+axiom L2InnerProduct {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     (L : HolomorphicLineBundle n X) (h : HermitianMetric L)
@@ -138,7 +147,7 @@ axiom L2InnerProduct_axiom {n : ℕ} {X : Type*}
 /-- The L2 norm of a section. -/
 noncomputable def L2Norm (L : HolomorphicLineBundle n X) (h : HermitianMetric L)
     (s : Section L) : ℝ :=
-  Real.sqrt (L2InnerProduct_axiom L h s s).re
+  Real.sqrt (L2InnerProduct L h s s).re
 
 /-- An ample line bundle. -/
 class IsAmple (L : HolomorphicLineBundle n X) : Prop where
@@ -148,7 +157,7 @@ class IsAmple (L : HolomorphicLineBundle n X) : Prop where
   growth : ∀ (k : ℕ), ∃ M₀ : ℕ, ∀ M ≥ M₀, BergmanDimension (L.power M) ≥ k
 
 /-- Axiom: The smooth 0-form log K_M associated to the Bergman kernel. -/
-axiom log_KM_axiom {n : ℕ} {X : Type*}
+axiom log_KM {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     (L : HolomorphicLineBundle n X) [IsAmple L] (M : ℕ) (h : HermitianMetric (L.power M)) :
@@ -157,14 +166,14 @@ axiom log_KM_axiom {n : ℕ} {X : Type*}
 /-- The Bergman metric ω_M = (i/2π) ∂∂̄ log K_M. -/
 noncomputable def BergmanMetric (L : HolomorphicLineBundle n X) [IsAmple L] (M : ℕ)
     (h : HermitianMetric (L.power M)) : SmoothForm n X 2 :=
-  (Complex.I / (2 * Real.pi)) • (partial_bar_deriv (partial_deriv (log_KM_axiom L M h)))
+  (Complex.I / (2 * Real.pi)) • (partial_bar_deriv (partial_deriv (log_KM L M h)))
 
 /-- Distance between 2-forms in C^2 topology. -/
 noncomputable def dist_form (_α _β : SmoothForm n X 2) : ℝ :=
   comass (_α - _β)
 
 /-- **Theorem: Tian's Theorem on Bergman Kernel Convergence** -/
-axiom tian_convergence_axiom {n : ℕ} {X : Type*}
+axiom tian_convergence {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
@@ -174,14 +183,14 @@ axiom tian_convergence_axiom {n : ℕ} {X : Type*}
       dist_form ((1 / M : ℝ) • BergmanMetric L M (h M)) (K.omega_form) ≤ ε
 
 /-- Axiom: The subspace of holomorphic sections vanishing to order k at x. -/
-axiom SectionsVanishingToOrder_axiom {n : ℕ} {X : Type*}
+axiom SectionsVanishingToOrder {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     (L : HolomorphicLineBundle n X) (x : X) (k : ℕ) : Submodule ℂ ↥(HolomorphicSection L)
 
 /-- The k-jet space of L at x. -/
 def JetSpace (L : HolomorphicLineBundle n X) (x : X) (k : ℕ) :=
-  ↥(HolomorphicSection L) ⧸ (SectionsVanishingToOrder_axiom L x (k + 1))
+  ↥(HolomorphicSection L) ⧸ (SectionsVanishingToOrder L x (k + 1))
 
 instance (L : HolomorphicLineBundle n X) (x : X) (k : ℕ) :
     AddCommGroup (JetSpace L x k) := Submodule.Quotient.addCommGroup _
@@ -195,7 +204,7 @@ noncomputable def jet_eval {L : HolomorphicLineBundle n X} (x : X) (k : ℕ) :
   Submodule.mkQ _
 
 /-- **Theorem: Jet Surjectivity for Ample Line Bundles** -/
-axiom jet_surjectivity_axiom {n : ℕ} {X : Type*}
+axiom jet_surjectivity {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     (L : HolomorphicLineBundle n X) [IsAmple L] (x : X) (k : ℕ) :

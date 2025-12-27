@@ -29,7 +29,7 @@ theorem form_is_bounded {k : ℕ} (α : SmoothForm n X k) :
 Let γ be a rational Hodge class. Then γ = γ⁺ - γ⁻ where γ⁺ and γ⁻ are
 cone-positive rational Hodge classes. -/
 theorem signed_decomposition {p : ℕ} (γ : SmoothForm n X (2 * p))
-    (_h_hodge : isPPForm' p γ) (_h_rational : isRationalClass γ) :
+    (_h_hodge : isPPForm' n X p γ) (_h_rational : isRationalClass γ) :
     ∃ (γplus γminus : SmoothForm n X (2 * p)),
       γ = γplus - γminus ∧
       isConePositive γplus ∧
