@@ -17,7 +17,7 @@
 | 5 | Global Gluing & Transport | ✅ Complete (Balanced flow logic wired) |
 | 6 | Final Integration | ✅ Complete (Main proof assembly verified) |
 
-**Total `sorry` count:** 90 (Targeting zero)
+**Total `sorry` count:** 74 (Targeting zero)
 **Total `axiom` count:** 0 (Absolute zero strictly enforced)
 **Total `True` placeholders:** 0 (Absolute zero strictly enforced)
 
