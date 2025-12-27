@@ -6,6 +6,33 @@
 
 ---
 
+## ⚠️ PROOF QUALITY STANDARDS (READ FIRST)
+
+**This is a quality proof, not a checkbox exercise.** Every definition and theorem must be mathematically meaningful.
+
+### Absolutely Forbidden:
+- ❌ **Vacuous definitions** like `def X := sorry` or `def X : Type* := Unit`
+- ❌ **Trivial propositions** like `theorem foo : True := trivial`
+- ❌ **Placeholder fields** like `is_something : Prop := True`
+- ❌ **Empty structures** that compile but prove nothing
+- ❌ **Circular reasoning** or assuming what you're trying to prove
+- ❌ **Rushing to remove `sorry`** without understanding the mathematics
+
+### Required:
+- ✅ **Every definition must have mathematical content** — if you define `SheafCohomology`, it must actually be sheaf cohomology (derived functors), not a placeholder type
+- ✅ **Every theorem must have a real proof** — the proof term must actually establish the statement, not just make Lean happy
+- ✅ **Consult references** — these are deep theorems (Harvey-Lawson, GAGA, Federer-Fleming); read the cited papers if needed
+- ✅ **Ask for help** if a proof is beyond current Mathlib — it's better to document a genuine gap than fake a proof
+- ✅ **Preserve mathematical intent** — the LaTeX manuscript `Hodge-v6-w-Jon-Update-MERGED.tex` contains the intended arguments
+
+### Quality Check:
+Before claiming a `sorry` is resolved, ask yourself:
+1. Does this definition/proof actually mean what the docstring says?
+2. Would a mathematician reading this accept it as rigorous?
+3. Is there any way this could be vacuously true or trivially satisfied?
+
+---
+
 ## 🚀 AGENT TRACKS (5 Parallel Agents)
 
 Each agent works on isolated files to minimize build conflicts. Just prompt:
