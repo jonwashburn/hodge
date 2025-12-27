@@ -23,21 +23,6 @@ structure AlgebraicSubvariety (n : ℕ) (X : Type*)
     ∃ (s : Finset (HolomorphicSection (L.power M))),
       carrier = ⋂ s_i ∈ s, { x | s_i.1 x = 0 }
 
-/-- An algebraic subvariety is complex analytic. -/
-def AlgebraicSubvariety.toAnalyticSubvariety {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] (W : AlgebraicSubvariety n X) : AnalyticSubvariety n X := {
-  carrier := W.carrier
-  codim := W.codim
-  is_analytic := trivial
-}
-
-instance {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] : Coe (AlgebraicSubvariety n X) (AnalyticSubvariety n X) := ⟨AlgebraicSubvariety.toAnalyticSubvariety⟩
-
 /-- Predicate for a set being an algebraic subvariety. -/
 def isAlgebraicSubvariety (n : ℕ) (X : Type*)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
@@ -201,12 +186,22 @@ theorem isAlgebraicSubvariety_intersection_power (n : ℕ) (X : Type*)
 
 /-! ## Fundamental Class and Lefschetz -/
 
-/-- **Axiom: Fundamental Class Set and Intersection Power** -/
-axiom FundamentalClassSet_intersection_power_eq (p k : ℕ) {n : ℕ} {X : Type*}
+axiom FundamentalClass_intersection_power_eq {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X]
-    (Z : Set X) (hZ : isAlgebraicSubvariety n X Z) :
+    {p k : ℕ}
+    (W : AlgebraicSubvariety n X) (_hW : W.codim = p) :
+    ∃ (W' : AlgebraicSubvariety n X),
+      W'.carrier = algebraic_intersection_power n X W.carrier k ∧
+      W'.codim = p + k
+
+/-- The fundamental class of an intersection with k hyperplanes equals L^k of the original. -/
+axiom FundamentalClassSet_intersection_power_eq {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    (p k : ℕ) (Z : Set X) (hZ : isAlgebraicSubvariety n X Z) :
     FundamentalClassSet n X (p + k) (algebraic_intersection_power n X Z k) =
     (show SmoothForm n X (2 * p + 2 * k) = SmoothForm n X (2 * (p + k)) from by ring_nf) ▸
     lefschetz_power_form k (FundamentalClassSet n X p Z)

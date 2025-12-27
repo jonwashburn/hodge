@@ -15,11 +15,23 @@ This file defines operations on differential forms using the SmoothForm structur
 
 We leverage `Mathlib.Analysis.Calculus.DifferentialForm.Basic` which provides:
 - `extDeriv`: The exterior derivative on normed spaces
-- `extDeriv_extDeriv`: The fundamental property d² = 0
+- `extDeriv_extDeriv`: The fundamental property d² = 0 (PROVED in Mathlib!)
 - Linearity properties (`extDeriv_add`, `extDeriv_smul`)
+- `extDerivWithin_pullback`: Exterior derivative commutes with pullback
 
 Our `SmoothForm` structure wraps alternating maps at each point of a manifold.
 The exterior derivative is defined via the chart structure.
+
+## Key Mathlib Theorems Used
+
+From `Mathlib.Analysis.Calculus.DifferentialForm.Basic`:
+```
+theorem extDeriv_extDeriv (h : ContDiff 𝕜 r ω) (hr : minSmoothness 𝕜 2 ≤ r) :
+    extDeriv (extDeriv ω) = 0
+```
+
+This is the fundamental **d² = 0** theorem, proved in Mathlib using the symmetry
+of second derivatives (Schwarz's theorem).
 -/
 
 noncomputable section
