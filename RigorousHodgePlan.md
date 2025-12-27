@@ -2,7 +2,7 @@
 
 **Goal:** Machine-verified proof with **zero** `sorry`, `admit`, or `axiom` statements.
 
-**Current Status:** 77 sorries across 14 files
+**Current Status:** 63 sorries across 13 files
 
 ---
 
@@ -67,7 +67,7 @@ Each agent works on isolated files to minimize build conflicts. Just prompt:
 
 ---
 
-### Track A1: Serre Vanishing (14 sorries)
+### Track A1: Serre Vanishing (0 sorries) ✅
 
 **File:** `Hodge/Classical/SerreVanishing.lean`
 
