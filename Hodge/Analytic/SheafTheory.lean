@@ -2,20 +2,11 @@ import Mathlib.Topology.Sheaves.Sheaf
 import Mathlib.Topology.Sheaves.CommRingCat
 import Mathlib.Algebra.Category.Ring.Basic
 import Mathlib.Geometry.Manifold.MFDeriv.Basic
+import Mathlib.Topology.Sheaves.LocalPredicate
+import Mathlib.Topology.Sheaves.SheafOfFunctions
+import Mathlib.Algebra.Category.ModuleCat.Basic
+import Mathlib.Algebra.BigOperators.Group.Finset
 import Hodge.Basic
-
-/-!
-# Sheaf Theory for Complex Manifolds
-
-This file provides axiomatized definitions for sheaf-theoretic constructions
-needed in the Hodge conjecture formalization.
-
-## Main Definitions
-
-- `CoherentSheaf`: A coherent sheaf on a complex projective manifold
-- `SheafCohomology`: The q-th sheaf cohomology group H^q(X, F)
-- `vanishes`: Predicate for vanishing cohomology groups
--/
 
 noncomputable section
 
@@ -27,39 +18,65 @@ variable {n : ℕ} {X : Type u}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X]
 
+/-- Holomorphicity is a local property. -/
+def holomorphicLocalPredicate (n : ℕ) (X : Type u)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] : TopCat.LocalPredicate (fun _ : TopCat.of X => ℂ) where
+  pred {U} f := MDifferentiable (𝓒_complex n) 𝓒_ℂ f
+  res {U V} i f h := h.comp (MDifferentiable.comp (I := 𝓒_complex n) (I' := 𝓒_complex n) (I'' := 𝓒_complex n)
+    (f := Set.inclusion i.le) (g := id) mdifferentiable_id (sorry)) -- MDifferentiable of inclusion
+  locality {U} f h := by
+    intro x
+    specialize h x
+    obtain ⟨V, hxV, i, hV⟩ := h
+    -- The restriction of f to V is MDifferentiable.
+    -- Since V is open and x ∈ V, this implies differentiability at x in U.
+    sorry
+
 /-- The structure sheaf 𝓞_X of holomorphic functions on a complex manifold. -/
 axiom structureSheaf (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] : Sheaf (Opens.grothendieckTopology (TopCat.of X)) CommRingCat
 
-/-- A coherent sheaf on a complex manifold. -/
-axiom CoherentSheaf (n : ℕ) (X : Type u)
+/-- A coherent sheaf on a complex manifold X. -/
+structure CoherentSheaf (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] : Type u
+    [ProjectiveComplexManifold n X] where
+  /-- The stalk at each point. -/
+  Stalk : X → Type u
+  stalk_module : ∀ x, Module ℂ (Stalk x)
+  /-- Restriction maps between stalks. -/
+  restriction : ∀ {U : Opens X} {x : X} (hx : x ∈ U), Stalk x
+  /-- Local finite generation: covered by finitely many generators. -/
+  locally_finitely_generated : ∀ x, ∃ (U : Opens X) (hx : x ∈ U) (m : ℕ)
+    (gen : Fin m → (y : U) → Stalk y), ∀ (y : U), ∀ (s : Stalk y.1),
+    ∃ (c : Fin m → ℂ), s = ∑ i, c i • gen i y
 
 /-- The q-th sheaf cohomology group H^q(X, F). -/
-axiom SheafCohomology {n : ℕ} {X : Type u}
+def SheafCohomology {n : ℕ} {X : Type u}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X]
-    (F : CoherentSheaf n X) (q : ℕ) : Type u
+    (F : CoherentSheaf n X) (q : ℕ) : Type u :=
+  -- This will be defined via Čech cohomology
+  sorry
 
-axiom SheafCohomology.instAddCommGroup {n : ℕ} {X : Type u}
+instance SheafCohomology.instAddCommGroup {n : ℕ} {X : Type u}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X]
-    (F : CoherentSheaf n X) (q : ℕ) : AddCommGroup (SheafCohomology F q)
-attribute [instance] SheafCohomology.instAddCommGroup
+    (F : CoherentSheaf n X) (q : ℕ) : AddCommGroup (SheafCohomology F q) :=
+  sorry
 
-axiom SheafCohomology.instModule {n : ℕ} {X : Type u}
+instance SheafCohomology.instModule {n : ℕ} {X : Type u}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X]
-    (F : CoherentSheaf n X) (q : ℕ) : Module ℂ (SheafCohomology F q)
-attribute [instance] SheafCohomology.instModule
+    (F : CoherentSheaf n X) (q : ℕ) : Module ℂ (SheafCohomology F q) :=
+  sorry
 
-/-- A cohomology group vanishes if all elements are zero. -/
+/-- A cohomology group vanishes if it is isomorphic to the zero module. -/
 def vanishes {n : ℕ} {X : Type u}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]

@@ -53,9 +53,11 @@ theorem mass_add_le {k : ℕ} (S T : Current n X k) : (S + T).mass ≤ S.mass + 
 def Current.boundary {k : ℕ} (T : Current n X (k + 1)) : Current n X k where
   toFun := fun ω => T (smoothExtDeriv ω)
   map_add' := fun α β => by
-    simp only [smoothExtDeriv_add, map_add]
+    rw [smoothExtDeriv_add]
+    exact map_add T _ _
   map_smul' := fun r α => by
-    simp only [smoothExtDeriv_smul_real, map_smul, RingHom.id_apply]
+    rw [smoothExtDeriv_smul_real]
+    exact map_smul T r _
 
 /-- A current is a cycle if its boundary is zero. -/
 def Current.isCycle {k : ℕ} (T : Current n X (k + 1)) : Prop :=
@@ -65,10 +67,10 @@ def Current.isCycle {k : ℕ} (T : Current n X (k + 1)) : Prop :=
 theorem Current.boundary_boundary {k : ℕ} (T : Current n X (k + 2)) : T.boundary.boundary = 0 := by
   apply LinearMap.ext
   intro ω
-  simp only [Current.boundary, LinearMap.coe_mk, AddHom.coe_mk, LinearMap.zero_apply]
+  unfold Current.boundary
+  simp only [LinearMap.coe_mk, AddHom.coe_mk, LinearMap.zero_apply]
   -- T.boundary.boundary(ω) = T.boundary(dω) = T(d(dω)) = T(0) = 0
   have h := d_squared_zero ω
-  rw [h]
-  exact map_zero T
+  simp only [h, map_zero]
 
 end

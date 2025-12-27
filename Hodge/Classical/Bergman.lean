@@ -45,10 +45,15 @@ structure HolomorphicLineBundle (n : ℕ) (X : Type*)
   /-- Local trivializations exist. -/
   has_local_trivializations : ∀ x : X, ∃ (U : Opens X) (hx : x ∈ U),
     Nonempty (∀ y ∈ U, Fiber y ≃ₗ[ℂ] ℂ)
-  /-- Transition functions are holomorphic. This is axiomatized as true for all
-      holomorphic line bundles by definition - any section holomorphic in one
-      trivialization is holomorphic in all trivializations. -/
-  transition_holomorphic : True
+  /-- Transition functions are holomorphic: for any two trivializations φ₁ on U₁ and φ₂ on U₂,
+      the transition function φ₁ ∘ φ₂⁻¹ (viewed as a ℂ-valued function via φ₁(φ₂⁻¹(1)))
+      is MDifferentiable on U₁ ∩ U₂. -/
+  transition_holomorphic :
+    ∀ (x : X) (U₁ U₂ : Opens X) (hx₁ : x ∈ U₁) (hx₂ : x ∈ U₂)
+      (φ₁ : ∀ y ∈ U₁, Fiber y ≃ₗ[ℂ] ℂ) (φ₂ : ∀ y ∈ U₂, Fiber y ≃ₗ[ℂ] ℂ),
+      MDifferentiableAt (𝓒_complex n) 𝓒_ℂ
+        (fun y : ↥(U₁ ⊓ U₂) => (φ₁ y.1 y.2.1).trans (φ₂ y.1 y.2.2).symm (1 : ℂ))
+        ⟨x, hx₁, hx₂⟩
 
 instance (L : HolomorphicLineBundle n X) (x : X) : AddCommGroup (L.Fiber x) := L.fiber_add x
 instance (L : HolomorphicLineBundle n X) (x : X) : Module ℂ (L.Fiber x) := L.fiber_module x

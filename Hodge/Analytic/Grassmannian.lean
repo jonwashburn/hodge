@@ -64,7 +64,7 @@ theorem calibratedCone_is_closed (p : ℕ) (x : X) :
 /-- The calibrated cone hull is pointed (contains 0). -/
 theorem calibratedCone_hull_pointed (p : ℕ) (x : X) :
     (ConvexCone.hull ℝ (simpleCalibratedForms (n := n) p x)).Pointed :=
-  (ConvexCone.hull ℝ (simpleCalibratedForms p x)).zero_mem
+  (ConvexCone.hull ℝ (simpleCalibratedForms p x)).zero_mem'
 
 /-! ## Cone Distance and Defect -/
 
@@ -97,23 +97,28 @@ theorem radial_minimization (x : X) (ξ : SmoothForm n X (2 * p)) (α : SmoothFo
   · rfl
   · intro l _hl
     -- Use the pointwise norm expansion axiom from Norms.lean
-    have h_expand (t : ℝ) : (pointwiseNorm (α - t • ξ) x)^2 =
+    have h_expand (t : ℝ) : (pointwiseNorm (α - t • ξ) x)^2 = 
         pointwiseInner α α x - 2 * t * (pointwiseInner α ξ x) + t^2 * (pointwiseInner ξ ξ x) := by
       rw [pointwiseNorm]
-      have : (α - t • ξ) = (α + (-t) • ξ) := by ext; simp; ring
-      rw [this]
+      -- ‖α - tξ‖² = ‖α + (-t)ξ‖²
+      have h_sub : (α - t • ξ) = (α + (-t) • ξ) := by
+        ext x' v'
+        simp only [SmoothForm.add_apply, SmoothForm.smul_apply, SmoothForm.neg_apply,
+                   AlternatingMap.add_apply, AlternatingMap.smul_apply, AlternatingMap.neg_apply]
+        rfl
+      rw [h_sub]
       rw [pointwiseNorm_sq_expand x α ξ (-t)]
       ring
-
+      
     have h_norm_ξ_sq : pointwiseInner ξ ξ x = 1 := by
       have h := hξ
       unfold pointwiseNorm at h
       rw [← h, Real.sq_sqrt]
       exact pointwiseInner_nonneg ξ x
-
+      
     rw [h_expand lambda_star, h_expand l, h_norm_ξ_sq, h_norm_ξ_sq]
     simp only [mul_one]
-
+    
     by_cases h_case : lambda_proj ≥ 0
     · have h_lambda_star : lambda_star = lambda_proj := max_eq_left h_case
       rw [h_lambda_star]
