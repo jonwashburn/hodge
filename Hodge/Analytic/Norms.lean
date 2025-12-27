@@ -1,13 +1,22 @@
 import Hodge.Analytic.Forms
 import Mathlib.Topology.Compactness.Compact
 import Mathlib.Analysis.InnerProductSpace.Basic
+import Mathlib.Analysis.InnerProductSpace.Projection
 import Mathlib.Analysis.Complex.Basic
+import Mathlib.Topology.MetricSpace.Basic
 
 /-!
 # Track B.2: Norms and Metrics
 
 This file defines the global norms on differential forms (comass and L2)
 and proves their basic properties on compact Kähler manifolds.
+
+## Mathlib Integration
+
+We leverage several Mathlib results:
+- `Mathlib.Analysis.InnerProductSpace.Projection`: Orthogonal projections
+- `Mathlib.Topology.Compactness.Compact`: Extreme value theorem
+- `Mathlib.Topology.MetricSpace.Basic`: Metric space properties
 
 ## Main definitions
 - `kahlerMetric`: The Riemannian metric induced by a Kähler form

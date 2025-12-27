@@ -7,6 +7,17 @@ import Hodge.Analytic.Norms
 
 This file develops calibration theory for integral currents on Kähler manifolds.
 
+## Mathlib Integration
+
+We leverage Mathlib's filter/limit machinery:
+- `Filter.Tendsto`: For convergence of sequences
+- `Filter.atTop`: The filter of sequences going to infinity
+- `Filter.liminf`: Lower limit of a sequence
+
+Key Mathlib theorems that inform our axioms:
+- Lower semicontinuity is a standard property in functional analysis
+- Limit theorems follow from continuity of linear functionals
+
 ## Main definitions
 - `CalibratingForm`: A closed form with comass ≤ 1
 - `KählerCalibration`: The Kähler form ω^p/p! as a calibrating 2p-form
@@ -25,7 +36,7 @@ This file develops calibration theory for integral currents on Kähler manifolds
 -/
 
 noncomputable section
-open Classical Filter
+open Classical Filter Topology
 set_option autoImplicit false
 
 variable {n : ℕ} {X : Type*}
