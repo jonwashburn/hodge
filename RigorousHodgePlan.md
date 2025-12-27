@@ -1,128 +1,175 @@
-# Rigorous Formalization Plan: Hodge Conjecture (Axiom-Free & Sorry-Free)
+# Rigorous Formalization Plan: Hodge Conjecture
 
-**Goal:** Provide a machine-checked, machine-verified proof of the Hodge Conjecture using the "Calibration–Coercivity" framework, grounded in Mathlib primitives. The final repository must contain **zero** `sorry`, `admit`, `axiom`, or `trivial` statements.
+**Goal:** Machine-verified proof with **zero** `sorry`, `admit`, or `axiom` statements.
 
-**Philosophy:** Every mathematical fact—including "classical" theorems like Harvey-Lawson, GAGA, and Federer-Fleming—must be derived from type theory. The use of the `axiom` keyword is strictly prohibited in the final assembly. Every result must be fully proved. Trivial placeholders (e.g., `is_something : True`) are forbidden; all structures must have rigorous, mathematically meaningful definitions. During development, `sorry` is used exclusively as a tracker for pending proof obligations.
-
----
-
-## 🚦 Current Status Summary
-
-| Phase | Description | Status |
-|-------|-------------|--------|
-| 1 | Analytic Foundations (Currents) | ✅ Complete (Rigorous algebraic foundations established) |
-| 2 | Kähler Linear Algebra (Cone Geometry) | ✅ Complete (Structural logic fully wired) |
-| 3 | Unconditional Reductions | ✅ Complete (Signed decomposition assembled) |
-| 4 | Microstructure Construction | ✅ Complete (Holomorphic skeleton established) |
-| 5 | Global Gluing & Transport | ✅ Complete (Balanced flow logic wired) |
-| 6 | Final Integration | ✅ Complete (Main proof assembly verified) |
-
-**Total `sorry` count:** 75 (Targeting zero)
-**Total `axiom` count:** 0 (Absolute zero strictly enforced)
-**Total `True` placeholders:** 0 (Absolute zero strictly enforced)
+**Current Status:** 77 sorries across 14 files
 
 ---
 
-## 🔀 Three Parallel Tracks
+## 🚀 AGENT TRACKS (5 Parallel Agents)
 
-We organize the formalization into three concurrent tracks that can be developed simultaneously. Each track has clear interfaces and dependencies.
-
-### Track A: Classical Theorems Foundation (`Hodge/Classical/`)
-*Formalize the deep theorems from complex/algebraic geometry and GMT that are not in Mathlib.*
-**Status:** ✅ Skeletons and Logical Chains Complete (Federer-Fleming, Harvey-Lawson, GAGA, Hard Lefschetz)
-- Federer-Fleming: Proof structure established via Deformation Theorem and diagonal argument.
-- Harvey-Lawson: Structural steps formalized (rectifiability, calibration, regularity, integrability).
-- Integral Currents: Core analytical properties (linearity, integrability, mass formula) resolved.
-- Federer-Fleming: Proof structure established via Deformation Theorem and diagonal argument.
-- Harvey-Lawson: Structural steps formalized (rectifiability, calibration, regularity).
-**Status:** ⚠️ Staged as theorem-axioms (sorries tracked)
-
-### Track B: Analytic/GMT Core (`Hodge/Analytic/`)
-*Build the machinery for currents, mass norms, calibrations, and compactness theorems.*
-**Status:** ⚠️ Partial implementation
-
-### Track C: Algebraic/Kähler Core (`Hodge/Kahler/`)
-*Kähler geometry, cone geometry, signed decomposition, and the main proof assembly.*
-**Status:** ✅ Logical Assembly Complete (Connective logic machine-checked)
+Each agent works on isolated files to minimize build conflicts. Just prompt:
+> "Work on @RigorousHodgePlan.md Track A1"
 
 ---
 
-## 🏛️ Track A: Classical Theorems Foundation
+### Track A1: Serre Vanishing (14 sorries)
 
-**Directory:** `Hodge/Classical/`
+**File:** `Hodge/Classical/SerreVanishing.lean`
 
-### Track A Progress
-- [x] A.1: Complex Analytic & Algebraic Geometry
-  - [x] A.1.1 Serre's GAGA (`Hodge/Classical/GAGA.lean`)
-  - [x] A.1.2 Serre Vanishing (`Hodge/Classical/SerreVanishing.lean`)
-- [x] A.2: Geometric Measure Theory (GMT)
-  - [x] A.2.1 Federer-Fleming Compactness (`Hodge/Classical/FedererFleming.lean`)
-  - [x] A.2.2 Harvey-Lawson Theorem (`Hodge/Classical/HarveyLawson.lean`)
-- [x] A.3: Transverse & Asymptotic Geometry
-  - [x] A.3.1 Hard Lefschetz Theorem (`Hodge/Classical/Lefschetz.lean`)
-  - [x] A.3.2 Bergman Kernel Asymptotics (`Hodge/Classical/Bergman.lean`)
+**Build command:** `lake build Hodge.Classical.SerreVanishing`
 
-**Detailed Foundation Status:**
-- **SmoothForm**: Algebraic wiring (Add, SMul, Module) implemented with full Lean proofs in `Forms.lean`.
-- **Kähler Manifold**: Rigorous class defined with smooth Kähler form and closedness condition.
-- **Federer-Fleming**: Proof structure established via Deformation Theorem and diagonal argument.
-- **Harvey-Lawson**: Structural steps formalized (rectifiability, calibration, regularity, integrability).
-- **Integral Currents**: Core analytical properties (linearity, integrability, mass formula) resolved.
-- **Hard Lefschetz**: sl_2(ℂ) representation structure defined on cohomology.
-- **Bergman/Tian**: Asymptotic kernel expansion skeleton formalized.
+**Sorries to resolve:**
+- `def SheafCohomology` — define via derived functors
+- `theorem serre_vanishing` — prove H^q vanishes for large M
+- `def tensorWithSheaf` — tensor product of line bundle with coherent sheaf
+- `def idealSheaf` — sheaf of functions vanishing at x to order k
+- `def jetSkyscraperSheaf` — skyscraper sheaf of jets
+- `def structureSheaf` — cokernel presentation
+- `theorem jet_surjectivity_from_serre` — derive from vanishing + LES
+
+**DO NOT EDIT:** `Basic.lean`, `Main.lean`, any file outside `Classical/`
 
 ---
 
-## 🔬 Track B: Analytic/GMT Core
+### Track A2: Bergman Kernels (12 sorries)
 
-**Directory:** `Hodge/Analytic/`
+**File:** `Hodge/Classical/Bergman.lean`
 
-### Track B Progress
-- [x] B.1: Forms (Rigorous Exterior Algebra)
-- [x] B.2: Norms (Comass, L2, Continuity)
-- [x] B.3: Currents (Mass Norm, Boundary)
-- [x] B.4: Integral Currents (Rectifiable Sets, Multiplicity)
-- [x] B.5: Flat Norm (Topology, Convergence)
-- [x] B.6: Calibration (Kähler Calibration, Spine Theorem)
+**Build command:** `lake build Hodge.Classical.Bergman`
+
+**Sorries to resolve:**
+- `def HolomorphicLineBundle.tensor` — tensor product holomorphicity
+- `def FirstChernClass` — first Chern class construction
+- `def HolomorphicSection.tensor` — section tensor product
+- `def BergmanMetric` — (i/2π) ∂∂̄ log K_M
+- `theorem tian_convergence` — Bergman → Kähler in C^2
+- `theorem jet_surjectivity` — jets are surjective for large M
+
+**DO NOT EDIT:** `Basic.lean`, `Main.lean`, any file outside `Classical/`
 
 ---
 
-## ⚡ Track C: Algebraic/Kähler Core
+### Track A3: GAGA + Federer-Fleming (11 sorries)
 
-**Directory:** `Hodge/Kahler/`
+**Files:** 
+- `Hodge/Classical/GAGA.lean` (7 sorries)
+- `Hodge/Classical/FedererFleming.lean` (4 sorries)
 
-### Track C Progress
-- [x] C.1: Manifolds (Projective Kähler Foundations)
-- [x] C.2: Type Decomposition (Hodge (p,q) Decomposition)
-- [x] C.3: Cone (Strongly Positive Cone, Interiority)
-- [x] C.4: Signed Decomposition (Lemma 8.7 Implementation)
-- [x] C.5: Microstructure (Holomorphic Sheets, Integer Transport)
-- [x] C.6: Main Theorem (Final assembly of `hodge_conjecture`)
+**Build commands:**
+```bash
+lake build Hodge.Classical.GAGA
+lake build Hodge.Classical.FedererFleming
+```
+
+**GAGA sorries:**
+- `theorem isAlgebraicSubvariety_union` — union of algebraic is algebraic
+- `def FundamentalClass` — fundamental class in cohomology
+- `theorem FundamentalClass_union` — additivity
+- `theorem isAlgebraicSubvariety_intersection` — intersection
+- `theorem serre_gaga` — analytic → algebraic on projective
+
+**Federer-Fleming sorries:**
+- `theorem deformation_theorem` — polyhedral approximation
+- `theorem federer_fleming_compactness` — diagonal argument + completeness
+
+**DO NOT EDIT:** `Basic.lean`, `Main.lean`, `HarveyLawson.lean`
+
+---
+
+### Track A4: Analytic Core (10 sorries)
+
+**Files:**
+- `Hodge/Analytic/Calibration.lean` (4 sorries)
+- `Hodge/Analytic/Norms.lean` (3 sorries)
+- `Hodge/Analytic/Grassmannian.lean` (3 sorries)
+
+**Build commands:**
+```bash
+lake build Hodge.Analytic.Calibration
+lake build Hodge.Analytic.Norms
+lake build Hodge.Analytic.Grassmannian
+```
+
+**Calibration sorries:**
+- `def KählerCalibration` — prove ω^p/p! is closed with comass ≤ 1
+
+**Norms sorries:**
+- `theorem pointwiseComass_continuous` — Berge maximum theorem
+- `def kahlerMetricDual` — dual metric on cotangent
+- `def pointwiseInner` — inner product of forms
+
+**Grassmannian sorries:**
+- `def simpleCalibratedForm` — volume form of complex p-plane
+- `theorem calibratedCone_is_closed` — cone closure
+- `theorem radial_minimization` — projection onto ray
+
+**DO NOT EDIT:** `Basic.lean`, `Main.lean`, `IntegralCurrents.lean`
+
+---
+
+### Track A5: Kähler Geometry (9 sorries)
+
+**Files:**
+- `Hodge/Kahler/Cone.lean` (5 sorries)
+- `Hodge/Kahler/Microstructure.lean` (3 sorries)
+- `Hodge/Kahler/TypeDecomposition.lean` (1 sorry)
+
+**Build commands:**
+```bash
+lake build Hodge.Kahler.Cone
+lake build Hodge.Kahler.Microstructure
+lake build Hodge.Kahler.TypeDecomposition
+```
+
+**Cone sorries:**
+- `theorem wirtinger_pairing` — ⟨ω^p, ξ⟩ = 1 on complex planes
+- `theorem ConvexCone.mem_interior_of_pairing_pos` — dual cone criterion
+- `theorem omegaPow_in_interior` — ω^p in interior of K_p
+- `theorem exists_uniform_interior_radius` — compactness argument
+- `theorem caratheodory_decomposition` — finite convex combination
+
+**Microstructure sorries:**
+- `theorem local_sheet_realization` — jet surjectivity → sheets
+- `theorem integer_transport` — total unimodularity
+- `theorem gluing_estimate` — boundary flat norm bound
+
+**TypeDecomposition sorries:**
+- `theorem hodge_decomposition` — spectral projections
+
+**DO NOT EDIT:** `Basic.lean`, `Main.lean`, `Kahler/Main.lean`
+
+---
+
+## 🔒 PHASE 2 (After Tracks A1-A5 Complete)
+
+These files have heavy dependencies — only work on them after above tracks are done:
+
+| File | Sorries | Reason to defer |
+|------|---------|-----------------|
+| `Basic.lean` | 3 | Imported everywhere — edits cause full rebuild |
+| `Kahler/Main.lean` | 8 | Imports all of Kahler/ and Classical/ |
+| `Main.lean` | 5 | Final assembly — imports everything |
+| `Classical/HarveyLawson.lean` | 3 | Imports Analytic/ |
+| `Classical/Lefschetz.lean` | 2 | Imports Kahler/ |
+
+---
+
+## 📋 BUILD POLICY
+
+1. **Never run `lake build` without arguments** — it rebuilds everything
+2. **Use specific module builds:** `lake build Hodge.Classical.GAGA`
+3. **Commit frequently, push at session end**
+4. **If build fails on imports:** another agent may have broken something — coordinate
 
 ---
 
 ## 🎯 Milestone Targets
 
-1. **M1: Structural Assembly Complete** — All tracks logically wired (ZERO trivialities) ✅
-2. **M2: Analytic Core Complete** — Resolve GMT and Norm sorries (Track B)
-3. **M3: Kähler Core Complete** — Resolve Cone and Microstructure sorries (Track C)
-4. **M4: Foundation Complete** — Prove or integrate Track A classical theorems
-5. **M5: Verified State** — The entire repository is **axiom-free and sorry-free**.
-
----
-
-## 📝 Rigorous Implementation Policy
-
-To achieve an axiom-free and sorry-free state, we adhere to the following strict policy:
-
-1. **Replace Assumption with Definition**: Every "assumption of existence" must be replaced with a rigorous definition.
-2. **Replace Staging with Proof**: Every "staging of a result" must be replaced with a fully derived proof.
-3. **Eliminating Trivial Placeholders (`Prop := True`)**: Fields like `projective_embedding_exists : Prop := True` in `Basic.lean` must be replaced with the actual data of the embedding (a map `ι`) and the proof that it satisfies the required properties (e.g., `IsClosedHolomorphicEmbedding`).
-4. **Eliminating Axioms**: The `axiom` keyword is strictly prohibited in the final state. Instead, we either:
-    * Incorporate the required property into a **typeclass** (making it a hypothesis the user must provide).
-    * **Derive** the property from existing Mathlib primitives.
-5. **Eliminating Sorries**: Deep obligations (e.g., proving `is_alternating` for every algebraic instance of `SmoothForm` in `Forms.lean`) must be fully resolved. The "wiring" must be based on real proofs, not just assumptions.
-6. **Zero Shortcuts**: Absolutely no `sorry`, `admit`, `axiom`, or `trivial` shortcuts. We cannot stop until all foundational placeholders are replaced with actual implementations.
+- **M1:** ✅ Structural Assembly Complete
+- **M2:** Tracks A1-A5 complete (56 sorries → 0)
+- **M3:** Phase 2 complete (21 sorries → 0)
+- **M4:** Verified State — **zero** `sorry`, `axiom`, `admit`
 
 ---
 
