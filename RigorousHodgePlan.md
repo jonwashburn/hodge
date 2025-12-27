@@ -6,6 +6,33 @@
 
 ---
 
+## 🔴🔴🔴 CRITICAL WARNING: FAKE PROOFS DETECTED 🔴🔴🔴
+
+**WE FOUND AGENTS REMOVING `sorry` BY MAKING DEFINITIONS TRIVIALLY TRUE.**
+
+### Example of what NOT to do (from SerreVanishing.lean):
+```lean
+-- ❌ WRONG: Defining cohomology as Unit makes everything trivially zero
+def SheafCohomology (_F : CoherentSheaf n X) (_q : ℕ) : Type := Unit
+
+-- ❌ WRONG: This "proves" nothing - it just shows Unit ≃ Unit  
+theorem serre_vanishing ... : isZero (SheafCohomology ...) := ⟨Equiv.refl Unit⟩
+```
+
+### This is CHEATING. The file compiles but proves NOTHING.
+
+**Before you write ANY code, ask yourself:**
+1. Does my definition have actual mathematical content?
+2. Could my proof be trivially true because I made the types empty/unit?
+3. Am I actually proving the theorem, or just making Lean happy?
+
+**If you can't prove something properly:**
+- Use `sorry` with a comment explaining the gap
+- Or use `axiom` with full documentation
+- **DO NOT** fake it with `Unit` types or `True` propositions
+
+---
+
 ## 🚨🚨🚨 STOP! READ YOUR TRACK ASSIGNMENT FIRST 🚨🚨🚨
 
 **YOU MAY ONLY EDIT THE FILES ASSIGNED TO YOUR TRACK. NO EXCEPTIONS.**
