@@ -220,6 +220,6 @@ On compact manifolds, the L2 norm controls the comass:
 comass α ≤ C · ‖α‖_L2 for some constant C > 0.
 This follows from Sobolev embedding and compactness. -/
 axiom trace_L2_control {k : ℕ} (α : SmoothForm n X k) :
-    ∃ C : ℝ, C > 0 ∧ comass α ≤ C * normL2 α
+    ∃ C : ℝ, (C > 0) ∧ (comass α ≤ C * normL2 α)
 
 end

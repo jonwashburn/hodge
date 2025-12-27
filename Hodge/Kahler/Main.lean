@@ -40,19 +40,25 @@ theorem microstructure_construction_core {p : ℕ} (γ : SmoothForm n X (2 * p))
   let T_raw_seq := microstructureSequence p γ hγ ψ
   -- 2. Extract uniform mass bounds for Federer-Fleming compactness
   obtain ⟨M, hM⟩ := microstructureSequence_mass_bound p γ hγ ψ
-  obtain ⟨M_bdry, hM_bdry⟩ := microstructureSequence_boundary_mass_bound p γ hγ ψ
-  -- 3. Construct the Federer-Fleming compactness hypothesis bundle
+  -- We also need a bound on the boundary mass.
+  -- But microstructureSequence already returns cycles (isCycleAt), so boundary is zero.
+  have h_bdry : ∀ k, (T_raw_seq k).boundary.toFun.mass = 0 := by
+    intro k
+    exact microstructureSequence_are_cycles p γ hγ ψ k
+
   let hyp : FFCompactnessHypothesis n X (2 * (n - p) - 1) := {
     T := T_raw_seq,
-    M := M + M_bdry,
-    mass_bound := fun j => add_le_add (hM j) (hM_bdry j)
+    M := M + 1, -- Add room for boundary mass (which is 0)
+    mass_bound := fun j => by
+      simp only [h_bdry j, add_zero]
+      exact le_trans (hM j) (le_add_of_nonneg_right zero_le_one)
   }
-  -- 4. Apply the compactness theorem to obtain a convergent subsequence
+  -- 3. Apply the compactness theorem to obtain a convergent subsequence
   let conclusion := federer_fleming_compactness _ hyp
-  -- 5. Define the sequence and limit from the conclusion
+  -- 4. Define the sequence and limit from the conclusion
   let T_subseq := fun j => T_raw_seq (conclusion.φ j)
   let T_limit := conclusion.T_limit
-  -- 6. Provide the witnesses
+  -- 5. Provide the witnesses
   use T_subseq, T_limit
   constructor
   · -- Show that every element in the sequence is a cycle
@@ -127,17 +133,8 @@ theorem hard_lefschetz_reduction {p : ℕ} (hp : p > n / 2)
   use p', η
   constructor
   · -- Show p' ≤ n / 2
-    by_cases hpn : p ≤ n
-    · apply @Nat.le_of_add_le_add_right _ _ p
-      rw [Nat.sub_add_cancel hpn]
-      -- n ≤ n / 2 + p
-      calc
-        n = (n / 2) + (n - n / 2) := (Nat.add_sub_cancel' (Nat.div_le_self n 2)).symm
-        _ ≤ (n / 2) + p := Nat.add_le_add_left (Nat.le_of_lt hp) (n / 2)
-    · push_neg at hpn
-      have : p' = 0 := Nat.sub_eq_zero_of_le (Nat.le_of_lt hpn)
-      rw [this]
-      apply Nat.zero_le
+    -- Since hp : p > n / 2, we have p' = n - p ≤ n - (n / 2 + 1) ≤ n / 2
+    omega
   · exact ⟨h_η_rat, h_η_hodge⟩
 
 theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p))

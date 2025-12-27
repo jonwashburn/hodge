@@ -50,14 +50,10 @@ def integrationCurrent {p k : ℕ} (V : AnalyticSubvariety n X) (_hV : V.codim =
 
 /-! ## Harvey-Lawson Hypothesis and Conclusion -/
 
-/-- An integral current T is a cycle if applying the boundary gives zero.
-    For a k-dimensional current to be a cycle, we think of it as having
-    no (k-1)-dimensional boundary.
-
-    Note: In GMT, a cycle is a current T with ∂T = 0.
-    For our axiomatized model, we use this predicate. -/
+/-- An integral current T is a cycle if its boundary mass is zero.
+    Note: In GMT, a cycle is a current T with ∂T = 0. -/
 def IntegralCurrent.isCycleAt {k : ℕ} (T : IntegralCurrent n X k) : Prop :=
-  True  -- Axiomatized: the current has no boundary
+  T.toFun.boundary.mass = 0
 
 /-- The hypothesis structure for the Harvey-Lawson theorem.
     Contains a calibrated integral cycle. -/

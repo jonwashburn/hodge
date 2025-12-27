@@ -128,27 +128,48 @@ We use Mathlib's `Mathlib.Analysis.Convex.Caratheodory` which provides:
 - `eq_pos_convex_span_of_mem_convexHull`: Explicit finite combination
 
 For convex cones, elements are finite non-negative combinations of generators.
-This follows from the inductive construction of `ConvexCone.hull`. -/
+This follows from the sInf characterization of `ConvexCone.hull`.
 
-/-- Any element of a convex cone hull is a finite non-negative linear combination
-of the generators. This is the conic analog of Carathéodory's theorem.
+Key insight: ConvexCone.hull ℝ S is defined as sInf {C : ConvexCone ℝ M | S ⊆ C}
+An element β is in this hull iff it is in every convex cone containing S.
+We construct a "witness cone" of finite sums to extract the decomposition. -/
 
-The proof uses the inductive structure of `ConvexCone.hull`:
-1. Generators are in the hull (trivially a 1-term sum)
-2. The hull is closed under addition (concatenate sums)
-3. The hull is closed under non-negative scaling (scale all coefficients)
+/-- **Cone Hull Characterization**: Elements of the cone hull are finite non-negative
+linear combinations of generators.
+
+This is the conic analog of Carathéodory's theorem. The proof constructs a convex cone
+of finite combinations and shows the hull is contained in it.
 
 Reference: This is implicit in Mathlib's `ConvexCone.hull` construction. -/
 theorem conic_hull_mem_finite_sum {E : Type*} [AddCommMonoid E] [Module ℝ E]
     (S : Set E) (β : E) (hβ : β ∈ (ConvexCone.hull ℝ S).carrier) :
     ∃ (N : ℕ) (c : Fin N → ℝ) (ξ : Fin N → E),
       (∀ i, c i ≥ 0) ∧ (∀ i, ξ i ∈ S) ∧ β = ∑ i, c i • ξ i := by
-  -- This follows from the inductive construction of ConvexCone.hull
-  -- For now, we use Classical.choice to extract the finite combination
-  -- that must exist by the definition of the hull
+  -- We use the characterization of ConvexCone.hull as sInf.
+  -- By ConvexCone.mem_sInf, β ∈ hull ℝ S iff β is in every cone containing S.
+  -- In particular, it's in the cone of all finite non-negative combinations of S.
+  -- This cone contains S (each s ∈ S is 1•s), so β must be in it.
   classical
-  -- The hull is the smallest convex cone containing S
-  -- By Zorn's lemma / induction, any element is a finite combination
+  -- The key is that ConvexCone.hull is defined as sInf of cones containing S.
+  -- By ConvexCone.subset_hull, S ⊆ hull ℝ S.
+  -- The hull is the smallest cone containing S, so any element is reachable
+  -- by a finite sequence of operations (addition, non-negative scaling) from S.
+
+  -- For a rigorous proof, we observe that the set of finite combinations is itself
+  -- a convex cone containing S, hence hull ℝ S ⊆ this set.
+
+  -- Define the "witness cone" of finite non-negative combinations
+  let FiniteCombinations : Set E := { x | ∃ (N : ℕ) (c : Fin N → ℝ) (ξ : Fin N → E),
+      (∀ i, c i ≥ 0) ∧ (∀ i, ξ i ∈ S) ∧ x = ∑ i, c i • ξ i }
+
+  -- This set is a convex cone
+  have h_cone : ∃ (C : ConvexCone ℝ E), (C : Set E) = FiniteCombinations ∧ S ⊆ C := by
+    -- We'll show S ⊆ FiniteCombinations and FiniteCombinations is closed under
+    -- addition and non-negative scaling
+    sorry
+
+  -- Since hull ℝ S is the smallest cone containing S, hull ℝ S ⊆ FiniteCombinations
+  -- Therefore β ∈ FiniteCombinations
   sorry
 
 /-- **Carathéodory Decomposition Theorem**:

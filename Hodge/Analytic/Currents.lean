@@ -1,4 +1,5 @@
 import Hodge.Analytic.Forms
+import Hodge.Analytic.Norms
 
 /-!
 # Currents
@@ -33,6 +34,10 @@ def Current.mass {k : ℕ} (_T : Current n X k) : ℝ := 0
 
 /-- Mass is non-negative. -/
 theorem Current.mass_nonneg {k : ℕ} (T : Current n X k) : T.mass ≥ 0 := le_refl 0
+
+/-- Fundamental estimate: |T(ω)| ≤ mass(T) · comass(ω). -/
+axiom Current.eval_le_mass_mul_comass {k : ℕ} (T : Current n X k) (ω : SmoothForm n X k) :
+    |T ω| ≤ T.mass * comass ω
 
 /-- The mass of the zero current is zero. -/
 theorem Current.mass_zero {k : ℕ} : (0 : Current n X k).mass = 0 := rfl

@@ -1,6 +1,7 @@
 import Mathlib.Analysis.Complex.Basic
 import Mathlib.Topology.MetricSpace.Basic
 import Mathlib.Geometry.Manifold.MFDeriv.Basic
+import Mathlib.Geometry.Manifold.MFDeriv.SpecificFunctions
 import Mathlib.Topology.Sets.Opens
 import Mathlib.LinearAlgebra.TensorProduct.Basic
 import Mathlib.LinearAlgebra.Dimension.Finrank
@@ -46,12 +47,20 @@ instance (L : HolomorphicLineBundle n X) (x : X) : Module ℂ (L.Fiber x) := L.f
 /-- The standard model for ℂ as a complex manifold. -/
 def 𝓒_ℂ : ModelWithCorners ℂ ℂ ℂ := modelWithCornersSelf ℂ ℂ
 
-/-- Axiom: The tensor product of two holomorphic line bundles is a holomorphic line bundle. -/
-axiom HolomorphicLineBundle.tensor_has_local_trivializations {n : ℕ} {X : Type*}
+/-- The tensor product of two holomorphic line bundles has local trivializations. -/
+theorem HolomorphicLineBundle.tensor_has_local_trivializations {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     {L₁ L₂ : HolomorphicLineBundle n X} (x : X) :
-  ∃ (U : Opens X) (hx : x ∈ U), Nonempty (∀ y ∈ U, (L₁.Fiber y ⊗[ℂ] L₂.Fiber y) ≃ₗ[ℂ] ℂ)
+    ∃ (U : Opens X) (hx : x ∈ U), Nonempty (∀ y ∈ U, (L₁.Fiber y ⊗[ℂ] L₂.Fiber y) ≃ₗ[ℂ] ℂ) := by
+  -- Get local trivializations for both bundles
+  obtain ⟨U₁, hx₁, ⟨φ₁⟩⟩ := L₁.has_local_trivializations x
+  obtain ⟨U₂, hx₂, ⟨φ₂⟩⟩ := L₂.has_local_trivializations x
+  -- Use the intersection
+  refine ⟨U₁ ⊓ U₂, ⟨hx₁, hx₂⟩, ⟨fun y hy => ?_⟩⟩
+  -- Construct the tensor product trivialization:
+  -- L₁.Fiber y ⊗ L₂.Fiber y → ℂ ⊗ ℂ → ℂ
+  exact (TensorProduct.congr (φ₁ y hy.1) (φ₂ y hy.2)).trans (TensorProduct.lid ℂ ℂ)
 
 /-- The tensor product of two holomorphic line bundles. -/
 def HolomorphicLineBundle.tensor (L₁ L₂ : HolomorphicLineBundle n X) :
@@ -63,11 +72,13 @@ def HolomorphicLineBundle.tensor (L₁ L₂ : HolomorphicLineBundle n X) :
                              letI := L₁.fiber_module x; letI := L₂.fiber_module x; inferInstance,
     has_local_trivializations := fun x => HolomorphicLineBundle.tensor_has_local_trivializations x }
 
-/-- Axiom: The trivial bundle has local trivializations. -/
-axiom trivial_bundle_has_local_trivializations {n : ℕ} {X : Type*}
+/-- The trivial bundle has local trivializations (trivially, use the identity). -/
+theorem trivial_bundle_has_local_trivializations {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] (x : X) :
-  ∃ (U : Opens X) (hx : x ∈ U), Nonempty (∀ y ∈ U, ℂ ≃ₗ[ℂ] ℂ)
+    ∃ (U : Opens X) (hx : x ∈ U), Nonempty (∀ y ∈ U, ℂ ≃ₗ[ℂ] ℂ) := by
+  -- Use the entire space as the open set and the identity map as the trivialization
+  refine ⟨⊤, trivial, ⟨fun _ _ => LinearEquiv.refl ℂ ℂ⟩⟩
 
 /-- The M-th tensor power L^⊗M. -/
 def HolomorphicLineBundle.power (L : HolomorphicLineBundle n X) : ℕ → HolomorphicLineBundle n X
@@ -100,13 +111,26 @@ def IsHolomorphic {L : HolomorphicLineBundle n X} (s : Section L) : Prop :=
   ∀ x : X, ∃ (U : Opens X) (_hx : x ∈ U) (φ : ∀ y ∈ U, L.Fiber y ≃ₗ[ℂ] ℂ),
     MDifferentiable (𝓒_complex n) 𝓒_ℂ (fun y : U => φ y.1 y.2 (s y.1))
 
-/-- Axiom: The sum of two holomorphic sections is holomorphic. -/
+/-- The sum of two holomorphic sections is holomorphic.
+    Proof requires transition function theory between local trivializations. -/
 axiom IsHolomorphic_add {L : HolomorphicLineBundle n X} (s₁ s₂ : Section L) :
   IsHolomorphic s₁ → IsHolomorphic s₂ → IsHolomorphic (s₁ + s₂)
 
-/-- Axiom: The zero section is holomorphic. -/
-axiom IsHolomorphic_zero {L : HolomorphicLineBundle n X} :
-  IsHolomorphic (0 : Section L)
+/-- The zero section is holomorphic. -/
+theorem IsHolomorphic_zero {L : HolomorphicLineBundle n X} :
+    IsHolomorphic (0 : Section L) := by
+  intro x
+  -- Get any local trivialization from the bundle structure
+  obtain ⟨U, hx, ⟨φ⟩⟩ := L.has_local_trivializations x
+  refine ⟨U, hx, ⟨φ, ?_⟩⟩
+  -- The zero section under trivialization is the constant zero function
+  have h_zero : (fun y : ↥U => φ y.1 y.2 ((0 : Section L) y.1)) = fun _ => (0 : ℂ) := by
+    ext y
+    show φ y.1 y.2 ((0 : Section L) y.1) = 0
+    exact (φ y.1 y.2).map_zero
+  rw [h_zero]
+  -- The constant zero function is MDifferentiable
+  exact mdifferentiable_const (I := 𝓒_complex n) (I' := 𝓒_ℂ)
 
 /-- Axiom: A scalar multiple of a holomorphic section is holomorphic. -/
 axiom IsHolomorphic_smul {L : HolomorphicLineBundle n X} (c : ℂ) (s : Section L) :
@@ -157,10 +181,7 @@ class IsAmple (L : HolomorphicLineBundle n X) : Prop where
   growth : ∀ (k : ℕ), ∃ M₀ : ℕ, ∀ M ≥ M₀, BergmanDimension (L.power M) ≥ k
 
 /-- Axiom: The smooth 0-form log K_M associated to the Bergman kernel. -/
-axiom log_KM {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
-    (L : HolomorphicLineBundle n X) [IsAmple L] (M : ℕ) (h : HermitianMetric (L.power M)) :
+axiom log_KM (L : HolomorphicLineBundle n X) [IsAmple L] (M : ℕ) (h : HermitianMetric (L.power M)) :
     SmoothForm n X 0
 
 /-- The Bergman metric ω_M = (i/2π) ∂∂̄ log K_M. -/
@@ -183,10 +204,8 @@ axiom tian_convergence {n : ℕ} {X : Type*}
       dist_form ((1 / M : ℝ) • BergmanMetric L M (h M)) (K.omega_form) ≤ ε
 
 /-- Axiom: The subspace of holomorphic sections vanishing to order k at x. -/
-axiom SectionsVanishingToOrder {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
-    (L : HolomorphicLineBundle n X) (x : X) (k : ℕ) : Submodule ℂ ↥(HolomorphicSection L)
+axiom SectionsVanishingToOrder (L : HolomorphicLineBundle n X) (x : X) (k : ℕ) :
+    Submodule ℂ ↥(HolomorphicSection L)
 
 /-- The k-jet space of L at x. -/
 def JetSpace (L : HolomorphicLineBundle n X) (x : X) (k : ℕ) :=
@@ -199,16 +218,13 @@ instance (L : HolomorphicLineBundle n X) (x : X) (k : ℕ) :
     Module ℂ (JetSpace L x k) := Submodule.Quotient.module _
 
 /-- The k-jet evaluation map. -/
-noncomputable def jet_eval {L : HolomorphicLineBundle n X} (x : X) (k : ℕ) :
+noncomputable def jet_eval (L : HolomorphicLineBundle n X) (x : X) (k : ℕ) :
     ↥(HolomorphicSection L) →ₗ[ℂ] (JetSpace L x k) :=
   Submodule.mkQ _
 
 /-- **Theorem: Jet Surjectivity for Ample Line Bundles** -/
-axiom jet_surjectivity {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
-    (L : HolomorphicLineBundle n X) [IsAmple L] (x : X) (k : ℕ) :
-    ∃ M₀ : ℕ, ∀ M ≥ M₀, Function.Surjective (jet_eval (L := L.power M) x k)
+axiom jet_surjectivity (L : HolomorphicLineBundle n X) [IsAmple L] (x : X) (k : ℕ) :
+    ∃ M₀ : ℕ, ∀ M ≥ M₀, Function.Surjective (jet_eval (L.power M) x k)
 
 /-- Axiom: The tensor product of two holomorphic sections is holomorphic. -/
 axiom IsHolomorphic_tensor {n : ℕ} {X : Type*}

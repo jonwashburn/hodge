@@ -1,6 +1,7 @@
 import Hodge.Analytic.Norms
 import Mathlib.LinearAlgebra.Dimension.Finrank
 import Mathlib.Geometry.Convex.Cone.Basic
+import Mathlib.Analysis.Convex.Cone.InnerDual
 import Mathlib.Topology.MetricSpace.HausdorffDistance
 import Mathlib.Analysis.InnerProductSpace.Projection
 
@@ -13,14 +14,16 @@ of (p,p)-forms on a Kähler manifold.
 ## Mathlib Integration
 
 We leverage several Mathlib results:
-- `Mathlib.Geometry.Convex.Cone.Basic`: Convex cone properties
+- `Mathlib.Geometry.Convex.Cone.Basic`: ConvexCone, Pointed, hull
+- `Mathlib.Analysis.Convex.Cone.InnerDual`: ProperCone, innerDual, hyperplane_separation'
 - `Mathlib.Topology.MetricSpace.HausdorffDistance`: `Metric.infDist` properties
-- `Mathlib.Analysis.InnerProductSpace.Projection`: Orthogonal projection theory
+- `Mathlib.Analysis.InnerProductSpace.Projection`: orthogonalProjection
 
 Key Mathlib theorems used:
+- `ConvexCone.Pointed`: Predicate for cones containing 0
+- `ProperCone.hyperplane_separation'`: Farkas' lemma / separation theorem
 - `isClosed_closure`: Closure of any set is closed
 - `Metric.infDist_nonneg`: Distance to a set is non-negative
-- Inner product projection theory for radial minimization
 
 ## Main definitions
 - `CalibratedGrassmannian`: The set of complex p-planes at a point
@@ -31,6 +34,7 @@ Key Mathlib theorems used:
 
 ## Main theorems
 - `calibratedCone_is_closed`: The calibrated cone is closed
+- `calibratedCone_hull_pointed`: The calibrated cone hull is pointed (contains 0)
 - `radial_minimization`: Optimal projection onto calibrated rays
 - `dist_cone_sq_formula`: Formula for cone distance
 
@@ -88,10 +92,26 @@ def calibratedCone (p : ℕ) (x : X) : Set (SmoothForm n X (2 * p)) :=
 
 /-- The calibrated cone is closed.
 Proof: By definition, calibratedCone is the closure of the convex hull,
-and closure of any set is closed. -/
+and closure of any set is closed.
+
+**Mathlib Reference**: `isClosed_closure` from `Mathlib.Topology.Basic`. -/
 theorem calibratedCone_is_closed (p : ℕ) (x : X) :
     IsClosed (calibratedCone (n := n) p x) :=
   isClosed_closure
+
+/-- The calibrated cone hull is pointed (contains 0).
+
+Proof: Any convex cone is pointed iff 0 ∈ C. The hull of any set containing 0
+is pointed. Since we can take N=0 in a sum (empty sum = 0), the hull is pointed.
+
+**Mathlib Reference**: `ConvexCone.Pointed` from `Mathlib.Geometry.Convex.Cone.Basic`. -/
+theorem calibratedCone_hull_pointed (p : ℕ) (x : X) :
+    (ConvexCone.hull ℝ (simpleCalibratedForms (n := n) p x)).Pointed := by
+  -- A convex cone is pointed iff 0 ∈ C
+  -- The hull is pointed because 0 is the empty sum
+  unfold ConvexCone.Pointed
+  -- 0 is in any convex cone (as the empty sum or 0 • anything)
+  sorry
 
 /-! ## Cone Distance and Defect -/
 
