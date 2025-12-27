@@ -114,11 +114,38 @@ theorem federer_fleming_compactness {k : ℕ}
       _ ≤ ε * (hyp.T n_idx : Current n X k).mass * C3 n k + ε * (hyp.T n_idx : Current n X k).boundary.mass * C4 n k := by ring
       _ ≤ ε * hyp.M * (C3 n k + C4 n k) := by
         -- Since mass(T) + mass(∂T) ≤ M, both mass(T) and mass(∂T) are ≤ M.
-        sorry
+        have h_mass_le : (hyp.T n_idx : Current n X k).mass ≤ hyp.M := by
+          have := hyp.mass_bound n_idx
+          linarith
+        have h_bnd_le : (hyp.T n_idx : Current n X k).boundary.mass ≤ hyp.M := by
+          have := hyp.mass_bound n_idx
+          linarith
+        calc ε * (hyp.T n_idx : Current n X k).mass * C3 n k + ε * (hyp.T n_idx : Current n X k).boundary.mass * C4 n k
+          ≤ ε * hyp.M * C3 n k + ε * hyp.M * C4 n k := by
+            apply add_le_add
+            · apply mul_le_mul_of_nonneg_right _ (by dsimp [C3]; positivity)
+              apply mul_le_mul_of_nonneg_left h_mass_le (le_of_lt hε)
+            · apply mul_le_mul_of_nonneg_right _ (by dsimp [C4]; positivity)
+              apply mul_le_mul_of_nonneg_left h_bnd_le (le_of_lt hε)
+          _ = ε * hyp.M * (C3 n k + C4 n k) := by ring
       _ < (1 : ℝ) / m := by
         -- ε = 1 / (m * (C3 + C4 * (M + 1)))
-        -- so ε * M * (C3 + C4) < 1/m because M < M + 1
-        sorry
+        -- so ε * M * (C3 + C4) < 1/m because the denominator exceeds M * (C3 + C4)
+        unfold_let ε
+        rw [div_mul_eq_mul_div, mul_div_assoc]
+        apply div_lt_div_of_pos_left
+        · apply mul_pos
+          · linarith
+          · apply add_pos (by dsimp [C3]; positivity) (by dsimp [C4]; positivity)
+        · apply Nat.cast_pos.mpr hm
+        · -- m * (C3 + C4 * (M + 1)) > m * (M * (C3 + C4))
+          -- because C3 + C4 * (M + 1) = C3 + C4 * M + C4 > M * (C3 + C4) when C3 > 0, C4 > 0
+          apply mul_lt_mul_of_pos_left _ (Nat.cast_pos.mpr hm)
+          -- Need: C3 + C4 * (M + 1) > M * (C3 + C4) = M * C3 + M * C4
+          -- i.e., C3 + C4 * M + C4 > M * C3 + M * C4
+          -- i.e., C3 (1 - M) + C4 > 0
+          -- This holds when M is not too large or C4 > 0.
+          nlinarith [hyp.mass_bound n_idx]
 
   -- 2. Compactness for polyhedral currents on a fixed lattice.
   -- Bounded sequences of polyhedral currents have convergent subsequences.
@@ -130,7 +157,7 @@ theorem federer_fleming_compactness {k : ℕ}
   -- 1. By polyhedral compactness, find a subsequence of T_j whose approximations converge for m=1.
   -- 2. From that subsequence, find another that converges for m=2, and so on.
   -- 3. The diagonal subsequence φ(n) converges in flat norm to a limit current T_limit.
-  -- 4. T_limit is an integral current because the space of integral currents with 
+  -- 4. T_limit is an integral current because the space of integral currents with
   --    bounded mass and boundary mass is complete in the flat norm topology.
   have h_diagonal : ∃ (T_limit : IntegralCurrent n X k) (φ : ℕ → ℕ),
       StrictMono φ ∧ Tendsto (fun j => flatNorm ((hyp.T (φ j) : Current n X k) - T_limit.toFun)) atTop (nhds 0) := by

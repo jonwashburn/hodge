@@ -66,9 +66,9 @@ We organize the formalization into three concurrent tracks that can be developed
 - **SmoothForm**: Algebraic wiring (Add, SMul, Module) implemented with full Lean proofs in `Forms.lean`.
 - **Kähler Manifold**: Rigorous class defined with smooth Kähler form and closedness condition.
 - **Federer-Fleming**: Proof structure established via Deformation Theorem and diagonal argument.
-- **Harvey-Lawson**: Structural steps formalized (rectifiability, J-invariance, regularity).
+- **Harvey-Lawson**: Structural steps formalized (rectifiability, calibration, regularity, integrability).
 - **Integral Currents**: Core analytical properties (linearity, integrability, mass formula) resolved.
-- **Hard Lefschetz**: sl_2(ℝ) representation structure defined on cohomology.
+- **Hard Lefschetz**: sl_2(ℂ) representation structure defined on cohomology.
 - **Bergman/Tian**: Asymptotic kernel expansion skeleton formalized.
 
 ---

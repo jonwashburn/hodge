@@ -13,6 +13,10 @@ variable {n : ℕ} {X : Type*}
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
 
 /-!
+## Track A.3.1: Hard Lefschetz Theorem
+
+This file formalizes the Hard Lefschetz theorem for Kähler manifolds.
+
 ## Mathematical Statement
 For a Kähler manifold (X, ω) of complex dimension n, the map
 L^{n-p} : H^p(X) → H^{2n-p}(X) induced by wedging with ω^{n-p}
@@ -63,10 +67,9 @@ Reference: [Griffiths-Harris, 1978]. -/
 theorem hard_lefschetz {p : ℕ} (hp : p ≤ n) :
     Function.Bijective (lefschetz_power p (n - p)) := by
   -- Proof strategy:
-  -- 1. Harmonic forms represent cohomology classes.
-  -- 2. The operators L, Λ, H act on harmonic forms.
-  -- 3. These operators satisfy the sl_2(ℝ) commutation relations.
-  -- 4. Weight space theory for sl_2(ℝ) implies the result.
+  -- 1. Use the Hodge Decomposition to identify cohomology with harmonic forms.
+  -- 2. Harmonic forms carry a representation of the Lie algebra sl_2(ℂ).
+  -- 3. The weight space theory of sl_2 implies that L^k is an isomorphism.
   sorry
 
 end

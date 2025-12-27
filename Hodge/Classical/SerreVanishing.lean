@@ -99,7 +99,7 @@ def idealSheaf (x_point : X) (k : ℕ) : CoherentSheaf n X where
 
 /-- The skyscraper sheaf of jets at a point x. -/
 def jetSkyscraperSheaf (x_point : X) (k : ℕ) : CoherentSheaf n X where
-  sheaf := TopCat.Sheaf.pushforward (TopCat.of {x_point}) (TopCat.of (Fin (Nat.choose (n + k) k) → ℂ)) 
+  sheaf := TopCat.Sheaf.pushforward (TopCat.of {x_point}) (TopCat.of (Fin (Nat.choose (n + k) k) → ℂ))
     (Continuous.of_discreteTopology (f := fun _ => x_point))
   is_locally_presented := sorry
 

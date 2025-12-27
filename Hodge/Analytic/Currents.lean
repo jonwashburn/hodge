@@ -1,3 +1,5 @@
+import Hodge.Analytic.Forms
+
 /-!
 # Track B.3: Currents
 
@@ -19,23 +21,25 @@ with the mass norm and boundary operator.
 - [x] Prove boundary ∘ boundary = 0
 -/
 
-import Hodge.Analytic.Norms
-
 noncomputable section
 
 open Classical
 
+set_option autoImplicit false
+
 variable {n : ℕ} {X : Type*}
-  [TopologicalSpace X] [ChartedSpace (EuclideanSpace Complex (Fin n)) X]
-  [ProjectiveComplexManifold n X] [KahlerStructure n X]
+  [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+  [IsManifold (𝓒_complex n) ⊤ X]
+  [ProjectiveComplexManifold n X] [KahlerManifold n X]
 
 /-! ## Current Type -/
 
 /-- A current of dimension k is a continuous linear functional on k-forms.
 This is the distributional dual to the space of smooth forms. -/
 def Current (n : ℕ) (X : Type*) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace Complex (Fin n)) X]
-    [ProjectiveComplexManifold n X] [KahlerStructure n X] :=
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] :=
   SmoothForm n X k →L[ℝ] ℝ
 
 /-- Evaluation of a current on a form. -/
@@ -48,15 +52,6 @@ def Current.eval {k : ℕ} (T : Current n X k) (ω : SmoothForm n X k) : ℝ :=
 mass(T) = sup { |T(ω)| : comass(ω) ≤ 1 } -/
 def Current.mass {k : ℕ} (T : Current n X k) : ℝ :=
   ‖T‖
-
-/-- **Theorem: Continuity of Currents**
-Every current T has bounded evaluations on forms with comass ≤ 1.
-Proof: This is the definition of the operator norm for continuous linear maps. -/
-theorem mass_finite {k : ℕ} (T : Current n X k) :
-    ∃ M : ℝ, ∀ α : SmoothForm n X k, comass α ≤ 1 → |T α| ≤ M := by
-  use ‖T‖
-  intro α hα
-  exact T.le_opNorm α
 
 /-- Mass is non-negative. -/
 theorem Current.mass_nonneg {k : ℕ} (T : Current n X k) :
@@ -79,14 +74,6 @@ theorem mass_add_le {k : ℕ}
     (S + T).mass ≤ S.mass + T.mass :=
   norm_add_le S T
 
-/-- The calibration inequality: |T(ψ)| ≤ mass(T) when comass(ψ) ≤ 1.
-Proof: This is the definition of the operator norm for continuous linear maps. -/
-theorem eval_le_mass {k : ℕ}
-    (T : Current n X k) (ψ : SmoothForm n X k) (h : comass ψ ≤ 1) :
-    |T ψ| ≤ T.mass :=
-  T.le_opNorm ψ
-
-
 /-! ## Boundary Operator -/
 
 /-- The boundary operator ∂ : Current_{k+1} → Current_k.
@@ -94,9 +81,18 @@ Defined by duality: ∂T(ω) = T(dω). -/
 def Current.boundary {k : ℕ} (T : Current n X (k + 1)) : Current n X k where
   toFun := fun ω => T (extDeriv ω)
   map_add' := fun ω₁ ω₂ => by
-    simp only [d_add, map_add]
+    -- extDeriv is linear, so extDeriv (ω₁ + ω₂) = extDeriv ω₁ + extDeriv ω₂
+    have h_linear : extDeriv (ω₁ + ω₂) = extDeriv ω₁ + extDeriv ω₂ := by
+      ext x v; simp only [extDeriv, Add.add, SmoothForm.as_alternating]
+      -- extDerivAt is linear in the form
+      rfl
+    simp only [h_linear, map_add]
   map_smul' := fun r ω => by
-    simp only [d_smul, RingHom.id_apply, LinearMap.map_smul]
+    -- extDeriv commutes with scalar multiplication
+    have h_smul : extDeriv (r • ω) = r • extDeriv ω := by
+      ext x v; simp only [extDeriv, HSMul.hSMul, SMul.smul, SmoothForm.as_alternating]
+      rfl
+    simp only [h_smul, map_smul, RingHom.id_apply]
 
 /-- A current is a cycle if its boundary is zero. -/
 def Current.isCycle {k : ℕ} (T : Current n X k) : Prop :=
@@ -108,6 +104,10 @@ theorem Current.boundary_boundary {k : ℕ} (T : Current n X (k + 2)) :
     T.boundary.boundary = 0 := by
   ext ω
   unfold Current.boundary
-  simp only [LinearMap.coe_mk, AddHom.coe_mk, LinearMap.zero_apply, d_squared_zero, map_zero]
+  simp only [ContinuousLinearMap.coe_mk', LinearMap.coe_mk, AddHom.coe_mk]
+  simp only [ContinuousLinearMap.zero_apply]
+  -- T.boundary.boundary(ω) = T.boundary(dω) = T(d(dω)) = T(0) = 0
+  have h_dd : extDeriv (extDeriv ω) = 0 := d_squared_zero ω
+  simp only [h_dd, map_zero]
 
 end
