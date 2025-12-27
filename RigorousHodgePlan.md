@@ -33,24 +33,31 @@ theorem serre_vanishing ... : isZero (SheafCohomology ...) := ⟨Equiv.refl Unit
 
 ---
 
-## 🚨🚨🚨 STOP! READ YOUR TRACK ASSIGNMENT FIRST 🚨🚨🚨
+## 🚨🚨🚨 STOP! FILE OWNERSHIP IS ABSOLUTE 🚨🚨🚨
 
-**YOU MAY ONLY EDIT THE FILES ASSIGNED TO YOUR TRACK. NO EXCEPTIONS.**
+# WHICH TRACK ARE YOU? FIND YOUR ROW. THOSE ARE YOUR ONLY FILES.
 
-| If you are... | You may ONLY edit these files | DO NOT TOUCH |
-|---------------|------------------------------|--------------|
-| **Track A1** | `Classical/SerreVanishing.lean` | Everything else |
-| **Track A2** | `Classical/Bergman.lean` | Everything else |
-| **Track A3** | `Classical/GAGA.lean`, `Classical/FedererFleming.lean` | Everything else |
-| **Track A4** | `Analytic/Calibration.lean`, `Analytic/Norms.lean`, `Analytic/Grassmannian.lean` | Everything else |
-| **Track A5** | `Kahler/Cone.lean`, `Kahler/Microstructure.lean`, `Kahler/TypeDecomposition.lean` | Everything else |
+| YOUR TRACK | YOUR FILES (touch ONLY these) | FORBIDDEN (touch = conflict) |
+|------------|------------------------------|------------------------------|
+| **A1** | `SerreVanishing.lean` | Bergman, GAGA, Norms, Cone, ALL others |
+| **A2** | `Bergman.lean` | SerreVanishing, GAGA, Norms, Cone, ALL others |
+| **A3** | `GAGA.lean`, `FedererFleming.lean` | Bergman, SerreVanishing, Norms, ALL others |
+| **A4** | `Calibration.lean`, `Norms.lean`, `Grassmannian.lean` | Bergman, GAGA, Cone, ALL others |
+| **A5** | `Cone.lean`, `Microstructure.lean`, `TypeDecomposition.lean` | Bergman, Norms, GAGA, ALL others |
 
-### ❌ IF YOU SEE AN ERROR IN ANOTHER FILE:
-- **DO NOT FIX IT** — that's another agent's job
-- **DO NOT EDIT IT** — you will create merge conflicts
-- **ONLY WORK ON YOUR ASSIGNED FILES**
+## ⛔ BERGMAN.LEAN → TRACK A2 ONLY
+## ⛔ SERREVANISHING.LEAN → TRACK A1 ONLY  
+## ⛔ GAGA.LEAN → TRACK A3 ONLY
+## ⛔ NORMS.LEAN → TRACK A4 ONLY
+## ⛔ CONE.LEAN → TRACK A5 ONLY
 
-### ❌ THESE FILES ARE OFF-LIMITS TO EVERYONE:
+### 🛑 IF ANOTHER FILE HAS AN ERROR:
+- **IGNORE IT** — not your problem
+- **DO NOT OPEN IT** — you will be tempted to edit
+- **DO NOT "FIX" IT** — you will break the build for everyone
+- **STAY IN YOUR LANE** — work ONLY on your assigned files
+
+### ❌ THESE FILES ARE FROZEN (nobody touches):
 `Basic.lean`, `Main.lean`, `Kahler/Main.lean`, `HarveyLawson.lean`, `Lefschetz.lean`, `IntegralCurrents.lean`, `Forms.lean`, `Currents.lean`, `FlatNorm.lean`, `Manifolds.lean`, `SignedDecomp.lean`
 
 ---
