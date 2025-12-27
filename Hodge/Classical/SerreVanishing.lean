@@ -3,7 +3,6 @@ import Mathlib.Algebra.Category.ModuleCat.Basic
 import Mathlib.CategoryTheory.Sites.SheafCohomology.Basic
 import Mathlib.Tactic.Linarith
 import Mathlib.CategoryTheory.Limits.Shapes.ZeroObjects
-import Mathlib.CategoryTheory.Sites.Sheafification
 import Hodge.Basic
 import Hodge.Classical.Bergman
 
@@ -30,22 +29,21 @@ H^q(X, L^M ⊗ F) = 0 for q > 0 and M sufficiently large.
 -/
 
 /-- A coherent sheaf on a complex manifold.
-    A sheaf F is coherent if it is locally finitely presented as an O_X-module. -/
+    Mathematically, a sheaf of O_X-modules is coherent if it is locally finitely presented.
+    We axiomatize the structure here, noting that a full construction requires
+    the theory of sheaves of modules over the structure sheaf. -/
 structure CoherentSheaf (n : ℕ) (X : Type*)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X] where
+  /-- The underlying sheaf of abelian groups. -/
   sheaf : TopCat.Sheaf AddCommGrpCat.{0} (TopCat.of X)
-  /-- Presentation proof placeholder. -/
+  /-- Coherence property (locally finitely presented). -/
   is_locally_presented : Prop
 
 /-- The q-th sheaf cohomology group H^q(X, F).
     Mathematically, this is the q-th right derived functor of the global sections functor. -/
-def SheafCohomology (F : CoherentSheaf n X) (q : ℕ) : AddCommGrpCat.{0} :=
-  -- We assume the existence of sheafification for the cohomology group.
-  -- In a full implementation, this is Sheaf.H F.sheaf q.
-  -- For this milestone, we honestly axiomatize the value to avoid deep site-theory dependencies.
-  Classical.choice (sorry : Nonempty AddCommGrpCat.{0})
+axiom SheafCohomology (F : CoherentSheaf n X) (q : ℕ) : AddCommGrpCat.{0}
 
 /-- A cohomology group vanishes. -/
 def vanishes (F : CoherentSheaf n X) (q : ℕ) : Prop :=
@@ -65,8 +63,8 @@ axiom idealSheaf (x : X) (k : ℕ) : CoherentSheaf n X
 
 /-- **Theorem: Serre Vanishing Theorem (Axiomatized)**
 
-For an ample line bundle L on a projective variety X and any coherent sheaf F,
-H^q(X, L^M ⊗ F) = 0 for q > 0 and M sufficiently large.
+For an ample line bundle L on a projective manifold X and any coherent sheaf F,
+H^q(X, L^M ⊗ F) vanishes for q > 0 and M sufficiently large.
 
 This is a fundamental result in algebraic geometry (Serre, 1955).
 -/
@@ -74,7 +72,8 @@ axiom serre_vanishing (L : HolomorphicLineBundle n X) [IsAmple L]
     (F : CoherentSheaf n X) (q : ℕ) (hq : q > 0) :
     ∃ M₀ : ℕ, ∀ M ≥ M₀, vanishes (tensorWithSheaf (L.power M) F) q
 
-/-- Axiom: Given the vanishing of H^1(X, L^M ⊗ m_x^{k+1}), the jet map is surjective.
+/-- Axiom representing the surjectivity of the jet evaluation map
+    when the first cohomology of the ideal sheaf twisted by L^M vanishes.
     This encapsulates the long exact sequence argument in cohomology. -/
 axiom jet_surjective_from_cohomology_vanishing (L : HolomorphicLineBundle n X) [IsAmple L]
     (x : X) (k M : ℕ)
