@@ -78,7 +78,8 @@ def HolomorphicLineBundle.power (L : HolomorphicLineBundle n X) (M : ℕ) : Holo
 /-- An ample line bundle has positive curvature. -/
 class IsAmple (L : HolomorphicLineBundle n X) : Prop where
   /-- The curvature form represents the Kähler class [ω] -/
-  curvature_is_kahler : ∀ x, True -- Placeholder for curvature property
+  curvature_is_kahler : ∀ (x : X) (v w : TangentSpace (𝓒_complex n) x),
+    True -- Placeholder for the curvature form property
 
 /-! ## Holomorphic Sections -/
 
@@ -128,18 +129,20 @@ def BergmanKernel (L : HolomorphicLineBundle n X) [IsAmple L] (M : ℕ) (h : Her
 /-- The Bergman metric on L^M. -/
 def BergmanMetric (L : HolomorphicLineBundle n X) [IsAmple L] (M : ℕ) (h : HermitianMetric (L.power M)) (b : BergmanOrthonormalBasis L M h) :
     SmoothForm n X 2 :=
-  { as_alternating := fun x =>
-      -- (i/2π) ∂∂̄ log K_M(x, x)
-      sorry
-  }
+  fun x v =>
+    -- (i/2π) ∂∂̄ log K_M(x, x)
+    sorry
 
 /-! ## Tian's Theorem -/
 
 /-- **Theorem: Tian's Theorem on Bergman Kernel Convergence** -/
 theorem tian_convergence (L : HolomorphicLineBundle n X) [IsAmple L] (h : ∀ M, HermitianMetric (L.power M)) (b : ∀ M, BergmanOrthonormalBasis L M (h M)) :
     ∀ ε > 0, ∃ M₀ : ℕ, ∀ M ≥ M₀,
-      dist_form ((1/M : ℝ) • BergmanMetric L (power L M) (h M) (b M)) (kahlerForm (K := K)) ≤ ε := by
-  -- Asymptotic expansion proof
+      dist_form ((1/M : ℝ) • (BergmanMetric L (power L M) (h M) (b M))) (K.omega_form) ≤ ε := by
+  -- Asymptotic expansion proof:
+  -- 1. K_M(x, x) = M^n (1 + a_1(x)/M + a_2(x)/M^2 + ...)
+  -- 2. a_1(x) = S(x)/2 where S is scalar curvature.
+  -- 3. taking ∂∂̄ log gives the convergence.
   sorry
 
 /-- Metric on the space of 2-forms. -/
@@ -161,19 +164,8 @@ def jet_eval {L : HolomorphicLineBundle n X} (x : X) (k : ℕ) :
 /-- **Theorem: Jet Surjectivity** -/
 theorem jet_surjectivity (L : HolomorphicLineBundle n X) [IsAmple L]
     (x : X) (k : ℕ) :
-    ∃ M₀ : ℕ, ∀ M ≥ M₀, Function.Surjective (jet_eval (L := L.power M) x k) :=
+    ∃ M₀ : ℕ, ∀ M ≥ M₀, Function.Surjective (jet_eval (L := L.power M) x k) := by
   -- Proof via Serre vanishing
   sorry
-
-/-- **Theorem: Bergman Gradient Control** -/
-theorem bergman_gradient_control (L : HolomorphicLineBundle n X) [IsAmple L]
-    (x : X) (ε : ℝ) (hε : ε > 0) :
-    ∃ M₀ : ℕ, ∀ M ≥ M₀, ∀ (v : TangentSpace (𝓒_complex n) x),
-      ∃ (s : BergmanSpace L M), ‖deriv_at_point s x v‖ ≤ ε := by
-  -- C^2-convergence of the Bergman metric established by Tian.
-  sorry
-
-/-- Derivative of a section at a point. -/
-def deriv_at_point (s : BergmanSpace L M) (x : X) (v : TangentSpace (𝓒_complex n) x) : ℝ := sorry
 
 end

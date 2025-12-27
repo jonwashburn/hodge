@@ -106,7 +106,7 @@ def integration_current {k : ℕ} (S : Set X) (hS : isRectifiable k S)
             apply Real.le_sSup
             · use comass (ω₁ + ω₂)
               rintro r ⟨v, hv, rfl⟩
-              apply le_trans (Real.le_iSup _ x) (le_refl _)
+              apply le_trans (Real.le_iSup (pointwiseComass (ω₁ + ω₂)) x) (le_refl _)
             · use ξx, h_unit
           exact le_trans h_pt_le (le_ciSup (comass_finite (ω₁ + ω₂)).bddAbove x)
         · simp [MeasureTheory.indicator_apply, hx]
@@ -119,12 +119,13 @@ def integration_current {k : ℕ} (S : Set X) (hS : isRectifiable k S)
           apply mul_le_mul_of_nonneg_left _ (abs_nonneg _)
           let ξx := (ξ x hx).1
           let h_unit := (ξ x hx).2
-          have h_pt_le : |ω₁ x ξx| ≤ pointwiseComass ω₁ x := by
+          have h_pt_le : |ω₁.as_alternating x ξx| ≤ pointwiseComass ω₁ x := by
             unfold pointwiseComass
             apply Real.le_sSup
             · use comass ω₁
               rintro r ⟨v, hv, rfl⟩
-              apply le_trans (Real.le_iSup _ x) (le_refl _)
+              apply le_trans (Real.le_iSup _ x)
+              exact le_refl _
             · use ξx, h_unit
           exact le_trans h_pt_le (le_ciSup (comass_finite ω₁).bddAbove x)
         · simp [MeasureTheory.indicator_apply, hx]
@@ -137,12 +138,13 @@ def integration_current {k : ℕ} (S : Set X) (hS : isRectifiable k S)
           apply mul_le_mul_of_nonneg_left _ (abs_nonneg _)
           let ξx := (ξ x hx).1
           let h_unit := (ξ x hx).2
-          have h_pt_le : |ω₂ x ξx| ≤ pointwiseComass ω₂ x := by
+          have h_pt_le : |ω₂.as_alternating x ξx| ≤ pointwiseComass ω₂ x := by
             unfold pointwiseComass
             apply Real.le_sSup
             · use comass ω₂
               rintro r ⟨v, hv, rfl⟩
-              apply le_trans (Real.le_iSup _ x) (le_refl _)
+              apply le_trans (Real.le_iSup _ x)
+              exact le_refl _
             · use ξx, h_unit
           exact le_trans h_pt_le (le_ciSup (comass_finite ω₂).bddAbove x)
         · simp [MeasureTheory.indicator_apply, hx]
@@ -278,11 +280,10 @@ theorem isIntegral_add {k : ℕ} (S T : Current n X k) :
       by_cases h_orient : (ξ_T x hT).1 = (ξ_S x hS).1
       · simp [h_orient]; ring
       · -- If orientations differ, they must be opposite for integral currents a.e.
-        -- Since both ξ_S and ξ_T are unit orientations for the same tangent space,
-        -- they must differ by a sign.
+        -- Since both are unit k-vectors in the same tangent space, ξ_T = -ξ_S.
         have h_sign : (ξ_T x hT).1 = fun i => -(ξ_S x hS).1 i := by
-          -- In GMT, rectifiable sets have a unique approximate tangent plane a.e.
-          -- Orientations are unit vectors spanning that plane.
+          -- In GMT, rectifiable sets have a unique approximate tangent k-plane a.e.
+          -- Any unit simple k-vector in that plane is determined up to sign.
           sorry
         simp [h_orient, h_sign]
         ring
@@ -354,11 +355,12 @@ Reference: [Federer-Fleming, 1960]. -/
 theorem isIntegral_boundary {k : ℕ} (T : Current n X (k + 1)) :
     isIntegral T → isIntegral T.boundary := by
   intro hT
-  -- 1. T is representable by integration over a (k+1)-rectifiable set S.
-  -- 2. By Federer-Fleming, the boundary ∂T is representable by integration
-  --    over a k-rectifiable set S' ⊆ ∂S.
-  -- 3. The multiplicities of ∂T are integers because they are sums of the
-  --    multiplicities of T weighted by incidence numbers.
+  -- 1. By the Boundary Rectifiability Theorem (Theorem 4.5 of Federer-Fleming 1960),
+  --    if T is an integral current and ∂T has finite mass, then ∂T is integral.
+  -- 2. Integral currents in the sense of Federer-Fleming are defined to have 
+  --    finite mass and boundary mass.
+  -- 3. In our formalization, we assume the boundary mass is finite.
+  -- 4. Thus the boundary is representable by integration over a k-rectifiable set.
   sorry
 
 /-- Convert an IntegralCurrent to a Current. -/
@@ -412,11 +414,10 @@ theorem mass_eq_integral_theorem {k : ℕ} (T : Current n X k) :
   -- 2. By choosing a test form ω that closely approximates sign(θ) * ξ^* (dual vector field),
   --    using Lusin's theorem and a partition of unity, we approach ∫ |θ|.
   have h_ge : ∫ x in S, |(θ x : ℝ)| ∂(hausdorffMeasure k) ≤ T.mass := by
-    -- 1. For any ε > 0, find a continuous approximation f of sign(θ) * ξ^* on S.
-    -- 2. Use a partition of unity to extend f to a smooth form ω on X with comass ≤ 1.
-    -- 3. By Lusin's Theorem, we can ensure that ω(ξ) is close to sign(θ) except on a small set.
-    -- 4. Then T(ω) = ∫ θ * ω(ξ) will be close to ∫ |θ|.
-    -- 5. Taking the supremum over all such ω shows that T.mass ≥ ∫ |θ|.
+    -- For any ε > 0, find a continuous approximation f of sign(θ) * ξ^* on S (Lusin's Theorem).
+    -- 1. Extend f to a smooth form ω on X with comass ≤ 1 using a partition of unity.
+    -- 2. Then T(ω) = ∫ θ * ω(ξ) is close to ∫ |θ|.
+    -- 3. Since mass(T) is the supremum of |T(ω)| over all such ω, we have mass(T) ≥ ∫ |θ|.
     sorry
   linarith
 

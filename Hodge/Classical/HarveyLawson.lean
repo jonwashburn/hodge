@@ -47,19 +47,39 @@ instance : CoeTC (AnalyticSubvariety n X) (Set X) where
 def analyticOrientation {p : ℕ} (V : AnalyticSubvariety n X) (hV : V.codim = p) :
     OrientationField (2 * n - 2 * p) V.carrier :=
   fun x hx =>
-    -- The natural complex orientation of a holomorphic submanifold
-    sorry
+    -- 1. T_x V is a complex subspace of T_x X of complex dimension m = n-p.
+    -- 2. Every complex subspace has a unitary basis {e_1, ..., e_m}.
+    -- 3. The natural real orientation is the (2m)-vector e_1 ∧ Je_1 ∧ ... ∧ e_m ∧ Je_m.
+    -- 4. This orientation is independent of the choice of basis and is consistent
+    --    with the complex structure of V.
+    ⟨fun i =>
+      let m := n - p
+      let j := i.val / 2
+      -- Unitary basis existence
+      have h_basis : ∃ (e : Fin m → TangentSpace (𝓒_complex n) x),
+        (∀ k l, kahlerMetric x (e k) (e l) = if k = l then 1 else 0) ∧
+        (∀ k l, K.omega_form x (e k) (e l) = 0) := by
+        -- Gram-Schmidt process for Hermitian inner products
+        sorry
+      let e := Classical.choose h_basis
+      if i.val % 2 = 0 then e ⟨j, sorry⟩ else (Complex.I : ℂ) • e ⟨j, sorry⟩,
+    fun i => by
+      -- Basis vectors are unit length under the Kähler metric g.
+      -- Je is also unit length because J is an isometry.
+      sorry⟩
 
 /-- The current of integration along an analytic subvariety. -/
 def integrationCurrent {p : ℕ} (V : AnalyticSubvariety n X) (hV : V.codim = p)
     (mult : ℤ) : IntegralCurrent n X (2 * n - 2 * p) := {
   toFun := {
     as_alternating := fun x =>
-      -- Integration along the variety using Hausdorff measure
+      -- If x ∈ V, the form evaluates to mult * evaluation on the complex orientation.
+      -- Formally: ω ↦ ∫_V mult * ω
       sorry
   }
   is_integral :=
-    -- Proof that integration along an analytic variety is an integral current
+    -- Lelong's Theorem: complex analytic subvarieties are rectifiable and define integral currents.
+    -- Reference: [Lelong, 1957].
     sorry
 }
 
@@ -89,8 +109,24 @@ structure HarveyLawsonConclusion (p : ℕ) (hyp : HarveyLawsonHypothesis p) wher
 
 /-- **Theorem: Harvey-Lawson Structure Theorem** -/
 theorem harvey_lawson_theorem {p : ℕ} (hyp : HarveyLawsonHypothesis p) :
-    HarveyLawsonConclusion p hyp :=
-  -- Deep structure theorem for calibrated currents
+    HarveyLawsonConclusion p hyp := by
+  -- 1. Rectifiability and Unique Tangent Planes:
+  -- Since hyp.T is an integral current, it is rectifiable. By Federer's theorem,
+  -- it admits a unique approximate tangent plane T_x at H^k-a.e. point x in its support.
+
+  -- 2. Calibration Equality implies Complex Tangent Planes:
+  -- Let ψ = ω^p / p!. The condition M(T) = T(ψ) implies that at a.e. point x,
+  -- the tangent plane T_x satisfies ⟨ψ(x), ξ(x)⟩ = 1 for the orientation vector ξ(x).
+  -- By Wirtinger's inequality, this holds if and only if T_x is a complex subspace
+  -- of the tangent space T_x X.
+
+  -- 3. Regularity of Support (Lelong-King Theorem):
+  -- A k-rectifiable current whose tangent planes are complex subspaces is supported
+  -- on a complex analytic subvariety V of codimension p.
+
+  -- 5. Final Representation:
+  -- Since T is supported on a complex analytic variety V and has constant integer
+  -- multiplicities mult_i on irreducible components V_i, T = ∑ mult_i [V_i].
   sorry
 
 end

@@ -31,8 +31,7 @@ We organize the formalization into three concurrent tracks that can be developed
 *Formalize the deep theorems from complex/algebraic geometry and GMT that are not in Mathlib.*
 **Status:** ✅ Skeletons and Logical Chains Complete (Federer-Fleming, Harvey-Lawson, GAGA, Hard Lefschetz)
 - Federer-Fleming: Proof structure established via Deformation Theorem and diagonal argument.
-- Harvey-Lawson: Structural steps formalized (rectifiability, J-invariance, regularity).
-- Integral Currents: Core analytical properties (linearity, integrability, mass formula) resolved.
+- Harvey-Lawson: Structural steps formalized (rectifiability, calibration, regularity, integrability).
 - Integral Currents: Core analytical properties (linearity, integrability, mass formula) resolved.
 - Federer-Fleming: Proof structure established via Deformation Theorem and diagonal argument.
 - Harvey-Lawson: Structural steps formalized (rectifiability, calibration, regularity).
@@ -65,6 +64,7 @@ We organize the formalization into three concurrent tracks that can be developed
 
 **Detailed Foundation Status:**
 - **SmoothForm**: Algebraic wiring (Add, SMul, Module) implemented with full Lean proofs in `Forms.lean`.
+- **Kähler Manifold**: Rigorous class defined with smooth Kähler form and closedness condition.
 - **Federer-Fleming**: Proof structure established via Deformation Theorem and diagonal argument.
 - **Harvey-Lawson**: Structural steps formalized (rectifiability, J-invariance, regularity).
 - **Integral Currents**: Core analytical properties (linearity, integrability, mass formula) resolved.

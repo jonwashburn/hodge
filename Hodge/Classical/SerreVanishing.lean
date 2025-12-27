@@ -30,8 +30,14 @@ H^q(X, L^M ⊗ F) = 0 for q > 0 and M sufficiently large.
 /-- The structure sheaf O_X of holomorphic functions on X. -/
 def holomorphicSheaf (n : ℕ) (X : Type*)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] : TopCat.Sheaf (Type*) X :=
-  (contDiffWithinAt_localInvariantProp (I := 𝓒_complex n) (I' := modelWithCornersSelf ℂ ℂ) ∞).sheaf X ℂ
+    [IsManifold (𝓒_complex n) ⊤ X] : TopCat.Sheaf (Type*) X where
+  val := {
+    obj := fun U => { f : unop U → ℂ // MDifferentiable (𝓒_complex n) (𝓒_complex 1) f }
+    map := fun {U V} i f => ⟨f.1 ∘ i.unop, f.2.comp (MDifferentiable.of_eq (fun x => rfl) sorry)⟩ -- Restriction is differentiable
+    map_id := fun U => by ext f; rfl
+    map_comp := fun {U V W} i j => by ext f; rfl
+  }
+  cond := sorry -- Sheaf condition for holomorphic functions
 
 /-- A coherent sheaf on a complex manifold.
 A sheaf F is coherent if it is locally finitely presented as an O_X-module. -/
@@ -50,17 +56,16 @@ def structureSheaf (n : ℕ) (X : Type*)
   sheaf := holomorphicSheaf n X,
   is_locally_presented := fun x => by
     use ⊤, Set.mem_univ x, 0, 1
-    -- f : O^0 -> O^1 is the zero map
     let f : (holomorphicSheaf n X).val.obj (op ⊤) ^ 0 ⟶ (holomorphicSheaf n X).val.obj (op ⊤) ^ 1 := 0
     use f
-    -- The cokernel of 0 : 0 -> O is O.
+    -- The structure sheaf O is locally finitely presented.
+    -- Coker(0 : O^0 -> O^1) ≅ O.
     sorry
 }
 
 /-- The q-th sheaf cohomology group H^q(X, F). -/
 def SheafCohomology (F : CoherentSheaf n X) (q : ℕ) : Type* :=
-  -- In a full implementation, this uses Mathlib's cohomology theory:
-  -- (sheaf_cohomology_functor q X).obj F.sheaf
+  -- Represented by the Cech cohomology or derived functors.
   sorry
 
 /-- A cohomology group is zero if its underlying type is equivalent to Unit. -/
@@ -75,12 +80,21 @@ theorem serre_vanishing (L : HolomorphicLineBundle n X) [IsAmple L] (F : Coheren
 
 /-- Tensor product of a line bundle with a coherent sheaf. -/
 def tensorWithSheaf (L : HolomorphicLineBundle n X) (F : CoherentSheaf n X) :
-    CoherentSheaf n X :=
-  sorry
+    CoherentSheaf n X where
+  sheaf := sorry -- Fiber-wise tensor product
+  is_locally_presented := sorry
 
 /-- The ideal sheaf of a point x up to order k. -/
 def idealSheaf (x_point : X) (k : ℕ) : CoherentSheaf n X where
-  sheaf := sorry -- Functions vanishing at x up to order k
+  sheaf := {
+    val := {
+      obj := fun U => { f : (holomorphicSheaf n X).val.obj U // MDifferentiable (𝓒_complex n) (𝓒_complex 1) f.1 } -- Placeholder for vanishing condition
+      map := sorry
+      map_id := sorry
+      map_comp := sorry
+    }
+    cond := sorry
+  }
   is_locally_presented := sorry
 
 /-- The skyscraper sheaf of jets at a point x. -/
@@ -98,15 +112,6 @@ theorem jet_surjectivity_from_serre (L : HolomorphicLineBundle n X) [IsAmple L]
   use M₀
   intro M hM
   have h_vanish : isZero (SheafCohomology (tensorWithSheaf (L.power M) (idealSheaf x k)) 1) := hM₀ M hM
-  
-  -- 2. Consider the short exact sequence of sheaves:
-  --    0 → L^M ⊗ m_x^{k+1} → L^M ⊗ O_X → L^M ⊗ (O_X / m_x^{k+1}) → 0
-  
-  -- 3. The long exact sequence in cohomology yields:
-  --    Γ(X, L^M ⊗ O_X) → Γ(X, L^M ⊗ (O_X / m_x^{k+1})) → H^1(X, L^M ⊗ m_x^{k+1})
-  
-  -- 4. Since H^1 vanishes, the map Γ(X, L^M ⊗ O_X) → Γ(X, L^M ⊗ (O_X / m_x^{k+1})) is surjective.
-  
-  -- 5. By identifying the global sections of the quotient sheaf with J^k_x(L^M), 
-  --    the jet evaluation map is surjective.
+
+  -- 2. Long exact sequence argument as in manuscript Section 8.
   sorry
