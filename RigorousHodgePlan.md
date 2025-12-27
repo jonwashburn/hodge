@@ -2,7 +2,7 @@
 
 **Goal:** Machine-verified proof with **zero** `sorry`, `admit`, or `axiom` statements.
 
-**Current Status:** 80 sorries across 17 files ⚠️
+**Current Status:** 80+ sorries + FAKE PROOFS detected ⚠️ Quality audit in progress
 
 ---
 
@@ -39,6 +39,8 @@
 - ❌ **Empty structures** that compile but prove nothing
 - ❌ **Circular reasoning** or assuming what you're trying to prove
 - ❌ **Rushing to remove `sorry`** without understanding the mathematics
+- ❌ **`Classical.choice sorry`** — this is just `sorry` with extra steps
+- ❌ **Defining types as `Unit` then proving `Unit ≃ Unit`** — this proves nothing
 
 ### Required:
 - ✅ **Every definition must have mathematical content** — if you define `SheafCohomology`, it must actually be sheaf cohomology (derived functors), not a placeholder type
@@ -62,20 +64,30 @@ Each agent works on isolated files to minimize build conflicts. Just prompt:
 
 ---
 
-### Track A1: Serre Vanishing (0 sorries) ✅
+### Track A1: Serre Vanishing — ❌ FAILED QUALITY AUDIT, NEEDS REWRITE
 
 **File:** `Hodge/Classical/SerreVanishing.lean`
 
 **Build command:** `lake build Hodge.Classical.SerreVanishing`
 
-**Sorries resolved:**
-- `def SheafCohomology` — defined via local rigorous types
-- `theorem serre_vanishing` — proven via axiomatized model
-- `def tensorWithSheaf` — implemented
-- `def idealSheaf` — implemented
-- `def jetSkyscraperSheaf` — implemented
-- `def structureSheaf` — implemented
-- `theorem jet_surjectivity_from_serre` — derived from vanishing + LES axiom
+**🚨 CRITICAL: This file was "completed" with FAKE proofs. It must be rewritten.**
+
+| Line | Problem | What's Wrong |
+|------|---------|--------------|
+| 35 | `Classical.choice sorry` | `holomorphicSheaf` defined via sorry |
+| 52 | `Classical.choice sorry` | `structureCoherentSheaf.sheaf` is sorry |
+| 53 | `is_locally_presented := True` | **FORBIDDEN** True placeholder |
+| 72-73 | `SheafCohomology := Unit` | Cohomology defined as trivial type! |
+| 91 | `Equiv.refl Unit` | "Proof" works because Unit ≃ Unit |
+| 95 | `sorry` | Still has a sorry |
+
+**Why this is wrong:** The "proof" of Serre vanishing defines `SheafCohomology` to be `Unit`, then proves `Unit ≃ Unit`. This proves nothing about actual sheaf cohomology.
+
+**What needs to happen:**
+1. Use Mathlib's actual sheaf cohomology (`CategoryTheory.Abelian.Ext` or similar)
+2. Or honestly axiomatize: `axiom serre_vanishing_axiom : ...` with a comment explaining this is a deep theorem we're assuming
+3. Remove all `Unit` placeholders and `True` fields
+4. Remove `Classical.choice sorry` patterns
 
 **YOUR FILE:** `Classical/SerreVanishing.lean` — ONLY edit this file
 **DO NOT EDIT:** Everything else, especially `Bergman.lean`, `GAGA.lean`, `FedererFleming.lean`
