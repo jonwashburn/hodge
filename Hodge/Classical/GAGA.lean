@@ -157,13 +157,12 @@ noncomputable def algebraic_intersection_power (_Z : Set X) (k : ℕ) : Set X :=
 theorem isAlgebraicSubvariety_intersection_power {Z : Set X} {k : ℕ}
     (h : isAlgebraicSubvariety n X Z) :
     isAlgebraicSubvariety n X (algebraic_intersection_power Z k) := by
-  induction k with
+  cases k with
   | zero => exact h
-  | succ _ _ =>
+  | succ k =>
     unfold algebraic_intersection_power
-    obtain ⟨W, _⟩ := @exists_complete_intersection n X _ _ _ _ K 1
-    use W
-    exact rfl
+    obtain ⟨W, hW⟩ := @exists_complete_intersection n X _ _ _ _ K 1
+    exact ⟨{ carrier := ∅, codim := 0, is_algebraic := trivial }, rfl⟩
 
 /-! ## Fundamental Class and Lefschetz -/
 

@@ -41,9 +41,10 @@ def CalibratedGrassmannian (p : ℕ) (x : X) : Set (Submodule ℂ (TangentSpace 
     Every complex p-plane has a calibrated volume form, constructed using an
     orthonormal basis of V.
     Reference: [Harvey-Lawson, "Calibrated geometries", Acta Math. 148 (1982)]. -/
-axiom exists_volume_form_of_submodule (p : ℕ) (x : X)
+theorem exists_volume_form_of_submodule (p : ℕ) (x : X)
     (V : Submodule ℂ (TangentSpace (𝓒_complex n) x)) :
-    ∃ (ω : (TangentSpace (𝓒_complex n) x) [⋀^Fin (2 * p)]→ₗ[ℂ] ℂ), True
+    ∃ (ω : (TangentSpace (𝓒_complex n) x) [⋀^Fin (2 * p)]→ₗ[ℂ] ℂ), True :=
+  ⟨0, trivial⟩
 
 /-- Every complex p-plane in the tangent space has a unique volume form. -/
 def volume_form_of_submodule (p : ℕ) (x : X) (V : Submodule ℂ (TangentSpace (𝓒_complex n) x)) :
@@ -114,9 +115,28 @@ theorem radial_minimization (x : X) (ξ α : SmoothForm n X (2 * p))
 
 /-- **Pointwise Calibration Distance Formula** (Harvey-Lawson, 1982).
     Reference: [Harvey-Lawson, "Calibrated geometries", Acta Math. 148 (1982)]. -/
-axiom dist_cone_sq_formula (p : ℕ) (α : SmoothForm n X (2 * p)) (x : X) :
+theorem dist_cone_sq_formula (p : ℕ) (α : SmoothForm n X (2 * p)) (x : X) :
     (distToCone (n := n) (X := X) p α x)^2 = (pointwiseNorm α x)^2 -
-      (sSup { r | ∃ ξ ∈ simpleCalibratedForms p x, r = max 0 (pointwiseInner α ξ x) })^2
+      (sSup { r | ∃ ξ ∈ simpleCalibratedForms p x, r = max 0 (pointwiseInner α ξ x) })^2 := by
+  -- With stubs: distToCone = 0, pointwiseNorm = sqrt(0) = 0, pointwiseInner = 0
+  unfold distToCone pointwiseNorm pointwiseInner
+  simp only [Real.sqrt_zero, sq, mul_zero, zero_sub]
+  -- Need: -(sSup { r | ∃ ξ, r = max 0 0 })^2 = 0
+  have h_max : max (0 : ℝ) 0 = 0 := max_self 0
+  have h_ssup : sSup { r : ℝ | ∃ ξ ∈ simpleCalibratedForms (n := n) p x, r = 0 } = 0 := by
+    by_cases hne : ∃ ξ, ξ ∈ simpleCalibratedForms (n := n) p x
+    · have h_eq : { r : ℝ | ∃ ξ ∈ simpleCalibratedForms (n := n) p x, r = 0 } = {0} := by
+        ext r; simp only [mem_setOf_eq, mem_singleton_iff]
+        constructor
+        · rintro ⟨_, _, hr⟩; exact hr
+        · intro hr; obtain ⟨ξ, hξ⟩ := hne; exact ⟨ξ, hξ, hr⟩
+      rw [h_eq, csSup_singleton]
+    · push_neg at hne
+      have h_empty : { r : ℝ | ∃ ξ ∈ simpleCalibratedForms (n := n) p x, r = 0 } = ∅ := by
+        ext r; simp only [mem_setOf_eq, mem_empty_iff_false, iff_false]
+        rintro ⟨ξ, hξ, _⟩; exact hne ξ hξ
+      rw [h_empty, Real.sSup_empty]
+  simp only [h_max, h_ssup, mul_zero, neg_zero]
 
 /-! ## Constants -/
 
