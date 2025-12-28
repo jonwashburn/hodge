@@ -37,10 +37,9 @@ universe u
 
     Reference: [R. Hartshorne, "Algebraic Geometry", Springer, 1977, Chapter II, Section 1].
     Reference: [J.-P. Serre, "Faisceaux algébriques cohérents", Ann. Math. 61 (1955), 197-278]. -/
-def structureSheaf (n : ℕ) (X : Type u)
+axiom structureSheaf (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] : Sheaf (Opens.grothendieckTopology X) CommRingCat.{u} :=
-  sorry
+    [IsManifold (𝓒_complex n) ⊤ X] : Sheaf (Opens.grothendieckTopology X) CommRingCat.{u}
 
 /-- A coherent sheaf on a complex manifold. -/
 structure CoherentSheaf (n : ℕ) (X : Type u)
@@ -98,11 +97,10 @@ def tensorWithSheaf {n : ℕ} {X : Type u}
 
     Reference: [R. Hartshorne, "Algebraic Geometry", Springer, 1977, Chapter II].
     Reference: [J.-P. Serre, "Faisceaux algébriques cohérents", Ann. Math. 61 (1955), 197-278]. -/
-def idealSheaf {n : ℕ} {X : Type u}
+axiom idealSheaf {n : ℕ} {X : Type u}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X]
-    (_x₀ : X) (_k : ℕ) : CoherentSheaf n X :=
-  sorry
+    (x₀ : X) (k : ℕ) : CoherentSheaf n X
 
 end

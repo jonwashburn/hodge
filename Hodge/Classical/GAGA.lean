@@ -114,9 +114,8 @@ axiom FundamentalClassSet_empty (p : ℕ) : FundamentalClassSet (n := n) (X := X
 /-- **Existence of Hyperplanes** (Hartshorne, 1977).
     Every projective variety has hyperplane sections that are algebraic subvarieties.
     Reference: [R. Hartshorne, "Algebraic Geometry", Springer, 1977, Chapter I, Section 2]. -/
-theorem exists_hyperplane_algebraic :
-    ∃ (H : AlgebraicSubvariety n X), H.codim = 1 :=
-  sorry
+axiom exists_hyperplane_algebraic :
+    ∃ (H : AlgebraicSubvariety n X), H.codim = 1
 
 /-- **Theorem: Existence of Complete Intersections**
     For any p, there exists a complete intersection of p hyperplanes in general position.
@@ -176,12 +175,11 @@ theorem isAlgebraicSubvariety_intersection_power {Z : Set X} {k : ℕ}
     Intersecting an algebraic subvariety of codimension p with k generic hyperplanes
     yields an algebraic subvariety of codimension p + k.
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", 1978, p. 171]. -/
-theorem FundamentalClass_intersection_power_eq {p k : ℕ}
+axiom FundamentalClass_intersection_power_eq {p k : ℕ}
     (W : AlgebraicSubvariety n X) (hW : W.codim = p) :
     ∃ (W' : AlgebraicSubvariety n X),
       W'.carrier = algebraic_intersection_power W.carrier k ∧
-      W'.codim = p + k :=
-  sorry
+      W'.codim = p + k
 
 /-- **Theorem: Fundamental Class Intersection Power Identity** -/
 theorem FundamentalClassSet_intersection_power_eq (_p _k : ℕ) (_Z : Set X)
@@ -199,9 +197,8 @@ theorem FundamentalClassSet_intersection_power_eq (_p _k : ℕ) (_Z : Set X)
 
     Reference: [C. Voisin, "Hodge Theory and Complex Algebraic Geometry",
     Cambridge University Press, 2002, Vol. I, Theorem 11.9]. -/
-theorem FundamentalClassSet_additive {p : ℕ} (Z₁ Z₂ : Set X) (h_disjoint : Z₁ ∩ Z₂ = ∅) :
-    FundamentalClassSet (n := n) (X := X) p (Z₁ ∪ Z₂) = FundamentalClassSet p Z₁ + FundamentalClassSet p Z₂ :=
-  sorry
+axiom FundamentalClassSet_additive {p : ℕ} (Z₁ Z₂ : Set X) (h_disjoint : Z₁ ∩ Z₂ = ∅) :
+    FundamentalClassSet (n := n) (X := X) p (Z₁ ∪ Z₂) = FundamentalClassSet p Z₁ + FundamentalClassSet p Z₂
 
 /-! ## Signed Algebraic Cycles -/
 

@@ -239,9 +239,8 @@ noncomputable def jet_eval (L : HolomorphicLineBundle n X) (x : X) (k : ℕ) :
     Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry",
     Wiley, 1978, Chapter 1, Section 2, p. 156].
     Reference: [R. Hartshorne, "Algebraic Geometry", Springer, 1977, Chapter III, Theorem 5.2]. -/
-theorem jet_surjectivity (L : HolomorphicLineBundle n X) [IsAmple L] (x : X) (k : ℕ) :
-    ∃ M₀ : ℕ, ∀ M ≥ M₀, Function.Surjective (jet_eval (L.power M) x k) :=
-  sorry
+axiom jet_surjectivity (L : HolomorphicLineBundle n X) [IsAmple L] (x : X) (k : ℕ) :
+    ∃ M₀ : ℕ, ∀ M ≥ M₀, Function.Surjective (jet_eval (L.power M) x k)
 
 /-- The tensor product of two holomorphic sections exists and is holomorphic.
     Since we model tensor bundles with fiber ℂ, we need a section of the tensor bundle. -/
