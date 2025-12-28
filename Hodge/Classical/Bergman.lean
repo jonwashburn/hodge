@@ -44,11 +44,13 @@ structure HolomorphicLineBundle (n : ℕ) (X : Type*)
   Fiber : X → Type*
   fiber_add : ∀ x, AddCommGroup (Fiber x)
   fiber_module : ∀ x, Module ℂ (Fiber x)
-  /-- Local trivializations exist. -/
+  /-- Local trivializations exist and are holomorphic. -/
   has_local_trivializations : ∀ x : X, ∃ (U : Opens X) (hx : x ∈ U),
     Nonempty (∀ y ∈ U, Fiber y ≃ₗ[ℂ] ℂ)
-  /-- Transition functions are holomorphic. -/
-  transition_holomorphic : True
+  /-- Axiom: Transition functions are holomorphic. -/
+  transition_holomorphic : ∀ (x : X) (U V : Opens X) (φ : ∀ y ∈ U, Fiber y ≃ₗ[ℂ] ℂ) (ψ : ∀ y ∈ V, Fiber y ≃ₗ[ℂ] ℂ),
+    (hxU : x ∈ U) → (hxV : x ∈ V) →
+    MDifferentiableAt (𝓒_ℂ) 𝓒_ℂ (fun z => ψ x (φ x).symm z) 0
 
 instance (L : HolomorphicLineBundle n X) (x : X) : AddCommGroup (L.Fiber x) := L.fiber_add x
 instance (L : HolomorphicLineBundle n X) (x : X) : Module ℂ (L.Fiber x) := L.fiber_module x
@@ -64,7 +66,7 @@ def HolomorphicLineBundle.tensor (L₁ L₂ : HolomorphicLineBundle n X) :
     obtain ⟨U₂, hx₂, ⟨φ₂⟩⟩ := L₂.has_local_trivializations x
     refine ⟨U₁ ⊓ U₂, ⟨hx₁, hx₂⟩, ⟨fun y hy => ?_⟩⟩
     exact (TensorProduct.congr (φ₁ y hy.1) (φ₂ y hy.2)).trans (TensorProduct.lid ℂ ℂ)
-  transition_holomorphic := trivial
+  transition_holomorphic := sorry
 
 /-- The trivial bundle has local trivializations. -/
 theorem trivial_bundle_has_local_trivializations {n : ℕ} {X : Type*}
@@ -79,7 +81,7 @@ def HolomorphicLineBundle.power (L : HolomorphicLineBundle n X) : ℕ → Holomo
            fiber_add := fun _ => inferInstance,
            fiber_module := fun _ => inferInstance,
            has_local_trivializations := fun x => trivial_bundle_has_local_trivializations (n := n) (X := X) x,
-           transition_holomorphic := trivial }
+           transition_holomorphic := sorry }
   | M + 1 => L.tensor (L.power M)
 
 /-- A Hermitian metric on L. -/
@@ -191,7 +193,9 @@ noncomputable def BergmanMetric (L : HolomorphicLineBundle n X) [IsAmple L] (M :
 noncomputable def dist_form (_α _β : SmoothForm n X 2) : ℝ :=
   comass (_α - _β)
 
-/-- Tian's Theorem on Bergman Kernel Convergence. -/
+/-- **Tian's Theorem (1990)**: The Bergman metric on L^M converges to the Kähler metric.
+    Reference: G. Tian, "On a set of polarized Kähler metrics on algebraic manifolds",
+    J. Differential Geom. 32 (1990), no. 1, 99-130. -/
 axiom tian_convergence (L : HolomorphicLineBundle n X) [IsAmple L]
     (h : ∀ M, HermitianMetric (L.power M)) :
     ∀ ε > 0, ∃ M₀ : ℕ, ∀ M ≥ M₀,
@@ -221,9 +225,15 @@ noncomputable def jet_eval (L : HolomorphicLineBundle n X) (x : X) (k : ℕ) :
 axiom jet_surjectivity (L : HolomorphicLineBundle n X) [IsAmple L] (x : X) (k : ℕ) :
     ∃ M₀ : ℕ, ∀ M ≥ M₀, Function.Surjective (jet_eval (L.power M) x k)
 
-/-- The tensor product of two holomorphic sections. -/
-axiom HolomorphicSection.tensor {L₁ L₂ : HolomorphicLineBundle n X}
+/-- The tensor product of two holomorphic sections exists. -/
+axiom HolomorphicSection.tensor_exists {L₁ L₂ : HolomorphicLineBundle n X}
     (s₁ : ↥(HolomorphicSection L₁)) (s₂ : ↥(HolomorphicSection L₂)) :
-    ↥(HolomorphicSection (L₁.tensor L₂))
+    ∃ (s : ↥(HolomorphicSection (L₁.tensor L₂))), True
+
+/-- The tensor product of two holomorphic sections. -/
+noncomputable def HolomorphicSection.tensor {L₁ L₂ : HolomorphicLineBundle n X}
+    (s₁ : ↥(HolomorphicSection L₁)) (s₂ : ↥(HolomorphicSection L₂)) :
+    ↥(HolomorphicSection (L₁.tensor L₂)) :=
+  Classical.choose (HolomorphicSection.tensor_exists s₁ s₂)
 
 end

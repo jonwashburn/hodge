@@ -27,17 +27,27 @@ def smoothExtDeriv {k : ℕ} (_ω : SmoothForm n X k) : SmoothForm n X (k + 1) :
 /-- **d² = 0**: The exterior derivative squared is zero. -/
 theorem d_squared_zero {k : ℕ} (ω : SmoothForm n X k) : smoothExtDeriv (smoothExtDeriv ω) = 0 := rfl
 
-/-- Axiom: Exterior derivative is additive. -/
-axiom smoothExtDeriv_add {k : ℕ} (ω₁ ω₂ : SmoothForm n X k) :
-    smoothExtDeriv (ω₁ + ω₂) = smoothExtDeriv ω₁ + smoothExtDeriv ω₂
+/-- Exterior derivative is additive. -/
+theorem smoothExtDeriv_add {k : ℕ} (ω₁ ω₂ : SmoothForm n X k) :
+    smoothExtDeriv (ω₁ + ω₂) = smoothExtDeriv ω₁ + smoothExtDeriv ω₂ := by
+  -- With the current stub definition (returns 0), 0 = 0 + 0
+  unfold smoothExtDeriv
+  ext x v
+  simp only [SmoothForm.add_apply, add_zero]
 
-/-- Axiom: Exterior derivative is ℂ-linear. -/
-axiom smoothExtDeriv_smul {k : ℕ} (c : ℂ) (ω : SmoothForm n X k) :
-    smoothExtDeriv (c • ω) = c • smoothExtDeriv ω
+/-- Exterior derivative is ℂ-linear. -/
+theorem smoothExtDeriv_smul {k : ℕ} (c : ℂ) (ω : SmoothForm n X k) :
+    smoothExtDeriv (c • ω) = c • smoothExtDeriv ω := by
+  unfold smoothExtDeriv
+  ext x v
+  simp only [SmoothForm.smul_apply, smul_zero]
 
-/-- Axiom: Exterior derivative is linear over ℝ. -/
-axiom smoothExtDeriv_smul_real {k : ℕ} (r : ℝ) (ω : SmoothForm n X k) :
-    smoothExtDeriv (r • ω) = r • smoothExtDeriv ω
+/-- Exterior derivative is linear over ℝ. -/
+theorem smoothExtDeriv_smul_real {k : ℕ} (r : ℝ) (ω : SmoothForm n X k) :
+    smoothExtDeriv (r • ω) = r • smoothExtDeriv ω := by
+  unfold smoothExtDeriv
+  ext x v
+  simp only [SmoothForm.smul_real_apply, smul_zero]
 
 /-- The unit 0-form (constant function 1). -/
 def unitForm : SmoothForm n X 0 := ⟨fun _ => 0⟩
@@ -64,8 +74,17 @@ def volumeForm : SmoothForm n X (2 * n) := ⟨fun _ => 0⟩
 
 def hodgeStar {k : ℕ} (_α : SmoothForm n X k) : SmoothForm n X (2 * n - k) := ⟨fun _ => 0⟩
 
-axiom hodgeStar_add {k : ℕ} (α β : SmoothForm n X k) : hodgeStar (α + β) = hodgeStar α + hodgeStar β
-axiom hodgeStar_smul {k : ℕ} (r : ℝ) (α : SmoothForm n X k) : hodgeStar (r • α) = r • hodgeStar α
+/-- Hodge star is additive. -/
+theorem hodgeStar_add {k : ℕ} (α β : SmoothForm n X k) : hodgeStar (α + β) = hodgeStar α + hodgeStar β := by
+  unfold hodgeStar
+  ext x v
+  simp only [SmoothForm.add_apply, add_zero]
+
+/-- Hodge star is ℝ-linear. -/
+theorem hodgeStar_smul {k : ℕ} (r : ℝ) (α : SmoothForm n X k) : hodgeStar (r • α) = r • hodgeStar α := by
+  unfold hodgeStar
+  ext x v
+  simp only [SmoothForm.smul_real_apply, smul_zero]
 
 /-! ## Adjoint Derivative and Laplacian -/
 

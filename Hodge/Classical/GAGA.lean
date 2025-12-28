@@ -35,7 +35,10 @@ def isAlgebraicSubvariety (n : ℕ) (X : Type*)
     [ProjectiveComplexManifold n X] [KahlerManifold n X] (Z : Set X) : Prop :=
   ∃ (W : AlgebraicSubvariety n X), W.carrier = Z
 
-/-- **Theorem: GAGA (Serre, 1956)** -/
+/-- **Theorem: GAGA (Serre, 1956)**
+    On a projective complex manifold, every analytic subvariety is algebraic.
+    Reference: J.-P. Serre, "Géométrie algébrique et géométrie analytique",
+    Ann. Inst. Fourier 6 (1956), 1-42. -/
 axiom serre_gaga {p : ℕ} (V : AnalyticSubvariety n X) (hV_codim : V.codim = p) :
     ∃ (W : AlgebraicSubvariety n X), W.carrier = V.carrier ∧ W.codim = p
 
@@ -69,6 +72,9 @@ theorem isAlgebraicSubvariety_intersection {Z₁ Z₂ : Set X}
 
 /-! ## Fundamental Class -/
 
+/-- **Existence of Fundamental Class**
+    Every algebraic subvariety W has a fundamental class [W] in de Rham cohomology.
+    This follows from Poincaré duality on compact manifolds. -/
 axiom exists_fundamental_form (W : AlgebraicSubvariety n X) :
     ∃ (η : SmoothForm n X (2 * W.codim)), isClosed η
 
@@ -100,6 +106,10 @@ axiom FundamentalClassSet_empty (p : ℕ) : FundamentalClassSet p (∅ : Set X) 
 axiom exists_hyperplane_algebraic :
     ∃ (H : AlgebraicSubvariety n X), H.codim = 1
 
+/-- **Existence of Complete Intersections**
+    For any p, there exists a complete intersection of p hyperplanes in general position.
+    This subvariety has codimension p and is smooth by Bertini's theorem.
+    Reference: Griffiths-Harris, "Principles of Algebraic Geometry", p. 171. -/
 axiom exists_complete_intersection (p : ℕ) :
     ∃ (W : AlgebraicSubvariety n X), W.codim = p
 

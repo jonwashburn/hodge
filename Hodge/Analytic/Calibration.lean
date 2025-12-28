@@ -38,9 +38,10 @@ structure CalibratingForm (n : ℕ) (X : Type*) (k : ℕ)
 
 /-! ## Kähler Calibration -/
 
-/-- **Axiom: Wirtinger inequality for ω^p/p!.**
-comass(ω^p/p!) ≤ 1 for all p.
-Reference: Harvey-Lawson, "Calibrated Geometries", Acta Math. 1982. -/
+/-- **Wirtinger Inequality** (Harvey-Lawson 1982).
+    For any complex p-plane V, |ω^p(V)| ≤ p! · vol(V).
+    This implies comass(ω^p/p!) ≤ 1.
+    Reference: [Harvey-Lawson, "Calibrated Geometries", Acta Math. 148 (1982), 47-157]. -/
 axiom wirtinger_comass_bound (p : ℕ) :
     comass ((1 / (p.factorial : ℂ)) • omegaPow n X p) ≤ 1
 
@@ -54,10 +55,9 @@ def KählerCalibration (p : ℕ) : CalibratingForm n X (2 * p) where
     rfl
   comass_le_one := wirtinger_comass_bound p
 
-/-- **Axiom: The Kähler calibration has comass exactly 1.**
-This is the Wirtinger inequality: the form ω^p/p! achieves
-its maximum value 1 when evaluated on any complex p-plane.
-Reference: Harvey-Lawson, "Calibrated Geometries", Theorem 2.3. -/
+/-- **Wirtinger Equality** (Harvey-Lawson 1982).
+    The Kähler calibration form ω^p/p! achieves its maximum value 1 on complex p-planes.
+    Reference: [Harvey-Lawson, "Calibrated Geometries", 1982, Theorem 2.3]. -/
 axiom KählerCalibration_comass_eq_one (p : ℕ) (hp : p > 0) :
     comass (KählerCalibration (n := n) (X := X) p).form = 1
 
@@ -159,30 +159,33 @@ theorem spine_theorem {k : ℕ} (T S G : Current n X k) (ψ : CalibratingForm n 
     _ ≤ G.mass + G.mass := by linarith
     _ = 2 * G.mass := by ring
 
-/-- Axiom: Mass is Lower Semicontinuous.
-If T_i → T in flat norm, then mass(T) ≤ liminf mass(T_i).
-Reference: Federer-Fleming, Theorem 8.4. -/
+/-- **Lower Semicontinuity of Mass** (Federer-Fleming 1960).
+    If T_i → T in flat norm, then mass(T) ≤ liminf mass(T_i).
+    Reference: [Federer and Fleming, "Normal and Integral Currents", Ann. of Math. 72 (1960), Theorem 8.4]. -/
 axiom mass_lsc {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k) :
     Tendsto (fun i => flatNorm (T i - T_limit)) atTop (nhds 0) →
     T_limit.mass ≤ liminf (fun i => (T i).mass) atTop
 
-/-- **Axiom: Continuity of Evaluation under Flat Convergence.**
-If T_i → T in flat norm, then T_i(ψ) → T(ψ) for any bounded form ψ.
-This is the weak-* continuity of currents as linear functionals. -/
+/-- **Continuity of Evaluation** (Federer-Fleming 1960).
+    If T_i → T in flat norm, then T_i(ψ) → T(ψ) for any bounded form ψ.
+    This expresses that flat convergence implies weak-* convergence.
+    Reference: [Federer and Fleming, "Normal and Integral Currents", 1960]. -/
 axiom eval_continuous_flat {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k)
     (ψ : SmoothForm n X k)
     (h_conv : Tendsto (fun i => flatNorm (T i - T_limit)) atTop (nhds 0)) :
     Tendsto (fun i => T i ψ) atTop (nhds (T_limit ψ))
 
-/-- **Axiom: Liminf of Evaluation equals Limit.**
-If T_i → T in flat norm, then liminf T_i(ψ) = T(ψ). -/
+/-- **Liminf of Evaluation** (Federer-Fleming 1960).
+    If T_i → T in flat norm, then liminf T_i(ψ) = T(ψ).
+    Follows from `eval_continuous_flat` and `Tendsto.liminf_eq`. -/
 axiom liminf_eval_eq {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k)
     (ψ : SmoothForm n X k)
     (h_conv : Tendsto (fun i => flatNorm (T i - T_limit)) atTop (nhds 0)) :
     liminf (fun i => T i ψ) atTop = T_limit ψ
 
-/-- **Axiom: Defect Vanishing implies Mass and Eval have same Liminf.**
-If defect(T_i) → 0, then liminf mass(T_i) = liminf T_i(ψ). -/
+/-- **Defect Vanishing Liminf Lemma**.
+    If defect(T_i) → 0, then liminf mass(T_i) = liminf T_i(ψ).
+    Proof: mass(T_i) = T_i(ψ) + defect(T_i). Since defect → 0, the liminfs coincide. -/
 axiom defect_vanish_liminf_eq {k : ℕ} (T : ℕ → Current n X k)
     (ψ : CalibratingForm n X k)
     (h_defect_vanish : Tendsto (fun i => calibrationDefect (T i) ψ) atTop (nhds 0)) :

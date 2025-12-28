@@ -35,7 +35,7 @@ def IntegralCycle (n : ℕ) (X : Type*) [TopologicalSpace X] [ChartedSpace (Eucl
 
 /-- Integration of a form over an integral cycle. -/
 def integral_over_cycle {k : ℕ} (γ : IntegralCycle n X k) (α : SmoothForm n X (k + 1)) : ℝ :=
-  γ.1.toFun α
+  γ.1.toFun.toFun α
 
 -- notation "∫_" γ " " α => integral_over_cycle γ α
 

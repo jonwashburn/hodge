@@ -18,22 +18,28 @@ variable {n : ℕ} {X : Type u}
   [IsManifold (𝓒_complex n) ⊤ X]
   [ProjectiveComplexManifold n X] [KahlerManifold n X]
 
-/-- **Theorem: Serre Vanishing Theorem (Axiomatized)**
-
-For an ample line bundle L on a projective manifold X and any coherent sheaf F,
-H^q(X, L^M ⊗ F) = 0 for q > 0 and M sufficiently large.
--/
+/-- **Serre Vanishing Theorem (1955)**: For an ample line bundle L and coherent sheaf F,
+    H^q(X, L^M ⊗ F) = 0 for q > 0 and M sufficiently large.
+    Reference: J.-P. Serre, "Faisceaux algébriques cohérents",
+    Ann. of Math. 61 (1955), 197-278. -/
 axiom serre_vanishing (L : HolomorphicLineBundle n X) [IsAmple L]
     (F : CoherentSheaf n X) (q : ℕ) (hq : q > 0) :
     ∃ M₀ : ℕ, ∀ M ≥ M₀, vanishes (tensorWithSheaf (L.power M) F) q
 
 /-- **Theorem: Jet Surjectivity Criterion**
 
-If H^1(X, L ⊗ I_x^{k+1}) = 0, then the jet evaluation map is surjective.
--/
-axiom jet_surjectivity_criterion {L : HolomorphicLineBundle n X} {x : X} {k : ℕ} :
+    Proof Strategy: Follows from the long exact sequence in sheaf cohomology:
+    0 → L ⊗ I_x^{k+1} → L → L/I_x^{k+1} → 0
+    The map H^0(X, L) → H^0(X, L/I_x^{k+1}) is surjective if H^1(X, L ⊗ I_x^{k+1}) = 0.
+    Since H^0(X, L/I_x^{k+1}) is isomorphic to the jet space J^k_x(L),
+    the jet evaluation map is surjective. -/
+theorem jet_surjectivity_criterion {L : HolomorphicLineBundle n X} {x : X} {k : ℕ} :
     vanishes (tensorWithSheaf L (idealSheaf x k)) 1 →
-    Function.Surjective (jet_eval (L := L) x k)
+    Function.Surjective (jet_eval (L := L) x k) := by
+  intro h_vanish
+  -- This proof requires the long exact sequence in sheaf cohomology.
+  -- We assume the bridge between the vanishing of H^1 and surjectivity of H^0.
+  sorry
 
 /-- **Theorem: Jet Surjectivity from Serre Vanishing**
 
