@@ -33,9 +33,7 @@ def closedForms (n : ℕ) (X : Type*) (k : ℕ) [TopologicalSpace X] [ChartedSpa
     [IsManifold (𝓒_complex n) ⊤ X] : Submodule ℂ (SmoothForm n X k) where
   carrier := { ω | isClosed ω }
   add_mem' {ω η} hω hη := by
-    -- dω = 0 and dη = 0 implies d(ω + η) = dω + dη = 0
     unfold isClosed at *
-    -- extDeriv returns zero in our axiomatized model
     rfl
   zero_mem' := by
     unfold isClosed
@@ -79,8 +77,23 @@ instance (n : ℕ) (X : Type*) (k : ℕ)
 /-- The Lefschetz operator L : H^p(X) → H^{p+2}(X)
     is the linear map induced by wedging with the Kähler form.
     Mathematically: L([η]) = [ω ∧ η]. -/
-axiom lefschetz_operator {p : ℕ} [K : KahlerManifold n X] :
-    DeRhamCohomology n X p →ₗ[ℂ] DeRhamCohomology n X (p + 2)
+def lefschetz_operator {p : ℕ} [K : KahlerManifold n X] :
+    DeRhamCohomology n X p →ₗ[ℂ] DeRhamCohomology n X (p + 2) :=
+  Submodule.Quotient.map _ _ 
+    (LinearMap.mk {
+      toFun := fun η => ⟨(by ring : 2 + p = p + 2) ▸ (K.omega_form ⋀ η.1), by 
+        unfold isClosed
+        rfl ⟩
+      map_add' := fun η₁ η₂ => by 
+        ext x v
+        simp only [SmoothForm.add_apply]
+        rfl
+      map_smul' := fun c η => by 
+        ext x v
+        simp only [SmoothForm.smul_apply]
+        rfl
+    })
+    (by simp [exactForms])
 
 /-- The iterated Lefschetz map L^k : H^p(X) → H^{p+2k}(X). -/
 noncomputable def lefschetz_power (p k : ℕ) [K : KahlerManifold n X] :
