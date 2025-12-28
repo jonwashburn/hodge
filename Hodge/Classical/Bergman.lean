@@ -242,7 +242,7 @@ theorem IsHolomorphic_tensor {L₁ L₂ : HolomorphicLineBundle n X}
 def HolomorphicSection.tensor {L₁ L₂ : HolomorphicLineBundle n X}
     (s₁ : ↥(HolomorphicSection L₁)) (s₂ : ↥(HolomorphicSection L₂)) :
     ↥(HolomorphicSection (L₁.tensor L₂)) :=
-  ⟨fun _ => (0 : ℂ), 
+  ⟨fun _ => (0 : ℂ),
     IsHolomorphic_tensor (L₁ := L₁) (L₂ := L₂) (_s₁ := s₁.1) (_s₂ := s₂.1) s₁.property s₂.property⟩
 
 end

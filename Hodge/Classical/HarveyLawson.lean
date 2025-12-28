@@ -12,6 +12,7 @@ variable {n : ℕ} {X : Type*}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X]
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
+  [Nonempty X]
 
 /-!
 # Track A.1: Harvey-Lawson Theorem
@@ -50,19 +51,12 @@ def integrationCurrent {p k : ℕ} (V : AnalyticSubvariety n X) (_hV : V.codim =
 
 /-! ## Harvey-Lawson Hypothesis and Conclusion -/
 
-/-- An integral current T is a cycle if its boundary is zero.
-    Note: In GMT, a cycle is a current T with ∂T = 0. -/
-def IntegralCurrent.isCycleAt {k : ℕ} (T : IntegralCurrent n X k) : Prop :=
-  match k with
-  | 0 => True -- 0-currents are vacuously cycles in this model
-  | k' + 1 => T.toFun.boundary = 0
-
 /-- The hypothesis structure for the Harvey-Lawson theorem.
     Contains a calibrated integral cycle. -/
 structure HarveyLawsonHypothesis (n : ℕ) (X : Type*) (k : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] where
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] where
   /-- The integral current -/
   T : IntegralCurrent n X k
   /-- The calibrating form -/
@@ -77,7 +71,7 @@ structure HarveyLawsonHypothesis (n : ℕ) (X : Type*) (k : ℕ)
 structure HarveyLawsonConclusion (n : ℕ) (X : Type*) (k : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] where
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] where
   /-- The collection of analytic subvarieties -/
   varieties : Finset (AnalyticSubvariety n X)
   /-- Positive integer multiplicities for each variety -/

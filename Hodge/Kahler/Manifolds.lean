@@ -18,11 +18,11 @@ variable {n : ℕ} {X : Type*}
   [IsManifold (𝓒_complex n) ⊤ X]
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
 
-/--- The Kähler metric is symmetric. -/
+/-- The Kähler metric is symmetric. This follows from J-invariance. -/
 theorem kahlerMetric_symm (x : X) (v w : TangentSpace (𝓒_complex n) x) :
     (K.omega_form.as_alternating x ![v, Complex.I • w]).re =
     (K.omega_form.as_alternating x ![w, Complex.I • v]).re := by
-  -- This follows from J-invariance and antisymmetry of the Kähler form
+  -- Proof using J-invariance
   sorry
 
 /-! ## Rationality -/
@@ -30,17 +30,15 @@ theorem kahlerMetric_symm (x : X) (v w : TangentSpace (𝓒_complex n) x) :
 /-- An integral cycle is an integral current with no boundary. -/
 def IntegralCycle (n : ℕ) (X : Type*) [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] (k : ℕ) :=
-  { T : IntegralCurrent n X (k + 1) // T.isCycle }
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] (k : ℕ) :=
+  { T : IntegralCurrent n X (k + 1) // T.toFun.isCycle }
 
 /-- Integration of a form over an integral cycle. -/
-def integral_over_cycle {k : ℕ} (γ : IntegralCycle n X k) (α : SmoothForm n X (k + 1)) : ℝ :=
+def integral_over_cycle {k : ℕ} [Nonempty X] (γ : IntegralCycle n X k) (α : SmoothForm n X (k + 1)) : ℝ :=
   γ.1.toFun.toFun α
 
--- notation "∫_" γ " " α => integral_over_cycle γ α
-
 /-- A property stating that a cohomology class is rational. -/
-def isRationalClass {k : ℕ} (α : SmoothForm n X k) : Prop :=
+def isRationalClass {k : ℕ} (_α : SmoothForm n X k) : Prop :=
   True  -- Axiomatized for now
 
 /-- The wedge product of rational classes is rational. -/
@@ -55,20 +53,8 @@ theorem isRationalClass_smul_rat (q : ℚ) {k : ℕ} {α : SmoothForm n X k}
 /-- The Kähler form ω represents a rational class. -/
 theorem omega_is_rational : isRationalClass (kahlerForm (n := n) (X := X)) := trivial
 
-/-- Powers of rational classes are rational. -/
-theorem isRationalClass_pow (p : ℕ) {α : SmoothForm n X 2}
-    (_ : isRationalClass α) : isRationalClass (wedge α α) := trivial
-
 /-- Sum of rational classes is rational. -/
 theorem isRationalClass_add {k : ℕ} {α β : SmoothForm n X k}
     (_ : isRationalClass α) (_ : isRationalClass β) : isRationalClass (α + β) := trivial
-
-/-! ## Complex Submanifolds -/
-
-/-- A property stating that a set is a complex submanifold of codimension p. -/
-def IsComplexSubmanifold (S : Set X) (p : ℕ) : Prop :=
-  ∀ x ∈ S, ∃ (U : Set X), IsOpen U ∧ x ∈ U ∧
-    ∃ (f : Fin p → (X → ℂ)),
-      S ∩ U = { y ∈ U | ∀ i, f i y = 0 }
 
 end
