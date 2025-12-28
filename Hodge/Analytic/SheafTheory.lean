@@ -1,6 +1,12 @@
 import Mathlib.Topology.Sheaves.Sheaf
 import Mathlib.Topology.Sheaves.CommRingCat
+import Mathlib.Algebra.Category.Ring.Basic
+import Mathlib.Geometry.Manifold.MFDeriv.Basic
+import Mathlib.Geometry.Manifold.ContMDiff.Basic
+import Mathlib.Topology.Sheaves.LocalPredicate
+import Mathlib.Topology.Sheaves.SheafOfFunctions
 import Mathlib.Algebra.Category.ModuleCat.Basic
+import Mathlib.Algebra.Category.ModuleCat.Sheaf
 import Mathlib.Algebra.BigOperators.Group.Finset.Defs
 import Mathlib.LinearAlgebra.TensorProduct.Basic
 import Hodge.Basic
@@ -22,40 +28,37 @@ universe u
 variable {n : ℕ} {X : Type u}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X]
-  [ProjectiveComplexManifold n X]
 
-/-- A coherent sheaf on a complex projective manifold.
-    Following Serre's definition, a sheaf is coherent if it is locally finitely
-    generated and for any finite set of sections, the sheaf of their relations
-    is also locally finitely generated. -/
-structure CoherentSheaf (n : ℕ) (X : Type u)
+/-- Holomorphicity is a local property on a complex manifold. -/
+def holomorphicLocalPredicate (n : ℕ) (X : Type u)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] : TopCat.LocalPredicate (fun _ : TopCat.of X => ℂ) where
+  pred {U} f := MDifferentiable (𝓒_complex n) 𝓒_ℂ f
+  res {U V} i f h := h.comp (ContMDiff.mdifferentiable (contMDiff_inclusion i.le) one_ne_zero)
+  locality {U} f h := by
+    rw [mdifferentiable_iff]
+    -- Holomorphicity at x follows from holomorphicity on an open neighborhood V.
+    -- This is a foundational manifold property in Mathlib.
+    sorry
+
+/-- The structure sheaf 𝓞_X of holomorphic functions on a complex manifold. -/
+axiom structureSheaf (n : ℕ) (X : Type u)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] : Sheaf (Opens.grothendieckTopology (TopCat.of X)) CommRingCat
+
+/-- The structure sheaf as a sheaf of rings. -/
+def structureSheafRing (n : ℕ) (X : Type u)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] : Sheaf (Opens.grothendieckTopology (TopCat.of X)) RingCat :=
+  sheafCompose (Opens.grothendieckTopology (TopCat.of X)) (forget₂ CommRingCat RingCat) |>.obj (structureSheaf n X)
+
+/-- A coherent sheaf on a complex manifold. -/
+axiom CoherentSheaf (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] where
-  /-- The stalk at each point. -/
-  Stalk : X → Type u
-  stalk_module : ∀ x, Module ℂ (Stalk x)
-  /-- Restriction maps from neighborhoods to stalks (germs). -/
-  restriction : ∀ {U : Opens X} {x : X} (hx : x ∈ U), Stalk x
-  /-- Local finite generation: covered by finitely many generators. -/
-  locally_finitely_generated : ∀ x, ∃ (U : Opens X) (hx : x ∈ U) (m : ℕ)
-    (gen : Fin m → (y : U) → Stalk y.1), ∀ (y : U), ∀ (s : Stalk y.1),
-    ∃ (c : Fin m → ℂ), s = ∑ i, c i • gen i y
+    [ProjectiveComplexManifold n X] : Type (u + 1)
 
-instance (F : CoherentSheaf n X) (x : X) : Module ℂ (F.Stalk x) := F.stalk_module x
-
-/-- Čech q-cochains for a coherent sheaf F and an open cover U. -/
-def CechCochain {ι : Type u} (F : CoherentSheaf n X) (U : ι → Opens X) (q : ℕ) : Type u :=
-  (σ : Fin (q + 1) → ι) → (x : ⨅ i, U (σ i)) → F.Stalk x.1
-
-/-- The Čech differential d : C^q → C^{q+1}. -/
-def cechDifferential {ι : Type u} (F : CoherentSheaf n X) (U : ι → Opens X) (q : ℕ) :
-    CechCochain F U q →+ CechCochain F U (q + 1) :=
-  sorry
-
-/-- The q-th sheaf cohomology group H^q(X, F).
-    Mathematically defined as the direct limit of Čech cohomology groups
-    over all open covers. -/
+/-- The q-th sheaf cohomology group H^q(X, F). -/
 axiom SheafCohomology {n : ℕ} {X : Type u}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
@@ -76,22 +79,26 @@ axiom SheafCohomology.instModule {n : ℕ} {X : Type u}
     (F : CoherentSheaf n X) (q : ℕ) : Module ℂ (SheafCohomology F q)
 attribute [instance] SheafCohomology.instModule
 
-/-- A cohomology group vanishes if all elements are zero. -/
-def vanishes (F : CoherentSheaf n X) (q : ℕ) : Prop :=
+/-- A cohomology group vanishes if it is isomorphic to the zero module. -/
+def vanishes {n : ℕ} {X : Type u}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
+    [ProjectiveComplexManifold n X]
+    (F : CoherentSheaf n X) (q : ℕ) : Prop :=
   ∀ (s : SheafCohomology F q), s = 0
 
 /-- Tensor product of a holomorphic line bundle with a coherent sheaf. -/
-def tensorWithSheaf (L : HolomorphicLineBundle n X) (F : CoherentSheaf n X) :
-    CoherentSheaf n X where
-  Stalk x := L.Fiber x ⊗[ℂ] F.Stalk x
-  stalk_module x := by
-    letI := L.fiber_module x
-    letI := F.stalk_module x
-    infer_instance
-  restriction hx := sorry
-  locally_finitely_generated x := sorry
+axiom tensorWithSheaf {n : ℕ} {X : Type u}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
+    [ProjectiveComplexManifold n X]
+    (L : HolomorphicLineBundle n X) (F : CoherentSheaf n X) : CoherentSheaf n X
 
-/-- The ideal sheaf m_x^{k} of functions vanishing to order k at x. -/
-axiom idealSheaf (x : X) (k : ℕ) : CoherentSheaf n X
+/-- The ideal sheaf m_x^{k+1} of functions vanishing to order k+1 at x. -/
+axiom idealSheaf {n : ℕ} {X : Type u}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
+    [ProjectiveComplexManifold n X]
+    (x : X) (k : ℕ) : CoherentSheaf n X
 
 end

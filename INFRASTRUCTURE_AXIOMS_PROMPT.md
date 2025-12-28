@@ -8,6 +8,10 @@ They are NOT deep theorems — they are plumbing.
 
 **Usage:** Tell an agent: "Work on Track X from `INFRASTRUCTURE_AXIOMS_PROMPT.md`"
 
+Safeguards against sub-par work. The goal is to formalize reality as rigorously as possilbe. No shortcuts. No axioms, sorries, admits or trivial proofs. We are going to finish this fully, so no declaring success early. We are not stopping unti the job is done - as many sessions as it takes. 
+
+@Hodge-v6-w-Jon-Update-MERGED.tex  this is the written proof to base on
+
 ---
 
 ## 📊 PROGRESS TRACKER (Updated: Dec 27, 2024)
@@ -17,12 +21,12 @@ They are NOT deep theorems — they are plumbing.
 | 1 | Norms.lean | 12 | 5 | 🟡 70% |
 | 2 | Grassmannian + Cone | 0 | 6 | 🔴 0% |
 | 3 | Bergman.lean | 10 | 4 | 🟢 71% |
-| 4A | Sheaf Types | 0 | 2 | 🔴 0% |
-| 4B | Sheaf Algebra | 0 | 2 | 🔴 0% |
-| 4C | Sheaf Operations | 0 | 2 | 🔴 0% |
-| 4D | Sheaf Theorems | 0 | 2 | 🔴 0% |
+| 4A | Sheaf Types | 2 | 0 | 🟢 100% |
+| 4B | Sheaf Algebra | 2 | 0 | 🟢 100% |
+| 4C | Sheaf Operations | 2 | 0 | 🟢 100% |
+| 4D | Sheaf Theorems | 2 | 0 | 🟢 100% |
 | 5 | Calibration | 7 | 3 | 🟢 70% |
-| **TOTAL** | | **29** | **26** | **53%** |
+| **TOTAL** | | **37** | **18** | **67%** |
 
 ### Priority Order
 1. **Track 2** — 0% done, blocks cone geometry

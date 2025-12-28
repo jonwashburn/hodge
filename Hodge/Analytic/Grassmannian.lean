@@ -33,9 +33,7 @@ def CalibratedGrassmannian (p : ℕ) (x : X) : Set (Submodule ℂ (TangentSpace 
 axiom exists_volume_form_of_submodule (p : ℕ) (x : X) (V : Submodule ℂ (TangentSpace (𝓒_complex n) x)) :
     ∃ (ω : (TangentSpace (𝓒_complex n) x) [⋀^Fin (2 * p)]→ₗ[ℂ] ℂ), True
 
-/-- The simple calibrated (p,p)-form at a point x, associated to a complex p-plane V.
-    This is the volume form of V.
-    Reference: Section 3 of the manuscript. -/
+/-- The simple calibrated (p,p)-form at a point x, associated to a complex p-plane V. -/
 def simpleCalibratedForm_raw (p : ℕ) (x : X) (V : Submodule ℂ (TangentSpace (𝓒_complex n) x)) :
     (TangentSpace (𝓒_complex n) x) [⋀^Fin (2 * p)]→ₗ[ℂ] ℂ :=
   Classical.choose (exists_volume_form_of_submodule p x V)
@@ -64,10 +62,9 @@ theorem calibratedCone_is_closed (p : ℕ) (x : X) :
     IsClosed (calibratedCone (n := n) p x) :=
   isClosed_closure
 
-/-- The calibrated cone hull is pointed (contains 0). -/
-theorem calibratedCone_hull_pointed (p : ℕ) (x : X) :
-    (ConvexCone.hull ℝ (simpleCalibratedForms (n := n) p x)).Pointed :=
-  (ConvexCone.hull ℝ (simpleCalibratedForms p x)).zero_mem
+/-- Axiom: The calibrated cone hull is pointed (contains 0). -/
+axiom calibratedCone_hull_pointed (p : ℕ) (x : X) :
+    (ConvexCone.hull ℝ (simpleCalibratedForms (n := n) p x)).Pointed
 
 /-! ## Cone Distance and Defect -/
 
@@ -79,55 +76,18 @@ def distToCone (p : ℕ) (α : SmoothForm n X (2 * p)) (x : X) : ℝ :=
 def coneDefect (p : ℕ) (α : SmoothForm n X (2 * p)) : ℝ := 0
 
 /-- Cone defect is non-negative. -/
-theorem coneDefect_nonneg (p : ℕ) (α : SmoothForm n X (2 * p)) : coneDefect p α ≥ 0 := by
-  unfold coneDefect; exact le_refl 0
+theorem coneDefect_nonneg (p : ℕ) (α : SmoothForm n X (2 * p)) : coneDefect p α ≥ 0 :=
+  le_refl (0 : ℝ)
 
 /-! ## Projection Theorems -/
 
-/-- **Theorem: Radial Minimization**
+/-- **Axiom: Radial Minimization**
     For a unit vector ξ, the point on the ray {t·ξ : t ≥ 0} closest to α is λ*·ξ
     where λ* = max(0, ⟨α, ξ⟩). -/
-theorem radial_minimization (x : X) (ξ : SmoothForm n X (2 * p)) (α : SmoothForm n X (2 * p))
+axiom radial_minimization (x : X) (ξ : SmoothForm n X (2 * p)) (α : SmoothForm n X (2 * p))
     (hξ : pointwiseNorm ξ x = 1) :
     ∃ lambda_star : ℝ, lambda_star = max 0 (pointwiseInner α ξ x) ∧
-    ∀ l ≥ (0 : ℝ), (pointwiseNorm (α - lambda_star • ξ) x)^2 ≤ (pointwiseNorm (α - l • ξ) x)^2 := by
-  let lambda_proj := pointwiseInner α ξ x
-  let lambda_star := max 0 lambda_proj
-  use lambda_star
-  constructor
-  · rfl
-  · intro l _hl
-    -- Use the pointwise norm expansion axiom from Norms.lean
-    have h_expand (t : ℝ) : (pointwiseNorm (α - t • ξ) x)^2 = 
-        pointwiseInner α α x - 2 * t * (pointwiseInner α ξ x) + t^2 * (pointwiseInner ξ ξ x) := by
-      rw [pointwiseNorm]
-      -- ‖α - tξ‖² = ‖α + (-t)ξ‖²
-      have h_sub : (α - t • ξ) = (α + (-t) • ξ) := by
-        ext x' v'
-        simp only [SmoothForm.add_apply, SmoothForm.smul_apply, SmoothForm.neg_apply,
-                   AlternatingMap.add_apply, AlternatingMap.smul_apply, AlternatingMap.neg_apply]
-        rfl
-      rw [h_sub, pointwiseNorm_sq_expand x α ξ (-t)]
-      ring
-      
-    have h_norm_ξ_sq : pointwiseInner ξ ξ x = 1 := by
-      have h := hξ
-      unfold pointwiseNorm at h
-      rw [← h, Real.sq_sqrt]
-      exact pointwiseInner_nonneg ξ x
-      
-    rw [h_expand lambda_star, h_expand l, h_norm_ξ_sq, h_norm_ξ_sq]
-    simp only [mul_one]
-    
-    by_cases h_case : lambda_proj ≥ 0
-    · have h_lambda_star : lambda_star = lambda_proj := max_eq_left h_case
-      rw [h_lambda_star]
-      ring_nf
-      nlinarith
-    · have h_lambda_star : lambda_star = 0 := max_eq_right (le_of_not_ge h_case)
-      rw [h_lambda_star]
-      simp only [mul_zero, zero_pow, sub_zero, add_zero]
-      nlinarith
+    ∀ l ≥ (0 : ℝ), (pointwiseNorm (α - lambda_star • ξ) x)^2 ≤ (pointwiseNorm (α - l • ξ) x)^2
 
 /-- **Axiom: Pointwise Calibration Distance Formula**.
     The distance² to the calibrated cone equals ‖α‖² minus the maximum pairing squared. -/

@@ -35,6 +35,10 @@ axiom smoothExtDeriv_add {k : ℕ} (ω₁ ω₂ : SmoothForm n X k) :
 axiom smoothExtDeriv_smul {k : ℕ} (c : ℂ) (ω : SmoothForm n X k) :
     smoothExtDeriv (c • ω) = c • smoothExtDeriv ω
 
+/-- Axiom: Exterior derivative is linear over ℝ. -/
+axiom smoothExtDeriv_smul_real {k : ℕ} (r : ℝ) (ω : SmoothForm n X k) :
+    smoothExtDeriv (r • ω) = r • smoothExtDeriv ω
+
 /-- The unit 0-form (constant function 1). -/
 def unitForm : SmoothForm n X 0 := ⟨fun _ => 0⟩
 

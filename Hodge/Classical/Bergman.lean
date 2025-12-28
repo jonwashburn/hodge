@@ -9,6 +9,7 @@ import Mathlib.Algebra.Module.Pi
 import Mathlib.LinearAlgebra.Quotient.Defs
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Geometry.Manifold.Algebra.Monoid
+import Mathlib.Geometry.Manifold.ContMDiff.Basic
 import Hodge.Basic
 import Hodge.Analytic.Forms
 import Hodge.Analytic.Norms
@@ -104,11 +105,7 @@ def IsHolomorphic {L : HolomorphicLineBundle n X} (s : Section L) : Prop :=
   ∀ x : X, ∃ (U : Opens X) (_hx : x ∈ U) (φ : ∀ y ∈ U, L.Fiber y ≃ₗ[ℂ] ℂ),
     MDifferentiable (𝓒_complex n) 𝓒_ℂ (fun y : U => φ y.1 y.2 (s y.1))
 
-/-- The sum of two holomorphic sections is holomorphic.
-    Proof: At any point x, we use the bundle's canonical trivialization φ.
-    Then φ(s₁ + s₂) = φ(s₁) + φ(s₂). We show each term is MDifferentiable
-    using the holomorphicity of s₁ and s₂ with their respective trivializations,
-    and the fact that transition functions are MDifferentiable (axiomatized). -/
+/-- The sum of two holomorphic sections is holomorphic. -/
 axiom IsHolomorphic_add {L : HolomorphicLineBundle n X} (s₁ s₂ : Section L) :
     IsHolomorphic s₁ → IsHolomorphic s₂ → IsHolomorphic (s₁ + s₂)
 
