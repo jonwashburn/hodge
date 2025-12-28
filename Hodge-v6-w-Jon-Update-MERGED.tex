@@ -2178,7 +2178,8 @@ Hence the defect also vanishes in the borderline case.
 \begin{proof}
 In this regime, the exponent $2-\frac{2n}{k}=0$ when $k=n$, so the naive mass estimate does not guarantee decay.
 However, Proposition~\ref{prop:integer-transport} yields $\mathcal F(\partial T^{\mathrm{raw}})\to 0$ directly from the slow-variation and face-edit control at lattice scale $\delta_j=o(h_j)$.
-Proposition~\ref{prop:glue-gap} then gives $\Mass(R_{\mathrm{glue}})\to 0$, and Proposition~\ref{prop:almost-calibration} concludes.
+Proposition~\ref{prop:glue-gap} then gives a filling $U_j$ with $\partial U_j=\partial T^{\mathrm{raw}}$ and $\Mass(U_j)\to 0$;
+taking $R_{\mathrm{glue},j}:=-U_j$ yields a vanishing-mass correction, and Proposition~\ref{prop:almost-calibration} concludes.
 \end{proof}
 
 \subsection*{H1/H2 packaged at the point of use (for Theorem~\ref{thm:spine-quantitative})}
@@ -3292,7 +3293,7 @@ Inserting this into Proposition~\ref{prop:transport-flat-glue} yields a global b
 \[
 \mathcal F(\partial T^{\mathrm{raw}})\ \lesssim\ m\,h \;+\; O(\varepsilon\,m),
 \]
-so choosing $h=h(m)\to 0$ slowly (e.g.\ $h=m^{-\alpha}$ with $\alpha>0$ small) makes the gluing correction $R_{\mathrm{glue}}$
+so choosing $h=h(m)\to 0$ slowly (e.g.\ $h=m^{-\alpha}$ with $\alpha>0$ small) makes the gluing correction $U_h$
 sublinear in $m$ and hence negligible in the mass equality as $m\to\infty$.
 The remaining task is then to implement this “fixed template” choice while still meeting the cohomological constraints (Substep 4.3).
 \smallskip
@@ -5572,16 +5573,51 @@ R_{\mathrm{glue}}:=-(Q+Q_R)
 \]
 gives $\partial R_{\mathrm{glue}}=-\partial T^{\mathrm{raw}}$ and $\Mass(R_{\mathrm{glue}})$ as small as desired once
 $\mathcal F(\partial T^{\mathrm{raw}})$ is small.
+\begin{lemma}[Face-slice translation/cycle model from the sheet construction]\label{lem:face-slice-translation-model}
+Fix an interior interface $F=Q\cap Q'$ in the mesh used in Substep~4.2, and work in a tubular product chart
+identifying a neighborhood of $F$ with $F\times B^{2p}(0,ch)$ in normal coordinates.
+For each direction label and each sheet piece $[Y]\llcorner Q$ meeting $F$, the induced \emph{face slice} current
+\[
+\Sigma_F(u)\ :=\ \partial\big([Y]\llcorner Q\big)\llcorner F
+\]
+is an integral $(2n-2p-1)$--\emph{cycle} on $F$ (so $\partial\Sigma_F(u)=0$), and in the flat/parallel model it depends on the transverse parameter
+$u\in B^{2p}(0,ch)$ only by translation in the face chart: $\Sigma_F(u)=(\tau_u)_\#\Sigma_F(0)$.
+Consequently, for every interior interface $F$ the mismatch current
+\[
+B_F:=\bigl(\partial S_Q\bigr)\llcorner F\ -\ \bigl(\partial S_{Q'}\bigr)\llcorner F
+\]
+fits the translation model of Proposition~\ref{prop:transport-flat-glue-weighted} (hence Proposition~\ref{prop:transport-flat-glue} and
+Corollary~\ref{cor:global-flat-weighted}).
+In particular, the slice currents used in that model are genuinely closed (so there is no “extra boundary along edges’’ in the sharp-cube picture).
+\end{lemma}
+\begin{proof}
+In the flat template model of Remark~\ref{rem:transport-hypotheses}, each sheet is an affine calibrated plane section
+$(\widetilde\Pi+t)\cap Q$ inside a product chart, and the face slice current $\Sigma_F(u)$ is obtained by translating the parameter
+$u$ in the transverse factor; this gives $\Sigma_F(u)=(\tau_u)_\#\Sigma_F(0)$.
+
+The only remaining point is that $\Sigma_F(u)$ is \emph{closed} as a current on $F$.
+For this we use the smooth-interface version of Substep~4.2 (already invoked in Corollary~\ref{cor:global-flat-weighted} and
+Lemma~\ref{lem:uniformly-convex-slice-boundary}): we work with $C^2$ uniformly convex cells of comparable diameter $h$
+(rounded cubes/balls) whose \emph{pairwise interfaces} $F=Q\cap Q'$ are smooth hypersurfaces \emph{without boundary} inside the chosen tubular chart.
+Then for any smooth sheet $Y$ with no boundary one has
+\(
+\partial([Y]\llcorner Q)=[Y]\llcorner \partial Q
+\)
+and $[Y]\llcorner \partial Q$ is an integral cycle (intersection of manifolds without boundary).
+Restricting to the interface hypersurface $F$ inside the chart therefore produces an integral cycle on $F$.
+\end{proof}
+
 \begin{proposition}[Microstructure/gluing estimate]\label{prop:glue-gap}
 Let $T^{\mathrm{raw}}=\sum_Q S_Q$ be the raw integral current built from the microstructure pieces on a mesh of size $h$
 as in Substep~4.2.
-Assume that for every interior interface $F=Q\cap Q'$ (i.e.\ a codimension-$1$ face shared by two distinct cells of the mesh)
+For every interior interface $F=Q\cap Q'$ (i.e.\ a codimension-$1$ face shared by two distinct cells of the mesh),
 the face mismatch current
 \[
 B_F\ :=\ \bigl(\partial S_Q\bigr)\llcorner F\ -\ \bigl(\partial S_{Q'}\bigr)\llcorner F
 \]
-admits the translation model of Proposition~\ref{prop:transport-flat-glue-weighted} with parameter multisets
-$\{u_{F,a}\}_{a=1}^{N_F}$ and $\{u'_{F,a}\}_{a=1}^{N_F}$, and that there exists a matching
+admits the translation model of Proposition~\ref{prop:transport-flat-glue-weighted} by Lemma~\ref{lem:face-slice-translation-model};
+write the resulting parameter multisets as $\{u_{F,a}\}_{a=1}^{N_F}$ and $\{u'_{F,a}\}_{a=1}^{N_F}$.
+Assume moreover that there exists a matching
 $\sigma_F\in S_{N_F}$ satisfying the uniform displacement bound
 \[
 \|u_{F,a}-u'_{F,\sigma_F(a)}\|\ \le\ \Delta_F\qquad\text{for all }a.
@@ -5599,8 +5635,8 @@ U\ :=\ \sum_F Q_F,
 T\ :=\ T^{\mathrm{raw}}-U.
 \]
 Here and below, $\sum_F$ ranges over all interior interfaces $F=Q\cap Q'$ (each counted once).
-Then $U$ is integral, $\partial U=\partial T^{\mathrm{raw}}$, and hence $T$ is an integral cycle with
-$[T]=[T^{\mathrm{raw}}]=\mathrm{PD}(m[\gamma])$.
+Then $U$ is integral, $\partial U=\partial T^{\mathrm{raw}}$, and hence $T$ is an integral cycle.
+(Its homology class will be forced to equal $\mathrm{PD}(m[\gamma])$ in Substep~4.3 by a period/rounding argument applied to this \emph{closed} glued cycle.)
 Moreover,
 \[
 \Mass(U)\ \le\ \sum_F \Mass(Q_F)\ \le\ \sum_F \Delta_F\sum_{a=1}^{N_F}\Mass(\Sigma_F(u_{F,a})).
@@ -5626,7 +5662,7 @@ Summing over all interior interfaces and setting $U:=\sum_F Q_F$ gives an integr
 \partial U=\sum_F \partial Q_F=\sum_F B_F.
 \]
 By the oriented face decomposition of $\partial T^{\mathrm{raw}}$ one has $\partial T^{\mathrm{raw}}=\sum_F B_F$, hence
-$\partial U=\partial T^{\mathrm{raw}}$ and $T:=T^{\mathrm{raw}}-U$ is an integral cycle with $[T]=[T^{\mathrm{raw}}]$.
+$\partial U=\partial T^{\mathrm{raw}}$ and $T:=T^{\mathrm{raw}}-U$ is an integral cycle.
 The mass bound follows from the triangle inequality:
 \[
 \Mass(U)\ \le\ \sum_F \Mass(Q_F)\ \le\ \sum_F \Delta_F\sum_{a=1}^{N_F}\Mass(\Sigma_F(u_{F,a})).
@@ -5637,18 +5673,26 @@ Corollary~\ref{cor:global-flat-weighted} and Remark~\ref{rem:weighted-scaling}.
 \end{proof}
 
 
-We now return to the global construction.  Fix $\varepsilon>0$, and choose the partition and $m$ so that
-$\Mass(R_{\mathrm{glue}})\le\varepsilon/2$.  Define
+We now return to the global construction.
+Fix $\varepsilon>0$, and choose the mesh/activation parameters so that the explicit gluing current $U$ constructed in
+Proposition~\ref{prop:glue-gap} satisfies $\Mass(U)\le\varepsilon/2$.
+Define the (closed) glued cycle
 \[
-T^{(1)}:=T^{\mathrm{raw}}+R_{\mathrm{glue}}.
+U_T:=U,
+\qquad
+T^{(1)}:=T:=T^{\mathrm{raw}}-U_T.
 \]
-Then $T^{(1)}$ is closed and integral.
+Then $T^{(1)}$ is closed and integral, and $\Mass(U_T)<\varepsilon/2$.
 
 \medskip\noindent
 \textbf{Substep 4.3: Forcing the cohomology class via lattice discreteness.}
-Fix a basis of harmonic $(2n-2p)$-forms $\{\eta_\ell\}_{\ell=1}^b$
-that generate $H^{2n-2p}(X,\Z)$.  The homology class of any closed
-integral current $T$ is determined by the pairings
+Fix harmonic $(2n-2p)$-forms $\{\eta_\ell\}_{\ell=1}^b$ whose cohomology classes form an integral basis of the free part
+$H^{2n-2p}(X,\Z)/\mathrm{tors}$.
+These harmonic representatives detect only the free part of integral cohomology, hence the period computation determines the class in
+$H_{2p}(X,\Z)/\mathrm{tors}$.
+If one wants an equality in full integral homology, let $m_{\mathrm{tors}}$ be the exponent of the torsion subgroup of $H_{2p}(X,\Z)$ and replace
+$(m,T^{(1)})$ by $(m_{\mathrm{tors}}m,\ m_{\mathrm{tors}}T^{(1)})$ (and correspondingly shrink the target $\varepsilon$), which kills any possible torsion discrepancy.
+The homology class of any closed integral current $T$ is determined (up to torsion) by the pairings
 \[
 \langle[T],[\eta_\ell]\rangle=\int_T\eta_\ell.
 \]
@@ -5718,13 +5762,13 @@ to each pairing) and choosing the integers $N_{Q,j}$ using Lemma~\ref{lem:barany
 \[
 \Bigl|\int_{T^{\mathrm{raw}}}\eta_\ell - m\,I_\ell\Bigr|<\tfrac12.
 \]
-Moreover, the gluing correction $R_{\mathrm{glue}}$ has arbitrarily small mass, hence
+Moreover, the explicit gluing correction $U_T$ has arbitrarily small mass (Proposition~\ref{prop:glue-gap}), hence
 its pairing with each fixed smooth $\eta_\ell$ is arbitrarily small:
-$\bigl|\int_{R_{\mathrm{glue}}}\eta_\ell\bigr|\le \|\eta_\ell\|_{C^0}\Mass(R_{\mathrm{glue}})$.
+$\bigl|\int_{U_T}\eta_\ell\bigr|\le \|\eta_\ell\|_{C^0}\Mass(U_T)$.
 Choosing parameters so that this error is $<\tfrac12$ as well yields
 \[
 \Bigl|\int_{T^{(1)}}\eta_\ell - m\,I_\ell\Bigr|<1,
-\qquad T^{(1)}=T^{\mathrm{raw}}+R_{\mathrm{glue}}.
+\qquad T^{(1)}=T^{\mathrm{raw}}-U_T.
 \]
 Since $\int_{T^{(1)}}\eta_\ell\in\Z$ (integral current against an integral class),
 we conclude $\int_{T^{(1)}}\eta_\ell = m\,I_\ell$ for all $\ell$.
@@ -5733,8 +5777,7 @@ Hence
 [T^{(1)}]=\mathrm{PD}(m[\gamma]).
 \]
 
-Set $R_\varepsilon:=R_{\mathrm{glue}}$ (plus any additional small
-fillings), and $T_\varepsilon:=T^{(1)}$.  This satisfies all requirements.
+Set $R_\varepsilon:=-U_T$ and $T_\varepsilon:=T^{(1)}$.  This satisfies all requirements.
 \end{proof}
 
 Let $\{\Theta_\ell\}_{\ell=1}^{b}$ be a fixed integral basis of
@@ -6504,7 +6547,7 @@ Calibrated-limit closure (Theorem~\ref{thm:realization-from-almost}) + Harvey--L
 	\begin{itemize}
 	\item \textbf{Citation (primary):} H.~Federer and W.~H.~Fleming, \emph{Normal and integral currents}, Annals of Mathematics \textbf{72} (1960), 458--520.
 	\item \textbf{Citation (textbook):} H.~Federer, \emph{Geometric Measure Theory}, Springer (1969); L.~Simon, \emph{Lectures on Geometric Measure Theory}, ANU (1983).
-	\item \textbf{Used in this manuscript:} Theorem~\ref{thm:realization-from-almost} (compactness of integral currents under mass bounds); Proposition~\ref{prop:glue-gap} and Substep~4.2 (isoperimetric filling to control $\Mass(R_{\mathrm{glue}})$ from $\mathcal F(\partial T^{\mathrm{raw}})$).
+	\item \textbf{Used in this manuscript:} Theorem~\ref{thm:realization-from-almost} (compactness of integral currents under mass bounds); Proposition~\ref{prop:glue-gap} and Substep~4.2 (constructing a small-mass correction $U_T$ with $\partial U_T=\partial T^{\mathrm{raw}}$, either explicitly face-by-face or via the flat-norm/isoperimetric filling).
 	\item \textbf{Hypotheses checked here:} $X$ is compact (mass bounds yield tightness); all currents are integral; dimension is finite.
 	\end{itemize}
 
