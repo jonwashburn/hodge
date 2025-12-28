@@ -49,7 +49,7 @@ def KählerCalibration (p : ℕ) : CalibratingForm n X (2 * p) where
 def isCalibrated {k : ℕ} (T : Current n X k) (ψ : CalibratingForm n X k) : Prop :=
   T.mass = T.toFun ψ.form
 
-/-- **Theorem: Calibration Inequality.**
+/-- **Calibration Inequality** (Harvey-Lawson, 1982).
     For any current T and calibrating form ψ, the evaluation of T on ψ is bounded
     by the mass of T. This is the fundamental inequality of calibration theory.
     Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", Acta Math. 148 (1982), 47-157, Theorem 4.2]. -/
@@ -74,27 +74,26 @@ theorem isCalibrated_iff_defect_zero {k : ℕ} (T : Current n X k) (ψ : Calibra
 
 /-! ## Advanced Calibration Theorems -/
 
-/-- **Theorem: Spine Theorem.**
-    If T = S - G where S is calibrated, then the calibration defect of T is bounded
-    by twice the mass of the difference G. This allows controlling the defect
-    of corrected currents in the SYR construction.
-    Reference: [Harvey-Lawson, 1982, Section 4]. -/
+/-- **Spine Theorem** (Harvey-Lawson, 1982).
+    If a current T is a difference of a calibrated current S and an error current G,
+    then the calibration defect of T is bounded by twice the mass of G.
+    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", Acta Math. 148 (1982), 47-157, Section 4]. -/
 axiom spine_theorem {k : ℕ} (T S G : Current n X k) (ψ : CalibratingForm n X k)
     (_h_decomp : T = S - G) (_h_calib : isCalibrated S ψ) :
     calibrationDefect T ψ ≤ 2 * G.mass
 
 /-- **Lower Semicontinuity of Mass** (Federer-Fleming, 1960).
     The mass functional is lower semicontinuous with respect to the flat norm topology.
-    This ensures that mass bounds are preserved in the limit.
-    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", Ann. of Math. 72 (1960), 458-520]. -/
+    This ensures that mass bounds on a sequence are preserved for its flat limit.
+    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", Ann. of Math. 72 (1960), 458-520, Theorem 6.4]. -/
 axiom mass_lsc {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k) :
     Tendsto (fun i => flatNorm (T i - T_limit)) atTop (nhds 0) →
     T_limit.mass ≤ liminf (fun i => (T i).mass) atTop
 
-/-- **Theorem: Limits of Calibrated Currents.**
-    If a sequence of currents T_i has calibration defect tending to zero and
-    converges to T in flat norm, then the limit T is calibrated.
-    Reference: [Harvey-Lawson, 1982, Section 5]. -/
+/-- **Limit Calibration Theorem** (Harvey-Lawson, 1982).
+    If a sequence of currents has calibration defect tending to zero and
+    converges in flat norm, then the limit current is calibrated.
+    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", Acta Math. 148 (1982), 47-157, Section 5]. -/
 axiom limit_is_calibrated {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k)
     (ψ : CalibratingForm n X k)
     (_h_defect_vanish : Tendsto (fun i => calibrationDefect (T i) ψ) atTop (nhds 0))

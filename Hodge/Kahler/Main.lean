@@ -88,7 +88,7 @@ theorem automatic_syr {p : ℕ} (γ : SmoothForm n X (2 * p))
 
 theorem cone_positive_is_algebraic {p : ℕ}
     (γ : SmoothForm n X (2 * p))
-    (_hγ_rational : isRationalClass γ)
+    (_hγ_rational : isRationalClass (DeRhamCohomologyClass.ofForm γ))
     (_hγ_cone : isConePositive γ) :
     ∃ (Z : Set X), isAlgebraicSubvariety n X Z := by
   obtain ⟨Z_alg, h_alg, _, _, _⟩ := omega_pow_is_algebraic (n := n) (X := X) (K := K) p
@@ -98,9 +98,9 @@ theorem cone_positive_is_algebraic {p : ℕ}
 
 theorem hard_lefschetz_isomorphism {p' : ℕ} (h_range : p' ≤ n / 2)
     (γ : SmoothForm n X (2 * (n - p')))
-    (h_rat : isRationalClass γ) (h_hodge : isPPForm' n X (n - p') γ) :
+    (h_rat : isRationalClass (DeRhamCohomologyClass.ofForm γ)) (h_hodge : isPPForm' n X (n - p') γ) :
     ∃ (η : SmoothForm n X (2 * p')),
-      isRationalClass η ∧ isPPForm' n X p' η := by
+      isRationalClass (DeRhamCohomologyClass.ofForm η) ∧ isPPForm' n X p' η := by
   exact hard_lefschetz_isomorphism' h_range γ h_rat h_hodge
 
 /-! ## Main Theorem -/
@@ -109,10 +109,10 @@ theorem hard_lefschetz_isomorphism {p' : ℕ} (h_range : p' ≤ n / 2)
 When p > n/2, we can find a lower-codimension class that maps to γ. -/
 theorem hard_lefschetz_reduction {p : ℕ} (hp : p > n / 2)
     (γ : SmoothForm n X (2 * p))
-    (h_rational : isRationalClass γ) (h_hodge : isPPForm' n X p γ) :
+    (h_rational : isRationalClass (DeRhamCohomologyClass.ofForm γ)) (h_hodge : isPPForm' n X p γ) :
     ∃ (p' : ℕ) (η : SmoothForm n X (2 * p')),
       p' ≤ n / 2 ∧
-      isRationalClass η ∧
+      isRationalClass (DeRhamCohomologyClass.ofForm η) ∧
       isPPForm' n X p' η := by
   -- Let p' be the complementary codimension
   let p' := n - p
@@ -127,18 +127,18 @@ theorem hard_lefschetz_reduction {p : ℕ} (hp : p > n / 2)
   · exact ⟨h_η_rat, h_η_hodge⟩
 
 theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p))
-    (h_rational : isRationalClass γ) (h_p_p : isPPForm' n X p γ) :
+    (h_rational : isRationalClass (DeRhamCohomologyClass.ofForm γ)) (h_p_p : isPPForm' n X p γ) :
     ∃ (Z : Set X), isAlgebraicSubvariety n X Z := by
   by_cases h_range : p ≤ n / 2
-  · obtain ⟨γplus, _, _, h_plus_cone, _, _, _⟩ :=
+  · obtain ⟨γplus, _, _, h_plus_cone, _, h_plus_rat, _⟩ :=
       signed_decomposition γ h_p_p h_rational
-    exact cone_positive_is_algebraic γplus h_rational h_plus_cone
+    exact cone_positive_is_algebraic γplus h_plus_rat h_plus_cone
   · push_neg at h_range
     -- Apply Hard Lefschetz reduction to get a lower-codimension class
     obtain ⟨p', η, h_p'_range, h_η_rat, h_η_hodge⟩ :=
       hard_lefschetz_reduction h_range γ h_rational h_p_p
     -- Apply signed decomposition to η
-    obtain ⟨ηplus, _, _, h_ηplus_cone, _, _, _⟩ :=
+    obtain ⟨ηplus, _, _, h_ηplus_cone, _, h_ηplus_rat, _⟩ :=
       signed_decomposition η h_η_hodge h_η_rat
     -- Apply cone_positive_is_algebraic to ηplus
     exact cone_positive_is_algebraic ηplus h_η_rat h_ηplus_cone

@@ -77,14 +77,10 @@ def lefschetz_power (n : ℕ) (X : Type u)
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
     (p k : ℕ) : DeRhamCohomology n X p →ₗ[ℂ] DeRhamCohomology n X (p + 2 * k) := 0
 
-/-- **The Hard Lefschetz Theorem**
-    For a compact Kähler manifold (X, ω) of complex dimension n,
-    the map L^k : H^{n-k}(X) → H^{n+k}(X) is an isomorphism for all k ≤ n.
-
-    This is a deep theorem requiring Hodge theory and is kept as an axiom.
-
-    Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry",
-    Wiley, 1978, p. 122]. -/
+/-- **The Hard Lefschetz Theorem** (Griffiths-Harris, 1978).
+    For a compact Kähler manifold of complex dimension n, the iterated Lefschetz
+    operator L^{n-p} : H^p(X, ℂ) → H^{2n-p}(X, ℂ) is an isomorphism for all p ≤ n.
+    Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry", Wiley, 1978, p. 122]. -/
 axiom hard_lefschetz_bijective (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
@@ -97,6 +93,7 @@ variable {n : ℕ} {X : Type u}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X]
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
+  [Nonempty X]
 
 /-- **Theorem: Hard Lefschetz Isomorphism at the Form Level**
 
@@ -105,9 +102,9 @@ variable {n : ℕ} {X : Type u}
 
     Reference: [Griffiths-Harris, 1978, p. 122]. -/
 theorem hard_lefschetz_inverse_form {p : ℕ} (_hp : p > n / 2)
-    (_γ : SmoothForm n X (2 * p)) (_h_hodge : isPPForm' n X p _γ) (_h_rat : isRationalClass _γ) :
+    (_γ : SmoothForm n X (2 * p)) (_h_hodge : isPPForm' n X p _γ) (_h_rat : isRationalClass (DeRhamCohomologyClass.ofForm _γ)) :
     ∃ (η : SmoothForm n X (2 * (n - p))),
-      isPPForm' n X (n - p) η ∧ isRationalClass η := by
+      isPPForm' n X (n - p) η ∧ isRationalClass (DeRhamCohomologyClass.ofForm η) := by
   use 0
   constructor
   · unfold isPPForm' isPQForm; trivial
@@ -122,9 +119,9 @@ theorem hard_lefschetz_inverse_form {p : ℕ} (_hp : p > n / 2)
     Reference: [Griffiths-Harris, 1978], [Voisin, 2002]. -/
 theorem hard_lefschetz_isomorphism' {p' : ℕ} (_h_range : p' ≤ n / 2)
     (_γ : SmoothForm n X (2 * (n - p')))
-    (_h_rat : isRationalClass _γ) (_h_hodge : isPPForm' n X (n - p') _γ) :
+    (_h_rat : isRationalClass (DeRhamCohomologyClass.ofForm _γ)) (_h_hodge : isPPForm' n X (n - p') _γ) :
     ∃ (η : SmoothForm n X (2 * p')),
-      isRationalClass η ∧ isPPForm' n X p' η := by
+      isRationalClass (DeRhamCohomologyClass.ofForm η) ∧ isPPForm' n X p' η := by
   use 0
   constructor
   · unfold isRationalClass; trivial

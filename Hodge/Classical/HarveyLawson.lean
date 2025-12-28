@@ -91,11 +91,11 @@ axiom harvey_lawson_theorem {k : ℕ} (hyp : HarveyLawsonHypothesis n X k) :
 
 /-! ## Flat Limit Properties -/
 
-/-- **Boundary of Flat Limit of Cycles is Zero**
-    If a sequence of currents T_i that are cycles converges in flat norm to T,
-    then the limit T is also a cycle.
-    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents",
-    Ann. of Math. 72 (1960), 458-520, Theorem 8.12]. -/
+/-- **Boundary of Flat Limit of Cycles** (Federer-Fleming, 1960).
+    If a sequence of currents that are cycles converges in flat norm to a limit T,
+    then the limit T is also a cycle. This follows from the continuity of the
+    boundary operator in the flat topology.
+    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", Ann. of Math. 72 (1960), 458-520, Theorem 8.12]. -/
 axiom flat_limit_of_cycles_is_cycle {k : ℕ}
     (T_seq : ℕ → IntegralCurrent n X k)
     (T_limit : IntegralCurrent n X k)

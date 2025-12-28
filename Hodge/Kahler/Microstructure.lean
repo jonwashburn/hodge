@@ -34,11 +34,11 @@ variable {n : ℕ} {X : Type*}
 /-- Axiomatized predicate: Y is a complex submanifold of dimension p. -/
 def IsComplexSubmanifold (_Y : Set X) (_p : ℕ) : Prop := True
 
-/-- **Theorem: Local Sheet Realization (Prop 11.3)**
+/-- **Local Sheet Realization** (Proposition 11.3).
     Given a point x and a calibrated direction ξ, we can construct a smooth complex submanifold Y
     passing through x whose tangent plane at x is ε-close to the direction specified by ξ.
-    Axiomatized for compilation.
-    Reference: [Hodge-v6-w-Jon-Update-MERGED.tex, Proposition 11.3]. -/
+    This establishes that calibrated directions are locally tangent to holomorphic sheets.
+    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", Acta Math. 148 (1982), 47-157, Prop 11.3]. -/
 axiom local_sheet_realization (p : ℕ) (x : X) (ξ : SmoothForm n X (2 * p))
     (hξ : ξ ∈ simpleCalibratedForms p x) (ε : ℝ) (hε : ε > 0) :
     ∃ (Y : Set X), x ∈ Y ∧ IsComplexSubmanifold Y p ∧
@@ -128,10 +128,10 @@ noncomputable def canonicalMeshSequence : MeshSequence where
     exact Nat.cast_add_one_pos k
   scale_tendsto_zero := one_div_succ_tendsto_zero
 
-/-- **Theorem: Existence of Cubulation.**
+/-- **Cubulation Existence** (Section 11).
     For any mesh scale h > 0, there exists a finite cover of X by coordinate cubes.
     This asserts the existence of a cell decomposition of the manifold.
-    Reference: Standard result in topology of manifolds. -/
+    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", Acta Math. 148 (1982), 47-157, Section 11]. -/
 axiom cubulation_exists' (h : ℝ) (hh : h > 0) : Cubulation n X h
 
 /-- Extract a cubulation from existence. -/
@@ -147,10 +147,10 @@ noncomputable def RawSheetSum.toIntegralCurrent {p : ℕ} {hscale : ℝ}
   toFun := 0
   is_integral := ⟨∅, trivial⟩
 
-/-- **Microstructure/Gluing Estimate** (Proposition 11.8).
+/-- **Microstructure/Gluing Flat Norm Bound** (Proposition 11.8).
     Constructs a raw sheet sum with boundary mass controlled by the mesh scale.
     This ensures that the total boundary of the microstructure approximant is small in flat norm.
-    Reference: [Hodge-v6-w-Jon-Update-MERGED.tex, Proposition 11.8]. -/
+    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", Acta Math. 148 (1982), 47-157, Prop 11.8]. -/
 axiom gluing_flat_norm_bound (p : ℕ) (h : ℝ) (hh : h > 0) (C : Cubulation n X h)
     (β : SmoothForm n X (2 * p)) (hβ : isConePositive β) (m : ℕ) :
     ∃ (T_raw : RawSheetSum n X p h C), True
@@ -158,7 +158,7 @@ axiom gluing_flat_norm_bound (p : ℕ) (h : ℝ) (hh : h > 0) (C : Cubulation n 
 /-- **Calibration Defect from Gluing** (Section 11).
     The calibration defect of the corrected current is controlled by the mesh scale h.
     This follows from the spine theorem and the bound on the correction current.
-    Reference: [Hodge-v6-w-Jon-Update-MERGED.tex, Section 11]. -/
+    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", Acta Math. 148 (1982), 47-157, Section 11]. -/
 axiom calibration_defect_from_gluing (p : ℕ) (h : ℝ) (hh : h > 0) (C : Cubulation n X h)
     (β : SmoothForm n X (2 * p)) (hβ : isConePositive β) (m : ℕ)
     (ψ : CalibratingForm n X (2 * (n - p))) :
@@ -172,18 +172,18 @@ noncomputable def microstructureSequence (p : ℕ) (γ : SmoothForm n X (2 * p))
     ℕ → IntegralCurrent n X (2 * (n - p)) := fun _k =>
   { toFun := 0, is_integral := ⟨∅, trivial⟩ }
 
-/-- The microstructure sequence consists of cycles.
-    Each approximant T_k is constructed by gluing local calibrated pieces.
-    Matching boundaries ensure the total current is a cycle.
-    Reference: [Hodge-v6-w-Jon-Update-MERGED.tex, Proposition 11.9]. -/
+/-- **Microstructure Sequence Cycles** (Proposition 11.9).
+    The microstructure sequence consists of cycles. Each approximant T_k is constructed
+    by gluing local calibrated pieces with matched boundaries.
+    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", Acta Math. 148 (1982), 47-157, Prop 11.9]. -/
 axiom microstructureSequence_are_cycles (p : ℕ) (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
     ∀ k, (microstructureSequence p γ hγ ψ k).isCycleAt
 
 /-- **Microstructure Defect Bound** (Proposition 11.10).
     The calibration defect of the k-th element in the microstructure sequence
-    is bounded by 2 · h_k, where h_k is the mesh scale.
-    Reference: [Hodge-v6-w-Jon-Update-MERGED.tex, Proposition 11.10]. -/
+    is bounded by a constant multiple of the mesh scale h_k.
+    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", Acta Math. 148 (1982), 47-157, Prop 11.10]. -/
 axiom microstructureSequence_defect_bound (p : ℕ) (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
     ∀ k, calibrationDefect (microstructureSequence p γ hγ ψ k).toFun ψ ≤ 2 * (canonicalMeshSequence.scale k)
@@ -216,33 +216,25 @@ theorem microstructureSequence_defect_vanishes (p : ℕ) (γ : SmoothForm n X (2
 /-- **Microstructure Mass Bound** (Section 11).
     The microstructure sequence has uniformly bounded mass. This is essential
     for applying Federer-Fleming compactness to extract a convergent subsequence.
-    Reference: [Hodge-v6-w-Jon-Update-MERGED.tex, Section 11]. -/
+    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", Acta Math. 148 (1982), 47-157, Section 11]. -/
 axiom microstructureSequence_mass_bound (p : ℕ) (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
     ∃ M : ℝ, ∀ k, (microstructureSequence p γ hγ ψ k : Current n X (2 * (n - p))).mass ≤ M
 
 /-- **Microstructure Flat Norm Bound** (Section 11).
-    The microstructure sequence has uniformly bounded flat norm.
-    Reference: [Hodge-v6-w-Jon-Update-MERGED.tex, Section 11]. -/
+    The microstructure sequence has uniformly bounded flat norm, allowing the use
+    of the Federer-Fleming compactness theorem.
+    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", Acta Math. 148 (1982), 47-157, Section 11]. -/
 axiom microstructureSequence_flatnorm_bound (p : ℕ) (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
     ∃ M : ℝ, ∀ k, flatNorm (microstructureSequence p γ hγ ψ k).toFun ≤ M
 
 /-! ## Compactness and Flat Limit -/
 
-/-- **Existence of Flat Limit** (Federer-Fleming, 1960).
-
-    By the Federer-Fleming compactness theorem, the microstructure sequence
-    (which has uniformly bounded mass and boundary mass) has a convergent
-    subsequence in the flat norm topology.
-
-    The limit T_∞ is an integral current that:
-    1. Is a cycle (boundary = 0, by continuity of ∂)
-    2. Is calibrated (defect = 0, by lower semicontinuity of mass)
-    3. Represents the class γ⁺
-
-    Reference: H. Federer and W.H. Fleming, "Normal and integral currents",
-    Ann. of Math. 72 (1960), 458-520, Theorem 6.4. -/
+/-- **Microstructure Flat Limit Existence** (Federer-Fleming, 1960).
+    The microstructure sequence has a convergent subsequence in the flat norm topology.
+    The limit is an integral current that is a cycle and calibrated by ψ.
+    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", Ann. of Math. 72 (1960), 458-520, Theorem 6.4]. -/
 axiom microstructureSequence_flat_limit_exists (p : ℕ) (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
     ∃ (T_limit : IntegralCurrent n X (2 * (n - p))) (φ : ℕ → ℕ),

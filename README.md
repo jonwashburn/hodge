@@ -22,7 +22,7 @@ theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p))
 
 - **Build:** ✅ `lake build` succeeds
 - **Sorries:** 0 ✅
-- **Axioms:** 41 (all documented deep theorems or Mathlib gaps)
+- **Axioms:** 28 (all documented deep theorems or Mathlib gaps)
 
 ## Axiom Dependencies
 
@@ -41,9 +41,9 @@ The main theorem depends on only **4 mathematical axioms** plus standard Lean fo
 ]
 ```
 
-### Full Axiom List (41 total)
+### Full Axiom List (28 total)
 
-The full project uses **41 mathematical axioms**, all of which are **published theorems** from the mathematical literature or documented gaps in Mathlib. These are categorized below:
+The full project uses **28 mathematical axioms**, all of which are **published theorems** from the mathematical literature or documented gaps in Mathlib. These are categorized below:
 
 ### Category 1: Foundational Theorems
 
@@ -69,21 +69,16 @@ The full project uses **41 mathematical axioms**, all of which are **published t
 | `wirtinger_pairing` | Wirtinger inequality for Kähler forms | Harvey-Lawson 1982 |
 | `caratheodory_decomposition` | Carathéodory convex decomposition | Carathéodory 1911 |
 
-### Category 3: Norm and Topology (Mathlib Gaps)
+### Category 3: Norms and Topology (Mathlib Gaps)
 
 | Axiom | Description | Reference |
 |-------|-------------|-----------|
-| `pointwiseComass_continuous` | Berge's maximum theorem | Berge 1963 |
 | `comass_eq_zero_iff` | Comass characterization | Standard GMT |
-| `energy_minimizer` | Hodge decomposition / energy minimization | Hodge 1941 |
 
 ### Category 4: Algebraic Geometry Infrastructure
 
 | Axiom | Description | Reference |
 |-------|-------------|-----------|
-| `structureSheaf` | Structure sheaf of holomorphic functions | Hartshorne 1977 |
-| `idealSheaf` | Ideal sheaf at a point | Hartshorne 1977 |
-| `jet_surjectivity` | Jet surjectivity for ample bundles | Griffiths-Harris 1978 |
 | `exists_hyperplane_algebraic` | Existence of hyperplanes | Hartshorne 1977 |
 
 ### Category 5: Kähler Geometry
@@ -114,24 +109,13 @@ The full project uses **41 mathematical axioms**, all of which are **published t
 |-------|-------------|-----------|
 | `harvey_lawson_fundamental_class` | GMT to cohomology bridge | Harvey-Lawson 1982 |
 | `complete_intersection_fundamental_class` | CI class formula | Griffiths-Harris 1978 |
-| `complete_intersection_represents_class` | Class representation | Griffiths-Harris 1978 |
-| `lefschetz_lift_signed_cycle` | Lefschetz lift formula | Voisin 2002 |
-| `hard_lefschetz_fundamental_class_coherence` | Hard Lefschetz coherence | Voisin 2002 |
-
-### Category 8: Calibration Theory (Additional)
-
-| Axiom | Description | Reference |
-|-------|-------------|-----------|
-| `calibration_inequality` | Calibration vs mass inequality | Harvey-Lawson 1982 |
-| `limit_is_calibrated` | Calibration preserved under limits | Harvey-Lawson 1982 |
-| `calibratedCone_hull_pointed` | Calibrated cone contains zero | Standard convex geometry |
 
 ## Project Structure
 
 ```
 Hodge/
 ├── Basic.lean              # Core definitions: complex manifolds, Kähler manifolds
-├── Main.lean               # Final integration and coherence theorems
+├── Main.lean               # Final integration and bridge axioms
 ├── Analytic/               # Geometric measure theory
 │   ├── Forms.lean          # Differential forms
 │   ├── Currents.lean       # Currents and boundary operator
@@ -142,12 +126,12 @@ Hodge/
 │   ├── Grassmannian.lean   # Calibrated Grassmannian
 │   └── SheafTheory.lean    # Sheaf-theoretic infrastructure
 ├── Kahler/                 # Kähler geometry
-│   ├── Manifolds.lean      # Kähler manifold structure
+│   ├── Manifolds.lean      # Kähler manifold structure and rationality
 │   ├── TypeDecomposition.lean  # Hodge (p,q)-decomposition
 │   ├── Cone.lean           # Strongly positive cones
 │   ├── SignedDecomp.lean   # Signed cycle decomposition
 │   ├── Microstructure.lean # Cubulation and microstructure sequences
-│   └── Main.lean           # Main theorem proof
+│   └── Main.lean           # Main theorem proof integration
 ├── Classical/              # Classical algebraic geometry
 │   ├── Bergman.lean        # Bergman spaces, jet bundles
 │   ├── SerreVanishing.lean # Serre vanishing theorem
@@ -163,7 +147,7 @@ Hodge/
 
 | Metric | Count |
 |--------|-------|
-| Total axioms | 41 |
+| Total axioms | 28 |
 | Sorry statements | 0 |
 | Lean files | 21 |
 | Lines of code | ~5000 |

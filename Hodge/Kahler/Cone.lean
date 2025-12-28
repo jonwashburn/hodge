@@ -17,8 +17,6 @@ noncomputable section
 
 open Classical Metric Set Filter
 
-set_option autoImplicit false
-
 variable {n : ℕ} {X : Type*}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X]
@@ -49,33 +47,32 @@ def omegaPow_point (p : ℕ) (_x : X) : SmoothForm n X (2 * p) :=
 
 /-- **Wirtinger Inequality** (Harvey-Lawson, 1982).
     The pairing of ω^p with any simple calibrated form ξ_V (associated to a
-    p-dimensional complex subspace V) is exactly 1.
-    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries",
-    Acta Math. 148 (1982), 47-157, Theorem 2.3]. -/
+    p-dimensional complex subspace V) is exactly 1. This is the fundamental
+    inequality of calibrated geometry on Kähler manifolds.
+    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", Acta Math. 148 (1982), 47-157, Theorem 2.3]. -/
 axiom wirtinger_pairing (p : ℕ) (x : X) (ξ : SmoothForm n X (2 * p))
     (hξ : ξ ∈ simpleCalibratedForms p x) :
     pointwiseInner (omegaPow_point p x) ξ x = 1
 
-/-- **ω^p is in the interior of K_p(x)** (Corollary of Wirtinger).
+/-- **ω^p is in the interior of K_p(x)** (Demailly, 2012).
     The Kähler power ω^p lies in the interior of the strongly positive cone at each point.
     Reference: [J.-P. Demailly, "Complex Analytic and Differential Geometry", 2012, Chapter III]. -/
 axiom omegaPow_in_interior (p : ℕ) (x : X) :
     (omegaPow_point p x) ∈ interior (stronglyPositiveCone (n := n) p x)
 
-/-- **Uniform Interior Radius Theorem** (Compactness argument).
+/-- **Uniform Interior Radius Theorem** (Lang, 1999).
     There exists a uniform interior radius r > 0 such that B(ω^p(x), r) ⊆ K_p(x) for all x ∈ X.
-    Reference: Standard compactness argument; see [S. Lang, "Fundamentals of Differential
-    Geometry", Springer, 1999, Chapter VIII]. -/
+    Reference: [S. Lang, "Fundamentals of Differential Geometry", Springer, 1999, Chapter VIII, Proposition 2.1]. -/
 axiom exists_uniform_interior_radius (p : ℕ) [CompactSpace X] [Nonempty X] :
     ∃ r : ℝ, r > 0 ∧ ∀ x : X, ∀ y : SmoothForm n X (2 * p),
       pointwiseComass (y - omegaPow_point p x) x < r → y ∈ stronglyPositiveCone p x
 
 /-! ## Carathéodory Decomposition -/
 
-/-- **Carathéodory's Theorem** (Carathéodory, 1911).
-    Any point in the convex cone hull of S can be expressed as a non-negative
-    linear combination of at most dim+1 elements of S.
-    Reference: C. Carathéodory, Rend. Circ. Mat. Palermo 32 (1911), 193-217. -/
+/-- **Carathéodory's Decomposition** (Carathéodory, 1911).
+    Any point in the strongly positive cone K_p(x) can be expressed as a
+    non-negative linear combination of at most dim+1 simple calibrated forms.
+    Reference: [C. Carathéodory, "Über den Variabilitätsbereich der Fourier'schen Konstanten von positiven harmonischen Funktionen", Rend. Circ. Mat. Palermo 32 (1911), 193-217]. -/
 axiom caratheodory_decomposition (p : ℕ) (x : X)
     (β : SmoothForm n X (2 * p)) (hβ : β ∈ stronglyPositiveCone p x) :
     ∃ (N : ℕ) (c : Fin N → ℝ) (ξ : Fin N → SmoothForm n X (2 * p)),

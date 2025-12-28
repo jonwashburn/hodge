@@ -35,11 +35,10 @@ theorem flatNorm_add_le {k : ℕ} (S T : Current n X k) :
 theorem flatNorm_le_mass {k : ℕ} (T : Current n X k) :
     flatNorm T ≤ T.mass := by simp [flatNorm, Current.mass]
 
-/-- **Federer-Fleming Flat Norm Estimate**: The evaluation of a current on a form
-    is bounded by the flat norm of the current times the maximum of the comass
-    of the form and its derivative.
-    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents",
-    Annals of Mathematics 72 (1960), 458-520, Section 4]. -/
+/-- **Federer-Fleming Evaluation Estimate** (Federer-Fleming, 1960).
+    The evaluation of a current on a smooth form is bounded by the flat norm of the
+    current and the maximum comass of the form and its derivative.
+    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", Ann. of Math. 72 (1960), 458-520, Section 4]. -/
 axiom eval_le_flatNorm {k : ℕ} (T : Current n X k) (ψ : SmoothForm n X k) :
     |T.toFun ψ| ≤ flatNorm T * max (comass ψ) (comass (smoothExtDeriv ψ))
 

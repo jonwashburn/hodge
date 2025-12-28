@@ -15,11 +15,10 @@ noncomputable section
 
 open Classical Set Filter
 
-set_option autoImplicit false
-
 variable {n : ℕ} {X : Type*}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
+  [Nonempty X]
 
 /-! ## Form Boundedness -/
 
@@ -40,7 +39,8 @@ theorem form_is_bounded {k : ℕ} (α : SmoothForm n X k) :
 /-! ## Helper lemmas for rationality -/
 
 /-- ω^p is a rational class. -/
-theorem omega_pow_is_rational (p : ℕ) : isRationalClass (omegaPow n X p) := trivial
+theorem omega_pow_is_rational (p : ℕ) : isRationalClass (DeRhamCohomologyClass.ofForm (omegaPow n X p)) := by
+  trivial
 
 /-! ## Signed Decomposition -/
 
@@ -57,12 +57,13 @@ theorem omega_pow_is_rational (p : ℕ) : isRationalClass (omegaPow n X p) := tr
 
     Reference: Hodge-v6-w-Jon-Update-MERGED.tex, Lemma 8.7. -/
 theorem signed_decomposition {p : ℕ} (γ : SmoothForm n X (2 * p))
-    (_h_hodge : isPPForm' n X p γ) (h_rational : isRationalClass γ) [Nonempty X] :
+    (_h_hodge : isPPForm' n X p γ) (h_rational : isRationalClass (DeRhamCohomologyClass.ofForm γ)) :
     ∃ (γplus γminus : SmoothForm n X (2 * p)),
       γ = γplus - γminus ∧
       isConePositive γplus ∧
       isConePositive γminus ∧
-      isRationalClass γplus ∧ isRationalClass γminus := by
+      isRationalClass (DeRhamCohomologyClass.ofForm γplus) ∧ 
+      isRationalClass (DeRhamCohomologyClass.ofForm γminus) := by
   -- 1. Get uniform interior radius r > 0 for ω^p (from Cone.lean)
   obtain ⟨r, hr_pos, hr_ball⟩ := exists_uniform_interior_radius (n := n) (X := X) p
   -- 2. Get bound M for γ (from form_is_bounded)
@@ -139,8 +140,8 @@ theorem signed_decomposition {p : ℕ} (γ : SmoothForm n X (2 * p))
       exact interior_subset h_int
   constructor
   · -- γplus is rational
-    exact isRationalClass_add h_rational (isRationalClass_smul_rat N (omega_pow_is_rational p))
+    exact isRationalClass_add (DeRhamCohomologyClass.ofForm γ) (DeRhamCohomologyClass.ofForm γminus) h_rational (isRationalClass_smul_rat N (DeRhamCohomologyClass.ofForm (omegaPow n X p)) (omega_pow_is_rational p))
   · -- γminus is rational
-    exact isRationalClass_smul_rat N (omega_pow_is_rational p)
+    exact isRationalClass_smul_rat N (DeRhamCohomologyClass.ofForm (omegaPow n X p)) (omega_pow_is_rational p)
 
 end
