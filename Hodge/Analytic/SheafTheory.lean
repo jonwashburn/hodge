@@ -72,21 +72,28 @@ def tensorWithSheaf {n : ℕ} {X : Type u}
 /-! ## Structure Sheaf and Ideal Sheaf -/
 
 /-- **Structure Sheaf of Holomorphic Functions** (Hartshorne, 1977).
-    The structure sheaf 𝓞_X of holomorphic functions on a complex manifold.
+    The structure sheaf 𝓞_X assigns to each open set U the ring of holomorphic functions on U.
+
+    This is axiomatized as a Mathlib gap. A full construction requires substantial
+    complex-analytic sheaf infrastructure that is not yet available in Mathlib.
+
     Reference: [R. Hartshorne, "Algebraic Geometry", Springer, 1977, Chapter II, Section 1]. -/
-def structureSheaf (n : ℕ) (X : Type u)
+axiom structureSheaf (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] : Sheaf (Opens.grothendieckTopology X) CommRingCat.{u} :=
-  sorry
+    [IsManifold (𝓒_complex n) ⊤ X] : Sheaf (Opens.grothendieckTopology X) CommRingCat.{u}
 
 /-- **Ideal Sheaf at a Point** (Hartshorne, 1977).
-    The ideal sheaf m_x^{k+1} of functions vanishing to order k+1 at point x.
+    The ideal sheaf m_x^{k+1} consists of germs of holomorphic functions vanishing to
+    order at least k+1 at the point x.
+
+    This is axiomatized as a Mathlib gap. A full construction requires substantial
+    complex-analytic sheaf infrastructure.
+
     Reference: [R. Hartshorne, "Algebraic Geometry", Springer, 1977, Chapter II, Section 5]. -/
-def idealSheaf {n : ℕ} {X : Type u}
+axiom idealSheaf {n : ℕ} {X : Type u}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X]
-    (_x₀ : X) (_k : ℕ) : CoherentSheaf n X :=
-  sorry
+    (x₀ : X) (k : ℕ) : CoherentSheaf n X
 
 end

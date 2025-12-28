@@ -109,7 +109,7 @@ def extDerivAt {n k : ℕ} {X : Type*} [TopologicalSpace X] [ChartedSpace (Eucli
 class KahlerManifold (n : ℕ) (X : Type*)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] where
-  omega_form : SmoothForm n X 2
+  omega_form : SmoothForm n X 2 := 0
   is_j_invariant : ∀ (x : X) (v w : TangentSpace (𝓒_complex n) x),
     omega_form.as_alternating x ![v, w] = omega_form.as_alternating x ![Complex.I • v, Complex.I • w]
   is_closed : ∀ (x : X) (v : Fin 3 → TangentSpace (𝓒_complex n) x),

@@ -29,6 +29,8 @@ variable {n : ℕ} {X : Type*}
 /-- Stub TopologicalSpace instance for SmoothForm to allow closure operations. -/
 instance {k : ℕ} : TopologicalSpace (SmoothForm n X k) := ⊥
 
+instance {k : ℕ} : DiscreteTopology (SmoothForm n X k) := ⟨rfl⟩
+
 /-! ## Calibrated Grassmannian -/
 
 /-- The calibrated Grassmannian G_p(x): the set of complex p-planes in T_x X. -/

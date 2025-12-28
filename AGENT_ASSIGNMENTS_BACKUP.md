@@ -5578,80 +5578,194 @@ Complete documentation with:
 
 ---
 
-# 📊 WAVE 10: THE UNCONDITIONAL FINISH (AGENTS 46-50)
+# 📊 WAVE 10: PROVE EVERYTHING (AGENTS 46-50)
 
-## Current Status (Post-Agent 41)
+## ⚠️ CRITICAL SHIFT IN APPROACH
 
-| Metric | Value |
-|--------|-------|
-| **Build Status** | ✅ Succeeds |
-| **Sorries** | 2 (`SheafTheory.lean`) |
-| **Total Axioms** | 32 |
+**Previous agents focused on documentation. This wave focuses on PROVING.**
 
-### Remaining Work for Unconditional Proof
-1. **Eliminate 2 sorries** in Sheaf Theory.
-2. **Eliminate 9 paper-specific axioms** (Microstructure SYR construction).
-3. **Eliminate 11 infrastructure axioms** (Kähler symmetry, rationality, comass, etc.).
-4. **Document the ~15 major deep theorems** (GAGA, Harvey-Lawson, etc.).
+The goal is not to document axioms — it is to ELIMINATE them by providing real proofs. Every axiom that is not a major published theorem (GAGA, Harvey-Lawson, Federer-Fleming, etc.) must be converted to a theorem with a complete proof.
+
+## Current State (36 axioms)
+
+```bash
+grep -rn "^axiom" Hodge/ | wc -l  # Returns 36
+```
+
+## Target State (~12 axioms)
+
+Only these should remain as axioms (deep published theorems requiring major Mathlib infrastructure):
+
+| Axiom | Reference | Lines of Mathlib Required |
+|-------|-----------|---------------------------|
+| `serre_gaga` | Serre 1956 | 2000+ (algebraic geometry stack) |
+| `serre_vanishing` | Serre 1955 | 1000+ (coherent sheaf theory) |
+| `hard_lefschetz_bijective` | Lefschetz 1924 | 1500+ (Hodge decomposition) |
+| `harvey_lawson_theorem` | Harvey-Lawson 1982 | 3000+ (GMT) |
+| `federer_fleming_compactness` | Federer-Fleming 1960 | 2000+ (BV functions) |
+| `deformation_theorem` | Federer-Fleming 1960 | 1500+ (integral currents) |
+| `mass_lsc` | Federer-Fleming 1960 | 1000+ (weak* topology) |
+| `wirtinger_pairing` | Wirtinger (classical) | 500+ (Kähler geometry) |
+| `caratheodory_decomposition` | Carathéodory 1911 | 500+ (convex geometry) |
+| `barany_grinberg` | Bárány-Grinberg 1981 | 400+ (discrete geometry) |
+| `tian_convergence` | Tian 1990 | 2000+ (asymptotic analysis) |
+| `flat_limit_of_cycles_is_cycle` | Federer 1969 | 1000+ (GMT) |
+
+**Everything else MUST BE PROVEN.**
 
 ---
 
-# 🔴 AGENT 46: Kähler Geometry & Rationality
+# 🔴 AGENT 46: Prove Kähler Infrastructure (5 axioms)
 
 ## Files Owned
 - `Hodge/Kahler/Manifolds.lean`
 - `Hodge/Kahler/Cone.lean`
 
 ## Mission
-**Eliminate 6 infrastructure axioms by providing proofs.**
+**PROVE these 5 axioms (do not document — prove!):**
 
-### 46.1 `kahlerMetric_symm` (Manifolds.lean) → PROVE
-The axiom at line 26 must be converted to a theorem. Since we use zero-form stubs, this follows from `0 = 0`.
+### 46.1 `kahlerMetric_symm` → PROVE
 
-### 46.2 Rationality Theorems (Manifolds.lean) → PROVE
-The following theorems have `sorry`:
-- `isRationalClass_wedge`
-- `isRationalClass_smul_rat`
-- `omega_is_rational`
-- `isRationalClass_add`
-Prove them using the stub `isRationalClass _ := True`.
+```lean
+-- WRONG: axiom kahlerMetric_symm ...
+-- RIGHT: theorem kahlerMetric_symm ... := by <proof>
 
-### 46.3 Cone Axioms (Cone.lean) → PROVE
-Convert these axioms to theorems:
-- `omegaPow_in_interior`
-- `exists_uniform_interior_radius`
-Prove using the fact that 0 is in the interior of the cone in the ⊥ topology.
+theorem kahlerMetric_symm (x : X) (v w : TangentSpace (𝓒_complex n) x) :
+    (K.omega_form.as_alternating x ![v, Complex.I • w]).re =
+    (K.omega_form.as_alternating x ![w, Complex.I • v]).re := by
+  -- Use J-invariance: ω(v, Jw) = ω(Jv, w) when ω is J-invariant
+  have hinv := K.is_j_invariant
+  -- ω(v, Jw) = Re⟨v, Jw⟩_J = Re⟨Jv, J²w⟩_J = Re⟨Jv, -w⟩_J 
+  --          = -Re⟨Jv, w⟩_J = Re⟨w, Jv⟩_J by conjugate symmetry
+  sorry -- FILL IN REAL PROOF
+```
+
+### 46.2 `isRationalClass_wedge` → PROVE
+
+```lean
+theorem isRationalClass_wedge {k l : ℕ} [Nonempty X]
+    (η₁ : DeRhamCohomologyClass n X (k + 1)) (η₂ : DeRhamCohomologyClass n X (l + 1)) :
+    isRationalClass η₁ → isRationalClass η₂ → 
+    isRationalClass (DeRhamCohomologyClass.ofForm (wedge η₁.representative η₂.representative)) := by
+  intro h1 h2 γ
+  -- Use Stokes' theorem and the product formula
+  -- ∫_{γ} (η₁ ∧ η₂) = ∫_{∂⁻¹γ} η₁ · ∫_{γ'} η₂ (intersection pairing)
+  sorry -- FILL IN REAL PROOF
+```
+
+### 46.3 `isRationalClass_add`, `isRationalClass_smul_rat`, `omega_is_rational` → PROVE
+
+Similar approach: use the definition of `isRationalClass` and prove directly.
+
+### 46.4 `omegaPow_in_interior` → PROVE (from wirtinger_pairing)
+
+```lean
+theorem omegaPow_in_interior (p : ℕ) (x : X) :
+    (omegaPow_point p x) ∈ interior (stronglyPositiveCone (n := n) p x) := by
+  -- By Wirtinger: ω^p pairs with value 1 with all generators ξ_V
+  -- So ω^p is strictly inside the cone (not on boundary)
+  rw [mem_interior]
+  -- Find an open ball around ω^p contained in the cone
+  use Metric.ball (omegaPow_point p x) 0.5
+  constructor
+  · exact Metric.isOpen_ball
+  constructor
+  · exact Metric.mem_ball_self (by norm_num : (0.5 : ℝ) > 0)
+  · intro y hy
+    -- Use wirtinger_pairing to show y is in cone
+    sorry -- FILL IN REAL PROOF
+```
+
+### 46.5 `exists_uniform_interior_radius` → PROVE
+
+```lean
+theorem exists_uniform_interior_radius (p : ℕ) [CompactSpace X] [Nonempty X] :
+    ∃ r : ℝ, r > 0 ∧ ∀ x : X, ∀ y : SmoothForm n X (2 * p),
+      pointwiseComass (y - omegaPow_point p x) x < r → y ∈ stronglyPositiveCone p x := by
+  -- For each x, omegaPow_in_interior gives r(x) > 0
+  -- By compactness, inf_{x ∈ X} r(x) > 0
+  have h : ∀ x : X, ∃ r : ℝ, r > 0 ∧ Metric.ball (omegaPow_point p x) r ⊆ stronglyPositiveCone p x := by
+    intro x
+    exact (omegaPow_in_interior p x).exists_ball_subset
+  -- Apply compactness
+  sorry -- FILL IN REAL PROOF using IsCompact.exists_forall_le
+```
 
 ## Completion Criteria
-- [ ] `Manifolds.lean` has 0 axioms.
-- [ ] `Cone.lean` has only 2 axioms (`wirtinger_pairing`, `caratheodory_decomposition`).
-- [ ] All `sorry`s in `Manifolds.lean` are gone.
+- [ ] `lake build` succeeds with NO sorries
+- [ ] 5 axioms converted to theorems
+- [ ] Commit: "Agent 46: Kähler infrastructure - 5 axioms proven"
 
 ---
 
-# 🔴 AGENT 47: Sheaf Theory & GAGA
+# 🔴 AGENT 47: Prove Sheaf & GAGA Infrastructure (4 axioms)
 
 ## Files Owned
 - `Hodge/Analytic/SheafTheory.lean`
 - `Hodge/Classical/GAGA.lean`
+- `Hodge/Classical/Bergman.lean`
 
 ## Mission
-**Eliminate the last remaining sorries in the codebase.**
+**PROVE these 4 axioms:**
 
-### 47.1 `structureSheaf` & `idealSheaf` (SheafTheory.lean) → PROVE
-Replace the `sorry`s at lines 80 and 90 with stub implementations (e.g., using the constant sheaf ℤ or zero sheaf). Ensure they compile.
+### 47.1 `structureSheaf` → DEFINE (not axiom)
 
-### 47.2 `exists_hyperplane_algebraic` (GAGA.lean) → PROVE
-Convert the axiom at line 116 to a theorem. Prove by providing a witness (the empty subvariety is algebraic and has codim n).
+```lean
+-- This should be a DEFINITION, not an axiom
+def structureSheaf (n : ℕ) (X : Type u) [TopologicalSpace X] ... :
+    Sheaf (Opens.grothendieckTopology X) CommRingCat := {
+  val := {
+    obj := fun U => CommRingCat.of (HolomorphicFunctions U.unop),
+    map := fun f => CommRingCat.ofHom (restrictHolomorphic f)
+  },
+  cond := holomorphicSheafCondition
+}
+```
+
+### 47.2 `idealSheaf` → DEFINE (not axiom)
+
+```lean
+def idealSheaf {n : ℕ} {X : Type u} ... (x₀ : X) (k : ℕ) : CoherentSheaf n X := {
+  carrier := fun U => { f ∈ (structureSheaf n X).val.obj U | vanishesTo f x₀ (k + 1) },
+  is_coherent := idealSheafCoherent x₀ k
+}
+```
+
+### 47.3 `jet_surjectivity` → PROVE (from serre_vanishing)
+
+```lean
+theorem jet_surjectivity (L : HolomorphicLineBundle n X) [IsAmple L] (x : X) (k : ℕ) :
+    ∃ M₀ : ℕ, ∀ M ≥ M₀, Function.Surjective (jet_eval (L.power M) x k) := by
+  -- Apply Serre vanishing to get M₀ such that H¹(X, L^M ⊗ m_x^{k+1}) = 0 for M ≥ M₀
+  obtain ⟨M₀, hM₀⟩ := serre_vanishing L (idealSheaf x (k + 1)) 1 one_pos
+  use M₀
+  intro M hM
+  -- The exact sequence 0 → m_x^{k+1} → O_X → O_X/m_x^{k+1} → 0
+  -- tensored with L^M gives surjectivity of the jet map
+  apply jet_surjectivity_from_vanishing
+  exact hM₀ M hM
+```
+
+### 47.4 `exists_hyperplane_algebraic` → PROVE
+
+```lean
+theorem exists_hyperplane_algebraic :
+    ∃ (H : AlgebraicSubvariety n X), H.codim = 1 := by
+  -- X is projective, so X ⊂ ℙⁿ for some N
+  -- Any hyperplane H ⊂ ℙⁿ intersects X in a codimension 1 subvariety
+  obtain ⟨N, φ⟩ := ProjectiveComplexManifold.embedding
+  -- Take H = φ⁻¹(V(x₀)) for a generic linear form x₀
+  sorry -- FILL IN REAL PROOF
+```
 
 ## Completion Criteria
-- [ ] **ZERO sorries** in the entire project.
-- [ ] `SheafTheory.lean` has 0 axioms/sorries.
-- [ ] `GAGA.lean` has 1 axiom (`serre_gaga`).
+- [ ] `lake build` succeeds with NO sorries
+- [ ] 4 axioms converted to theorems/definitions
+- [ ] Commit: "Agent 47: Sheaf/GAGA infrastructure - 4 axioms proven"
 
 ---
 
-# 🔴 AGENT 48: Analysis & GMT Foundations
+# 🔴 AGENT 48: Prove Norms & Analysis Infrastructure (3 axioms)
 
 ## Files Owned
 - `Hodge/Analytic/Norms.lean`
@@ -5659,86 +5773,210 @@ Convert the axiom at line 116 to a theorem. Prove by providing a witness (the em
 - `Hodge/Analytic/Calibration.lean`
 
 ## Mission
-**Eliminate infrastructure axioms in analysis.**
+**PROVE these 3 axioms:**
 
-### 48.1 Analysis Axioms → PROVE
-Convert these axioms to theorems:
-- `comass_eq_zero_iff` (Norms.lean:123)
-- `eval_le_flatNorm` (FlatNorm.lean:42)
-- `calibration_inequality` (Calibration.lean:56)
-- `spine_theorem` (Calibration.lean:81)
-- `limit_is_calibrated` (Calibration.lean:97)
+### 48.1 `comass_eq_zero_iff` → PROVE
 
-Prove them using the stub values (mass = 0, comass = 0, flatNorm = 0).
+```lean
+theorem comass_eq_zero_iff {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [Nonempty X] {k : ℕ} (α : SmoothForm n X k) :
+    comass α = 0 ↔ α = 0 := by
+  constructor
+  · intro h
+    -- If comass = 0, then pointwiseComass = 0 everywhere
+    -- pointwiseComass = 0 means ‖α(x)‖ = 0 for all unit tangent vectors
+    -- Therefore α = 0
+    ext x
+    have hx : pointwiseComass α x = 0 := by
+      apply le_antisymm
+      · calc pointwiseComass α x ≤ comass α := pointwiseComass_le_comass α x
+          _ = 0 := h
+      · exact pointwiseComass_nonneg α x
+    -- Use hx to show α.as_alternating x = 0
+    sorry -- FILL IN: use the definition of pointwiseComass
+  · intro h
+    simp [h, comass_zero]
+```
+
+### 48.2 `eval_le_flatNorm` → PROVE
+
+```lean
+theorem eval_le_flatNorm {k : ℕ} (T : Current n X k) (ψ : SmoothForm n X k) :
+    |T.toFun ψ| ≤ flatNorm T * comass ψ := by
+  -- The flat norm is defined as the infimum over decompositions T = R + ∂S
+  -- Use the definition of flat norm and the triangle inequality
+  unfold flatNorm
+  -- For any decomposition T = R + ∂S:
+  -- |T(ψ)| = |R(ψ) + S(dψ)| ≤ |R(ψ)| + |S(dψ)|
+  --        ≤ mass(R) · comass(ψ) + mass(S) · comass(dψ)
+  sorry -- FILL IN REAL PROOF
+```
+
+### 48.3 `spine_theorem` → PROVE
+
+```lean
+theorem spine_theorem {k : ℕ} (T S G : Current n X k) (ψ : CalibratingForm n X k)
+    (h_decomp : T = S + G) (h_calib : isCalibrated S ψ)
+    (h_small : Current.mass G < ε) :
+    |T.toFun ψ.form - S.toFun ψ.form| ≤ Current.mass G * comass ψ.form := by
+  -- Use linearity and the fundamental estimate
+  calc |T.toFun ψ.form - S.toFun ψ.form| 
+      = |G.toFun ψ.form| := by rw [h_decomp]; ring_nf
+    _ ≤ Current.mass G * comass ψ.form := eval_le_mass_mul_comass G ψ.form
+```
 
 ## Completion Criteria
-- [ ] These files have only `mass_lsc` as an axiom.
-- [ ] `lake build` succeeds.
+- [ ] `lake build` succeeds with NO sorries
+- [ ] 3 axioms converted to theorems
+- [ ] Commit: "Agent 48: Norms/Analysis infrastructure - 3 axioms proven"
 
 ---
 
-# 🔴 AGENT 49: Microstructure Part I (Section 11)
+# 🔴 AGENT 49: Prove Main.lean Bridge Theorems (5 axioms)
+
+## Files Owned
+- `Hodge/Main.lean`
+
+## Mission
+**PROVE these 5 axioms:**
+
+### 49.1 `harvey_lawson_fundamental_class` → PROVE
+
+```lean
+theorem harvey_lawson_fundamental_class {p : ℕ}
+    (γ⁺ : SmoothForm n X (2 * p)) (hγ : γ⁺ ∈ stronglyPositiveCone p)
+    (Vars : Finset (AnalyticSubvariety n X))
+    (hVars : HarveyLawsonConclusion n X p γ⁺ Vars) :
+    ∑ V in Vars, FundamentalClass V = γ⁺ := by
+  -- Use the Harvey-Lawson theorem conclusion
+  -- The calibrated limit equals the sum of fundamental classes
+  exact hVars.fundamental_class_sum
+```
+
+### 49.2 `complete_intersection_fundamental_class` → PROVE
+
+```lean
+theorem complete_intersection_fundamental_class {p : ℕ}
+    (W : AlgebraicSubvariety n X) (hW : W.codim = p)
+    (hCI : W.isCompleteIntersection) :
+    ∃ (c : ℤ), c > 0 ∧ FundamentalClass W = c • omegaPow n X p := by
+  -- Complete intersections are cut out by p hypersurfaces
+  -- Their fundamental class is deg(H₁) · ... · deg(Hₚ) · [ω^p]
+  obtain ⟨H, hH⟩ := hCI
+  use ∏ i, deg (H i)
+  constructor
+  · exact Finset.prod_pos (fun i _ => deg_pos (H i))
+  · -- Use the product formula for complete intersections
+    sorry -- FILL IN REAL PROOF
+```
+
+### 49.3-49.5 Other Main.lean axioms → PROVE
+
+Similar approach for `complete_intersection_represents_class`, `lefschetz_lift_signed_cycle`, and any remaining bridge axioms.
+
+## Completion Criteria
+- [ ] `lake build` succeeds with NO sorries
+- [ ] 5 axioms converted to theorems
+- [ ] Commit: "Agent 49: Main.lean bridge theorems - 5 axioms proven"
+
+---
+
+# 🔴 AGENT 50: Prove Microstructure (9 axioms from paper)
 
 ## Files Owned
 - `Hodge/Kahler/Microstructure.lean`
 
 ## Mission
-**Prove the first 5 microstructure axioms from the SYR paper.**
+**PROVE all 9 microstructure axioms from the paper `Hodge-v6-w-Jon-Update-MERGED.tex`.**
 
-These are specific constructions from `Hodge-v6-w-Jon-Update-MERGED.tex` Section 11.
+These are not deep theorems — they are the novel constructions in the paper that must be formalized.
 
-### 49.1-49.5 SYR Construction → PROVE
-Convert to theorems and provide proofs:
-- `local_sheet_realization` (Prop 11.3)
-- `cubulation_exists'` (Section 11)
-- `gluing_flat_norm_bound` (Prop 11.8)
+### 50.1 `local_sheet_realization` (Prop 11.3) → PROVE
+
+Read Section 11 of the paper and implement the construction.
+
+### 50.2 `cubulation_exists'` (Section 11) → PROVE
+
+Construct an explicit cubulation using the standard cube lattice.
+
+### 50.3 `gluing_flat_norm_bound` (Prop 11.8) → PROVE
+
+Prove using the calibration estimates from Section 11.
+
+### 50.4-50.9 Remaining microstructure axioms → PROVE
+
 - `calibration_defect_from_gluing`
 - `microstructureSequence_are_cycles`
-
-## Completion Criteria
-- [ ] 5 microstructure axioms converted to theorems with proofs.
-
----
-
-# 🔴 AGENT 50: Microstructure Part II & Final Audit
-
-## Files Owned
-- `Hodge/Kahler/Microstructure.lean`
-- `README.md`
-- All files (for audit)
-
-## Mission
-**Finalize the unconditional proof.**
-
-### 50.1 Remaining Microstructure → PROVE
 - `microstructureSequence_defect_bound`
 - `microstructureSequence_mass_bound`
 - `microstructureSequence_flatnorm_bound`
 - `microstructureSequence_flat_limit_exists`
 
-### 50.2 Final Axiom Audit & Documentation
-- Document all remaining ~15 axioms (Major Deep Theorems) with full citations.
-- Update the README.md with the final axiom list and citations.
-- Verify `#print axioms hodge_conjecture'` matches the documented list.
+## Reference
+The paper `Hodge-v6-w-Jon-Update-MERGED.tex` contains all the details needed for these proofs.
 
 ## Completion Criteria
-- [ ] **UNCONDITIONAL PROOF COMPLETE**.
-- [ ] Zero sorries, ~15 documented axioms.
-- [ ] README.md finalized.
+- [ ] `lake build` succeeds with NO sorries
+- [ ] 9 axioms converted to theorems
+- [ ] Commit: "Agent 50: Microstructure SYR construction - 9 axioms proven"
 
 ---
 
 # 📊 WAVE 10 SUMMARY
 
-| Agent | Focus | Axioms/Sorries | Target |
-|-------|-------|----------------|--------|
-| 46 | Kähler/Rationality | 6 axioms | 0 infrastructure axioms |
-| 47 | Sheaf/GAGA | 2 sorries + 1 axiom | 0 project sorries |
-| 48 | Analysis/GMT | 5 axioms | Only `mass_lsc` remains |
-| 49 | Micro I | 5 axioms | Section 11 formalized |
-| 50 | Micro II / Audit | 4 axioms + Docs | ~15 deep theorems |
+| Agent | Focus | Axioms to Prove | Target |
+|-------|-------|-----------------|--------|
+| 46 | Kähler/Cone | 5 | 0 new axioms |
+| 47 | Sheaf/GAGA | 4 | 0 new axioms |
+| 48 | Norms/Analysis | 3 | 0 new axioms |
+| 49 | Main.lean | 5 | 0 new axioms |
+| 50 | Microstructure | 9 | 0 new axioms |
+| **Total** | | **26** | |
+
+## Expected Final State After Wave 10
+
+| Metric | Current | After Wave 10 |
+|--------|---------|---------------|
+| Axioms | 36 | ~12 |
+| Sorries | 0 | 0 |
+| Build | ✅ | ✅ |
+
+## The 12 Remaining Axioms (Deep Theorems Only)
+
+After Wave 10, only these major published theorems should remain as axioms:
+
+1. `serre_gaga` — GAGA correspondence
+2. `serre_vanishing` — Coherent sheaf vanishing
+3. `hard_lefschetz_bijective` — Hard Lefschetz theorem
+4. `harvey_lawson_theorem` — Calibrated geometry main theorem
+5. `federer_fleming_compactness` — Compactness for integral currents
+6. `deformation_theorem` — Deformation of integral currents
+7. `mass_lsc` — Mass lower semicontinuity
+8. `wirtinger_pairing` — Wirtinger inequality
+9. `caratheodory_decomposition` — Carathéodory's theorem
+10. `barany_grinberg` — Bárány-Grinberg theorem
+11. `tian_convergence` — Bergman kernel asymptotics
+12. `flat_limit_of_cycles_is_cycle` — Closure of cycles under flat limits
+
+**Everything else must be proven.**
+
+---
+
+# 📊 WAVE 9 SUMMARY
+
+| Agent | Focus | Axioms Before | Target |
+|-------|-------|---------------|--------|
+| 41 | Main.lean | 5 | 2-3 |
+| 42 | Kähler geometry | 5 | 2 |
+| 43 | Sheaf/Bergman/GAGA | 5 | 3 |
+| 44 | Norms/Grassmannian | 4 | 1-2 |
+| 45 | Documentation | — | verify ~26 |
 
 **Expected Final State:**
 - **0 sorries** ✅
-- **~15 axioms** (Only major published deep theorems)
-- **Hodge Conjecture proven unconditional modulo major gaps.**
+- **~26 axioms** (17 deep theorems + 9 microstructure)
+- **All axioms fully documented**
+- **README.md complete**
+- **`#print axioms` verified**
+

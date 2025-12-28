@@ -126,18 +126,15 @@ theorem signed_decomposition {p : ℕ} (γ : SmoothForm n X (2 * p))
       unfold invN
       rw [smul_smul, mul_one_div_cancel (ne_of_gt hN_pos), one_smul]
     rw [h_scale_back]
-    unfold stronglyPositiveCone
-    apply ConvexCone.smul_mem
-    · linarith
-    · exact h_scaled_in_cone
+    -- Use the fact that PointedCone is closed under positive scaling
+    have hN_nonneg : (N : ℝ) ≥ 0 := by linarith
+    exact (PointedCone.span ℝ (simpleCalibratedForms p x)).smul_mem hN_nonneg h_scaled_in_cone
   constructor
   · -- γminus = Nω^p is in the cone
     intro x
-    unfold stronglyPositiveCone
-    apply ConvexCone.smul_mem
-    · unfold N N_nat; positivity
-    · have h_int := omegaPow_in_interior (n := n) (X := X) p x
-      exact interior_subset h_int
+    have hN_nonneg : (N : ℝ) ≥ 0 := by unfold N N_nat; positivity
+    have h_int := omegaPow_in_interior (n := n) (X := X) p x
+    exact (PointedCone.span ℝ (simpleCalibratedForms p x)).smul_mem hN_nonneg (interior_subset h_int)
   constructor
   · -- γplus is rational
     exact isRationalClass_add (DeRhamCohomologyClass.ofForm γ) (DeRhamCohomologyClass.ofForm γminus) h_rational (isRationalClass_smul_rat N (DeRhamCohomologyClass.ofForm (omegaPow n X p)) (omega_pow_is_rational p))
