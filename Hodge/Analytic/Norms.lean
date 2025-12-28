@@ -70,18 +70,79 @@ axiom pointwiseComass_zero {k : ℕ} (x : X) : pointwiseComass (0 : SmoothForm n
 /-- Pointwise comass of negation equals pointwise comass. -/
 theorem pointwiseComass_neg {k : ℕ} (α : SmoothForm n X k) (x : X) :
     pointwiseComass (-α) x = pointwiseComass α x := by
-  unfold pointwiseComass
-  congr 1
-  ext r
-  simp only [Set.mem_setOf_eq, SmoothForm.neg_apply, AlternatingMap.neg_apply, norm_neg]
+  unfold pointwiseComass pointwiseComassSet
+  congr; ext r
+  simp only [SmoothForm.neg_apply, AlternatingMap.neg_apply, norm_neg]
+
+/-- **Axiom: Pointwise Comass Bounded Above**.
+    The set of values defining pointwise comass is bounded above because the
+    unit ball in the tangent space is compact and the form is continuous. -/
+axiom pointwiseComass_set_bddAbove {k : ℕ} (α : SmoothForm n X k) (x : X) :
+    BddAbove (pointwiseComassSet α x)
 
 /-- Pointwise comass satisfies triangle inequality. -/
-axiom pointwiseComass_add_le {k : ℕ} (α β : SmoothForm n X k) (x : X) :
-    pointwiseComass (α + β) x ≤ pointwiseComass α x + pointwiseComass β x
+theorem pointwiseComass_add_le {k : ℕ} (α β : SmoothForm n X k) (x : X) : 
+    pointwiseComass (α + β) x ≤ pointwiseComass α x + pointwiseComass β x := by
+  unfold pointwiseComass pointwiseComassSet
+  apply csSup_le
+  · use ‖α.as_alternating x (fun _ => 0)‖
+    use fun _ => 0
+    constructor
+    · intro i; rw [tangentNorm_zero]; exact zero_le_one
+    · rfl
+  · rintro r ⟨v, hv, rfl⟩
+    calc ‖(α + β).as_alternating x v‖
+      _ = ‖α.as_alternating x v + β.as_alternating x v‖ := by rfl
+      _ ≤ ‖α.as_alternating x v‖ + ‖β.as_alternating x v‖ := norm_add_le _ _
+      _ ≤ sSup {r | ∃ v, (∀ i, tangentNorm x (v i) ≤ 1) ∧ r = ‖α.as_alternating x v‖} +
+          sSup {r | ∃ v, (∀ i, tangentNorm x (v i) ≤ 1) ∧ r = ‖β.as_alternating x v‖} := by
+        apply add_le_add
+        · apply le_csSup (pointwiseComass_set_bddAbove α x) ⟨v, hv, rfl⟩
+        · apply le_csSup (pointwiseComass_set_bddAbove β x) ⟨v, hv, rfl⟩
+  apply csSup_le
+  · use ‖α.as_alternating x (fun _ => 0)‖
+    use fun _ => 0
+    constructor
+    · intro i; rw [tangentNorm_zero]; exact zero_le_one
+    · rfl
+  · rintro r ⟨v, hv, rfl⟩
+    calc ‖(α + β).as_alternating x v‖
+      _ = ‖α.as_alternating x v + β.as_alternating x v‖ := by rfl
+      _ ≤ ‖α.as_alternating x v‖ + ‖β.as_alternating x v‖ := norm_add_le _ _
+      _ ≤ sSup {r | ∃ v, (∀ i, tangentNorm x (v i) ≤ 1) ∧ r = ‖α.as_alternating x v‖} +
+          sSup {r | ∃ v, (∀ i, tangentNorm x (v i) ≤ 1) ∧ r = ‖β.as_alternating x v‖} := by
+        apply add_le_add
+        · apply le_csSup (pointwiseComass_set_bddAbove α x) ⟨v, hv, rfl⟩
+        · apply le_csSup (pointwiseComass_set_bddAbove β x) ⟨v, hv, rfl⟩
 
 /-- Pointwise comass scales with absolute value. -/
-axiom pointwiseComass_smul {k : ℕ} (r : ℝ) (α : SmoothForm n X k) (x : X) :
-    pointwiseComass (r • α) x = |r| * pointwiseComass α x
+theorem pointwiseComass_smul {k : ℕ} (r : ℝ) (α : SmoothForm n X k) (x : X) :
+    pointwiseComass (r • α) x = |r| * pointwiseComass α x := by
+  unfold pointwiseComass pointwiseComassSet
+  by_cases hr : r = 0
+  · subst hr
+    have h_zero : {r' | ∃ v, (∀ i, tangentNorm x (v i) ≤ 1) ∧ r' = ‖((0 : ℝ) • α).as_alternating x v‖} = {0} := by
+      ext r'
+      simp only [SmoothForm.smul_apply, zero_smul, AlternatingMap.zero_apply, norm_zero, mem_setOf_eq, mem_singleton_iff]
+      constructor
+      · rintro ⟨v, _, rfl⟩; rfl
+      · intro h; subst h; exact ⟨fun _ => 0, fun _ => by simp [tangentNorm_zero], rfl⟩
+    rw [h_zero, abs_zero, zero_mul]
+    exact csSup_singleton 0
+  · have h_set : {r' | ∃ v, (∀ i, tangentNorm x (v i) ≤ 1) ∧ r' = ‖(r • α).as_alternating x v‖} =
+        (fun r' => |r| * r') '' {r' | ∃ v, (∀ i, tangentNorm x (v i) ≤ 1) ∧ r' = ‖α.as_alternating x v‖} := by
+      ext r'
+      simp only [SmoothForm.smul_apply, AlternatingMap.smul_apply, norm_smul, mem_image, mem_setOf_eq]
+      constructor
+      · rintro ⟨v, hv, rfl⟩; use ‖α.as_alternating x v‖, ⟨v, hv, rfl⟩, rfl
+      · rintro ⟨r'', ⟨v, hv, rfl⟩, rfl⟩; use v, hv, rfl
+    rw [h_set]
+    apply Real.sSup_mul_of_nonneg (abs_nonneg r)
+    · use ‖α.as_alternating x (fun _ => 0)‖
+      use fun _ => 0
+      constructor
+      · intro i; rw [tangentNorm_zero]; exact zero_le_one
+      · rfl
 
 /-! ## Global Comass Properties -/
 
