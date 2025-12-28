@@ -20,7 +20,7 @@ open Classical
 variable {n : ℕ} {X : Type*}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X]
-  [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
+  [ProjectiveComplexManifold n X] [K : KahlerManifold n X] [Nonempty X]
 
 /-! ## Automatic SYR Theorem -/
 
@@ -89,11 +89,9 @@ theorem automatic_syr {p : ℕ} (γ : SmoothForm n X (2 * p))
 theorem cone_positive_is_algebraic {p : ℕ}
     (γ : SmoothForm n X (2 * p))
     (_hγ_rational : isRationalClass γ)
-    (hγ_cone : isConePositive γ) :
+    (_hγ_cone : isConePositive γ) :
     ∃ (Z : Set X), isAlgebraicSubvariety n X Z := by
-  let ψ : CalibratingForm n X (2 * (n - p)) := KählerCalibration (n - p)
-  obtain ⟨_, _⟩ := automatic_syr γ hγ_cone ψ
-  obtain ⟨Z_alg, h_alg, _⟩ := omega_pow_is_algebraic n X p
+  obtain ⟨Z_alg, h_alg, _, _, _⟩ := omega_pow_is_algebraic (n := n) (X := X) (K := K) p
   exact ⟨Z_alg, h_alg⟩
 
 /-! ## Hard Lefschetz Interface -/
@@ -102,8 +100,7 @@ theorem hard_lefschetz_isomorphism {p' : ℕ} (h_range : p' ≤ n / 2)
     (γ : SmoothForm n X (2 * (n - p')))
     (h_rat : isRationalClass γ) (h_hodge : isPPForm' n X (n - p') γ) :
     ∃ (η : SmoothForm n X (2 * p')),
-      isRationalClass η ∧ isPPForm' n X p' η ∧
-      True := by
+      isRationalClass η ∧ isPPForm' n X p' η := by
   exact hard_lefschetz_isomorphism' h_range γ h_rat h_hodge
 
 /-! ## Main Theorem -/
@@ -120,7 +117,7 @@ theorem hard_lefschetz_reduction {p : ℕ} (hp : p > n / 2)
   -- Let p' be the complementary codimension
   let p' := n - p
   -- Apply the Hard Lefschetz isomorphism at the form level
-  obtain ⟨η, h_η_hodge, h_η_rat, _⟩ := hard_lefschetz_inverse_form hp γ h_hodge h_rational
+  obtain ⟨η, h_η_hodge, h_η_rat⟩ := hard_lefschetz_inverse_form hp γ h_hodge h_rational
   -- Provide p' and η as the witnesses
   use p', η
   constructor

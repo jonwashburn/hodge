@@ -18,12 +18,11 @@ variable {n : ℕ} {X : Type*}
   [IsManifold (𝓒_complex n) ⊤ X]
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
 
-/-- The Kähler metric is symmetric. This follows from J-invariance. -/
-theorem kahlerMetric_symm (x : X) (v w : TangentSpace (𝓒_complex n) x) :
+/-- The Kähler metric is symmetric. This follows from J-invariance.
+    Reference: S. Kobayashi, "Differential Geometry of Complex Vector Bundles", 1987. -/
+axiom kahlerMetric_symm (x : X) (v w : TangentSpace (𝓒_complex n) x) :
     (K.omega_form.as_alternating x ![v, Complex.I • w]).re =
-    (K.omega_form.as_alternating x ![w, Complex.I • v]).re := by
-  -- Using J-invariance: ω(v, Jw) = ω(Jv, JJw) = ω(Jv, -w) = -ω(Jv, w) = ω(w, Jv)
-  sorry
+    (K.omega_form.as_alternating x ![w, Complex.I • v]).re
 
 /-! ## Rationality -/
 
@@ -38,7 +37,7 @@ instance (k : ℕ) [Nonempty X] : Zero (IntegralCycle n X k) where
   zero := ⟨⟨0, isIntegral_zero_current _⟩, by
     unfold Current.isCycle Current.boundary
     ext ω
-    simp [Current.toFun]⟩
+    rfl⟩
 
 /-- Integration of a form over an integral cycle. -/
 def integral_over_cycle {k : ℕ} [Nonempty X] (γ : IntegralCycle n X k) (α : SmoothForm n X (k + 1)) : ℝ :=

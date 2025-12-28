@@ -24,8 +24,9 @@ variable {n : ℕ} {X : Type*}
 /-! ## Form Boundedness -/
 
 /-- Any smooth form on a compact manifold has a finite supremum norm.
-    Proof: The pointwise comass is continuous, and X is compact.
-    Reference: Standard result in differential geometry. -/
+    This property is a consequence of the continuity of the pointwise comass
+    and the compactness of the manifold X.
+    Reference: [Wells, "Differential Analysis on Complex Manifolds", Springer, 1980]. -/
 axiom form_is_bounded {k : ℕ} (α : SmoothForm n X k) :
     ∃ M : ℝ, M > 0 ∧ ∀ x, pointwiseComass α x ≤ M
 

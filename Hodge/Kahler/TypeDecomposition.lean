@@ -1,5 +1,6 @@
 import Hodge.Kahler.Manifolds
 import Hodge.Analytic.Forms
+import Mathlib.Tactic.Ring
 
 /-!
 # Track C.2: Type Decomposition
@@ -91,8 +92,6 @@ def omegaPow (n : ℕ) (X : Type*)
   match p with
   | 0 => unitForm
   | p + 1 =>
-    -- ω^{p+1} = ω ⋀ ω^p
-    -- We need to cast since ω has degree 2 and ω^p has degree 2p
     have h_eq : 2 * (p + 1) = 2 + 2 * p := by ring
     h_eq ▸ (K.omega_form ⋀ omegaPow n X p)
 

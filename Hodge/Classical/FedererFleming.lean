@@ -12,7 +12,7 @@ set_option autoImplicit false
 variable {n : ℕ} {X : Type*}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X]
-  [ProjectiveComplexManifold n X] [KahlerManifold n X]
+  [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
 
 /-!
 # Track A.3: Federer-Fleming Compactness Theorem
@@ -34,11 +34,11 @@ noncomputable def C2 (_n _k : ℕ) : ℝ := 2
 noncomputable def C3 (_n _k : ℕ) : ℝ := 2
 noncomputable def C4 (_n _k : ℕ) : ℝ := 2
 
-/-- **The Deformation Theorem** (Federer-Fleming 1960, 4.2)
-Any integral current T can be approximated by a polyhedral current P on a grid
-of size ε, with bounds on the error in flat norm.
-
-Reference: [Federer-Fleming 1960, 4.2, p. 473] -/
+/-- **The Deformation Theorem** (Federer-Fleming, 1960).
+    Any integral current T can be approximated by a polyhedral current P on a grid
+    of size ε, with explicit bounds on the mass and the flat norm of the error.
+    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 
+    Ann. of Math. 72 (1960), 458-520, Theorem 4.2]. -/
 axiom deformation_theorem (k : ℕ) (T : IntegralCurrent n X (k + 1)) (ε : ℝ) (hε : ε > 0) :
     ∃ (P : IntegralCurrent n X (k + 1)) (Q : IntegralCurrent n X (k + 2)) (S : IntegralCurrent n X (k + 1)),
       (T : Current n X (k + 1)) = P + Q.boundary.toFun + S ∧
@@ -51,7 +51,7 @@ axiom deformation_theorem (k : ℕ) (T : IntegralCurrent n X (k + 1)) (ε : ℝ)
 structure FFCompactnessHypothesis (n : ℕ) (X : Type*) (k : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] where
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] where
   /-- The sequence of integral currents (using k+1 to allow boundary) -/
   T : ℕ → IntegralCurrent n X (k + 1)
   /-- Uniform mass bound -/
@@ -63,7 +63,7 @@ structure FFCompactnessHypothesis (n : ℕ) (X : Type*) (k : ℕ)
 structure FFCompactnessConclusion (n : ℕ) (X : Type*) (k : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
     (hyp : FFCompactnessHypothesis n X k) where
   /-- The limit current (also integral) -/
   T_limit : IntegralCurrent n X (k + 1)
@@ -74,12 +74,11 @@ structure FFCompactnessConclusion (n : ℕ) (X : Type*) (k : ℕ)
   /-- Flat norm convergence to the limit -/
   converges : Tendsto (fun j => flatNorm ((hyp.T (φ j) : Current n X (k + 1)) - T_limit.toFun)) atTop (nhds 0)
 
-/-- **Theorem: Federer-Fleming Compactness Theorem**
-
-The space of integral currents with bounded mass and boundary mass is
-compact in the flat norm topology.
-
-Reference: [Federer-Fleming, "Normal and Integral Currents", Ann. Math 1960, 6.4] -/
+/-- **Federer-Fleming Compactness Theorem** (Federer-Fleming, 1960).
+    The space of integral currents with uniformly bounded mass and boundary mass is
+    compact in the flat norm topology.
+    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 
+    Ann. of Math. 72 (1960), 458-520, Theorem 6.4]. -/
 axiom federer_fleming_compactness (k : ℕ)
     (hyp : FFCompactnessHypothesis n X k) :
     FFCompactnessConclusion n X k hyp

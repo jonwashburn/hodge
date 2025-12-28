@@ -26,12 +26,11 @@ open CategoryTheory TopologicalSpace Opposite TensorProduct
 
 universe u
 
-variable {n : ℕ} {X : Type u}
-  [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-  [IsManifold (𝓒_complex n) ⊤ X]
-
 /-- The structure sheaf 𝓞_X of holomorphic functions on a complex manifold.
-    This is axiomatized as a CommRingCat sheaf. -/
+    This is axiomatized as a CommRingCat sheaf. Formalizing the structure sheaf
+    from first principles would require defining the sheaf of continuous functions
+    and then the subsheaf of MDifferentiable functions.
+    Reference: [Hartshorne, "Algebraic Geometry", Springer, 1977, Chapter II, Section 1]. -/
 axiom structureSheaf (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] : Sheaf (Opens.grothendieckTopology X) CommRingCat.{u}

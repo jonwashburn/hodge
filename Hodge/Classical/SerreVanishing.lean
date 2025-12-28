@@ -18,10 +18,10 @@ variable {n : ℕ} {X : Type u}
   [IsManifold (𝓒_complex n) ⊤ X]
   [ProjectiveComplexManifold n X] [KahlerManifold n X]
 
-/-- **Serre Vanishing Theorem (1955)**: For an ample line bundle L and coherent sheaf F,
-H^q(X, L^M ⊗ F) = 0 for q > 0 and M sufficiently large.
-    Reference: J.-P. Serre, "Faisceaux algébriques cohérents",
-    Ann. of Math. 61 (1955), 197-278. -/
+/-- **Serre Vanishing Theorem** (Serre, 1955).
+    For an ample line bundle L and a coherent sheaf F on a projective complex manifold X,
+    the higher cohomology groups H^q(X, L^M ⊗ F) vanish for sufficiently large M.
+    Reference: [J.-P. Serre, "Faisceaux algébriques cohérents", Ann. of Math. 61 (1955), 197-278]. -/
 axiom serre_vanishing (L : HolomorphicLineBundle n X) [IsAmple L]
     (F : CoherentSheaf n X) (q : ℕ) (hq : q > 0) :
     ∃ M₀ : ℕ, ∀ M ≥ M₀, vanishes (tensorWithSheaf (L.power M) F) q

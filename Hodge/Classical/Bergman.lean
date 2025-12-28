@@ -193,9 +193,13 @@ noncomputable def BergmanMetric (L : HolomorphicLineBundle n X) [IsAmple L] (M :
 noncomputable def dist_form (_α _β : SmoothForm n X 2) : ℝ :=
   comass (_α - _β)
 
-/-- **Tian's Theorem (1990)**: The Bergman metric on L^M converges to the Kähler metric.
-    Reference: G. Tian, "On a set of polarized Kähler metrics on algebraic manifolds",
-    J. Differential Geom. 32 (1990), no. 1, 99-130. -/
+/-- **Tian's Theorem** (Tian, 1990).
+    The Bergman metric on the M-th tensor power of an ample line bundle converges
+    to the Kähler metric as M tends to infinity. This establishes the link between
+    the Kähler form and the fundamental classes of algebraic subvarieties.
+    
+    Reference: [G. Tian, "On a set of polarized Kähler metrics on algebraic manifolds",
+    J. Differential Geom. 32 (1990), no. 1, 99-130]. -/
 axiom tian_convergence (L : HolomorphicLineBundle n X) [IsAmple L]
     (h : ∀ M, HermitianMetric (L.power M)) :
     ∀ ε > 0, ∃ M₀ : ℕ, ∀ M ≥ M₀,
@@ -221,8 +225,11 @@ noncomputable def jet_eval (L : HolomorphicLineBundle n X) (x : X) (k : ℕ) :
     ↥(HolomorphicSection L) →ₗ[ℂ] (JetSpace L x k) :=
   Submodule.mkQ _
 
-/-- Jet Surjectivity for Ample Line Bundles.
-    This is proven in SerreVanishing.lean as `jet_surjectivity_from_serre`. -/
+/-- **Jet Surjectivity for Ample Line Bundles**.
+    For sufficiently large tensor powers of an ample line bundle, the global 
+    holomorphic sections can represent any k-jet at a point.
+    This property is essential for constructing local submanifolds from sections.
+    Reference: [Griffiths-Harris, 1978, p. 156]. -/
 axiom jet_surjectivity (L : HolomorphicLineBundle n X) [IsAmple L] (x : X) (k : ℕ) :
     ∃ M₀ : ℕ, ∀ M ≥ M₀, Function.Surjective (jet_eval (L.power M) x k)
 

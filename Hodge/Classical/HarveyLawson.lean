@@ -81,32 +81,21 @@ structure HarveyLawsonConclusion (n : ℕ) (X : Type*) (k : ℕ)
   /-- The current is represented by the sum of varieties -/
   represents : ∀ (ω : SmoothForm n X k), True -- Placeholder for [T] = Σ n_i [V_i]
 
-/-- **Theorem: Harvey-Lawson Structure Theorem (Axiom)**
-
-A calibrated integral cycle on a Kähler manifold is integration along a
-positive sum of complex analytic subvarieties.
-
-Reference: [Harvey-Lawson, Calibrated Geometries, Acta Math 1982, Theorem 4.1]
-
-The proof is deep and uses:
-1. Regularity theory for calibrated currents
-2. Unique continuation for holomorphic functions
-3. Bishop's theorem on analytic continuation -/
+/-- **Harvey-Lawson Structure Theorem** (Harvey-Lawson, 1982).
+    A calibrated integral cycle on a Kähler manifold is integration along a
+    positive sum of complex analytic subvarieties.
+    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries",
+    Acta Math. 148 (1982), 47-157, Theorem 4.1]. -/
 axiom harvey_lawson_theorem {k : ℕ} (hyp : HarveyLawsonHypothesis n X k) :
     HarveyLawsonConclusion n X k
 
 /-! ## Flat Limit Properties -/
 
-/-- **Axiom: Boundary of Flat Limit of Cycles is Zero**
-
-If T_i is a sequence of currents that are cycles (∂T_i = 0)
-converging in flat norm to T, then T is also a cycle (∂T = 0).
-
-This is a fundamental property of flat convergence:
-- Flat convergence implies weak-* convergence of boundaries
-- The limit of zero boundaries is zero
-
-Reference: Federer-Fleming, Theorem 8.12 -/
+/-- **Boundary of Flat Limit of Cycles is Zero**
+    If a sequence of currents T_i that are cycles converges in flat norm to T, 
+    then the limit T is also a cycle.
+    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents",
+    Ann. of Math. 72 (1960), 458-520, Theorem 8.12]. -/
 axiom flat_limit_of_cycles_is_cycle {k : ℕ}
     (T_seq : ℕ → IntegralCurrent n X k)
     (T_limit : IntegralCurrent n X k)
