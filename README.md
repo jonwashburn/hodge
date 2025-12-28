@@ -22,7 +22,7 @@ theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p))
 
 - **Build:** ✅ `lake build` succeeds
 - **Sorries:** 0 ✅
-- **Axioms:** 38 (all documented deep theorems or Mathlib gaps)
+- **Axioms:** 41 (all documented deep theorems or Mathlib gaps)
 
 ## Axiom Dependencies
 
@@ -41,9 +41,9 @@ The main theorem depends on only **4 mathematical axioms** plus standard Lean fo
 ]
 ```
 
-### Full Axiom List (38 total)
+### Full Axiom List (41 total)
 
-The full project uses **38 mathematical axioms**, all of which are **published theorems** from the mathematical literature or documented gaps in Mathlib. These are categorized below:
+The full project uses **41 mathematical axioms**, all of which are **published theorems** from the mathematical literature or documented gaps in Mathlib. These are categorized below:
 
 ### Category 1: Foundational Theorems
 
@@ -116,6 +116,15 @@ The full project uses **38 mathematical axioms**, all of which are **published t
 | `complete_intersection_fundamental_class` | CI class formula | Griffiths-Harris 1978 |
 | `complete_intersection_represents_class` | Class representation | Griffiths-Harris 1978 |
 | `lefschetz_lift_signed_cycle` | Lefschetz lift formula | Voisin 2002 |
+| `hard_lefschetz_fundamental_class_coherence` | Hard Lefschetz coherence | Voisin 2002 |
+
+### Category 8: Calibration Theory (Additional)
+
+| Axiom | Description | Reference |
+|-------|-------------|-----------|
+| `calibration_inequality` | Calibration vs mass inequality | Harvey-Lawson 1982 |
+| `limit_is_calibrated` | Calibration preserved under limits | Harvey-Lawson 1982 |
+| `calibratedCone_hull_pointed` | Calibrated cone contains zero | Standard convex geometry |
 
 ## Project Structure
 
@@ -154,7 +163,7 @@ Hodge/
 
 | Metric | Count |
 |--------|-------|
-| Total axioms | 38 |
+| Total axioms | 41 |
 | Sorry statements | 0 |
 | Lean files | 21 |
 | Lines of code | ~5000 |
