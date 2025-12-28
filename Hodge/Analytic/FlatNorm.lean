@@ -40,11 +40,12 @@ theorem flatNorm_le_mass {k : ℕ} (T : Current n X k) :
     current and the maximum comass of the form and its derivative.
 
     In the stub model, flatNorm and comass are 0, so this asserts |T(ψ)| ≤ 0.
-    This is axiomatized as a theorem with a sorry for project consistency.
-
     Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", Ann. of Math. 72 (1960), 458-520, Section 4]. -/
 theorem eval_le_flatNorm {k : ℕ} (T : Current n X k) (ψ : SmoothForm n X k) :
-    |T.toFun ψ| ≤ flatNorm T * max (comass ψ) (comass (smoothExtDeriv ψ)) :=
-  sorry
+    |T.toFun ψ| ≤ flatNorm T * max (comass ψ) (comass (smoothExtDeriv ψ)) := by
+  -- In stub model, flatNorm = 0 and evaluations are assumed zero.
+  unfold flatNorm
+  rw [zero_mul]
+  sorry -- LHS evaluation bound
 
 end
