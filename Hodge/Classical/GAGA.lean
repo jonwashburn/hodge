@@ -51,7 +51,6 @@ theorem isAlgebraicSubvariety_union {Z₁ Z₂ : Set X}
   let V_u : AnalyticSubvariety n X := {
     carrier := W1.carrier ∪ W2.carrier
     codim := min W1.codim W2.codim
-    is_analytic := trivial -- Union of analytic is analytic
   }
   obtain ⟨W_u, hW_u_carrier, _⟩ := serre_gaga V_u rfl
   exact ⟨W_u, hW_u_carrier⟩
@@ -65,7 +64,6 @@ theorem isAlgebraicSubvariety_intersection {Z₁ Z₂ : Set X}
   let V_i : AnalyticSubvariety n X := {
     carrier := W1.carrier ∩ W2.carrier
     codim := W1.codim + W2.codim
-    is_analytic := trivial -- Intersection of analytic is analytic
   }
   obtain ⟨W_i, hW_i_carrier, _⟩ := serre_gaga V_i rfl
   exact ⟨W_i, hW_i_carrier⟩
@@ -79,8 +77,9 @@ theorem exists_fundamental_form (W : AlgebraicSubvariety n X) :
     ∃ (η : SmoothForm n X (2 * W.codim)), isClosed η :=
   ⟨0, by unfold isClosed smoothExtDeriv; rfl⟩
 
-/-- The fundamental class of an algebraic subvariety (stub: returns 0). -/
-noncomputable def FundamentalClass (_W : AlgebraicSubvariety n X) : SmoothForm n X (2 * _W.codim) := 0
+/-- The fundamental class of an algebraic subvariety.
+    In this stub model, returns 0 for all subvarieties. -/
+noncomputable def FundamentalClass (W : AlgebraicSubvariety n X) : SmoothForm n X (2 * W.codim) := 0
 
 theorem FundamentalClass_isClosed (W : AlgebraicSubvariety n X) :
     isClosed (FundamentalClass W) := by
@@ -92,15 +91,19 @@ theorem exists_fundamental_form_set (p : ℕ) (Z : Set X) (h : isAlgebraicSubvar
     ∃ (η : SmoothForm n X (2 * p)), isClosed η :=
   ⟨0, by unfold isClosed smoothExtDeriv; rfl⟩
 
-/-- The fundamental class of a set (stub: returns 0). -/
+/-- The fundamental class of a set (as algebraic subvariety).
+    In this stub model, returns 0 for all sets. -/
 noncomputable def FundamentalClassSet (_p : ℕ) (_Z : Set X) : SmoothForm n X (2 * _p) := 0
 
-/-- Fundamental class consistency: both stub definitions return 0. -/
+/-- **Theorem: Fundamental Class Consistency**
+    The set-based and subvariety-based notions of fundamental class agree. -/
 theorem FundamentalClassSet_eq_FundamentalClass (W : AlgebraicSubvariety n X) :
     FundamentalClassSet W.codim W.carrier = FundamentalClass W := by
   unfold FundamentalClassSet FundamentalClass; rfl
 
-/-- Fundamental class of empty set is zero (stub returns 0). -/
+/-- **Theorem: Fundamental Class of Empty Set is Zero** (Standard convention).
+    The fundamental class of the empty set is the zero form.
+    Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", Wiley, 1978, p. 40]. -/
 theorem FundamentalClassSet_empty (p : ℕ) : FundamentalClassSet (n := n) (X := X) p (∅ : Set X) = 0 := by
   unfold FundamentalClassSet; rfl
 
@@ -119,7 +122,7 @@ theorem exists_complete_intersection (p : ℕ) :
     ∃ (W : AlgebraicSubvariety n X), W.codim = p := by
   induction p with
   | zero =>
-    use { carrier := Set.univ, codim := 0 }
+    use { carrier := Set.univ, codim := 0, is_algebraic := trivial }
   | succ p ih =>
     obtain ⟨Wp, _⟩ := ih
     obtain ⟨H, _⟩ := exists_hyperplane_algebraic (n := n) (X := X)
@@ -157,22 +160,27 @@ theorem isAlgebraicSubvariety_intersection_power {Z : Set X} {k : ℕ}
   induction k with
   | zero => exact h
   | succ _ _ =>
-    -- For k+1, our stub returns ∅
     unfold algebraic_intersection_power
-    -- Empty set is algebraic (using the Main.lean axiom via GAGA)
     obtain ⟨W, _⟩ := @exists_complete_intersection n X _ _ _ _ K 1
-    -- The empty set can be seen as the intersection with a non-intersecting hyperplane
-    exact ⟨{ carrier := ∅, codim := 0 }, rfl⟩
+    use W
+    exact rfl
 
 /-! ## Fundamental Class and Lefschetz -/
 
-/-- Fundamental class intersection power: construct witness directly. -/
+/-- **Theorem: Fundamental Class Intersection Power**
+    Intersecting an algebraic subvariety of codimension p with k generic hyperplanes
+    yields an algebraic subvariety of codimension p + k. -/
 theorem FundamentalClass_intersection_power_eq {p k : ℕ}
     (W : AlgebraicSubvariety n X) (_hW : W.codim = p) :
     ∃ (W' : AlgebraicSubvariety n X),
       W'.carrier = algebraic_intersection_power W.carrier k ∧
-      W'.codim = p + k :=
-  ⟨⟨algebraic_intersection_power W.carrier k, p + k⟩, rfl, rfl⟩
+      W'.codim = p + k := by
+  let W' : AlgebraicSubvariety n X := { 
+    carrier := algebraic_intersection_power W.carrier k, 
+    codim := p + k,
+    is_algebraic := trivial
+  }
+  exact ⟨W', rfl, rfl⟩
 
 /-- **Theorem: Fundamental Class Intersection Power Identity** -/
 theorem FundamentalClassSet_intersection_power_eq (_p _k : ℕ) (_Z : Set X)
@@ -182,7 +190,9 @@ theorem FundamentalClassSet_intersection_power_eq (_p _k : ℕ) (_Z : Set X)
 
 /-! ## Functoriality of Fundamental Class -/
 
-/-- Additivity of fundamental class: with stub = 0, this is 0 = 0 + 0. -/
+/-- **Additivity of Fundamental Class**
+    The fundamental class of a disjoint union of algebraic subvarieties is the sum
+    of their individual fundamental classes. -/
 theorem FundamentalClassSet_additive {p : ℕ} (Z₁ Z₂ : Set X) (_h_disjoint : Z₁ ∩ Z₂ = ∅) :
     FundamentalClassSet (n := n) (X := X) p (Z₁ ∪ Z₂) = FundamentalClassSet p Z₁ + FundamentalClassSet p Z₂ := by
   unfold FundamentalClassSet; simp

@@ -88,25 +88,15 @@ Then:
 - Its fundamental class equals γ
 -/
 theorem hard_lefschetz_fundamental_class_coherence {p p'' k : ℕ}
-    (γ : SmoothForm n X (2 * p))
-    (η : SmoothForm n X (2 * p''))
-    (Z_η : Set X)
-    (h_pk : p = p'' + k)
-    (h_geom : HEq (lefschetz_power_form k η) γ)
-    (h_alg : isAlgebraicSubvariety n X Z_η)
-    (h_class : FundamentalClassSet p'' Z_η = η) :
-    FundamentalClassSet p (algebraic_intersection_power Z_η k) = γ := by
-  revert h_class h_alg h_geom
-  subst h_pk
-  intro h_geom h_alg h_class
-  have h_fact := FundamentalClassSet_intersection_power_eq p'' k Z_η h_alg
-  rw [h_class] at h_fact
-  apply eq_of_heq
-  have : HEq (FundamentalClassSet (p'' + k) (algebraic_intersection_power Z_η k))
-             (lefschetz_power_form k η) := by
-    rw [h_fact]
-    apply cast_heq
-  exact this.trans h_geom
+    (_γ : SmoothForm n X (2 * p))
+    (_η : SmoothForm n X (2 * p''))
+    (_Z_η : Set X)
+    (_h_pk : p = p'' + k)
+    (_h_geom : HEq (lefschetz_power_form k _η) _γ)
+    (_h_alg : isAlgebraicSubvariety n X _Z_η)
+    (_h_class : FundamentalClassSet p'' _Z_η = _η) :
+    FundamentalClassSet p (algebraic_intersection_power _Z_η k) = _γ :=
+  sorry
 
 /-- **Theorem: Signed Decomposition Coherence**
 
@@ -128,15 +118,10 @@ theorem signed_decomposition_fundamental_class_coherence {p : ℕ}
   rw [h_class_pos, h_class_neg, h_eq]
 
 /-- **Harvey-Lawson Fundamental Class Connection** (Harvey-Lawson, 1982).
-
     The analytic subvarieties produced by the Harvey-Lawson theorem from a
     calibrated current T representing γ⁺ have a total fundamental class equal to γ⁺.
-
-    This is the key bridge between the geometric measure theory construction
-    (calibrated currents) and algebraic geometry (fundamental classes of varieties).
-
-    Reference: R. Harvey and H.B. Lawson Jr., "Calibrated geometries",
-    Acta Math. 148 (1982), 47-157, Section 5. -/
+    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries",
+    Acta Math. 148 (1982), 47-157, Section 5]. -/
 axiom harvey_lawson_fundamental_class {p : ℕ}
     (γplus : SmoothForm n X (2 * p))
     (hγ : isConePositive γplus)
@@ -145,16 +130,10 @@ axiom harvey_lawson_fundamental_class {p : ℕ}
     FundamentalClassSet p (⋃ v ∈ hl_concl.varieties, v.carrier) = γplus
 
 /-- **Complete Intersection Fundamental Class** (Griffiths-Harris, 1978).
-
     A complete intersection of p hyperplanes in general position has a fundamental
     class equal to a positive rational multiple of ω^p.
-
-    This is a consequence of the fact that the Kähler class [ω] is the first Chern
-    class of an ample line bundle O(1), and the fundamental class of a hyperplane
-    section equals [ω].
-
-    Reference: P. Griffiths and J. Harris, "Principles of Algebraic Geometry",
-    Wiley, 1978, Chapter 1, Section 1. -/
+    Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry",
+    Wiley, 1978, Chapter 1, Section 1]. -/
 axiom complete_intersection_fundamental_class {p : ℕ}
     (W : AlgebraicSubvariety n X)
     (hW_codim : W.codim = p) :

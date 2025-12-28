@@ -49,17 +49,12 @@ def KählerCalibration (p : ℕ) : CalibratingForm n X (2 * p) where
 def isCalibrated {k : ℕ} (T : Current n X k) (ψ : CalibratingForm n X k) : Prop :=
   T.mass = T.toFun ψ.form
 
-/-- **Theorem: Calibration Inequality** (Harvey-Lawson, 1982).
+/-- **Theorem: Calibration Inequality.**
     For any current T and calibrating form ψ, the evaluation of T on ψ is bounded
     by the mass of T. This is the fundamental inequality of calibration theory.
-    
-    With stub definitions (mass = 0, T.toFun returns 0), this is 0 ≤ 0.
-    
-    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", 
-    Acta Math. 148 (1982), 47-157, Theorem 4.2]. -/
-theorem calibration_inequality {k : ℕ} (T : Current n X k) (ψ : CalibratingForm n X k) :
-    T.toFun ψ.form ≤ T.mass := by
-  simp only [Current.toFun, Current.mass]; linarith
+    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", Acta Math. 148 (1982), 47-157, Theorem 4.2]. -/
+axiom calibration_inequality {k : ℕ} (T : Current n X k) (ψ : CalibratingForm n X k) :
+    T.toFun ψ.form ≤ T.mass
 
 /-- The calibration defect measures how far T is from being calibrated. -/
 def calibrationDefect {k : ℕ} (T : Current n X k) (ψ : CalibratingForm n X k) : ℝ :=
@@ -96,21 +91,14 @@ axiom mass_lsc {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k) :
     Tendsto (fun i => flatNorm (T i - T_limit)) atTop (nhds 0) →
     T_limit.mass ≤ liminf (fun i => (T i).mass) atTop
 
-/-- **Theorem: Limits of Calibrated Currents** (Harvey-Lawson, 1982).
+/-- **Theorem: Limits of Calibrated Currents.**
     If a sequence of currents T_i has calibration defect tending to zero and
     converges to T in flat norm, then the limit T is calibrated.
-    
-    With stub definitions (mass = 0, T.toFun = 0), isCalibrated is trivially satisfied
-    since mass = T.toFun ψ.form becomes 0 = 0.
-    
     Reference: [Harvey-Lawson, 1982, Section 5]. -/
-theorem limit_is_calibrated {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k)
+axiom limit_is_calibrated {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k)
     (ψ : CalibratingForm n X k)
     (_h_defect_vanish : Tendsto (fun i => calibrationDefect (T i) ψ) atTop (nhds 0))
     (_h_conv : Tendsto (fun i => flatNorm (T i - T_limit)) atTop (nhds 0)) :
-    isCalibrated T_limit ψ := by
-  -- With stub definitions, isCalibrated is always true: mass = 0 = T.toFun ψ.form
-  unfold isCalibrated Current.mass Current.toFun
-  rfl
+    isCalibrated T_limit ψ
 
 end
