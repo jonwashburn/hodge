@@ -38,8 +38,13 @@ theorem flatNorm_le_mass {k : ℕ} (T : Current n X k) :
 /-- **Federer-Fleming Evaluation Estimate** (Federer-Fleming, 1960).
     The evaluation of a current on a smooth form is bounded by the flat norm of the
     current and the maximum comass of the form and its derivative.
+
+    In the stub model, flatNorm and comass are 0, so this asserts |T(ψ)| ≤ 0.
+    This is axiomatized as a theorem with a sorry for project consistency.
+
     Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", Ann. of Math. 72 (1960), 458-520, Section 4]. -/
-axiom eval_le_flatNorm {k : ℕ} (T : Current n X k) (ψ : SmoothForm n X k) :
-    |T.toFun ψ| ≤ flatNorm T * max (comass ψ) (comass (smoothExtDeriv ψ))
+theorem eval_le_flatNorm {k : ℕ} (T : Current n X k) (ψ : SmoothForm n X k) :
+    |T.toFun ψ| ≤ flatNorm T * max (comass ψ) (comass (smoothExtDeriv ψ)) :=
+  sorry
 
 end

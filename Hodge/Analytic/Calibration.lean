@@ -52,9 +52,14 @@ def isCalibrated {k : ℕ} (T : Current n X k) (ψ : CalibratingForm n X k) : Pr
 /-- **Calibration Inequality** (Harvey-Lawson, 1982).
     For any current T and calibrating form ψ, the evaluation of T on ψ is bounded
     by the mass of T. This is the fundamental inequality of calibration theory.
+
+    In the stub model, mass is 0, so this asserts T(ψ) ≤ 0.
+    Axiomatized as a theorem with a sorry for project consistency.
+
     Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", Acta Math. 148 (1982), 47-157, Theorem 4.2]. -/
-axiom calibration_inequality {k : ℕ} (T : Current n X k) (ψ : CalibratingForm n X k) :
-    T.toFun ψ.form ≤ T.mass
+theorem calibration_inequality {k : ℕ} (T : Current n X k) (ψ : CalibratingForm n X k) :
+    T.toFun ψ.form ≤ T.mass :=
+  sorry
 
 /-- The calibration defect measures how far T is from being calibrated. -/
 def calibrationDefect {k : ℕ} (T : Current n X k) (ψ : CalibratingForm n X k) : ℝ :=
@@ -77,10 +82,15 @@ theorem isCalibrated_iff_defect_zero {k : ℕ} (T : Current n X k) (ψ : Calibra
 /-- **Spine Theorem** (Harvey-Lawson, 1982).
     If a current T is a difference of a calibrated current S and an error current G,
     then the calibration defect of T is bounded by twice the mass of G.
+
+    In the stub model, mass is 0, so this asserts defect(T, ψ) ≤ 0.
+    Axiomatized as a theorem with a sorry for project consistency.
+
     Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", Acta Math. 148 (1982), 47-157, Section 4]. -/
-axiom spine_theorem {k : ℕ} (T S G : Current n X k) (ψ : CalibratingForm n X k)
+theorem spine_theorem {k : ℕ} (T S G : Current n X k) (ψ : CalibratingForm n X k)
     (_h_decomp : T = S - G) (_h_calib : isCalibrated S ψ) :
-    calibrationDefect T ψ ≤ 2 * G.mass
+    calibrationDefect T ψ ≤ 2 * G.mass :=
+  sorry
 
 /-- **Lower Semicontinuity of Mass** (Federer-Fleming, 1960).
     The mass functional is lower semicontinuous with respect to the flat norm topology.
@@ -93,11 +103,16 @@ axiom mass_lsc {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k) :
 /-- **Limit Calibration Theorem** (Harvey-Lawson, 1982).
     If a sequence of currents has calibration defect tending to zero and
     converges in flat norm, then the limit current is calibrated.
+
+    In the stub model, this asserts 0 = 0 achieves calibration.
+    Axiomatized as a theorem with a sorry for project consistency.
+
     Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", Acta Math. 148 (1982), 47-157, Section 5]. -/
-axiom limit_is_calibrated {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k)
+theorem limit_is_calibrated {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k)
     (ψ : CalibratingForm n X k)
     (_h_defect_vanish : Tendsto (fun i => calibrationDefect (T i) ψ) atTop (nhds 0))
     (_h_conv : Tendsto (fun i => flatNorm (T i - T_limit)) atTop (nhds 0)) :
-    isCalibrated T_limit ψ
+    isCalibrated T_limit ψ :=
+  sorry
 
 end
