@@ -41,6 +41,11 @@ theorem isIntegral_add {k : ℕ} (S T : Current n X k) :
   intro ⟨S_set, _⟩ ⟨T_set, _⟩
   exact ⟨S_set ∪ T_set, trivial⟩
 
+/-- The zero current is integral. -/
+theorem isIntegral_zero_current (k : ℕ) [Nonempty X] : isIntegral (0 : Current n X k) := by
+  use (∅ : Set X)
+  exact trivial
+
 /-- Integer Scaling of Integral Currents is Integral -/
 theorem isIntegral_smul {k : ℕ} (c : ℤ) (T : Current n X k) :
     isIntegral T → isIntegral (c • T) := by

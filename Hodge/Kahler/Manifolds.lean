@@ -22,7 +22,7 @@ variable {n : ℕ} {X : Type*}
 theorem kahlerMetric_symm (x : X) (v w : TangentSpace (𝓒_complex n) x) :
     (K.omega_form.as_alternating x ![v, Complex.I • w]).re =
     (K.omega_form.as_alternating x ![w, Complex.I • v]).re := by
-  -- Proof using J-invariance
+  -- Using J-invariance: ω(v, Jw) = ω(Jv, JJw) = ω(Jv, -w) = -ω(Jv, w) = ω(w, Jv)
   sorry
 
 /-! ## Rationality -/
@@ -32,6 +32,13 @@ def IntegralCycle (n : ℕ) (X : Type*) [TopologicalSpace X] [ChartedSpace (Eucl
     [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] (k : ℕ) :=
   { T : IntegralCurrent n X (k + 1) // T.toFun.isCycle }
+
+/-- The zero current is a trivial integral cycle. -/
+instance (k : ℕ) [Nonempty X] : Zero (IntegralCycle n X k) where
+  zero := ⟨⟨0, isIntegral_zero_current _⟩, by
+    unfold Current.isCycle Current.boundary
+    ext ω
+    simp [Current.toFun]⟩
 
 /-- Integration of a form over an integral cycle. -/
 def integral_over_cycle {k : ℕ} [Nonempty X] (γ : IntegralCycle n X k) (α : SmoothForm n X (k + 1)) : ℝ :=
