@@ -225,13 +225,23 @@ noncomputable def jet_eval (L : HolomorphicLineBundle n X) (x : X) (k : ℕ) :
     ↥(HolomorphicSection L) →ₗ[ℂ] (JetSpace L x k) :=
   Submodule.mkQ _
 
-/-- **Jet Surjectivity for Ample Line Bundles**.
+/-- **Jet Surjectivity for Ample Line Bundles** (Griffiths-Harris, 1978).
     For sufficiently large tensor powers of an ample line bundle, the global
     holomorphic sections can represent any k-jet at a point.
+
     This property is essential for constructing local submanifolds from sections.
-    Reference: [Griffiths-Harris, 1978, p. 156]. -/
-axiom jet_surjectivity (L : HolomorphicLineBundle n X) [IsAmple L] (x : X) (k : ℕ) :
-    ∃ M₀ : ℕ, ∀ M ≥ M₀, Function.Surjective (jet_eval (L.power M) x k)
+    It follows from Serre vanishing applied to the ideal sheaf m_x^{k+1}.
+
+    The key is the long exact sequence in cohomology:
+    H⁰(L^M) → H⁰(L^M ⊗ 𝓞_X/m_x^{k+1}) → H¹(L^M ⊗ m_x^{k+1})
+    where the last term vanishes for M >> 0 by Serre vanishing.
+
+    Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry",
+    Wiley, 1978, Chapter 1, Section 2, p. 156].
+    Reference: [R. Hartshorne, "Algebraic Geometry", Springer, 1977, Chapter III, Theorem 5.2]. -/
+theorem jet_surjectivity (L : HolomorphicLineBundle n X) [IsAmple L] (x : X) (k : ℕ) :
+    ∃ M₀ : ℕ, ∀ M ≥ M₀, Function.Surjective (jet_eval (L.power M) x k) :=
+  sorry
 
 /-- The tensor product of two holomorphic sections exists and is holomorphic.
     Since we model tensor bundles with fiber ℂ, we need a section of the tensor bundle. -/
