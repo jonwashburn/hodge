@@ -40,12 +40,12 @@ theorem microstructure_limit_is_cycle {k : ℕ}
 
 /-- **Theorem: Empty Set is Algebraic** (Standard fact).
     The empty set is an algebraic subvariety of any projective variety.
-    
+
     This follows from the fact that on a projective variety embedded in ℙⁿ,
     the intersection of n+1 generic hyperplanes in general position is empty.
     Alternatively, for any ample line bundle L, sufficiently high tensor powers
     L^M have sections with no common zeros.
-    
+
     Reference: [Hartshorne, "Algebraic Geometry", Springer, 1977, Chapter II, Section 5]. -/
 axiom empty_set_is_algebraic : ∃ (W : AlgebraicSubvariety n X), W.carrier = ∅
 
@@ -108,13 +108,13 @@ theorem signed_decomposition_fundamental_class_coherence {p : ℕ}
   sorry
 
 /-- **Harvey-Lawson Fundamental Class Connection** (Harvey-Lawson, 1982).
-    
+
     The analytic subvarieties produced by the Harvey-Lawson theorem from a
     calibrated current T representing γ⁺ have a total fundamental class equal to γ⁺.
-    
+
     This is the key bridge between the geometric measure theory construction
     (calibrated currents) and algebraic geometry (fundamental classes of varieties).
-    
+
     Reference: R. Harvey and H.B. Lawson Jr., "Calibrated geometries",
     Acta Math. 148 (1982), 47-157, Section 5. -/
 axiom harvey_lawson_fundamental_class {p : ℕ}
@@ -125,14 +125,14 @@ axiom harvey_lawson_fundamental_class {p : ℕ}
     FundamentalClassSet p (⋃ v ∈ hl_concl.varieties, v.carrier) = γplus
 
 /-- **Complete Intersection Fundamental Class** (Griffiths-Harris, 1978).
-    
+
     A complete intersection of p hyperplanes in general position has a fundamental
     class equal to a positive rational multiple of ω^p.
-    
-    This is a consequence of the fact that the Kähler class [ω] is the first Chern 
+
+    This is a consequence of the fact that the Kähler class [ω] is the first Chern
     class of an ample line bundle O(1), and the fundamental class of a hyperplane
     section equals [ω].
-    
+
     Reference: P. Griffiths and J. Harris, "Principles of Algebraic Geometry",
     Wiley, 1978, Chapter 1, Section 1. -/
 axiom complete_intersection_fundamental_class {p : ℕ}
@@ -141,13 +141,13 @@ axiom complete_intersection_fundamental_class {p : ℕ}
     ∃ (c : ℚ), c > 0 ∧ FundamentalClassSet p W.carrier = (c : ℝ) • omegaPow n X p
 
 /-- **Complete Intersection Representation** (Griffiths-Harris, 1978).
-    
+
     Any rational Hodge class that is a positive multiple of [ω^p] can be represented
     by an algebraic subvariety (specifically, a complete intersection).
-    
-    This provides algebraic representatives for classes in the image of the 
+
+    This provides algebraic representatives for classes in the image of the
     Lefschetz operator.
-    
+
     Reference: P. Griffiths and J. Harris, "Principles of Algebraic Geometry",
     Wiley, 1978. -/
 axiom complete_intersection_represents_class {p : ℕ}
@@ -156,15 +156,15 @@ axiom complete_intersection_represents_class {p : ℕ}
     FundamentalClassSet p Z = γ
 
 /-- **Lefschetz Lift for Signed Cycles** (Voisin, 2002).
-    
+
     If a rational Hodge class η of degree 2p' is represented by a signed cycle Z_η,
-    then its image γ = L^k(η) under the Lefschetz operator is represented by the 
+    then its image γ = L^k(η) under the Lefschetz operator is represented by the
     signed cycle obtained by intersecting Z_η with k generic hyperplanes.
-    
-    This allows lifting algebraic representations from lower degree (where the 
+
+    This allows lifting algebraic representations from lower degree (where the
     Hodge conjecture is known) to higher degree.
-    
-    Reference: C. Voisin, "Hodge Theory and Complex Algebraic Geometry", 
+
+    Reference: C. Voisin, "Hodge Theory and Complex Algebraic Geometry",
     Vol. I, Cambridge University Press, 2002, Chapter 6. -/
 axiom lefschetz_lift_signed_cycle {p : ℕ}
     (γ : SmoothForm n X (2 * p))

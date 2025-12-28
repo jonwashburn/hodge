@@ -37,7 +37,7 @@ noncomputable def C4 (_n _k : ℕ) : ℝ := 2
 /-- **The Deformation Theorem** (Federer-Fleming, 1960).
     Any integral current T can be approximated by a polyhedral current P on a grid
     of size ε, with explicit bounds on the mass and the flat norm of the error.
-    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 
+    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents",
     Ann. of Math. 72 (1960), 458-520, Theorem 4.2]. -/
 axiom deformation_theorem (k : ℕ) (T : IntegralCurrent n X (k + 1)) (ε : ℝ) (hε : ε > 0) :
     ∃ (P : IntegralCurrent n X (k + 1)) (Q : IntegralCurrent n X (k + 2)) (S : IntegralCurrent n X (k + 1)),
@@ -77,7 +77,7 @@ structure FFCompactnessConclusion (n : ℕ) (X : Type*) (k : ℕ)
 /-- **Federer-Fleming Compactness Theorem** (Federer-Fleming, 1960).
     The space of integral currents with uniformly bounded mass and boundary mass is
     compact in the flat norm topology.
-    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 
+    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents",
     Ann. of Math. 72 (1960), 458-520, Theorem 6.4]. -/
 axiom federer_fleming_compactness (k : ℕ)
     (hyp : FFCompactnessHypothesis n X k) :

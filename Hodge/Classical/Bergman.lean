@@ -197,7 +197,7 @@ noncomputable def dist_form (_α _β : SmoothForm n X 2) : ℝ :=
     The Bergman metric on the M-th tensor power of an ample line bundle converges
     to the Kähler metric as M tends to infinity. This establishes the link between
     the Kähler form and the fundamental classes of algebraic subvarieties.
-    
+
     Reference: [G. Tian, "On a set of polarized Kähler metrics on algebraic manifolds",
     J. Differential Geom. 32 (1990), no. 1, 99-130]. -/
 axiom tian_convergence (L : HolomorphicLineBundle n X) [IsAmple L]
@@ -226,7 +226,7 @@ noncomputable def jet_eval (L : HolomorphicLineBundle n X) (x : X) (k : ℕ) :
   Submodule.mkQ _
 
 /-- **Jet Surjectivity for Ample Line Bundles**.
-    For sufficiently large tensor powers of an ample line bundle, the global 
+    For sufficiently large tensor powers of an ample line bundle, the global
     holomorphic sections can represent any k-jet at a point.
     This property is essential for constructing local submanifolds from sections.
     Reference: [Griffiths-Harris, 1978, p. 156]. -/
