@@ -5575,7 +5575,8 @@ $\mathcal F(\partial T^{\mathrm{raw}})$ is small.
 \begin{proposition}[Microstructure/gluing estimate]\label{prop:glue-gap}
 Let $T^{\mathrm{raw}}=\sum_Q S_Q$ be the raw integral current built from the microstructure pieces on a mesh of size $h$
 as in Substep~4.2.
-Assume that for every interior interface $F=Q\cap Q'$ the face mismatch current
+Assume that for every interior interface $F=Q\cap Q'$ (i.e.\ a codimension-$1$ face shared by two distinct cells of the mesh)
+the face mismatch current
 \[
 B_F\ :=\ \bigl(\partial S_Q\bigr)\llcorner F\ -\ \bigl(\partial S_{Q'}\bigr)\llcorner F
 \]
@@ -5597,6 +5598,7 @@ U\ :=\ \sum_F Q_F,
 \qquad
 T\ :=\ T^{\mathrm{raw}}-U.
 \]
+Here and below, $\sum_F$ ranges over all interior interfaces $F=Q\cap Q'$ (each counted once).
 Then $U$ is integral, $\partial U=\partial T^{\mathrm{raw}}$, and hence $T$ is an integral cycle with
 $[T]=[T^{\mathrm{raw}}]=\mathrm{PD}(m[\gamma])$.
 Moreover,
@@ -5605,13 +5607,13 @@ Moreover,
 \]
 In particular, in the parameter regime of Corollary~\ref{cor:global-flat-weighted} and Remark~\ref{rem:weighted-scaling}
 (where $\Delta_F\lesssim h^2$ and the right-hand side is $o(m)$ as $h\downarrow 0$), we obtain a family of integral fillings
-$U_h$ with $\partial U_h=\partial T^{\mathrm{raw}}$ and $\Mass(U_h)=o(m)$; consequently
+$U_h$ (i.e.\ the above $U$ at mesh size $h$) with $\partial U_h=\partial T^{\mathrm{raw}}$ and $\Mass(U_h)=o(m)$; consequently
 \[
 \mathcal F\!\left(\partial T^{\mathrm{raw}}\right)\ \le\ \Mass(U_h)\ =\ o(m).
 \]
 \end{proposition}
 \begin{proof}
-Fix an interface $F=Q\cap Q'$ and a matching $\sigma_F$ as in the hypothesis.
+Fix an interior interface $F=Q\cap Q'$ and a matching $\sigma_F$ as in the hypothesis.
 In the translation model, each slice $\Sigma_F(u_{F,a})$ is a translate of $\Sigma_F(0)$ in face coordinates, so
 Proposition~\ref{prop:transport-flat-glue-weighted} (see its proof via Lemma~\ref{lem:flat-translate})
 produces an integral filling current $Q_F$ with $\partial Q_F=B_F$ and
@@ -5619,7 +5621,7 @@ produces an integral filling current $Q_F$ with $\partial Q_F=B_F$ and
 \Mass(Q_F)\ \le\ \sum_{a=1}^{N_F}\|u_{F,a}-u'_{F,\sigma_F(a)}\|\,\Mass(\Sigma_F(u_{F,a}))
 \ \le\ \Delta_F\sum_{a=1}^{N_F}\Mass(\Sigma_F(u_{F,a})).
 \]
-Summing over all interfaces and setting $U:=\sum_F Q_F$ gives an integral current with
+Summing over all interior interfaces and setting $U:=\sum_F Q_F$ gives an integral current with
 \[
 \partial U=\sum_F \partial Q_F=\sum_F B_F.
 \]
@@ -5635,7 +5637,7 @@ Corollary~\ref{cor:global-flat-weighted} and Remark~\ref{rem:weighted-scaling}.
 \end{proof}
 
 
-Choose the partition and $m$ so that
+We now return to the global construction.  Fix $\varepsilon>0$, and choose the partition and $m$ so that
 $\Mass(R_{\mathrm{glue}})\le\varepsilon/2$.  Define
 \[
 T^{(1)}:=T^{\mathrm{raw}}+R_{\mathrm{glue}}.
