@@ -62,7 +62,7 @@ theorem signed_decomposition {p : ℕ} (γ : SmoothForm n X (2 * p))
       γ = γplus - γminus ∧
       isConePositive γplus ∧
       isConePositive γminus ∧
-      isRationalClass (DeRhamCohomologyClass.ofForm γplus) ∧ 
+      isRationalClass (DeRhamCohomologyClass.ofForm γplus) ∧
       isRationalClass (DeRhamCohomologyClass.ofForm γminus) := by
   -- 1. Get uniform interior radius r > 0 for ω^p (from Cone.lean)
   obtain ⟨r, hr_pos, hr_ball⟩ := exists_uniform_interior_radius (n := n) (X := X) p

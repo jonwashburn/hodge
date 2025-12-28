@@ -21,7 +21,7 @@ variable {n : ℕ} {X : Type*}
     The Riemannian metric induced by the Kähler form is symmetric.
     This is a direct consequence of the J-invariance of the Kähler form.
     In this stub model with zero forms, this is trivially satisfied.
-    Reference: [S. Kobayashi, "Differential Geometry of Complex Vector Bundles", 
+    Reference: [S. Kobayashi, "Differential Geometry of Complex Vector Bundles",
     Princeton University Press, 1987, Chapter II, Section 3]. -/
 axiom kahlerMetric_symm (x : X) (v w : TangentSpace (𝓒_complex n) x) :
     (K.omega_form.as_alternating x ![v, Complex.I • w]).re =
@@ -29,7 +29,7 @@ axiom kahlerMetric_symm (x : X) (v w : TangentSpace (𝓒_complex n) x) :
 
 /-! ## Rationality -/
 
-/-- A de Rham cohomology class is rational. 
+/-- A de Rham cohomology class is rational.
     In this stub model, all classes are considered rational. -/
 def isRationalClass [Nonempty X] {k : ℕ} (_η : DeRhamCohomologyClass n X k) : Prop :=
   True
