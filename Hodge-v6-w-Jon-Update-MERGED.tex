@@ -4825,7 +4825,9 @@ up to the rounding error $O(1/N)+O(\varepsilon^2)$ from Proposition~\ref{prop:ve
 $|N_{Q,v,i}-N_{Q',v,i}|\lesssim h\min\{N_{Q,v,i},N_{Q',v,i}\}$ on the region where $M_{Q,i}$ is not negligible (e.g.\ via Lemma~\ref{lem:slow-variation-rounding}
 and the $0$--$1$ stability Lemma~\ref{lem:slow-variation-discrepancy});
 \item[\textnormal{(c)}] (\textbf{Cohomology periods}) after clearing denominators by choosing $m$ and applying fixed-dimension discrepancy rounding
-(Lemma~\ref{lem:barany-grinberg} in the form of Proposition~\ref{prop:cohomology-match}), the resulting raw current satisfies the integral period constraints.
+(Lemma~\ref{lem:barany-grinberg}), one can choose the integer activations so that the \emph{raw} current has the desired periods up to an error $<\tfrac14$
+on a fixed integral cohomology basis; after applying the gluing correction with sufficiently small mass, the resulting \emph{closed} glued cycle has the
+exact integral periods and hence the exact class $\mathrm{PD}(m[\gamma])$ in rational homology (Proposition~\ref{prop:cohomology-match}).
 \end{enumerate}
 Consequently, for each label $i$ the activation hypotheses (iii)–(iv) in Theorem~\ref{thm:sliver-mass-matching-on-template} hold (by Corollary~\ref{cor:corner-exit-iii-iv}),
 and summing the resulting per-label flat-norm mismatch bounds yields $\mathcal F(\partial T^{\mathrm{raw}})=o(m)$ under the parameter regime of
@@ -5573,47 +5575,60 @@ R_{\mathrm{glue}}:=-(Q+Q_R)
 \]
 gives $\partial R_{\mathrm{glue}}=-\partial T^{\mathrm{raw}}$ and $\Mass(R_{\mathrm{glue}})$ as small as desired once
 $\mathcal F(\partial T^{\mathrm{raw}})$ is small.
-\begin{lemma}[Face-slice translation/cycle model from the sheet construction]\label{lem:face-slice-translation-model}
-Fix an interior interface $F=Q\cap Q'$ in the mesh used in Substep~4.2, and work in a tubular product chart
+\begin{lemma}[Interface slice cycles for the gluing estimate (ridge issue isolated)]\label{lem:face-slice-translation-model}
+Fix an interior combinatorial interface face $F=Q\cap Q'$ in the mesh used in Substep~4.2, and work in a tubular product chart
 identifying a neighborhood of $F$ with $F\times B^{2p}(0,ch)$ in normal coordinates.
-For each direction label and each sheet piece $[Y]\llcorner Q$ meeting $F$, the induced \emph{face slice} current
+
+\smallskip\noindent
+\textbf{(i) Translation.}
+In the single-sheet/flat model of Remark~\ref{rem:transport-hypotheses}, each relevant sheet piece is a $C^1$ graph over an affine translate
+of a fixed calibrated plane, and the induced slice currents on $F$ depend on the transverse parameter $u\in B^{2p}(0,ch)$ only by translation
+in the face chart.
+
+\smallskip\noindent
+\textbf{(ii) Ridge boundary and how it is avoided.}
+The nontrivial point is to ensure the slice currents used in Proposition~\ref{prop:transport-flat-glue-weighted} are \emph{closed} (no extra boundary supported
+on the codimension-$2$ skeleton of $F$).
+For this, we do \emph{not} work directly on the sharp polyhedral face patch $F$.
+Instead, as part of the mesh geometry (cf.\ the rounded-cell convention in Remark~\ref{rem:smooth-cells}), one replaces each combinatorial interface face
+by a \emph{ridge-free interface hypersurface} $F^{\sharp}\subset Q\cup Q'$ obtained by rounding the face near its boundary inside an $O(h^2)$ neighborhood
+of the cube skeleton, so that $F^{\sharp}$ is a smooth hypersurface \emph{without boundary} and agrees with $F$ on the $O(h)$ interior scale where the
+single-sheet graph control holds.
+Then for each sheet piece $[Y]\llcorner Q$ meeting this interface, the induced interface slice current
 \[
-\Sigma_F(u)\ :=\ \partial\big([Y]\llcorner Q\big)\llcorner F
+\Sigma_F(u)\ :=\ \partial\big([Y]\llcorner Q\big)\llcorner F^{\sharp}
 \]
-is an integral $(2n-2p-1)$--\emph{cycle} on $F$ (so $\partial\Sigma_F(u)=0$), and in the flat/parallel model it depends on the transverse parameter
-$u\in B^{2p}(0,ch)$ only by translation in the face chart: $\Sigma_F(u)=(\tau_u)_\#\Sigma_F(0)$.
+is an integral $(2n-2p-1)$--cycle, and in the flat/parallel model it is a translate of a fixed template cycle in the $F^{\sharp}$ chart.
+
+\smallskip\noindent
 Consequently, for every interior interface $F$ the mismatch current
 \[
-B_F:=\bigl(\partial S_Q\bigr)\llcorner F\ -\ \bigl(\partial S_{Q'}\bigr)\llcorner F
+B_F:=\bigl(\partial S_Q\bigr)\llcorner F^{\sharp}\ -\ \bigl(\partial S_{Q'}\bigr)\llcorner F^{\sharp}
 \]
 fits the translation model of Proposition~\ref{prop:transport-flat-glue-weighted} (hence Proposition~\ref{prop:transport-flat-glue} and
-Corollary~\ref{cor:global-flat-weighted}).
-In particular, the slice currents used in that model are genuinely closed (so there is no “extra boundary along edges’’ in the sharp-cube picture).
+Corollary~\ref{cor:global-flat-weighted}) with the required cycle slices.
 \end{lemma}
 \begin{proof}
-In the flat template model of Remark~\ref{rem:transport-hypotheses}, each sheet is an affine calibrated plane section
-$(\widetilde\Pi+t)\cap Q$ inside a product chart, and the face slice current $\Sigma_F(u)$ is obtained by translating the parameter
-$u$ in the transverse factor; this gives $\Sigma_F(u)=(\tau_u)_\#\Sigma_F(0)$.
+The translation dependence in (i) is exactly the discussion in Remark~\ref{rem:transport-hypotheses} (flat template model) together with the $C^1$ graph
+stability of the holomorphic realization on a cell scale.
 
-The only remaining point is that $\Sigma_F(u)$ is \emph{closed} as a current on $F$.
-For this we use the smooth-interface version of Substep~4.2 (already invoked in Corollary~\ref{cor:global-flat-weighted} and
-Lemma~\ref{lem:uniformly-convex-slice-boundary}): we work with $C^2$ uniformly convex cells of comparable diameter $h$
-(rounded cubes/balls) whose \emph{pairwise interfaces} $F=Q\cap Q'$ are smooth hypersurfaces \emph{without boundary} inside the chosen tubular chart.
-Then for any smooth sheet $Y$ with no boundary one has
-\(
-\partial([Y]\llcorner Q)=[Y]\llcorner \partial Q
-\)
-and $[Y]\llcorner \partial Q$ is an integral cycle (intersection of manifolds without boundary).
-Restricting to the interface hypersurface $F$ inside the chart therefore produces an integral cycle on $F$.
+For (ii), the ridge issue arises only because the sharp face patch $F$ has boundary (edges/ridges) in the cubical complex.
+The rounded-cell convention (Remark~\ref{rem:smooth-cells}) allows us to choose the interface representative $F^{\sharp}$ so that, inside the same tubular chart,
+$F^{\sharp}$ is a smooth hypersurface without boundary that coincides with the flat face away from an $O(h^2)$ neighborhood of the skeleton.
+Since each sheet $Y$ has no boundary, the current $\partial([Y]\llcorner Q)$ is supported on $\partial Q$ and has $\partial(\partial([Y]\llcorner Q))=0$.
+Restricting to the boundaryless hypersurface $F^{\sharp}$ therefore produces an integral cycle slice on $F^{\sharp}$.
+This removes any additional edge-supported boundary term and justifies using Lemma~\ref{lem:flat-translate} in the proof of
+Proposition~\ref{prop:transport-flat-glue-weighted}.
 \end{proof}
 
 \begin{proposition}[Microstructure/gluing estimate]\label{prop:glue-gap}
 Let $T^{\mathrm{raw}}=\sum_Q S_Q$ be the raw integral current built from the microstructure pieces on a mesh of size $h$
 as in Substep~4.2.
-For every interior interface $F=Q\cap Q'$ (i.e.\ a codimension-$1$ face shared by two distinct cells of the mesh),
+For every interior combinatorial interface face $F=Q\cap Q'$ (i.e.\ a codimension-$1$ face shared by two distinct cells of the mesh),
+let $F^{\sharp}\subset Q\cup Q'$ denote the corresponding ridge-free interface hypersurface from Lemma~\ref{lem:face-slice-translation-model}, and define
 the face mismatch current
 \[
-B_F\ :=\ \bigl(\partial S_Q\bigr)\llcorner F\ -\ \bigl(\partial S_{Q'}\bigr)\llcorner F
+B_F\ :=\ \bigl(\partial S_Q\bigr)\llcorner F^{\sharp}\ -\ \bigl(\partial S_{Q'}\bigr)\llcorner F^{\sharp}
 \]
 admits the translation model of Proposition~\ref{prop:transport-flat-glue-weighted} by Lemma~\ref{lem:face-slice-translation-model};
 write the resulting parameter multisets as $\{u_{F,a}\}_{a=1}^{N_F}$ and $\{u'_{F,a}\}_{a=1}^{N_F}$.
@@ -5661,7 +5676,7 @@ Summing over all interior interfaces and setting $U:=\sum_F Q_F$ gives an integr
 \[
 \partial U=\sum_F \partial Q_F=\sum_F B_F.
 \]
-By the oriented face decomposition of $\partial T^{\mathrm{raw}}$ one has $\partial T^{\mathrm{raw}}=\sum_F B_F$, hence
+By the oriented interface decomposition of $\partial T^{\mathrm{raw}}$ on these ridge-free hypersurfaces one has $\partial T^{\mathrm{raw}}=\sum_F B_F$, hence
 $\partial U=\partial T^{\mathrm{raw}}$ and $T:=T^{\mathrm{raw}}-U$ is an integral cycle.
 The mass bound follows from the triangle inequality:
 \[
@@ -5830,11 +5845,17 @@ Given $\epsilon>0$, by refining the cube decomposition and choosing the
 integers $N_{Q,j}$ appropriately, one can achieve simultaneously for all
 $\ell=1,\ldots,b$ that
 \[
-\biggl|\sum_Q S_Q(\Theta_\ell) - m\,I_\ell\biggr| < \tfrac12.
+\biggl|\sum_Q S_Q(\Theta_\ell) - m\,I_\ell\biggr| < \tfrac14.
 \]
-Consequently, by integrality, $\sum_Q S_Q(\Theta_\ell) = m\,I_\ell$ for
-all $\ell$, i.e., the class of $\sum_Q S_Q$ in $H_{2(n-p)}(X,\Z)$ equals
-$\mathrm{PD}(m[\gamma])$.
+Let $S:=\sum_Q S_Q$ and let $U_\epsilon$ be any integral $(2n-2p)$--current with $\partial U_\epsilon=\partial S$ and
+\[
+\Mass(U_\epsilon)\ <\ \min\Bigl\{\epsilon,\ \frac{1}{4\,\max_\ell\|\Theta_\ell\|_{C^0}}\Bigr\}.
+\]
+Then $T_\epsilon:=S-U_\epsilon$ is a closed integral cycle and
+\[
+\int_{T_\epsilon}\Theta_\ell\ =\ m\,I_\ell\qquad\text{for all }\ell=1,\dots,b.
+\]
+In particular, $[T_\epsilon]=\mathrm{PD}(m[\gamma])$ in $H_{2(n-p)}(X,\Z)/\mathrm{tors}$ (equivalently in $H_{2(n-p)}(X,\Q)$).
 \end{proposition}
 
 \begin{proof}
@@ -5866,32 +5887,43 @@ depending on $\max_\ell\|\Theta_\ell\|_{C^0}$ such that
 \[
 \|v_{Q,j}\|_{\ell^\infty}\ \le\ C_0\,h^{2(n-p)}.
 \]
-Choose the mesh $h$ so small that $C_0\,h^{2(n-p)}\le \frac{1}{4b}$.
+Choose the mesh $h$ so small that $C_0\,h^{2(n-p)}\le \frac{1}{8b}$.
 
 \smallskip\noindent
 \textbf{Step 3: Apply B\'ar\'any--Grinberg.}
 Apply Lemma~\ref{lem:barany-grinberg} in dimension $d=b$ to the normalized vectors
-$\widetilde v_{Q,j}:=(4b)\,v_{Q,j}$ (so $\|\widetilde v_{Q,j}\|_{\ell^\infty}\le 1$) with coefficients $a_{Q,j}$.
+$\widetilde v_{Q,j}:=(8b)\,v_{Q,j}$ (so $\|\widetilde v_{Q,j}\|_{\ell^\infty}\le 1$) with coefficients $a_{Q,j}$.
 This yields choices $\varepsilon_{Q,j}\in\{0,1\}$ such that
 \[
 \Bigl\|\sum_{Q,j} (\varepsilon_{Q,j}-a_{Q,j})\,\widetilde v_{Q,j}\Bigr\|_{\ell^\infty}\ \le\ b.
 \]
 Undoing the normalization gives
 \[
-\Bigl\|\sum_{Q,j} (\varepsilon_{Q,j}-a_{Q,j})\, v_{Q,j}\Bigr\|_{\ell^\infty}\ \le\ \frac{1}{4}.
+\Bigl\|\sum_{Q,j} (\varepsilon_{Q,j}-a_{Q,j})\, v_{Q,j}\Bigr\|_{\ell^\infty}\ \le\ \frac{1}{8}.
 \]
 Equivalently, for every $\ell$,
 \[
-\Bigl|\sum_{Q,j} (N_{Q,j}-n_{Q,j})\,\int_{Y_{Q,j}\cap Q}\Theta_\ell\Bigr|\ \le\ \frac{1}{4}.
+\Bigl|\sum_{Q,j} (N_{Q,j}-n_{Q,j})\,\int_{Y_{Q,j}\cap Q}\Theta_\ell\Bigr|\ \le\ \frac{1}{8}.
 \]
 Thus, provided the continuous targets $n_{Q,j}$ were chosen so that
-$\sum_{Q,j} n_{Q,j}\int_{Y_{Q,j}\cap Q}\Theta_\ell$ equals $mI_\ell$ up to $<\frac14$ error (achieved by taking $\delta$ small in the local
+$\sum_{Q,j} n_{Q,j}\int_{Y_{Q,j}\cap Q}\Theta_\ell$ equals $mI_\ell$ up to $<\frac18$ error (achieved by taking $\delta$ small in the local
 Carath\'eodory approximation), we obtain
 \[
-\Bigl|\sum_Q S_Q(\Theta_\ell)-mI_\ell\Bigr|<\frac12
+\Bigl|\sum_Q S_Q(\Theta_\ell)-mI_\ell\Bigr|<\frac14
 \qquad\text{for all }\ell=1,\dots,b.
 \]
-The integrality conclusion is then as stated.
+Now choose the gluing correction $U_\epsilon$ so that $\partial U_\epsilon=\partial S$ and
+$\Mass(U_\epsilon)<\frac{1}{4\max_\ell\|\Theta_\ell\|_{C^0}}$, so that $|\int_{U_\epsilon}\Theta_\ell|<\frac14$ for all $\ell$.
+Then $T_\epsilon:=S-U_\epsilon$ is a closed integral cycle, so by Lemma~\ref{lem:integral-periods} each $\int_{T_\epsilon}\Theta_\ell\in\Z$.
+Moreover,
+\[
+\Bigl|\int_{T_\epsilon}\Theta_\ell-mI_\ell\Bigr|
+\le
+\Bigl|\int_S\Theta_\ell-mI_\ell\Bigr|+\Bigl|\int_{U_\epsilon}\Theta_\ell\Bigr|
+<\tfrac12,
+\]
+so Lemma~\ref{lem:lattice-discreteness} forces $\int_{T_\epsilon}\Theta_\ell=mI_\ell$ for all $\ell$.
+This determines $[T_\epsilon]$ in $H_{2(n-p)}(X,\Z)/\mathrm{tors}$ (hence in rational homology), as claimed.
 \end{proof}
 
 % ------------------------------------------------------------
@@ -5928,9 +5960,9 @@ Define the closed integral current
 T_\epsilon := S - U_\epsilon,
 \qquad \partial T_\epsilon=0.
 \]
-By construction, the homology class
-$[T_\epsilon]=[S]=\mathrm{PD}(m[\gamma])$
-(Proposition~\ref{prop:cohomology-match}).  Moreover, calibratedness
+By Proposition~\ref{prop:cohomology-match}, the closed integral cycle $T_\epsilon$ satisfies
+$[T_\epsilon]=\mathrm{PD}(m[\gamma])$ in $H_{2(n-p)}(X,\Z)/\mathrm{tors}$.
+Moreover, calibratedness
 of the $S_Q$ pieces gives
 \[
 \Mass(T_\epsilon)
@@ -5940,7 +5972,7 @@ of the $S_Q$ pieces gives
 since $\Mass(U_\epsilon)\to 0$.
 
 \begin{proposition}[Almost--calibration and global mass convergence for the glued cycles]\label{prop:almost-calibration}
-Let $S$ be an integral $(2n-2p)$--current (typically not closed) in the class $\mathrm{PD}(m[\gamma])$.
+Let $S$ be an integral $(2n-2p)$--current (typically not closed) built as a sum of local $\psi$--calibrated sheet pieces.
 Let $U_\epsilon$ be integral currents such that
 \[
 \partial U_\epsilon=\partial S,
@@ -5955,6 +5987,7 @@ T_\epsilon := S-U_\epsilon,
 \qquad
 \partial T_\epsilon=0.
 \]
+Assume (as ensured by Proposition~\ref{prop:cohomology-match}) that $[T_\epsilon]=\mathrm{PD}(m[\gamma])$ in $H_{2(n-p)}(X,\Q)$.
 Then:
 \begin{enumerate}
 \item[\textnormal{(i)}] \textbf{Exact calibration pairing.}
