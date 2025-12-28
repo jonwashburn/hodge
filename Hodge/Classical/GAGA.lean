@@ -35,10 +35,10 @@ def isAlgebraicSubvariety (n : ℕ) (X : Type u)
     [ProjectiveComplexManifold n X] [KahlerManifold n X] (Z : Set X) : Prop :=
   ∃ (W : AlgebraicSubvariety n X), W.carrier = Z
 
-/-- **Theorem: GAGA (Serre, 1956)**
+/-- **Serre's GAGA Theorem** (Serre, 1956).
     On a projective complex manifold, every analytic subvariety is algebraic.
-    Reference: J.-P. Serre, "Géométrie algébrique et géométrie analytique",
-    Ann. Inst. Fourier 6 (1956), 1-42. -/
+    This correspondence allows us to treat holomorphic varieties as algebraic objects.
+    Reference: [J.-P. Serre, "Géométrie algébrique et géométrie analytique", Ann. Inst. Fourier 6 (1956), 1-42]. -/
 axiom serre_gaga {p : ℕ} (V : AnalyticSubvariety n X) (hV_codim : V.codim = p) :
     ∃ (W : AlgebraicSubvariety n X), W.carrier = V.carrier ∧ W.codim = p
 
@@ -109,8 +109,9 @@ theorem FundamentalClassSet_empty (p : ℕ) : FundamentalClassSet (n := n) (X :=
 
 /-! ## ω^p is Algebraic (Complete Intersections) -/
 
-/-- **Existence of Hyperplanes** (Hartshorne, 1977).
-    Every projective variety has hyperplane sections that are algebraic subvarieties.
+/-- **Existence of Algebraic Hyperplane Sections** (Hartshorne, 1977).
+    Every projective complex manifold has hyperplane sections that are algebraic
+    subvarieties of codimension 1.
     Reference: [R. Hartshorne, "Algebraic Geometry", Springer, 1977, Chapter I, Section 2]. -/
 axiom exists_hyperplane_algebraic :
     ∃ (H : AlgebraicSubvariety n X), H.codim = 1
