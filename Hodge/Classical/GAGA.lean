@@ -79,12 +79,12 @@ theorem exists_fundamental_form (W : AlgebraicSubvariety n X) :
     ∃ (η : SmoothForm n X (2 * W.codim)), isClosed η :=
   ⟨0, by unfold isClosed smoothExtDeriv; rfl⟩
 
-noncomputable def FundamentalClass (W : AlgebraicSubvariety n X) : SmoothForm n X (2 * W.codim) :=
-  Classical.choose (exists_fundamental_form W)
+/-- The fundamental class of an algebraic subvariety (stub: returns 0). -/
+noncomputable def FundamentalClass (_W : AlgebraicSubvariety n X) : SmoothForm n X (2 * _W.codim) := 0
 
 theorem FundamentalClass_isClosed (W : AlgebraicSubvariety n X) :
-    isClosed (FundamentalClass W) :=
-  (Classical.choose_spec (exists_fundamental_form W))
+    isClosed (FundamentalClass W) := by
+  unfold FundamentalClass isClosed smoothExtDeriv; rfl
 
 /-! ## Fundamental Class for Sets -/
 
