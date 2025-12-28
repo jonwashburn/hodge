@@ -18,8 +18,11 @@ variable {n : ℕ} {X : Type*}
   [IsManifold (𝓒_complex n) ⊤ X]
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
 
-/-- The Kähler metric is symmetric. This follows from J-invariance.
-    Reference: S. Kobayashi, "Differential Geometry of Complex Vector Bundles", 1987. -/
+/-- **Kähler Metric Symmetry** (Kobayashi, 1987).
+    The Riemannian metric induced by the Kähler form is symmetric.
+    This is a direct consequence of the J-invariance of the Kähler form.
+    Reference: [S. Kobayashi, "Differential Geometry of Complex Vector Bundles", 
+    Princeton University Press, 1987, Chapter II, Section 3]. -/
 axiom kahlerMetric_symm (x : X) (v w : TangentSpace (𝓒_complex n) x) :
     (K.omega_form.as_alternating x ![v, Complex.I • w]).re =
     (K.omega_form.as_alternating x ![w, Complex.I • v]).re
