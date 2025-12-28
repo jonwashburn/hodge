@@ -47,14 +47,25 @@ theorem microstructure_limit_is_cycle {k : ℕ}
     L^M have sections with no common zeros.
 
     Reference: [Hartshorne, "Algebraic Geometry", Springer, 1977, Chapter II, Section 5]. -/
-axiom empty_set_is_algebraic : ∃ (W : AlgebraicSubvariety n X), W.carrier = ∅
+theorem empty_set_is_algebraic : ∃ (W : AlgebraicSubvariety n X), W.carrier = ∅ := by
+  use { carrier := ∅, codim := n }
 
-/-- **Lemma: Finite Union from Harvey-Lawson is Algebraic** -/
+/-- **Theorem: Finite Union from Harvey-Lawson is Algebraic**
+    Follows from GAGA and finite induction on the set of varieties. -/
 theorem harvey_lawson_union_is_algebraic {k : ℕ}
     (hl_concl : HarveyLawsonConclusion n X k) :
     isAlgebraicSubvariety n X (⋃ v ∈ hl_concl.varieties, v.carrier) := by
-  -- Follows from GAGA and finite induction on the set of varieties
-  sorry
+  induction hl_concl.varieties using Finset.induction with
+  | empty =>
+    simp only [Finset.notMem_empty, Set.iUnion_of_empty, Set.iUnion_empty]
+    obtain ⟨W, hW⟩ := empty_set_is_algebraic (n := n) (X := X)
+    use W
+  | @insert v vs _ ih =>
+    rw [Finset.set_biUnion_insert]
+    have h_v_alg : isAlgebraicSubvariety n X v.carrier := by
+      obtain ⟨W, hW_carrier, _⟩ := serre_gaga v rfl
+      use W
+    exact isAlgebraicSubvariety_union h_v_alg ih
 
 /-- **Lemma: Degree Reduction Arithmetic** -/
 theorem degree_reduction_arithmetic {p : ℕ} (h : ¬(p ≤ n / 2)) : n - p ≤ n / 2 := by
@@ -85,8 +96,17 @@ theorem hard_lefschetz_fundamental_class_coherence {p p'' k : ℕ}
     (h_alg : isAlgebraicSubvariety n X Z_η)
     (h_class : FundamentalClassSet p'' Z_η = η) :
     FundamentalClassSet p (algebraic_intersection_power Z_η k) = γ := by
-  -- Follows from the functoriality of fundamental classes and Hard Lefschetz
-  sorry
+  revert h_class h_alg h_geom
+  subst h_pk
+  intro h_geom h_alg h_class
+  have h_fact := FundamentalClassSet_intersection_power_eq p'' k Z_η h_alg
+  rw [h_class] at h_fact
+  apply eq_of_heq
+  have : HEq (FundamentalClassSet (p'' + k) (algebraic_intersection_power Z_η k))
+             (lefschetz_power_form k η) := by
+    rw [h_fact]
+    apply cast_heq
+  exact this.trans h_geom
 
 /-- **Theorem: Signed Decomposition Coherence**
 
@@ -104,8 +124,8 @@ theorem signed_decomposition_fundamental_class_coherence {p : ℕ}
     (h_class_pos : FundamentalClassSet p Z_pos = γplus)
     (h_class_neg : FundamentalClassSet p Z_neg = γminus) :
     (SignedAlgebraicCycle.mk Z_pos Z_neg h_alg_pos h_alg_neg).fundamentalClass p = γ := by
-  -- Follows from the definition of signed fundamental classes
-  sorry
+  unfold SignedAlgebraicCycle.fundamentalClass
+  rw [h_class_pos, h_class_neg, h_eq]
 
 /-- **Harvey-Lawson Fundamental Class Connection** (Harvey-Lawson, 1982).
 

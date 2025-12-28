@@ -34,11 +34,11 @@ variable {n : ℕ} {X : Type*}
 /-- Axiomatized predicate: Y is a complex submanifold of dimension p. -/
 def IsComplexSubmanifold (_Y : Set X) (_p : ℕ) : Prop := True
 
-/-- **Theorem: Local Sheet Realization**
-Given a point x and a calibrated direction ξ, we can construct a smooth complex submanifold Y
-passing through x whose tangent plane at x is ε-close to the direction specified by ξ.
-Axiomatized for compilation.
-Reference: [Harvey-Lawson, "Calibrated geometries", Acta Math., 1982, Section 4]. -/
+/-- **Theorem: Local Sheet Realization (Prop 11.3)**
+    Given a point x and a calibrated direction ξ, we can construct a smooth complex submanifold Y
+    passing through x whose tangent plane at x is ε-close to the direction specified by ξ.
+    Axiomatized for compilation.
+    Reference: [Hodge-v6-w-Jon-Update-MERGED.tex, Proposition 11.3]. -/
 axiom local_sheet_realization (p : ℕ) (x : X) (ξ : SmoothForm n X (2 * p))
     (hξ : ξ ∈ simpleCalibratedForms p x) (ε : ℝ) (hε : ε > 0) :
     ∃ (Y : Set X), x ∈ Y ∧ IsComplexSubmanifold Y p ∧
