@@ -15,7 +15,9 @@ This file defines the strongly positive cone K_p(x) of (p,p)-forms at each point
 
 noncomputable section
 
-open Classical Metric Set
+open Classical Metric Set Filter
+
+set_option autoImplicit false
 
 variable {n : ℕ} {X : Type*}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
@@ -25,15 +27,15 @@ variable {n : ℕ} {X : Type*}
 /-! ## Strongly Positive Cone -/
 
 /-- The strongly positive cone K_p(x) at a point x is the convex cone hull
-of simple calibrated forms.
-Reference: [Harvey-Lawson, 1982]. -/
+of simple calibrated forms. -/
 def stronglyPositiveCone (p : ℕ) (x : X) : Set (SmoothForm n X (2 * p)) :=
   (ConvexCone.hull ℝ (simpleCalibratedForms p x)).carrier
 
-/-- The strongly positive cone is convex. 
-    This is axiomatized because the module structure needed is complex. -/
-axiom stronglyPositiveCone_convex (p : ℕ) (x : X) :
-    Convex ℝ (stronglyPositiveCone (n := n) p x)
+/-- The strongly positive cone is convex. -/
+theorem stronglyPositiveCone_convex (p : ℕ) (x : X) :
+    Convex ℝ (stronglyPositiveCone (n := n) p x) := by
+  unfold stronglyPositiveCone
+  exact ConvexCone.convex _
 
 /-- A global form is cone-positive if it is pointwise in the strongly positive cone. -/
 def isConePositive {p : ℕ} (α : SmoothForm n X (2 * p)) : Prop :=
@@ -45,40 +47,45 @@ def isConePositive {p : ℕ} (α : SmoothForm n X (2 * p)) : Prop :=
 def omegaPow_point (p : ℕ) (_x : X) : SmoothForm n X (2 * p) :=
   omegaPow n X p
 
-/-- **Axiom: Wirtinger Inequality** (Pointwise):
-The pairing of ω^p with any simple calibrated form is exactly 1.
-Reference: [Harvey-Lawson, 1982, p. 17]. -/
-axiom wirtinger_pairing (p : ℕ) (x : X) (ξ : SmoothForm n X (2 * p))
+/-- **Wirtinger Inequality** (Pointwise):
+    The pairing of ω^p with any simple calibrated form is exactly 1.
+    Reference: [Harvey-Lawson, 1982, p. 17]. -/
+theorem wirtinger_pairing (p : ℕ) (x : X) (ξ : SmoothForm n X (2 * p))
     (hξ : ξ ∈ simpleCalibratedForms p x) :
-    pointwiseInner (omegaPow_point p x) ξ x = 1
+    pointwiseInner (omegaPow_point p x) ξ x = 1 := by
+  -- Follows from the fact that ω^p evaluates to p! on complex p-planes.
+  -- With our normalization, this is 1.
+  sorry
 
-/-- **Axiom: ω^p is in the interior of K_p(x)**.
-Proof: By the Wirtinger inequality, ω^p pairs with value 1 with all simple calibrated forms.
-Since these generate the strongly positive cone, ω^p lies in its interior.
-Reference: [Harvey-Lawson, 1982]. -/
-axiom omegaPow_in_interior (p : ℕ) (x : X) :
-    (omegaPow_point p x) ∈ interior (stronglyPositiveCone (n := n) p x)
+/-- **ω^p is in the interior of K_p(x)**.
+    Proof: By the Wirtinger inequality, ω^p pairs with value 1 with all simple calibrated forms.
+    Since these generate the strongly positive cone and its dual, ω^p lies in its interior. -/
+theorem omegaPow_in_interior (p : ℕ) (x : X) :
+    (omegaPow_point p x) ∈ interior (stronglyPositiveCone (n := n) p x) := by
+  -- Since ω^p pairs positively with all calibrated forms, it lies in the interior.
+  sorry
 
-/-- **Axiom: Uniform Interior Radius Theorem**:
-There exists a uniform interior radius r > 0 such that B(ω^p(x), r) ⊆ K_p(x) for all x ∈ X.
-This follows from compactness of X and continuity of the cone bundle. -/
-axiom exists_uniform_interior_radius (p : ℕ) [CompactSpace X] [Nonempty X] :
+/-- **Uniform Interior Radius Theorem**:
+    There exists a uniform interior radius r > 0 such that B(ω^p(x), r) ⊆ K_p(x) for all x ∈ X. -/
+theorem exists_uniform_interior_radius (p : ℕ) [CompactSpace X] [Nonempty X] :
     ∃ r : ℝ, r > 0 ∧ ∀ x : X, ∀ y : SmoothForm n X (2 * p),
-      comass (y - omegaPow_point p x) < r → y ∈ stronglyPositiveCone p x
+      pointwiseComass (y - omegaPow_point p x) x < r → y ∈ stronglyPositiveCone p x := by
+  -- Continuous function (radius) on compact space has positive minimum.
+  sorry
 
 /-! ## Carathéodory Decomposition -/
 
-/-- **Axiom: Carathéodory Decomposition Theorem**: Any element of K_p(x) can be written as
-    a finite conic combination of simple calibrated forms.
-    Reference: [Carathéodory, 1907]. -/
+/-- **Carathéodory's Theorem**: Any point in the convex hull of S in ℝ^d
+    is a convex combination of at most d+1 points.
+    Reference: C. Carathéodory, "Über den Variabilitätsbereich der Fourier'schen Konstanten von positiven harmonischen Funktionen",
+    Rend. Circ. Mat. Palermo 32 (1911), 193-217. -/
 axiom caratheodory_decomposition (p : ℕ) (x : X)
     (β : SmoothForm n X (2 * p)) (hβ : β ∈ stronglyPositiveCone p x) :
     ∃ (N : ℕ) (c : Fin N → ℝ) (ξ : Fin N → SmoothForm n X (2 * p)),
       (∀ i, c i ≥ 0) ∧ (∀ i, ξ i ∈ simpleCalibratedForms p x) ∧
       β = ∑ i, c i • ξ i
 
-/-- **Helper**: On a compact space, a continuous positive function has a positive infimum.
-This uses `IsCompact.exists_isMinOn` from Mathlib. -/
+/-- **Helper**: On a compact space, a continuous positive function has a positive infimum. -/
 theorem compact_pos_has_pos_inf {Y : Type*} [TopologicalSpace Y] [CompactSpace Y]
     [Nonempty Y] (f : Y → ℝ) (hf_cont : Continuous f) (hf_pos : ∀ y, f y > 0) :
     ∃ r : ℝ, r > 0 ∧ ∀ y, f y ≥ r := by
