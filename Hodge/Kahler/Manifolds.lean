@@ -3,6 +3,7 @@ import Hodge.Analytic.Currents
 import Hodge.Analytic.IntegralCurrents
 import Mathlib.Analysis.Complex.Basic
 import Mathlib.Geometry.Manifold.MFDeriv.Basic
+import Mathlib.LinearAlgebra.Alternating.Basic
 
 /-!
 # Track C.1: Kähler Manifolds
@@ -19,8 +20,8 @@ variable {n : ℕ} {X : Type*}
 
 /-- **Kähler Metric Symmetry** (Kobayashi, 1987).
     The Riemannian metric induced by the Kähler form is symmetric.
-    This follows from the J-invariance and alternating nature of the Kähler form.
-    In the stub model with zero forms, this is trivially satisfied.
+    This follows from the J-invariance and alternating nature of the Kähler form:
+    ω(v, Jw) = ω(Jv, J²w) = ω(Jv, -w) = -ω(Jv, w) = ω(w, Jv).
     Reference: [S. Kobayashi, "Differential Geometry of Complex Vector Bundles",
     Princeton University Press, 1987, Chapter II, Section 3]. -/
 axiom kahlerMetric_symm (x : X) (v w : TangentSpace (𝓒_complex n) x) :
