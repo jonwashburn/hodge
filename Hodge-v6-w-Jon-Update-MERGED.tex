@@ -459,6 +459,27 @@ the Hermitian/PSD and net linear-algebra discussions (Sections~\ref{sec:energy-g
 \end{center}
 \end{editconeblock}
 
+\subsection*{External inputs (adversarial disclosure)}
+
+For transparency regarding what this manuscript does and does not prove ``from scratch,'' we explicitly list the external inputs on which the main theorem depends.  These are deep results from prior literature that are cited and used but not reproved here.
+
+\begin{enumerate}
+\item \textbf{Bergman kernel asymptotics and jet control} (Lemma~\ref{lem:bergman-control}, Remark~\ref{rem:bergman-control-external}): The uniform $C^1$ gradient control on $m^{-1/2}$-balls for holomorphic sections of high tensor powers of ample line bundles.  References: Tian~\cite{Tian90}, Catlin~\cite{Catlin99}, Zelditch~\cite{Zelditch98}, Ma--Marinescu~\cite{MaMarinescu07}.
+
+\item \textbf{Bertini-type transversality}: The existence of small generic perturbations in linear systems that preserve prescribed jets while maintaining $C^1$ bounds.  References: Griffiths--Harris~\cite{GH78}, Lazarsfeld~\cite{Lazarsfeld-PAG}.
+
+\item \textbf{Integer rounding in fixed dimension} (Proposition~\ref{prop:global-coherence-all-labels}, Remark~\ref{rem:integer-rounding-external}): The Barvinok--Bar\'any--Grinberg discrepancy bounds for integer approximation in fixed-dimensional polytopes.  Reference: Barvinok~\cite{Barvinok-IntProg}.
+
+\item \textbf{Harvey--Lawson structure theorem}: $\psi$-calibrated integral currents are positive sums of complex analytic subvarieties.  Reference: Harvey--Lawson~\cite{HL82}.
+
+\item \textbf{Chow / GAGA}: Closed analytic subvarieties of projective manifolds are algebraic.  References: Chow~\cite{Chow49}, Serre~\cite{Serre56}.
+
+\item \textbf{Federer--Fleming compactness}: Integral currents with uniformly bounded mass and boundary mass admit weakly convergent subsequences with integral limits.  Reference: Federer~\cite{Federer69}.
+\end{enumerate}
+
+\noindent
+The novel content of this manuscript is the \emph{microstructure/gluing} construction (Section~\ref{sec:realization}) that produces fixed-class integral cycles with vanishing calibration defect, together with the corner-exit coherence mechanism that achieves the required $\mathcal{F}(\partial T^{\mathrm{raw}}) = o(m)$ estimate.  The above external inputs are the ``black boxes'' on which this construction rests.  See Remark~\ref{rem:external-inputs-h1h2} for a more detailed discussion of the H1/H2 external inputs.
+
 \section{Notation and K\"ahler Preliminaries}
 
 This section records the analytic and geometric conventions used throughout the
@@ -2210,6 +2231,27 @@ The exact-class conclusion is enforced by Proposition~\ref{prop:cohomology-match
 rather than relying on a decay exponent in $h$.
 Thus the hypothesis \textnormal{(H2)} in Theorem~\ref{thm:spine-quantitative} holds in this manuscript.
 \end{proposition}
+
+\begin{remark}[External inputs for H1/H2 (adversarial disclosure)]\label{rem:external-inputs-h1h2}
+For clarity in assessing the proof, we explicitly flag the following components of H1/H2 as \emph{external inputs}---deep theorems from prior literature that are invoked but not proved from scratch here.
+
+\smallskip\noindent
+\textbf{External inputs for H1:}
+\begin{enumerate}
+\item \emph{Bergman/peak-section control} (Lemma~\ref{lem:bergman-control}): The uniform $C^1$ gradient control on $m^{-1/2}$-balls is a consequence of standard Bergman kernel asymptotics and jet interpolation on ample line bundles.  References: Tian~\cite{Tian90}, Catlin~\cite{Catlin99}, Zelditch~\cite{Zelditch98}, Demailly~\cite{Demailly-L2}.  This is not a trivial input: it requires holomorphic peak-section construction with quantitative derivative control.
+\item \emph{Bertini-type transversality} (Proposition~\ref{prop:tangent-approx-full}, Step 4): The existence of small generic perturbations that preserve prescribed jets while maintaining $C^1$ bounds uses the fact that for large $m$, the space $H^0(X,L^m)$ is large enough to perturb independently at separated points.  References: Bertini theorems in Griffiths--Harris~\cite{GH78}, Lazarsfeld~\cite{Lazarsfeld-PAG}.
+\end{enumerate}
+
+\smallskip\noindent
+\textbf{External inputs for H2:}
+\begin{enumerate}
+\item \emph{Integer simultaneous rounding} (Proposition~\ref{prop:global-coherence-all-labels}): The claim that integer activations can satisfy local budgets, slow-variation, and global period constraints simultaneously relies on the Barvinok--Bar\'any--Grinberg integer rounding lemmas and the fact that the constraint dimension is fixed (rank of $H^{2n-2p}(X,\Z)$).  Reference: Barvinok~\cite{Barvinok-IntProg}.
+\item \emph{Corner-exit template coherence} (Proposition~\ref{prop:vertex-template-face-edits}): The deterministic face-incidence properties of the corner-exit geometry are structural consequences of convexity and transversality, but the fact that edge/corner contributions do not accumulate relies on the bounded-face-count property of cubical meshes.
+\end{enumerate}
+
+\smallskip\noindent
+\textbf{Consistency note:} The local engine for H1 is not the multi-direction local-sheets statement (Theorem~\ref{thm:local-sheets}) in isolation, but the corner-exit route (Proposition~\ref{prop:holomorphic-corner-exit-L1} + vertex-template coherence) which manufactures parallel translates of a single plane per label and enforces deterministic face incidence.  This avoids the potential disjointness issues that arise when different $(n-p)$-planes generically intersect for $p < n/2$.
+\end{remark}
 \end{editjonblock}
 
 % ------------------------------------------------------------
@@ -2691,6 +2733,10 @@ and Zelditch~\cite{Zelditch98}; quantitative jet-interpolation and $C^\ell$ esti
 suitable for projective embeddings can be found for example in Donaldson~\cite{Donaldson01}
 or in the exposition of Ma--Marinescu~\cite{MaMarinescu07}.
 \end{proof}
+
+\begin{remark}[External input flag]\label{rem:bergman-control-external}
+\textbf{This lemma is an external input.}  It is not proved from first principles in this manuscript.  The statement relies on deep results from complex geometry: Bergman kernel asymptotics on ample line bundles, uniform $C^\ell$ estimates on Bergman-scale balls, and the construction of ``peak sections'' that interpolate prescribed jets.  These are well-established but substantial theorems.  Any adversarial audit of this proof should treat Lemma~\ref{lem:bergman-control} as an imported assumption with the above references as justification.
+\end{remark}
 
 \begin{editblock}
 \begin{lemma}[Graph control from uniform gradient control]\label{lem:graph-from-grad}
@@ -4887,6 +4933,18 @@ give a per-label flat-norm mismatch bound; summing over the finitely many labels
 $\mathcal F(\partial T^{\mathrm{raw}})=o(m)$ in the scaling regime of Remark~\ref{rem:weighted-scaling}.
 \end{proof}
 
+\begin{remark}[External inputs for integer rounding]\label{rem:integer-rounding-external}
+\textbf{This proposition relies on external inputs from discrete optimization.}  Steps 2 and 4 use integer rounding lemmas whose proofs invoke:
+\begin{itemize}
+\item the Barvinok--Bar\'any--Grinberg discrepancy bounds for integer approximation in fixed-dimensional polytopes (Lemma~\ref{lem:barany-grinberg});
+\item the observation that the constraint dimension $b=\mathrm{rank}\,H^{2n-2p}(X,\Z)$ is fixed (independent of mesh refinement), so that
+  discrepancy bounds do not blow up.
+\end{itemize}
+Reference: Barvinok, \emph{Integer Programming} \cite{Barvinok-IntProg}.
+
+\smallskip\noindent
+\textbf{Adversarial concern:} The claim that global period-fixing does not break the local slow-variation bounds depends on the bounded-correction absorption mechanism (Remark~\ref{rem:bounded-corrections}).  Any audit should verify that the correction vectors have uniformly bounded entries and that this bound is independent of mesh refinement.
+\end{remark}
 
 \begin{remark}[Making the ``prefix-balanced face population'' explicit]
 The previous proposition treats each vertex template separately.

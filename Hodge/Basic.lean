@@ -158,22 +158,22 @@ def DeRhamCohomologyClass.ofForm {n : ℕ} {X : Type u} {k : ℕ}
 notation "⟦" ω "⟧" => DeRhamCohomologyClass.ofForm ω
 
 /-- **Rationality of Cohomology Classes** (Integral/Rational Cohomology).
-    
+
     A cohomology class η ∈ H^k(X, ℂ) is *rational* if it lies in the image of
     H^k(X, ℚ) → H^k(X, ℂ) under the natural inclusion.
-    
+
     Equivalently, η is rational if its periods over all integral cycles are rational.
-    
+
     This predicate is fundamental to the Hodge Conjecture, which asserts that
     rational (p,p)-classes are algebraic.
-    
+
     Key properties (axiomatized in Manifolds.lean):
     - `isRationalClass_add`: sum of rational classes is rational
     - `isRationalClass_smul_rat`: rational multiple of rational class is rational
     - `zero_is_rational`: the zero class is rational
     - `omega_pow_is_rational`: powers of the Kähler form are rational
     - `FundamentalClassSet_rational`: fundamental classes of algebraic varieties are rational
-    
+
     Reference: [C. Voisin, "Hodge Theory and Complex Algebraic Geometry",
     Vol. I, Cambridge University Press, 2002, Definition 7.1]. -/
 opaque isRationalClass {n : ℕ} {X : Type u}

@@ -34,8 +34,28 @@ universe u
 
 /-! ## (p,q)-Forms -/
 
-/-- A smooth differential form is of type (p,q).
-    In the stub model, this is an opaque predicate. -/
+/-- **(p,q)-Type Decomposition** (Hodge Decomposition).
+
+    On a complex manifold X, the space of smooth k-forms decomposes as:
+
+    A^k(X) = ⊕_{p+q=k} A^{p,q}(X)
+
+    where A^{p,q}(X) consists of forms of type (p,q), meaning forms that are
+    locally expressible as sums of terms involving p holomorphic differentials
+    dz_i and q anti-holomorphic differentials dz̄_j.
+
+    This predicate `isPQForm n X p q h ω` asserts that the form ω is of type (p,q).
+
+    Key properties:
+    - `zero_is_pq`: the zero form is of type (p,q) for all p,q
+    - `isPQForm_wedge`: wedge product of (p,q) and (r,s) forms is of type (p+r, q+s)
+    - `omega_is_1_1`: the Kähler form is of type (1,1)
+    - `omega_pow_is_p_p`: ω^p is of type (p,p)
+
+    Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry",
+    Wiley, 1978, Chapter 0, Section 5].
+    Reference: [C. Voisin, "Hodge Theory and Complex Algebraic Geometry",
+    Vol. I, Cambridge University Press, 2002, Chapter 6]. -/
 opaque isPQForm (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]

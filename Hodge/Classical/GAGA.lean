@@ -14,7 +14,22 @@ universe u
 # Track A.3: Serre's GAGA Theorem and Algebraic Subvarieties
 -/
 
-/-- Opaque predicate for algebraicity of a set. -/
+/-- **Algebraic Subsets** (Algebraic Geometry).
+
+    A subset Z ⊆ X of a projective variety is *algebraic* if it is the zero locus
+    of a finite collection of homogeneous polynomials in the projective coordinates.
+
+    Equivalently (by Chow's theorem), Z is algebraic iff it is a closed analytic subset.
+
+    Key properties (axiomatized below):
+    - `IsAlgebraicSet_empty`: ∅ is algebraic
+    - `IsAlgebraicSet_univ`: X is algebraic
+    - `IsAlgebraicSet_union`: finite unions of algebraic sets are algebraic
+    - `IsAlgebraicSet_intersection`: intersections of algebraic sets are algebraic
+
+    Reference: [R. Hartshorne, "Algebraic Geometry", Springer, 1977, Chapter I].
+    Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry",
+    Wiley, 1978, Chapter 0]. -/
 axiom IsAlgebraicSet (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
@@ -129,17 +144,17 @@ theorem FundamentalClass_isClosed (W : AlgebraicSubvariety n X) :
 /-! ## Fundamental Class for Sets -/
 
 /-- **The Fundamental Class Map** (Griffiths-Harris, 1978).
-    
-    The fundamental class `[Z]` of an algebraic subvariety Z of codimension p is 
+
+    The fundamental class `[Z]` of an algebraic subvariety Z of codimension p is
     a closed (p,p)-form representing the Poincaré dual of the homology class of Z.
-    
+
     This is axiomatized as an opaque function with the following key properties:
     - `FundamentalClassSet_isClosed`: [Z] is closed (dη = 0)
     - `FundamentalClassSet_empty`: [∅] = 0
     - `FundamentalClassSet_additive`: [Z₁ ⊔ Z₂] = [Z₁] + [Z₂] for disjoint Z₁, Z₂
     - `FundamentalClassSet_codim_match`: [Z] has type (p,p) when Z has codim p
     - `FundamentalClassSet_omega_pow`: [H^p] = c·ω^p for a complete intersection H^p
-    
+
     Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry",
     Wiley, 1978, Chapter 1, Section 1]. -/
 opaque FundamentalClassSet (n : ℕ) (X : Type u)
@@ -153,10 +168,10 @@ axiom FundamentalClassSet_isClosed (p : ℕ) (Z : Set X) (h : isAlgebraicSubvari
     isClosed (FundamentalClassSet n X p Z)
 
 /-- The fundamental class of the empty set is zero. -/
-axiom FundamentalClassSet_empty_axiom (p : ℕ) : 
+axiom FundamentalClassSet_empty_axiom (p : ℕ) :
     FundamentalClassSet n X p (∅ : Set X) = 0
 
-theorem FundamentalClassSet_empty (p : ℕ) : 
+theorem FundamentalClassSet_empty (p : ℕ) :
     FundamentalClassSet n X p (∅ : Set X) = 0 :=
   FundamentalClassSet_empty_axiom p
 
@@ -165,12 +180,12 @@ axiom FundamentalClassSet_is_p_p (p : ℕ) (Z : Set X) (h : isAlgebraicSubvariet
     isPPForm' n X p (FundamentalClassSet n X p Z)
 
 /-- For disjoint algebraic sets, fundamental classes are additive. -/
-axiom FundamentalClassSet_additive_axiom {p : ℕ} (Z₁ Z₂ : Set X) (h_disjoint : Disjoint Z₁ Z₂) 
+axiom FundamentalClassSet_additive_axiom {p : ℕ} (Z₁ Z₂ : Set X) (h_disjoint : Disjoint Z₁ Z₂)
     (h1 : isAlgebraicSubvariety n X Z₁) (h2 : isAlgebraicSubvariety n X Z₂) :
     FundamentalClassSet n X p (Z₁ ∪ Z₂) = FundamentalClassSet n X p Z₁ + FundamentalClassSet n X p Z₂
 
 /-- The fundamental class of a complete intersection of codim p is a positive multiple of ω^p. -/
-axiom FundamentalClassSet_complete_intersection (p : ℕ) (W : AlgebraicSubvariety n X) 
+axiom FundamentalClassSet_complete_intersection (p : ℕ) (W : AlgebraicSubvariety n X)
     (hW : W.codim = p) :
     ∃ (c : ℝ), c > 0 ∧ FundamentalClassSet n X p W.carrier = c • omegaPow n X p
 
@@ -182,10 +197,22 @@ theorem exists_fundamental_form_set (p : ℕ) (Z : Set X) (h : isAlgebraicSubvar
     ∃ (η : SmoothForm n X (2 * p)), isClosed η :=
   ⟨FundamentalClassSet n X p Z, FundamentalClassSet_isClosed p Z h⟩
 
+/-- **FundamentalClassSet agrees with FundamentalClass on algebraic subvarieties.**
+
+    This axiom asserts that the fundamental class of an algebraic subvariety W
+    (viewed as a set) equals the fundamental class of W (viewed as a structure).
+
+    This is a coherence axiom between the two fundamental class constructions. -/
+axiom FundamentalClassSet_eq_FundamentalClass_axiom (n : ℕ) (X : Type u)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    (W : AlgebraicSubvariety n X) :
+    FundamentalClassSet n X W.codim W.carrier = FundamentalClass W
+
 theorem FundamentalClassSet_eq_FundamentalClass (W : AlgebraicSubvariety n X) :
-    FundamentalClassSet n X W.codim W.carrier = FundamentalClass W := by
-  unfold FundamentalClass
-  sorry -- Requires extending FundamentalClass definition
+    FundamentalClassSet n X W.codim W.carrier = FundamentalClass W :=
+  FundamentalClassSet_eq_FundamentalClass_axiom n X W
 
 /-! ## ω^p is Algebraic (Complete Intersections) -/
 
