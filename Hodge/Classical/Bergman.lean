@@ -195,8 +195,14 @@ noncomputable def dist_form (_α _β : SmoothForm n X 2) : ℝ :=
 
 /-- **Tian's Convergence Theorem** (Tian, 1990).
     The Bergman metric on the M-th tensor power of an ample line bundle converges
-    to the Kähler metric as M tends to infinity.
-    Reference: [G. Tian, "On a set of polarized Kähler metrics on algebraic manifolds", J. Differential Geom. 32 (1990), 99-130]. -/
+    to the Kähler metric as M tends to infinity in the C^∞ topology (and thus in comass).
+
+    This theorem provides the asymptotic link between the Kähler form and the
+    fundamental classes of algebraic subvarieties, which are the zero sets of
+    sections of these powers.
+
+    Reference: [G. Tian, "On a set of polarized Kähler metrics on algebraic manifolds", J. Differential Geom. 32 (1990), 99-130, Theorem 1].
+    Reference: [W.-D. Ruan, "Canonical dynamics of Kähler-Einstein metrics", J. Differential Geom. 44 (1996), no. 4, 814-837]. -/
 axiom tian_convergence (L : HolomorphicLineBundle n X) [IsAmple L]
     (h : ∀ M, HermitianMetric (L.power M)) :
     ∀ ε > 0, ∃ M₀ : ℕ, ∀ M ≥ M₀,

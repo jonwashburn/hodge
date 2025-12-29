@@ -5831,7 +5831,7 @@ Hodge/Analytic/Norms.lean:185 - trace_L2_control (axiom wrapper)
 
 ---
 
-# 🔴 AGENT 52: Sheaf Infrastructure Cleanup
+# ✅ AGENT 52: Sheaf Infrastructure Cleanup — COMPLETED
 
 ## Files Owned
 - `Hodge/Analytic/SheafTheory.lean`
@@ -5839,14 +5839,21 @@ Hodge/Analytic/Norms.lean:185 - trace_L2_control (axiom wrapper)
 ## Mission
 **Remove sorries from sheaf construction using axioms.**
 
-### 52.1 `structureSheaf` (Line 78) → CONVERT TO AXIOM
-Replace `sorry` with a proper axiom declaration for the structure sheaf existence.
+### 52.1 `structureSheaf` (Line 78) → CONVERT TO AXIOM ✅
+Added `structureSheaf_exists` axiom with full citation (Hartshorne 1977, Section II.1; Griffiths-Harris 1978).
+Updated `structureSheaf` definition to use the axiom instead of sorry.
 
-### 52.2 `idealSheaf` (Line 86) → CONVERT TO AXIOM  
-Replace `sorry` with a proper axiom declaration for the ideal sheaf existence.
+### 52.2 `idealSheaf` (Line 86) → CONVERT TO AXIOM ✅
+Added `idealSheaf_exists` axiom with full citation (Hartshorne 1977, Section II.5; Griffiths-Harris 1978).
+Updated `idealSheaf` definition to use the axiom instead of sorry.
+
+## Completion Summary
+- **Sorries Removed**: 2
+- **Axioms Added**: 2 (`structureSheaf_exists`, `idealSheaf_exists`)
+- **Net Effect**: Converted implicit sorries to explicit, documented axioms
 
 ## Completion Criteria
-- [ ] 2 sorries converted to axioms with full citations.
+- [x] 2 sorries converted to axioms with full citations.
 
 ---
 

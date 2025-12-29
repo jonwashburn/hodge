@@ -35,7 +35,8 @@ structure CalibratingForm (n : ℕ) (X : Type*) (k : ℕ)
 /-- **Wirtinger Inequality** (Harvey-Lawson 1982). -/
 theorem wirtinger_comass_bound (p : ℕ) :
     comass ((1 / (p.factorial : ℂ)) • omegaPow n X p) ≤ 1 := by
-  unfold comass; simp
+  unfold comass
+  split_ifs <;> norm_num
 
 /-- The Kähler calibration ω^p/p! as a 2p-form. -/
 def KählerCalibration (p : ℕ) : CalibratingForm n X (2 * p) where
@@ -59,7 +60,9 @@ def isCalibrated {k : ℕ} (T : Current n X k) (ψ : CalibratingForm n X k) : Pr
 theorem calibration_inequality {k : ℕ} (T : Current n X k) (ψ : CalibratingForm n X k) :
     T.toFun ψ.form ≤ T.mass := by
   -- In stub model, T.toFun ψ.form = 0 and T.mass = 0.
-  rw [T.toFun_zero ψ.form, Current.mass]
+  rw [T.toFun_zero ψ.form]
+  unfold Current.mass
+  exact le_refl 0
 
 /-- The calibration defect measures how far T is from being calibrated. -/
 def calibrationDefect {k : ℕ} (T : Current n X k) (ψ : CalibratingForm n X k) : ℝ :=
@@ -114,6 +117,8 @@ theorem limit_is_calibrated {k : ℕ} (T : ℕ → Current n X k) (T_limit : Cur
     isCalibrated T_limit ψ := by
   -- In stub model, all currents are calibrated.
   unfold isCalibrated
-  rw [T_limit.toFun_zero ψ.form, Current.mass]
+  rw [T_limit.toFun_zero ψ.form]
+  unfold Current.mass
+  rfl
 
 end

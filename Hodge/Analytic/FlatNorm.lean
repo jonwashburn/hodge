@@ -44,8 +44,7 @@ theorem flatNorm_le_mass {k : ℕ} (T : Current n X k) :
 theorem eval_le_flatNorm {k : ℕ} (T : Current n X k) (ψ : SmoothForm n X k) :
     |T.toFun ψ| ≤ flatNorm T * max (comass ψ) (comass (smoothExtDeriv ψ)) := by
   -- In stub model, T.toFun ψ = 0 by definition.
-  have h_zero : T.toFun ψ = 0 := T.toFun_zero ψ
-  rw [h_zero, flatNorm]
-  simp only [abs_zero, zero_mul, le_refl]
+  rw [T.toFun_zero ψ]
+  simp only [abs_zero, flatNorm, zero_mul, le_refl]
 
 end

@@ -20,8 +20,14 @@ variable {n : ℕ} {X : Type u}
 
 /-- **Serre Vanishing Theorem** (Serre, 1955).
     For an ample line bundle L and a coherent sheaf F on a projective complex manifold X,
-    the higher cohomology groups H^q(X, L^M ⊗ F) vanish for sufficiently large M.
-    Reference: [J.-P. Serre, "Faisceaux algébriques cohérents", Ann. of Math. 61 (1955), 197-278]. -/
+    the higher cohomology groups H^q(X, L^⊗M ⊗ F) vanish for sufficiently large M.
+
+    This theorem is fundamental in the study of algebraic varieties and ensures that
+    geometric obstructions (cohomology classes) disappear when the bundle is
+    sufficiently positive.
+
+    Reference: [J.-P. Serre, "Faisceaux algébriques cohérents", Ann. of Math. (2) 61 (1955), 197-278, Theorem 1].
+    Reference: [R. Hartshorne, "Algebraic Geometry", Springer, 1977, Chapter III, Theorem 5.2]. -/
 axiom serre_vanishing (L : HolomorphicLineBundle n X) [IsAmple L]
     (F : CoherentSheaf n X) (q : ℕ) (hq : q > 0) :
     ∃ M₀ : ℕ, ∀ M ≥ M₀, vanishes (tensorWithSheaf (L.power M) F) q

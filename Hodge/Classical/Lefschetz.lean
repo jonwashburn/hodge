@@ -77,9 +77,15 @@ def lefschetz_power (n : ℕ) (X : Type u)
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
     (p k : ℕ) : DeRhamCohomology n X p →ₗ[ℂ] DeRhamCohomology n X (p + 2 * k) := 0
 
-/-- **The Hard Lefschetz Theorem** (Griffiths-Harris, 1978).
+/-- **The Hard Lefschetz Theorem** (Lefschetz, 1924).
     For a compact Kähler manifold of complex dimension n, the iterated Lefschetz
     operator L^{n-p} : H^p(X, ℂ) → H^{2n-p}(X, ℂ) is an isomorphism for all p ≤ n.
+
+    This theorem relates the cohomology groups of different degrees through the
+    Kähler class and is a pillar of Kähler geometry and Hodge theory.
+
+    Reference: [S. Lefschetz, "L'Analysis Situs et la Géométrie Algébrique", Gauthier-Villars, 1924].
+    Reference: [W.V.D. Hodge, "The Theory and Applications of Harmonic Integrals", Cambridge University Press, 1941, p. 173].
     Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry", Wiley, 1978, p. 122]. -/
 axiom hard_lefschetz_bijective (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]

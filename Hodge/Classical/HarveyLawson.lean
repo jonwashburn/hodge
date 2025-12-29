@@ -84,18 +84,27 @@ structure HarveyLawsonConclusion (n : ℕ) (X : Type*) (k : ℕ)
 /-- **Harvey-Lawson Structure Theorem** (Harvey-Lawson, 1982).
     A calibrated integral cycle on a Kähler manifold is integration along a
     positive sum of complex analytic subvarieties.
-    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries",
-    Acta Math. 148 (1982), 47-157, Theorem 4.1]. -/
+
+    This deep theorem provides the crucial link between the geometric measure
+    theory output (calibrated cycles) and algebraic geometry (analytic varieties).
+
+    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", Acta Math. 148 (1982), 47-157, Theorem 4.1].
+    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", Acta Math. 148 (1982), 47-157, Section 4]. -/
 axiom harvey_lawson_theorem {k : ℕ} (hyp : HarveyLawsonHypothesis n X k) :
     HarveyLawsonConclusion n X k
 
 /-! ## Flat Limit Properties -/
 
-/-- **Boundary of Flat Limit of Cycles** (Federer-Fleming, 1960).
+/-- **Boundary of Flat Limit of Cycles** (Federer, 1969).
     If a sequence of currents that are cycles converges in flat norm to a limit T,
     then the limit T is also a cycle. This follows from the continuity of the
     boundary operator in the flat topology.
-    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", Ann. of Math. 72 (1960), 458-520, Theorem 8.12]. -/
+
+    This property ensures that the limit of our microstructure sequence remains
+    a cycle, a necessary condition for the Harvey-Lawson theorem.
+
+    Reference: [H. Federer, "Geometric Measure Theory", Springer, 1969, Section 4.2.26].
+    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", Ann. of Math. (2) 72 (1960), 458-520, Theorem 8.12]. -/
 axiom flat_limit_of_cycles_is_cycle {k : ℕ}
     (T_seq : ℕ → IntegralCurrent n X k)
     (T_limit : IntegralCurrent n X k)

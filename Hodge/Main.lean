@@ -38,35 +38,6 @@ theorem microstructure_limit_is_cycle {k : ℕ}
   obtain ⟨T_seq, h_cycles, h_conv⟩ := h_from_microstructure
   exact flat_limit_of_cycles_is_cycle T_seq T h_cycles h_conv
 
-/-- **Theorem: Empty Set is Algebraic** (Standard fact).
-    The empty set is an algebraic subvariety of any projective variety.
-
-    This follows from the fact that on a projective variety embedded in ℙⁿ,
-    the intersection of n+1 generic hyperplanes in general position is empty.
-    Alternatively, for any ample line bundle L, sufficiently high tensor powers
-    L^M have sections with no common zeros.
-
-    Reference: [Hartshorne, "Algebraic Geometry", Springer, 1977, Chapter II, Section 5]. -/
-theorem empty_set_is_algebraic : ∃ (W : AlgebraicSubvariety n X), W.carrier = ∅ := by
-  use { carrier := ∅, codim := n }
-
-/-- **Theorem: Finite Union from Harvey-Lawson is Algebraic**
-    Follows from GAGA and finite induction on the set of varieties. -/
-theorem harvey_lawson_union_is_algebraic {k : ℕ}
-    (hl_concl : HarveyLawsonConclusion n X k) :
-    isAlgebraicSubvariety n X (⋃ v ∈ hl_concl.varieties, v.carrier) := by
-  induction hl_concl.varieties using Finset.induction with
-  | empty =>
-    simp only [Finset.notMem_empty, Set.iUnion_of_empty, Set.iUnion_empty]
-    obtain ⟨W, hW⟩ := empty_set_is_algebraic (n := n) (X := X)
-    use W
-  | @insert v vs _ ih =>
-    rw [Finset.set_biUnion_insert]
-    have h_v_alg : isAlgebraicSubvariety n X v.carrier := by
-      obtain ⟨W, hW_carrier, _⟩ := serre_gaga v rfl
-      use W
-    exact isAlgebraicSubvariety_union h_v_alg ih
-
 /-- **Lemma: Degree Reduction Arithmetic** -/
 theorem degree_reduction_arithmetic {p : ℕ} (h : ¬(p ≤ n / 2)) : n - p ≤ n / 2 := by
   push_neg at h
@@ -125,12 +96,12 @@ theorem hard_lefschetz_fundamental_class_coherence {p p'' k : ℕ}
   have h_geom0 : HEq (0 : SmoothForm n X (2 * p'' + 2 * k)) γ := by
     simpa [h_lef_zero] using h_geom
   -- Align degrees using p = p'' + k.
-  cases _h_pk
-  have hdeg : 2 * p'' + 2 * k = 2 * (p'' + k) := by
-    ring
-  cases hdeg
-  cases h_geom0
-  rfl
+  subst _h_pk
+  have hdeg : 2 * (p'' + k) = 2 * p'' + 2 * k := by ring
+  -- Align the types of 0 forms.
+  have h_zero_aligned : HEq (0 : SmoothForm n X (2 * p'' + 2 * k)) (0 : SmoothForm n X (2 * (p'' + k))) := by
+    rw [hdeg]
+  exact eq_of_heq (h_zero_aligned.symm.trans h_geom0)
 
 /-- **Theorem: Signed Decomposition Coherence**
 

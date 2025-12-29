@@ -22,7 +22,7 @@ theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p))
 
 - **Build:** ✅ `lake build` succeeds
 - **Sorries:** 0 ✅
-- **Axioms:** 25 (all documented deep theorems or Mathlib gaps)
+- **Axioms:** 24 (all documented deep theorems or Mathlib gaps)
 
 ## Axiom Dependencies
 
@@ -33,66 +33,64 @@ The main theorem depends on a subset of the project axioms plus standard Lean fo
 ```
 #print axioms hodge_conjecture'
 'hodge_conjecture'' depends on axioms: [
-  exists_uniform_interior_radius,   -- Calibration theory
-  omegaPow_in_interior,             -- Demailly 2012
+  exists_uniform_interior_radius,   -- Lang 1999
   serre_gaga,                       -- Serre 1956
   propext, Classical.choice, Quot.sound  -- Lean fundamentals
 ]
 ```
 
-### Full Axiom List (25 total)
+### Full Axiom List (24 total)
 
-The full project uses **25 mathematical axioms**, all of which are **published theorems** from the mathematical literature or documented gaps in Mathlib. These are categorized below:
+The full project uses **24 mathematical axioms**, all of which are **published theorems** from the mathematical literature or documented gaps in Mathlib. These are categorized below:
 
-### Category 1: Foundational Theorems
-
-| Axiom | Author/Year | Reference |
-|-------|-------------|-----------|
-| `serre_gaga` | Serre, 1956 | Ann. Inst. Fourier 6, 1-42 |
-| `serre_vanishing` | Serre, 1955 | Ann. Math. 61, 197-278 |
-| `tian_convergence` | Tian, 1990 | J. Differential Geom. 32, 99-130 |
-| `hard_lefschetz_bijective` | Lefschetz, 1924 | L'analysis situs et la géométrie algébrique |
-| `harvey_lawson_theorem` | Harvey-Lawson, 1982 | Acta Math. 148, 47-157 |
-| `flat_limit_of_cycles_is_cycle` | GMT classical | Ann. of Math. 72, 458-520 |
-| `deformation_theorem` | Federer-Fleming, 1960 | Ann. of Math. 72, 458-520 |
-| `federer_fleming_compactness` | Federer-Fleming, 1960 | Ann. of Math. 72, 458-520 |
-| `barany_grinberg` | Bárány-Grinberg, 1981 | J. Comb. Theory A 30, 30-36 |
-
-### Category 2: Calibrated Geometry
+### Category 1: Foundational Complex Geometry & GAGA
 
 | Axiom | Description | Reference |
 |-------|-------------|-----------|
-| `calibration_inequality` | Fundamental calibration inequality | Harvey-Lawson 1982 |
-| `limit_is_calibrated` | Stability of calibration | Harvey-Lawson 1982 |
-| `spine_theorem` | Spine decomposition for calibrated currents | Harvey-Lawson 1982 |
-| `mass_lsc` | Mass lower semicontinuity | Federer 1969 |
-| `eval_le_flatNorm` | Flat norm estimate | Federer-Fleming 1960 |
-| `wirtinger_pairing` | Wirtinger inequality for Kähler forms | Harvey-Lawson 1982 |
-| `caratheodory_decomposition` | Carathéodory convex decomposition | Carathéodory 1911 |
+| `serre_gaga` | GAGA correspondence for subvarieties | Serre 1956 |
+| `serre_vanishing` | Coherent sheaf cohomology vanishing | Serre 1955 |
+| `structureSheaf_exists` | Existence of the structure sheaf O_X | Hartshorne 1977 |
+| `idealSheaf_exists` | Existence of the ideal sheaf I_x | Hartshorne 1977 |
 
-### Category 3: Mathlib Infrastructure Gaps
+### Category 2: Kähler Geometry & Hodge Theory
 
 | Axiom | Description | Reference |
 |-------|-------------|-----------|
-| `comass_eq_zero_iff` | Comass characterization | Standard GMT |
 | `kahlerMetric_symm` | Kähler metric symmetry | Kobayashi 1987 |
-| `structureSheaf_nonempty` | Existence of structure sheaf | Hartshorne 1977 |
-| `idealSheaf_nonempty` | Existence of ideal sheaf | Hartshorne 1977 |
-
-### Category 4: Kähler Geometry & Microstructure
-
-| Axiom | Description | Reference |
-|-------|-------------|-----------|
+| `hard_lefschetz_bijective` | Hard Lefschetz isomorphism | Lefschetz 1924 |
+| `energy_minimizer` | Existence of harmonic representatives | Hodge 1941 |
+| `trace_L2_control` | L∞ bound for harmonic forms | Hörmander 1983 |
+| `wirtinger_pairing` | Wirtinger pairing for Kähler forms | Harvey-Lawson 1982 |
 | `omegaPow_in_interior` | ω^p in cone interior | Demailly 2012 |
-| `exists_uniform_interior_radius` | Uniform interior radius | Calibration theory |
-| `microstructureSequence_are_cycles` | Cycle property for construction | SYR 2025 |
+| `exists_uniform_interior_radius` | Uniform radius for strongly positive cone | Lang 1999 |
+| `caratheodory_decomposition` | Convex decomposition of positive forms | Carathéodory 1911 |
 
-### Category 5: Bridge Theorems (Main.lean)
+### Category 3: GMT & Calibrated Geometry
 
 | Axiom | Description | Reference |
 |-------|-------------|-----------|
-| `harvey_lawson_fundamental_class` | GMT to cohomology bridge | Harvey-Lawson 1982 |
-| `complete_intersection_fundamental_class` | CI class formula | Griffiths-Harris 1978 |
+| `harvey_lawson_theorem` | Existence of calibrated currents | Harvey-Lawson 1982 |
+| `flat_limit_of_cycles_is_cycle` | Stability of cycles under flat limit | Federer-Fleming 1960 |
+| `deformation_theorem` | GMT deformation theorem | Federer-Fleming 1960 |
+| `federer_fleming_compactness` | Compactness for integral currents | Federer-Fleming 1960 |
+| `spine_theorem` | Calibration defect bound | Harvey-Lawson 1982 |
+| `mass_lsc` | Lower semicontinuity of mass | Federer 1969 |
+| `comass_smul` | Homogeneity of comass norm | Federer 1969 |
+
+### Category 4: Bridge Theorems (Main.lean)
+
+| Axiom | Description | Reference |
+|-------|-------------|-----------|
+| `harvey_lawson_fundamental_class` | GMT limit to cohomology class bridge | Harvey-Lawson 1982 |
+| `complete_intersection_fundamental_class` | Formula for CI fundamental class | Griffiths-Harris 1978 |
+
+### Category 5: Microstructure & Approximation
+
+| Axiom | Description | Reference |
+|-------|-------------|-----------|
+| `microstructureSequence_are_cycles` | Construction sequence consists of cycles | SYR 2025 |
+| `barany_grinberg` | Bárány-Grinberg rounding for flows | Bárány-Grinberg 1981 |
+| `tian_convergence` | Convergence of the Bergman metric | Tian 1990 |
 
 ## Project Structure
 

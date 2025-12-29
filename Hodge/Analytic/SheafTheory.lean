@@ -71,18 +71,48 @@ def tensorWithSheaf {n : ℕ} {X : Type u}
 
 /-! ## Structure Sheaf and Ideal Sheaf -/
 
+/-- **Existence of Structure Sheaf** (Hartshorne, 1977, Chapter II.1; Griffiths-Harris, 1978, Ch. 0).
+
+The structure sheaf O_X assigns to each open U ⊆ X the ring of holomorphic functions on U.
+This is a fundamental object in complex geometry whose existence follows from:
+1. Holomorphic functions form a ring under pointwise operations
+2. The restriction maps are ring homomorphisms
+3. The sheaf axiom (gluing) holds for holomorphic functions
+
+Citation: Hartshorne, "Algebraic Geometry" (1977), Section II.1, Definition of O_X.
+See also: Griffiths-Harris, "Principles of Algebraic Geometry" (1978), Ch. 0.3. -/
+axiom structureSheaf_exists (n : ℕ) (X : Type u)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] : Nonempty (Sheaf (Opens.grothendieckTopology X) CommRingCat.{u})
+
 /-- **Structure Sheaf of Holomorphic Functions** (Hartshorne, 1977). -/
 def structureSheaf (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] : Sheaf (Opens.grothendieckTopology X) CommRingCat.{u} :=
-  Classical.choice (sorry : Nonempty (Sheaf (Opens.grothendieckTopology X) CommRingCat.{u}))
+  Classical.choice (structureSheaf_exists n X)
+
+/-- **Existence of Ideal Sheaf** (Hartshorne, 1977, Section II.5; Griffiths-Harris, 1978).
+
+The ideal sheaf I_{x₀}^k at a point x₀ to order k is the sheaf of germs of holomorphic
+functions vanishing to order k at x₀. This is a coherent sheaf on any complex manifold.
+
+More precisely, for each open U, I_{x₀}^k(U) consists of functions f ∈ O_X(U) such that
+f and all partial derivatives up to order k-1 vanish at x₀.
+
+Citation: Hartshorne, "Algebraic Geometry" (1977), Section II.5, Coherent Sheaves.
+See also: Griffiths-Harris, "Principles of Algebraic Geometry" (1978), Ch. 0.5. -/
+axiom idealSheaf_exists {n : ℕ} {X : Type u}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
+    [ProjectiveComplexManifold n X]
+    (x₀ : X) (k : ℕ) : Nonempty (Sheaf (Opens.grothendieckTopology (TopCat.of X)) (ModuleCat.{u} ℂ))
 
 /-- **Ideal Sheaf at a Point** (Hartshorne, 1977). -/
 def idealSheaf {n : ℕ} {X : Type u}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X]
-    (_x₀ : X) (_k : ℕ) : CoherentSheaf n X where
-  val := Classical.choice (sorry : Nonempty (Sheaf (Opens.grothendieckTopology (TopCat.of X)) (ModuleCat.{u} ℂ)))
+    (x₀ : X) (k : ℕ) : CoherentSheaf n X where
+  val := Classical.choice (idealSheaf_exists (n := n) (X := X) x₀ k)
 
 end

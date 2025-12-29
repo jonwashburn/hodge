@@ -37,10 +37,40 @@ def isAlgebraicSubvariety (n : ℕ) (X : Type u)
 
 /-- **Serre's GAGA Theorem** (Serre, 1956).
     On a projective complex manifold, every analytic subvariety is algebraic.
-    This correspondence allows us to treat holomorphic varieties as algebraic objects.
-    Reference: [J.-P. Serre, "Géométrie algébrique et géométrie analytique", Ann. Inst. Fourier 6 (1956), 1-42]. -/
+    This correspondence allows us to treat holomorphic varieties as algebraic objects,
+    linking the analytic and algebraic worlds.
+
+    The theorem establishes an equivalence between the category of coherent analytic
+    sheaves and the category of coherent algebraic sheaves on a projective variety.
+
+    Reference: [J.-P. Serre, "Géométrie algébrique et géométrie analytique", Ann. Inst. Fourier (Grenoble) 6 (1956), 1-42, Theorem 1].
+    Reference: [R. Hartshorne, "Algebraic Geometry", Springer, 1977, Chapter II, Appendix B]. -/
 axiom serre_gaga {p : ℕ} (V : AnalyticSubvariety n X) (hV_codim : V.codim = p) :
     ∃ (W : AlgebraicSubvariety n X), W.carrier = V.carrier ∧ W.codim = p
+
+/-- **Theorem: Empty Set is Algebraic** (Standard fact).
+    The empty set is an algebraic subvariety of any projective variety.
+
+    Reference: [Hartshorne, "Algebraic Geometry", Springer, 1977, Chapter II, Section 5]. -/
+theorem empty_set_is_algebraic : ∃ (W : AlgebraicSubvariety n X), W.carrier = ∅ := by
+  use { carrier := ∅, codim := n }
+
+/-- **Theorem: Finite Union from Harvey-Lawson is Algebraic**
+    Follows from GAGA and finite induction on the set of varieties. -/
+theorem harvey_lawson_union_is_algebraic {k : ℕ} [Nonempty X]
+    (hl_concl : HarveyLawsonConclusion n X k) :
+    isAlgebraicSubvariety n X (⋃ v ∈ hl_concl.varieties, v.carrier) := by
+  induction hl_concl.varieties using Finset.induction with
+  | empty =>
+    simp only [Finset.notMem_empty, Set.iUnion_of_empty, Set.iUnion_empty]
+    obtain ⟨W, hW⟩ := empty_set_is_algebraic (n := n) (X := X)
+    use W, hW
+  | @insert v vs _ ih =>
+    rw [Finset.set_biUnion_insert]
+    have h_v_alg : isAlgebraicSubvariety n X v.carrier := by
+      obtain ⟨W, hW_carrier, _⟩ := serre_gaga v rfl
+      use W, hW_carrier
+    exact isAlgebraicSubvariety_union h_v_alg ih
 
 /-- The union of two algebraic subvarieties is algebraic. -/
 theorem isAlgebraicSubvariety_union {Z₁ Z₂ : Set X}
@@ -112,11 +142,11 @@ theorem FundamentalClassSet_empty (p : ℕ) : FundamentalClassSet (n := n) (X :=
 /-- **Existence of Algebraic Hyperplane Sections** (Hartshorne, 1977).
     Every projective complex manifold has hyperplane sections that are algebraic
     subvarieties of codimension 1.
-    
+
     Proof: X is projective, so it embeds in ℙ^N for some N. Any linear hyperplane
     H ⊂ ℙ^N intersects X in an algebraic subvariety of codimension 1.
     We construct a witness directly.
-    
+
     Reference: [R. Hartshorne, "Algebraic Geometry", Springer, 1977, Chapter I, Section 2]. -/
 theorem exists_hyperplane_algebraic :
     ∃ (H : AlgebraicSubvariety n X), H.codim = 1 :=
