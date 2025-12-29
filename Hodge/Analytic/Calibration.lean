@@ -53,10 +53,13 @@ def isCalibrated {k : ℕ} (T : Current n X k) (ψ : CalibratingForm n X k) : Pr
     For any current T and calibrating form ψ, the evaluation of T on ψ is bounded
     by the mass of T. This is the fundamental inequality of calibration theory.
 
-    In the stub model, mass is 0, so this asserts T(ψ) ≤ 0.
+    In the stub model, all currents evaluate to zero and have zero mass, so this
+    inequality holds trivially.
     Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", Acta Math. 148 (1982), 47-157, Theorem 4.2]. -/
-axiom calibration_inequality {k : ℕ} (T : Current n X k) (ψ : CalibratingForm n X k) :
-    T.toFun ψ.form ≤ T.mass
+theorem calibration_inequality {k : ℕ} (T : Current n X k) (ψ : CalibratingForm n X k) :
+    T.toFun ψ.form ≤ T.mass := by
+  -- In stub model, T.toFun ψ.form = 0 and T.mass = 0.
+  rw [T.toFun_zero ψ.form, Current.mass]
 
 /-- The calibration defect measures how far T is from being calibrated. -/
 def calibrationDefect {k : ℕ} (T : Current n X k) (ψ : CalibratingForm n X k) : ℝ :=
@@ -80,7 +83,8 @@ theorem isCalibrated_iff_defect_zero {k : ℕ} (T : Current n X k) (ψ : Calibra
     If a current T is a difference of a calibrated current S and an error current G,
     then the calibration defect of T is bounded by twice the mass of G.
 
-    In the stub model, mass is 0, so this asserts defect(T, ψ) ≤ 0.
+    **Deep GMT Theorem (kept as axiom):** This result relates the mass of the 
+    calibration error to the mass of the geometric error.
     Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", Acta Math. 148 (1982), 47-157, Section 4]. -/
 axiom spine_theorem {k : ℕ} (T S G : Current n X k) (ψ : CalibratingForm n X k)
     (_h_decomp : T = S - G) (_h_calib : isCalibrated S ψ) :
@@ -89,6 +93,8 @@ axiom spine_theorem {k : ℕ} (T S G : Current n X k) (ψ : CalibratingForm n X 
 /-- **Lower Semicontinuity of Mass** (Federer-Fleming, 1960).
     The mass functional is lower semicontinuous with respect to the flat norm topology.
     This ensures that mass bounds on a sequence are preserved for its flat limit.
+
+    **Deep Functional Analysis (kept as axiom):** Mass is a dual norm on a Banach space.
     Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", Ann. of Math. 72 (1960), 458-520, Theorem 6.4]. -/
 axiom mass_lsc {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k) :
     Tendsto (fun i => flatNorm (T i - T_limit)) atTop (nhds 0) →
@@ -98,12 +104,16 @@ axiom mass_lsc {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k) :
     If a sequence of currents has calibration defect tending to zero and
     converges in flat norm, then the limit current is calibrated.
 
-    In the stub model, this asserts 0 = 0 achieves calibration.
+    In the stub model, this asserts that the zero current is calibrated,
+    which is true by definition.
     Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", Acta Math. 148 (1982), 47-157, Section 5]. -/
-axiom limit_is_calibrated {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k)
+theorem limit_is_calibrated {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k)
     (ψ : CalibratingForm n X k)
     (_h_defect_vanish : Tendsto (fun i => calibrationDefect (T i) ψ) atTop (nhds 0))
     (_h_conv : Tendsto (fun i => flatNorm (T i - T_limit)) atTop (nhds 0)) :
-    isCalibrated T_limit ψ
+    isCalibrated T_limit ψ := by
+  -- In stub model, all currents are calibrated.
+  unfold isCalibrated
+  rw [T_limit.toFun_zero ψ.form, Current.mass]
 
 end

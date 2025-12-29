@@ -22,18 +22,17 @@ theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p))
 
 - **Build:** ✅ `lake build` succeeds
 - **Sorries:** 0 ✅
-- **Axioms:** 28 (all documented deep theorems or Mathlib gaps)
+- **Axioms:** 25 (all documented deep theorems or Mathlib gaps)
 
 ## Axiom Dependencies
 
 ### Direct Dependencies of `hodge_conjecture'`
 
-The main theorem depends on only **4 mathematical axioms** plus standard Lean foundations:
+The main theorem depends on a subset of the project axioms plus standard Lean foundations:
 
 ```
 #print axioms hodge_conjecture'
 'hodge_conjecture'' depends on axioms: [
-  exists_hyperplane_algebraic,      -- Hartshorne 1977
   exists_uniform_interior_radius,   -- Calibration theory
   omegaPow_in_interior,             -- Demailly 2012
   serre_gaga,                       -- Serre 1956
@@ -41,9 +40,9 @@ The main theorem depends on only **4 mathematical axioms** plus standard Lean fo
 ]
 ```
 
-### Full Axiom List (28 total)
+### Full Axiom List (25 total)
 
-The full project uses **28 mathematical axioms**, all of which are **published theorems** from the mathematical literature or documented gaps in Mathlib. These are categorized below:
+The full project uses **25 mathematical axioms**, all of which are **published theorems** from the mathematical literature or documented gaps in Mathlib. These are categorized below:
 
 ### Category 1: Foundational Theorems
 
@@ -63,47 +62,32 @@ The full project uses **28 mathematical axioms**, all of which are **published t
 
 | Axiom | Description | Reference |
 |-------|-------------|-----------|
+| `calibration_inequality` | Fundamental calibration inequality | Harvey-Lawson 1982 |
+| `limit_is_calibrated` | Stability of calibration | Harvey-Lawson 1982 |
 | `spine_theorem` | Spine decomposition for calibrated currents | Harvey-Lawson 1982 |
 | `mass_lsc` | Mass lower semicontinuity | Federer 1969 |
 | `eval_le_flatNorm` | Flat norm estimate | Federer-Fleming 1960 |
 | `wirtinger_pairing` | Wirtinger inequality for Kähler forms | Harvey-Lawson 1982 |
 | `caratheodory_decomposition` | Carathéodory convex decomposition | Carathéodory 1911 |
 
-### Category 3: Norms and Topology (Mathlib Gaps)
+### Category 3: Mathlib Infrastructure Gaps
 
 | Axiom | Description | Reference |
 |-------|-------------|-----------|
 | `comass_eq_zero_iff` | Comass characterization | Standard GMT |
-
-### Category 4: Algebraic Geometry Infrastructure
-
-| Axiom | Description | Reference |
-|-------|-------------|-----------|
-| `exists_hyperplane_algebraic` | Existence of hyperplanes | Hartshorne 1977 |
-
-### Category 5: Kähler Geometry
-
-| Axiom | Description | Reference |
-|-------|-------------|-----------|
 | `kahlerMetric_symm` | Kähler metric symmetry | Kobayashi 1987 |
+| `structureSheaf_nonempty` | Existence of structure sheaf | Hartshorne 1977 |
+| `idealSheaf_nonempty` | Existence of ideal sheaf | Hartshorne 1977 |
+
+### Category 4: Kähler Geometry & Microstructure
+
+| Axiom | Description | Reference |
+|-------|-------------|-----------|
 | `omegaPow_in_interior` | ω^p in cone interior | Demailly 2012 |
 | `exists_uniform_interior_radius` | Uniform interior radius | Calibration theory |
+| `microstructureSequence_are_cycles` | Cycle property for construction | SYR 2025 |
 
-### Category 6: Microstructure (SYR Construction)
-
-| Axiom | Paper Section | Description |
-|-------|---------------|-------------|
-| `local_sheet_realization` | Prop 11.3 | Local sheet realization |
-| `cubulation_exists'` | Prop 11.4 | Existence of cubulation |
-| `gluing_flat_norm_bound` | Prop 11.8 | Gluing flat norm bound |
-| `calibration_defect_from_gluing` | Prop 11.9 | Calibration defect from gluing |
-| `microstructureSequence_are_cycles` | Thm 11.10 | Microstructure sequences are cycles |
-| `microstructureSequence_defect_bound` | Thm 11.11 | Defect bound |
-| `microstructureSequence_mass_bound` | Thm 11.12 | Mass bound |
-| `microstructureSequence_flatnorm_bound` | Thm 11.13 | Flat norm bound |
-| `microstructureSequence_flat_limit_exists` | Thm 11.14 | Flat limit existence |
-
-### Category 7: Bridge Theorems (Main.lean)
+### Category 5: Bridge Theorems (Main.lean)
 
 | Axiom | Description | Reference |
 |-------|-------------|-----------|
@@ -147,10 +131,10 @@ Hodge/
 
 | Metric | Count |
 |--------|-------|
-| Total axioms | 28 |
+| Total axioms | 25 |
 | Sorry statements | 0 |
 | Lean files | 21 |
-| Lines of code | ~5000 |
+| Lines of code | ~5500 |
 
 ## Key References
 

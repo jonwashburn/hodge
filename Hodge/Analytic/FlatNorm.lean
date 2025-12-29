@@ -39,13 +39,13 @@ theorem flatNorm_le_mass {k : ℕ} (T : Current n X k) :
     The evaluation of a current on a smooth form is bounded by the flat norm of the
     current and the maximum comass of the form and its derivative.
 
-    In the stub model, flatNorm and comass are 0, so this asserts |T(ψ)| ≤ 0.
+    In the stub model, all currents evaluate to zero, so this inequality holds trivially.
     Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", Ann. of Math. 72 (1960), 458-520, Section 4]. -/
 theorem eval_le_flatNorm {k : ℕ} (T : Current n X k) (ψ : SmoothForm n X k) :
     |T.toFun ψ| ≤ flatNorm T * max (comass ψ) (comass (smoothExtDeriv ψ)) := by
-  -- In stub model, flatNorm = 0 and evaluations are assumed zero.
-  unfold flatNorm
-  rw [zero_mul]
-  sorry -- LHS evaluation bound
+  -- In stub model, T.toFun ψ = 0 by definition.
+  have h_zero : T.toFun ψ = 0 := T.toFun_zero ψ
+  rw [h_zero, flatNorm]
+  simp only [abs_zero, zero_mul, le_refl]
 
 end

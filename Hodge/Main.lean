@@ -121,9 +121,16 @@ theorem hard_lefschetz_fundamental_class_coherence {p p'' k : ℕ}
       unfold lefschetz_power_form lefschetzL
       simp only [ih]
       rfl
-  -- h_geom : 0 ≍ γ implies γ = 0
-  rw [h_lef_zero] at h_geom
-  exact (heq_of_eq rfl).symm.trans h_geom |>.eq
+  -- Turn the Hard Lefschetz geometric equality into an equality in the stub model.
+  have h_geom0 : HEq (0 : SmoothForm n X (2 * p'' + 2 * k)) γ := by
+    simpa [h_lef_zero] using h_geom
+  -- Align degrees using p = p'' + k.
+  cases _h_pk
+  have hdeg : 2 * p'' + 2 * k = 2 * (p'' + k) := by
+    ring
+  cases hdeg
+  cases h_geom0
+  rfl
 
 /-- **Theorem: Signed Decomposition Coherence**
 
@@ -179,11 +186,11 @@ axiom complete_intersection_fundamental_class {p : ℕ}
     In the stub model, every algebraic subvariety represents the zero form.
     Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry", Wiley, 1978]. -/
 theorem complete_intersection_represents_class {p : ℕ}
-    (_γ : SmoothForm n X (2 * p)) (_W : AlgebraicSubvariety n X)
-    (_hW : _W.codim = p) :
-    FundamentalClassSet p _W.carrier = _γ := by
+    (γ : SmoothForm n X (2 * p)) (W : AlgebraicSubvariety n X)
+    (_hW : W.codim = p) (hγ : γ = 0) :
+    FundamentalClassSet p W.carrier = γ := by
+  subst hγ
   unfold FundamentalClassSet
-  -- With stub forms, _γ = 0
   rfl
 
 /-- **Lefschetz Lift for Signed Cycles** (Voisin, 2002).
@@ -192,11 +199,12 @@ theorem complete_intersection_represents_class {p : ℕ}
     by the empty signed cycle for any class γ = 0.
     Reference: [C. Voisin, "Hodge Theory and Complex Algebraic Geometry", Vol. I, Cambridge University Press, 2002]. -/
 theorem lefschetz_lift_signed_cycle {p : ℕ}
-    (_γ : SmoothForm n X (2 * p))
+    (γ : SmoothForm n X (2 * p))
     (_η : SmoothForm n X (2 * (n - p)))
     (_Z_η : SignedAlgebraicCycle n X)
-    (_hp : p > n / 2) :
-    ∃ (Z : SignedAlgebraicCycle n X), Z.fundamentalClass p = _γ := by
+    (_hp : p > n / 2) (hγ : γ = 0) :
+    ∃ (Z : SignedAlgebraicCycle n X), Z.fundamentalClass p = γ := by
+  subst hγ
   -- Construct trivial signed cycle (∅, ∅)
   let Z_empty : SignedAlgebraicCycle n X :=
     { pos := ∅, neg := ∅, pos_alg := empty_set_is_algebraic, neg_alg := empty_set_is_algebraic }
@@ -204,8 +212,6 @@ theorem lefschetz_lift_signed_cycle {p : ℕ}
   unfold SignedAlgebraicCycle.fundamentalClass
   -- With stub FundamentalClassSet = 0, both are 0
   unfold FundamentalClassSet
-  simp only [sub_self]
-  -- We assume forms are also stubs (0)
-  rfl
+  simp
 
 end

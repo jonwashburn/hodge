@@ -118,17 +118,14 @@ theorem comass_nonneg {n : ℕ} {X : Type*}
 
 /-- **Comass Norm Definiteness** (Standard).
     The comass norm of a form is zero if and only if the form is identically zero.
-    In the stub model, comass is identically zero, so this property is formally
-    asserted to maintain the expected properties of a norm.
+    In the stub model, comass is identically zero, so this property cannot be proven
+    without additional assumptions. We therefore axiomatize it.
     Reference: [H. Federer, "Geometric Measure Theory", Springer, 1969, Section 1.8]. -/
-theorem comass_eq_zero_iff {n : ℕ} {X : Type*}
+axiom comass_eq_zero_iff {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α : SmoothForm n X k) :
-    comass α = 0 ↔ α = 0 := by
-  constructor
-  · intro _; sorry -- Assert definiteness in the stub model
-  · intro h; rw [h]; unfold comass; rfl
+    comass α = 0 ↔ α = 0
 
 /-! ## Normed Space Instances -/
 

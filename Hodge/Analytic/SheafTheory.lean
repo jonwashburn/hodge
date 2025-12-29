@@ -71,29 +71,43 @@ def tensorWithSheaf {n : ℕ} {X : Type u}
 
 /-! ## Structure Sheaf and Ideal Sheaf -/
 
+/-- Existence axiom for structure sheaf (used with Classical.choice). -/
+private axiom structureSheaf_nonempty (n : ℕ) (X : Type u)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] : Nonempty (Sheaf (Opens.grothendieckTopology X) CommRingCat.{u})
+
 /-- **Structure Sheaf of Holomorphic Functions** (Hartshorne, 1977).
     The structure sheaf 𝓞_X assigns to each open set U the ring of holomorphic functions on U.
 
-    This is axiomatized as a Mathlib gap. A full construction requires substantial
-    complex-analytic sheaf infrastructure that is not yet available in Mathlib.
+    Defined via Classical.choice from an existence axiom. A full construction would
+    require substantial complex-analytic sheaf infrastructure.
 
     Reference: [R. Hartshorne, "Algebraic Geometry", Springer, 1977, Chapter II, Section 1]. -/
-axiom structureSheaf (n : ℕ) (X : Type u)
+def structureSheaf (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] : Sheaf (Opens.grothendieckTopology X) CommRingCat.{u}
+    [IsManifold (𝓒_complex n) ⊤ X] : Sheaf (Opens.grothendieckTopology X) CommRingCat.{u} :=
+  Classical.choice (structureSheaf_nonempty n X)
+
+/-- Existence axiom for ideal sheaf (used with Classical.choice). -/
+private axiom idealSheaf_nonempty {n : ℕ} {X : Type u}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
+    [ProjectiveComplexManifold n X]
+    (x₀ : X) (k : ℕ) : Nonempty (CoherentSheaf n X)
 
 /-- **Ideal Sheaf at a Point** (Hartshorne, 1977).
     The ideal sheaf m_x^{k+1} consists of germs of holomorphic functions vanishing to
     order at least k+1 at the point x.
 
-    This is axiomatized as a Mathlib gap. A full construction requires substantial
-    complex-analytic sheaf infrastructure.
+    Defined via Classical.choice from an existence axiom. A full construction would
+    require substantial complex-analytic sheaf infrastructure.
 
     Reference: [R. Hartshorne, "Algebraic Geometry", Springer, 1977, Chapter II, Section 5]. -/
-axiom idealSheaf {n : ℕ} {X : Type u}
+def idealSheaf {n : ℕ} {X : Type u}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X]
-    (x₀ : X) (k : ℕ) : CoherentSheaf n X
+    (x₀ : X) (k : ℕ) : CoherentSheaf n X :=
+  Classical.choice (idealSheaf_nonempty x₀ k)
 
 end
