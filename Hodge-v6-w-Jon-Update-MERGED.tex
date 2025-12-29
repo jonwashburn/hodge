@@ -3113,20 +3113,23 @@ Let $y,y'\in B^{2p}(0,ch)$ and set $v:=y'-y$.
 In the flat/parallel model (i.e.\ when $\Sigma_{y'}=(\tau_v)_\#\Sigma_y$ inside the product chart), consider the straight-line homotopy
 $H:[0,1]\times F\to F\times B^{2p}(0,ch)$, $H(t,x)=(x,y+t v)$.
 Let $Q_{y\to y'}:=H_\#([0,1]\times \Sigma_y)$.
-Then $\partial Q_{y\to y'}=\Sigma_{y'}-\Sigma_y$ and
+Set also $R_{y\to y'}:=H_\#([0,1]\times \partial\Sigma_y)$.
+Then
 \[
-\Mass(Q_{y\to y'})\ \le\ \|v\|\,\Mass(\Sigma_y).
+\Sigma_{y'}-\Sigma_y\ =\ R_{y\to y'}+\partial Q_{y\to y'},
+\qquad
+\Mass(Q_{y\to y'})\ \le\ \|v\|\,\Mass(\Sigma_y),
+\qquad
+\Mass(R_{y\to y'})\ \le\ \|v\|\,\Mass(\partial\Sigma_y).
 \]
-By Stokes and the comass bound on $d\eta$,
+By Stokes and the comass bounds on $\eta$ and $d\eta$,
 \[
 |f_\eta(y')-f_\eta(y)|
-=|(\Sigma_{y'}-\Sigma_y)(\eta)|
-=|Q_{y\to y'}(d\eta)|
-\le \Mass(Q_{y\to y'})\|d\eta\|_{\mathrm{comass}}
-\le \|v\|\,\Mass(\Sigma_y).
+=|Q_{y\to y'}(d\eta)+R_{y\to y'}(\eta)|
+\le \|v\|\Bigl(\Mass(\Sigma_y)+\Mass(\partial\Sigma_y)\Bigr).
 \]
 Under the small-angle graph hypothesis \textnormal{(a)} and bounded geometry of the chart, each slice has mass
-$\Mass(\Sigma_y)\le C\,h^{2n-2p-1}$ with $C=C(n,p,X)$.
+$\Mass(\Sigma_y)\le C\,h^{2n-2p-1}$ and $\Mass(\partial\Sigma_y)\le C\,h^{2n-2p-2}$ with $C=C(n,p,X)$.
 Hence
 \[
 \mathrm{Lip}(f_\eta)\ \le\ C\,h^{2n-2p-1}.
@@ -3325,7 +3328,7 @@ interior piece mass on smooth curvature-pinched cells.  This is packaged globall
 \begin{editblock}
 \begin{proposition}[Weighted transport $\Rightarrow$ flat-norm face control (sliver-compatible)]\label{prop:transport-flat-glue-weighted}
 Work in the tubular/flat model on an interior face $F=Q\cap Q'$.
-Assume each sheet piece meeting $F$ contributes a \emph{cycle slice} current $\Sigma(u)$ on $F$ depending on a transverse parameter
+Assume each sheet piece meeting $F$ contributes an integral slice current $\Sigma(u)$ on $F$ depending on a transverse parameter
 $u\in\Omega_F\subset\R^{2p}$, and that $\Sigma(u)$ is obtained from $\Sigma(0)$ by translation in the face chart.
 Let the two adjacent cubes induce two multisets of parameters $\{u_a\}_{a=1}^N$ and $\{u'_a\}_{a=1}^N$ (same cardinality), hence two face currents
 \[
@@ -3336,9 +3339,9 @@ B_F:=S_{Q\to F}-S_{Q'\to F}.
 \]
 Then
 \[
-\mathcal F(B_F)\ \le\ \inf_{\sigma\in S_N}\ \sum_{a=1}^N \|u_a-u'_{\sigma(a)}\|\,\Mass(\Sigma(u_a)).
+\mathcal F(B_F)\ \le\ \inf_{\sigma\in S_N}\ \sum_{a=1}^N \|u_a-u'_{\sigma(a)}\|\Bigl(\Mass(\Sigma(u_a))+\Mass(\partial\Sigma(u_a))\Bigr).
 \]
-In particular, if $\Mass(\Sigma(u_a))\le b_F$ for all $a$ and if
+In particular, if $\Mass(\Sigma(u_a))+\Mass(\partial\Sigma(u_a))\le b_F$ for all $a$ and if
 \[
 \tau_F:=\inf_{\sigma\in S_N}\ \sum_{a=1}^N \|u_a-u'_{\sigma(a)}\|
 \]
@@ -3351,19 +3354,19 @@ In particular, if $\Mass(\Sigma(u_a))\le b_F$ for all $a$ and if
 
 \begin{proof}
 Fix a permutation $\sigma\in S_N$.
-For each index $a$, the difference $\Sigma(u_a)-\Sigma(u'_{\sigma(a)})$ is the difference of two translated copies of the same
-integral cycle in the face chart, hence is itself a boundary.
-By Lemma~\ref{lem:flat-translate} there exists an integral filling current $Q_a$ with
+For each index $a$, apply Lemma~\ref{lem:flat-translate} in the face chart to the translated pair
+$\Sigma(u_a)$ and $\Sigma(u'_{\sigma(a)})$.
+This yields integral currents $R_a$ and $Q_a$ such that
 \[
-\partial Q_a=\Sigma(u_a)-\Sigma(u'_{\sigma(a)})
+\Sigma(u_a)-\Sigma(u'_{\sigma(a)})\ =\ R_a+\partial Q_a
 \qquad\text{and}\qquad
-\Mass(Q_a)\ \le\ \|u_a-u'_{\sigma(a)}\|\,\Mass(\Sigma(u_a)).
+\Mass(R_a)+\Mass(Q_a)\ \le\ \|u_a-u'_{\sigma(a)}\|\Bigl(\Mass(\Sigma(u_a))+\Mass(\partial\Sigma(u_a))\Bigr).
 \]
-Summing $Q:=\sum_{a=1}^N Q_a$ yields $\partial Q=B_F$ and
+Summing $R:=\sum_{a=1}^N R_a$ and $Q:=\sum_{a=1}^N Q_a$ gives $B_F=R+\partial Q$ and
 \[
-\Mass(Q)\ \le\ \sum_{a=1}^N \|u_a-u'_{\sigma(a)}\|\,\Mass(\Sigma(u_a)).
+\Mass(R)+\Mass(Q)\ \le\ \sum_{a=1}^N \|u_a-u'_{\sigma(a)}\|\Bigl(\Mass(\Sigma(u_a))+\Mass(\partial\Sigma(u_a))\Bigr).
 \]
-Taking $R:=0$ in the definition of the flat norm gives $\mathcal F(B_F)\le \Mass(Q)$, and then taking the infimum over $\sigma$ proves the claim.
+Taking the infimum over $\sigma$ in the definition of $\mathcal F$ proves the claim.
 \end{proof}
 
 \end{editblock}
@@ -3478,12 +3481,14 @@ The supporting-hyperplane/unique-support-point facts used above are standard con
 
 \begin{editblock}
 \begin{lemma}[Flat-norm stability under translation]\label{lem:flat-translate}
-Let $S$ be an integral $\ell$-cycle in $\R^d$ (so $\partial S=0$) with finite mass.
+Let $S$ be an integral $\ell$--current in $\R^d$ with finite mass and finite boundary mass.
 For any translation vector $v\in\R^d$, write $\tau_v(x):=x+v$ and $(\tau_v)_\#S$ for the pushforward.
 Then
 \[
-\mathcal F\!\bigl((\tau_v)_\#S-S\bigr)\ \le\ \|v\|\,\Mass(S).
+\mathcal F\!\bigl((\tau_v)_\#S-S\bigr)\ \le\ \|v\|\Bigl(\Mass(S)+\Mass(\partial S)\Bigr).
 \]
+In particular, if $S$ is a cycle ($\partial S=0$) this reduces to
+$\mathcal F((\tau_v)_\#S-S)\le \|v\|\,\Mass(S)$.
 \end{lemma}
 
 
@@ -3493,20 +3498,26 @@ Consider the product current $[0,1]\times S$ in $[0,1]\times\R^d$ and set
 \(
 Q:=H_\#([0,1]\times S).
 \)
-Since $\partial([0,1]\times S)=\{1\}\times S-\{0\}\times S-[0,1]\times \partial S$ and $\partial S=0$, we have
+Set also
+\(
+R:=H_\#([0,1]\times \partial S).
+\)
+Since $\partial([0,1]\times S)=\{1\}\times S-\{0\}\times S-[0,1]\times \partial S$, we have
 \[
 \partial Q
-=H_\#(\{1\}\times S)-H_\#(\{0\}\times S)
-=(\tau_v)_\#S-S.
+=H_\#(\{1\}\times S)-H_\#(\{0\}\times S)-H_\#([0,1]\times \partial S)
+=(\tau_v)_\#S-S-R.
 \]
+Thus $(\tau_v)_\#S-S=R+\partial Q$.
 Moreover, $H$ has Jacobian bounded by $\|v\|$ in the $t$-direction, so the mass estimate for pushforwards gives
 \(
 \Mass(Q)\le \|v\|\,\Mass(S).
 \)
-Taking $R:=0$ in the definition of $\mathcal F$ yields
-\(
-\mathcal F((\tau_v)_\#S-S)\le \Mass(Q)\le \|v\|\,\Mass(S),
-\)
+Likewise $\Mass(R)\le \|v\|\,\Mass(\partial S)$.
+Taking these $R,Q$ in the definition of $\mathcal F$ yields
+\[
+\mathcal F((\tau_v)_\#S-S)\le \Mass(R)+\Mass(Q)\le \|v\|\Bigl(\Mass(S)+\Mass(\partial S)\Bigr),
+\]
 as claimed.
 \end{proof}
 
@@ -3527,13 +3538,13 @@ If there exists a matching $\sigma\in S_N$ with a uniform displacement bound
 \]
 then
 \[
-\mathcal F(B_F)\ \le\ \Delta_F\sum_{a=1}^N \Mass(\Sigma(u_a)).
+\mathcal F(B_F)\ \le\ \Delta_F\sum_{a=1}^N \Bigl(\Mass(\Sigma(u_a))+\Mass(\partial\Sigma(u_a))\Bigr).
 \]
 Consequently,
 \[
 \mathcal F\!\left(\partial T^{\mathrm{raw}}\right)
 \ \le\ \sum_F \mathcal F(B_F)
-\ \le\ \sum_F \Delta_F\sum_{a\in\mathcal S(F)} \Mass(\Sigma_F(u_a)),
+\ \le\ \sum_F \Delta_F\sum_{a\in\mathcal S(F)} \Bigl(\Mass(\Sigma_F(u_a))+\Mass(\partial\Sigma_F(u_a))\Bigr),
 \]
 where $\mathcal S(F)$ indexes the pieces meeting the interface $F$.
 
@@ -3543,7 +3554,7 @@ $Y^a\cap Q$ with interior mass $m_a:=\Mass([Y^a]\llcorner Q)$, then Lemma~\ref{l
 \Mass(\Sigma_F(u_a))\ \lesssim\ m_a^{\frac{k-1}{k}},
 \qquad k:=2n-2p,
 \]
-and hence the global estimate
+and hence, in the common situation where the slice currents on interfaces are cycles (so $\partial\Sigma_F(u_a)=0$), the global estimate
 \[
 \mathcal F\!\left(\partial T^{\mathrm{raw}}\right)
 \ \lesssim\ h^2\sum_Q\ \sum_{a\in\mathcal S(Q)} m_{Q,a}^{\frac{k-1}{k}}.
@@ -3573,12 +3584,12 @@ By the triangle inequality for the flat norm,
 For a fixed interface $F$, the translation model hypothesis and a matching $\sigma$ with
 $\|u_a-u'_{\sigma(a)}\|\le \Delta_F$ give the per-face estimate
 \[
-\mathcal F(B_F)\ \le\ \Delta_F\sum_{a=1}^N \Mass(\Sigma_F(u_a)),
+\mathcal F(B_F)\ \le\ \Delta_F\sum_{a=1}^N \Bigl(\Mass(\Sigma_F(u_a))+\Mass(\partial\Sigma_F(u_a))\Bigr),
 \]
 so summing over $F$ yields the first bound.
 
 Under the additional assumptions $\Delta_F\le C\,h^2$ and
-$\Mass(\Sigma_F(u_a))\lesssim m_a^{\frac{k-1}{k}}$ (with $k=2n-2p$),
+$\Mass(\Sigma_F(u_a))+\Mass(\partial\Sigma_F(u_a))\lesssim m_a^{\frac{k-1}{k}}$ (with $k=2n-2p$),
 we obtain
 \[
 \mathcal F(B_F)\ \lesssim\ h^2\sum_{a\in\mathcal S(F)} m_{F,a}^{\frac{k-1}{k}}.
@@ -3731,7 +3742,8 @@ $\mu_{Q\to F}=(\Phi_{Q,F})_\#\nu$ and $\mu_{Q'\to F}=(\Phi_{Q',F})_\#\nu$.
 Assume $\|\Phi_{Q,F}\|_{\mathrm{op}}+\|\Phi_{Q',F}\|_{\mathrm{op}}\le C_{\Phi,0}$ and $\|\Phi_{Q,F}-\Phi_{Q',F}\|_{\mathrm{op}}\le C_\Phi h$.
 Then, after pairing atoms by the identity pairing $y_a\leftrightarrow y_a$, the mismatch current $B_F$ satisfies
 \[
-\mathcal F(B_F)\ \le\ C\,h^2\,\Bigl(\Mass(\partial S_Q\llcorner F)+\Mass(\partial S_{Q'}\llcorner F)\Bigr)\ +\ O(\varepsilon\,M_F),
+\mathcal F(B_F)\ \le\ C\,h^2\,\Biggl(\sum_{a=1}^{N_F} w_a\Bigl(\Mass(\Sigma_{\Phi_{Q,F}y_a})+\Mass(\partial\Sigma_{\Phi_{Q,F}y_a})\Bigr)
+\;+\sum_{a=1}^{N_F} w_a\Bigl(\Mass(\Sigma_{\Phi_{Q',F}y_a})+\Mass(\partial\Sigma_{\Phi_{Q',F}y_a})\Bigr)\Biggr)\ +\ O(\varepsilon\,M_F),
 \]
 where $M_F$ denotes the total $(2n-2p)$-mass of pieces meeting the interface (so $M_F\lesssim M_Q+M_{Q'}$) and
 $\varepsilon$ is the small-angle/graph parameter from Proposition~\ref{prop:transport-flat-glue}\textnormal{(a)}.
@@ -3756,13 +3768,12 @@ Since $\|y_a\|\le C_0h$ and $\|\Phi_{Q,F}-\Phi_{Q',F}\|_{\mathrm{op}}\le C_\Phi 
 Lemma~\ref{lem:flat-translate} then gives
 \[
 \mathcal F\!\bigl(\Sigma_{\Phi_{Q,F}y_a}-\Sigma_{\Phi_{Q',F}y_a}\bigr)
-\le \|v_a\|\,\Mass(\Sigma_{\Phi_{Q,F}y_a})
-\le C h^2\,\Mass(\Sigma_{\Phi_{Q,F}y_a}).
+\le \|v_a\|\Bigl(\Mass(\Sigma_{\Phi_{Q,F}y_a})+\Mass(\partial\Sigma_{\Phi_{Q,F}y_a})\Bigr)
+\le C h^2\Bigl(\Mass(\Sigma_{\Phi_{Q,F}y_a})+\Mass(\partial\Sigma_{\Phi_{Q,F}y_a})\Bigr).
 \]
 By subadditivity of $\mathcal F$ and summing over $a$ (with weights $w_a$),
 \[
-\mathcal F(B_F)\le C h^2\sum_{a=1}^{N_F} w_a\,\Mass(\Sigma_{\Phi_{Q,F}y_a})
-\le C h^2\,\Mass(\partial S_Q\llcorner F).
+\mathcal F(B_F)\le C h^2\sum_{a=1}^{N_F} w_a\,\Bigl(\Mass(\Sigma_{\Phi_{Q,F}y_a})+\Mass(\partial\Sigma_{\Phi_{Q,F}y_a})\Bigr).
 \]
 The same bound holds with $Q$ and $Q'$ swapped; combining yields the symmetric form stated.
 
