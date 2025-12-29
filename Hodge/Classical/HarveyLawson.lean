@@ -104,7 +104,8 @@ axiom harvey_lawson_theorem {k : ℕ} (hyp : HarveyLawsonHypothesis n X k) :
     a cycle, a necessary condition for the Harvey-Lawson theorem.
 
     Reference: [H. Federer, "Geometric Measure Theory", Springer, 1969, Section 4.2.26].
-    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", Ann. of Math. (2) 72 (1960), 458-520, Theorem 8.12]. -/
+    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", Ann. of Math. (2) 72 (1960), 458-520, Theorem 8.12].
+    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", Acta Math. 148 (1982), 47-157, Theorem 3.3]. -/
 axiom flat_limit_of_cycles_is_cycle {k : ℕ}
     (T_seq : ℕ → IntegralCurrent n X k)
     (T_limit : IntegralCurrent n X k)

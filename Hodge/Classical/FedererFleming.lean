@@ -86,6 +86,7 @@ structure FFCompactnessConclusion (n : ℕ) (X : Type*) (k : ℕ)
     measure theory, ensuring the existence of minimizers for the mass functional.
 
     Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", Ann. of Math. (2) 72 (1960), 458-520, Theorem 6.4].
+    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", Ann. of Math. (2) 72 (1960), 458-520, Theorem 8.13].
     Reference: [H. Federer, "Geometric Measure Theory", Springer, 1969, Section 4.2.17]. -/
 axiom federer_fleming_compactness (k : ℕ)
     (hyp : FFCompactnessHypothesis n X k) :

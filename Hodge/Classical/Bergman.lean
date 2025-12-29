@@ -202,7 +202,8 @@ noncomputable def dist_form (_α _β : SmoothForm n X 2) : ℝ :=
     sections of these powers.
 
     Reference: [G. Tian, "On a set of polarized Kähler metrics on algebraic manifolds", J. Differential Geom. 32 (1990), 99-130, Theorem 1].
-    Reference: [W.-D. Ruan, "Canonical dynamics of Kähler-Einstein metrics", J. Differential Geom. 44 (1996), no. 4, 814-837]. -/
+    Reference: [W.-D. Ruan, "Canonical dynamics of Kähler-Einstein metrics", J. Differential Geom. 44 (1996), no. 4, 814-837].
+    Reference: [S. Zelditch, "Szegő kernels and a theorem of Tian", Internat. Math. Res. Notices 1998, no. 6, 317-331]. -/
 axiom tian_convergence (L : HolomorphicLineBundle n X) [IsAmple L]
     (h : ∀ M, HermitianMetric (L.power M)) :
     ∀ ε > 0, ∃ M₀ : ℕ, ∀ M ≥ M₀,
