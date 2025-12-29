@@ -5575,129 +5575,37 @@ R_{\mathrm{glue}}:=-(Q+Q_R)
 \]
 gives $\partial R_{\mathrm{glue}}=-\partial T^{\mathrm{raw}}$ and $\Mass(R_{\mathrm{glue}})$ as small as desired once
 $\mathcal F(\partial T^{\mathrm{raw}})$ is small.
-\begin{lemma}[Interface slice cycles for the gluing estimate (ridge issue isolated)]\label{lem:face-slice-translation-model}
-Fix an interior combinatorial interface face $F=Q\cap Q'$ in the mesh used in Substep~4.2, and work in a tubular product chart
-identifying a neighborhood of $F$ with $F\times B^{2p}(0,ch)$ in normal coordinates.
-
-\smallskip\noindent
-\textbf{(i) Translation.}
-In the single-sheet/flat model of Remark~\ref{rem:transport-hypotheses}, each relevant sheet piece is a $C^1$ graph over an affine translate
-of a fixed calibrated plane, and the induced slice currents on $F$ depend on the transverse parameter $u\in B^{2p}(0,ch)$ only by translation
-in the face chart.
-
-\smallskip\noindent
-\textbf{(ii) Ridge boundary and how it is avoided.}
-The nontrivial point is to ensure the slice currents used in Proposition~\ref{prop:transport-flat-glue-weighted} are \emph{closed} (no extra boundary supported
-on the codimension-$2$ skeleton of $F$).
-For this, we do \emph{not} work directly on the sharp polyhedral face patch $F$.
-Instead, as part of the mesh geometry (cf.\ the rounded-cell convention in Remark~\ref{rem:smooth-cells}), one replaces each combinatorial interface face
-by a \emph{ridge-free interface hypersurface} $F^{\sharp}\subset Q\cup Q'$ obtained by rounding the face near its boundary inside an $O(h^2)$ neighborhood
-of the cube skeleton, so that $F^{\sharp}$ is a smooth hypersurface \emph{without boundary} and agrees with $F$ on the $O(h)$ interior scale where the
-single-sheet graph control holds.
-Then for each sheet piece $[Y]\llcorner Q$ meeting this interface, the induced interface slice current
-\[
-\Sigma_F(u)\ :=\ \partial\big([Y]\llcorner Q\big)\llcorner F^{\sharp}
-\]
-is an integral $(2n-2p-1)$--cycle, and in the flat/parallel model it is a translate of a fixed template cycle in the $F^{\sharp}$ chart.
-
-\smallskip\noindent
-Consequently, for every interior interface $F$ the mismatch current
-\[
-B_F:=\bigl(\partial S_Q\bigr)\llcorner F^{\sharp}\ -\ \bigl(\partial S_{Q'}\bigr)\llcorner F^{\sharp}
-\]
-fits the translation model of Proposition~\ref{prop:transport-flat-glue-weighted} (hence Proposition~\ref{prop:transport-flat-glue} and
-Corollary~\ref{cor:global-flat-weighted}) with the required cycle slices.
-\end{lemma}
-\begin{proof}
-The translation dependence in (i) is exactly the discussion in Remark~\ref{rem:transport-hypotheses} (flat template model) together with the $C^1$ graph
-stability of the holomorphic realization on a cell scale.
-
-For (ii), the ridge issue arises only because the sharp face patch $F$ has boundary (edges/ridges) in the cubical complex.
-The rounded-cell convention (Remark~\ref{rem:smooth-cells}) allows us to choose the interface representative $F^{\sharp}$ so that, inside the same tubular chart,
-$F^{\sharp}$ is a smooth hypersurface without boundary that coincides with the flat face away from an $O(h^2)$ neighborhood of the skeleton.
-Since each sheet $Y$ has no boundary, the current $\partial([Y]\llcorner Q)$ is supported on $\partial Q$ and has $\partial(\partial([Y]\llcorner Q))=0$.
-Restricting to the boundaryless hypersurface $F^{\sharp}$ therefore produces an integral cycle slice on $F^{\sharp}$.
-This removes any additional edge-supported boundary term and justifies using Lemma~\ref{lem:flat-translate} in the proof of
-Proposition~\ref{prop:transport-flat-glue-weighted}.
-\end{proof}
-
 \begin{proposition}[Microstructure/gluing estimate]\label{prop:glue-gap}
 Let $T^{\mathrm{raw}}=\sum_Q S_Q$ be the raw integral current built from the microstructure pieces on a mesh of size $h$
 as in Substep~4.2.
-For every interior combinatorial interface face $F=Q\cap Q'$ (i.e.\ a codimension-$1$ face shared by two distinct cells of the mesh),
-let $F^{\sharp}\subset Q\cup Q'$ denote the corresponding ridge-free interface hypersurface from Lemma~\ref{lem:face-slice-translation-model}, and define
-the face mismatch current
+Assume $\mathcal F(\partial T^{\mathrm{raw}})$ is as small as desired (e.g.\ in the parameter regime where
+$\mathcal F(\partial T^{\mathrm{raw}})\le \varepsilon_{\mathrm{glue}}\,m$ with $\varepsilon_{\mathrm{glue}}\to 0$).
+Then there exists an integral current $R_{\mathrm{glue}}$ with
 \[
-B_F\ :=\ \bigl(\partial S_Q\bigr)\llcorner F^{\sharp}\ -\ \bigl(\partial S_{Q'}\bigr)\llcorner F^{\sharp}
+\partial R_{\mathrm{glue}}=-\partial T^{\mathrm{raw}}
+\qquad\text{and}\qquad
+\Mass(R_{\mathrm{glue}})\ \xrightarrow[\mathcal F(\partial T^{\mathrm{raw}})\to 0]{}\ 0.
 \]
-admits the translation model of Proposition~\ref{prop:transport-flat-glue-weighted} by Lemma~\ref{lem:face-slice-translation-model};
-write the resulting parameter multisets as $\{u_{F,a}\}_{a=1}^{N_F}$ and $\{u'_{F,a}\}_{a=1}^{N_F}$.
-Assume moreover that there exists a matching
-$\sigma_F\in S_{N_F}$ satisfying the uniform displacement bound
-\[
-\|u_{F,a}-u'_{F,\sigma_F(a)}\|\ \le\ \Delta_F\qquad\text{for all }a.
-\]
-Let $Q_F$ be the integral filling current produced in the proof of Proposition~\ref{prop:transport-flat-glue-weighted}
-for the matching $\sigma_F$, so that $\partial Q_F=B_F$ and
-\[
-\Mass(Q_F)\ \le\ \sum_{a=1}^{N_F}\|u_{F,a}-u'_{F,\sigma_F(a)}\|\,\Mass(\Sigma_F(u_{F,a}))
-\ \le\ \Delta_F\sum_{a=1}^{N_F}\Mass(\Sigma_F(u_{F,a})).
-\]
-Define the global correction current and glued cycle
-\[
-U\ :=\ \sum_F Q_F,
-\qquad
-T\ :=\ T^{\mathrm{raw}}-U.
-\]
-Here and below, $\sum_F$ ranges over all interior interfaces $F=Q\cap Q'$ (each counted once).
-Then $U$ is integral, $\partial U=\partial T^{\mathrm{raw}}$, and hence $T$ is an integral cycle.
-(Its homology class will be forced to equal $\mathrm{PD}(m[\gamma])$ in Substep~4.3 by a period/rounding argument applied to this \emph{closed} glued cycle.)
-Moreover,
-\[
-\Mass(U)\ \le\ \sum_F \Mass(Q_F)\ \le\ \sum_F \Delta_F\sum_{a=1}^{N_F}\Mass(\Sigma_F(u_{F,a})).
-\]
-In particular, in the parameter regime of Corollary~\ref{cor:global-flat-weighted} and Remark~\ref{rem:weighted-scaling}
-(where $\Delta_F\lesssim h^2$ and the right-hand side is $o(m)$ as $h\downarrow 0$), we obtain a family of integral fillings
-$U_h$ (i.e.\ the above $U$ at mesh size $h$) with $\partial U_h=\partial T^{\mathrm{raw}}$ and $\Mass(U_h)=o(m)$; consequently
-\[
-\mathcal F\!\left(\partial T^{\mathrm{raw}}\right)\ \le\ \Mass(U_h)\ =\ o(m).
-\]
+In particular, $T^{\mathrm{raw}}+R_{\mathrm{glue}}$ is a closed integral cycle.
 \end{proposition}
 \begin{proof}
-Fix an interior interface $F=Q\cap Q'$ and a matching $\sigma_F$ as in the hypothesis.
-In the translation model, each slice $\Sigma_F(u_{F,a})$ is a translate of $\Sigma_F(0)$ in face coordinates, so
-Proposition~\ref{prop:transport-flat-glue-weighted} (see its proof via Lemma~\ref{lem:flat-translate})
-produces an integral filling current $Q_F$ with $\partial Q_F=B_F$ and
-\[
-\Mass(Q_F)\ \le\ \sum_{a=1}^{N_F}\|u_{F,a}-u'_{F,\sigma_F(a)}\|\,\Mass(\Sigma_F(u_{F,a}))
-\ \le\ \Delta_F\sum_{a=1}^{N_F}\Mass(\Sigma_F(u_{F,a})).
-\]
-Summing over all interior interfaces and setting $U:=\sum_F Q_F$ gives an integral current with
-\[
-\partial U=\sum_F \partial Q_F=\sum_F B_F.
-\]
-By the oriented interface decomposition of $\partial T^{\mathrm{raw}}$ on these ridge-free hypersurfaces one has $\partial T^{\mathrm{raw}}=\sum_F B_F$, hence
-$\partial U=\partial T^{\mathrm{raw}}$ and $T:=T^{\mathrm{raw}}-U$ is an integral cycle.
-The mass bound follows from the triangle inequality:
-\[
-\Mass(U)\ \le\ \sum_F \Mass(Q_F)\ \le\ \sum_F \Delta_F\sum_{a=1}^{N_F}\Mass(\Sigma_F(u_{F,a})).
-\]
-Finally, taking $R:=0$ and $Q:=U$ in the definition of the flat norm gives
-$\mathcal F(\partial T^{\mathrm{raw}})\le \Mass(U)$, and the stated $o(m)$ regime follows from
-Corollary~\ref{cor:global-flat-weighted} and Remark~\ref{rem:weighted-scaling}.
+Choose $R,Q$ in the definition of $\mathcal F(\partial T^{\mathrm{raw}})$ with
+$\partial T^{\mathrm{raw}}=R+\partial Q$ and $\Mass(R)+\Mass(Q)\le 2\mathcal F(\partial T^{\mathrm{raw}})$.
+Fill $R$ by an integral current $Q_R$ with $\partial Q_R=R$ (Federer--Fleming isoperimetric inequality), and set
+$R_{\mathrm{glue}}:=-(Q+Q_R)$ as above.
+Then $\partial R_{\mathrm{glue}}=-\partial T^{\mathrm{raw}}$ and
+$\Mass(R_{\mathrm{glue}})\le \Mass(Q)+\Mass(Q_R)\to 0$ as $\mathcal F(\partial T^{\mathrm{raw}})\to 0$.
 \end{proof}
 
 
 We now return to the global construction.
-Fix $\varepsilon>0$, and choose the mesh/activation parameters so that the explicit gluing current $U$ constructed in
-Proposition~\ref{prop:glue-gap} satisfies $\Mass(U)\le\varepsilon/2$.
-Define the (closed) glued cycle
+Fix $\varepsilon>0$, and choose the mesh/activation parameters so that the gluing correction $R_{\mathrm{glue}}$ from
+Proposition~\ref{prop:glue-gap} satisfies $\Mass(R_{\mathrm{glue}})\le\varepsilon/2$.
+Define the closed glued cycle
 \[
-U_T:=U,
-\qquad
-T^{(1)}:=T:=T^{\mathrm{raw}}-U_T.
+T^{(1)}:=T^{\mathrm{raw}}+R_{\mathrm{glue}}.
 \]
-Then $T^{(1)}$ is closed and integral, and $\Mass(U_T)<\varepsilon/2$.
+Then $T^{(1)}$ is closed and integral.
 
 \medskip\noindent
 \textbf{Substep 4.3: Forcing the cohomology class via lattice discreteness.}
@@ -5777,13 +5685,13 @@ to each pairing) and choosing the integers $N_{Q,j}$ using Lemma~\ref{lem:barany
 \[
 \Bigl|\int_{T^{\mathrm{raw}}}\eta_\ell - m\,I_\ell\Bigr|<\tfrac12.
 \]
-Moreover, the explicit gluing correction $U_T$ has arbitrarily small mass (Proposition~\ref{prop:glue-gap}), hence
+Moreover, the gluing correction $R_{\mathrm{glue}}$ has arbitrarily small mass (Proposition~\ref{prop:glue-gap}), hence
 its pairing with each fixed smooth $\eta_\ell$ is arbitrarily small:
-$\bigl|\int_{U_T}\eta_\ell\bigr|\le \|\eta_\ell\|_{C^0}\Mass(U_T)$.
+$\bigl|\int_{R_{\mathrm{glue}}}\eta_\ell\bigr|\le \|\eta_\ell\|_{C^0}\Mass(R_{\mathrm{glue}})$.
 Choosing parameters so that this error is $<\tfrac12$ as well yields
 \[
 \Bigl|\int_{T^{(1)}}\eta_\ell - m\,I_\ell\Bigr|<1,
-\qquad T^{(1)}=T^{\mathrm{raw}}-U_T.
+\qquad T^{(1)}=T^{\mathrm{raw}}+R_{\mathrm{glue}}.
 \]
 Since $\int_{T^{(1)}}\eta_\ell\in\Z$ (integral current against an integral class),
 we conclude $\int_{T^{(1)}}\eta_\ell = m\,I_\ell$ for all $\ell$.
@@ -5792,7 +5700,7 @@ Hence
 [T^{(1)}]=\mathrm{PD}(m[\gamma]).
 \]
 
-Set $R_\varepsilon:=-U_T$ and $T_\varepsilon:=T^{(1)}$.  This satisfies all requirements.
+Set $R_\varepsilon:=R_{\mathrm{glue}}$ and $T_\varepsilon:=T^{(1)}$.  This satisfies all requirements.
 \end{proof}
 
 Let $\{\Theta_\ell\}_{\ell=1}^{b}$ be a fixed integral basis of
@@ -6580,7 +6488,7 @@ Calibrated-limit closure (Theorem~\ref{thm:realization-from-almost}) + Harvey--L
 	\begin{itemize}
 	\item \textbf{Citation (primary):} H.~Federer and W.~H.~Fleming, \emph{Normal and integral currents}, Annals of Mathematics \textbf{72} (1960), 458--520.
 	\item \textbf{Citation (textbook):} H.~Federer, \emph{Geometric Measure Theory}, Springer (1969); L.~Simon, \emph{Lectures on Geometric Measure Theory}, ANU (1983).
-	\item \textbf{Used in this manuscript:} Theorem~\ref{thm:realization-from-almost} (compactness of integral currents under mass bounds); Proposition~\ref{prop:glue-gap} and Substep~4.2 (constructing a small-mass correction $U_T$ with $\partial U_T=\partial T^{\mathrm{raw}}$, either explicitly face-by-face or via the flat-norm/isoperimetric filling).
+	\item \textbf{Used in this manuscript:} Theorem~\ref{thm:realization-from-almost} (compactness of integral currents under mass bounds); Proposition~\ref{prop:glue-gap} and Substep~4.2 (constructing a small-mass correction $R_{\mathrm{glue}}$ with $\partial R_{\mathrm{glue}}=-\partial T^{\mathrm{raw}}$ via the flat-norm/isoperimetric filling).
 	\item \textbf{Hypotheses checked here:} $X$ is compact (mass bounds yield tightness); all currents are integral; dimension is finite.
 	\end{itemize}
 
