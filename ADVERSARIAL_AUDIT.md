@@ -40,19 +40,20 @@ Current output:
 
 ```
 #print axioms hodge_conjecture'
-'hodge_conjecture'' depends on axioms: [cohomologous_refl,
+'hodge_conjecture'' depends on axioms: [IsAlgebraicSet,
+ cohomologous_refl,
  cohomologous_symm,
  cohomologous_trans,
+ cone_positive_represents,
  exists_uniform_interior_radius,
- flat_limit_of_cycles_is_cycle,
- harvey_lawson_theorem,
  isRationalClass_add,
  isRationalClass_smul_rat,
- microstructureSequence_are_cycles,
+ lefschetz_lift_signed_cycle,
+ omega_pow_is_rational,
+ omega_pow_represents_multiple_axiom,
  propext,
- serre_gaga,
  zero_is_pq,
- zero_is_rational_axiom,
+ zero_is_rational,
  Classical.choice,
  Quot.sound]
 ```
