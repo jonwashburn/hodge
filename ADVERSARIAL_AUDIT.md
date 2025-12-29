@@ -8,6 +8,9 @@ Scope:
 - **Lean artifact**: what `hodge_conjecture'` *actually* proves, its axiom dependencies, and why it is **not yet** the classical Hodge conjecture.
 - **TeX manuscript** `Hodge-v6-w-Jon-Update-MERGED.tex`: rigorous “referee-style” gap scan, with special focus on the novel **H1/H2 microstructure** packages (local holomorphic manufacturing + global coherence/gluing).
 
+Related:
+- See `FAITHFULNESS_REMEDIATION_PLAN.md` for a concrete roadmap to make the *core notions/bridges* faithful (de Rham cohomology, currents, cycle class map, etc.), while keeping classical theorems as axioms.
+
 ---
 
 ## Pass 1 — Lean statement vs classical Hodge (faithfulness audit)
