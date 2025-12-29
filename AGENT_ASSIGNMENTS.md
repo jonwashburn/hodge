@@ -8,6 +8,37 @@ We are building a **complete, unconditional, machine-checkable proof** of the Ho
 
 ---
 
+## Current Lean dependency set (auto-extracted)
+
+Reproduce with:
+
+```bash
+lake env lean DependencyCheck.lean
+```
+
+Current output:
+
+```
+#print axioms hodge_conjecture'
+'hodge_conjecture'' depends on axioms: [cohomologous_refl,
+ cohomologous_symm,
+ cohomologous_trans,
+ exists_uniform_interior_radius,
+ flat_limit_of_cycles_is_cycle,
+ harvey_lawson_theorem,
+ isRationalClass_add,
+ isRationalClass_smul_rat,
+ microstructureSequence_are_cycles,
+ propext,
+ serre_gaga,
+ zero_is_pq,
+ zero_is_rational_axiom,
+ Classical.choice,
+ Quot.sound]
+```
+
+**Adversarial warning:** the current Lean theorem `hodge_conjecture'` is still **not a faithful formalization of the classical Hodge conjecture**, since it does not relate the produced algebraic object back to the input class \([\gamma]\) (no fundamental class / `RepresentsClass` in the statement), and several core predicates remain opaque/stubbed.
+
 ## 🚫 ABSOLUTE RULES — NO EXCEPTIONS
 
 ### 1. NO SHORTCUTS

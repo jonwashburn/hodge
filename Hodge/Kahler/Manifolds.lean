@@ -13,15 +13,15 @@ noncomputable section
 
 open Classical
 
-variable {n : ℕ} {X : Type*}
+universe u
+
+variable {n : ℕ} {X : Type u}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X]
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
 
 /-- **Kähler Metric Symmetry** (Kobayashi, 1987).
     The Riemannian metric induced by the Kähler form is symmetric.
-    This follows from the J-invariance and alternating nature of the Kähler form:
-    ω(v, Jw) = ω(Jv, J²w) = ω(Jv, -w) = -ω(Jv, w) = ω(w, Jv).
     Reference: [S. Kobayashi, "Differential Geometry of Complex Vector Bundles",
     Princeton University Press, 1987, Chapter II, Section 3]. -/
 axiom kahlerMetric_symm (x : X) (v w : TangentSpace (𝓒_complex n) x) :
@@ -30,29 +30,30 @@ axiom kahlerMetric_symm (x : X) (v w : TangentSpace (𝓒_complex n) x) :
 
 /-! ## Rationality -/
 
-/-- A de Rham cohomology class is rational.
-    In this stub model, all classes are considered rational. -/
-def isRationalClass [Nonempty X] {k : ℕ} (_η : DeRhamCohomologyClass n X k) : Prop :=
-  True
+/-- The wedge product of two rational forms is rational. -/
+axiom isRationalClass_wedge {k l : ℕ} {ω₁ : SmoothForm n X k} {ω₂ : SmoothForm n X l} :
+    isRationalClass (DeRhamCohomologyClass.ofForm ω₁) →
+    isRationalClass (DeRhamCohomologyClass.ofForm ω₂) →
+    isRationalClass (DeRhamCohomologyClass.ofForm (wedge ω₁ ω₂))
 
-/-- The wedge product of two rational classes is rational. -/
-theorem isRationalClass_wedge [Nonempty X] {k l : ℕ}
-    (η₁ : DeRhamCohomologyClass n X k) (η₂ : DeRhamCohomologyClass n X l) :
-    isRationalClass η₁ → isRationalClass η₂ → isRationalClass (DeRhamCohomologyClass.ofForm (wedge η₁.representative η₂.representative)) := by
-  intros; trivial
-
-/-- Scalar multiplication by a rational number preserves rationality. -/
-theorem isRationalClass_smul_rat [Nonempty X] {k : ℕ} (q : ℚ) (η : DeRhamCohomologyClass n X k) :
-    isRationalClass η → isRationalClass (DeRhamCohomologyClass.ofForm (SMul.smul (q : ℝ) η.representative)) := by
-  intros; trivial
+/-- Scalar multiplication by a rational number preserves rationality (on forms). -/
+axiom isRationalClass_smul_rat {k : ℕ} (q : ℚ) {ω : SmoothForm n X k} :
+    isRationalClass (DeRhamCohomologyClass.ofForm ω) →
+    isRationalClass (DeRhamCohomologyClass.ofForm ((q : ℝ) • ω))
 
 /-- The Kähler form represents a rational cohomology class. -/
-theorem omega_is_rational [Nonempty X] : isRationalClass (DeRhamCohomologyClass.ofForm K.omega_form) := by
-  trivial
+axiom omega_is_rational : isRationalClass (DeRhamCohomologyClass.ofForm K.omega_form)
 
-/-- Addition of rational classes is rational. -/
-theorem isRationalClass_add [Nonempty X] {k : ℕ} (η₁ η₂ : DeRhamCohomologyClass n X k) :
-    isRationalClass η₁ → isRationalClass η₂ → isRationalClass (DeRhamCohomologyClass.ofForm (η₁.representative + η₂.representative)) := by
-  intros; trivial
+/-- Addition of rational classes is rational (on forms). -/
+axiom isRationalClass_add {k : ℕ} {ω₁ ω₂ : SmoothForm n X k} :
+    isRationalClass (DeRhamCohomologyClass.ofForm ω₁) →
+    isRationalClass (DeRhamCohomologyClass.ofForm ω₂) →
+    isRationalClass (DeRhamCohomologyClass.ofForm (ω₁ + ω₂))
+
+/-- The zero class is rational. -/
+axiom zero_is_rational {k : ℕ} : isRationalClass (DeRhamCohomologyClass.ofForm (0 : SmoothForm n X k))
+
+/-- The unit form represents a rational cohomology class. -/
+axiom unitForm_is_rational : isRationalClass (DeRhamCohomologyClass.ofForm (unitForm (n := n) (X := X)))
 
 end

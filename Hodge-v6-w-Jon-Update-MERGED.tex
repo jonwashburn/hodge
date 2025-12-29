@@ -473,6 +473,13 @@ functional-analytic framework for calibrations, currents, and the gluing estimat
 \paragraph{Ambient setting.}
 Let $X$ be a smooth projective complex manifold of complex dimension $n$, with
 K\"ahler form $\omega$ and integrable complex structure $J$.
+Since $X$ is projective, we may (and do) fix $\omega$ so that its cohomology class is the hyperplane/ample class:
+\[
+[\omega]=c_1(L)\in H^2(X,\Z)
+\]
+for some ample holomorphic line bundle $L\to X$ (equivalently, after choosing an embedding $X\hookrightarrow\mathbb P^M$, take $\omega$ to be a
+positive multiple of the restricted Fubini--Study form).  This ensures that the Lefschetz operator $[\omega]\wedge(\cdot)$ preserves rational cohomology,
+and that $[\omega^p]\in H^{2p}(X,\Z)$ is algebraic (complete intersections).
 The associated Riemannian metric is
 \[
 g(\cdot,\cdot)=\omega(\cdot,J\cdot),
@@ -2186,7 +2193,9 @@ taking $R_{\mathrm{glue},j}:=-U_j$ yields a vanishing-mass correction, and Propo
 
 \begin{proposition}[H1 package: local holomorphic multi-sheet manufacturing]\label{prop:h1-package}
 In the parameter schedule of \S\ref{sec:parameter-schedule}, for each mesh cell $Q$ and each direction family prescribed by the local Carath\'eodory data of $\beta$ on $Q$,
-Theorem~\ref{thm:local-sheets} and the projective holomorphic manufacturing machinery supply the required calibrated sheet--sum $S_Q$ satisfying $\Mass(S_Q)=\langle S_Q,\psi\rangle$
+Theorem~\ref{thm:local-sheets} and the projective holomorphic manufacturing machinery (implemented concretely via Bergman-scale $C^1$ jet control, Lemma~\ref{lem:bergman-control},
+feeding the finite-template realization Proposition~\ref{prop:finite-template} and the corner-exit holomorphic sliver construction Proposition~\ref{prop:holomorphic-corner-exit-L1})
+supply the required calibrated sheet--sum $S_Q$ satisfying $\Mass(S_Q)=\langle S_Q,\psi\rangle$
 with quantitative disjointness, slope, and budget control.  Thus the hypothesis \textnormal{(H1)} in Theorem~\ref{thm:spine-quantitative} holds in this manuscript.
 \end{proposition}
 
@@ -3811,7 +3820,8 @@ where $C$ depends only on $(n,p,X)$ and the uniform tubular-face charts.
 The matched part $B_F^{\wedge}$ is obtained by applying the two face maps to the \emph{same} common submeasure $\nu^{\wedge}$.
 Therefore Lemma~\ref{lem:template-displacement} applies directly and yields the stated bound for $B_F^{\wedge}$.
 
-For the unmatched part, $B_F^{\mathrm{un}}$ is an integral $(k-1)$--cycle supported on the face patch $F$.
+For the unmatched part, $B_F^{\mathrm{un}}$ is an integral $(k-1)$--cycle supported on the (relative) interior of the face patch $F$
+(any possible edge contributions are treated separately in the global bookkeeping/corner-exit package).
 Since $\mathrm{diam}(F)\lesssim h$, Lemma~\ref{lem:flat-diameter} gives
 \[
 \mathcal F(B_F^{\mathrm{un}})\ \le\ C\,h\,\Mass(B_F^{\mathrm{un}}).
@@ -5571,11 +5581,13 @@ Using the corner-exit vertex-template activation scheme (Proposition~\ref{prop:g
 (Theorem~\ref{thm:sliver-mass-matching-on-template} and Corollary~\ref{cor:global-flat-weighted}), one obtains the quantitative estimate
 \[
 \mathcal F\!\left(\partial T^{\mathrm{raw}}\right)\ \le\ \varepsilon_{\mathrm{glue}}(m,\delta,\varepsilon,\mathrm{mesh})\cdot m,
-\qquad \varepsilon_{\mathrm{glue}}\xrightarrow[\delta,\varepsilon\to 0,\ \mathrm{mesh}\to 0,\ m\to\infty]{}0.
 \]
+\noindent where $\varepsilon_{\mathrm{glue}}=O(\delta+\varepsilon+\mathrm{mesh}+1/m)$.
+In the global parameter schedule of \S\ref{sec:parameter-schedule} (choose $m$ first), given any $\tau>0$ we may choose $m$ so large that $1/m<\tau$,
+then choose $\delta,\varepsilon$ and the mesh scale so small that $\delta+\varepsilon+\mathrm{mesh}<\tau$, yielding $\mathcal F(\partial T^{\mathrm{raw}})\le C\,\tau\,m=o(m)$ along the mesh refinement.
 By definition of $\mathcal F$ there exist integral currents
 $R$ and $Q$ with $\partial T^{\mathrm{raw}}=R+\partial Q$ and $\Mass(R)+\Mass(Q)\le 2\mathcal F(\partial T^{\mathrm{raw}})$.
-Moreover $R$ is a boundary (since $\partial T^{\mathrm{raw}}$ is), hence null-homologous; by the Federer--Fleming
+Moreover $R=\partial(T^{\mathrm{raw}}-Q)$ is itself a boundary (hence null-homologous); by the Federer--Fleming
 isoperimetric inequality there exists an integral filling $Q_R$ with $\partial Q_R=R$ and
 \[
 \Mass(Q_R)\le C\,\Mass(R)^{\frac{2n-2p}{2n-2p-1}}.
@@ -5704,7 +5716,7 @@ Choosing parameters so that this error is $<\tfrac12$ as well yields
 \Bigl|\int_{T^{(1)}}\eta_\ell - m\,I_\ell\Bigr|<1,
 \qquad T^{(1)}=T^{\mathrm{raw}}+R_{\mathrm{glue}}.
 \]
-Since $\int_{T^{(1)}}\eta_\ell\in\Z$ (integral current against an integral class),
+Since $\int_{T^{(1)}}\eta_\ell\in\Z$ (Lemma~\ref{lem:integral-periods}),
 we conclude $\int_{T^{(1)}}\eta_\ell = m\,I_\ell$ for all $\ell$.
 Hence
 \[
@@ -5745,8 +5757,12 @@ Then $\int_T\eta\in\Z$.
 \end{lemma}
 
 \begin{proof}
-By definition of integral homology and the de Rham isomorphism, the period of $T$ on any integral cohomology class is an integer.
-Explicitly, if $T$ represents an element of $H_k(X,\Z)$ and $[\eta]\in H^k(X,\Z)$, then $\langle [T],[\eta]\rangle\in\Z$ by the universal coefficient theorem.
+An integral cycle $T$ determines a class $[T]\in H_k(X,\Z)$ (see Federer, \emph{Geometric Measure Theory}, 1969, \S4.1).
+If $[\eta]\in H^k(X,\Z)$ is an integral cohomology class, then the de~Rham pairing gives
+\[
+\int_T \eta \;=\; \langle [T],[\eta]\rangle \in \Z,
+\]
+since $H^k(X,\Z)$ pairs integrally with $H_k(X,\Z)$ (universal coefficient theorem / de~Rham theorem).
 \end{proof}
 
 \begin{lemma}[Lattice discreteness]\label{lem:lattice-discreteness}
@@ -5939,7 +5955,9 @@ c_0\ \le\ \Mass(T_\epsilon)\ \le\ c_0+2\,\Mass(U_\epsilon),
 \end{proposition}
 
 \begin{proof}
-By construction, each local sheet current $S_Q$ is holomorphic and hence $\psi$--calibrated, so their sum $S$ is $\psi$--calibrated.
+By construction, each local sheet current $S_Q$ is holomorphic and hence $\psi$--calibrated, and the sheet pieces are chosen disjointly on each cell $Q$
+(cf.\ the disjointness requirements in the local manufacturing step).
+Therefore the sum $S=\sum_Q S_Q$ is $\psi$--calibrated and evaluation/mass add without cancellation.
 In particular,
 \[
 \Mass(S)=\int_S\psi.
@@ -6022,17 +6040,21 @@ Thus $\Mass(T_k)\ge m\int_X\beta\wedge\psi-o(1)$ as well.  We conclude:
 This is the compactness/normalization needed for Federer--Fleming.
 
 \medskip\noindent
-\textbf{Substep 6.2: Varifold compactness \cite{Allard72,Sim83}.}
+\textbf{Substep 6.2: Compactness (Federer--Fleming + Allard).}
 Let $V_k$ be the associated integral varifold of $T_k$.  Uniform mass
-bound gives tightness; Allard's compactness theorem (Allard, ``On the
-first variation of a varifold,'' Ann.~of Math.~95 (1972), 417--491)
-gives, after passing to a subsequence (not relabeled):
+bound gives tightness.
+Since $\partial T_k=0$ and $\sup_k \Mass(T_k)<\infty$, the Federer--Fleming compactness theorem for integral currents
+(Federer--Fleming, \emph{Normal and integral currents}, Ann.~of Math.~72 (1960), 458--520; see also Federer, \emph{GMT}, 1969)
+gives, after passing to a subsequence (not relabeled), flat convergence $T_k\to T$ to an integral cycle.
+In parallel, Allard's compactness theorem for integral varifolds (Allard, Ann.~of Math.~95 (1972), 417--491)
+gives varifold convergence $V_k\to V$.
 \begin{itemize}
 \item $V_k\to V$ as varifolds;
 \item $T_k\to T$ as integral currents in the flat norm;
 \item $T$ is an integral $(2n-2p)$-cycle with $\partial T=0$;
-\item By homological continuity, $[T]=\mathrm{PD}(m[\gamma])$ (since
-$T_k$ and $T$ differ by a boundary and cohomology is discrete).
+\item By the period constraints of Proposition~\ref{prop:cohomology-match} (applied to $T_k$) and continuity of current evaluation under flat convergence,
+the limit $T$ has the same pairings with a fixed integral basis $\{\Theta_\ell\}$ of $H^{2(n-p)}(X,\Z)$; hence $[T]=\mathrm{PD}(m[\gamma])$
+in $H_{2(n-p)}(X,\Z)/\mathrm{tors}$ (equivalently in $H_{2(n-p)}(X,\Q)$).
 \end{itemize}
 Lower semicontinuity gives
 \begin{equation}\label{eq:mass-lsc}

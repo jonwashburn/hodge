@@ -1,14 +1,10 @@
 # Hodge Conjecture Formalization in Lean 4
 
-A formalization of the Hodge Conjecture using Lean 4 and Mathlib, providing a complete machine-checkable proof structure.
+This repo contains a **Lean 4 proof skeleton** inspired by the manuscript `Hodge-v6-w-Jon-Update-MERGED.tex`.
 
-## Overview
+Important: it is **not yet a faithful formalization of the classical Hodge conjecture** as mathematicians state it. Several core notions are currently stubbed/opaque, and the current Lean “main theorem” is intentionally weaker than the classical conjecture.
 
-The **Hodge Conjecture** is one of the seven Millennium Prize Problems. It states that for a smooth projective complex algebraic variety X, every rational Hodge class is a linear combination of the cohomology classes of algebraic cycles.
-
-This formalization provides a complete framework capturing the key mathematical structures and relationships needed to state and prove the conjecture, built on modern techniques from geometric measure theory, calibrated geometry, and Kähler geometry.
-
-## Main Theorem
+## Main Theorem (current Lean statement)
 
 The main result is formalized in `Hodge/Kahler/Main.lean`:
 
@@ -18,81 +14,54 @@ theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p))
     ∃ (Z : Set X), isAlgebraicSubvariety n X Z
 ```
 
-## Build Status
+**Warning (statement weakness):** this conclusion currently does **not** relate the produced algebraic object back to the input class \([\gamma]\) (there is no `RepresentsClass` / fundamental-class equality in the statement).
 
-- **Build:** ✅ `lake build` succeeds
-- **Sorries:** 0 ✅
-- **Axioms:** 23 (all documented deep theorems or Mathlib gaps)
+## Status (local checks)
+
+- **Sorries in `Hodge/**/*.lean`:** 0 (checked via grep)
+- **Declared `axiom` in `Hodge/**/*.lean`:** 50 (checked via grep)
+- **Full `lake build`:** not rerun in this session (running full builds is intentionally avoided)
 
 ## Axiom Dependencies
 
 ### Direct Dependencies of `hodge_conjecture'`
 
-The main theorem depends on a subset of the project axioms plus standard Lean foundations:
+Reproduce:
+
+```bash
+lake env lean DependencyCheck.lean
+```
+
+Current output:
 
 ```
 #print axioms hodge_conjecture'
 'hodge_conjecture'' depends on axioms: [
-  exists_uniform_interior_radius,   -- Lang 1999
-  flat_limit_of_cycles_is_cycle,    -- Federer 1969
-  harvey_lawson_theorem,            -- Harvey-Lawson 1982
-  microstructureSequence_are_cycles,-- SYR 2025
-  serre_gaga,                       -- Serre 1956
-  propext, Classical.choice, Quot.sound  -- Lean fundamentals
+  cohomologous_refl,
+  cohomologous_symm,
+  cohomologous_trans,
+  exists_uniform_interior_radius,
+  flat_limit_of_cycles_is_cycle,
+  harvey_lawson_theorem,
+  isRationalClass_add,
+  isRationalClass_smul_rat,
+  microstructureSequence_are_cycles,
+  propext,
+  serre_gaga,
+  zero_is_pq,
+  zero_is_rational_axiom,
+  Classical.choice,
+  Quot.sound
 ]
 ```
 
-### Full Axiom List (23 total)
+## Faithfulness / “proof killers” (current)
 
-The full project uses **23 mathematical axioms**, all of which are **published theorems** from the mathematical literature or documented gaps in Mathlib. These are categorized below:
+The Lean development is not yet a faithful Hodge formalization primarily because:
 
-### Category 1: Foundational Complex Geometry & GAGA
-
-| Axiom | Description | Reference |
-|-------|-------------|-----------|
-| `serre_gaga` | GAGA correspondence for subvarieties | Serre 1956 |
-| `serre_vanishing` | Coherent sheaf cohomology vanishing | Serre 1955 |
-| `structureSheaf_exists` | Existence of the structure sheaf O_X | Hartshorne 1977 |
-| `idealSheaf_exists` | Existence of the ideal sheaf I_x | Hartshorne 1977 |
-
-### Category 2: Kähler Geometry & Hodge Theory
-
-| Axiom | Description | Reference |
-|-------|-------------|-----------|
-| `kahlerMetric_symm` | Kähler metric symmetry | Kobayashi 1987 |
-| `hard_lefschetz_bijective` | Hard Lefschetz isomorphism | Lefschetz 1924 |
-| `energy_minimizer` | Existence of harmonic representatives | Hodge 1941 |
-| `trace_L2_control` | L∞ bound for harmonic forms | Hörmander 1983 |
-| `wirtinger_pairing` | Wirtinger pairing for Kähler forms | Harvey-Lawson 1982 |
-| `exists_uniform_interior_radius` | Uniform radius for strongly positive cone | Lang 1999 |
-| `caratheodory_decomposition` | Convex decomposition of positive forms | Carathéodory 1911 |
-
-### Category 3: GMT & Calibrated Geometry
-
-| Axiom | Description | Reference |
-|-------|-------------|-----------|
-| `harvey_lawson_theorem` | Existence of calibrated currents | Harvey-Lawson 1982 |
-| `flat_limit_of_cycles_is_cycle` | Stability of cycles under flat limit | Federer-Fleming 1960 |
-| `deformation_theorem` | GMT deformation theorem | Federer-Fleming 1960 |
-| `federer_fleming_compactness` | Compactness for integral currents | Federer-Fleming 1960 |
-| `spine_theorem` | Calibration defect bound | Harvey-Lawson 1982 |
-| `mass_lsc` | Lower semicontinuity of mass | Federer 1969 |
-| `comass_smul` | Homogeneity of comass norm | Federer 1969 |
-
-### Category 4: Bridge Theorems (Main.lean)
-
-| Axiom | Description | Reference |
-|-------|-------------|-----------|
-| `harvey_lawson_fundamental_class` | GMT limit to cohomology class bridge | Harvey-Lawson 1982 |
-| `complete_intersection_fundamental_class` | Formula for CI fundamental class | Griffiths-Harris 1978 |
-
-### Category 5: Microstructure & Approximation
-
-| Axiom | Description | Reference |
-|-------|-------------|-----------|
-| `microstructureSequence_are_cycles` | Construction sequence consists of cycles | SYR 2025 |
-| `barany_grinberg` | Bárány-Grinberg rounding for flows | Bárány-Grinberg 1981 |
-| `tian_convergence` | Convergence of the Bergman metric | Tian 1990 |
+- **Final statement is too weak**: it produces an “algebraic subvariety” but does not assert it represents \([\gamma]\).
+- **Core predicates are opaque/stubbed**: e.g. `isRationalClass`, `isPPForm'`, and the algebraicity predicate used by `isAlgebraicSubvariety`.
+- **Key analytic/GMT steps are axiomatized**: e.g. `microstructureSequence_are_cycles`, `harvey_lawson_theorem`, and `flat_limit_of_cycles_is_cycle`.
 
 ## Project Structure
 
@@ -131,7 +100,7 @@ Hodge/
 
 | Metric | Count |
 |--------|-------|
-| Total axioms | 23 |
+| Declared axioms (`^axiom` in `Hodge/**/*.lean`) | 50 |
 | Sorry statements | 0 |
 | Lean files | 21 |
 | Lines of code | ~5500 |
@@ -149,16 +118,7 @@ Hodge/
 
 ## Definition of Unconditional Proof
 
-This formalization is **UNCONDITIONAL** in the sense that:
-
-1. ✅ `lake build` succeeds with no errors
-2. ✅ Zero `sorry`, `admit`, or placeholder proofs
-3. ✅ Every `axiom` is either:
-   - A **published theorem** with author, year, and citation
-   - A **Lean fundamental** (`propext`, `funext`, `Classical.choice`)
-4. ✅ Each cited theorem is verifiable in the mathematical literature
-
-**The proof is unconditional modulo the listed deep theorems**, which is the standard for formalized mathematics. These theorems could in principle be formalized given sufficient Mathlib infrastructure.
+At present, the repo has **0 `sorry`** but still uses **many axioms/opaque placeholders**, so “unconditional proof of the classical Hodge conjecture” is **not** an accurate description of the current Lean artifact.
 
 ## License
 

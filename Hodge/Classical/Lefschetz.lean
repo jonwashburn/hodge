@@ -113,8 +113,8 @@ theorem hard_lefschetz_inverse_form {p : ℕ} (_hp : p > n / 2)
       isPPForm' n X (n - p) η ∧ isRationalClass (DeRhamCohomologyClass.ofForm η) := by
   use 0
   constructor
-  · unfold isPPForm' isPQForm; trivial
-  · unfold isRationalClass; trivial
+  · exact zero_is_pq n X (n - p) (n - p) (by rw [Nat.two_mul])
+  · exact zero_is_rational
 
 /-- **Theorem: Hard Lefschetz Isomorphism (Form Level)**
 
@@ -130,7 +130,7 @@ theorem hard_lefschetz_isomorphism' {p' : ℕ} (_h_range : p' ≤ n / 2)
       isRationalClass (DeRhamCohomologyClass.ofForm η) ∧ isPPForm' n X p' η := by
   use 0
   constructor
-  · unfold isRationalClass; trivial
-  · unfold isPPForm' isPQForm; trivial
+  · exact zero_is_rational
+  · exact zero_is_pq n X p' p' (by rw [Nat.two_mul])
 
 end

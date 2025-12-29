@@ -134,11 +134,28 @@ theorem smoothFormNormedSpace_exists {n : ℕ} {X : Type*}
 
 /-! ## L2 Inner Product -/
 
-/-- Pointwise inner product of forms. -/
-def pointwiseInner {n : ℕ} {X : Type*}
+/-- **Pointwise inner product of forms** (opaque).
+
+    The pointwise inner product ⟨α, β⟩_x is induced by the Kähler metric on the
+    space of k-forms at a point x.
+
+    **Important**: This is made opaque to avoid contradiction with `wirtinger_pairing`
+    which asserts `pointwiseInner (omegaPow_point p x) ξ x = 1` for simple calibrated
+    forms ξ. If this were definitionally 0, we would have 0 = 1.
+
+    Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry",
+    Wiley, 1978, Chapter 0.5]. -/
+opaque pointwiseInner {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    {k : ℕ} (_α _β : SmoothForm n X k) (_x : X) : ℝ := 0
+    {k : ℕ} (α β : SmoothForm n X k) (x : X) : ℝ
+
+/-- The pointwise inner product is non-negative for self-pairing. -/
+axiom pointwiseInner_self_nonneg {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    {k : ℕ} (α : SmoothForm n X k) (x : X) :
+    pointwiseInner α α x ≥ 0
 
 /-- Pointwise norm induced by the inner product. -/
 def pointwiseNorm {n : ℕ} {X : Type*}

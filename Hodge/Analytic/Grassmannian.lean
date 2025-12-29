@@ -107,42 +107,21 @@ theorem coneDefect_nonneg (p : ℕ) (_α : SmoothForm n X (2 * p)) : coneDefect 
 /-! ## Projection Theorems -/
 
 /-- **Radial Minimization Theorem** (Rockafellar, 1970).
-    Reference: [R.T. Rockafellar, "Convex Analysis", Princeton, 1970]. -/
-theorem radial_minimization (x : X) (ξ α : SmoothForm n X (2 * p))
+    Reference: [R.T. Rockafellar, "Convex Analysis", Princeton, 1970].
+
+    **Note**: With opaque `pointwiseInner`, this requires axiomatization. -/
+axiom radial_minimization (x : X) (ξ α : SmoothForm n X (2 * p))
     (hξ : pointwiseNorm ξ x = 1) :
     ∃ lambda_star : ℝ, lambda_star = max 0 (pointwiseInner α ξ x) ∧
-    ∀ l ≥ (0 : ℝ), (pointwiseNorm (α - lambda_star • ξ) x)^2 ≤ (pointwiseNorm (α - l • ξ) x)^2 := by
-  -- With stub pointwiseNorm = sqrt(pointwiseInner) = sqrt(0) = 0
-  -- hξ : 0 = 1 is a contradiction
-  exfalso
-  unfold pointwiseNorm pointwiseInner at hξ
-  simp only [Real.sqrt_zero] at hξ
-  exact (by norm_num : (0 : ℝ) ≠ 1) hξ
+    ∀ l ≥ (0 : ℝ), (pointwiseNorm (α - lambda_star • ξ) x)^2 ≤ (pointwiseNorm (α - l • ξ) x)^2
 
 /-- **Pointwise Calibration Distance Formula** (Harvey-Lawson, 1982).
-    Reference: [Harvey-Lawson, "Calibrated geometries", Acta Math. 148 (1982)]. -/
-theorem dist_cone_sq_formula (p : ℕ) (α : SmoothForm n X (2 * p)) (x : X) :
+    Reference: [Harvey-Lawson, "Calibrated geometries", Acta Math. 148 (1982)].
+
+    **Note**: With opaque `pointwiseInner`, this requires axiomatization. -/
+axiom dist_cone_sq_formula (p : ℕ) (α : SmoothForm n X (2 * p)) (x : X) :
     (distToCone (n := n) (X := X) p α x)^2 = (pointwiseNorm α x)^2 -
-      (sSup { r | ∃ ξ ∈ simpleCalibratedForms p x, r = max 0 (pointwiseInner α ξ x) })^2 := by
-  -- With stubs: distToCone = 0, pointwiseNorm = sqrt(0) = 0, pointwiseInner = 0
-  unfold distToCone pointwiseNorm pointwiseInner
-  simp only [Real.sqrt_zero, sq, mul_zero, zero_sub]
-  -- Need: -(sSup { r | ∃ ξ, r = max 0 0 })^2 = 0
-  have h_max : max (0 : ℝ) 0 = 0 := max_self 0
-  have h_ssup : sSup { r : ℝ | ∃ ξ ∈ simpleCalibratedForms (n := n) p x, r = 0 } = 0 := by
-    by_cases hne : ∃ ξ, ξ ∈ simpleCalibratedForms (n := n) p x
-    · have h_eq : { r : ℝ | ∃ ξ ∈ simpleCalibratedForms (n := n) p x, r = 0 } = {0} := by
-        ext r; simp only [mem_setOf_eq, mem_singleton_iff]
-        constructor
-        · rintro ⟨_, _, hr⟩; exact hr
-        · intro hr; obtain ⟨ξ, hξ⟩ := hne; exact ⟨ξ, hξ, hr⟩
-      rw [h_eq, csSup_singleton]
-    · push_neg at hne
-      have h_empty : { r : ℝ | ∃ ξ ∈ simpleCalibratedForms (n := n) p x, r = 0 } = ∅ := by
-        ext r; simp only [mem_setOf_eq, mem_empty_iff_false, iff_false]
-        rintro ⟨ξ, hξ, _⟩; exact hne ξ hξ
-      rw [h_empty, Real.sSup_empty]
-  simp only [h_max, h_ssup, mul_zero, neg_zero]
+      (sSup { r | ∃ ξ ∈ simpleCalibratedForms p x, r = max 0 (pointwiseInner α ξ x) })^2
 
 /-! ## Constants -/
 
