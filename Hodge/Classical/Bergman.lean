@@ -168,7 +168,7 @@ def L2InnerProduct (_L : HolomorphicLineBundle n X) (_h : HermitianMetric _L)
   0
 
 /-- The L2 norm of a section. -/
-noncomputable def L2Norm (L : HolomorphicLineBundle n X) (h : HermitianMetric L)
+noncomputable def sectionL2Norm (L : HolomorphicLineBundle n X) (h : HermitianMetric L)
     (s : Section L) : ℝ :=
   Real.sqrt (L2InnerProduct L h s s).re
 
