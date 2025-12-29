@@ -93,9 +93,9 @@ theorem cone_positive_is_algebraic {p : ℕ}
     ∃ (Z : Set X), isAlgebraicSubvariety n X Z := by
   -- Step 1: Use the Automatic SYR Theorem to find a calibrated current
   -- Choose the Kähler calibration ψ = ω^{n-p}/(n-p)!
-  let ψ := KählerCalibration (n - p)
+  let ψ := KählerCalibration (n := n) (X := X) (p := n - p)
   obtain ⟨T_seq, T_limit, h_cycles, h_flat_conv, h_calib⟩ := microstructure_approximation γ hγ_cone ψ
-  
+
   -- Step 2: Use Harvey-Lawson Structure Theorem to represent the limit as analytic varieties
   let hyp : HarveyLawsonHypothesis n X (2 * (n - p)) := {
     T := T_limit,
@@ -104,7 +104,7 @@ theorem cone_positive_is_algebraic {p : ℕ}
     is_calibrated := h_calib
   }
   let hl_concl := harvey_lawson_theorem hyp
-  
+
   -- Step 3: Use GAGA to show the union of these analytic varieties is algebraic
   let Z := ⋃ v ∈ hl_concl.varieties, v.carrier
   use Z

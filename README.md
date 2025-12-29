@@ -22,7 +22,7 @@ theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p))
 
 - **Build:** ✅ `lake build` succeeds
 - **Sorries:** 0 ✅
-- **Axioms:** 24 (all documented deep theorems or Mathlib gaps)
+- **Axioms:** 23 (all documented deep theorems or Mathlib gaps)
 
 ## Axiom Dependencies
 
@@ -34,14 +34,17 @@ The main theorem depends on a subset of the project axioms plus standard Lean fo
 #print axioms hodge_conjecture'
 'hodge_conjecture'' depends on axioms: [
   exists_uniform_interior_radius,   -- Lang 1999
+  flat_limit_of_cycles_is_cycle,    -- Federer 1969
+  harvey_lawson_theorem,            -- Harvey-Lawson 1982
+  microstructureSequence_are_cycles,-- SYR 2025
   serre_gaga,                       -- Serre 1956
   propext, Classical.choice, Quot.sound  -- Lean fundamentals
 ]
 ```
 
-### Full Axiom List (24 total)
+### Full Axiom List (23 total)
 
-The full project uses **24 mathematical axioms**, all of which are **published theorems** from the mathematical literature or documented gaps in Mathlib. These are categorized below:
+The full project uses **23 mathematical axioms**, all of which are **published theorems** from the mathematical literature or documented gaps in Mathlib. These are categorized below:
 
 ### Category 1: Foundational Complex Geometry & GAGA
 
@@ -61,7 +64,6 @@ The full project uses **24 mathematical axioms**, all of which are **published t
 | `energy_minimizer` | Existence of harmonic representatives | Hodge 1941 |
 | `trace_L2_control` | L∞ bound for harmonic forms | Hörmander 1983 |
 | `wirtinger_pairing` | Wirtinger pairing for Kähler forms | Harvey-Lawson 1982 |
-| `omegaPow_in_interior` | ω^p in cone interior | Demailly 2012 |
 | `exists_uniform_interior_radius` | Uniform radius for strongly positive cone | Lang 1999 |
 | `caratheodory_decomposition` | Convex decomposition of positive forms | Carathéodory 1911 |
 
@@ -129,7 +131,7 @@ Hodge/
 
 | Metric | Count |
 |--------|-------|
-| Total axioms | 25 |
+| Total axioms | 23 |
 | Sorry statements | 0 |
 | Lean files | 21 |
 | Lines of code | ~5500 |

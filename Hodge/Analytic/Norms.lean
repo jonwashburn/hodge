@@ -169,7 +169,7 @@ def energy {n : ℕ} {X : Type*}
     {k : ℕ} (α : SmoothForm n X k) : ℝ := L2Inner α α
 
 /-- **Hodge Theorem: Existence of Harmonic Representative** (Hodge, 1941).
-    In each de Rham cohomology class on a compact Kähler manifold, there exists a 
+    In each de Rham cohomology class on a compact Kähler manifold, there exists a
     unique harmonic form which minimizes the L2 energy.
     Reference: [W.V.D. Hodge, "The Theory and Applications of Harmonic Integrals", 1941]. -/
 axiom energy_minimizer {n : ℕ} {X : Type*}

@@ -48,6 +48,19 @@ def isAlgebraicSubvariety (n : ℕ) (X : Type u)
 axiom serre_gaga {p : ℕ} (V : AnalyticSubvariety n X) (hV_codim : V.codim = p) :
     ∃ (W : AlgebraicSubvariety n X), W.carrier = V.carrier ∧ W.codim = p
 
+/-- The union of two algebraic subvarieties is algebraic. -/
+theorem isAlgebraicSubvariety_union {Z₁ Z₂ : Set X}
+    (h1 : isAlgebraicSubvariety n X Z₁) (h2 : isAlgebraicSubvariety n X Z₂) :
+    isAlgebraicSubvariety n X (Z₁ ∪ Z₂) := by
+  obtain ⟨W1, rfl⟩ := h1
+  obtain ⟨W2, rfl⟩ := h2
+  let V_u : AnalyticSubvariety n X := {
+    carrier := W1.carrier ∪ W2.carrier
+    codim := min W1.codim W2.codim
+  }
+  obtain ⟨W_u, hW_u_carrier, _⟩ := serre_gaga V_u rfl
+  exact ⟨W_u, hW_u_carrier⟩
+
 /-- **Theorem: Empty Set is Algebraic** (Standard fact).
     The empty set is an algebraic subvariety of any projective variety.
 
@@ -71,19 +84,6 @@ theorem harvey_lawson_union_is_algebraic {k : ℕ} [Nonempty X]
       obtain ⟨W, hW_carrier, _⟩ := serre_gaga v rfl
       use W, hW_carrier
     exact isAlgebraicSubvariety_union h_v_alg ih
-
-/-- The union of two algebraic subvarieties is algebraic. -/
-theorem isAlgebraicSubvariety_union {Z₁ Z₂ : Set X}
-    (h1 : isAlgebraicSubvariety n X Z₁) (h2 : isAlgebraicSubvariety n X Z₂) :
-    isAlgebraicSubvariety n X (Z₁ ∪ Z₂) := by
-  obtain ⟨W1, rfl⟩ := h1
-  obtain ⟨W2, rfl⟩ := h2
-  let V_u : AnalyticSubvariety n X := {
-    carrier := W1.carrier ∪ W2.carrier
-    codim := min W1.codim W2.codim
-  }
-  obtain ⟨W_u, hW_u_carrier, _⟩ := serre_gaga V_u rfl
-  exact ⟨W_u, hW_u_carrier⟩
 
 /-- The intersection of two algebraic subvarieties is algebraic. -/
 theorem isAlgebraicSubvariety_intersection {Z₁ Z₂ : Set X}
