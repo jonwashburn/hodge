@@ -51,6 +51,23 @@ def isConePositive {p : ℕ} (α : SmoothForm n X (2 * p)) : Prop :=
 def omegaPow_point (p : ℕ) (_x : X) : SmoothForm n X (2 * p) :=
   omegaPow n X p
 
+/-- Helper: casting a zero SmoothForm gives a zero SmoothForm. -/
+theorem smoothForm_cast_zero {k k' : ℕ} (h : k = k') :
+    (h ▸ (0 : SmoothForm n X k) : SmoothForm n X k') = 0 := by
+  subst h
+  rfl
+
+/-- Helper: the structure form of zero equals zero. -/
+theorem smoothForm_mk_zero_eq_zero (k : ℕ) :
+    (⟨fun _ => 0⟩ : SmoothForm n X k) = 0 := rfl
+
+/-- Helper: casting a structure-form zero from k to k' gives zero.
+    Note: the source type has index k, not k'. -/
+theorem smoothForm_cast_mk_zero {k k' : ℕ} (h : k' = k) :
+    (h ▸ (⟨fun _ => 0⟩ : SmoothForm n X k) : SmoothForm n X k') = 0 := by
+  subst h
+  rfl
+
 /-- In the stub model, omegaPow is the zero form.
     This is because unitForm = 0 and wedge _ _ = 0. -/
 theorem omegaPow_eq_zero (p : ℕ) : omegaPow n X p = 0 := by
@@ -60,12 +77,12 @@ theorem omegaPow_eq_zero (p : ℕ) : omegaPow n X p = 0 := by
     unfold omegaPow unitForm
     rfl
   | succ p' _ih =>
-    -- omegaPow n X (p'+1) = cast (omega_form ⋀ omegaPow n X p')
-    -- Since wedge _ _ = 0, this is 0
-    -- The cast makes definitional equality tricky, but the result is still 0
-    ext x v
-    unfold omegaPow wedge
-    simp only [SmoothForm.zero_apply, AlternatingMap.zero_apply]
+    -- omegaPow n X (p'+1) = h_eq ▸ (omega_form ⋀ omegaPow n X p')
+    -- where h_eq : 2 * (p' + 1) = 2 + 2 * p'
+    -- Since wedge _ _ = ⟨fun _ => 0⟩, the result is h_eq ▸ ⟨fun _ => 0⟩
+    -- where the source has type SmoothForm n X (2 + 2 * p')
+    simp only [omegaPow, wedge]
+    exact smoothForm_cast_mk_zero (n := n) (X := X) (by ring : 2 * (p' + 1) = 2 + 2 * p')
 
 /-- **Wirtinger Inequality** (Harvey-Lawson, 1982).
     The pairing of ω^p with any simple calibrated form ξ_V (associated to a

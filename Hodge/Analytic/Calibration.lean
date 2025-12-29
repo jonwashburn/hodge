@@ -83,7 +83,7 @@ theorem isCalibrated_iff_defect_zero {k : ℕ} (T : Current n X k) (ψ : Calibra
     If a current T is a difference of a calibrated current S and an error current G,
     then the calibration defect of T is bounded by twice the mass of G.
 
-    **Deep GMT Theorem (kept as axiom):** This result relates the mass of the 
+    **Deep GMT Theorem (kept as axiom):** This result relates the mass of the
     calibration error to the mass of the geometric error.
     Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", Acta Math. 148 (1982), 47-157, Section 4]. -/
 axiom spine_theorem {k : ℕ} (T S G : Current n X k) (ψ : CalibratingForm n X k)
