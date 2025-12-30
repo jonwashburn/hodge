@@ -2,176 +2,237 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{geometry}
-\geometry{a4paper, margin=1in}
+\geometry{a4paper, margin=0.75in}
 \usepackage{amsmath, amssymb}
 \usepackage{hyperref}
 \hypersetup{colorlinks=true, linkcolor=blue, urlcolor=blue}
 \usepackage{booktabs}
 \usepackage{longtable}
+\usepackage{array}
 \usepackage{xcolor}
+\usepackage{rotating}
 \definecolor{lightgray}{RGB}{245,245,245}
-\title{\textbf{Hodge Lean Proof: Axiom Completion Roadmap}\\[0.4em]\large What must be proved vs what can remain assumed}
+\definecolor{priorityred}{RGB}{200,50,50}
+\definecolor{priorityorange}{RGB}{200,120,50}
+
+\title{\textbf{Hodge Lean Proof: Axiom Completion Roadmap}\\[0.4em]\large What must be proved vs.\ what can remain assumed}
 \author{Generated from \texttt{DependencyCheck.lean}}
 \date{\today}
+
 \begin{document}
 \maketitle
+
 \fcolorbox{black}{lightgray}{\parbox{\dimexpr\textwidth-2\fboxsep-2\fboxrule}{%
-\textbf{Purpose.} This document lists the \textbf{current axiom dependencies of} \texttt{hodge\_conjecture'} and classifies them into:
+\textbf{Purpose.} This document lists the \textbf{current axiom dependencies} of \texttt{hodge\_conjecture'} and classifies them into:
 \begin{itemize}
 \item \textbf{Must complete} (strategy-critical: likely to contain the conjecture's hard content if left as axioms),
-\item \textbf{Can leave (for now)} (classical pillars + interface glue), if your goal is a solid proof \emph{modulo named classical theorems}. 
+\item \textbf{Can leave (for now)} (classical pillars + interface glue), if your goal is a solid proof \emph{modulo named classical theorems}.
 \end{itemize}
 \textbf{Note:} This is not an unconditional proof unless \emph{all} axioms are ultimately discharged.
 }}
+
 \section{Current axiom list (mechanical)}
+
 Lean reports the following axioms for \texttt{hodge\_conjecture'} (currently 38):
+
 \begin{verbatim}
 'hodge_conjecture'' depends on axioms: [
- FundamentalClassSet_isClosed,
- IsAlgebraicSet,
- IsAlgebraicSet_empty,
- IsAlgebraicSet_union,
- calibration_inequality,
- exists_volume_form_of_submodule_axiom,
- flat_limit_of_cycles_is_cycle,
- hard_lefschetz_inverse_form,
- harvey_lawson_fundamental_class,
- harvey_lawson_represents,
- harvey_lawson_theorem,
- instAddCommGroupDeRhamCohomologyClass,
- instModuleRealDeRhamCohomologyClass,
- isClosed_omegaPow_scaled,
- isIntegral_zero_current,
- isSmoothAlternating_add,
- isSmoothAlternating_neg,
- isSmoothAlternating_smul,
- isSmoothAlternating_sub,
- isSmoothAlternating_zero,
- lefschetz_lift_signed_cycle,
- limit_is_calibrated,
- microstructureSequence_are_cycles,
- microstructureSequence_defect_bound,
- microstructureSequence_flat_limit_exists,
- ofForm_smul_real,
- ofForm_sub,
- omega_pow_isClosed,
- omega_pow_represents_multiple,
- propext,
- serre_gaga,
- signed_decomposition,
- simpleCalibratedForm_is_smooth,
- smoothExtDeriv_add,
- smoothExtDeriv_smul,
- wirtinger_comass_bound,
- Classical.choice,
- Quot.sound]
+  FundamentalClassSet_isClosed, IsAlgebraicSet, IsAlgebraicSet_empty,
+  IsAlgebraicSet_union, calibration_inequality, exists_volume_form_of_submodule_axiom,
+  flat_limit_of_cycles_is_cycle, hard_lefschetz_inverse_form,
+  harvey_lawson_fundamental_class, harvey_lawson_represents, harvey_lawson_theorem,
+  instAddCommGroupDeRhamCohomologyClass, instModuleRealDeRhamCohomologyClass,
+  isClosed_omegaPow_scaled, isIntegral_zero_current, isSmoothAlternating_add,
+  isSmoothAlternating_neg, isSmoothAlternating_smul, isSmoothAlternating_sub,
+  isSmoothAlternating_zero, lefschetz_lift_signed_cycle, limit_is_calibrated,
+  microstructureSequence_are_cycles, microstructureSequence_defect_bound,
+  microstructureSequence_flat_limit_exists, ofForm_smul_real, ofForm_sub,
+  omega_pow_isClosed, omega_pow_represents_multiple, propext, serre_gaga,
+  signed_decomposition, simpleCalibratedForm_is_smooth, smoothExtDeriv_add,
+  smoothExtDeriv_smul, wirtinger_comass_bound, Classical.choice, Quot.sound]
 \end{verbatim}
+
 \section{Axioms you still need to complete (recommended)}
-If your goal is a \emph{solid} proof relative to this strategy (i.e. not assuming the core bridge from rational Hodge class to algebraic cycle), these are the first axioms to target.
+
+If your goal is a \emph{solid} proof relative to this strategy (i.e.\ not assuming the core bridge from rational Hodge class to algebraic cycle), these are the first axioms to target.
+
 \subsection{P0 (strategy-critical; highest priority)}
-\begin{longtable}{p{4.2cm}p{3.4cm}p{5.1cm}p{3.3cm}}
-\toprule\textbf{Axiom} & \textbf{Declared at} & \textbf{Why it must be completed} & \textbf{What completion means}\\\midrule\endhead
-\texttt{signed\_decomposition} & \texttt{Hodge/Kahler/SignedDecomp.lean:61} & This is where rationality is turned into a decomposition used to build algebraic cycles. If axiomatized, it can encode most of the conjecture's content. & Prove as theorem (or replace by a genuinely standard theorem known \textbackslash\{\}emph\{not\} to imply Hodge). \\
 
-\texttt{microstructureSequence\_are\_cycles} & \texttt{Hodge/Kahler/Microstructure.lean:228} & Part of the microstructure pipeline; asserts the constructed approximants are genuine cycles. If axiomatized, it hides the geometric construction. & Define the construction and prove boundary=0 for each approximant. \\
+\renewcommand{\arraystretch}{1.4}
+\small
+\begin{longtable}{>{\ttfamily\small}p{3.8cm} >{\ttfamily\footnotesize}p{4cm} p{4.5cm} p{4.5cm}}
+\toprule
+\textnormal{\textbf{Axiom}} & \textnormal{\textbf{Declared at}} & \textbf{Why it must be completed} & \textbf{What completion means} \\
+\midrule
+\endhead
 
-\texttt{microstructureSequence\_defect\_bound} & \texttt{Hodge/Kahler/Microstructure.lean:234} & Controls calibration defect; needed to pass to calibrated limits. If axiomatized, it hides the key analytic estimate. & Prove the defect estimate from concrete norms/currents. \\
+signed\_decomposition &
+Hodge/Kahler/\newline SignedDecomp.lean:61 &
+This is where rationality is turned into a decomposition used to build algebraic cycles. If axiomatized, it can encode most of the conjecture's content. &
+Prove as theorem (or replace by a genuinely standard theorem known \emph{not} to imply Hodge). \\
+\midrule
 
-\texttt{microstructureSequence\_flat\_limit\_exists} & \texttt{Hodge/Kahler/Microstructure.lean:269} & Provides the convergent subsequence / limit current. If axiomatized, it assumes the compactness/extraction needed by the strategy. & Prove via a formal Federer--Fleming compactness theorem for your current model. \\
+microstructureSequence\_are\_cycles &
+Hodge/Kahler/\newline Microstructure.lean:228 &
+Part of the microstructure pipeline; asserts the constructed approximants are genuine cycles. If axiomatized, it hides the geometric construction. &
+Define the construction and prove $\partial = 0$ for each approximant. \\
+\midrule
 
-\texttt{harvey\_lawson\_fundamental\_class} & \texttt{Hodge/Kahler/Main.lean:94} & Cohomology-level bridge equating the fundamental class of the HL/GAGA output to the target class. This is the exact representation step. & Prove the de Rham class identification from the definition of cycle/fundamental class. \\
+microstructureSequence\_defect\_bound &
+Hodge/Kahler/\newline Microstructure.lean:234 &
+Controls calibration defect; needed to pass to calibrated limits. If axiomatized, it hides the key analytic estimate. &
+Prove the defect estimate from concrete norms/currents. \\
+\midrule
 
-\texttt{lefschetz\_lift\_signed\_cycle} & \texttt{Hodge/Kahler/Main.lean:150} & Cycle-level lifting used in the Hard Lefschetz reduction (p>n/2). If axiomatized, it assumes compatibility of cycle classes with Lefschetz operator/hyperplane intersection. & Prove via intersection-with-hyperplane compatibility of cycle class maps. \\
+microstructureSequence\_flat\_limit\_exists &
+Hodge/Kahler/\newline Microstructure.lean:269 &
+Provides the convergent subsequence / limit current. If axiomatized, it assumes the compactness/extraction needed by the strategy. &
+Prove via a formal Federer--Fleming compactness theorem for your current model. \\
+\midrule
 
-\bottomrule\end{longtable}
+harvey\_lawson\_fundamental\_class &
+Hodge/Kahler/\newline Main.lean:94 &
+Cohomology-level bridge equating the fundamental class of the HL/GAGA output to the target class. This is the exact representation step. &
+Prove the de Rham class identification from the definition of cycle/fundamental class. \\
+\midrule
+
+lefschetz\_lift\_signed\_cycle &
+Hodge/Kahler/\newline Main.lean:150 &
+Cycle-level lifting used in the Hard Lefschetz reduction ($p > n/2$). If axiomatized, it assumes compatibility of cycle classes with Lefschetz operator/hyperplane intersection. &
+Prove via intersection-with-hyperplane compatibility of cycle class maps. \\
+
+\bottomrule
+\end{longtable}
+\normalsize
+
 \subsection{P1 (pipeline integrity; classical GMT facts but still assumed here)}
+
 These are standard in GMT once currents/flat topology are fully defined, but are still axioms in this repo. Complete them if you want the analytic limit behavior internal to Lean.
-\begin{longtable}{p{4.2cm}p{3.4cm}p{5.1cm}p{3.3cm}}
-\toprule\textbf{Axiom} & \textbf{Declared at} & \textbf{Why it matters} & \textbf{What completion means}\\\midrule\endhead
-\texttt{limit\_is\_calibrated} & \texttt{Hodge/Analytic/Calibration.lean:93} & Needed to ensure the flat limit current is calibrated, so Harvey--Lawson applies. & Prove from lower semicontinuity of mass + calibration inequality in a concrete current model. \\
 
-\texttt{flat\_limit\_of\_cycles\_is\_cycle} & \texttt{Hodge/Classical/HarveyLawson.lean:186} & Needed to ensure the flat limit remains a cycle (boundary=0), another HL hypothesis. & Prove continuity of boundary in flat norm for your integral current model. \\
+\small
+\begin{longtable}{>{\ttfamily\small}p{3.8cm} >{\ttfamily\footnotesize}p{4cm} p{4.5cm} p{4.5cm}}
+\toprule
+\textnormal{\textbf{Axiom}} & \textnormal{\textbf{Declared at}} & \textbf{Why it matters} & \textbf{What completion means} \\
+\midrule
+\endhead
 
-\bottomrule\end{longtable}
+limit\_is\_calibrated &
+Hodge/Analytic/\newline Calibration.lean:93 &
+Needed to ensure the flat limit current is calibrated, so Harvey--Lawson applies. &
+Prove from lower semicontinuity of mass + calibration inequality in a concrete current model. \\
+\midrule
+
+flat\_limit\_of\_cycles\_is\_cycle &
+Hodge/Classical/\newline HarveyLawson.lean:186 &
+Needed to ensure the flat limit remains a cycle ($\partial = 0$), another HL hypothesis. &
+Prove continuity of boundary in flat norm for your integral current model. \\
+
+\bottomrule
+\end{longtable}
+\normalsize
+
 \section{Axioms you can leave (if you accept classical pillars)}
+
 If you are comfortable treating major named theorems as axioms, the following can remain assumed while you focus on removing the strategy-critical bridge axioms above.
+
 \subsection{Major classical pillars (deep but standard)}
-\begin{longtable}{p{4.2cm}p{3.4cm}p{8.6cm}}
-\toprule\textbf{Axiom} & \textbf{Declared at} & \textbf{Reason it is reasonable to leave (for now)}\\\midrule\endhead
-\texttt{hard\_lefschetz\_inverse\_form} & \texttt{Hodge/Classical/Lefschetz.lean:48} & Hard Lefschetz / Hodge theory infrastructure; large formalization project. \\
 
-\texttt{serre\_gaga} & \texttt{Hodge/Classical/GAGA.lean:100} & GAGA/Chow direction (analytic $\textbackslash\{\}Rightarrow$ algebraic on projective varieties); large AG formalization. \\
+\small
+\begin{longtable}{>{\ttfamily\small}p{4cm} >{\ttfamily\footnotesize}p{4cm} p{8.5cm}}
+\toprule
+\textnormal{\textbf{Axiom}} & \textnormal{\textbf{Declared at}} & \textbf{Reason it is reasonable to leave (for now)} \\
+\midrule
+\endhead
 
-\texttt{harvey\_lawson\_theorem} & \texttt{Hodge/Classical/HarveyLawson.lean:166} & Harvey--Lawson structure theorem for calibrated currents; deep GMT/complex-analytic theorem. \\
+hard\_lefschetz\_inverse\_form &
+Hodge/Classical/\newline Lefschetz.lean:48 &
+Hard Lefschetz / Hodge theory infrastructure; large formalization project. \\
+\midrule
 
-\texttt{harvey\_lawson\_represents} & \texttt{Hodge/Classical/HarveyLawson.lean:170} & Companion representation statement for HL conclusion. \\
+serre\_gaga &
+Hodge/Classical/\newline GAGA.lean:100 &
+GAGA/Chow direction (analytic $\Rightarrow$ algebraic on projective varieties); large AG formalization. \\
+\midrule
 
-\texttt{omega\_pow\_represents\_multiple} & \texttt{Hodge/Kahler/Main.lean:143} & $\textbackslash\{\}omega\textasciicircum{}p$ represented by algebraic cycle (complete intersections/hyperplane sections); classical AG fact. \\
+harvey\_lawson\_theorem &
+Hodge/Classical/\newline HarveyLawson.lean:166 &
+Harvey--Lawson structure theorem for calibrated currents; deep GMT/complex-analytic theorem. \\
+\midrule
 
-\bottomrule\end{longtable}
+harvey\_lawson\_represents &
+Hodge/Classical/\newline HarveyLawson.lean:170 &
+Companion representation statement for HL conclusion. \\
+\midrule
+
+omega\_pow\_represents\_multiple &
+Hodge/Kahler/\newline Main.lean:143 &
+$\omega^p$ represented by algebraic cycle (complete intersections/hyperplane sections); classical AG fact. \\
+
+\bottomrule
+\end{longtable}
+\normalsize
+
 \subsection{Interface / glue axioms (engineering layer)}
+
 These provide algebraic/smoothness/linearity properties for the abstract APIs used in the formalization. They are typically discharged only after choosing fully concrete definitions.
-\begin{longtable}{p{4.2cm}p{3.4cm}p{8.6cm}}
-\toprule\textbf{Axiom} & \textbf{Declared at} & \textbf{Reason it can be left}\\\midrule\endhead
-\texttt{IsAlgebraicSet} & \texttt{Hodge/Classical/GAGA.lean:33} & Defines the minimal interface laws needed by the proof; not expected to be strategy-critical. \\
 
-\texttt{IsAlgebraicSet\_empty} & \texttt{Hodge/Classical/GAGA.lean:55} & Defines the minimal interface laws needed by the proof; not expected to be strategy-critical. \\
+\small
+\begin{longtable}{>{\ttfamily\small}p{5cm} >{\ttfamily\footnotesize}p{5cm} p{6.5cm}}
+\toprule
+\textnormal{\textbf{Axiom}} & \textnormal{\textbf{Declared at}} & \textbf{Reason it can be left} \\
+\midrule
+\endhead
 
-\texttt{IsAlgebraicSet\_union} & \texttt{Hodge/Classical/GAGA.lean:67} & Defines the minimal interface laws needed by the proof; not expected to be strategy-critical. \\
+IsAlgebraicSet & Hodge/Classical/GAGA.lean:33 & Interface law; not strategy-critical. \\
+IsAlgebraicSet\_empty & Hodge/Classical/GAGA.lean:55 & Interface law; not strategy-critical. \\
+IsAlgebraicSet\_union & Hodge/Classical/GAGA.lean:67 & Interface law; not strategy-critical. \\
+FundamentalClassSet\_isClosed & Hodge/Classical/GAGA.lean:174 & Interface law; not strategy-critical. \\
+omega\_pow\_isClosed & Hodge/Kahler/TypeDecomposition.lean:152 & Interface law; not strategy-critical. \\
+isClosed\_omegaPow\_scaled & Hodge/Kahler/TypeDecomposition.lean:160 & Interface law; not strategy-critical. \\
+wirtinger\_comass\_bound & Hodge/Analytic/Calibration.lean:36 & Interface law; not strategy-critical. \\
+calibration\_inequality & Hodge/Analytic/Calibration.lean:55 & Interface law; not strategy-critical. \\
+exists\_volume\_form\_of\_submodule\_axiom & Hodge/Analytic/Grassmannian.lean:70 & Interface law; not strategy-critical. \\
+simpleCalibratedForm\_is\_smooth & Hodge/Analytic/Grassmannian.lean:96 & Interface law; not strategy-critical. \\
+isIntegral\_zero\_current & Hodge/Analytic/IntegralCurrents.lean:40 & Interface law; not strategy-critical. \\
+smoothExtDeriv\_add & Hodge/Basic.lean:246 & Interface law; not strategy-critical. \\
+smoothExtDeriv\_smul & Hodge/Basic.lean:252 & Interface law; not strategy-critical. \\
+ofForm\_sub & Hodge/Basic.lean:1004 & Interface law; not strategy-critical. \\
+ofForm\_smul\_real & Hodge/Basic.lean:1021 & Interface law; not strategy-critical. \\
+isSmoothAlternating\_zero & Hodge/Basic.lean:66 & Interface law; not strategy-critical. \\
+isSmoothAlternating\_add & Hodge/Basic.lean:69 & Interface law; not strategy-critical. \\
+isSmoothAlternating\_neg & Hodge/Basic.lean:72 & Interface law; not strategy-critical. \\
+isSmoothAlternating\_sub & Hodge/Basic.lean:78 & Interface law; not strategy-critical. \\
+isSmoothAlternating\_smul & Hodge/Basic.lean:75 & Interface law; not strategy-critical. \\
+instAddCommGroupDeRhamCohomologyClass & Hodge/Basic.lean:605 & Algebraic structure axiom. \\
+instModuleRealDeRhamCohomologyClass & Hodge/Basic.lean:621 & Algebraic structure axiom. \\
 
-\texttt{FundamentalClassSet\_isClosed} & \texttt{Hodge/Classical/GAGA.lean:174} & Defines the minimal interface laws needed by the proof; not expected to be strategy-critical. \\
+\bottomrule
+\end{longtable}
+\normalsize
 
-\texttt{omega\_pow\_isClosed} & \texttt{Hodge/Kahler/TypeDecomposition.lean:152} & Defines the minimal interface laws needed by the proof; not expected to be strategy-critical. \\
-
-\texttt{isClosed\_omegaPow\_scaled} & \texttt{Hodge/Kahler/TypeDecomposition.lean:160} & Defines the minimal interface laws needed by the proof; not expected to be strategy-critical. \\
-
-\texttt{wirtinger\_comass\_bound} & \texttt{Hodge/Analytic/Calibration.lean:36} & Defines the minimal interface laws needed by the proof; not expected to be strategy-critical. \\
-
-\texttt{calibration\_inequality} & \texttt{Hodge/Analytic/Calibration.lean:55} & Defines the minimal interface laws needed by the proof; not expected to be strategy-critical. \\
-
-\texttt{exists\_volume\_form\_of\_submodule\_axiom} & \texttt{Hodge/Analytic/Grassmannian.lean:70} & Defines the minimal interface laws needed by the proof; not expected to be strategy-critical. \\
-
-\texttt{simpleCalibratedForm\_is\_smooth} & \texttt{Hodge/Analytic/Grassmannian.lean:96} & Defines the minimal interface laws needed by the proof; not expected to be strategy-critical. \\
-
-\texttt{isIntegral\_zero\_current} & \texttt{Hodge/Analytic/IntegralCurrents.lean:40} & Defines the minimal interface laws needed by the proof; not expected to be strategy-critical. \\
-
-\texttt{smoothExtDeriv\_add} & \texttt{Hodge/Basic.lean:246} & Defines the minimal interface laws needed by the proof; not expected to be strategy-critical. \\
-
-\texttt{smoothExtDeriv\_smul} & \texttt{Hodge/Basic.lean:252} & Defines the minimal interface laws needed by the proof; not expected to be strategy-critical. \\
-
-\texttt{ofForm\_sub} & \texttt{Hodge/Basic.lean:1004} & Defines the minimal interface laws needed by the proof; not expected to be strategy-critical. \\
-
-\texttt{ofForm\_smul\_real} & \texttt{Hodge/Basic.lean:1021} & Defines the minimal interface laws needed by the proof; not expected to be strategy-critical. \\
-
-\texttt{isSmoothAlternating\_zero} & \texttt{Hodge/Basic.lean:66} & Defines the minimal interface laws needed by the proof; not expected to be strategy-critical. \\
-
-\texttt{isSmoothAlternating\_add} & \texttt{Hodge/Basic.lean:69} & Defines the minimal interface laws needed by the proof; not expected to be strategy-critical. \\
-
-\texttt{isSmoothAlternating\_neg} & \texttt{Hodge/Basic.lean:72} & Defines the minimal interface laws needed by the proof; not expected to be strategy-critical. \\
-
-\texttt{isSmoothAlternating\_sub} & \texttt{Hodge/Basic.lean:78} & Defines the minimal interface laws needed by the proof; not expected to be strategy-critical. \\
-
-\texttt{isSmoothAlternating\_smul} & \texttt{Hodge/Basic.lean:75} & Defines the minimal interface laws needed by the proof; not expected to be strategy-critical. \\
-
-\texttt{instAddCommGroupDeRhamCohomologyClass} & \texttt{Hodge/Basic.lean:605} & Defines the minimal interface laws needed by the proof; not expected to be strategy-critical. \\
-
-\texttt{instModuleRealDeRhamCohomologyClass} & \texttt{Hodge/Basic.lean:621} & Defines the minimal interface laws needed by the proof; not expected to be strategy-critical. \\
-
-\bottomrule\end{longtable}
 \subsection{Lean foundations}
-\begin{longtable}{p{4.2cm}p{3.4cm}p{8.6cm}}
-\toprule\textbf{Axiom} & \textbf{Declared at} & \textbf{Reason it can be left}\\\midrule\endhead
-\texttt{Classical.choice} & (Lean core) & Standard classical logic; removing it is a separate (constructive) project. \\
 
-\texttt{propext} & (Lean core) & Standard extensionality principle in Lean/Mathlib classical developments. \\
+\small
+\begin{longtable}{>{\ttfamily\small}p{4cm} p{3cm} p{9.5cm}}
+\toprule
+\textnormal{\textbf{Axiom}} & \textbf{Declared at} & \textbf{Reason it can be left} \\
+\midrule
+\endhead
 
-\texttt{Quot.sound} & (Lean core) & Core quotient principle used by Lean; not a mathematical assumption. \\
+Classical.choice & (Lean core) & Standard classical logic; removing it is a separate (constructive) project. \\
+propext & (Lean core) & Standard extensionality principle in Lean/Mathlib classical developments. \\
+Quot.sound & (Lean core) & Core quotient principle used by Lean; not a mathematical assumption. \\
 
-\bottomrule\end{longtable}
+\bottomrule
+\end{longtable}
+\normalsize
+
 \section{Recommended completion order}
+
 \begin{enumerate}
-\item Discharge P0 axioms (strategy-critical) so the proof does not assume the core bridge.
-\item Discharge P1 axioms if you want the analytic limit behavior internal to Lean.
-\item Optionally, begin a long-term project to formalize the classical pillars (Hard Lefschetz, GAGA, Harvey--Lawson).
+\item \textbf{Discharge P0 axioms} (strategy-critical) so the proof does not assume the core bridge.
+\item \textbf{Discharge P1 axioms} if you want the analytic limit behavior internal to Lean.
+\item \textbf{Optionally}, begin a long-term project to formalize the classical pillars (Hard Lefschetz, GAGA, Harvey--Lawson).
 \end{enumerate}
+
 \end{document}
