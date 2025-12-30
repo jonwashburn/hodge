@@ -20,9 +20,22 @@ We are building a **complete, unconditional, machine-checkable proof** of the Ho
 |------|---------|
 | **NO `sorry`** | Leaves proof incomplete |
 | **NO `admit`** | Same as sorry |
-| **NO builds** | Only the coordinator runs builds. Agents write code. |
+| **🔴 NO BUILDS 🔴** | **AGENTS DO NOT RUN `lake build`!** Only the coordinator runs builds. |
 | **Mathlib first** | Search before writing custom lemmas |
 | **Document everything** | Every non-obvious step needs a comment |
+
+### ⚠️ CRITICAL: Build Policy
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  AGENTS: DO NOT RUN `lake build`, `lake exe`, or any build     │
+│  commands. Write your code and submit. The COORDINATOR will    │
+│  run the build, collect errors, and reassign as needed.        │
+│                                                                 │
+│  WHY: Builds take 10-30 minutes. Running them in parallel      │
+│  wastes resources and causes conflicts.                        │
+└─────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
@@ -728,7 +741,7 @@ Convert ALL 53 axioms and opaques to theorems and concrete definitions.
 
 ## RULES
 - NO sorry, NO admit
-- Do NOT run builds - just write the code
+- 🔴 **DO NOT RUN `lake build`** 🔴 — The coordinator runs builds, not you!
 - Use Mathlib wherever possible
 - Document non-obvious steps
 
@@ -797,7 +810,7 @@ Convert ALL 26 axioms and opaques to theorems and concrete definitions.
 
 ## RULES
 - NO sorry, NO admit
-- Do NOT run builds
+- 🔴 **DO NOT RUN `lake build`** 🔴 — The coordinator runs builds, not you!
 - Use Mathlib wherever possible
 
 ## OUTPUT FORMAT
@@ -869,7 +882,7 @@ Convert ALL 32 axioms and opaques to theorems and concrete definitions.
 
 ## RULES
 - NO sorry, NO admit
-- Do NOT run builds
+- 🔴 **DO NOT RUN `lake build`** 🔴 — The coordinator runs builds, not you!
 
 ## OUTPUT FORMAT
 ```lean
@@ -954,7 +967,7 @@ Convert 48 of 56 items. Keep these 8 as axioms (classical pillars):
 
 ## RULES
 - NO sorry, NO admit
-- Do NOT run builds
+- 🔴 **DO NOT RUN `lake build`** 🔴 — The coordinator runs builds, not you!
 
 ## OUTPUT FORMAT
 ```lean
@@ -1036,7 +1049,7 @@ After fixing errors, convert 28 of 29 items. Keep `barany_grinberg` as axiom.
 
 ## RULES
 - NO sorry, NO admit (except to fix blocking errors, documented)
-- Do NOT run builds
+- 🔴 **DO NOT RUN `lake build`** 🔴 — The coordinator runs builds, not you!
 
 ## OUTPUT FORMAT
 ```lean
