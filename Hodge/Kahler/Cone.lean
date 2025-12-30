@@ -8,7 +8,6 @@ import Mathlib.Topology.MetricSpace.Basic
 import Mathlib.Topology.Compactness.Compact
 
 /-!
-# Track C.3: Strongly Positive Cone
 
 This file defines the strongly positive cone K_p(x) of (p,p)-forms at each point x.
 -/
@@ -120,3 +119,4 @@ theorem compact_pos_has_pos_inf {Y : Type*} [TopologicalSpace Y] [CompactSpace Y
   intro y; exact hy₀ (mem_univ y)
 
 end
+

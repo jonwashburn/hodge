@@ -16,18 +16,29 @@ universe u
 -/
 
 /-- The Lefschetz operator L : H^p(X) → H^{p+2}(X)
-    is the linear map induced by wedging with the Kähler form.
-    Reference: [Griffiths-Harris, 1978, p. 122]. -/
-opaque lefschetz_operator (n : ℕ) (X : Type u)
+    is the linear map induced by wedging with the Kähler form. -/
+def lefschetz_operator (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
-    (p : ℕ) : DeRhamCohomologyClass n X p →ₗ[ℂ] DeRhamCohomologyClass n X (p + 2)
+    (p : ℕ) : DeRhamCohomologyClass n X p →ₗ[ℂ] DeRhamCohomologyClass n X (p + 2) where
+  toFun c := 
+    let ω := K.omega_form
+    let η := c.representative
+    ⟦smoothWedge ω η, sorry⟧
+  map_add' x y := sorry
+  map_smul' c x := sorry
 
 /-- The iterated Lefschetz map L^k : H^p(X) → H^{p+2k}(X). -/
-opaque lefschetz_power (n : ℕ) (X : Type u)
+def lefschetz_power (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
-    (p k : ℕ) : DeRhamCohomologyClass n X p →ₗ[ℂ] DeRhamCohomologyClass n X (p + 2 * k)
+    (p k : ℕ) : DeRhamCohomologyClass n X p →ₗ[ℂ] DeRhamCohomologyClass n X (p + 2 * k) :=
+  match k with
+  | 0 => LinearMap.id
+  | k' + 1 => 
+    let L := lefschetz_operator n X (p + 2 * k')
+    let Lk := lefschetz_power n X p k'
+    LinearMap.comp L Lk
 
 /-- **The Hard Lefschetz Theorem** (Lefschetz, 1924). -/
 axiom hard_lefschetz_bijective (n : ℕ) (X : Type u)
@@ -35,6 +46,14 @@ axiom hard_lefschetz_bijective (n : ℕ) (X : Type u)
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
     (p : ℕ) (hp : p ≤ n) :
     Function.Bijective (lefschetz_power n X p (n - p))
+
+/-- The inverse Lefschetz map. -/
+noncomputable def lefschetz_inverse_cohomology (n : ℕ) (X : Type u)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
+    (p k : ℕ) (h : p ≤ n) : DeRhamCohomologyClass n X (p + 2 * k) →ₗ[ℂ] DeRhamCohomologyClass n X p :=
+  -- Placeholder for the inverse mapping
+  sorry
 
 /-! ## Hard Lefschetz Isomorphism for Forms -/
 
@@ -59,3 +78,5 @@ axiom hard_lefschetz_isomorphism' {p' : ℕ} (h_range : p' ≤ n / 2)
     ∃ (η : SmoothForm n X (2 * p')),
       ∃ (h_η_closed : IsFormClosed η),
       isRationalClass (DeRhamCohomologyClass.ofForm η h_η_closed) ∧ isPPForm' n X p' η
+
+end

@@ -3,17 +3,14 @@ import Hodge.Analytic.Forms
 import Mathlib.Tactic.Ring
 
 /-!
-# Track C.2: Type Decomposition
 
 This file defines the type decomposition of differential forms on complex manifolds.
 
-## Main Definitions
 
 - `isPQForm`: Predicate for a form being of type (p,q)
 - `isPPForm'`: Predicate for a form being of type (p,p)
 - `omegaPow`: The p-th power of the Kähler form ω^p
 
-## Mathematical Background
 
 On a complex manifold of dimension n, differential k-forms decompose as:
   Ω^k = ⊕_{p+q=k} Ω^{p,q}
@@ -161,3 +158,4 @@ axiom isClosed_omegaPow_scaled (p : ℕ) :
     isClosed ((1 / (p.factorial : ℂ)) • omegaPow n X p)
 
 end
+

@@ -6,7 +6,6 @@ import Mathlib.Geometry.Manifold.MFDeriv.Basic
 import Mathlib.LinearAlgebra.Alternating.Basic
 
 /-!
-# Track C.1: Kähler Manifolds
 -/
 
 noncomputable section
@@ -59,3 +58,4 @@ axiom unitForm_isClosed : IsFormClosed (unitForm (n := n) (X := X))
 axiom unitForm_is_rational : isRationalClass ⟦unitForm (n := n) (X := X), unitForm_isClosed⟧
 
 end
+

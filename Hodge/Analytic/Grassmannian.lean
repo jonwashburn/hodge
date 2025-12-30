@@ -8,7 +8,6 @@ import Mathlib.Analysis.InnerProductSpace.GramSchmidtOrtho
 import Mathlib.LinearAlgebra.ExteriorAlgebra.Basic
 
 /-!
-# Calibrated Grassmannian and Strongly Positive Cones
 
 This file defines the calibrated Grassmannian and the strongly positive cone
 of (p,p)-forms on a Kahler manifold.
@@ -177,3 +176,4 @@ theorem coneToNetConstant_pos : coneToNetConstant > 0 := by
   unfold coneToNetConstant; positivity
 
 end
+

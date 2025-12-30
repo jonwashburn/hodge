@@ -2,7 +2,6 @@ import Hodge.Analytic.Forms
 import Hodge.Analytic.Norms
 
 /-!
-# Currents on Complex Manifolds
 
 This file defines currents (distributional differential forms) on compact Kähler manifolds.
 
@@ -166,3 +165,4 @@ theorem boundary_boundary (T : Current n X (k + 2)) : (boundary (boundary T)) = 
 end Current
 
 end
+
