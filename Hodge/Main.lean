@@ -21,7 +21,7 @@ variable {n : ℕ} {X : Type*}
 /-- **The Hodge Conjecture** (Hodge, 1950; Millennium Prize Problem).
     For a smooth projective complex algebraic variety X, every rational Hodge class
     is algebraic (i.e., it is represented by a signed algebraic cycle). -/
-theorem hodge_conjecture {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : IsClosed γ)
+theorem hodge_conjecture {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
     (h_rational : isRationalClass (DeRhamCohomologyClass.ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :
     ∃ (Z : SignedAlgebraicCycle n X), Z.RepresentsClass (DeRhamCohomologyClass.ofForm γ h_closed) :=
   hodge_conjecture' γ h_closed h_rational h_p_p
