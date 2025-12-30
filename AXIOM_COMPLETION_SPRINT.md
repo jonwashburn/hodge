@@ -1022,3 +1022,177 @@ lemma cycle_class_lefschetz_commute {p p' : ℕ} (Z : SignedAlgebraicCycle n X)
 | **E** | `harvey_lawson_fundamental_class`, `lefschetz_lift_signed_cycle` | 600 | 3 | Agents C, D |
 | **TOTAL** | 8 axioms | ~3,000 | 3 weeks | |
 
+---
+
+# 📋 Copy-Paste Agent Prompts
+
+Use these prompts to assign agents to work on specific axioms.
+
+## Agent A Prompt
+
+```
+You are working on the Hodge Conjecture Lean formalization.
+
+**Your assignment:** Convert `signed_decomposition` from an axiom to a theorem.
+
+**File:** `Hodge/Kahler/SignedDecomp.lean:61`
+
+**Current axiom:**
+axiom signed_decomposition {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
+    (_h_hodge : isPPForm' n X p γ) (η : DeRhamCohomologyClass n X (2 * p)) 
+    (h_rational : isRationalClass η) : SignedDecomposition γ h_closed
+
+**What to prove:**
+Given a rational Hodge class γ, construct γ = γ⁺ - γ⁻ where:
+- γ⁺ is cone-positive (in the interior of the strongly positive cone)  
+- γ⁻ = N·ω^p for some rational N ≥ 0
+
+**Key insight:** Since ω^p is in the interior of the positive cone (`omegaPow_in_interior`), for any bounded class γ, find N large enough so that γ + N·ω^p is cone-positive.
+
+**Rules:**
+- NO `sorry`, `admit`, or placeholders
+- Search Mathlib first before writing custom proofs
+- Build incrementally: `lake build Hodge.Kahler.SignedDecomp`
+
+**Deliverable:** Replace `axiom` with `theorem` and provide a complete proof.
+```
+
+## Agent B Prompt
+
+```
+You are working on the Hodge Conjecture Lean formalization.
+
+**Your assignment:** Make `microstructureSequence` concrete and prove each element is a cycle.
+
+**File:** `Hodge/Kahler/Microstructure.lean:211-230`
+
+**Current code:**
+opaque microstructureSequence (p : ℕ) (γ : SmoothForm n X (2 * p))
+    (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
+    ℕ → IntegralCurrent n X (2 * (n - p))
+
+axiom microstructureSequence_are_cycles (p : ℕ) (γ : SmoothForm n X (2 * p))
+    (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
+    ∀ k, (microstructureSequence p γ hγ ψ k).isCycleAt
+
+**What to do:**
+1. Replace `opaque microstructureSequence` with a concrete `def`
+2. Prove `microstructureSequence_are_cycles` as a theorem
+3. The construction uses: cubulation → calibrated flow → integer rounding → gluing
+
+**Key insight:** Glued integer cells form closed chains because integer flows satisfy conservation (∑ inflow = ∑ outflow at each vertex).
+
+**Rules:**
+- NO `sorry`, `admit`, or placeholders
+- Build incrementally: `lake build Hodge.Kahler.Microstructure`
+
+**Deliverable:** Concrete definition + theorem proving ∂T_k = 0 for each approximant.
+```
+
+## Agent C Prompt
+
+```
+You are working on the Hodge Conjecture Lean formalization.
+
+**Your assignment:** Prove the calibration defect bound and flat limit existence.
+
+**File:** `Hodge/Kahler/Microstructure.lean:234-274`
+
+**Depends on:** Agent B must complete `microstructureSequence` definition first.
+
+**Current axioms:**
+axiom microstructureSequence_defect_bound (p : ℕ) (γ : SmoothForm n X (2 * p))
+    (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
+    ∀ k, calibrationDefect (microstructureSequence p γ hγ ψ k).toFun ψ ≤ 2 * (canonicalMeshSequence.scale k)
+
+axiom microstructureSequence_flat_limit_exists (p : ℕ) (γ : SmoothForm n X (2 * p))
+    (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
+    ∃ (T_limit : IntegralCurrent n X (2 * (n - p))) (φ : ℕ → ℕ),
+      StrictMono φ ∧ Tendsto (fun j => flatNorm (...)) atTop (nhds 0)
+
+**What to prove:**
+1. Defect bound: integer rounding error is O(mesh size)
+2. Mass bound: uniform bound on mass(T_k)
+3. Flat limit: apply Federer-Fleming compactness (can stay as axiom)
+
+**Rules:**
+- NO `sorry`, `admit`, or placeholders
+- Build: `lake build Hodge.Kahler.Microstructure`
+
+**Deliverable:** Both axioms converted to theorems.
+```
+
+## Agent D Prompt
+
+```
+You are working on the Hodge Conjecture Lean formalization.
+
+**Your assignment:** Prove the two GMT limit facts needed for Harvey-Lawson.
+
+**Files:** 
+- `Hodge/Analytic/Calibration.lean:93`
+- `Hodge/Classical/HarveyLawson.lean:186`
+
+**Current axioms:**
+axiom limit_is_calibrated {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k)
+    (ψ : CalibratingForm n X k)
+    (h_defect_vanish : Tendsto (fun i => calibrationDefect (T i) ψ) atTop (nhds 0))
+    (h_conv : Tendsto (fun i => flatNorm (T i - T_limit)) atTop (nhds 0)) :
+    isCalibrated T_limit ψ
+
+axiom flat_limit_of_cycles_is_cycle {k : ℕ}
+    (T_seq : ℕ → IntegralCurrent n X k) (T_limit : IntegralCurrent n X k)
+    (h_cycles : ∀ i, (T_seq i).isCycleAt)
+    (h_conv : Tendsto (fun i => flatNorm (...)) atTop (nhds 0)) :
+    T_limit.isCycleAt
+
+**What to prove:**
+1. `limit_is_calibrated`: Use mass lower semicontinuity + pairing continuity
+2. `flat_limit_of_cycles_is_cycle`: Use boundary continuity in flat norm
+
+**Key lemmas needed:**
+- `mass_lsc_flat`: mass is lower semicontinuous in flat topology
+- `boundary_continuous_flat`: boundary is continuous in flat norm
+
+**Rules:**
+- NO `sorry`, `admit`, or placeholders
+- Build: `lake build Hodge.Analytic.Calibration` and `lake build Hodge.Classical.HarveyLawson`
+
+**Deliverable:** Both axioms converted to theorems.
+```
+
+## Agent E Prompt
+
+```
+You are working on the Hodge Conjecture Lean formalization.
+
+**Your assignment:** Prove the cohomology-level bridges completing the proof.
+
+**File:** `Hodge/Kahler/Main.lean:94-155`
+
+**Depends on:** Agents C and D must complete their axioms first.
+
+**Current axioms:**
+axiom harvey_lawson_fundamental_class {p : ℕ}
+    (γplus : SmoothForm n X (2 * p)) (hplus : IsFormClosed γplus)
+    (hγ : isConePositive γplus) (hl_concl : HarveyLawsonConclusion n X (2 * (n - p)))
+    (T_limit : Current n X (2 * (n - p))) (h_represents : hl_concl.represents T_limit) :
+    hl_concl.toSignedAlgebraicCycle.RepresentsClass (DeRhamCohomologyClass.ofForm γplus hplus)
+
+axiom lefschetz_lift_signed_cycle {p p' : ℕ}
+    (γ : SmoothForm n X (2 * p)) (hγ : IsFormClosed γ) ...
+    (hp : p > n / 2) (h_rep : Z_η.RepresentsClass ...) :
+    ∃ Z_γ : SignedAlgebraicCycle n X, Z_γ.RepresentsClass (DeRhamCohomologyClass.ofForm γ hγ)
+
+**What to prove:**
+1. `harvey_lawson_fundamental_class`: Chain of representations (microstructure → limit → HL → GAGA → fundamental class)
+2. `lefschetz_lift_signed_cycle`: Cycle classes commute with Lefschetz operator
+
+**Rules:**
+- NO `sorry`, `admit`, or placeholders  
+- Keep `harvey_lawson_theorem`, `serre_gaga`, `hard_lefschetz_inverse_form` as axioms
+- Build: `lake build Hodge.Kahler.Main`
+
+**Deliverable:** Both axioms converted to theorems.
+```
+
