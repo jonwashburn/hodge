@@ -145,45 +145,8 @@ theorem isAlgebraicSubvariety_intersection {Z₁ Z₂ : Set X}
 
 /-! ## Fundamental Class -/
 
-theorem exists_fundamental_form (W : AlgebraicSubvariety n X) :
-    ∃ (η : SmoothForm n X (2 * W.codim)), IsFormClosed η :=
-  ⟨0, by
-    -- `d(0)=0` follows from linearity of `d`
-    unfold IsFormClosed
-    have h := smoothExtDeriv_add (n := n) (X := X) (k := 2 * W.codim) (0 : SmoothForm n X (2 * W.codim)) 0
-    -- d(0) = d(0)+d(0) hence d(0)=0
-    have : smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) =
-        smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) +
-        smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) := by
-      simpa using h.symm
-    -- cancel
-    have h0 : smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) = 0 := by
-      -- rewrite as a + 0 = a + a and cancel
-      have h' : smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) + 0 =
-          smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) +
-          smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) := by
-        simpa [add_zero] using this
-      exact (add_left_cancel h').symm
-    exact h0⟩
-
-noncomputable def FundamentalClass (W : AlgebraicSubvariety n X) : SmoothForm n X (2 * W.codim) := 0
-
-theorem FundamentalClass_isClosed (W : AlgebraicSubvariety n X) :
-    IsFormClosed (FundamentalClass W) := by
-  -- `FundamentalClass W = 0`, and `d(0)=0` follows from linearity of `d`.
-  unfold FundamentalClass IsFormClosed
-  have h := smoothExtDeriv_add (n := n) (X := X) (k := 2 * W.codim)
-      (0 : SmoothForm n X (2 * W.codim)) 0
-  have ha : smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) =
-      smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) +
-      smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) := by
-    simpa using h.symm
-  have ha' : smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) + 0 =
-      smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) +
-      smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) := by
-    simpa [add_zero] using ha
-  have : 0 = smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) := add_left_cancel ha'
-  simpa using this.symm
+-- We define the fundamental class of a structured algebraic subvariety via the set-level
+-- map `FundamentalClassSet` introduced below (so there is no default `0` model).
 
 /-! ## Fundamental Class for Sets -/
 
@@ -242,22 +205,26 @@ theorem exists_fundamental_form_set (p : ℕ) (Z : Set X) (h : isAlgebraicSubvar
     ∃ (η : SmoothForm n X (2 * p)), IsFormClosed η :=
   ⟨FundamentalClassSet n X p Z, FundamentalClassSet_isClosed p Z h⟩
 
-/-- **FundamentalClassSet agrees with FundamentalClass on algebraic subvarieties.**
+/-! ## Fundamental Class for Structured Algebraic Subvarieties -/
 
-    This axiom asserts that the fundamental class of an algebraic subvariety W
-    (viewed as a set) equals the fundamental class of W (viewed as a structure).
+/-- The fundamental class of an algebraic subvariety, defined via `FundamentalClassSet`. -/
+noncomputable def FundamentalClass (W : AlgebraicSubvariety n X) : SmoothForm n X (2 * W.codim) :=
+  FundamentalClassSet n X W.codim W.carrier
 
-    This is a coherence axiom between the two fundamental class constructions. -/
-axiom FundamentalClassSet_eq_FundamentalClass_axiom (n : ℕ) (X : Type u)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    (W : AlgebraicSubvariety n X) :
-    FundamentalClassSet n X W.codim W.carrier = FundamentalClass W
+theorem FundamentalClass_isClosed (W : AlgebraicSubvariety n X) :
+    IsFormClosed (FundamentalClass (n := n) (X := X) W) := by
+  have hW : isAlgebraicSubvariety n X W.carrier := ⟨W, rfl⟩
+  simpa [FundamentalClass] using
+    (FundamentalClassSet_isClosed (n := n) (X := X) (p := W.codim) (Z := W.carrier) hW)
 
-theorem FundamentalClassSet_eq_FundamentalClass (W : AlgebraicSubvariety n X) :
-    FundamentalClassSet n X W.codim W.carrier = FundamentalClass W :=
-  FundamentalClassSet_eq_FundamentalClass_axiom n X W
+theorem exists_fundamental_form (W : AlgebraicSubvariety n X) :
+    ∃ (η : SmoothForm n X (2 * W.codim)), IsFormClosed η :=
+  ⟨FundamentalClass (n := n) (X := X) W, FundamentalClass_isClosed (n := n) (X := X) W⟩
+
+/-- Coherence lemma: on algebraic subvarieties, `FundamentalClassSet` agrees with `FundamentalClass`. -/
+@[simp] theorem FundamentalClassSet_eq_FundamentalClass (W : AlgebraicSubvariety n X) :
+    FundamentalClassSet n X W.codim W.carrier = FundamentalClass (n := n) (X := X) W := by
+  rfl
 
 /-! ## ω^p is Algebraic (Complete Intersections) -/
 
@@ -311,10 +278,8 @@ noncomputable def hyperplaneClass : AlgebraicSubvariety n X :=
 theorem hyperplaneClass_codim : (hyperplaneClass (n := n) (X := X)).codim = 1 :=
   exists_hyperplane_algebraic.choose_spec
 
-noncomputable def algebraic_intersection_power (_Z : Set X) (k : ℕ) : Set X :=
-  match k with
-  | 0 => _Z
-  | _ + 1 => ∅  -- Simplified stub
+/-- Intersection power of an algebraic set (e.g. iterated hyperplane section), opaque at this level. -/
+opaque algebraic_intersection_power (_Z : Set X) (k : ℕ) : Set X
 
 /-- **Intersection Power Preserves Algebraicity** (Hartshorne, 1977). -/
 axiom isAlgebraicSubvariety_intersection_power_axiom {Z : Set X} {k : ℕ} :

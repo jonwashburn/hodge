@@ -1,6 +1,6 @@
 ================================================================================
 LEAN PROOF BUNDLE - Hodge Conjecture Formalization
-Generated: 2025-12-30 (POST-CRITICAL-REMEDIATION)
+Generated: 2025-12-30
 Total files: 32
 ================================================================================
 
@@ -2690,7 +2690,7 @@ Total files: 32
 
 ################################################################################
 # FILE: Hodge/Classical/GAGA.lean
-# Lines: 376
+# Lines: 341
 ################################################################################
 
      1| import Hodge.Classical.HarveyLawson
@@ -2840,235 +2840,200 @@ Total files: 32
    145| 
    146| /-! ## Fundamental Class -/
    147| 
-   148| theorem exists_fundamental_form (W : AlgebraicSubvariety n X) :
-   149|     ∃ (η : SmoothForm n X (2 * W.codim)), IsFormClosed η :=
-   150|   ⟨0, by
-   151|     -- `d(0)=0` follows from linearity of `d`
-   152|     unfold IsFormClosed
-   153|     have h := smoothExtDeriv_add (n := n) (X := X) (k := 2 * W.codim) (0 : SmoothForm n X (2 * W.codim)) 0
-   154|     -- d(0) = d(0)+d(0) hence d(0)=0
-   155|     have : smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) =
-   156|         smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) +
-   157|         smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) := by
-   158|       simpa using h.symm
-   159|     -- cancel
-   160|     have h0 : smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) = 0 := by
-   161|       -- rewrite as a + 0 = a + a and cancel
-   162|       have h' : smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) + 0 =
-   163|           smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) +
-   164|           smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) := by
-   165|         simpa [add_zero] using this
-   166|       exact (add_left_cancel h').symm
-   167|     exact h0⟩
-   168| 
-   169| noncomputable def FundamentalClass (W : AlgebraicSubvariety n X) : SmoothForm n X (2 * W.codim) := 0
-   170| 
-   171| theorem FundamentalClass_isClosed (W : AlgebraicSubvariety n X) :
-   172|     IsFormClosed (FundamentalClass W) := by
-   173|   -- `FundamentalClass W = 0`, and `d(0)=0` follows from linearity of `d`.
-   174|   unfold FundamentalClass IsFormClosed
-   175|   have h := smoothExtDeriv_add (n := n) (X := X) (k := 2 * W.codim)
-   176|       (0 : SmoothForm n X (2 * W.codim)) 0
-   177|   have ha : smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) =
-   178|       smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) +
-   179|       smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) := by
-   180|     simpa using h.symm
-   181|   have ha' : smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) + 0 =
-   182|       smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) +
-   183|       smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) := by
-   184|     simpa [add_zero] using ha
-   185|   have : 0 = smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) := add_left_cancel ha'
-   186|   simpa using this.symm
-   187| 
-   188| /-! ## Fundamental Class for Sets -/
-   189| 
-   190| /-- **The Fundamental Class Map** (Griffiths-Harris, 1978).
-   191| 
-   192|     The fundamental class `[Z]` of an algebraic subvariety Z of codimension p is
-   193|     a closed (p,p)-form representing the Poincaré dual of the homology class of Z.
-   194| 
-   195|     This is axiomatized as an opaque function with the following key properties:
-   196|     - `FundamentalClassSet_isClosed`: [Z] is closed (dη = 0)
-   197|     - `FundamentalClassSet_empty`: [∅] = 0
-   198|     - `FundamentalClassSet_additive`: [Z₁ ⊔ Z₂] = [Z₁] + [Z₂] for disjoint Z₁, Z₂
-   199|     - `FundamentalClassSet_codim_match`: [Z] has type (p,p) when Z has codim p
-   200|     - `FundamentalClassSet_omega_pow`: [H^p] = c·ω^p for a complete intersection H^p
-   201| 
-   202|     Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry",
-   203|     Wiley, 1978, Chapter 1, Section 1]. -/
-   204| opaque FundamentalClassSet (n : ℕ) (X : Type u)
-   205|     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-   206|     [IsManifold (𝓒_complex n) ⊤ X]
-   207|     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-   208|     (p : ℕ) (Z : Set X) : SmoothForm n X (2 * p)
+   148| -- We define the fundamental class of a structured algebraic subvariety via the set-level
+   149| -- map `FundamentalClassSet` introduced below (so there is no default `0` model).
+   150| 
+   151| /-! ## Fundamental Class for Sets -/
+   152| 
+   153| /-- **The Fundamental Class Map** (Griffiths-Harris, 1978).
+   154| 
+   155|     The fundamental class `[Z]` of an algebraic subvariety Z of codimension p is
+   156|     a closed (p,p)-form representing the Poincaré dual of the homology class of Z.
+   157| 
+   158|     This is axiomatized as an opaque function with the following key properties:
+   159|     - `FundamentalClassSet_isClosed`: [Z] is closed (dη = 0)
+   160|     - `FundamentalClassSet_empty`: [∅] = 0
+   161|     - `FundamentalClassSet_additive`: [Z₁ ⊔ Z₂] = [Z₁] + [Z₂] for disjoint Z₁, Z₂
+   162|     - `FundamentalClassSet_codim_match`: [Z] has type (p,p) when Z has codim p
+   163|     - `FundamentalClassSet_omega_pow`: [H^p] = c·ω^p for a complete intersection H^p
+   164| 
+   165|     Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry",
+   166|     Wiley, 1978, Chapter 1, Section 1]. -/
+   167| opaque FundamentalClassSet (n : ℕ) (X : Type u)
+   168|     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+   169|     [IsManifold (𝓒_complex n) ⊤ X]
+   170|     [ProjectiveComplexManifold n X] [KahlerManifold n X]
+   171|     (p : ℕ) (Z : Set X) : SmoothForm n X (2 * p)
+   172| 
+   173| /-- The fundamental class of an algebraic subvariety is closed. -/
+   174| axiom FundamentalClassSet_isClosed (p : ℕ) (Z : Set X) (h : isAlgebraicSubvariety n X Z) :
+   175|     IsFormClosed (FundamentalClassSet n X p Z)
+   176| 
+   177| /-- The fundamental class of the empty set is zero. -/
+   178| axiom FundamentalClassSet_empty_axiom (p : ℕ) :
+   179|     FundamentalClassSet n X p (∅ : Set X) = 0
+   180| 
+   181| theorem FundamentalClassSet_empty (p : ℕ) :
+   182|     FundamentalClassSet n X p (∅ : Set X) = 0 :=
+   183|   FundamentalClassSet_empty_axiom p
+   184| 
+   185| /-- The fundamental class is a (p,p)-form. -/
+   186| axiom FundamentalClassSet_is_p_p (p : ℕ) (Z : Set X) (h : isAlgebraicSubvariety n X Z) :
+   187|     isPPForm' n X p (FundamentalClassSet n X p Z)
+   188| 
+   189| /-- For disjoint algebraic sets, fundamental classes are additive. -/
+   190| axiom FundamentalClassSet_additive_axiom {p : ℕ} (Z₁ Z₂ : Set X) (h_disjoint : Disjoint Z₁ Z₂)
+   191|     (h1 : isAlgebraicSubvariety n X Z₁) (h2 : isAlgebraicSubvariety n X Z₂) :
+   192|     FundamentalClassSet n X p (Z₁ ∪ Z₂) = FundamentalClassSet n X p Z₁ + FundamentalClassSet n X p Z₂
+   193| 
+   194| /-- The fundamental class of a complete intersection of codim p is a positive multiple of ω^p. -/
+   195| axiom FundamentalClassSet_complete_intersection (p : ℕ) (W : AlgebraicSubvariety n X)
+   196|     (hW : W.codim = p) :
+   197|     ∃ (c : ℝ), c > 0 ∧ FundamentalClassSet n X p W.carrier = c • omegaPow n X p
+   198| 
+   199| /-- The fundamental class represents a rational cohomology class. -/
+   200| axiom FundamentalClassSet_rational (p : ℕ) (Z : Set X) (h : isAlgebraicSubvariety n X Z) :
+   201|     isRationalClass (DeRhamCohomologyClass.ofForm (FundamentalClassSet n X p Z)
+   202|       (FundamentalClassSet_isClosed (n := n) (X := X) p Z h))
+   203| 
+   204| theorem exists_fundamental_form_set (p : ℕ) (Z : Set X) (h : isAlgebraicSubvariety n X Z) :
+   205|     ∃ (η : SmoothForm n X (2 * p)), IsFormClosed η :=
+   206|   ⟨FundamentalClassSet n X p Z, FundamentalClassSet_isClosed p Z h⟩
+   207| 
+   208| /-! ## Fundamental Class for Structured Algebraic Subvarieties -/
    209| 
-   210| /-- The fundamental class of an algebraic subvariety is closed. -/
-   211| axiom FundamentalClassSet_isClosed (p : ℕ) (Z : Set X) (h : isAlgebraicSubvariety n X Z) :
-   212|     IsFormClosed (FundamentalClassSet n X p Z)
+   210| /-- The fundamental class of an algebraic subvariety, defined via `FundamentalClassSet`. -/
+   211| noncomputable def FundamentalClass (W : AlgebraicSubvariety n X) : SmoothForm n X (2 * W.codim) :=
+   212|   FundamentalClassSet n X W.codim W.carrier
    213| 
-   214| /-- The fundamental class of the empty set is zero. -/
-   215| axiom FundamentalClassSet_empty_axiom (p : ℕ) :
-   216|     FundamentalClassSet n X p (∅ : Set X) = 0
-   217| 
-   218| theorem FundamentalClassSet_empty (p : ℕ) :
-   219|     FundamentalClassSet n X p (∅ : Set X) = 0 :=
-   220|   FundamentalClassSet_empty_axiom p
-   221| 
-   222| /-- The fundamental class is a (p,p)-form. -/
-   223| axiom FundamentalClassSet_is_p_p (p : ℕ) (Z : Set X) (h : isAlgebraicSubvariety n X Z) :
-   224|     isPPForm' n X p (FundamentalClassSet n X p Z)
-   225| 
-   226| /-- For disjoint algebraic sets, fundamental classes are additive. -/
-   227| axiom FundamentalClassSet_additive_axiom {p : ℕ} (Z₁ Z₂ : Set X) (h_disjoint : Disjoint Z₁ Z₂)
-   228|     (h1 : isAlgebraicSubvariety n X Z₁) (h2 : isAlgebraicSubvariety n X Z₂) :
-   229|     FundamentalClassSet n X p (Z₁ ∪ Z₂) = FundamentalClassSet n X p Z₁ + FundamentalClassSet n X p Z₂
+   214| theorem FundamentalClass_isClosed (W : AlgebraicSubvariety n X) :
+   215|     IsFormClosed (FundamentalClass (n := n) (X := X) W) := by
+   216|   have hW : isAlgebraicSubvariety n X W.carrier := ⟨W, rfl⟩
+   217|   simpa [FundamentalClass] using
+   218|     (FundamentalClassSet_isClosed (n := n) (X := X) (p := W.codim) (Z := W.carrier) hW)
+   219| 
+   220| theorem exists_fundamental_form (W : AlgebraicSubvariety n X) :
+   221|     ∃ (η : SmoothForm n X (2 * W.codim)), IsFormClosed η :=
+   222|   ⟨FundamentalClass (n := n) (X := X) W, FundamentalClass_isClosed (n := n) (X := X) W⟩
+   223| 
+   224| /-- Coherence lemma: on algebraic subvarieties, `FundamentalClassSet` agrees with `FundamentalClass`. -/
+   225| @[simp] theorem FundamentalClassSet_eq_FundamentalClass (W : AlgebraicSubvariety n X) :
+   226|     FundamentalClassSet n X W.codim W.carrier = FundamentalClass (n := n) (X := X) W := by
+   227|   rfl
+   228| 
+   229| /-! ## ω^p is Algebraic (Complete Intersections) -/
    230| 
-   231| /-- The fundamental class of a complete intersection of codim p is a positive multiple of ω^p. -/
-   232| axiom FundamentalClassSet_complete_intersection (p : ℕ) (W : AlgebraicSubvariety n X)
-   233|     (hW : W.codim = p) :
-   234|     ∃ (c : ℝ), c > 0 ∧ FundamentalClassSet n X p W.carrier = c • omegaPow n X p
-   235| 
-   236| /-- The fundamental class represents a rational cohomology class. -/
-   237| axiom FundamentalClassSet_rational (p : ℕ) (Z : Set X) (h : isAlgebraicSubvariety n X Z) :
-   238|     isRationalClass (DeRhamCohomologyClass.ofForm (FundamentalClassSet n X p Z)
-   239|       (FundamentalClassSet_isClosed (n := n) (X := X) p Z h))
-   240| 
-   241| theorem exists_fundamental_form_set (p : ℕ) (Z : Set X) (h : isAlgebraicSubvariety n X Z) :
-   242|     ∃ (η : SmoothForm n X (2 * p)), IsFormClosed η :=
-   243|   ⟨FundamentalClassSet n X p Z, FundamentalClassSet_isClosed p Z h⟩
-   244| 
-   245| /-- **FundamentalClassSet agrees with FundamentalClass on algebraic subvarieties.**
-   246| 
-   247|     This axiom asserts that the fundamental class of an algebraic subvariety W
-   248|     (viewed as a set) equals the fundamental class of W (viewed as a structure).
-   249| 
-   250|     This is a coherence axiom between the two fundamental class constructions. -/
-   251| axiom FundamentalClassSet_eq_FundamentalClass_axiom (n : ℕ) (X : Type u)
-   252|     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-   253|     [IsManifold (𝓒_complex n) ⊤ X]
-   254|     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-   255|     (W : AlgebraicSubvariety n X) :
-   256|     FundamentalClassSet n X W.codim W.carrier = FundamentalClass W
-   257| 
-   258| theorem FundamentalClassSet_eq_FundamentalClass (W : AlgebraicSubvariety n X) :
-   259|     FundamentalClassSet n X W.codim W.carrier = FundamentalClass W :=
-   260|   FundamentalClassSet_eq_FundamentalClass_axiom n X W
-   261| 
-   262| /-! ## ω^p is Algebraic (Complete Intersections) -/
-   263| 
-   264| /-- **Existence of Algebraic Hyperplane Sections** (Hartshorne, 1977). -/
-   265| axiom exists_hyperplane_algebraic_axiom (n : ℕ) (X : Type u)
-   266|     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-   267|     [IsManifold (𝓒_complex n) ⊤ X]
-   268|     [ProjectiveComplexManifold n X] [KahlerManifold n X] :
-   269|     ∃ (H : AlgebraicSubvariety n X), H.codim = 1
-   270| 
-   271| theorem exists_hyperplane_algebraic :
-   272|     ∃ (H : AlgebraicSubvariety n X), H.codim = 1 :=
-   273|   exists_hyperplane_algebraic_axiom n X
+   231| /-- **Existence of Algebraic Hyperplane Sections** (Hartshorne, 1977). -/
+   232| axiom exists_hyperplane_algebraic_axiom (n : ℕ) (X : Type u)
+   233|     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+   234|     [IsManifold (𝓒_complex n) ⊤ X]
+   235|     [ProjectiveComplexManifold n X] [KahlerManifold n X] :
+   236|     ∃ (H : AlgebraicSubvariety n X), H.codim = 1
+   237| 
+   238| theorem exists_hyperplane_algebraic :
+   239|     ∃ (H : AlgebraicSubvariety n X), H.codim = 1 :=
+   240|   exists_hyperplane_algebraic_axiom n X
+   241| 
+   242| /-- **Theorem: Existence of Complete Intersections** -/
+   243| theorem exists_complete_intersection (p : ℕ) :
+   244|     ∃ (W : AlgebraicSubvariety n X), W.codim = p := by
+   245|   induction p with
+   246|   | zero =>
+   247|     use { carrier := Set.univ, codim := 0, is_algebraic := IsAlgebraicSet_univ n X }
+   248|   | succ p ih =>
+   249|     obtain ⟨Wp, _⟩ := ih
+   250|     obtain ⟨H, _⟩ := exists_hyperplane_algebraic (n := n) (X := X)
+   251|     -- Algebraic sets are analytic (Chow's theorem)
+   252|     have hWp_analytic : IsAnalyticSet (n := n) (X := X) Wp.carrier :=
+   253|       IsAlgebraicSet_isAnalyticSet n X Wp.carrier Wp.is_algebraic
+   254|     have hH_analytic : IsAnalyticSet (n := n) (X := X) H.carrier :=
+   255|       IsAlgebraicSet_isAnalyticSet n X H.carrier H.is_algebraic
+   256|     -- Intersections of analytic sets are analytic
+   257|     have h_inter_analytic : IsAnalyticSet (n := n) (X := X) (Wp.carrier ∩ H.carrier) :=
+   258|       IsAnalyticSet_inter Wp.carrier H.carrier hWp_analytic hH_analytic
+   259|     let V : AnalyticSubvariety n X := {
+   260|       carrier := Wp.carrier ∩ H.carrier
+   261|       codim := p + 1
+   262|       is_analytic := h_inter_analytic
+   263|     }
+   264|     obtain ⟨W, _, hW_codim⟩ := serre_gaga V rfl
+   265|     exact ⟨W, hW_codim⟩
+   266| 
+   267| theorem omega_pow_is_algebraic (p : ℕ) :
+   268|     ∃ (Z : Set X), isAlgebraicSubvariety n X Z ∧
+   269|     ∃ (W : AlgebraicSubvariety n X), W.carrier = Z ∧ W.codim = p := by
+   270|   obtain ⟨W, hW_codim⟩ := exists_complete_intersection (n := n) (X := X) p
+   271|   exact ⟨W.carrier, ⟨W, rfl⟩, W, rfl, hW_codim⟩
+   272| 
+   273| /-! ## Hyperplane Intersection Operations -/
    274| 
-   275| /-- **Theorem: Existence of Complete Intersections** -/
-   276| theorem exists_complete_intersection (p : ℕ) :
-   277|     ∃ (W : AlgebraicSubvariety n X), W.codim = p := by
-   278|   induction p with
-   279|   | zero =>
-   280|     use { carrier := Set.univ, codim := 0, is_algebraic := IsAlgebraicSet_univ n X }
-   281|   | succ p ih =>
-   282|     obtain ⟨Wp, _⟩ := ih
-   283|     obtain ⟨H, _⟩ := exists_hyperplane_algebraic (n := n) (X := X)
-   284|     -- Algebraic sets are analytic (Chow's theorem)
-   285|     have hWp_analytic : IsAnalyticSet (n := n) (X := X) Wp.carrier :=
-   286|       IsAlgebraicSet_isAnalyticSet n X Wp.carrier Wp.is_algebraic
-   287|     have hH_analytic : IsAnalyticSet (n := n) (X := X) H.carrier :=
-   288|       IsAlgebraicSet_isAnalyticSet n X H.carrier H.is_algebraic
-   289|     -- Intersections of analytic sets are analytic
-   290|     have h_inter_analytic : IsAnalyticSet (n := n) (X := X) (Wp.carrier ∩ H.carrier) :=
-   291|       IsAnalyticSet_inter Wp.carrier H.carrier hWp_analytic hH_analytic
-   292|     let V : AnalyticSubvariety n X := {
-   293|       carrier := Wp.carrier ∩ H.carrier
-   294|       codim := p + 1
-   295|       is_analytic := h_inter_analytic
-   296|     }
-   297|     obtain ⟨W, _, hW_codim⟩ := serre_gaga V rfl
-   298|     exact ⟨W, hW_codim⟩
-   299| 
-   300| theorem omega_pow_is_algebraic (p : ℕ) :
-   301|     ∃ (Z : Set X), isAlgebraicSubvariety n X Z ∧
-   302|     ∃ (W : AlgebraicSubvariety n X), W.carrier = Z ∧ W.codim = p := by
-   303|   obtain ⟨W, hW_codim⟩ := exists_complete_intersection (n := n) (X := X) p
-   304|   exact ⟨W.carrier, ⟨W, rfl⟩, W, rfl, hW_codim⟩
+   275| noncomputable def hyperplaneClass : AlgebraicSubvariety n X :=
+   276|   exists_hyperplane_algebraic.choose
+   277| 
+   278| theorem hyperplaneClass_codim : (hyperplaneClass (n := n) (X := X)).codim = 1 :=
+   279|   exists_hyperplane_algebraic.choose_spec
+   280| 
+   281| /-- Intersection power of an algebraic set (e.g. iterated hyperplane section), opaque at this level. -/
+   282| opaque algebraic_intersection_power (_Z : Set X) (k : ℕ) : Set X
+   283| 
+   284| /-- **Intersection Power Preserves Algebraicity** (Hartshorne, 1977). -/
+   285| axiom isAlgebraicSubvariety_intersection_power_axiom {Z : Set X} {k : ℕ} :
+   286|     isAlgebraicSubvariety n X Z → isAlgebraicSubvariety n X (algebraic_intersection_power Z k)
+   287| 
+   288| theorem isAlgebraicSubvariety_intersection_power {Z : Set X} {k : ℕ}
+   289|     (h : isAlgebraicSubvariety n X Z) :
+   290|     isAlgebraicSubvariety n X (algebraic_intersection_power Z k) :=
+   291|   isAlgebraicSubvariety_intersection_power_axiom h
+   292| 
+   293| /-! ## Fundamental Class and Lefschetz -/
+   294| 
+   295| -- NOTE: deeper functoriality/Lefschetz coherence axioms live in `Hodge/Main.lean`
+   296| -- and `Hodge/Kahler/Main.lean`. We intentionally do not model hyperplane powers and
+   297| -- cohomological powers (`^k`) here, to avoid importing a full cohomology ring API.
+   298| 
+   299| /-! ## Functoriality of Fundamental Class -/
+   300| 
+   301| theorem FundamentalClassSet_additive' {p : ℕ} (Z₁ Z₂ : Set X) (h_disjoint : Disjoint Z₁ Z₂)
+   302|     (h1 : isAlgebraicSubvariety n X Z₁) (h2 : isAlgebraicSubvariety n X Z₂) :
+   303|     FundamentalClassSet n X p Z₁ + FundamentalClassSet n X p Z₂ = FundamentalClassSet n X p (Z₁ ∪ Z₂) := by
+   304|   rw [← FundamentalClassSet_additive_axiom Z₁ Z₂ h_disjoint h1 h2]
    305| 
-   306| /-! ## Hyperplane Intersection Operations -/
+   306| /-! ## Signed Algebraic Cycles -/
    307| 
-   308| noncomputable def hyperplaneClass : AlgebraicSubvariety n X :=
-   309|   exists_hyperplane_algebraic.choose
-   310| 
-   311| theorem hyperplaneClass_codim : (hyperplaneClass (n := n) (X := X)).codim = 1 :=
-   312|   exists_hyperplane_algebraic.choose_spec
-   313| 
-   314| noncomputable def algebraic_intersection_power (_Z : Set X) (k : ℕ) : Set X :=
-   315|   match k with
-   316|   | 0 => _Z
-   317|   | _ + 1 => ∅  -- Simplified stub
-   318| 
-   319| /-- **Intersection Power Preserves Algebraicity** (Hartshorne, 1977). -/
-   320| axiom isAlgebraicSubvariety_intersection_power_axiom {Z : Set X} {k : ℕ} :
-   321|     isAlgebraicSubvariety n X Z → isAlgebraicSubvariety n X (algebraic_intersection_power Z k)
-   322| 
-   323| theorem isAlgebraicSubvariety_intersection_power {Z : Set X} {k : ℕ}
-   324|     (h : isAlgebraicSubvariety n X Z) :
-   325|     isAlgebraicSubvariety n X (algebraic_intersection_power Z k) :=
-   326|   isAlgebraicSubvariety_intersection_power_axiom h
-   327| 
-   328| /-! ## Fundamental Class and Lefschetz -/
-   329| 
-   330| -- NOTE: deeper functoriality/Lefschetz coherence axioms live in `Hodge/Main.lean`
-   331| -- and `Hodge/Kahler/Main.lean`. We intentionally do not model hyperplane powers and
-   332| -- cohomological powers (`^k`) here, to avoid importing a full cohomology ring API.
-   333| 
-   334| /-! ## Functoriality of Fundamental Class -/
-   335| 
-   336| theorem FundamentalClassSet_additive' {p : ℕ} (Z₁ Z₂ : Set X) (h_disjoint : Disjoint Z₁ Z₂)
-   337|     (h1 : isAlgebraicSubvariety n X Z₁) (h2 : isAlgebraicSubvariety n X Z₂) :
-   338|     FundamentalClassSet n X p Z₁ + FundamentalClassSet n X p Z₂ = FundamentalClassSet n X p (Z₁ ∪ Z₂) := by
-   339|   rw [← FundamentalClassSet_additive_axiom Z₁ Z₂ h_disjoint h1 h2]
+   308| structure SignedAlgebraicCycle (n : ℕ) (X : Type u)
+   309|     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+   310|     [IsManifold (𝓒_complex n) ⊤ X]
+   311|     [ProjectiveComplexManifold n X] [KahlerManifold n X] where
+   312|   pos : Set X
+   313|   neg : Set X
+   314|   pos_alg : isAlgebraicSubvariety n X pos
+   315|   neg_alg : isAlgebraicSubvariety n X neg
+   316| 
+   317| /-- The fundamental class map into de Rham cohomology. -/
+   318| noncomputable def SignedAlgebraicCycle.fundamentalClass (p : ℕ)
+   319|     (Z : SignedAlgebraicCycle n X) : SmoothForm n X (2 * p) :=
+   320|   FundamentalClassSet n X p Z.pos - FundamentalClassSet n X p Z.neg
+   321| 
+   322| /-- **Theorem: fundamentalClass of a signed cycle is closed.** -/
+   323| axiom SignedAlgebraicCycle.fundamentalClass_isClosed (p : ℕ) (Z : SignedAlgebraicCycle n X) :
+   324|     IsFormClosed (Z.fundamentalClass p)
+   325| 
+   326| /-- The cycle class map into de Rham cohomology. -/
+   327| noncomputable def SignedAlgebraicCycle.cycleClass (p : ℕ)
+   328|     (Z : SignedAlgebraicCycle n X) : DeRhamCohomologyClass n X (2 * p) :=
+   329|   ⟦Z.fundamentalClass p, SignedAlgebraicCycle.fundamentalClass_isClosed (n := n) (X := X) p Z⟧
+   330| 
+   331| /-- Predicate stating that a signed algebraic cycle represents a cohomology class η. -/
+   332| def SignedAlgebraicCycle.RepresentsClass {p : ℕ} (Z : SignedAlgebraicCycle n X) (η : DeRhamCohomologyClass n X (2 * p)) : Prop :=
+   333|   Z.cycleClass p = η
+   334| 
+   335| def SignedAlgebraicCycle.support (Z : SignedAlgebraicCycle n X) : Set X := Z.pos ∪ Z.neg
+   336| 
+   337| theorem SignedAlgebraicCycle.support_is_algebraic (Z : SignedAlgebraicCycle n X) :
+   338|     isAlgebraicSubvariety n X Z.support :=
+   339|   isAlgebraicSubvariety_union Z.pos_alg Z.neg_alg
    340| 
-   341| /-! ## Signed Algebraic Cycles -/
-   342| 
-   343| structure SignedAlgebraicCycle (n : ℕ) (X : Type u)
-   344|     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-   345|     [IsManifold (𝓒_complex n) ⊤ X]
-   346|     [ProjectiveComplexManifold n X] [KahlerManifold n X] where
-   347|   pos : Set X
-   348|   neg : Set X
-   349|   pos_alg : isAlgebraicSubvariety n X pos
-   350|   neg_alg : isAlgebraicSubvariety n X neg
-   351| 
-   352| /-- The fundamental class map into de Rham cohomology. -/
-   353| noncomputable def SignedAlgebraicCycle.fundamentalClass (p : ℕ)
-   354|     (Z : SignedAlgebraicCycle n X) : SmoothForm n X (2 * p) :=
-   355|   FundamentalClassSet n X p Z.pos - FundamentalClassSet n X p Z.neg
-   356| 
-   357| /-- **Theorem: fundamentalClass of a signed cycle is closed.** -/
-   358| axiom SignedAlgebraicCycle.fundamentalClass_isClosed (p : ℕ) (Z : SignedAlgebraicCycle n X) :
-   359|     IsFormClosed (Z.fundamentalClass p)
-   360| 
-   361| /-- The cycle class map into de Rham cohomology. -/
-   362| noncomputable def SignedAlgebraicCycle.cycleClass (p : ℕ)
-   363|     (Z : SignedAlgebraicCycle n X) : DeRhamCohomologyClass n X (2 * p) :=
-   364|   ⟦Z.fundamentalClass p, SignedAlgebraicCycle.fundamentalClass_isClosed (n := n) (X := X) p Z⟧
-   365| 
-   366| /-- Predicate stating that a signed algebraic cycle represents a cohomology class η. -/
-   367| def SignedAlgebraicCycle.RepresentsClass {p : ℕ} (Z : SignedAlgebraicCycle n X) (η : DeRhamCohomologyClass n X (2 * p)) : Prop :=
-   368|   Z.cycleClass p = η
-   369| 
-   370| def SignedAlgebraicCycle.support (Z : SignedAlgebraicCycle n X) : Set X := Z.pos ∪ Z.neg
-   371| 
-   372| theorem SignedAlgebraicCycle.support_is_algebraic (Z : SignedAlgebraicCycle n X) :
-   373|     isAlgebraicSubvariety n X Z.support :=
-   374|   isAlgebraicSubvariety_union Z.pos_alg Z.neg_alg
-   375| 
-   376| end
+   341| end
 
 ################################################################################
 # FILE: Hodge/Classical/HarveyLawson.lean
@@ -4773,5 +4738,5 @@ Total files: 32
     15|   root := `Main
 
 ================================================================================
-END OF BUNDLE - Total lines across all files: 4575
+END OF BUNDLE - Total lines across all files: 4540
 ================================================================================
