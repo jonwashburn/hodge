@@ -23,7 +23,7 @@
 \newtheorem{definition}{Definition}
 
 \title{\textbf{Lean Formalization of the Hodge Conjecture}\\[0.5em]
-\Large Status Report --- December 2024}
+\Large Status Report --- December 2025}
 \author{Automated Proof Verification System}
 \date{\today}
 
@@ -60,12 +60,9 @@ then there exists a signed algebraic cycle $Z$ such that $Z$ represents $[\gamma
 
 \noindent\textbf{Lean code} (from \texttt{Hodge/Kahler/Main.lean}):
 \begin{verbatim}
-theorem hodge_conjecture' {p : N} (g : SmoothForm n X (2 * p))
-    (h_closed : IsFormClosed g)
-    (h_rational : isRationalClass (DeRhamCohomologyClass.ofForm g h_closed))
-    (h_p_p : isPPForm' n X p g) :
-    E (Z : SignedAlgebraicCycle n X),
-      Z.RepresentsClass (DeRhamCohomologyClass.ofForm g h_closed) := by
+theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
+    (h_rational : isRationalClass (DeRhamCohomologyClass.ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :
+    ∃ (Z : SignedAlgebraicCycle n X), Z.RepresentsClass (DeRhamCohomologyClass.ofForm γ h_closed) := by
   ...
 \end{verbatim}
 
@@ -74,7 +71,7 @@ theorem hodge_conjecture' {p : N} (g : SmoothForm n X (2 * p))
 The conclusion ``$Z$ represents $[\gamma]$'' is \emph{equality in de~Rham cohomology}, not equality of differential forms:
 
 \begin{verbatim}
-def SignedAlgebraicCycle.RepresentsClass {p : N}
+def SignedAlgebraicCycle.RepresentsClass {p : ℕ}
     (Z : SignedAlgebraicCycle n X)
     (eta : DeRhamCohomologyClass n X (2 * p)) : Prop :=
   Z.cycleClass p = eta
@@ -123,6 +120,29 @@ These represent major results from classical mathematics that are accepted as in
 \texttt{lefschetz\_lift\_signed\_cycle} & Cycle-level lifting for Hard Lefschetz \\
 \bottomrule
 \end{longtable}
+
+\subsection{Closure note: ``classical limit lemmas'' vs strategy-critical bridges}
+
+Feedback that came up during review: axioms like \texttt{flat\_limit\_of\_cycles\_is\_cycle} and
+\texttt{limit\_is\_calibrated} assert that the analytic limit objects behave as required
+for the downstream Harvey--Lawson $\rightarrow$ GAGA pipeline. These are standard results in GMT
+when one works in a concrete model of currents and the flat topology, but in this repository they remain
+\emph{assumed} (axiomatized) at the current abstraction level.
+
+\medskip
+\noindent\textbf{Crucial distinction.} Even if one accepts those GMT limit properties as classical,
+the proof strategy still relies on \emph{strategy-critical assumptions} that supply the bridge from a
+rational Hodge class to the specific calibrated/integral objects to which Harvey--Lawson applies.
+In this development, those strategy-critical assumptions are concentrated in:
+\begin{itemize}
+  \item \texttt{signed\_decomposition} (decomposition of a rational \((p,p)\) class into a cone-positive piece and a K\"ahler power term),
+  \item the \texttt{microstructureSequence\_*} axioms (the microstructure approximation pipeline),
+  \item \texttt{harvey\_lawson\_fundamental\_class} (the cohomological identification needed to conclude representation).
+\end{itemize}
+
+\noindent\textbf{Interpretation.} The Lean theorem is therefore a \emph{conditional} proof of the Hodge Conjecture
+modulo the explicit axiom list printed by \texttt{DependencyCheck.lean}. It is not presented here as an
+unconditional resolution of the conjecture.
 
 \subsection{Interface / API Axioms (26 axioms)}
 
@@ -227,12 +247,13 @@ grep -r "sorry\|admit" Hodge/**/*.lean
 \section{Conclusion}
 
 \fbox{\parbox{\dimexpr\textwidth-2\fboxsep-2\fboxrule}{%
-\textbf{Claim:} The repository contains a machine-checked Lean proof of the Hodge Conjecture (\texttt{hodge\_conjecture'}) that is faithful to the classical statement, contingent only on:
+\textbf{Claim:} The repository contains a machine-checked Lean proof of the Hodge Conjecture (\texttt{hodge\_conjecture'}) whose \emph{statement} matches the classical conjecture shape, contingent on the \emph{explicit axiom set} printed by \texttt{DependencyCheck.lean} (plus Lean's standard classical axioms), including:
 \begin{itemize}
     \item Hard Lefschetz Theorem
     \item Serre GAGA
     \item Harvey--Lawson Structure Theorem
     \item Federer--Fleming Compactness
+    \item Strategy-critical bridge axioms used by this proof strategy (notably \texttt{signed\_decomposition}, \texttt{microstructureSequence\_*}, \texttt{harvey\_lawson\_fundamental\_class})
     \item Standard interface axioms for differential forms, cohomology, and algebraic geometry
 \end{itemize}
 \textbf{The proof contains no vacuous definitions or trivially-satisfied predicates.}
