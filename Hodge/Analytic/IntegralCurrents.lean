@@ -14,7 +14,7 @@ set_option autoImplicit false
 variable {n : ℕ} {X : Type*}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X]
-  [ProjectiveComplexManifold n X] [KahlerManifold n X]
+  [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
   [Nonempty X]
 
 /-- **Rectifiability** (Federer, 1969).
@@ -45,7 +45,7 @@ axiom isIntegral_smul {k : ℕ} (c : ℤ) (T : Current n X k) :
 
 /-- **The boundary of an integral current is integral.** -/
 axiom isIntegral_boundary {k : ℕ} (T : Current n X (k + 1)) :
-    isIntegral T → isIntegral T.boundary
+    isIntegral T → isIntegral (Current.boundary T)
 
 /-- An integral current structure wrapping the predicate. -/
 structure IntegralCurrent (n : ℕ) (X : Type*) (k : ℕ)
@@ -73,11 +73,23 @@ instance {k : ℕ} : Coe (IntegralCurrent n X k) (Current n X k) where
 
 /-- The isCycle property for IntegralCurrent. -/
 def IntegralCurrent.isCycleAt {k : ℕ} (T : IntegralCurrent n X k) : Prop :=
-  ∃ (k' : ℕ) (h : k = k' + 1), (h ▸ T.toFun).boundary = 0
+  ∃ (k' : ℕ) (h : k = k' + 1), (Current.boundary (h ▸ T.toFun)) = 0
 
 def IntegralCurrent.boundary {k : ℕ} (T : IntegralCurrent n X (k + 1)) :
     IntegralCurrent n X k where
-  toFun := T.toFun.boundary
+  toFun := Current.boundary T.toFun
   is_integral := isIntegral_boundary T.toFun T.is_integral
+
+/-- If an integral current is a cycle, its boundary mass is zero. -/
+theorem IntegralCurrent.boundary_mass_zero {k : ℕ} (T : IntegralCurrent n X (k + 1))
+    (h_cycle : T.isCycleAt) : T.boundary.toFun.mass = 0 := by
+  obtain ⟨k', h_dim, h_bdy⟩ := h_cycle
+  -- Since T is of dimension k+1, k+1 = k'+1, so k = k'.
+  injection h_dim with h_k
+  subst h_k
+  unfold IntegralCurrent.boundary
+  simp at h_bdy
+  simp [h_bdy]
+  exact Current.mass_zero
 
 end

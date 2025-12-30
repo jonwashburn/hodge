@@ -1,6 +1,7 @@
 import Hodge.Classical.HarveyLawson
 import Hodge.Classical.Bergman
 import Hodge.Classical.SerreVanishing
+import Hodge.Classical.Lefschetz
 
 noncomputable section
 
@@ -33,13 +34,13 @@ universe u
 axiom IsAlgebraicSet (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] (Z : Set X) : Prop
+    [ProjectiveComplexManifold n X] [K : KahlerManifold n X] (Z : Set X) : Prop
 
 /-- An algebraic subvariety of a projective variety X. -/
 structure AlgebraicSubvariety (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] where
+    [ProjectiveComplexManifold n X] [K : KahlerManifold n X] where
   carrier : Set X
   codim : ℕ
   is_algebraic : IsAlgebraicSet n X carrier
@@ -48,33 +49,33 @@ structure AlgebraicSubvariety (n : ℕ) (X : Type u)
 def isAlgebraicSubvariety (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] (Z : Set X) : Prop :=
+    [ProjectiveComplexManifold n X] [K : KahlerManifold n X] (Z : Set X) : Prop :=
   ∃ (W : AlgebraicSubvariety n X), W.carrier = Z
 
 /-- Axiom: The empty set is algebraic. -/
 axiom IsAlgebraicSet_empty (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] : IsAlgebraicSet n X (∅ : Set X)
+    [ProjectiveComplexManifold n X] [K : KahlerManifold n X] : IsAlgebraicSet n X (∅ : Set X)
 
 /-- Axiom: The entire manifold is algebraic. -/
 axiom IsAlgebraicSet_univ (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] : IsAlgebraicSet n X (Set.univ : Set X)
+    [ProjectiveComplexManifold n X] [K : KahlerManifold n X] : IsAlgebraicSet n X (Set.univ : Set X)
 
 /-- Axiom: The union of two algebraic sets is algebraic. -/
 axiom IsAlgebraicSet_union (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] {Z₁ Z₂ : Set X} :
+    [ProjectiveComplexManifold n X] [K : KahlerManifold n X] {Z₁ Z₂ : Set X} :
     IsAlgebraicSet n X Z₁ → IsAlgebraicSet n X Z₂ → IsAlgebraicSet n X (Z₁ ∪ Z₂)
 
 /-- Axiom: The intersection of two algebraic sets is algebraic. -/
 axiom IsAlgebraicSet_intersection (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] {Z₁ Z₂ : Set X} :
+    [ProjectiveComplexManifold n X] [K : KahlerManifold n X] {Z₁ Z₂ : Set X} :
     IsAlgebraicSet n X Z₁ → IsAlgebraicSet n X Z₂ → IsAlgebraicSet n X (Z₁ ∩ Z₂)
 
 /-- **Algebraic Sets are Analytic** (Chow's Theorem / GAGA).
@@ -88,7 +89,7 @@ Reference: [Chow, "On compact complex analytic varieties", 1949]
 axiom IsAlgebraicSet_isAnalyticSet (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] (Z : Set X) :
+    [ProjectiveComplexManifold n X] [K : KahlerManifold n X] (Z : Set X) :
     IsAlgebraicSet n X Z → IsAnalyticSet (n := n) (X := X) Z
 
 variable {n : ℕ} {X : Type u}
@@ -343,5 +344,24 @@ def SignedAlgebraicCycle.support (Z : SignedAlgebraicCycle n X) : Set X := Z.pos
 theorem SignedAlgebraicCycle.support_is_algebraic (Z : SignedAlgebraicCycle n X) :
     isAlgebraicSubvariety n X Z.support :=
   isAlgebraicSubvariety_union Z.pos_alg Z.neg_alg
+
+/-- The intersection of a signed cycle with an algebraic subvariety. -/
+def SignedAlgebraicCycle.intersect (Z : SignedAlgebraicCycle n X) (H : AlgebraicSubvariety n X) : SignedAlgebraicCycle n X :=
+  { pos := Z.pos ∩ H.carrier,
+    neg := Z.neg ∩ H.carrier,
+    pos_alg := isAlgebraicSubvariety_intersection Z.pos_alg ⟨H, rfl⟩,
+    neg_alg := isAlgebraicSubvariety_intersection Z.neg_alg ⟨H, rfl⟩ }
+
+/-- Iterated intersection of a signed cycle with the same algebraic variety. -/
+def SignedAlgebraicCycle.intersect_power (Z : SignedAlgebraicCycle n X) (H : AlgebraicSubvariety n X) : ℕ → SignedAlgebraicCycle n X
+  | 0 => Z
+  | k + 1 => (Z.intersect_power H k).intersect H
+
+/-- **Theorem: Cycle Class commutes with Lefschetz.**
+    The cycle class of Z ∩ H is L([Z]).
+    Reference: [Voisin, 2002, Lemma 7.28]. -/
+axiom cycle_class_intersect_lefschetz (p : ℕ) (Z : SignedAlgebraicCycle n X)
+    (H : AlgebraicSubvariety n X) (hH : H.codim = 1) :
+    (Z.intersect H).cycleClass (p + 1) = lefschetz_operator n X (2 * p) (Z.cycleClass p)
 
 end

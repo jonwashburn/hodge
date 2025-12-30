@@ -172,24 +172,54 @@ axiom harvey_lawson_represents {k : ℕ} (hyp : HarveyLawsonHypothesis n X k) :
 
 /-! ## Flat Limit Properties -/
 
-/-- **Boundary of Flat Limit of Cycles** (Federer, 1969).
+/-- **Boundary of Flat Limit of Cycles** (Federer, 1960).
     If a sequence of currents that are cycles converges in flat norm to a limit T,
     then the limit T is also a cycle. This follows from the continuity of the
     boundary operator in the flat topology.
-
-    This property ensures that the limit of our microstructure sequence remains
-    a cycle, a necessary condition for the Harvey-Lawson theorem.
-
     Reference: [H. Federer, "Geometric Measure Theory", Springer, 1969, Section 4.2.26].
     Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", Ann. of Math. (2) 72 (1960), 458-520, Theorem 8.12].
     Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", Acta Math. 148 (1982), 47-157, Theorem 3.3]. -/
-axiom flat_limit_of_cycles_is_cycle {k : ℕ}
+theorem flat_limit_of_cycles_is_cycle {k : ℕ}
     (T_seq : ℕ → IntegralCurrent n X k)
     (T_limit : IntegralCurrent n X k)
     (h_cycles : ∀ i, (T_seq i).isCycleAt)
     (h_conv : Filter.Tendsto (fun i => flatNorm ((T_seq i).toFun - T_limit.toFun))
               Filter.atTop (nhds 0)) :
-    T_limit.isCycleAt
+    T_limit.isCycleAt := by
+  -- Use the definition of isCycleAt for the limit
+  unfold IntegralCurrent.isCycleAt
+  
+  -- Since h_cycles holds for all i, k must be of the form k' + 1
+  cases k with
+  | zero => 
+    -- If k = 0, isCycleAt is impossible (no k' such that 0 = k' + 1)
+    specialize h_cycles 0
+    obtain ⟨k', h_eq, _⟩ := h_cycles
+    norm_num at h_eq
+  | succ k' =>
+    use k', rfl
+    -- Show (T_limit.toFun).boundary = 0
+    -- Each (T_seq i).toFun has boundary 0
+    have h_seq_boundary : ∀ i, ((T_seq i).toFun).boundary = 0 := by
+      intro i
+      rcases h_cycles i with ⟨k'', h_k, h_b⟩
+      cases h_k
+      exact h_b
+      
+    -- By tendsto_boundary_of_flat_conv, (T_seq i).boundary → T_limit.boundary in flat norm
+    have h_boundary_conv := tendsto_boundary_of_flat_conv h_conv
+    
+    -- Since each term in the sequence is 0 (relative to T_limit.boundary),
+    -- the limit T_limit.boundary must have flat norm 0.
+    simp_rw [h_seq_boundary, zero_sub, flatNorm_neg] at h_boundary_conv
+    
+    -- The sequence of flatNorm (T_limit.toFun.boundary) is constant.
+    -- If a constant sequence converges to 0, the constant must be 0.
+    have h_zero : flatNorm T_limit.toFun.boundary = 0 := 
+      tendsto_nhds_unique h_boundary_conv (tendsto_const_nhds (x := 0))
+    
+    -- Finally, flatNorm T = 0 implies T = 0
+    exact (flatNorm_eq_zero_iff _).mp h_zero
 
 /-- **Corollary: Any calibrated limit from the microstructure is a cycle**
 

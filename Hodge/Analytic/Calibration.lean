@@ -90,10 +90,40 @@ axiom mass_lsc {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k) :
     If a sequence of currents has calibration defect tending to zero and
     converges in flat norm, then the limit current is calibrated.
     Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", 1982]. -/
-axiom limit_is_calibrated {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k)
+theorem limit_is_calibrated {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k)
     (ψ : CalibratingForm n X k)
-    (_h_defect_vanish : Tendsto (fun i => calibrationDefect (T i) ψ) atTop (nhds 0))
-    (_h_conv : Tendsto (fun i => flatNorm (T i - T_limit)) atTop (nhds 0)) :
-    isCalibrated T_limit ψ
+    (h_defect_vanish : Tendsto (fun i => calibrationDefect (T i) ψ) atTop (nhds 0))
+    (h_conv : Tendsto (fun i => flatNorm (T i - T_limit)) atTop (nhds 0)) :
+    isCalibrated T_limit ψ := by
+  -- Use definition of isCalibrated: mass T_limit = T_limit ψ.form
+  unfold isCalibrated
+  
+  -- 1. mass T_limit ≤ liminf (mass (T i)) by mass_lsc
+  have h_mass_lsc := mass_lsc T T_limit h_conv
+  
+  -- 2. (T i) ψ.form → T_limit ψ.form by flat norm convergence
+  have h_eval_conv := tendsto_eval_of_flat_conv ψ.form h_conv
+  
+  -- 3. mass (T i) = (T i) ψ.form + calibrationDefect (T i) ψ
+  have h_mass_eq : ∀ i, Current.mass (T i) = (T i).toFun ψ.form + calibrationDefect (T i) ψ := by
+    intro i; unfold calibrationDefect; linarith
+    
+  -- 4. liminf (mass (T i)) = liminf ((T i) ψ.form + defect)
+  -- Since the sequence converges, liminf = limit
+  have h_sum_conv : Tendsto (fun i => (T i).toFun ψ.form + calibrationDefect (T i) ψ) atTop 
+      (nhds (T_limit.toFun ψ.form + 0)) := by
+    apply Tendsto.add h_eval_conv h_defect_vanish
+  rw [add_zero] at h_sum_conv
+  
+  have h_liminf_mass : liminf (fun i => Current.mass (T i)) atTop = T_limit.toFun ψ.form := by
+    apply Tendsto.liminf_eq
+    simp_rw [h_mass_eq]
+    exact h_sum_conv
+    
+  -- 5. Conclusion: mass T_limit ≤ T_limit ψ.form and T_limit ψ.form ≤ mass T_limit
+  apply le_antisymm
+  · rw [← h_liminf_mass]
+    exact h_mass_lsc
+  · exact calibration_inequality T_limit ψ
 
 end

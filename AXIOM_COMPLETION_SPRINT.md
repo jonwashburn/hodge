@@ -1,9 +1,173 @@
-# Axiom Completion Sprint
+# Hodge Conjecture Lean Formalization: Sprint Plan
 
 **Generated:** 2024-12-30  
-**Goal:** Eliminate strategy-critical axioms to make the Hodge proof solid  
+**Goal:** Build a complete, unconditional, machine-checkable proof of the Hodge Conjecture in Lean 4  
 **Current axiom count:** 38  
-**Target axiom count:** ~30 (remove 8 strategy-critical axioms)
+**Target axiom count:** ~30 (remove 8 strategy-critical axioms this sprint)
+
+---
+
+## 🎯 MISSION STATEMENT
+
+We are building a **complete, unconditional, machine-checkable proof** of the Hodge Conjecture in Lean 4. This is not a sketch, not a proof-of-concept, and not an approximation. Every statement must be rigorously proven with no gaps.
+
+**The proof is based on:** `Hodge-v6-w-Jon-Update-MERGED.tex` (the calibration-coercivity approach)
+
+---
+
+## 🚫 ABSOLUTE RULES — NO EXCEPTIONS
+
+### 1. NO SHORTCUTS
+
+| Forbidden | Why |
+|-----------|-----|
+| `sorry` | Leaves proof incomplete |
+| `admit` | Same as sorry |
+| `trivial` | Often hides real work |
+| `by decide` | Usually wrong for infinite types |
+| `native_decide` | Not a proof |
+
+**If you cannot prove something:** Stop and document why. Do NOT use `sorry` as a placeholder.
+
+### 2. MATHLIB FIRST
+
+Before writing ANY proof:
+```bash
+# Search for existing lemmas
+grep -r "KEYWORD" .lake/packages/mathlib/Mathlib/ | head -30
+
+# Check specific modules
+grep -r "sSup\|iSup" .lake/packages/mathlib/Mathlib/Topology/Order/ | head -20
+```
+
+**Key Mathlib paths:**
+- `Mathlib.Analysis.Normed.*` — norms, normed spaces
+- `Mathlib.Analysis.InnerProductSpace.*` — inner products
+- `Mathlib.Geometry.Manifold.*` — manifolds, tangent spaces
+- `Mathlib.LinearAlgebra.*` — exterior algebra, alternating maps
+- `Mathlib.Topology.*` — compactness, continuity
+- `Mathlib.Analysis.Convex.*` — convex sets, cones
+- `Mathlib.Order.ConditionallyCompleteLattice.*` — sSup, iSup
+- `Mathlib.CategoryTheory.Abelian.*` — abelian categories, filtrations
+
+### 3. BUILD STRATEGY
+
+```bash
+# Prefer file-level builds (faster feedback)
+lake build Hodge.Analytic.Norms
+
+# Only use full build when changing imports
+lake build
+
+# Check for errors explicitly
+lake build Hodge.YourFile 2>&1 | grep -E "error:|warning:"
+
+# Check axiom dependencies
+lake env lean DependencyCheck.lean
+```
+
+### 4. PROOF METHODOLOGY
+
+1. **Read and understand** the mathematical content
+2. **Search Mathlib** for existing results
+3. **Write the type signature** first
+4. **Build incrementally** — test each lemma compiles
+5. **Document** any mathematical subtleties
+
+### 5. COORDINATION
+
+- Each agent owns specific axioms — do NOT edit others' axioms without coordination
+- If you need something from another agent's file, create an interface axiom that THEY must prove
+- Check build status before starting each session
+- Update progress at the end of each session
+
+---
+
+## 📜 AXIOM POLICY
+
+### ✅ ALLOWED AXIOMS (Classical Pillars)
+
+These are **major theorems from the mathematical literature** that are acceptable as axioms:
+
+| Axiom | Reference | Why Allowed |
+|-------|-----------|-------------|
+| `hard_lefschetz_inverse_form` | Lefschetz 1924, Hodge 1941 | Deep Hodge theory |
+| `serre_gaga` | Serre, Ann. Inst. Fourier 6 (1956) | Large AG formalization |
+| `harvey_lawson_theorem` | Harvey-Lawson, Acta Math. 148 (1982) | Deep GMT theorem |
+| `harvey_lawson_represents` | Harvey-Lawson (1982) | Companion to above |
+| `omega_pow_represents_multiple` | Classical AG | Hyperplane sections |
+
+### ⚠️ INTERFACE AXIOMS (Engineering Layer)
+
+These provide algebraic/smoothness properties and can remain until concrete definitions are chosen:
+
+- `isSmoothAlternating_*` (5 axioms)
+- `smoothExtDeriv_*` (2 axioms)
+- `ofForm_*` (2 axioms)
+- `instAddCommGroupDeRhamCohomologyClass`, `instModuleRealDeRhamCohomologyClass`
+- Various `isClosed` axioms
+
+### ❌ MUST BE PROVEN (Strategy-Critical)
+
+These axioms likely encode the conjecture's hard content:
+
+| Axiom | Why Critical |
+|-------|--------------|
+| `signed_decomposition` | Core decomposition step |
+| `microstructureSequence_are_cycles` | Construction validity |
+| `microstructureSequence_defect_bound` | Key estimate |
+| `microstructureSequence_flat_limit_exists` | Compactness |
+| `harvey_lawson_fundamental_class` | Representation bridge |
+| `lefschetz_lift_signed_cycle` | Lefschetz compatibility |
+| `limit_is_calibrated` | GMT limit property |
+| `flat_limit_of_cycles_is_cycle` | GMT limit property |
+
+---
+
+## 📐 PROOF STRUCTURE OVERVIEW
+
+The Hodge Conjecture proof has 3 main steps:
+
+### Step 1: Signed Decomposition
+Every rational Hodge class γ decomposes as:
+$$\gamma = \gamma^+ - \gamma^-$$
+where γ⁺ is cone-positive and γ⁻ = N·ω^p is already algebraic.
+
+### Step 2: Automatic SYR (Microstructure)
+For cone-positive γ⁺: build integral cycles T_k with calibration defect → 0.
+
+### Step 3: Calibrated Limit → Algebraic
+- Defect → 0 implies calibrated limit (Federer-Fleming)
+- Calibrated = sum of analytic varieties (Harvey-Lawson)
+- Analytic on projective = algebraic (GAGA)
+
+---
+
+## 📊 Current Axiom List
+
+Reproduce with:
+```bash
+lake env lean DependencyCheck.lean
+```
+
+Current output (38 axioms):
+```
+'hodge_conjecture'' depends on axioms: [
+  FundamentalClassSet_isClosed, IsAlgebraicSet, IsAlgebraicSet_empty,
+  IsAlgebraicSet_union, calibration_inequality, exists_volume_form_of_submodule_axiom,
+  flat_limit_of_cycles_is_cycle, hard_lefschetz_inverse_form,
+  harvey_lawson_fundamental_class, harvey_lawson_represents, harvey_lawson_theorem,
+  instAddCommGroupDeRhamCohomologyClass, instModuleRealDeRhamCohomologyClass,
+  isClosed_omegaPow_scaled, isIntegral_zero_current, isSmoothAlternating_add,
+  isSmoothAlternating_neg, isSmoothAlternating_smul, isSmoothAlternating_sub,
+  isSmoothAlternating_zero, lefschetz_lift_signed_cycle, limit_is_calibrated,
+  microstructureSequence_are_cycles, microstructureSequence_defect_bound,
+  microstructureSequence_flat_limit_exists, ofForm_smul_real, ofForm_sub,
+  omega_pow_isClosed, omega_pow_represents_multiple, propext, serre_gaga,
+  signed_decomposition, simpleCalibratedForm_is_smooth, smoothExtDeriv_add,
+  smoothExtDeriv_smul, wirtinger_comass_bound, Classical.choice, Quot.sound
+]
+```
 
 ---
 
@@ -14,355 +178,6 @@
 | P0 (strategy-critical) | 6 | ~2,400 | Week 1-2 |
 | P1 (GMT facts) | 2 | ~600 | Week 3 |
 | **Total** | **8** | **~3,000** | **3 weeks** |
-
----
-
-## 🔴 P0: Strategy-Critical Axioms (MUST COMPLETE)
-
-These axioms likely encode the conjecture's hard content. Completing them ensures the proof doesn't assume the core bridge.
-
-### 1. `signed_decomposition`
-
-| Field | Value |
-|-------|-------|
-| **Location** | `Hodge/Kahler/SignedDecomp.lean:61` |
-| **Est. LOC** | 400-600 |
-| **Difficulty** | ⭐⭐⭐⭐ (Hard) |
-| **Dependencies** | `isRationalClass`, `isConePositive`, cone geometry |
-| **Blocking** | Everything downstream |
-
-**Current signature:**
-```lean
-axiom signed_decomposition {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
-    (_h_hodge : isPPForm' n X p γ) (η : DeRhamCohomologyClass n X (2 * p)) 
-    (h_rational : isRationalClass η) : SignedDecomposition γ h_closed
-```
-
-**What needs to be proved:**
-- Given a rational Hodge class γ, decompose it as γ = γ⁺ - γ⁻
-- γ⁺ must be cone-positive (in the interior of strongly positive cone)
-- γ⁻ = N·ω^p for some rational N (already algebraic)
-- Both must preserve closedness and rationality
-
-**Approach:**
-1. Use that ω^p is in the interior of the positive cone
-2. For rational γ, find N large enough so that γ + N·ω^p is cone-positive
-3. Set γ⁺ = γ + N·ω^p, γ⁻ = N·ω^p
-
-**Assigned to:** `___________`
-
----
-
-### 2. `microstructureSequence_are_cycles`
-
-| Field | Value |
-|-------|-------|
-| **Location** | `Hodge/Kahler/Microstructure.lean:228` |
-| **Est. LOC** | 500-800 |
-| **Difficulty** | ⭐⭐⭐⭐⭐ (Very Hard) |
-| **Dependencies** | Cubulation, Flow, IntegralCurrent |
-| **Blocking** | Defect bound, flat limit |
-
-**Current signature:**
-```lean
-axiom microstructureSequence_are_cycles (p : ℕ) (γ : SmoothForm n X (2 * p))
-    (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
-    ∀ k, (microstructureSequence p γ hγ ψ k).isCycleAt
-```
-
-**What needs to be proved:**
-- Define `microstructureSequence` as a concrete construction (not opaque)
-- Each approximant T_k must satisfy ∂T_k = 0
-- Use cubulation + integer rounding + gluing
-
-**Approach:**
-1. First make `microstructureSequence` a `def` not `opaque`
-2. Prove boundary vanishes by construction (closed polyhedral chains)
-3. Use `boundary_boundary` = 0 and careful bookkeeping
-
-**Assigned to:** `___________`
-
----
-
-### 3. `microstructureSequence_defect_bound`
-
-| Field | Value |
-|-------|-------|
-| **Location** | `Hodge/Kahler/Microstructure.lean:234` |
-| **Est. LOC** | 300-500 |
-| **Difficulty** | ⭐⭐⭐⭐ (Hard) |
-| **Dependencies** | `microstructureSequence_are_cycles`, calibrationDefect |
-| **Blocking** | `limit_is_calibrated` |
-
-**Current signature:**
-```lean
-axiom microstructureSequence_defect_bound (p : ℕ) (γ : SmoothForm n X (2 * p))
-    (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
-    ∀ k, calibrationDefect (microstructureSequence p γ hγ ψ k).toFun ψ ≤ 2 * (canonicalMeshSequence.scale k)
-```
-
-**What needs to be proved:**
-- The calibration defect is bounded by O(mesh size)
-- As mesh → 0, defect → 0
-
-**Approach:**
-1. Defect comes from integer rounding error
-2. Error per cell is O(mesh^{2p})
-3. Number of cells is O(mesh^{-2n})
-4. Total defect = O(mesh^{2p-2n}) · mass = O(mesh) when properly scaled
-
-**Assigned to:** `___________`
-
----
-
-### 4. `microstructureSequence_flat_limit_exists`
-
-| Field | Value |
-|-------|-------|
-| **Location** | `Hodge/Kahler/Microstructure.lean:269` |
-| **Est. LOC** | 400-600 |
-| **Difficulty** | ⭐⭐⭐⭐ (Hard) |
-| **Dependencies** | Mass bound, Federer-Fleming compactness |
-| **Blocking** | Harvey-Lawson application |
-
-**Current signature:**
-```lean
-axiom microstructureSequence_flat_limit_exists (p : ℕ) (γ : SmoothForm n X (2 * p))
-    (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
-    ∃ (T_limit : IntegralCurrent n X (2 * (n - p))) (φ : ℕ → ℕ),
-      StrictMono φ ∧
-      Filter.Tendsto (fun j => flatNorm ((microstructureSequence p γ hγ ψ (φ j)).toFun - T_limit.toFun))
-        Filter.atTop (nhds 0)
-```
-
-**What needs to be proved:**
-- The microstructure sequence has uniformly bounded mass
-- By Federer-Fleming compactness, extract convergent subsequence
-- Limit exists in flat norm topology
-
-**Approach:**
-1. Prove `microstructureSequence_mass_bound` (uniform mass bound)
-2. Apply Federer-Fleming compactness (can remain an axiom)
-3. Extract subsequence φ and limit T_limit
-
-**Assigned to:** `___________`
-
----
-
-### 5. `harvey_lawson_fundamental_class`
-
-| Field | Value |
-|-------|-------|
-| **Location** | `Hodge/Kahler/Main.lean:94` |
-| **Est. LOC** | 200-400 |
-| **Difficulty** | ⭐⭐⭐ (Medium) |
-| **Dependencies** | FundamentalClass, HarveyLawsonConclusion |
-| **Blocking** | Final representation |
-
-**Current signature:**
-```lean
-axiom harvey_lawson_fundamental_class {p : ℕ}
-    (γplus : SmoothForm n X (2 * p)) (hplus : IsFormClosed γplus)
-    (hγ : isConePositive γplus)
-    (hl_concl : HarveyLawsonConclusion n X (2 * (n - p)))
-    (T_limit : Current n X (2 * (n - p)))
-    (h_represents : hl_concl.represents T_limit) :
-    hl_concl.toSignedAlgebraicCycle.RepresentsClass (DeRhamCohomologyClass.ofForm γplus hplus)
-```
-
-**What needs to be proved:**
-- The Harvey-Lawson output (analytic → algebraic cycle) represents γ⁺
-- This is the cohomology-level identification
-
-**Approach:**
-1. The limit T_limit represents γ⁺ by construction (integration)
-2. HL says T_limit = sum of analytic subvarieties
-3. GAGA converts analytic → algebraic
-4. Fundamental class of algebraic cycle = original class
-
-**Assigned to:** `___________`
-
----
-
-### 6. `lefschetz_lift_signed_cycle`
-
-| Field | Value |
-|-------|-------|
-| **Location** | `Hodge/Kahler/Main.lean:150` |
-| **Est. LOC** | 300-500 |
-| **Difficulty** | ⭐⭐⭐ (Medium) |
-| **Dependencies** | Hard Lefschetz, cycle class maps |
-| **Blocking** | Cases p > n/2 |
-
-**Current signature:**
-```lean
-axiom lefschetz_lift_signed_cycle {p p' : ℕ}
-    (γ : SmoothForm n X (2 * p)) (hγ : IsFormClosed γ)
-    (η : SmoothForm n X (2 * p')) (hη : IsFormClosed η)
-    (Z_η : SignedAlgebraicCycle n X)
-    (_hp : p > n / 2)
-    (h_rep : Z_η.RepresentsClass (DeRhamCohomologyClass.ofForm η hη)) :
-    ∃ Z_γ : SignedAlgebraicCycle n X, 
-      Z_γ.RepresentsClass (DeRhamCohomologyClass.ofForm γ hγ)
-```
-
-**What needs to be proved:**
-- If p > n/2, use Hard Lefschetz to reduce to p' ≤ n/2
-- Cycle classes compatible with hyperplane intersection
-- Lift back from p' to p
-
-**Approach:**
-1. L^{p-n/2} : H^{p',p'} → H^{p,p} is isomorphism (Hard Lefschetz)
-2. At cycle level: Z_γ = Z_η ∩ H^{p-p'} (hyperplane sections)
-3. Prove cycle class map commutes with Lefschetz L
-
-**Assigned to:** `___________`
-
----
-
-## 🟡 P1: Pipeline Integrity (GMT Facts)
-
-Standard GMT facts that complete the analytic pipeline.
-
-### 7. `limit_is_calibrated`
-
-| Field | Value |
-|-------|-------|
-| **Location** | `Hodge/Analytic/Calibration.lean:93` |
-| **Est. LOC** | 200-400 |
-| **Difficulty** | ⭐⭐⭐ (Medium) |
-| **Dependencies** | Lower semicontinuity of mass, calibration inequality |
-| **Blocking** | Harvey-Lawson hypothesis |
-
-**Current signature:**
-```lean
-axiom limit_is_calibrated {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k)
-    (ψ : CalibratingForm n X k)
-    (_h_defect_vanish : Tendsto (fun i => calibrationDefect (T i) ψ) atTop (nhds 0))
-    (_h_conv : Tendsto (fun i => flatNorm (T i - T_limit)) atTop (nhds 0)) :
-    isCalibrated T_limit ψ
-```
-
-**What needs to be proved:**
-- If calibration defect → 0 and T_i → T_limit in flat norm
-- Then T_limit is calibrated
-
-**Approach:**
-1. Calibration defect = |mass(T) - ⟨T, ψ⟩|
-2. Mass is lower semicontinuous in flat topology
-3. Pairing ⟨·, ψ⟩ is continuous in flat topology
-4. Taking limits: defect(T_limit) ≤ liminf defect(T_i) = 0
-
-**Assigned to:** `___________`
-
----
-
-### 8. `flat_limit_of_cycles_is_cycle`
-
-| Field | Value |
-|-------|-------|
-| **Location** | `Hodge/Classical/HarveyLawson.lean:186` |
-| **Est. LOC** | 200-400 |
-| **Difficulty** | ⭐⭐⭐ (Medium) |
-| **Dependencies** | Boundary continuity in flat norm |
-| **Blocking** | Harvey-Lawson hypothesis |
-
-**Current signature:**
-```lean
-axiom flat_limit_of_cycles_is_cycle {k : ℕ}
-    (T_seq : ℕ → IntegralCurrent n X k)
-    (T_limit : IntegralCurrent n X k)
-    (h_cycles : ∀ i, (T_seq i).isCycleAt)
-    (h_conv : Filter.Tendsto (fun i => flatNorm ((T_seq i).toFun - T_limit.toFun))
-              Filter.atTop (nhds 0)) :
-    T_limit.isCycleAt
-```
-
-**What needs to be proved:**
-- If T_i → T_limit in flat norm and each ∂T_i = 0
-- Then ∂T_limit = 0
-
-**Approach:**
-1. Boundary operator ∂ is continuous in flat norm
-2. ∂T_i = 0 for all i
-3. ∂T_limit = lim ∂T_i = lim 0 = 0
-
-**Assigned to:** `___________`
-
----
-
-## 📋 Assignment Template
-
-Copy this for each agent assignment:
-
-```markdown
-## Assignment: [AXIOM_NAME]
-
-**Agent:** [Agent ID]  
-**Start Date:** YYYY-MM-DD  
-**Target Date:** YYYY-MM-DD  
-**Status:** 🔴 Not Started / 🟡 In Progress / 🟢 Complete
-
-### Files to modify:
-- [ ] `Hodge/[path].lean`
-
-### Subtasks:
-- [ ] Task 1
-- [ ] Task 2
-- [ ] Task 3
-
-### Blockers:
-- None
-
-### Notes:
-```
-
----
-
-## 🗓️ Sprint Schedule
-
-| Week | Focus | Axioms | Est. LOC |
-|------|-------|--------|----------|
-| 1 | Signed decomposition + Microstructure setup | 1, 2 | 1,000 |
-| 2 | Microstructure bounds + Limit existence | 3, 4 | 800 |
-| 3 | HL bridge + GMT limits | 5, 6, 7, 8 | 1,200 |
-
----
-
-## 📈 Progress Tracker
-
-| Axiom | Est. LOC | Actual LOC | Status | Assignee |
-|-------|----------|------------|--------|----------|
-| signed_decomposition | 500 | - | 🔴 | - |
-| microstructureSequence_are_cycles | 650 | - | 🔴 | - |
-| microstructureSequence_defect_bound | 400 | - | 🔴 | - |
-| microstructureSequence_flat_limit_exists | 500 | - | 🔴 | - |
-| harvey_lawson_fundamental_class | 300 | - | 🔴 | - |
-| lefschetz_lift_signed_cycle | 400 | - | 🔴 | - |
-| limit_is_calibrated | 300 | - | 🔴 | - |
-| flat_limit_of_cycles_is_cycle | 300 | - | 🔴 | - |
-| **TOTAL** | **3,350** | - | - | - |
-
----
-
-## ✅ Definition of Done
-
-An axiom is considered "complete" when:
-
-1. [ ] The `axiom` keyword is replaced with `theorem` or `def`
-2. [ ] The proof compiles without `sorry`
-3. [ ] `lake build` passes
-4. [ ] `#print axioms hodge_conjecture'` no longer lists this axiom
-5. [ ] Code review passed
-
----
-
-## 🔗 Related Documents
-
-- `AGENT_ASSIGNMENTS.md` — Full agent assignment protocol
-- `ADVERSARIAL_AUDIT.md` — Audit findings and status
-- `HodgeAxiomCompletionRoadmap.pdf` — Formatted version of this document
-- `LeanProofBundle.txt` — Full codebase bundle for reference
 
 ---
 
@@ -410,8 +225,6 @@ Prove that every rational Hodge class γ can be written as γ = γ⁺ - γ⁻ wh
 - γ⁺ is cone-positive (in the interior of the strongly positive cone)
 - γ⁻ = N·ω^p for some rational N ≥ 0
 
-This is the key decomposition that enables the microstructure construction.
-
 ## Current Code Location
 
 ```lean
@@ -438,38 +251,11 @@ structure SignedDecomposition {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed 
   γminus_is_omega_multiple : ∃ N : ℚ, ⟦γminus, γminus_closed⟧ = N • ⟦omegaPow n X p, omega_pow_isClosed p⟧
 ```
 
-### Step 2: Prove the decomposition theorem
+### Step 2: Key insight
 
-**Key insight:** Since ω^p is in the interior of the cone (from `omegaPow_in_interior`), for any bounded class γ, we can find N large enough so that γ + N·ω^p is also in the interior.
-
-```lean
-theorem signed_decomposition_proof {p : ℕ} (γ : SmoothForm n X (2 * p)) 
-    (h_closed : IsFormClosed γ) (h_hodge : isPPForm' n X p γ) 
-    (η : DeRhamCohomologyClass n X (2 * p)) (h_rational : isRationalClass η) : 
-    SignedDecomposition γ h_closed := by
-  -- Step 1: ω^p is in the interior of the positive cone
-  have h_omega_interior := omegaPow_in_interior (n := n) (X := X) p
-  
-  -- Step 2: Get the interior radius r > 0
-  obtain ⟨r, hr_pos, hr_ball⟩ := exists_uniform_interior_radius (n := n) (X := X) p
-  
-  -- Step 3: γ is bounded (uses compactness of X)
-  -- Need: ‖γ‖ ≤ M for some M
-  
-  -- Step 4: Choose N = ⌈M/r⌉ + 1 (rational)
-  -- Then γ + N·ω^p is in the r-ball around N·ω^p
-  -- Since N·ω^p is deep in the cone, γ + N·ω^p is cone-positive
-  
-  -- Step 5: Construct the decomposition
-  -- γplus := γ + N·ω^p
-  -- γminus := N·ω^p
-  -- Verify all conditions
-  sorry
-```
+Since ω^p is in the interior of the positive cone (from `omegaPow_in_interior`), for any bounded class γ, we can find N large enough so that γ + N·ω^p is also in the interior.
 
 ### Step 3: Required lemmas
-
-You'll need to prove these helper lemmas:
 
 ```lean
 -- 1. Norm bound on γ (compactness)
@@ -485,24 +271,14 @@ lemma interior_scale_invariant {p : ℕ} (N : ℝ) (hN : N > 0) :
 lemma cone_interior_addition {p : ℕ} (α β : SmoothForm n X (2 * p))
     (hα : isConePositive α) (hβ_small : comass β < interior_radius α) :
     isConePositive (α + β)
-
--- 4. Rationality preserved under addition
-lemma isRationalClass_add_omega_multiple {p : ℕ} (γ : SmoothForm n X (2 * p))
-    (h_closed : IsFormClosed γ) (h_rational : isRationalClass ⟦γ, h_closed⟧) (N : ℚ) :
-    isRationalClass ⟦γ + N • omegaPow n X p, _⟧
 ```
 
 ## Deliverables
 
 - [ ] Replace `axiom signed_decomposition` with `theorem signed_decomposition`
-- [ ] Prove all 4 helper lemmas above
+- [ ] Prove all helper lemmas above
 - [ ] `lake build Hodge.Kahler.SignedDecomp` succeeds
 - [ ] `#print axioms signed_decomposition` shows only allowed axioms
-
-## Blockers
-
-- Needs `omegaPow_in_interior` (already an axiom, acceptable)
-- Needs `exists_uniform_interior_radius` (already an axiom, acceptable)
 
 ---
 
@@ -543,7 +319,6 @@ axiom microstructureSequence_are_cycles (p : ℕ) (γ : SmoothForm n X (2 * p))
 Replace `opaque microstructureSequence` with a `def`:
 
 ```lean
-/-- The microstructure sequence: integral current approximants to γ. -/
 def microstructureSequence (p : ℕ) (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
     ℕ → IntegralCurrent n X (2 * (n - p)) := fun k =>
@@ -555,66 +330,24 @@ def microstructureSequence (p : ℕ) (γ : SmoothForm n X (2 * p))
   T_k
 ```
 
-### Step 2: Prove each approximant is a cycle
+### Step 2: Key insight
 
-```lean
-theorem microstructureSequence_are_cycles_proof (p : ℕ) (γ : SmoothForm n X (2 * p))
-    (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
-    ∀ k, (microstructureSequence p γ hγ ψ k).isCycleAt := by
-  intro k
-  unfold microstructureSequence
-  -- The glued cells form a closed chain
-  -- Key: integer flows satisfy ∑ (inflow) = ∑ (outflow) at each vertex
-  -- This is the discrete divergence-free condition
-  -- Therefore ∂(glued chain) = 0
-  sorry
-```
+Glued integer cells form closed chains because integer flows satisfy conservation (∑ inflow = ∑ outflow at each vertex). This is the discrete divergence-free condition.
 
 ### Step 3: Required infrastructure
 
 ```lean
--- 1. Cubulation structure (already exists)
-structure Cubulation (n : ℕ) (X : Type*) (h : ℝ) where ...
-
--- 2. Flow through cells
-def calibratedFlow (γ : SmoothForm n X (2 * p)) (ψ : CalibratingForm n X (2 * (n - p)))
-    (C : Cubulation n X h) : DirectedEdge C → ℝ := ...
-
--- 3. Integer rounding with conservation
-def integerRounding (flow : DirectedEdge C → ℝ) : DirectedEdge C → ℤ := ...
-
--- 4. Gluing cells into a current
-def glueCells (C : Cubulation n X h) (int_flow : DirectedEdge C → ℤ) : 
-    IntegralCurrent n X (2 * (n - p)) := ...
-
--- 5. Key lemma: glued cells are closed
+-- Key lemma: glued cells are closed
 lemma glueCells_isCycle (C : Cubulation n X h) (int_flow : DirectedEdge C → ℤ)
     (h_conserv : ∀ v, ∑ e ∈ inEdges v, int_flow e = ∑ e ∈ outEdges v, int_flow e) :
     (glueCells C int_flow).isCycleAt
-```
-
-### Step 4: Integer rounding with flow conservation
-
-The key mathematical insight: use the Barany-Grinberg theorem for integer rounding that preserves flow conservation.
-
-```lean
--- Already have this axiom:
-axiom integer_transport (p : ℕ) {h : ℝ} (C : Cubulation n X h) (target : Flow C) :
-    ∃ (int_flow : DirectedEdge C → ℤ), IsValidIntegerApproximation C target int_flow
 ```
 
 ## Deliverables
 
 - [ ] Replace `opaque microstructureSequence` with concrete `def`
 - [ ] Replace `axiom microstructureSequence_are_cycles` with `theorem`
-- [ ] Define `calibratedFlow`, `integerRounding`, `glueCells`
-- [ ] Prove `glueCells_isCycle` lemma
 - [ ] `lake build Hodge.Kahler.Microstructure` succeeds
-
-## Blockers
-
-- Needs `Cubulation` structure (exists)
-- Needs `integer_transport` axiom (keep as axiom for Barany-Grinberg)
 
 ---
 
@@ -638,99 +371,34 @@ Prove the calibration defect bound and the existence of a flat limit.
 ## Current Code Location
 
 ```lean
--- Hodge/Kahler/Microstructure.lean:234
 axiom microstructureSequence_defect_bound (p : ℕ) (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
     ∀ k, calibrationDefect (microstructureSequence p γ hγ ψ k).toFun ψ ≤ 2 * (canonicalMeshSequence.scale k)
 
--- Hodge/Kahler/Microstructure.lean:269
 axiom microstructureSequence_flat_limit_exists (p : ℕ) (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
     ∃ (T_limit : IntegralCurrent n X (2 * (n - p))) (φ : ℕ → ℕ),
-      StrictMono φ ∧
-      Filter.Tendsto (fun j => flatNorm ((microstructureSequence p γ hγ ψ (φ j)).toFun - T_limit.toFun))
-        Filter.atTop (nhds 0)
+      StrictMono φ ∧ Tendsto (fun j => flatNorm (...)) atTop (nhds 0)
 ```
 
 ## Implementation Plan
 
 ### Part 1: Defect Bound
 
-```lean
-theorem microstructureSequence_defect_bound_proof (p : ℕ) (γ : SmoothForm n X (2 * p))
-    (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
-    ∀ k, calibrationDefect (microstructureSequence p γ hγ ψ k).toFun ψ ≤ 
-         2 * (canonicalMeshSequence.scale k) := by
-  intro k
-  -- Step 1: Defect comes from integer rounding error
-  -- Each cell contributes error ≤ mesh^{2p} (local rounding)
-  
-  -- Step 2: Number of cells is O(mesh^{-2n})
-  
-  -- Step 3: But errors partially cancel (by calibration)
-  -- Net error = O(mesh) when properly weighted
-  
-  sorry
-```
-
-**Key lemmas needed:**
-
-```lean
--- Per-cell defect bound
-lemma cell_defect_bound (C : Cubulation n X h) (cell : Cell C) 
-    (int_flow : DirectedEdge C → ℤ) (real_flow : DirectedEdge C → ℝ) :
-    cellDefect cell int_flow ψ ≤ h^(2*p) * ‖real_flow - int_flow‖_cell
-
--- Cancellation from calibration form
-lemma calibration_cancellation (C : Cubulation n X h) (int_flow : DirectedEdge C → ℤ) :
-    ∑ cell, cellDefect cell int_flow ψ ≤ C_const * h * mass(glueCells C int_flow)
-```
+- Defect comes from integer rounding error
+- Each cell contributes error ≤ mesh^{2p}
+- Net error = O(mesh) when properly weighted
 
 ### Part 2: Flat Limit Existence
 
-```lean
-theorem microstructureSequence_flat_limit_exists_proof (p : ℕ) (γ : SmoothForm n X (2 * p))
-    (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
-    ∃ (T_limit : IntegralCurrent n X (2 * (n - p))) (φ : ℕ → ℕ),
-      StrictMono φ ∧
-      Filter.Tendsto (fun j => flatNorm ((microstructureSequence p γ hγ ψ (φ j)).toFun - T_limit.toFun))
-        Filter.atTop (nhds 0) := by
-  -- Step 1: Prove uniform mass bound
-  have h_mass_bound := microstructureSequence_mass_bound p γ hγ ψ
-  obtain ⟨M, hM⟩ := h_mass_bound
-  
-  -- Step 2: Apply Federer-Fleming compactness (axiom)
-  -- Bounded mass + bounded support → precompact in flat norm
-  
-  -- Step 3: Extract convergent subsequence
-  sorry
-```
-
-**Key: first prove mass bound**
-
-```lean
-theorem microstructureSequence_mass_bound_proof (p : ℕ) (γ : SmoothForm n X (2 * p))
-    (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
-    ∃ M : ℝ, ∀ k, (microstructureSequence p γ hγ ψ k : Current n X (2 * (n - p))).mass ≤ M := by
-  -- Mass of T_k ≈ ∫_X γ ∧ ψ (by calibration)
-  -- This is bounded since γ, ψ are fixed smooth forms on compact X
-  use comass γ * comass ψ * volume X
-  intro k
-  sorry
-```
+1. Prove uniform mass bound: `∃ M, ∀ k, mass(T_k) ≤ M`
+2. Apply Federer-Fleming compactness (can remain axiom)
+3. Extract convergent subsequence
 
 ## Deliverables
 
-- [ ] Replace `axiom microstructureSequence_defect_bound` with `theorem`
-- [ ] Replace `axiom microstructureSequence_flat_limit_exists` with `theorem`  
-- [ ] Prove `microstructureSequence_mass_bound` as intermediate
-- [ ] Prove cell-level defect estimates
+- [ ] Replace both axioms with theorems
 - [ ] `lake build Hodge.Kahler.Microstructure` succeeds
-
-## Blockers
-
-- **Depends on Agent B:** needs concrete `microstructureSequence` definition
-- Keep `federer_fleming_compactness` as axiom (deep GMT theorem)
 
 ---
 
@@ -748,9 +416,7 @@ theorem microstructureSequence_mass_bound_proof (p : ℕ) (γ : SmoothForm n X (
 
 ## Mission
 
-Prove the two GMT facts needed for the Harvey-Lawson theorem to apply:
-1. Flat limits of nearly-calibrated currents are calibrated
-2. Flat limits of cycles are cycles
+Prove the two GMT facts needed for the Harvey-Lawson theorem to apply.
 
 ## Current Code Location
 
@@ -758,17 +424,15 @@ Prove the two GMT facts needed for the Harvey-Lawson theorem to apply:
 -- Hodge/Analytic/Calibration.lean:93
 axiom limit_is_calibrated {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k)
     (ψ : CalibratingForm n X k)
-    (_h_defect_vanish : Tendsto (fun i => calibrationDefect (T i) ψ) atTop (nhds 0))
-    (_h_conv : Tendsto (fun i => flatNorm (T i - T_limit)) atTop (nhds 0)) :
+    (h_defect_vanish : Tendsto (fun i => calibrationDefect (T i) ψ) atTop (nhds 0))
+    (h_conv : Tendsto (fun i => flatNorm (T i - T_limit)) atTop (nhds 0)) :
     isCalibrated T_limit ψ
 
 -- Hodge/Classical/HarveyLawson.lean:186
 axiom flat_limit_of_cycles_is_cycle {k : ℕ}
-    (T_seq : ℕ → IntegralCurrent n X k)
-    (T_limit : IntegralCurrent n X k)
+    (T_seq : ℕ → IntegralCurrent n X k) (T_limit : IntegralCurrent n X k)
     (h_cycles : ∀ i, (T_seq i).isCycleAt)
-    (h_conv : Filter.Tendsto (fun i => flatNorm ((T_seq i).toFun - T_limit.toFun))
-              Filter.atTop (nhds 0)) :
+    (h_conv : Tendsto (fun i => flatNorm (...)) atTop (nhds 0)) :
     T_limit.isCycleAt
 ```
 
@@ -776,98 +440,23 @@ axiom flat_limit_of_cycles_is_cycle {k : ℕ}
 
 ### Part 1: Calibrated Limits
 
-```lean
-theorem limit_is_calibrated_proof {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k)
-    (ψ : CalibratingForm n X k)
-    (h_defect_vanish : Tendsto (fun i => calibrationDefect (T i) ψ) atTop (nhds 0))
-    (h_conv : Tendsto (fun i => flatNorm (T i - T_limit)) atTop (nhds 0)) :
-    isCalibrated T_limit ψ := by
-  -- Recall: isCalibrated T ψ ↔ mass T = ⟨T, ψ⟩
-  -- Equivalently: calibrationDefect T ψ = |mass T - ⟨T, ψ⟩| = 0
-  
-  -- Step 1: mass is lower semicontinuous in flat norm
-  have h_mass_lsc : mass T_limit ≤ liminf (fun i => mass (T i)) := mass_lsc_flat h_conv
-  
-  -- Step 2: pairing ⟨·, ψ⟩ is continuous in flat norm
-  have h_pair_cont : Tendsto (fun i => ⟨T i, ψ⟩) atTop (nhds ⟨T_limit, ψ⟩) := 
-    pairing_continuous_flat h_conv ψ
-  
-  -- Step 3: By defect → 0, we have mass(T_i) → ⟨T_i, ψ⟩
-  -- Taking limits: mass(T_limit) ≤ liminf mass(T_i) = lim ⟨T_i, ψ⟩ = ⟨T_limit, ψ⟩
-  
-  -- Step 4: But always mass(T) ≥ ⟨T, ψ⟩ (calibration inequality)
-  -- So mass(T_limit) = ⟨T_limit, ψ⟩, i.e., T_limit is calibrated
-  
-  sorry
-```
+Key lemmas needed:
+- `mass_lsc_flat`: mass is lower semicontinuous in flat topology
+- `pairing_continuous_flat`: pairing ⟨·, ψ⟩ is continuous in flat norm
 
-**Key lemmas:**
-
-```lean
--- Lower semicontinuity of mass (standard GMT)
-lemma mass_lsc_flat {T_seq : ℕ → Current n X k} {T_limit : Current n X k}
-    (h_conv : Tendsto (fun i => flatNorm (T_seq i - T_limit)) atTop (nhds 0)) :
-    mass T_limit ≤ liminf (fun i => mass (T_seq i))
-
--- Pairing is continuous in flat norm (because ψ is smooth)
-lemma pairing_continuous_flat {T_seq : ℕ → Current n X k} {T_limit : Current n X k}
-    (h_conv : Tendsto (fun i => flatNorm (T_seq i - T_limit)) atTop (nhds 0))
-    (ψ : SmoothForm n X k) :
-    Tendsto (fun i => T_seq i ψ) atTop (nhds (T_limit ψ))
-```
+Proof: Taking limits, mass(T_limit) ≤ liminf mass(T_i) = lim ⟨T_i, ψ⟩ = ⟨T_limit, ψ⟩. But mass ≥ pairing always, so equality holds.
 
 ### Part 2: Cycle Limits
 
-```lean
-theorem flat_limit_of_cycles_is_cycle_proof {k : ℕ}
-    (T_seq : ℕ → IntegralCurrent n X k)
-    (T_limit : IntegralCurrent n X k)
-    (h_cycles : ∀ i, (T_seq i).isCycleAt)
-    (h_conv : Filter.Tendsto (fun i => flatNorm ((T_seq i).toFun - T_limit.toFun))
-              Filter.atTop (nhds 0)) :
-    T_limit.isCycleAt := by
-  -- isCycleAt means boundary T = 0
-  
-  -- Step 1: Boundary is continuous in flat norm
-  have h_bdy_cont : Tendsto (fun i => boundary (T_seq i).toFun) atTop 
-                           (nhds (boundary T_limit.toFun)) := 
-    boundary_continuous_flat h_conv
-  
-  -- Step 2: Each T_seq i is a cycle, so boundary (T_seq i) = 0
-  have h_bdy_zero : ∀ i, boundary (T_seq i).toFun = 0 := fun i => (h_cycles i).boundary_eq_zero
-  
-  -- Step 3: Taking limits: boundary T_limit = lim boundary (T_seq i) = lim 0 = 0
-  have h_limit_zero : boundary T_limit.toFun = 0 := by
-    have := tendsto_const_nhds (x := (0 : Current n X (k-1)))
-    rw [show (fun i => boundary (T_seq i).toFun) = (fun _ => 0) from funext h_bdy_zero] at h_bdy_cont
-    exact tendsto_nhds_unique h_bdy_cont this
-  
-  exact ⟨h_limit_zero⟩
-```
+Key lemma:
+- `boundary_continuous_flat`: boundary is continuous in flat norm
 
-**Key lemma:**
-
-```lean
--- Boundary is continuous in flat norm
-lemma boundary_continuous_flat {T_seq : ℕ → Current n X k} {T_limit : Current n X k}
-    (h_conv : Tendsto (fun i => flatNorm (T_seq i - T_limit)) atTop (nhds 0)) :
-    Tendsto (fun i => boundary (T_seq i)) atTop (nhds (boundary T_limit))
-```
-
-This follows from the definition of flat norm: `flatNorm T = mass T + mass (boundary T)`, so convergence in flat norm implies convergence of boundaries.
+Proof: ∂T_limit = lim ∂T_i = lim 0 = 0.
 
 ## Deliverables
 
-- [ ] Replace `axiom limit_is_calibrated` with `theorem`
-- [ ] Replace `axiom flat_limit_of_cycles_is_cycle` with `theorem`
-- [ ] Prove `mass_lsc_flat`, `pairing_continuous_flat`, `boundary_continuous_flat`
-- [ ] `lake build Hodge.Analytic.Calibration` succeeds
-- [ ] `lake build Hodge.Classical.HarveyLawson` succeeds
-
-## Blockers
-
-- Keep `mass_lsc` as axiom if needed (standard but technical GMT)
-- The proofs are mostly about continuity/semicontinuity in flat topology
+- [ ] Replace both axioms with theorems
+- [ ] `lake build Hodge.Analytic.Calibration` and `lake build Hodge.Classical.HarveyLawson` succeed
 
 ---
 
@@ -886,14 +475,11 @@ This follows from the definition of flat norm: `flatNorm T = mass T + mass (boun
 
 ## Mission
 
-Prove the cohomology-level bridges that complete the proof:
-1. The Harvey-Lawson output represents the original class
-2. Lefschetz lifting is compatible with cycle classes
+Prove the cohomology-level bridges that complete the proof.
 
 ## Current Code Location
 
 ```lean
--- Hodge/Kahler/Main.lean:94
 axiom harvey_lawson_fundamental_class {p : ℕ}
     (γplus : SmoothForm n X (2 * p)) (hplus : IsFormClosed γplus)
     (hγ : isConePositive γplus)
@@ -902,12 +488,11 @@ axiom harvey_lawson_fundamental_class {p : ℕ}
     (h_represents : hl_concl.represents T_limit) :
     hl_concl.toSignedAlgebraicCycle.RepresentsClass (DeRhamCohomologyClass.ofForm γplus hplus)
 
--- Hodge/Kahler/Main.lean:150
 axiom lefschetz_lift_signed_cycle {p p' : ℕ}
     (γ : SmoothForm n X (2 * p)) (hγ : IsFormClosed γ)
     (η : SmoothForm n X (2 * p')) (hη : IsFormClosed η)
     (Z_η : SignedAlgebraicCycle n X)
-    (_hp : p > n / 2)
+    (hp : p > n / 2)
     (h_rep : Z_η.RepresentsClass (DeRhamCohomologyClass.ofForm η hη)) :
     ∃ Z_γ : SignedAlgebraicCycle n X, 
       Z_γ.RepresentsClass (DeRhamCohomologyClass.ofForm γ hγ)
@@ -917,41 +502,14 @@ axiom lefschetz_lift_signed_cycle {p p' : ℕ}
 
 ### Part 1: Harvey-Lawson Fundamental Class
 
-```lean
-theorem harvey_lawson_fundamental_class_proof {p : ℕ}
-    (γplus : SmoothForm n X (2 * p)) (hplus : IsFormClosed γplus)
-    (hγ : isConePositive γplus)
-    (hl_concl : HarveyLawsonConclusion n X (2 * (n - p)))
-    (T_limit : Current n X (2 * (n - p)))
-    (h_represents : hl_concl.represents T_limit) :
-    hl_concl.toSignedAlgebraicCycle.RepresentsClass (DeRhamCohomologyClass.ofForm γplus hplus) := by
-  -- Step 1: T_limit represents γplus by construction
-  -- T_limit = lim T_k where T_k are microstructure approximants
-  -- Each T_k integrates to approximately ∫ γplus ∧ ψ
-  
-  -- Step 2: Harvey-Lawson theorem says T_limit = ∑ n_i [V_i]
-  -- where V_i are analytic subvarieties
-  
-  -- Step 3: GAGA: analytic on projective ⟹ algebraic
-  -- So V_i are algebraic, hence hl_concl.toSignedAlgebraicCycle is algebraic
-  
-  -- Step 4: Fundamental class of algebraic cycle = integration current
-  -- [∑ n_i V_i] = ∑ n_i [V_i] = T_limit
-  
-  -- Step 5: T_limit represents γplus ⟹ fundamental class represents γplus
-  
-  sorry
-```
-
-**Key: the chain of representations**
-
+Chain of representations:
 ```
 γplus (form) 
   ↓ (microstructure construction)
 T_k (integral currents)
   ↓ (flat limit)
 T_limit (calibrated current)
-  ↓ (Harvey-Lawson)
+  ↓ (Harvey-Lawson theorem)
 ∑ n_i [V_i] (analytic varieties)
   ↓ (GAGA)
 ∑ n_i [W_i] (algebraic varieties)
@@ -961,53 +519,14 @@ T_limit (calibrated current)
 
 ### Part 2: Lefschetz Lift
 
-```lean
-theorem lefschetz_lift_signed_cycle_proof {p p' : ℕ}
-    (γ : SmoothForm n X (2 * p)) (hγ : IsFormClosed γ)
-    (η : SmoothForm n X (2 * p')) (hη : IsFormClosed η)
-    (Z_η : SignedAlgebraicCycle n X)
-    (hp : p > n / 2)
-    (h_rep : Z_η.RepresentsClass (DeRhamCohomologyClass.ofForm η hη)) :
-    ∃ Z_γ : SignedAlgebraicCycle n X, 
-      Z_γ.RepresentsClass (DeRhamCohomologyClass.ofForm γ hγ) := by
-  -- Set p' = n - p (so p' < n/2 ≤ p)
-  -- Hard Lefschetz: L^{p-p'} : H^{p',p'} ≃ H^{p,p}
-  
-  -- Step 1: η = L^{p-p'}(γ) by Hard Lefschetz inverse
-  have h_HL := hard_lefschetz_inverse_form (n := n) (X := X) p p' hp hγ
-  
-  -- Step 2: At the cycle level, L corresponds to ∩ H (hyperplane intersection)
-  -- If Z_η represents η, then Z_γ := "Lefschetz lift of Z_η" represents γ
-  
-  -- Step 3: Construct Z_γ by intersecting Z_η with (p - p') generic hyperplanes
-  -- This increases codimension by (p - p')
-  
-  -- Step 4: Cycle class commutes with Lefschetz: [Z_γ] = L^{-(p-p')}[Z_η] = [γ]
-  
-  sorry
-```
-
-**Key lemma needed:**
-
-```lean
--- Cycle classes commute with Lefschetz operator
-lemma cycle_class_lefschetz_commute {p p' : ℕ} (Z : SignedAlgebraicCycle n X)
-    (H : AlgebraicHyperplane n X) :
-    (Z.intersect H).cycleClass (p + 1) = lefschetzL (Z.cycleClass p)
-```
+- L^{p-p'} : H^{p',p'} → H^{p,p} is isomorphism (Hard Lefschetz)
+- At cycle level: Z_γ = Z_η ∩ H^{p-p'} (hyperplane sections)
+- Cycle class commutes with Lefschetz
 
 ## Deliverables
 
-- [ ] Replace `axiom harvey_lawson_fundamental_class` with `theorem`
-- [ ] Replace `axiom lefschetz_lift_signed_cycle` with `theorem`
-- [ ] Prove representation chain (microstructure → limit → HL → GAGA → fundamental class)
-- [ ] Prove cycle class / Lefschetz commutation
+- [ ] Replace both axioms with theorems
 - [ ] `lake build Hodge.Kahler.Main` succeeds
-
-## Blockers
-
-- **Depends on Agents C, D:** needs limit existence and limit properties
-- Keep `harvey_lawson_theorem`, `serre_gaga`, `hard_lefschetz_inverse_form` as axioms (classical pillars)
 
 ---
 
@@ -1021,6 +540,34 @@ lemma cycle_class_lefschetz_commute {p p' : ℕ} (Z : SignedAlgebraicCycle n X)
 | **D** | `limit_is_calibrated`, `flat_limit_of_cycles_is_cycle` | 500 | 2-3 | None |
 | **E** | `harvey_lawson_fundamental_class`, `lefschetz_lift_signed_cycle` | 600 | 3 | Agents C, D |
 | **TOTAL** | 8 axioms | ~3,000 | 3 weeks | |
+
+---
+
+# ✅ Definition of Done
+
+An axiom is considered "complete" when:
+
+1. [ ] The `axiom` keyword is replaced with `theorem` or `def`
+2. [ ] The proof compiles without `sorry`
+3. [ ] `lake build` passes
+4. [ ] `#print axioms hodge_conjecture'` no longer lists this axiom
+5. [ ] Code review passed
+
+---
+
+# 📈 Progress Tracker
+
+| Axiom | Est. LOC | Actual LOC | Status | Assignee |
+|-------|----------|------------|--------|----------|
+| signed_decomposition | 500 | - | 🔴 | - |
+| microstructureSequence_are_cycles | 650 | - | 🔴 | - |
+| microstructureSequence_defect_bound | 400 | - | 🔴 | - |
+| microstructureSequence_flat_limit_exists | 500 | - | 🔴 | - |
+| harvey_lawson_fundamental_class | 300 | - | 🔴 | - |
+| lefschetz_lift_signed_cycle | 400 | - | 🔴 | - |
+| limit_is_calibrated | 300 | - | 🔴 | - |
+| flat_limit_of_cycles_is_cycle | 300 | - | 🔴 | - |
+| **TOTAL** | **3,350** | - | - | - |
 
 ---
 
@@ -1196,3 +743,11 @@ axiom lefschetz_lift_signed_cycle {p p' : ℕ}
 **Deliverable:** Both axioms converted to theorems.
 ```
 
+---
+
+# 🔗 Related Documents
+
+- `HodgeAxiomCompletionRoadmap.pdf` — Formatted version for circulation
+- `LeanProofBundle.txt` — Full codebase bundle for reference
+- `ADVERSARIAL_AUDIT.md` — Audit findings and status
+- `Hodge-v6-w-Jon-Update-MERGED.tex` — Mathematical paper
