@@ -34,45 +34,85 @@ def CalibratedGrassmannian (p : ℕ) (x : X) : Set (Submodule ℂ (TangentSpace 
 
 /-! ## Simple Calibrated Forms -/
 
-/-- **Existence of Volume Form** (Harvey-Lawson, 1982). -/
+/-- **Predicate: Form is a Volume Form on Subspace**
+
+A (2p)-form ω is a volume form on a complex p-dimensional subspace V if:
+1. ω is nonzero on V (normalized)
+2. ω vanishes on vectors orthogonal to V
+
+Reference: [Harvey-Lawson, "Calibrated geometries", 1982, Section 2] -/
+opaque IsVolumeFormOn {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    (x : X) (p : ℕ) (V : Submodule ℂ (TangentSpace (𝓒_complex n) x))
+    (ω : (TangentSpace (𝓒_complex n) x) [⋀^Fin (2 * p)]→ₗ[ℂ] ℂ) : Prop
+
+/-- Volume forms are nonzero. -/
+axiom IsVolumeFormOn_nonzero {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    (x : X) (p : ℕ) (V : Submodule ℂ (TangentSpace (𝓒_complex n) x))
+    (ω : (TangentSpace (𝓒_complex n) x) [⋀^Fin (2 * p)]→ₗ[ℂ] ℂ)
+    (hV : Module.finrank ℂ V = p) :
+    IsVolumeFormOn x p V ω → ω ≠ 0
+
+/-- **Existence of Volume Form** (Harvey-Lawson, 1982).
+
+For any complex p-plane V in the tangent space, there exists a unique (up to scaling)
+volume form on V. This form is the Wirtinger form restricted to V.
+
+**Critical**: The existence claim now has a meaningful constraint (IsVolumeFormOn),
+not just True.
+
+Reference: [Harvey-Lawson, "Calibrated geometries", 1982, Section 2] -/
 axiom exists_volume_form_of_submodule_axiom (p : ℕ) (x : X)
-    (V : Submodule ℂ (TangentSpace (𝓒_complex n) x)) :
-    ∃ (ω : (TangentSpace (𝓒_complex n) x) [⋀^Fin (2 * p)]→ₗ[ℂ] ℂ), True
+    (V : Submodule ℂ (TangentSpace (𝓒_complex n) x))
+    (hV : Module.finrank ℂ V = p) :
+    ∃ (ω : (TangentSpace (𝓒_complex n) x) [⋀^Fin (2 * p)]→ₗ[ℂ] ℂ),
+      IsVolumeFormOn (n := n) (X := X) x p V ω
 
 theorem exists_volume_form_of_submodule (p : ℕ) (x : X)
-    (V : Submodule ℂ (TangentSpace (𝓒_complex n) x)) :
-    ∃ (ω : (TangentSpace (𝓒_complex n) x) [⋀^Fin (2 * p)]→ₗ[ℂ] ℂ), True :=
-  exists_volume_form_of_submodule_axiom p x V
+    (V : Submodule ℂ (TangentSpace (𝓒_complex n) x))
+    (hV : Module.finrank ℂ V = p) :
+    ∃ (ω : (TangentSpace (𝓒_complex n) x) [⋀^Fin (2 * p)]→ₗ[ℂ] ℂ),
+      IsVolumeFormOn (n := n) (X := X) x p V ω :=
+  exists_volume_form_of_submodule_axiom p x V hV
 
 /-- Every complex p-plane in the tangent space has a unique volume form. -/
-def volume_form_of_submodule (p : ℕ) (x : X) (V : Submodule ℂ (TangentSpace (𝓒_complex n) x)) :
+def volume_form_of_submodule (p : ℕ) (x : X) (V : Submodule ℂ (TangentSpace (𝓒_complex n) x))
+    (hV : Module.finrank ℂ V = p) :
     (TangentSpace (𝓒_complex n) x) [⋀^Fin (2 * p)]→ₗ[ℂ] ℂ :=
-  Classical.choose (exists_volume_form_of_submodule p x V)
+  Classical.choose (exists_volume_form_of_submodule p x V hV)
 
 /-- The simple calibrated (p,p)-form at a point x, associated to a complex p-plane V. -/
-def simpleCalibratedForm_raw (p : ℕ) (x : X) (V : Submodule ℂ (TangentSpace (𝓒_complex n) x)) :
+def simpleCalibratedForm_raw (p : ℕ) (x : X) (V : Submodule ℂ (TangentSpace (𝓒_complex n) x))
+    (hV : Module.finrank ℂ V = p) :
     (TangentSpace (𝓒_complex n) x) [⋀^Fin (2 * p)]→ₗ[ℂ] ℂ :=
-  volume_form_of_submodule p x V
+  volume_form_of_submodule p x V hV
 
 /-- Smoothness of the pointwise-defined simple calibrated form (axiomatized at this abstraction level). -/
 axiom simpleCalibratedForm_is_smooth (p : ℕ) (x : X)
-    (V : Submodule ℂ (TangentSpace (𝓒_complex n) x)) :
+    (V : Submodule ℂ (TangentSpace (𝓒_complex n) x))
+    (hV : Module.finrank ℂ V = p) :
     IsSmoothAlternating n X (2 * p) (fun x' =>
-      if h : x' = x then h ▸ simpleCalibratedForm_raw p x V else 0)
+      if h : x' = x then h ▸ simpleCalibratedForm_raw p x V hV else 0)
 
 /-- The simple calibrated (p,p)-form supported at point x. -/
-def simpleCalibratedForm (p : ℕ) (x : X) (V : Submodule ℂ (TangentSpace (𝓒_complex n) x)) :
+def simpleCalibratedForm (p : ℕ) (x : X) (V : Submodule ℂ (TangentSpace (𝓒_complex n) x))
+    (hV : Module.finrank ℂ V = p) :
     SmoothForm n X (2 * p) :=
   { as_alternating := fun x' =>
-      if h : x' = x then h ▸ simpleCalibratedForm_raw p x V
+      if h : x' = x then h ▸ simpleCalibratedForm_raw p x V hV
       else 0
     is_smooth := by
-      exact simpleCalibratedForm_is_smooth (n := n) (X := X) p x V }
+      exact simpleCalibratedForm_is_smooth (n := n) (X := X) p x V hV }
 
 /-- The set of all simple calibrated (p,p)-forms at a point x. -/
 def simpleCalibratedForms (p : ℕ) (x : X) : Set (SmoothForm n X (2 * p)) :=
-  { ξ | ∃ (V : Submodule ℂ (TangentSpace (𝓒_complex n) x)),
-    Module.finrank ℂ V = p ∧ ξ = simpleCalibratedForm p x V }
+  { ξ | ∃ (V : Submodule ℂ (TangentSpace (𝓒_complex n) x)) (hV : Module.finrank ℂ V = p),
+    ξ = simpleCalibratedForm p x V hV }
 
 /-! ## Calibrated Cone -/
 

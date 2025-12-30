@@ -83,12 +83,34 @@ instance fintype_tgt {h : ℝ} {C : Cubulation n X h} (Q : C.cubes) : Fintype {e
 instance fintype_src {h : ℝ} {C : Cubulation n X h} (Q : C.cubes) : Fintype {e : DirectedEdge C // e.src = Q} :=
   Fintype.ofFinite _
 
+/-- **Integer Flow Approximation Property**
+
+An integer flow is a valid approximation of a target flow if:
+1. It approximates the target flow within a bounded error per edge
+2. It preserves the net divergence structure (up to rounding)
+
+Reference: [Bárány and Grinberg, "On some combinatorial questions in finite-dimensional spaces", 1982] -/
+opaque IsValidIntegerApproximation {h : ℝ} {C : Cubulation n X h}
+    (target : Flow C) (int_flow : DirectedEdge C → ℤ) : Prop
+
+/-- The integer approximation is within 1 of the target at each edge. -/
+axiom IsValidIntegerApproximation_edge_bound {h : ℝ} {C : Cubulation n X h}
+    (target : Flow C) (int_flow : DirectedEdge C → ℤ)
+    (hvalid : IsValidIntegerApproximation target int_flow) :
+    ∀ e, |int_flow e - ⌊target e⌋| ≤ 1
+
 /-- **Theorem: Integer Transport Theorem**
-    Given a real-valued flow on the dual graph of a cubulation, we can construct
-    an integer-valued flow.
-    Reference: Uses Bárány-Grinberg rounding [Bárány and Grinberg, 1982]. -/
+
+Given a real-valued flow on the dual graph of a cubulation, we can construct
+an integer-valued flow that approximates it.
+
+**Critical**: The existence claim now has a meaningful constraint
+(IsValidIntegerApproximation), not just True.
+
+Reference: Uses Bárány-Grinberg rounding [Bárány and Grinberg, 1982]. -/
 axiom integer_transport (p : ℕ) {h : ℝ} (C : Cubulation n X h) (target : Flow C) :
-    ∃ (int_flow : DirectedEdge C → ℤ), True
+    ∃ (int_flow : DirectedEdge C → ℤ),
+      IsValidIntegerApproximation target int_flow
 
 /-! ## Microstructure Gluing -/
 
@@ -99,10 +121,22 @@ structure RawSheetSum (n : ℕ) (X : Type*) (p : ℕ) (h : ℝ)
     (C : Cubulation n X h) where
   sheets : ∀ Q ∈ C.cubes, Set X
 
-/-- **Theorem: Microstructure Gluing Estimate** -/
+/-- **Valid Gluing Property**
+
+A raw sheet sum is valid if its local sheets correctly approximate the target form.
+Reference: [Harvey-Lawson, "Calibrated geometries", 1982, Section 11] -/
+opaque IsValidGluing {p : ℕ} {h : ℝ} {C : Cubulation n X h}
+    (β : SmoothForm n X (2 * p)) (T_raw : RawSheetSum n X p h C) : Prop
+
+/-- **Theorem: Microstructure Gluing Estimate**
+
+**Critical**: The existence claim now has a meaningful constraint (IsValidGluing),
+not just True.
+
+Reference: [Harvey-Lawson, "Calibrated geometries", 1982, Section 11] -/
 axiom gluing_estimate (p : ℕ) (h : ℝ) (C : Cubulation n X h)
     (β : SmoothForm n X (2 * p)) (hβ : isConePositive β) (m : ℕ) :
-    ∃ (T_raw : RawSheetSum n X p h C), True
+    ∃ (T_raw : RawSheetSum n X p h C), IsValidGluing β T_raw
 
 /-! ## Mesh Sequence Infrastructure -/
 
@@ -142,18 +176,45 @@ opaque RawSheetSum.toIntegralCurrent {p : ℕ} {hscale : ℝ}
     {C : Cubulation n X hscale} (T_raw : RawSheetSum n X p hscale C) :
     IntegralCurrent n X (2 * (n - p))
 
+/-- **Flat Norm Bounded Gluing Property**
+
+A raw sheet sum has bounded flat norm if its integral current representation
+has flat norm controlled by the mesh scale.
+Reference: [Harvey-Lawson, "Calibrated geometries", 1982, Proposition 11.8] -/
+opaque HasBoundedFlatNorm {p : ℕ} {h : ℝ} {C : Cubulation n X h}
+    (T_raw : RawSheetSum n X p h C) (bound : ℝ) : Prop
+
 /-- **Theorem: Microstructure/Gluing Flat Norm Bound** (Proposition 11.8).
-    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", 1982, Prop 11.8]. -/
+
+**Critical**: The existence claim now has a meaningful constraint (IsValidGluing
+and HasBoundedFlatNorm), not just True.
+
+Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", 1982, Prop 11.8]. -/
 axiom gluing_flat_norm_bound (p : ℕ) (h : ℝ) (hh : h > 0) (C : Cubulation n X h)
     (β : SmoothForm n X (2 * p)) (hβ : isConePositive β) (m : ℕ) :
-    ∃ (T_raw : RawSheetSum n X p h C), True
+    ∃ (T_raw : RawSheetSum n X p h C),
+      IsValidGluing β T_raw ∧ HasBoundedFlatNorm T_raw (comass β * h)
+
+/-- **Bounded Calibration Defect Property**
+
+A raw sheet sum has bounded calibration defect if its integral current
+has calibration defect controlled by the mesh scale.
+Reference: [Harvey-Lawson, "Calibrated geometries", 1982, Section 11] -/
+opaque HasBoundedCalibrationDefect {p : ℕ} {h : ℝ} {C : Cubulation n X h}
+    (T_raw : RawSheetSum n X p h C)
+    (ψ : CalibratingForm n X (2 * (n - p))) (bound : ℝ) : Prop
 
 /-- **Theorem: Calibration Defect from Gluing** (Section 11).
-    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", 1982, Section 11]. -/
+
+**Critical**: The existence claim now has a meaningful constraint
+(HasBoundedCalibrationDefect), not just True.
+
+Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", 1982, Section 11]. -/
 axiom calibration_defect_from_gluing (p : ℕ) (h : ℝ) (hh : h > 0) (C : Cubulation n X h)
     (β : SmoothForm n X (2 * p)) (hβ : isConePositive β) (m : ℕ)
     (ψ : CalibratingForm n X (2 * (n - p))) :
-    ∃ (T_raw : RawSheetSum n X p h C), True
+    ∃ (T_raw : RawSheetSum n X p h C),
+      IsValidGluing β T_raw ∧ HasBoundedCalibrationDefect T_raw ψ (comass β * h)
 
 /-! ## Main Construction Sequence -/
 

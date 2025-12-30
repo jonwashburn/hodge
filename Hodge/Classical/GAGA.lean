@@ -77,6 +77,20 @@ axiom IsAlgebraicSet_intersection (n : ℕ) (X : Type u)
     [ProjectiveComplexManifold n X] [KahlerManifold n X] {Z₁ Z₂ : Set X} :
     IsAlgebraicSet n X Z₁ → IsAlgebraicSet n X Z₂ → IsAlgebraicSet n X (Z₁ ∩ Z₂)
 
+/-- **Algebraic Sets are Analytic** (Chow's Theorem / GAGA).
+
+Every algebraic subset of a projective variety is analytic. This is one direction
+of Chow's theorem (the other direction is that every closed analytic subset of
+a projective variety is algebraic).
+
+Reference: [Chow, "On compact complex analytic varieties", 1949]
+Reference: [Serre, "Géométrie algébrique et géométrie analytique", 1956] -/
+axiom IsAlgebraicSet_isAnalyticSet (n : ℕ) (X : Type u)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] (Z : Set X) :
+    IsAlgebraicSet n X Z → IsAnalyticSet (n := n) (X := X) Z
+
 variable {n : ℕ} {X : Type u}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X]
@@ -267,10 +281,18 @@ theorem exists_complete_intersection (p : ℕ) :
   | succ p ih =>
     obtain ⟨Wp, _⟩ := ih
     obtain ⟨H, _⟩ := exists_hyperplane_algebraic (n := n) (X := X)
+    -- Algebraic sets are analytic (Chow's theorem)
+    have hWp_analytic : IsAnalyticSet (n := n) (X := X) Wp.carrier :=
+      IsAlgebraicSet_isAnalyticSet n X Wp.carrier Wp.is_algebraic
+    have hH_analytic : IsAnalyticSet (n := n) (X := X) H.carrier :=
+      IsAlgebraicSet_isAnalyticSet n X H.carrier H.is_algebraic
+    -- Intersections of analytic sets are analytic
+    have h_inter_analytic : IsAnalyticSet (n := n) (X := X) (Wp.carrier ∩ H.carrier) :=
+      IsAnalyticSet_inter Wp.carrier H.carrier hWp_analytic hH_analytic
     let V : AnalyticSubvariety n X := {
       carrier := Wp.carrier ∩ H.carrier
       codim := p + 1
-      is_analytic := True
+      is_analytic := h_inter_analytic
     }
     obtain ⟨W, _, hW_codim⟩ := serre_gaga V rfl
     exact ⟨W, hW_codim⟩
