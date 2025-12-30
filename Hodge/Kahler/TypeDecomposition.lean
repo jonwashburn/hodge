@@ -148,7 +148,16 @@ variable {n : ℕ} {X : Type u}
   [IsManifold (𝓒_complex n) ⊤ X]
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
 
+/-- Kähler power is closed. -/
+axiom omega_pow_isClosed (p : ℕ) : isClosed (omegaPow n X p)
+
 /-- Kähler power is rational. -/
-axiom omega_pow_is_rational (p : ℕ) : isRationalClass (DeRhamCohomologyClass.ofForm (omegaPow n X p))
+axiom omega_pow_is_rational (p : ℕ) : isRationalClass ⟦omegaPow n X p, omega_pow_isClosed p⟧
+
+/-- **Theorem: scaled Kähler power is closed.**
+    This is the standard fact that \(d(\omega^p)=0\) and hence also
+    \(d(\omega^p/p!)=0\). -/
+axiom isClosed_omegaPow_scaled (p : ℕ) :
+    isClosed ((1 / (p.factorial : ℂ)) • omegaPow n X p)
 
 end

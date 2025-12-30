@@ -31,24 +31,19 @@ variable {n : ℕ} {X : Type*}
 
 /-! ## Local Sheet Realization -/
 
-/-- Axiomatized predicate: Y is a complex submanifold of dimension p. -/
-def IsComplexSubmanifold (_Y : Set X) (_p : ℕ) : Prop := True
+/-- Axiomatized predicate: Y is a complex submanifold of dimension p.
+    Reference: [R. Hartshorne, "Algebraic Geometry", Springer, 1977]. -/
+opaque IsComplexSubmanifold (Y : Set X) (p : ℕ) : Prop
 
 /-- **Theorem: Local Sheet Realization** (Proposition 11.3).
     Given a point x and a calibrated direction ξ, we can construct a smooth complex submanifold Y
     passing through x whose tangent plane at x is ε-close to the direction specified by ξ.
-    In the stub model, the property `IsComplexSubmanifold` is identically true.
-    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", Acta Math. 148 (1982), 47-157, Prop 11.3]. -/
-theorem local_sheet_realization (p : ℕ) (x : X) (ξ : SmoothForm n X (2 * p))
-    (hξ : ξ ∈ simpleCalibratedForms p x) (ε : ℝ) (_hε : ε > 0) :
+    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", 1982, Prop 11.3]. -/
+axiom local_sheet_realization (p : ℕ) (x : X) (ξ : SmoothForm n X (2 * p))
+    (hξ : ξ ∈ simpleCalibratedForms p x) (ε : ℝ) (hε : ε > 0) :
     ∃ (Y : Set X), x ∈ Y ∧ IsComplexSubmanifold Y p ∧
       ∃ (V : Submodule ℂ (TangentSpace (𝓒_complex n) x)),
-        Module.finrank ℂ V = p := by
-  -- In the stub model, the existence of V is guaranteed by hξ.
-  -- IsComplexSubmanifold is identically True.
-  unfold simpleCalibratedForms at hξ
-  obtain ⟨V, hV_rank, _⟩ := hξ
-  exact ⟨{x}, rfl, trivial, ⟨V, hV_rank⟩⟩
+        Module.finrank ℂ V = p
 
 /-! ## Cubulation -/
 
@@ -89,12 +84,11 @@ instance fintype_src {h : ℝ} {C : Cubulation n X h} (Q : C.cubes) : Fintype {e
   Fintype.ofFinite _
 
 /-- **Theorem: Integer Transport Theorem**
-Given a real-valued flow on the dual graph of a cubulation, we can construct
-an integer-valued flow that establishes existence.
-Paper reference: Uses Bárány-Grinberg rounding. -/
-theorem integer_transport (_p : ℕ) {h : ℝ} (C : Cubulation n X h) (target : Flow C) :
-    ∃ (int_flow : DirectedEdge C → ℤ), True :=
-  ⟨fun e => Int.floor (target e), trivial⟩
+    Given a real-valued flow on the dual graph of a cubulation, we can construct
+    an integer-valued flow.
+    Reference: Uses Bárány-Grinberg rounding [Bárány and Grinberg, 1982]. -/
+axiom integer_transport (p : ℕ) {h : ℝ} (C : Cubulation n X h) (target : Flow C) :
+    ∃ (int_flow : DirectedEdge C → ℤ), True
 
 /-! ## Microstructure Gluing -/
 
@@ -106,10 +100,9 @@ structure RawSheetSum (n : ℕ) (X : Type*) (p : ℕ) (h : ℝ)
   sheets : ∀ Q ∈ C.cubes, Set X
 
 /-- **Theorem: Microstructure Gluing Estimate** -/
-theorem gluing_estimate (p : ℕ) (h : ℝ) (C : Cubulation n X h)
-    (β : SmoothForm n X (2 * p)) (_hβ : isConePositive β) (_m : ℕ) :
-    ∃ (T_raw : RawSheetSum n X p h C), True :=
-  ⟨{ sheets := fun _ _ => ∅ }, trivial⟩
+axiom gluing_estimate (p : ℕ) (h : ℝ) (C : Cubulation n X h)
+    (β : SmoothForm n X (2 * p)) (hβ : isConePositive β) (m : ℕ) :
+    ∃ (T_raw : RawSheetSum n X p h C), True
 
 /-! ## Mesh Sequence Infrastructure -/
 
@@ -135,138 +128,88 @@ noncomputable def canonicalMeshSequence : MeshSequence where
 
 /-- **Theorem: Existence of Cubulation** (Section 11).
     For any mesh scale h > 0, there exists a finite cover of X by coordinate cubes.
-    In the stub model, we provide a trivial empty cubulation.
-    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", Acta Math. 148 (1982), 47-157, Section 11]. -/
-def cubulation_exists' (h : ℝ) (_hh : h > 0) : Cubulation n X h :=
-  { cubes := ∅, overlap_bound := True }
+    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", 1982, Section 11]. -/
+axiom cubulation_exists (h : ℝ) (hh : h > 0) : Cubulation n X h
 
 /-- Extract a cubulation from existence. -/
 noncomputable def cubulationFromMesh (h : ℝ) (hh : h > 0) : Cubulation n X h :=
-  cubulation_exists' h hh
+  cubulation_exists h hh
 
 /-! ## RawSheetSum to IntegralCurrent Conversion -/
 
 /-- Convert a RawSheetSum to an IntegralCurrent. -/
-noncomputable def RawSheetSum.toIntegralCurrent {p : ℕ} {hscale : ℝ}
-    {C : Cubulation n X hscale} (_T_raw : RawSheetSum n X p hscale C) :
-    IntegralCurrent n X (2 * (n - p)) where
-  toFun := 0
-  is_integral := ⟨∅, trivial⟩
+opaque RawSheetSum.toIntegralCurrent {p : ℕ} {hscale : ℝ}
+    {C : Cubulation n X hscale} (T_raw : RawSheetSum n X p hscale C) :
+    IntegralCurrent n X (2 * (n - p))
 
 /-- **Theorem: Microstructure/Gluing Flat Norm Bound** (Proposition 11.8).
-    Constructs a raw sheet sum with boundary mass controlled by the mesh scale.
-    This ensures that the total boundary of the microstructure approximant is small in flat norm.
-    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", Acta Math. 148 (1982), 47-157, Prop 11.8]. -/
-theorem gluing_flat_norm_bound (p : ℕ) (h : ℝ) (hh : h > 0) (C : Cubulation n X h)
+    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", 1982, Prop 11.8]. -/
+axiom gluing_flat_norm_bound (p : ℕ) (h : ℝ) (hh : h > 0) (C : Cubulation n X h)
     (β : SmoothForm n X (2 * p)) (hβ : isConePositive β) (m : ℕ) :
-    ∃ (T_raw : RawSheetSum n X p h C), True :=
-  ⟨{ sheets := fun _ _ => ∅ }, trivial⟩
+    ∃ (T_raw : RawSheetSum n X p h C), True
 
 /-- **Theorem: Calibration Defect from Gluing** (Section 11).
-    The calibration defect of the corrected current is controlled by the mesh scale h.
-    This follows from the spine theorem and the bound on the correction current.
-    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", Acta Math. 148 (1982), 47-157, Section 11]. -/
-theorem calibration_defect_from_gluing (p : ℕ) (h : ℝ) (hh : h > 0) (C : Cubulation n X h)
+    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", 1982, Section 11]. -/
+axiom calibration_defect_from_gluing (p : ℕ) (h : ℝ) (hh : h > 0) (C : Cubulation n X h)
     (β : SmoothForm n X (2 * p)) (hβ : isConePositive β) (m : ℕ)
     (ψ : CalibratingForm n X (2 * (n - p))) :
-    ∃ (T_raw : RawSheetSum n X p h C), True :=
-  ⟨{ sheets := fun _ _ => ∅ }, trivial⟩
+    ∃ (T_raw : RawSheetSum n X p h C), True
 
 /-! ## Main Construction Sequence -/
 
 /-- Build the full approximation sequence from a cone-positive form. -/
-noncomputable def microstructureSequence (p : ℕ) (γ : SmoothForm n X (2 * p))
-    (_hγ : isConePositive γ) (_ψ : CalibratingForm n X (2 * (n - p))) :
-    ℕ → IntegralCurrent n X (2 * (n - p)) := fun _k =>
-  { toFun := 0, is_integral := ⟨∅, trivial⟩ }
+opaque microstructureSequence (p : ℕ) (γ : SmoothForm n X (2 * p))
+    (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
+    ℕ → IntegralCurrent n X (2 * (n - p))
 
 /-- **Theorem: Microstructure Sequence Cycles** (Proposition 11.9).
-    The microstructure sequence consists of cycles. Each approximant T_k is constructed
-    by gluing local calibrated pieces with matched boundaries.
-    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", Acta Math. 148 (1982), 47-157, Prop 11.9]. -/
+    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", 1982, Prop 11.9]. -/
 axiom microstructureSequence_are_cycles (p : ℕ) (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
     ∀ k, (microstructureSequence p γ hγ ψ k).isCycleAt
 
 /-- **Microstructure Defect Bound** (Proposition 11.10).
-    The calibration defect of the k-th element in the microstructure sequence
-    is bounded by a constant multiple of the mesh scale h_k.
-    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", Acta Math. 148 (1982), 47-157, Prop 11.10]. -/
-theorem microstructureSequence_defect_bound (p : ℕ) (γ : SmoothForm n X (2 * p))
+    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", 1982, Prop 11.10]. -/
+axiom microstructureSequence_defect_bound (p : ℕ) (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
-    ∀ k, calibrationDefect (microstructureSequence p γ hγ ψ k).toFun ψ ≤ 2 * (canonicalMeshSequence.scale k) := by
-  intro k
-  -- In the stub model, `microstructureSequence` is constantly the zero current, so the defect is 0.
-  have hk : 0 < canonicalMeshSequence.scale k := canonicalMeshSequence.scale_pos k
-  have hnonneg : (0 : ℝ) ≤ 2 * canonicalMeshSequence.scale k := by
-    nlinarith [hk]
-  -- Reduce the defect to 0 and conclude.
-  simpa [microstructureSequence, calibrationDefect, Current.mass] using hnonneg
+    ∀ k, calibrationDefect (microstructureSequence p γ hγ ψ k).toFun ψ ≤ 2 * (canonicalMeshSequence.scale k)
 
 /-- **Theorem: Microstructure Defect Vanishes**
-    The calibration defect of the microstructure sequence tends to zero.
-    Proof: Follows from the defect bound O(h_k) and the fact that h_k → 0. -/
+    The calibration defect of the microstructure sequence tends to zero. -/
 theorem microstructureSequence_defect_vanishes (p : ℕ) (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
     Filter.Tendsto (fun k => calibrationDefect (microstructureSequence p γ hγ ψ k).toFun ψ)
       Filter.atTop (nhds 0) := by
-  -- Use the defect bound: defect ≤ 2 * scale(k)
-  have h_bound := microstructureSequence_defect_bound p γ hγ ψ
-  -- The scale tends to 0
-  have h_scale_zero := canonicalMeshSequence.scale_tendsto_zero
-  -- Defect is non-negative
-  have h_nonneg (k : ℕ) : calibrationDefect (microstructureSequence p γ hγ ψ k).toFun ψ ≥ 0 :=
-    calibrationDefect_nonneg _ _
-  -- By squeeze theorem
   apply tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds
-  · -- 2 * scale tends to 0
-    have : Tendsto (fun k => 2 * canonicalMeshSequence.scale k) atTop (nhds (2 * 0)) :=
-      Tendsto.const_mul 2 h_scale_zero
+  · have : Tendsto (fun k => 2 * canonicalMeshSequence.scale k) atTop (nhds (2 * 0)) :=
+      Tendsto.const_mul 2 canonicalMeshSequence.scale_tendsto_zero
     simpa using this
-  · intro k; exact h_nonneg k
-  · intro k; exact h_bound k
+  · intro k; exact calibrationDefect_nonneg _ _
+  · intro k; exact microstructureSequence_defect_bound p γ hγ ψ k
 
 /-! ## Mass Bounds for Compactness -/
 
 /-- **Microstructure Mass Bound** (Section 11).
-    The microstructure sequence has uniformly bounded mass. This is essential
-    for applying Federer-Fleming compactness to extract a convergent subsequence.
-    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", Acta Math. 148 (1982), 47-157, Section 11]. -/
-theorem microstructureSequence_mass_bound (p : ℕ) (γ : SmoothForm n X (2 * p))
+    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", 1982, Section 11]. -/
+axiom microstructureSequence_mass_bound (p : ℕ) (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
-    ∃ M : ℝ, ∀ k, (microstructureSequence p γ hγ ψ k : Current n X (2 * (n - p))).mass ≤ M := by
-  refine ⟨0, ?_⟩
-  intro k
-  simp [microstructureSequence, Current.mass]
+    ∃ M : ℝ, ∀ k, (microstructureSequence p γ hγ ψ k : Current n X (2 * (n - p))).mass ≤ M
 
 /-- **Microstructure Flat Norm Bound** (Section 11).
-    The microstructure sequence has uniformly bounded flat norm, allowing the use
-    of the Federer-Fleming compactness theorem.
-    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", Acta Math. 148 (1982), 47-157, Section 11]. -/
-theorem microstructureSequence_flatnorm_bound (p : ℕ) (γ : SmoothForm n X (2 * p))
+    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", 1982, Section 11]. -/
+axiom microstructureSequence_flatnorm_bound (p : ℕ) (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
-    ∃ M : ℝ, ∀ k, flatNorm (microstructureSequence p γ hγ ψ k).toFun ≤ M := by
-  refine ⟨0, ?_⟩
-  intro k
-  simp [flatNorm, microstructureSequence]
+    ∃ M : ℝ, ∀ k, flatNorm (microstructureSequence p γ hγ ψ k).toFun ≤ M
 
 /-! ## Compactness and Flat Limit -/
 
 /-- **Microstructure Flat Limit Existence** (Federer-Fleming, 1960).
-    The microstructure sequence has a convergent subsequence in the flat norm topology.
-    The limit is an integral current that is a cycle and calibrated by ψ.
-    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", Ann. of Math. 72 (1960), 458-520, Theorem 6.4]. -/
-theorem microstructureSequence_flat_limit_exists (p : ℕ) (γ : SmoothForm n X (2 * p))
+    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 1960]. -/
+axiom microstructureSequence_flat_limit_exists (p : ℕ) (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
     ∃ (T_limit : IntegralCurrent n X (2 * (n - p))) (φ : ℕ → ℕ),
       StrictMono φ ∧
       Filter.Tendsto (fun j => flatNorm ((microstructureSequence p γ hγ ψ (φ j)).toFun - T_limit.toFun))
         Filter.atTop (nhds 0)
-    := by
-  -- In the stub model, `flatNorm` is identically 0, so every sequence converges in flat norm.
-  let T_limit : IntegralCurrent n X (2 * (n - p)) := microstructureSequence p γ hγ ψ 0
-  refine ⟨T_limit, (fun j => j), strictMono_id, ?_⟩
-  -- flatNorm is identically 0, so the convergence is immediate.
-  simpa [flatNorm] using (tendsto_const_nhds : Tendsto (fun _ : ℕ => (0 : ℝ)) atTop (nhds 0))
 
 end

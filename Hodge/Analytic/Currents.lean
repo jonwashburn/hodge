@@ -21,15 +21,15 @@ variable {n : ℕ} {X : Type*}
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
   [Nonempty X]
 
-/-- A current of dimension k is a continuous linear functional on k-forms.
-    In the stub model, all currents are identically zero. -/
+/-- A current of dimension k is a continuous linear functional on smooth k-forms.
+    In this faithful model, the evaluation map is nontrivial. -/
 @[ext]
 structure Current (n : ℕ) (X : Type*) (k : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] where
   toFun : SmoothForm n X k → ℝ
-  toFun_zero : ∀ ψ, toFun ψ = 0
+  is_linear : ∀ (c : ℝ) (ω₁ ω₂ : SmoothForm n X k), toFun (c • ω₁ + ω₂) = c * toFun ω₁ + toFun ω₂
 
 namespace Current
 
@@ -38,64 +38,130 @@ variable {k : ℕ}
 theorem map_add {n k : ℕ} {X : Type*} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
     (T : Current n X k) (ω₁ ω₂ : SmoothForm n X k) : T.toFun (ω₁ + ω₂) = T.toFun ω₁ + T.toFun ω₂ := by
-  rw [T.toFun_zero, T.toFun_zero, T.toFun_zero]; simp
+  have h := T.is_linear 1 ω₁ ω₂
+  simp at h; exact h
 
 theorem map_smul {n k : ℕ} {X : Type*} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
     (T : Current n X k) (r : ℝ) (ω : SmoothForm n X k) : T.toFun (r • ω) = r * T.toFun ω := by
-  rw [T.toFun_zero, T.toFun_zero]; simp
+  -- First note that `T(0)=0` from linearity.
+  have h0' := T.is_linear 1 (0 : SmoothForm n X k) 0
+  -- `T(0) = 1*T(0) + T(0)` hence `T(0)=0`
+  have h0 : T.toFun (0 : SmoothForm n X k) = 0 := by
+    have ha : T.toFun (0 : SmoothForm n X k) = T.toFun (0 : SmoothForm n X k) + T.toFun (0 : SmoothForm n X k) := by
+      simpa using h0'
+    have ha' : T.toFun (0 : SmoothForm n X k) + 0 =
+        T.toFun (0 : SmoothForm n X k) + T.toFun (0 : SmoothForm n X k) := by
+      simpa [add_zero] using ha
+    have : 0 = T.toFun (0 : SmoothForm n X k) := add_left_cancel ha'
+    simpa using this.symm
+  have h := T.is_linear r ω 0
+  -- simplify the linearity equation using `h0`
+  have h' : T.toFun (r • ω) = r * T.toFun ω + T.toFun (0 : SmoothForm n X k) := by
+    -- `r•ω + 0 = r•ω`
+    simpa [add_zero] using h
+  simpa [h0] using h'
 
 /-- The zero current. -/
 def zero : Current n X k := {
   toFun := fun _ => 0
-  toFun_zero := fun _ => rfl
+  is_linear := fun _ _ _ => by simp
 }
 
 instance : Zero (Current n X k) := ⟨zero⟩
 
 /-- Addition of currents. -/
-instance : Add (Current n X k) where
-  add _ _ := 0
+def add_curr (T₁ T₂ : Current n X k) : Current n X k := {
+  toFun := fun ω => T₁.toFun ω + T₂.toFun ω
+  is_linear := fun c ω₁ ω₂ => by
+    simp [T₁.is_linear, T₂.is_linear]
+    ring
+}
+
+instance : Add (Current n X k) := ⟨add_curr⟩
 
 /-- Negation of currents. -/
-instance : Neg (Current n X k) where
-  neg _ := 0
+def neg_curr (T : Current n X k) : Current n X k := {
+  toFun := fun ω => -T.toFun ω
+  is_linear := fun c ω₁ ω₂ => by
+    simp [T.is_linear]
+    ring
+}
 
-/-- Subtraction of currents. -/
-instance : Sub (Current n X k) where
-  sub _ _ := 0
+instance : Neg (Current n X k) := ⟨neg_curr⟩
+
+instance : Sub (Current n X k) := ⟨fun T₁ T₂ => T₁ + -T₂⟩
+
+/-- Scalar multiplication of currents. -/
+def smul_curr (r : ℝ) (T : Current n X k) : Current n X k := {
+  toFun := fun ω => r * T.toFun ω
+  is_linear := fun c ω₁ ω₂ => by
+    simp [T.is_linear]
+    ring
+}
+
+instance : HSMul ℝ (Current n X k) (Current n X k) := ⟨smul_curr⟩
 
 /-- Integer scalar multiplication of currents. -/
-instance : HSMul ℤ (Current n X k) (Current n X k) where
-  hSMul _ _ := 0
+instance : HSMul ℤ (Current n X k) (Current n X k) := ⟨fun z T => (z : ℝ) • T⟩
 
-/-- Real scalar multiplication of currents. -/
-instance : HSMul ℝ (Current n X k) (Current n X k) where
-  hSMul _ _ := 0
+/-- **Mass of a current** (Federer, 1969).
+    The mass is the dual norm to the comass norm on forms. -/
+opaque mass (T : Current n X k) : ℝ
 
-/-- Mass of a current (stub - returns 0). -/
-def mass (_T : Current n X k) : ℝ := 0
+axiom mass_nonneg (T : Current n X k) : mass T ≥ 0
+axiom mass_zero : mass (0 : Current n X k) = 0
+axiom mass_neg (T : Current n X k) : mass (-T) = mass T
+axiom mass_add_le (S T : Current n X k) : mass (S + T) ≤ mass S + mass T
 
-theorem mass_nonneg (T : Current n X k) : T.mass ≥ 0 := le_refl 0
-theorem mass_zero : (0 : Current n X k).mass = 0 := rfl
-theorem mass_neg (T : Current n X k) : (-T).mass = T.mass := rfl
-
-theorem mass_add_le (S T : Current n X k) : (S + T).mass ≤ S.mass + T.mass := by
-  unfold mass; linarith
-
-/-- Boundary operator on currents.
-    In the stub model, the boundary of any current is zero. -/
-def boundary (_T : Current n X (k + 1)) : Current n X k := 0
+/-- **Boundary operator on currents** (Federer, 1969).
+    The boundary ∂T is defined by duality: (∂T)(ω) = T(dω). -/
+def boundary (T : Current n X (k + 1)) : Current n X k := {
+  toFun := fun ω => T.toFun (smoothExtDeriv ω)
+  is_linear := fun c ω₁ ω₂ => by
+    -- Expand `d(c•ω₁ + ω₂)` using linearity of `d`.
+    have h_d : smoothExtDeriv (c • ω₁ + ω₂) = (c : ℂ) • smoothExtDeriv ω₁ + smoothExtDeriv ω₂ := by
+      rw [smoothExtDeriv_add]
+      -- `c•ω₁` (ℝ-scalar) is definitionally `((c:ℂ)•ω₁)`
+      have h_smul : smoothExtDeriv (c • ω₁) = (c : ℂ) • smoothExtDeriv ω₁ := by
+        simpa using (smoothExtDeriv_smul (n := n) (X := X) (k := k) (c : ℂ) ω₁)
+      simp [h_smul]
+    -- Now use linearity of `T` (over ℝ) on the resulting combination.
+    -- Note: `(c:ℂ)•α` is definitional equal to `c•α` for the ℝ-action on `SmoothForm`.
+    have hT := T.is_linear c (smoothExtDeriv ω₁) (smoothExtDeriv ω₂)
+    -- combine `h_d` and `hT`
+    calc
+      T.toFun (smoothExtDeriv (c • ω₁ + ω₂))
+          = T.toFun ((c : ℂ) • smoothExtDeriv ω₁ + smoothExtDeriv ω₂) := by
+              simpa [h_d]
+      _ = c * T.toFun (smoothExtDeriv ω₁) + T.toFun (smoothExtDeriv ω₂) := by
+              simpa using hT
+}
 
 /-- A current is a cycle if its boundary is zero. -/
 def isCycle (T : Current n X (k + 1)) : Prop := T.boundary = 0
 
-/-- Helper lemma for zero current. -/
-@[simp] lemma zero_toFun (ω : SmoothForm n X k) : (0 : Current n X k).toFun ω = 0 := by
-  rw [(0 : Current n X k).toFun_zero]
-
 /-- ∂∂ = 0: boundary of boundary is zero. -/
-theorem boundary_boundary (_T : Current n X (k + 2)) : (boundary (boundary _T)) = 0 := rfl
+theorem boundary_boundary (T : Current n X (k + 2)) : (boundary (boundary T)) = 0 := by
+  ext ω
+  simp only [boundary]
+  -- (∂∂T)(ω) = (∂T)(dω) = T(ddω) = T(0) = 0
+  have h_dd := smoothExtDeriv_extDeriv ω
+  rw [h_dd]
+  -- T(0) = 0 follows from linearity (same argument as in `map_smul`).
+  have h0' := T.is_linear 1 (0 : SmoothForm n X (k + 2)) 0
+  have h0 : T.toFun (0 : SmoothForm n X (k + 2)) = 0 := by
+    have ha : T.toFun (0 : SmoothForm n X (k + 2)) =
+        T.toFun (0 : SmoothForm n X (k + 2)) + T.toFun (0 : SmoothForm n X (k + 2)) := by
+      simpa using h0'
+    have ha' : T.toFun (0 : SmoothForm n X (k + 2)) + 0 =
+        T.toFun (0 : SmoothForm n X (k + 2)) + T.toFun (0 : SmoothForm n X (k + 2)) := by
+      simpa [add_zero] using ha
+    have : 0 = T.toFun (0 : SmoothForm n X (k + 2)) := add_left_cancel ha'
+    simpa using this.symm
+  -- Finish by rewriting the left-hand side and observing the RHS is definitionally 0.
+  rw [h0]
+  rfl
 
 end Current
 

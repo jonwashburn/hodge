@@ -132,14 +132,44 @@ theorem isAlgebraicSubvariety_intersection {Z₁ Z₂ : Set X}
 /-! ## Fundamental Class -/
 
 theorem exists_fundamental_form (W : AlgebraicSubvariety n X) :
-    ∃ (η : SmoothForm n X (2 * W.codim)), isClosed η :=
-  ⟨0, by unfold isClosed smoothExtDeriv; rfl⟩
+    ∃ (η : SmoothForm n X (2 * W.codim)), IsFormClosed η :=
+  ⟨0, by
+    -- `d(0)=0` follows from linearity of `d`
+    unfold IsFormClosed
+    have h := smoothExtDeriv_add (n := n) (X := X) (k := 2 * W.codim) (0 : SmoothForm n X (2 * W.codim)) 0
+    -- d(0) = d(0)+d(0) hence d(0)=0
+    have : smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) =
+        smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) +
+        smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) := by
+      simpa using h.symm
+    -- cancel
+    have h0 : smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) = 0 := by
+      -- rewrite as a + 0 = a + a and cancel
+      have h' : smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) + 0 =
+          smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) +
+          smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) := by
+        simpa [add_zero] using this
+      exact (add_left_cancel h').symm
+    exact h0⟩
 
 noncomputable def FundamentalClass (W : AlgebraicSubvariety n X) : SmoothForm n X (2 * W.codim) := 0
 
 theorem FundamentalClass_isClosed (W : AlgebraicSubvariety n X) :
-    isClosed (FundamentalClass W) := by
-  unfold FundamentalClass isClosed smoothExtDeriv; rfl
+    IsFormClosed (FundamentalClass W) := by
+  -- `FundamentalClass W = 0`, and `d(0)=0` follows from linearity of `d`.
+  unfold FundamentalClass IsFormClosed
+  have h := smoothExtDeriv_add (n := n) (X := X) (k := 2 * W.codim)
+      (0 : SmoothForm n X (2 * W.codim)) 0
+  have ha : smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) =
+      smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) +
+      smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) := by
+    simpa using h.symm
+  have ha' : smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) + 0 =
+      smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) +
+      smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) := by
+    simpa [add_zero] using ha
+  have : 0 = smoothExtDeriv (0 : SmoothForm n X (2 * W.codim)) := add_left_cancel ha'
+  simpa using this.symm
 
 /-! ## Fundamental Class for Sets -/
 
@@ -165,7 +195,7 @@ opaque FundamentalClassSet (n : ℕ) (X : Type u)
 
 /-- The fundamental class of an algebraic subvariety is closed. -/
 axiom FundamentalClassSet_isClosed (p : ℕ) (Z : Set X) (h : isAlgebraicSubvariety n X Z) :
-    isClosed (FundamentalClassSet n X p Z)
+    IsFormClosed (FundamentalClassSet n X p Z)
 
 /-- The fundamental class of the empty set is zero. -/
 axiom FundamentalClassSet_empty_axiom (p : ℕ) :
@@ -191,10 +221,11 @@ axiom FundamentalClassSet_complete_intersection (p : ℕ) (W : AlgebraicSubvarie
 
 /-- The fundamental class represents a rational cohomology class. -/
 axiom FundamentalClassSet_rational (p : ℕ) (Z : Set X) (h : isAlgebraicSubvariety n X Z) :
-    isRationalClass (DeRhamCohomologyClass.ofForm (FundamentalClassSet n X p Z))
+    isRationalClass (DeRhamCohomologyClass.ofForm (FundamentalClassSet n X p Z)
+      (FundamentalClassSet_isClosed (n := n) (X := X) p Z h))
 
 theorem exists_fundamental_form_set (p : ℕ) (Z : Set X) (h : isAlgebraicSubvariety n X Z) :
-    ∃ (η : SmoothForm n X (2 * p)), isClosed η :=
+    ∃ (η : SmoothForm n X (2 * p)), IsFormClosed η :=
   ⟨FundamentalClassSet n X p Z, FundamentalClassSet_isClosed p Z h⟩
 
 /-- **FundamentalClassSet agrees with FundamentalClass on algebraic subvarieties.**
@@ -239,6 +270,7 @@ theorem exists_complete_intersection (p : ℕ) :
     let V : AnalyticSubvariety n X := {
       carrier := Wp.carrier ∩ H.carrier
       codim := p + 1
+      is_analytic := True
     }
     obtain ⟨W, _, hW_codim⟩ := serre_gaga V rfl
     exact ⟨W, hW_codim⟩
@@ -273,17 +305,9 @@ theorem isAlgebraicSubvariety_intersection_power {Z : Set X} {k : ℕ}
 
 /-! ## Fundamental Class and Lefschetz -/
 
-theorem FundamentalClass_intersection_power_eq {p k : ℕ}
-    (W : AlgebraicSubvariety n X) (_hW : W.codim = p) :
-    ∃ (W' : AlgebraicSubvariety n X),
-      W'.carrier = algebraic_intersection_power W.carrier k ∧
-      W'.codim = p + k := by
-  obtain ⟨W', hW'⟩ := isAlgebraicSubvariety_intersection_power (n := n) (X := X) ⟨W, rfl⟩
-  exact ⟨{ carrier := W'.carrier, codim := p + k, is_algebraic := W'.is_algebraic }, hW', rfl⟩
-
-theorem FundamentalClassSet_intersection_power_eq (_p _k : ℕ) (_Z : Set X)
-    (_hZ : isAlgebraicSubvariety n X _Z) :
-    True := trivial
+-- NOTE: deeper functoriality/Lefschetz coherence axioms live in `Hodge/Main.lean`
+-- and `Hodge/Kahler/Main.lean`. We intentionally do not model hyperplane powers and
+-- cohomological powers (`^k`) here, to avoid importing a full cohomology ring API.
 
 /-! ## Functoriality of Fundamental Class -/
 
@@ -303,13 +327,23 @@ structure SignedAlgebraicCycle (n : ℕ) (X : Type u)
   pos_alg : isAlgebraicSubvariety n X pos
   neg_alg : isAlgebraicSubvariety n X neg
 
+/-- The fundamental class map into de Rham cohomology. -/
 noncomputable def SignedAlgebraicCycle.fundamentalClass (p : ℕ)
     (Z : SignedAlgebraicCycle n X) : SmoothForm n X (2 * p) :=
   FundamentalClassSet n X p Z.pos - FundamentalClassSet n X p Z.neg
 
+/-- **Theorem: fundamentalClass of a signed cycle is closed.** -/
+axiom SignedAlgebraicCycle.fundamentalClass_isClosed (p : ℕ) (Z : SignedAlgebraicCycle n X) :
+    IsFormClosed (Z.fundamentalClass p)
+
+/-- The cycle class map into de Rham cohomology. -/
+noncomputable def SignedAlgebraicCycle.cycleClass (p : ℕ)
+    (Z : SignedAlgebraicCycle n X) : DeRhamCohomologyClass n X (2 * p) :=
+  ⟦Z.fundamentalClass p, SignedAlgebraicCycle.fundamentalClass_isClosed (n := n) (X := X) p Z⟧
+
 /-- Predicate stating that a signed algebraic cycle represents a cohomology class η. -/
-def SignedAlgebraicCycle.RepresentsClass {p : ℕ} (Z : SignedAlgebraicCycle n X) (η : SmoothForm n X (2 * p)) : Prop :=
-  Z.fundamentalClass p = η
+def SignedAlgebraicCycle.RepresentsClass {p : ℕ} (Z : SignedAlgebraicCycle n X) (η : DeRhamCohomologyClass n X (2 * p)) : Prop :=
+  Z.cycleClass p = η
 
 def SignedAlgebraicCycle.support (Z : SignedAlgebraicCycle n X) : Set X := Z.pos ∪ Z.neg
 

@@ -20,40 +20,77 @@ variable {n : ℕ} {X : Type*}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X]
 
-/-- The exterior derivative d : Ω^k → Ω^{k+1} on a complex manifold. -/
-def smoothExtDeriv {k : ℕ} (_ω : SmoothForm n X k) : SmoothForm n X (k + 1) :=
-  ⟨fun _ => 0⟩
-
 /-- **d² = 0**: The exterior derivative squared is zero. -/
-theorem d_squared_zero {k : ℕ} (ω : SmoothForm n X k) : smoothExtDeriv (smoothExtDeriv ω) = 0 := rfl
+theorem d_squared_zero {k : ℕ} (ω : SmoothForm n X k) : smoothExtDeriv (smoothExtDeriv ω) = 0 :=
+  smoothExtDeriv_extDeriv ω
 
 /-- Exterior derivative is additive. -/
-theorem smoothExtDeriv_add {k : ℕ} (ω₁ ω₂ : SmoothForm n X k) :
-    smoothExtDeriv (ω₁ + ω₂) = smoothExtDeriv ω₁ + smoothExtDeriv ω₂ := by
-  -- With the current stub definition (returns 0), 0 = 0 + 0
-  unfold smoothExtDeriv
-  ext x v
-  simp only [SmoothForm.add_apply, add_zero]
+theorem smoothExtDeriv_add_lem {k : ℕ} (ω₁ ω₂ : SmoothForm n X k) :
+    smoothExtDeriv (ω₁ + ω₂) = smoothExtDeriv ω₁ + smoothExtDeriv ω₂ :=
+  smoothExtDeriv_add ω₁ ω₂
 
 /-- Exterior derivative is ℂ-linear. -/
-theorem smoothExtDeriv_smul {k : ℕ} (c : ℂ) (ω : SmoothForm n X k) :
-    smoothExtDeriv (c • ω) = c • smoothExtDeriv ω := by
-  unfold smoothExtDeriv
-  ext x v
-  simp only [SmoothForm.smul_apply, smul_zero]
+theorem smoothExtDeriv_smul_lem {k : ℕ} (c : ℂ) (ω : SmoothForm n X k) :
+    smoothExtDeriv (c • ω) = c • smoothExtDeriv ω :=
+  smoothExtDeriv_smul c ω
 
 /-- Exterior derivative is linear over ℝ. -/
 theorem smoothExtDeriv_smul_real {k : ℕ} (r : ℝ) (ω : SmoothForm n X k) :
     smoothExtDeriv (r • ω) = r • smoothExtDeriv ω := by
-  unfold smoothExtDeriv
-  ext x v
-  simp only [SmoothForm.smul_real_apply, smul_zero]
+  -- `r•ω` is implemented as `((r:ℂ)•ω)`; use ℂ-linearity of `d`.
+  simpa using (smoothExtDeriv_smul (n := n) (X := X) (k := k) (r : ℂ) ω)
+
+/-! ### Degree-casting helper -/
+
+/-- Cast a form across an equality of degrees. -/
+def castForm {k k' : ℕ} (h : k = k') (α : SmoothForm n X k) : SmoothForm n X k' := by
+  cases h
+  exact α
 
 /-- The unit 0-form (constant function 1). -/
-def unitForm : SmoothForm n X 0 := ⟨fun _ => 0⟩
+opaque unitForm {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] : SmoothForm n X 0
 
 /-- The wedge product ω ⋀ η of two smooth forms. -/
-def wedge {k l : ℕ} (_ω : SmoothForm n X k) (_η : SmoothForm n X l) : SmoothForm n X (k + l) := ⟨fun _ => 0⟩
+opaque wedge {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
+    {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) : SmoothForm n X (k + l)
+
+/-- **Wedge Product is Bilinear.** -/
+axiom wedge_add {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
+    {k l : ℕ} (ω₁ ω₂ : SmoothForm n X k) (η : SmoothForm n X l) :
+    wedge (ω₁ + ω₂) η = wedge ω₁ η + wedge ω₂ η
+
+axiom wedge_smul {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
+    {k l : ℕ} (c : ℂ) (ω : SmoothForm n X k) (η : SmoothForm n X l) :
+    wedge (c • ω) η = c • wedge ω η
+
+/-- **Wedge Product Associativity.** -/
+axiom wedge_assoc {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
+    {k l m : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) (θ : SmoothForm n X m) :
+    HEq (wedge (wedge ω η) θ) (wedge ω (wedge η θ))
+
+/-- **Leibniz Rule for Exterior Derivative.** -/
+axiom smoothExtDeriv_wedge {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
+    {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) :
+    let h1 : (k + 1) + l = k + l + 1 := by
+      simp [Nat.add_assoc, Nat.add_comm, Nat.add_left_comm]
+    let h2 : k + (l + 1) = k + l + 1 := by
+      simp [Nat.add_assoc]
+    smoothExtDeriv (wedge ω η) =
+      castForm (n := n) (X := X) (k := (k + 1) + l) (k' := k + l + 1) h1 (wedge (smoothExtDeriv ω) η)
+        + (-1 : ℂ)^k •
+          castForm (n := n) (X := X) (k := k + (l + 1)) (k' := k + l + 1) h2 (wedge ω (smoothExtDeriv η))
 
 instance (k l : ℕ) : HMul (SmoothForm n X k) (SmoothForm n X l) (SmoothForm n X (k + l)) where
   hMul := wedge
@@ -68,34 +105,42 @@ variable [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
 def kahlerForm : SmoothForm n X 2 := K.omega_form
 
 /-- The volume form dvol = ω^n / n!. -/
-def volumeForm : SmoothForm n X (2 * n) := ⟨fun _ => 0⟩
+opaque volumeForm (n : ℕ) (X : Type*)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] :
+    SmoothForm n X (2 * n)
 
 /-! ## Hodge Star Operator -/
 
-def hodgeStar {k : ℕ} (_α : SmoothForm n X k) : SmoothForm n X (2 * n - k) := ⟨fun _ => 0⟩
+/-- **Hodge Star Operator** (Hodge, 1941).
+    The star operator maps k-forms to (2n-k)-forms. -/
+opaque hodgeStar {k : ℕ} (α : SmoothForm n X k) : SmoothForm n X (2 * n - k)
 
-/-- Hodge star is additive. -/
-theorem hodgeStar_add {k : ℕ} (α β : SmoothForm n X k) : hodgeStar (α + β) = hodgeStar α + hodgeStar β := by
-  unfold hodgeStar
-  ext x v
-  simp only [SmoothForm.add_apply, add_zero]
-
-/-- Hodge star is ℝ-linear. -/
-theorem hodgeStar_smul {k : ℕ} (r : ℝ) (α : SmoothForm n X k) : hodgeStar (r • α) = r • hodgeStar α := by
-  unfold hodgeStar
-  ext x v
-  simp only [SmoothForm.smul_real_apply, smul_zero]
+axiom hodgeStar_add {k : ℕ} (α β : SmoothForm n X k) : hodgeStar (α + β) = hodgeStar α + hodgeStar β
+axiom hodgeStar_smul {k : ℕ} (r : ℝ) (α : SmoothForm n X k) : hodgeStar (r • α) = r • hodgeStar α
 
 /-! ## Adjoint Derivative and Laplacian -/
 
-def adjointDeriv {k : ℕ} (_ω : SmoothForm n X k) : SmoothForm n X (k - 1) := ⟨fun _ => 0⟩
-def laplacian {k : ℕ} (_ω : SmoothForm n X k) : SmoothForm n X k := ⟨fun _ => 0⟩
+/-- **Adjoint Derivative** d* = -*d*. -/
+opaque adjointDeriv {k : ℕ} (ω : SmoothForm n X k) : SmoothForm n X (k - 1)
+
+/-- **Hodge-Laplacian** Δ = dd* + d*d. -/
+opaque laplacian {k : ℕ} (ω : SmoothForm n X k) : SmoothForm n X k
+
+axiom laplacian_add {k : ℕ} (α β : SmoothForm n X k) : laplacian (α + β) = laplacian α + laplacian β
+
 def isHarmonic {k : ℕ} (ω : SmoothForm n X k) : Prop := laplacian ω = 0
 
 /-! ## Lefschetz Operators -/
 
-def lefschetzL {k : ℕ} (_η : SmoothForm n X k) : SmoothForm n X (k + 2) := ⟨fun _ => 0⟩
-def lefschetzLambda {k : ℕ} (_η : SmoothForm n X k) : SmoothForm n X (k - 2) := ⟨fun _ => 0⟩
+/-- **Lefschetz Operator L**: ω ⋀ -. -/
+def lefschetzL {k : ℕ} (η : SmoothForm n X k) : SmoothForm n X (k + 2) :=
+  by
+    -- `ω ⋀ η` has degree `2 + k`; rewrite to `k + 2`.
+    simpa [Nat.add_comm] using (wedge (n := n) (X := X) (k := 2) (l := k) K.omega_form η)
+
+/-- **Dual Lefschetz Operator Λ**: Adjoint to L. -/
+opaque lefschetzLambda {k : ℕ} (η : SmoothForm n X k) : SmoothForm n X (k - 2)
 
 def lefschetz_power_form (k : ℕ) {p : ℕ} (η : SmoothForm n X p) : SmoothForm n X (p + 2 * k) :=
   match k with
@@ -106,6 +151,11 @@ def lefschetz_power_form (k : ℕ) {p : ℕ} (η : SmoothForm n X p) : SmoothFor
 
 def gradingH {k : ℕ} (α : SmoothForm n X k) : SmoothForm n X k := ((k : ℝ) - (n : ℝ)) • α
 def isClosed {k : ℕ} (ω : SmoothForm n X k) : Prop := smoothExtDeriv ω = 0
+
+/-- **Theorem: scaled Kähler power is closed.** -/
+-- NOTE: the closedness of `omegaPow` (and its scaled variant) lives in
+-- `Hodge/Kahler/TypeDecomposition.lean` where `omegaPow` is defined.
+
 def isPrimitive {k : ℕ} (η : SmoothForm n X k) : Prop := lefschetzLambda η = 0
 
 end

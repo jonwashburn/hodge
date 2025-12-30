@@ -19,118 +19,100 @@ set_option autoImplicit false
 
 /-- The pointwise comass of a k-form at a point x.
     Defined as sup{|α(v₁,...,vₖ)| : ‖vᵢ‖ ≤ 1}. -/
-def pointwiseComass {n : ℕ} {X : Type*}
+opaque pointwiseComass {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    {k : ℕ} (_α : SmoothForm n X k) (_x : X) : ℝ := 0
+    {k : ℕ} (α : SmoothForm n X k) (x : X) : ℝ
 
-/-- **Berge's Maximum Theorem**: The supremum of a continuous function over
-    a continuously-varying compact domain varies continuously.
-    In the stub model, pointwise comass is identically zero, hence continuous.
-    Reference: [C. Berge, "Topological Spaces", Macmillan, 1963, Chapter VI]. -/
-theorem pointwiseComass_continuous {n : ℕ} {X : Type*}
+/-- Pointwise comass is non-negative. -/
+axiom pointwiseComass_nonneg {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    {k : ℕ} (α : SmoothForm n X k) (x : X) : pointwiseComass α x ≥ 0
+
+/-- **Berge's Maximum Theorem**: Pointwise comass is continuous for smooth forms. -/
+axiom pointwiseComass_continuous {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    {k : ℕ} (α : SmoothForm n X k) : Continuous (pointwiseComass α) := by
-  unfold pointwiseComass
-  exact continuous_const
+    {k : ℕ} (α : SmoothForm n X k) : Continuous (pointwiseComass α)
 
-/-- Global comass norm on forms.
-    In the stub model, we use a discrete norm to satisfy definiteness. -/
+/-- Global comass norm on forms: supremum of pointwise comass. -/
 def comass {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [CompactSpace X]
     {k : ℕ} (α : SmoothForm n X k) : ℝ :=
-  if α = 0 then 0 else 1
+  sSup (range (pointwiseComass α))
 
 /-! ## Pointwise Comass Properties -/
 
 /-- Pointwise comass of zero form is zero. -/
-theorem pointwiseComass_zero {n : ℕ} {X : Type*}
+axiom pointwiseComass_zero {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    (x : X) {k : ℕ} : pointwiseComass (0 : SmoothForm n X k) x = 0 := rfl
+    (x : X) {k : ℕ} : pointwiseComass (0 : SmoothForm n X k) x = 0
 
 /-- Pointwise comass satisfies triangle inequality. -/
-theorem pointwiseComass_add_le {n : ℕ} {X : Type*}
+axiom pointwiseComass_add_le {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     {k : ℕ} (α β : SmoothForm n X k) (x : X) :
-    pointwiseComass (α + β) x ≤ pointwiseComass α x + pointwiseComass β x := by
-  unfold pointwiseComass; norm_num
+    pointwiseComass (α + β) x ≤ pointwiseComass α x + pointwiseComass β x
 
 /-- Pointwise comass scales with absolute value. -/
-theorem pointwiseComass_smul {n : ℕ} {X : Type*}
+axiom pointwiseComass_smul {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     {k : ℕ} (r : ℝ) (α : SmoothForm n X k) (x : X) :
-    pointwiseComass (r • α) x = |r| * pointwiseComass α x := by
-  unfold pointwiseComass; ring
+    pointwiseComass (r • α) x = |r| * pointwiseComass α x
 
 /-- Pointwise comass of negation equals pointwise comass. -/
 theorem pointwiseComass_neg {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     {k : ℕ} (α : SmoothForm n X k) (x : X) :
     pointwiseComass (-α) x = pointwiseComass α x := by
-  unfold pointwiseComass; rfl
+  have : (-α) = (-1 : ℝ) • α := by ext; simp
+  rw [this, pointwiseComass_smul]
+  simp
 
 /-! ## Global Comass Properties -/
 
-/-- Global comass is bounded above. -/
-theorem comass_bddAbove {n : ℕ} {X : Type*}
+/-- Global comass is bounded above on compact manifolds. -/
+axiom comass_bddAbove {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α : SmoothForm n X k) :
-    BddAbove (range (pointwiseComass α)) := by
-  use 0; intro y hy; obtain ⟨x, hx⟩ := hy; rw [← hx]; unfold pointwiseComass; norm_num
+    BddAbove (range (pointwiseComass α))
 
 /-- The comass of the zero form is zero. -/
-theorem comass_zero {n : ℕ} {X : Type*}
+axiom comass_zero {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    {k : ℕ} : comass (n := n) (0 : SmoothForm n X k) = 0 := by
-  unfold comass; simp
+    [IsManifold (𝓒_complex n) ⊤ X] [CompactSpace X]
+    {k : ℕ} : comass (n := n) (0 : SmoothForm n X k) = 0
 
 /-- Global comass satisfies triangle inequality. -/
-theorem comass_add_le {n : ℕ} {X : Type*}
+axiom comass_add_le {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α β : SmoothForm n X k) :
-    comass (α + β) ≤ comass α + comass β := by
-  unfold comass
-  by_cases h1 : α + β = 0 <;> by_cases h2 : α = 0 <;> by_cases h3 : β = 0 <;> simp [*]
-  all_goals norm_num
+    comass (α + β) ≤ comass α + comass β
 
 /-- **Comass Homogeneity** (Standard).
     The comass norm is homogeneous: comass (r • α) = |r| * comass α.
     Reference: [H. Federer, "Geometric Measure Theory", 1969]. -/
 axiom comass_smul {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [CompactSpace X]
     {k : ℕ} (r : ℝ) (α : SmoothForm n X k) :
     comass (r • α) = |r| * comass α
 
 /-- Comass is non-negative. -/
-theorem comass_nonneg {n : ℕ} {X : Type*}
+axiom comass_nonneg {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    {k : ℕ} (α : SmoothForm n X k) : comass α ≥ 0 := by
-  unfold comass; split_ifs <;> norm_num
+    [IsManifold (𝓒_complex n) ⊤ X] [CompactSpace X]
+    {k : ℕ} (α : SmoothForm n X k) : comass α ≥ 0
 
 /-- **Comass Norm Definiteness** (Standard).
     The comass norm of a form is zero if and only if the form is identically zero. -/
-theorem comass_eq_zero_iff {n : ℕ} {X : Type*}
+axiom comass_eq_zero_iff {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [CompactSpace X]
     {k : ℕ} (α : SmoothForm n X k) :
-    comass α = 0 ↔ α = 0 := by
-  unfold comass; split_ifs with h <;> simp [h]
-
-/-! ## Normed Space Instances -/
-
-/-- Construction of NormedAddCommGroup for SmoothForm. -/
-theorem smoothFormNormedAddCommGroup_exists {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    (k : ℕ) : True := trivial
-
-/-- Construction of NormedSpace for SmoothForm over ℝ. -/
-theorem smoothFormNormedSpace_exists {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    (k : ℕ) : True := trivial
+    comass α = 0 ↔ α = 0
 
 /-! ## L2 Inner Product -/
 
@@ -164,11 +146,24 @@ def pointwiseNorm {n : ℕ} {X : Type*}
     {k : ℕ} (α : SmoothForm n X k) (x : X) : ℝ :=
   Real.sqrt (pointwiseInner α α x)
 
-/-- Global L2 inner product of two k-forms. -/
-def L2Inner {n : ℕ} {X : Type*}
+/-- Global L2 inner product of two k-forms.
+    Defined as ∫_X ⟨α, β⟩_x dvol. -/
+opaque L2Inner {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    {k : ℕ} (_α _β : SmoothForm n X k) : ℝ := 0
+    {k : ℕ} (α β : SmoothForm n X k) : ℝ
+
+axiom L2Inner_add_left {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    {k : ℕ} (α₁ α₂ β : SmoothForm n X k) :
+    L2Inner (α₁ + α₂) β = L2Inner α₁ β + L2Inner α₂ β
+
+axiom L2Inner_smul_left {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    {k : ℕ} (r : ℝ) (α β : SmoothForm n X k) :
+    L2Inner (r • α) β = r * L2Inner α β
 
 /-- Global L2 norm of a k-form. -/
 def L2NormForm {n : ℕ} {X : Type*}
@@ -193,7 +188,10 @@ axiom energy_minimizer {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
     {k : ℕ} (η : DeRhamCohomologyClass n X k) :
-    ∃! α : SmoothForm n X k, (∀ β : SmoothForm n X k, DeRhamCohomologyClass.ofForm β = η → energy α ≤ energy β)
+    ∃! α : SmoothForm n X k,
+      (∃ (hα : IsFormClosed α), DeRhamCohomologyClass.ofForm α hα = η) ∧
+      (∀ β : SmoothForm n X k, ∀ (hβ : IsFormClosed β),
+        DeRhamCohomologyClass.ofForm β hβ = η → energy α ≤ energy β)
 
 /-- **Trace-L2 Control** (Sobolev/Gagliardo-Nirenberg).
     The comass (L∞) of a harmonic form is controlled by its L2 norm.

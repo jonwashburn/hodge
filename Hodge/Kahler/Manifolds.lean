@@ -30,30 +30,32 @@ axiom kahlerMetric_symm (x : X) (v w : TangentSpace (𝓒_complex n) x) :
 
 /-! ## Rationality -/
 
-/-- The wedge product of two rational forms is rational. -/
-axiom isRationalClass_wedge {k l : ℕ} {ω₁ : SmoothForm n X k} {ω₂ : SmoothForm n X l} :
-    isRationalClass (DeRhamCohomologyClass.ofForm ω₁) →
-    isRationalClass (DeRhamCohomologyClass.ofForm ω₂) →
-    isRationalClass (DeRhamCohomologyClass.ofForm (wedge ω₁ ω₂))
+/-- The wedge product of two rational cohomology classes is rational. -/
+axiom isRationalClass_wedge {k l : ℕ}
+    (η₁ : DeRhamCohomologyClass n X k) (η₂ : DeRhamCohomologyClass n X l) :
+    isRationalClass η₁ → isRationalClass η₂ → isRationalClass (η₁ * η₂)
 
-/-- Scalar multiplication by a rational number preserves rationality (on forms). -/
-axiom isRationalClass_smul_rat {k : ℕ} (q : ℚ) {ω : SmoothForm n X k} :
-    isRationalClass (DeRhamCohomologyClass.ofForm ω) →
-    isRationalClass (DeRhamCohomologyClass.ofForm ((q : ℝ) • ω))
+/-- Scalar multiplication by a rational number preserves rationality. -/
+axiom isRationalClass_smul_rat {k : ℕ} (q : ℚ) (η : DeRhamCohomologyClass n X k) :
+    isRationalClass η → isRationalClass (q • η)
+
+/-- **Axiom: Kähler form is closed (dω = 0).** -/
+axiom omega_isClosed : IsFormClosed (K.omega_form)
 
 /-- The Kähler form represents a rational cohomology class. -/
-axiom omega_is_rational : isRationalClass (DeRhamCohomologyClass.ofForm K.omega_form)
+axiom omega_is_rational : isRationalClass ⟦K.omega_form, omega_isClosed⟧
 
-/-- Addition of rational classes is rational (on forms). -/
-axiom isRationalClass_add {k : ℕ} {ω₁ ω₂ : SmoothForm n X k} :
-    isRationalClass (DeRhamCohomologyClass.ofForm ω₁) →
-    isRationalClass (DeRhamCohomologyClass.ofForm ω₂) →
-    isRationalClass (DeRhamCohomologyClass.ofForm (ω₁ + ω₂))
+/-- Addition of rational classes is rational. -/
+axiom isRationalClass_add {k : ℕ} (η₁ η₂ : DeRhamCohomologyClass n X k) :
+    isRationalClass η₁ → isRationalClass η₂ → isRationalClass (η₁ + η₂)
 
 /-- The zero class is rational. -/
-axiom zero_is_rational {k : ℕ} : isRationalClass (DeRhamCohomologyClass.ofForm (0 : SmoothForm n X k))
+axiom zero_is_rational {k : ℕ} : isRationalClass (0 : DeRhamCohomologyClass n X k)
+
+/-- **Axiom: Unit form is closed.** -/
+axiom unitForm_isClosed : IsFormClosed (unitForm (n := n) (X := X))
 
 /-- The unit form represents a rational cohomology class. -/
-axiom unitForm_is_rational : isRationalClass (DeRhamCohomologyClass.ofForm (unitForm (n := n) (X := X)))
+axiom unitForm_is_rational : isRationalClass ⟦unitForm (n := n) (X := X), unitForm_isClosed⟧
 
 end

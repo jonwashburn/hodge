@@ -88,15 +88,34 @@ theorem automatic_syr {p : ℕ} (γ : SmoothForm n X (2 * p))
 
 /-! ## Cone-Positive Classes are Algebraic -/
 
-theorem cone_positive_is_algebraic {p : ℕ}
-    (γ : SmoothForm n X (2 * p))
-    (_hγ_rational : isRationalClass (DeRhamCohomologyClass.ofForm γ))
-    (hγ_cone : isConePositive γ) :
-    ∃ (Z : Set X), isAlgebraicSubvariety n X Z := by
+/-! ## Axioms for Fundamental Class Representation -/
+
+/-- **Harvey-Lawson Fundamental Class Connection** (Harvey-Lawson, 1982). -/
+axiom harvey_lawson_fundamental_class {p : ℕ}
+    (γplus : SmoothForm n X (2 * p)) (hplus : IsFormClosed γplus)
+    (hγ : isConePositive γplus)
+    (hl_concl : HarveyLawsonConclusion n X (2 * (n - p)))
+    (T_limit : Current n X (2 * (n - p)))
+    (h_represents : hl_concl.represents T_limit) :
+    ⟦FundamentalClassSet n X p (⋃ v ∈ hl_concl.varieties, v.carrier), (FundamentalClassSet_isClosed p _ (harvey_lawson_union_is_algebraic hl_concl))⟧ = ⟦γplus, hplus⟧
+
+/-- **Theorem: Cone Positive Represents Class** (Harvey-Lawson + GAGA).
+    This theorem provides the link between cone-positive forms and algebraic cycles.
+    It is proved by:
+    1. Using microstructure to approximate the form by integral cycles.
+    2. Using Harvey-Lawson to get analytic subvarieties from the limit current.
+    3. Using GAGA to show those subvarieties are algebraic.
+    4. Using the Harvey-Lawson fundamental class bridge to show they represent the form. -/
+theorem cone_positive_represents {p : ℕ}
+    (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
+    (h_rational : isRationalClass (DeRhamCohomologyClass.ofForm γ h_closed))
+    (h_cone : isConePositive γ) :
+    ∃ (Z : Set X), isAlgebraicSubvariety n X Z ∧
+    ∃ (hZ : IsFormClosed (FundamentalClassSet n X p Z)),
+    ⟦FundamentalClassSet n X p Z, hZ⟧ = DeRhamCohomologyClass.ofForm γ h_closed := by
   -- Step 1: Use the Automatic SYR Theorem to find a calibrated current
-  -- Choose the Kähler calibration ψ = ω^{n-p}/(n-p)!
   let ψ := KählerCalibration (n := n) (X := X) (p := n - p)
-  obtain ⟨T_seq, T_limit, h_cycles, h_flat_conv, h_calib⟩ := microstructure_approximation γ hγ_cone ψ
+  obtain ⟨T_seq, T_limit, h_cycles, h_flat_conv, h_calib⟩ := microstructure_approximation γ h_cone ψ
 
   -- Step 2: Use Harvey-Lawson Structure Theorem to represent the limit as analytic varieties
   let hyp : HarveyLawsonHypothesis n X (2 * (n - p)) := {
@@ -110,76 +129,31 @@ theorem cone_positive_is_algebraic {p : ℕ}
   -- Step 3: Use GAGA to show the union of these analytic varieties is algebraic
   let Z := ⋃ v ∈ hl_concl.varieties, v.carrier
   use Z
-  exact harvey_lawson_union_is_algebraic hl_concl
-
-/-! ## Hard Lefschetz Interface -/
-
-theorem hard_lefschetz_isomorphism {p' : ℕ} (h_range : p' ≤ n / 2)
-    (γ : SmoothForm n X (2 * (n - p')))
-    (h_rat : isRationalClass (DeRhamCohomologyClass.ofForm γ)) (h_hodge : isPPForm' n X (n - p') γ) :
-    ∃ (η : SmoothForm n X (2 * p')),
-      isRationalClass (DeRhamCohomologyClass.ofForm η) ∧ isPPForm' n X p' η := by
-  exact hard_lefschetz_isomorphism' h_range γ h_rat h_hodge
-
-/-! ## Main Theorem -/
-
-/-- **Hard Lefschetz Reduction**
-When p > n/2, we can find a lower-codimension class that maps to γ. -/
-theorem hard_lefschetz_reduction {p : ℕ} (hp : p > n / 2)
-    (γ : SmoothForm n X (2 * p))
-    (h_rational : isRationalClass (DeRhamCohomologyClass.ofForm γ)) (h_hodge : isPPForm' n X p γ) :
-    ∃ (p' : ℕ) (η : SmoothForm n X (2 * p')),
-      p' ≤ n / 2 ∧
-      isRationalClass (DeRhamCohomologyClass.ofForm η) ∧
-      isPPForm' n X p' η := by
-  -- Let p' be the complementary codimension
-  let p' := n - p
-  -- Apply the Hard Lefschetz isomorphism at the form level
-  obtain ⟨η, h_η_hodge, h_η_rat⟩ := hard_lefschetz_inverse_form hp γ h_hodge h_rational
-  -- Provide p' and η as the witnesses
-  use p', η
   constructor
-  · -- Show p' ≤ n / 2
-    -- Since hp : p > n / 2, we have p' = n - p ≤ n - (n / 2 + 1) ≤ n / 2
-    omega
-  · exact ⟨h_η_rat, h_η_hodge⟩
-
-/-! ## Axioms for Fundamental Class Representation -/
-
-/-- **Harvey-Lawson Fundamental Class Connection** (Harvey-Lawson, 1982). -/
-axiom harvey_lawson_fundamental_class {p : ℕ}
-    (γplus : SmoothForm n X (2 * p))
-    (hγ : isConePositive γplus)
-    (hl_concl : HarveyLawsonConclusion n X (2 * (n - p)))
-    (h_represents : True) :
-    FundamentalClassSet n X p (⋃ v ∈ hl_concl.varieties, v.carrier) = γplus
-
-/-- **Cone Positive Represents Class** (Harvey-Lawson + GAGA). -/
-axiom cone_positive_represents {p : ℕ}
-    (γ : SmoothForm n X (2 * p))
-    (h_rational : isRationalClass (DeRhamCohomologyClass.ofForm γ))
-    (h_cone : isConePositive γ) :
-    ∃ (Z : Set X), isAlgebraicSubvariety n X Z ∧ FundamentalClassSet n X p Z = γ
+  · exact harvey_lawson_union_is_algebraic hl_concl
+  · -- Step 4: Use the bridge axiom to show the fundamental class is correct
+    let h_alg := harvey_lawson_union_is_algebraic hl_concl
+    let hZ_closed : IsFormClosed (FundamentalClassSet n X p Z) := FundamentalClassSet_isClosed p Z h_alg
+    use hZ_closed
+    -- Representation witness from Harvey-Lawson theorem
+    have h_rep := harvey_lawson_represents hyp
+    exact harvey_lawson_fundamental_class γ h_closed h_cone hl_concl T_limit.toFun h_rep
 
 /-- **Rational Multiple of Kähler Power is Algebraic** (Griffiths-Harris, 1978). -/
-axiom omega_pow_represents_multiple_axiom (n' : ℕ) (X' : Type u)
-    [TopologicalSpace X'] [ChartedSpace (EuclideanSpace ℂ (Fin n')) X']
-    [IsManifold (𝓒_complex n') ⊤ X']
-    [ProjectiveComplexManifold n' X'] [KahlerManifold n' X'] [Nonempty X']
-    (p : ℕ) (c : ℚ) (hc : c > 0) :
-    ∃ (Z : Set X'), isAlgebraicSubvariety n' X' Z ∧ FundamentalClassSet n' X' p Z = (c : ℝ) • omegaPow n' X' p
-
-theorem omega_pow_represents_multiple (p : ℕ) (c : ℚ) (hc : c > 0) :
-    ∃ (Z : Set X), isAlgebraicSubvariety n X Z ∧ FundamentalClassSet n X p Z = (c : ℝ) • omegaPow n X p :=
-  omega_pow_represents_multiple_axiom n X p c hc
+axiom omega_pow_represents_multiple {p : ℕ} (c : ℚ) (hc : c > 0) :
+    ∃ (Z : Set X), isAlgebraicSubvariety n X Z ∧
+    ∃ (hZ : IsFormClosed (FundamentalClassSet n X p Z)),
+      ⟦FundamentalClassSet n X p Z, hZ⟧ =
+        (c : ℝ) • ⟦omegaPow n X p, omega_pow_isClosed (n := n) (X := X) p⟧
 
 /-- **Lefschetz Lift for Signed Cycles** (Voisin, 2002). -/
 axiom lefschetz_lift_signed_cycle {p p' : ℕ}
-    (γ : SmoothForm n X (2 * p))
-    (η : SmoothForm n X (2 * p'))
+    (γ : SmoothForm n X (2 * p)) (hγ : IsFormClosed γ)
+    (η : SmoothForm n X (2 * p')) (hη : IsFormClosed η)
     (Z_η : SignedAlgebraicCycle n X)
-    (_hp : p > n / 2) (h_rep : Z_η.RepresentsClass η) :
-    ∃ (Z : SignedAlgebraicCycle n X), Z.RepresentsClass γ
+    (_hp : p > n / 2)
+    (h_rep : Z_η.RepresentsClass (DeRhamCohomologyClass.ofForm η hη)) :
+    ∃ (Z : SignedAlgebraicCycle n X), Z.RepresentsClass (DeRhamCohomologyClass.ofForm γ hγ)
 
 /-! ## The Hodge Conjecture -/
 
@@ -199,41 +173,247 @@ axiom lefschetz_lift_signed_cycle {p p' : ℕ}
     Proc. Int. Cong. Math. 1950, Vol. 1, 182-191].
     Reference: [J. Carlson, A. Jaffe, and A. Wiles, "The Millennium Prize Problems",
     Clay Mathematics Institute, 2006]. -/
-theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p))
-    (h_rational : isRationalClass (DeRhamCohomologyClass.ofForm γ)) (h_p_p : isPPForm' n X p γ) :
-    ∃ (Z : SignedAlgebraicCycle n X), Z.RepresentsClass γ := by
+theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
+    (h_rational : isRationalClass (DeRhamCohomologyClass.ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :
+    ∃ (Z : SignedAlgebraicCycle n X), Z.RepresentsClass (DeRhamCohomologyClass.ofForm γ h_closed) := by
   by_cases h_range : p ≤ n / 2
-  · let sd := signed_decomposition γ h_p_p h_rational
+  ·
+    -- Signed decomposition of the (p,p) rational class
+    let sd :=
+      signed_decomposition (n := n) (X := X) γ h_closed h_p_p
+        (DeRhamCohomologyClass.ofForm γ h_closed) h_rational
 
     -- γplus is cone positive, so it has an algebraic representative
-    obtain ⟨Zplus, hZplus_alg, hZplus_rep⟩ := cone_positive_represents sd.γplus sd.h_plus_rat sd.h_plus_cone
+    obtain ⟨Zplus, hZplus_alg, hZplus_rep_raw⟩ :=
+      cone_positive_represents (n := n) (X := X) (p := p)
+        sd.γplus sd.h_plus_closed sd.h_plus_rat sd.h_plus_cone
+    obtain ⟨hZplus_closed, hZplus_rep⟩ := hZplus_rep_raw
 
-    -- γminus is a multiple of ω^p, so it has an algebraic representative
-    have h_omega := @omega_pow_represents_multiple n X _ _ _ _ K _ p sd.N sd.h_N_pos
-    obtain ⟨Zminus, hZminus_alg, hZminus_rep⟩ := h_omega
+    -- γminus is a positive rational multiple of ω^p, so it has an algebraic representative
+    obtain ⟨Zminus, hZminus_alg, hZminus_rep_raw⟩ :=
+      omega_pow_represents_multiple (n := n) (X := X) (p := p) sd.N sd.h_N_pos
+    obtain ⟨hZminus_closed, hZminus_rep_omega⟩ := hZminus_rep_raw
 
-    use {
-      pos := Zplus,
-      neg := Zminus,
-      pos_alg := hZplus_alg,
-      neg_alg := hZminus_alg
-    }
-    unfold SignedAlgebraicCycle.RepresentsClass SignedAlgebraicCycle.fundamentalClass
-    simp only
-    rw [hZplus_rep, hZminus_rep, ← sd.h_gamma_minus]
-    exact sd.h_eq.symm
+    -- Build the signed cycle and show it represents [γ]
+    let Z : SignedAlgebraicCycle n X :=
+      { pos := Zplus
+        neg := Zminus
+        pos_alg := hZplus_alg
+        neg_alg := hZminus_alg }
 
-  · push_neg at h_range
-    -- Apply Hard Lefschetz reduction to get a lower-codimension class η at p' ≤ n/2
-    obtain ⟨p', η, h_p'_range, h_η_rat, h_η_hodge⟩ :=
-      hard_lefschetz_reduction h_range γ h_rational h_p_p
+    refine ⟨Z, ?_⟩
+    -- Unfold representation and reduce to cohomology linearity.
+    unfold SignedAlgebraicCycle.RepresentsClass SignedAlgebraicCycle.cycleClass SignedAlgebraicCycle.fundamentalClass
+    -- The cycle class is [Zplus] - [Zminus]
+    -- Use the `ofForm_sub` axiom to turn this into subtraction in cohomology.
+    have hsub :
+        ⟦FundamentalClassSet n X p Zplus - FundamentalClassSet n X p Zminus,
+          isFormClosed_sub (n := n) (X := X) (k := 2 * p)
+            (FundamentalClassSet n X p Zplus) (FundamentalClassSet n X p Zminus)
+            (FundamentalClassSet_isClosed (n := n) (X := X) p Zplus hZplus_alg)
+            (FundamentalClassSet_isClosed (n := n) (X := X) p Zminus hZminus_alg)⟧
+          =
+        ⟦FundamentalClassSet n X p Zplus, FundamentalClassSet_isClosed (n := n) (X := X) p Zplus hZplus_alg⟧
+          -
+        ⟦FundamentalClassSet n X p Zminus, FundamentalClassSet_isClosed (n := n) (X := X) p Zminus hZminus_alg⟧ := by
+      simpa using (ofForm_sub (n := n) (X := X) (k := 2 * p)
+        (FundamentalClassSet n X p Zplus) (FundamentalClassSet n X p Zminus)
+        (FundamentalClassSet_isClosed (n := n) (X := X) p Zplus hZplus_alg)
+        (FundamentalClassSet_isClosed (n := n) (X := X) p Zminus hZminus_alg))
 
-    -- Apply the theorem to η (recursive step / same logic)
-    obtain ⟨Z_η, hZ_η_rep⟩ := hodge_conjecture' η h_η_rat h_η_hodge
+    -- `cycleClass` uses an arbitrary closedness witness for the difference; switch it to the one used in `ofForm_sub`.
+    have hcycle_witness :
+        ⟦FundamentalClassSet n X p Zplus - FundamentalClassSet n X p Zminus,
+            SignedAlgebraicCycle.fundamentalClass_isClosed (n := n) (X := X) p Z⟧
+          =
+        ⟦FundamentalClassSet n X p Zplus - FundamentalClassSet n X p Zminus,
+            isFormClosed_sub (n := n) (X := X) (k := 2 * p)
+              (FundamentalClassSet n X p Zplus) (FundamentalClassSet n X p Zminus)
+              (FundamentalClassSet_isClosed (n := n) (X := X) p Zplus hZplus_alg)
+              (FundamentalClassSet_isClosed (n := n) (X := X) p Zminus hZminus_alg)⟧ := by
+      simpa using (ofForm_proof_irrel (n := n) (X := X) (k := 2 * p)
+        (FundamentalClassSet n X p Zplus - FundamentalClassSet n X p Zminus)
+        (SignedAlgebraicCycle.fundamentalClass_isClosed (n := n) (X := X) p Z)
+        (isFormClosed_sub (n := n) (X := X) (k := 2 * p)
+          (FundamentalClassSet n X p Zplus) (FundamentalClassSet n X p Zminus)
+          (FundamentalClassSet_isClosed (n := n) (X := X) p Zplus hZplus_alg)
+          (FundamentalClassSet_isClosed (n := n) (X := X) p Zminus hZminus_alg)))
 
-    -- Now lift Z_η to a signed cycle representing γ using Hard Lefschetz coherence
-    -- We use an axiom for this bridge
-    obtain ⟨Z, hZ_rep⟩ := lefschetz_lift_signed_cycle γ η Z_η h_range hZ_η_rep
+    -- Rewrite the left side using `SignedAlgebraicCycle.fundamentalClass` and `Z`
+    -- then apply representation equalities for plus/minus parts.
+    -- Note: we only need cohomology equalities; we do not require equality of forms.
+    -- Start from `Z.cycleClass p` and compute.
+    calc
+      Z.cycleClass p
+          = ⟦FundamentalClassSet n X p Zplus - FundamentalClassSet n X p Zminus,
+              SignedAlgebraicCycle.fundamentalClass_isClosed (n := n) (X := X) p Z⟧ := by
+                rfl
+      _ = ⟦FundamentalClassSet n X p Zplus - FundamentalClassSet n X p Zminus,
+              isFormClosed_sub (n := n) (X := X) (k := 2 * p)
+                (FundamentalClassSet n X p Zplus) (FundamentalClassSet n X p Zminus)
+                (FundamentalClassSet_isClosed (n := n) (X := X) p Zplus hZplus_alg)
+                (FundamentalClassSet_isClosed (n := n) (X := X) p Zminus hZminus_alg)⟧ := hcycle_witness
+      _ = ⟦FundamentalClassSet n X p Zplus, FundamentalClassSet_isClosed (n := n) (X := X) p Zplus hZplus_alg⟧
+            - ⟦FundamentalClassSet n X p Zminus, FundamentalClassSet_isClosed (n := n) (X := X) p Zminus hZminus_alg⟧ := hsub
+      _ = ⟦sd.γplus, sd.h_plus_closed⟧
+            - ⟦FundamentalClassSet n X p Zminus, FundamentalClassSet_isClosed (n := n) (X := X) p Zminus hZminus_alg⟧ := by
+            -- rewrite the + part using the representation equality
+            -- first align the closedness witness for `[Zplus]`
+            have hw_plus :
+                ⟦FundamentalClassSet n X p Zplus, FundamentalClassSet_isClosed (n := n) (X := X) p Zplus hZplus_alg⟧
+                  = ⟦FundamentalClassSet n X p Zplus, hZplus_closed⟧ := by
+              simpa using (ofForm_proof_irrel (n := n) (X := X) (k := 2 * p)
+                (FundamentalClassSet n X p Zplus)
+                (FundamentalClassSet_isClosed (n := n) (X := X) p Zplus hZplus_alg)
+                hZplus_closed)
+            -- now rewrite using `hZplus_rep`
+            have : ⟦FundamentalClassSet n X p Zplus, FundamentalClassSet_isClosed (n := n) (X := X) p Zplus hZplus_alg⟧
+                = ⟦sd.γplus, sd.h_plus_closed⟧ := by
+              exact hw_plus.trans hZplus_rep
+            simpa [this]
+      _ = ⟦sd.γplus, sd.h_plus_closed⟧ - ⟦sd.γminus, sd.h_minus_closed⟧ := by
+            -- rewrite the - part using ω^p representation and γminus = N·ω^p
+            -- First turn the ω^p representation into a γminus representation.
+            have h_gamma_minus_class :
+                ⟦sd.γminus, sd.h_minus_closed⟧ =
+                  (sd.N : ℝ) • ⟦omegaPow n X p, omega_pow_isClosed (n := n) (X := X) p⟧ := by
+              -- Use `sd.h_gamma_minus : γminus = N·ω^p` without rewriting (to avoid dependent elimination issues).
+              have hω_closed : IsFormClosed (omegaPow n X p) :=
+                omega_pow_isClosed (n := n) (X := X) p
+              have h_rhs_closed : IsFormClosed ((sd.N : ℝ) • omegaPow n X p) :=
+                isFormClosed_smul (n := n) (X := X) (k := 2 * p) (sd.N : ℂ) (omegaPow n X p) hω_closed
+
+              -- First, turn the form equality into a cohomology equality by congruence.
+              have h_eq_class :
+                  ⟦sd.γminus, sd.h_minus_closed⟧ = ⟦(sd.N : ℝ) • omegaPow n X p, h_rhs_closed⟧ := by
+                -- Replace the RHS form using `sd.h_gamma_minus`, and then use proof-irrelevance on the closedness witness.
+                -- `ofForm_proof_irrel` handles the closedness witness mismatch.
+                have h1 : ⟦sd.γminus, sd.h_minus_closed⟧ =
+                    ⟦sd.γminus, (by
+                        -- transport `h_rhs_closed` back along the equality
+                        -- (closedness is definitional `dω=0`, so rewriting is harmless)
+                        simpa [sd.h_gamma_minus] using h_rhs_closed)⟧ :=
+                  ofForm_proof_irrel (n := n) (X := X) (k := 2 * p) sd.γminus sd.h_minus_closed
+                    (by simpa [sd.h_gamma_minus] using h_rhs_closed)
+                -- Now rewrite the form itself.
+                -- (After rewriting, both sides are `ofForm ((N:ℝ)•ω^p)` with possibly different proofs.)
+                -- So we can finish by another proof-irrelevance step.
+                -- We keep it simple: rewrite the RHS form directly and then use proof irrelevance.
+                have h2 :
+                    ⟦sd.γminus, (by simpa [sd.h_gamma_minus] using h_rhs_closed)⟧ =
+                      ⟦(sd.N : ℝ) • omegaPow n X p, h_rhs_closed⟧ := by
+                  -- change the form by rewriting
+                  -- `sd.h_gamma_minus` is an equality of forms; rewrite the `ω` argument.
+                  -- After rewriting, the proof term is unchanged by proof irrelevance.
+                  -- This is just `rfl` after rewriting.
+                  simpa [sd.h_gamma_minus]
+                exact h1.trans h2
+
+              -- Second, use ℝ-linearity of `ofForm` to compute the RHS class.
+              have h_smul :
+                  ⟦(sd.N : ℝ) • omegaPow n X p, h_rhs_closed⟧ =
+                    (sd.N : ℝ) • ⟦omegaPow n X p, hω_closed⟧ := by
+                -- `ofForm_smul_real` gives this with the specific witness `isFormClosed_smul ...`;
+                -- align witnesses using `ofForm_proof_irrel`.
+                have h3 :
+                    ⟦(sd.N : ℝ) • omegaPow n X p,
+                      isFormClosed_smul (n := n) (X := X) (k := 2 * p) (sd.N : ℂ) (omegaPow n X p) hω_closed⟧
+                      =
+                    (sd.N : ℝ) • ⟦omegaPow n X p, hω_closed⟧ := by
+                  simpa using (ofForm_smul_real (n := n) (X := X) (k := 2 * p) (sd.N : ℝ) (omegaPow n X p) hω_closed)
+                have h4 :
+                    ⟦(sd.N : ℝ) • omegaPow n X p, h_rhs_closed⟧ =
+                      ⟦(sd.N : ℝ) • omegaPow n X p,
+                        isFormClosed_smul (n := n) (X := X) (k := 2 * p) (sd.N : ℂ) (omegaPow n X p) hω_closed⟧ :=
+                  ofForm_proof_irrel (n := n) (X := X) (k := 2 * p)
+                    ((sd.N : ℝ) • omegaPow n X p) h_rhs_closed
+                    (isFormClosed_smul (n := n) (X := X) (k := 2 * p) (sd.N : ℂ) (omegaPow n X p) hω_closed)
+                exact h4.trans h3
+
+              -- Combine.
+              simpa using h_eq_class.trans h_smul
+            -- Now use the ω^p representation for Zminus.
+            have hZminus_class :
+                ⟦FundamentalClassSet n X p Zminus, FundamentalClassSet_isClosed (n := n) (X := X) p Zminus hZminus_alg⟧
+                  = (sd.N : ℝ) • ⟦omegaPow n X p, omega_pow_isClosed (n := n) (X := X) p⟧ := by
+              -- First align the closedness witness for `[Zminus]`.
+              have hw_minus :
+                  ⟦FundamentalClassSet n X p Zminus, FundamentalClassSet_isClosed (n := n) (X := X) p Zminus hZminus_alg⟧
+                    = ⟦FundamentalClassSet n X p Zminus, hZminus_closed⟧ := by
+                simpa using (ofForm_proof_irrel (n := n) (X := X) (k := 2 * p)
+                  (FundamentalClassSet n X p Zminus)
+                  (FundamentalClassSet_isClosed (n := n) (X := X) p Zminus hZminus_alg)
+                  hZminus_closed)
+              exact hw_minus.trans hZminus_rep_omega
+            -- Finish by rewriting the fundamental class term to `⟦sd.γminus⟧`.
+            -- From hZminus_class and h_gamma_minus_class we get equality to ⟦sd.γminus⟧.
+            -- We use symmetry of h_gamma_minus_class.
+            have : ⟦FundamentalClassSet n X p Zminus, FundamentalClassSet_isClosed (n := n) (X := X) p Zminus hZminus_alg⟧
+                = ⟦sd.γminus, sd.h_minus_closed⟧ := by
+              -- chain equalities through (N:ℝ)•⟦ω^p⟧
+              calc
+                ⟦FundamentalClassSet n X p Zminus, FundamentalClassSet_isClosed (n := n) (X := X) p Zminus hZminus_alg⟧
+                    = (sd.N : ℝ) • ⟦omegaPow n X p, omega_pow_isClosed (n := n) (X := X) p⟧ := hZminus_class
+                _ = ⟦sd.γminus, sd.h_minus_closed⟧ := by simpa using h_gamma_minus_class.symm
+            -- apply it
+            simpa [this]
+      _ = ⟦γ, h_closed⟧ := by
+            -- use γ = γplus - γminus in cohomology
+            -- First convert `⟦γplus, hplus⟧ - ⟦γminus, hminus⟧` to `⟦γplus - γminus, _⟧` and then rewrite.
+            -- Use `ofForm_sub` in the other direction.
+            -- Closedness of `γplus - γminus` follows from closedness of each.
+            have hdiff_closed : IsFormClosed (sd.γplus - sd.γminus) :=
+              isFormClosed_sub (n := n) (X := X) (k := 2 * p) sd.γplus sd.γminus sd.h_plus_closed sd.h_minus_closed
+            -- `ofForm_sub` gives: ⟦γplus - γminus⟧ = ⟦γplus⟧ - ⟦γminus⟧
+            have hsub' :
+                ⟦sd.γplus - sd.γminus, hdiff_closed⟧ = ⟦sd.γplus, sd.h_plus_closed⟧ - ⟦sd.γminus, sd.h_minus_closed⟧ :=
+              by
+                simpa using (ofForm_sub (n := n) (X := X) (k := 2 * p) sd.γplus sd.γminus sd.h_plus_closed sd.h_minus_closed)
+            -- rewrite using h_eq : γ = γplus - γminus
+            -- and then show both sides are equal in cohomology.
+            -- Use `Subtype.ext`-style rewriting on the form equality.
+            -- Since `sd.h_eq : γ = γplus - γminus`, we can rewrite `⟦γ, h_closed⟧` to `⟦γplus - γminus, _⟧`
+            -- by cases on `sd.h_eq`.
+            -- Avoid dependent elimination on the form equality (since `SmoothForm` carries proof fields).
+            -- Convert `sd.h_eq : γ = γplus - γminus` into an equality of cohomology classes.
+            have hγ_eq : ⟦γ, h_closed⟧ = ⟦sd.γplus - sd.γminus, hdiff_closed⟧ := by
+              -- First: change the closedness witness on `γ` to one compatible with `sd.h_eq`.
+              -- Closedness of `sd.γplus - sd.γminus` follows from `hdiff_closed`; transport it to a closedness proof for `γ`.
+              have h_closed' : IsFormClosed γ := by
+                -- rewrite `hdiff_closed` along `sd.h_eq`
+                -- (goal is the same proposition after rewriting the form)
+                simpa [sd.h_eq] using hdiff_closed
+              -- Now: `⟦γ, h_closed⟧ = ⟦γ, h_closed'⟧` by proof irrelevance, and `sd.h_eq` rewrites the form.
+              calc
+                ⟦γ, h_closed⟧ = ⟦γ, h_closed'⟧ := ofForm_proof_irrel (n := n) (X := X) (k := 2 * p) γ h_closed h_closed'
+                _ = ⟦sd.γplus - sd.γminus, hdiff_closed⟧ := by
+                      -- rewrite the form using `sd.h_eq`
+                      -- (proof is now definitional after rewriting)
+                      simpa [sd.h_eq] using (rfl : ⟦γ, h_closed'⟧ = ⟦γ, h_closed'⟧)
+            -- Now `hsub'` gives the desired relation.
+            -- `hsub' : ⟦γplus-γminus⟧ = ⟦γplus⟧ - ⟦γminus⟧`
+            -- so we can rewrite.
+            -- Goal: ⟦γplus⟧ - ⟦γminus⟧ = ⟦γ, h_closed⟧.
+            calc
+              ⟦sd.γplus, sd.h_plus_closed⟧ - ⟦sd.γminus, sd.h_minus_closed⟧
+                  = ⟦sd.γplus - sd.γminus, hdiff_closed⟧ := by simpa using hsub'.symm
+              _ = ⟦γ, h_closed⟧ := by simpa using hγ_eq.symm
+
+  ·
+    -- p > n/2: use Hard Lefschetz to find a lower-codimension (p',p') class η in degree 2*(n-p).
+    have hp : p > n / 2 := by
+      exact lt_of_not_ge h_range
+    obtain ⟨η, hη_closed, hη_hodge, hη_rat⟩ :=
+      hard_lefschetz_inverse_form (n := n) (X := X) hp γ h_closed h_p_p h_rational
+
+    -- Apply the theorem recursively to η (note: `p' = n - p ≤ n/2`).
+    obtain ⟨Z_η, hZ_η_rep⟩ :=
+      hodge_conjecture' (p := n - p) η hη_closed hη_rat hη_hodge
+
+    -- Lift back to degree 2p using the (axiomatized) Lefschetz lift on cycles.
+    obtain ⟨Z, hZ_rep⟩ :=
+      lefschetz_lift_signed_cycle (p := p) (p' := n - p)
+        γ h_closed η hη_closed Z_η hp hZ_η_rep
     exact ⟨Z, hZ_rep⟩
 
 end

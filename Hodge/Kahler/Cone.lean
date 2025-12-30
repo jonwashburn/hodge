@@ -57,33 +57,6 @@ theorem smoothForm_cast_zero {k k' : ℕ} (h : k = k') :
   subst h
   rfl
 
-/-- Helper: the structure form of zero equals zero. -/
-theorem smoothForm_mk_zero_eq_zero (k : ℕ) :
-    (⟨fun _ => 0⟩ : SmoothForm n X k) = 0 := rfl
-
-/-- Helper: casting a structure-form zero from k to k' gives zero.
-    Note: the source type has index k, not k'. -/
-theorem smoothForm_cast_mk_zero {k k' : ℕ} (h : k' = k) :
-    (h ▸ (⟨fun _ => 0⟩ : SmoothForm n X k) : SmoothForm n X k') = 0 := by
-  subst h
-  rfl
-
-/-- In the stub model, omegaPow is the zero form.
-    This is because unitForm = 0 and wedge _ _ = 0. -/
-theorem omegaPow_eq_zero (p : ℕ) : omegaPow n X p = 0 := by
-  induction p with
-  | zero =>
-    -- omegaPow n X 0 = unitForm = 0
-    unfold omegaPow unitForm
-    rfl
-  | succ p' _ih =>
-    -- omegaPow n X (p'+1) = h_eq ▸ (omega_form ⋀ omegaPow n X p')
-    -- where h_eq : 2 * (p' + 1) = 2 + 2 * p'
-    -- Since wedge _ _ = ⟨fun _ => 0⟩, the result is h_eq ▸ ⟨fun _ => 0⟩
-    -- where the source has type SmoothForm n X (2 + 2 * p')
-    simp only [omegaPow, wedge]
-    exact smoothForm_cast_mk_zero (n := n) (X := X) (by ring : 2 * (p' + 1) = 2 + 2 * p')
-
 /-- **Wirtinger Inequality** (Harvey-Lawson, 1982).
     The pairing of ω^p with any simple calibrated form ξ_V (associated to a
     p-dimensional complex subspace V) is exactly 1. This is the fundamental
@@ -97,21 +70,10 @@ axiom wirtinger_pairing (p : ℕ) (x : X) (ξ : SmoothForm n X (2 * p))
 /-- **ω^p is in the interior of K_p(x)** (Demailly, 2012).
     The Kähler power ω^p lies in the interior of the strongly positive cone at each point.
 
-    In this stub model with discrete topology, every set is open, so interior S = S.
-    Since omegaPow = 0 (by `omegaPow_eq_zero`) and 0 ∈ cone (by `zero_mem_stronglyPositiveCone`),
-    the result follows.
-
     Reference: [J.-P. Demailly, "Complex Analytic and Differential Geometry",
     Institut Fourier, 2012, Chapter III, Section 1]. -/
-theorem omegaPow_in_interior (p : ℕ) (x : X) :
-    (omegaPow_point (n := n) (X := X) p x) ∈ interior (stronglyPositiveCone (n := n) p x) := by
-  -- In the discrete topology (⊥), every set is open, so interior S = S
-  rw [interior_eq_iff_isOpen.mpr (isOpen_discrete _)]
-  -- omegaPow_point = omegaPow = 0
-  unfold omegaPow_point
-  rw [omegaPow_eq_zero]
-  -- 0 ∈ stronglyPositiveCone
-  exact zero_mem_stronglyPositiveCone p x
+axiom omegaPow_in_interior (p : ℕ) (x : X) :
+    (omegaPow_point (n := n) (X := X) p x) ∈ interior (stronglyPositiveCone (n := n) p x)
 
 /-- **Uniform Interior Radius Theorem** (Lang, 1999).
     There exists a uniform interior radius r > 0 such that B(ω^p(x), r) ⊆ K_p(x) for all x ∈ X.

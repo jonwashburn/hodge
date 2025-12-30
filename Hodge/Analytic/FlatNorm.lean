@@ -19,32 +19,25 @@ variable {n : ℕ} {X : Type*}
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
   [Nonempty X]
 
-/-- The flat norm of a current T.
-    Defined as 0 for compilation (stub). -/
-def flatNorm {k : ℕ} (_T : Current n X k) : ℝ := 0
+/-- **The Flat Norm** (Federer-Fleming, 1960).
+    The flat norm of a current T is the infimum of M(S) + M(V) such that T = S + ∂V.
+    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 1960]. -/
+opaque flatNorm {k : ℕ} (T : Current n X k) : ℝ
 
 /-- The flat norm is non-negative. -/
-theorem flatNorm_nonneg {k : ℕ} (T : Current n X k) :
-    flatNorm T ≥ 0 := le_refl 0
+axiom flatNorm_nonneg {k : ℕ} (T : Current n X k) : flatNorm T ≥ 0
 
 /-- The flat norm satisfies the triangle inequality. -/
-theorem flatNorm_add_le {k : ℕ} (S T : Current n X k) :
-    flatNorm (S + T) ≤ flatNorm S + flatNorm T := by simp [flatNorm]
+axiom flatNorm_add_le {k : ℕ} (S T : Current n X k) : flatNorm (S + T) ≤ flatNorm S + flatNorm T
 
 /-- The flat norm is bounded above by the mass. -/
-theorem flatNorm_le_mass {k : ℕ} (T : Current n X k) :
-    flatNorm T ≤ T.mass := by simp [flatNorm, Current.mass]
+axiom flatNorm_le_mass {k : ℕ} (T : Current n X k) : flatNorm T ≤ Current.mass T
 
 /-- **Federer-Fleming Evaluation Estimate** (Federer-Fleming, 1960).
     The evaluation of a current on a smooth form is bounded by the flat norm of the
     current and the maximum comass of the form and its derivative.
-
-    In the stub model, all currents evaluate to zero, so this inequality holds trivially.
-    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", Ann. of Math. 72 (1960), 458-520, Section 4]. -/
-theorem eval_le_flatNorm {k : ℕ} (T : Current n X k) (ψ : SmoothForm n X k) :
-    |T.toFun ψ| ≤ flatNorm T * max (comass ψ) (comass (smoothExtDeriv ψ)) := by
-  -- In stub model, T.toFun ψ = 0 by definition.
-  rw [T.toFun_zero ψ]
-  simp only [abs_zero, flatNorm, zero_mul, le_refl]
+    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 1960]. -/
+axiom eval_le_flatNorm {k : ℕ} (T : Current n X k) (ψ : SmoothForm n X k) :
+    |T.toFun ψ| ≤ flatNorm T * max (comass ψ) (comass (smoothExtDeriv ψ))
 
 end
