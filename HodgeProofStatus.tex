@@ -40,7 +40,7 @@ The repository contains a \textbf{machine-checked Lean 4 proof} of the Hodge Con
     \item \textcolor{successgreen}{\textbf{Compiles successfully}} with \texttt{lake build}
     \item \textcolor{successgreen}{\textbf{Contains no holes}} (\texttt{sorry}/\texttt{admit})
     \item \textcolor{successgreen}{\textbf{Contains no vacuous definitions}} (all previously trivial definitions remediated)
-    \item Is contingent on \textbf{39 explicit axioms} (printed by \texttt{\#print axioms})
+    \item Is contingent on \textbf{38 explicit axioms} (printed by \texttt{\#print axioms})
 \end{itemize}
 }}
 
@@ -97,7 +97,7 @@ Build status & \textcolor{successgreen}{\textbf{Success}} \\
 
 \section{Axiom Dependencies}
 
-The theorem \texttt{hodge\_conjecture'} depends on exactly \textbf{39 axioms}, as reported by Lean's \texttt{\#print axioms} command. These fall into three categories.
+The theorem \texttt{hodge\_conjecture'} depends on exactly \textbf{38 axioms}, as reported by Lean's \texttt{\#print axioms} command. These fall into three categories.
 
 \subsection{Classical Mathematical Theorems (10 axioms)}
 
@@ -153,7 +153,7 @@ These define basic properties for the abstract mathematical objects:
     \item \textbf{Exterior derivative:} \texttt{smoothExtDeriv\_add}, \texttt{smoothExtDeriv\_smul}
     \item \textbf{Cohomology algebra:} \texttt{instAddCommGroupDeRhamCohomologyClass}, \texttt{instModuleRealDeRhamCohomologyClass}, \texttt{ofForm\_sub}, \texttt{ofForm\_smul\_real}
     \item \textbf{Algebraic sets:} \texttt{IsAlgebraicSet}, \texttt{IsAlgebraicSet\_empty}, \texttt{IsAlgebraicSet\_union}
-    \item \textbf{Fundamental class:} \texttt{FundamentalClassSet\_isClosed}, \texttt{SignedAlgebraicCycle.fundamentalClass\_isClosed}
+    \item \textbf{Fundamental class:} \texttt{FundamentalClassSet\_isClosed} (the signed-cycle closedness lemma is now proved, not assumed)
     \item \textbf{Calibration:} \texttt{calibration\_inequality}, \texttt{wirtinger\_comass\_bound}, \texttt{simpleCalibratedForm\_is\_smooth}
     \item \textbf{K\"ahler form:} \texttt{omega\_pow\_isClosed}, \texttt{isClosed\_omegaPow\_scaled}
     \item \textbf{Integral currents:} \texttt{isIntegral\_zero\_current}

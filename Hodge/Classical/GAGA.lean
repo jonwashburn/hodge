@@ -84,7 +84,7 @@ of Chow's theorem (the other direction is that every closed analytic subset of
 a projective variety is algebraic).
 
 Reference: [Chow, "On compact complex analytic varieties", 1949]
-Reference: [Serre, "Géométrie algébrique et géométrie analytique", 1956] -/
+    Reference: [Serre, "Géométrie algébrique et géométrie analytique", 1956] -/
 axiom IsAlgebraicSet_isAnalyticSet (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
@@ -267,8 +267,8 @@ theorem exists_complete_intersection (p : ℕ) :
 theorem omega_pow_is_algebraic (p : ℕ) :
     ∃ (Z : Set X), isAlgebraicSubvariety n X Z ∧
     ∃ (W : AlgebraicSubvariety n X), W.carrier = Z ∧ W.codim = p := by
-  obtain ⟨W, hW_codim⟩ := exists_complete_intersection (n := n) (X := X) p
-  exact ⟨W.carrier, ⟨W, rfl⟩, W, rfl, hW_codim⟩
+    obtain ⟨W, hW_codim⟩ := exists_complete_intersection (n := n) (X := X) p
+    exact ⟨W.carrier, ⟨W, rfl⟩, W, rfl, hW_codim⟩
 
 /-! ## Hyperplane Intersection Operations -/
 
@@ -320,8 +320,14 @@ noncomputable def SignedAlgebraicCycle.fundamentalClass (p : ℕ)
   FundamentalClassSet n X p Z.pos - FundamentalClassSet n X p Z.neg
 
 /-- **Theorem: fundamentalClass of a signed cycle is closed.** -/
-axiom SignedAlgebraicCycle.fundamentalClass_isClosed (p : ℕ) (Z : SignedAlgebraicCycle n X) :
-    IsFormClosed (Z.fundamentalClass p)
+theorem SignedAlgebraicCycle.fundamentalClass_isClosed (p : ℕ) (Z : SignedAlgebraicCycle n X) :
+    IsFormClosed (Z.fundamentalClass p) := by
+  unfold SignedAlgebraicCycle.fundamentalClass
+  -- closedness is preserved under subtraction
+  exact isFormClosed_sub (n := n) (X := X) (k := 2 * p)
+    (FundamentalClassSet n X p Z.pos) (FundamentalClassSet n X p Z.neg)
+    (FundamentalClassSet_isClosed (n := n) (X := X) p Z.pos Z.pos_alg)
+    (FundamentalClassSet_isClosed (n := n) (X := X) p Z.neg Z.neg_alg)
 
 /-- The cycle class map into de Rham cohomology. -/
 noncomputable def SignedAlgebraicCycle.cycleClass (p : ℕ)
