@@ -1,9 +1,9 @@
 # Hodge Conjecture Lean Formalization: Full Sprint Plan
 
 **Generated:** 2024-12-30  
-**Last Update:** 2024-12-30  
+**Last Update:** 2024-12-31  
 **Build Status:** ✅ **BUILD PASSES** — All Hodge modules compile!  
-**Total Axioms/Opaques:** 196  
+**Total Axioms/Opaques:** 211  
 **Target:** Convert all to theorems/defs (except ~12 classical pillars)
 
 ---
@@ -66,32 +66,32 @@ Everything else. This includes:
 
 ---
 
-## 📊 AXIOM DISTRIBUTION BY FILE
+## 📊 AXIOM DISTRIBUTION BY FILE (Current Count: 211)
 
 | File | Axioms/Opaques | Assigned To |
 |------|----------------|-------------|
-| `Hodge/Kahler/Microstructure.lean` | 24 | Agent 5 (🟢 Complete) |
-| `Hodge/Basic.lean` | 20 | Agent 1 (✅ FIXED!) |
-| `Hodge/Analytic/Norms.lean` | 19 | Agent 1 |
-| `Hodge/Classical/GAGA.lean` | 18 | Agent 4 (🟢 Complete) |
-| `Hodge/Analytic/Forms.lean` | 14 | Agent 1 (⏳ check after IntegralCurrents) |
-| `Hodge/Classical/HarveyLawson.lean` | 10 | Agent 4 (🟢 Complete) |
-| `Hodge/Classical/Bergman.lean` | 10 | Agent 4 (🟡 3 errors) |
-| `Hodge/Analytic/SheafTheory.lean` | 10 | Agent 4 (🟢 Complete) |
-| `Hodge/Analytic/Grassmannian.lean` | 10 | Agent 3 (🟢 Complete) |
-| `Hodge/Kahler/TypeDecomposition.lean` | 9 | Agent 3 (🟢 Complete) |
-| `Hodge/Kahler/Manifolds.lean` | 9 | Agent 3 (🟢 Complete) |
-| `Hodge/Analytic/FlatNorm.lean` | 9 | Agent 2 (🟢 Complete) |
-| `Hodge/Analytic/IntegralCurrents.lean` | 8 | Agent 2 (🟢 Complete) |
-| `Hodge/Classical/Lefschetz.lean` | 5 | Agent 4 (🟢 Complete) |
-| `Hodge/Analytic/Currents.lean` | 5 | Agent 2 (✅ builds) |
-| `Hodge/Kahler/Cone.lean` | 4 | Agent 3 (🟢 Complete) |
-| `Hodge/Analytic/Calibration.lean` | 4 | Agent 2 (🟢 Complete) |
-| `Hodge/Kahler/Main.lean` | 3 | Agent 5 (🟢 Complete) |
-| `Hodge/Classical/FedererFleming.lean` | 2 | Agent 4 (🟢 Complete) |
-| `Hodge/Utils/BaranyGrinberg.lean` | 1 | Agent 5 |
-| `Hodge/Kahler/SignedDecomp.lean` | 1 | Agent 5 (🟢 Complete) |
-| `Hodge/Classical/SerreVanishing.lean` | 1 | Agent 4 (🟢 Complete) |
+| `Hodge/Analytic/Forms.lean` | 31 | **Agent 1** |
+| `Hodge/Basic.lean` | 28 | **Agent 1** |
+| `Hodge/Analytic/Norms.lean` | 23 | **Agent 1** |
+| `Hodge/Analytic/Currents.lean` | 16 | **Agent 2** |
+| `Hodge/Analytic/IntegralCurrents.lean` | 12 | **Agent 2** |
+| `Hodge/Analytic/FlatNorm.lean` | 11 | **Agent 2** |
+| `Hodge/Analytic/Grassmannian.lean` | 11 | **Agent 3** |
+| `Hodge/Kahler/TypeDecomposition.lean` | 10 | **Agent 3** |
+| `Hodge/Classical/HarveyLawson.lean` | 10 | **Agent 4** |
+| `Hodge/Classical/GAGA.lean` | 10 | **Agent 4** |
+| `Hodge/Kahler/Microstructure.lean` | 8 | **Agent 5** |
+| `Hodge/Kahler/Manifolds.lean` | 7 | **Agent 3** |
+| `Hodge/Classical/Lefschetz.lean` | 7 | **Agent 4** |
+| `Hodge/Analytic/SheafTheory.lean` | 5 | **Agent 4** |
+| `Hodge/Analytic/Calibration.lean` | 5 | **Agent 2** |
+| `Hodge/Kahler/Cone.lean` | 4 | **Agent 3** |
+| `Hodge/Classical/Bergman.lean` | 4 | **Agent 4** |
+| `Hodge/Kahler/Main.lean` | 3 | **Agent 5** |
+| `Hodge/Kahler/SignedDecomp.lean` | 2 | **Agent 5** |
+| `Hodge/Classical/FedererFleming.lean` | 2 | **Agent 4** |
+| `Hodge/Utils/BaranyGrinberg.lean` | 1 | **Agent 5** (keep as axiom) |
+| `Hodge/Classical/SerreVanishing.lean` | 1 | **Agent 4** (keep as axiom) |
 
 ---
 
@@ -101,31 +101,18 @@ Everything else. This includes:
 
 All errors have been resolved. The codebase uses a consistent axiom/opaque approach.
 
-### ✅ All files build successfully
+**Next Goal:** Convert 211 axioms/opaques → theorems/defs (keeping ~12 classical pillars).
 
-- `Hodge/Basic.lean` ✅
-- `Hodge/Analytic/Forms.lean` ✅
-- `Hodge/Analytic/Norms.lean` ✅
-- `Hodge/Analytic/Currents.lean` ✅
-- `Hodge/Analytic/FlatNorm.lean` ✅
-- `Hodge/Analytic/IntegralCurrents.lean` ✅
-- `Hodge/Analytic/Calibration.lean` ✅
-- `Hodge/Analytic/Grassmannian.lean` ✅
-- `Hodge/Analytic/SheafTheory.lean` ✅
-- `Hodge/Classical/GAGA.lean` ✅
-- `Hodge/Classical/HarveyLawson.lean` ✅
-- `Hodge/Classical/Bergman.lean` ✅
-- `Hodge/Classical/Lefschetz.lean` ✅
-- `Hodge/Classical/FedererFleming.lean` ✅
-- `Hodge/Classical/SerreVanishing.lean` ✅
-- `Hodge/Kahler/Manifolds.lean` ✅
-- `Hodge/Kahler/TypeDecomposition.lean` ✅
-- `Hodge/Kahler/Cone.lean` ✅
-- `Hodge/Kahler/Microstructure.lean` ✅
-- `Hodge/Kahler/SignedDecomp.lean` ✅
-- `Hodge/Kahler/Main.lean` ✅
-- `Hodge/CategoryTheory/Filtration/*.lean` ✅
-- `Hodge/CategoryTheory/Filtration/InducedOnGr.lean` ✅
+### Agent Workload Summary
+
+| Agent | Files | Items | LOC Est |
+|-------|-------|-------|---------|
+| **Agent 1** | Basic, Forms, Norms | **82** | ~2000 |
+| **Agent 2** | Currents, FlatNorm, IntegralCurrents, Calibration | **44** | ~1100 |
+| **Agent 3** | Grassmannian, Cone, TypeDecomp, Manifolds | **32** | ~800 |
+| **Agent 4** | GAGA, HarveyLawson, Bergman, SheafTheory, Lefschetz, FF, SV | **39** | ~1000 |
+| **Agent 5** | Microstructure, SignedDecomp, Main, BaranyGrinberg | **14** | ~400 |
+| **TOTAL** | 22 files | **211** | ~5300 |
 
 ---
 
@@ -135,118 +122,159 @@ All errors have been resolved. The codebase uses a consistent axiom/opaque appro
 
 | File | Axioms/Opaques |
 |------|----------------|
-| `Hodge/Basic.lean` | 20 |
-| `Hodge/Analytic/Forms.lean` | 14 |
-| `Hodge/Analytic/Norms.lean` | 19 |
-| **TOTAL** | **53** |
+| `Hodge/Basic.lean` | 28 |
+| `Hodge/Analytic/Forms.lean` | 31 |
+| `Hodge/Analytic/Norms.lean` | 23 |
+| **TOTAL** | **82** |
 
 ## Full Axiom List
 
-### Hodge/Basic.lean (20 items)
+### Hodge/Basic.lean (28 items)
 
 ```lean
--- Line 42: Convert to def
-opaque IsSmoothAlternating (n : ℕ) (X : Type u) ... : Prop
+-- Line 32: prove existence
+axiom exists_not_isClosed_set (X : Type*) [TopologicalSpace X] [Nonempty X] : ∃ S : Set X, ¬ IsClosed S
 
--- Line 60: Convert to def using Mathlib topology
-axiom smoothFormTopologicalSpace_axiom (k : ℕ) : TopologicalSpace (SmoothForm n X k)
+-- Line 35: Convert to def using exterior algebra
+opaque SmoothForm (n : ℕ) (X : Type u) (k : ℕ)
 
--- Lines 66-78: Prove from definition of IsSmoothAlternating
-axiom isSmoothAlternating_zero (k : ℕ) : IsSmoothAlternating n X k ⟨0, ...⟩
-axiom isSmoothAlternating_add (k : ℕ) (ω η : SmoothForm n X k) : ...
-axiom isSmoothAlternating_neg (k : ℕ) (ω : SmoothForm n X k) : ...
-axiom isSmoothAlternating_smul (k : ℕ) (c : ℂ) (ω : SmoothForm n X k) : ...
-axiom isSmoothAlternating_sub (k : ℕ) (ω η : SmoothForm n X k) : ...
+-- Lines 39-61: Prove as instances
+axiom SmoothForm.zero (n : ℕ) (X : Type u) (k : ℕ) : SmoothForm n X k
+axiom SmoothForm.instAddCommGroup (n : ℕ) (X : Type u) (k : ℕ) : AddCommGroup (SmoothForm n X k)
+axiom SmoothForm.instModuleComplex (n : ℕ) (X : Type u) (k : ℕ) : Module ℂ (SmoothForm n X k)
+axiom SmoothForm.instModuleReal (n : ℕ) (X : Type u) (k : ℕ) : Module ℝ (SmoothForm n X k)
+axiom SmoothForm.instTopologicalSpace (n : ℕ) (X : Type u) (k : ℕ) : TopologicalSpace (SmoothForm n X k)
 
--- Line 211: Convert to def using exterior derivative
+-- Line 70: Convert to def
+opaque as_alternating : SmoothForm n X k → (x : X) → (TangentSpace (𝓒_complex n) x) [⋀^Fin k]→ₗ[ℂ] ℂ
+
+-- Lines 75-86: Convert/prove exterior derivative
 opaque smoothExtDeriv {n : ℕ} {X : Type u} ... (ω : SmoothForm n X k) : SmoothForm n X (k + 1)
-
--- Lines 217-252: Prove from definition
-axiom smoothExtDeriv_extDeriv ... : smoothExtDeriv ω x = extDeriv ω x
-axiom smoothExtDeriv_add ... : smoothExtDeriv (ω₁ + ω₂) = smoothExtDeriv ω₁ + smoothExtDeriv ω₂
+axiom smoothExtDeriv_add ... : smoothExtDeriv (ω + η) = smoothExtDeriv ω + smoothExtDeriv η
 axiom smoothExtDeriv_smul ... : smoothExtDeriv (c • ω) = c • smoothExtDeriv ω
 
--- Lines 605-621: Prove as instances using Quotient API
+-- Line 149: Prove
+axiom isFormClosed_smul_real ... : IsFormClosed ω → IsFormClosed (r • ω)
+
+-- Lines 228-250: Prove as instances using Quotient API
 axiom instAddCommGroupDeRhamCohomologyClass : AddCommGroup (DeRhamCohomologyClass n X k)
 axiom instModuleDeRhamCohomologyClass : Module ℂ (DeRhamCohomologyClass n X k)
-axiom instModuleRealDeRhamCohomologyClass : Module ℝ (DeRhamCohomologyClass n X k)
+axiom smulRat_DeRhamCohomologyClass : HSMul ℚ (DeRhamCohomologyClass n X k) (DeRhamCohomologyClass n X k)
+axiom neg_eq_neg_one_smul_rat_DeRham (η) : -η = (-1 : ℚ) • η
+axiom instHMulDeRhamCohomologyClass : HMul (DeRhamCohomologyClass n X k) (DeRhamCohomologyClass n X l) (DeRhamCohomologyClass n X (k + l))
 
--- Line 946: Prove wedge product on cohomology
-axiom instHMulDeRhamCohomologyClass : HMul (DeRhamCohomologyClass n X k) ...
+-- Lines 263-289: Prove from Quotient.liftOn
+axiom ofForm_add (ω η) (hω hη) : ofForm (ω + η) _ = ofForm ω hω + ofForm η hη
+axiom ofForm_smul (c) (ω) (hω) : ofForm (c • ω) _ = c • ofForm ω hω
+axiom ofForm_neg (ω) (hω) : ofForm (-ω) _ = -ofForm ω hω
+axiom ofForm_smul_real (r) (ω) (hω) : ofForm (r • ω) _ = r • ofForm ω hω
 
--- Lines 996-1021: Prove from Quotient.liftOn
-axiom ofForm_add ... : ofForm (ω₁ + ω₂) h = ofForm ω₁ h₁ + ofForm ω₂ h₂
-axiom ofForm_sub ... : ofForm (ω₁ - ω₂) h = ofForm ω₁ h₁ - ofForm ω₂ h₂
-axiom ofForm_smul_rat ... : ofForm (q • ω) h = q • ofForm ω hω
-axiom ofForm_smul_real ... : ofForm (r • ω) h = r • ofForm ω hω
+-- Lines 306-349: Rationality predicates
+opaque isRationalClass {n : ℕ} {X : Type u} {k : ℕ} ... (η : DeRhamCohomologyClass n X k) : Prop
+axiom isRationalClass_zero : isRationalClass (0 : DeRhamCohomologyClass n X k)
+axiom isRationalClass_add (η₁ η₂) : isRationalClass η₁ → isRationalClass η₂ → isRationalClass (η₁ + η₂)
+axiom isRationalClass_smul_rat (q : ℚ) (η) : isRationalClass η → isRationalClass (q • η)
+axiom isRationalClass_mul (η₁ η₂) : isRationalClass η₁ → isRationalClass η₂ → isRationalClass (η₁ * η₂)
 
--- Line 1048: Convert to def
-opaque isRationalClass {n : ℕ} {X : Type u} ... (η : DeRhamCohomologyClass n X k) : Prop
+-- Lines 357-360: (p,p) form type
+opaque isPPForm' (n : ℕ) (X : Type u) ... (p : ℕ) (ω : SmoothForm n X (2 * p)) : Prop
+axiom isPPForm_zero : isPPForm' n X p (0 : SmoothForm n X (2 * p))
 ```
 
-### Hodge/Analytic/Forms.lean (14 items)
+### Hodge/Analytic/Forms.lean (31 items)
 
 ```lean
--- Lines 25-35: Convert opaques to defs
+-- Line 30: Wedge product
+opaque smoothWedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) : SmoothForm n X (k + l)
+
+-- Lines 37-69: Wedge properties
+axiom isFormClosed_wedge {k l : ℕ} (ω η) : IsFormClosed ω → IsFormClosed η → IsFormClosed (smoothWedge ω η)
+axiom smoothWedge_add_right {k l : ℕ} (ω η₁ η₂) : smoothWedge ω (η₁ + η₂) = smoothWedge ω η₁ + smoothWedge ω η₂
+axiom smoothWedge_add_left {k l : ℕ} (ω₁ ω₂ η) : smoothWedge (ω₁ + ω₂) η = smoothWedge ω₁ η + smoothWedge ω₂ η
+axiom smoothWedge_smul_right {k l : ℕ} (c ω η) : smoothWedge ω (c • η) = c • smoothWedge ω η
+axiom smoothWedge_smul_left {k l : ℕ} (c ω η) : smoothWedge (c • ω) η = c • smoothWedge ω η
+axiom smoothWedge_assoc {k l m : ℕ} (α β γ) : smoothWedge (smoothWedge α β) γ = smoothWedge α (smoothWedge β γ)
+axiom smoothWedge_zero_right {k l : ℕ} (ω) : smoothWedge ω 0 = 0
+axiom smoothWedge_zero_left {k l : ℕ} (η) : smoothWedge 0 η = 0
+axiom smoothWedge_comm {k l : ℕ} (α β) : smoothWedge α β = (-1)^(k*l) • smoothWedge β α
+
+-- Lines 85-94: Exterior derivative
+axiom smoothExtDeriv_extDeriv {k : ℕ} (ω) : ...
+axiom smoothExtDeriv_smul_real {k : ℕ} (r ω) : smoothExtDeriv (r • ω) = r • smoothExtDeriv ω
+axiom smoothExtDeriv_wedge {k l : ℕ} (α β) : smoothExtDeriv (smoothWedge α β) = ...
+
+-- Lines 103-110: Unit form & Hodge star
 opaque unitForm : SmoothForm n X 0
-opaque wedge {k l : ℕ} (α : SmoothForm n X k) (β : SmoothForm n X l) : SmoothForm n X (k + l)
 opaque hodgeStar {k : ℕ} (ω : SmoothForm n X k) : SmoothForm n X (2 * n - k)
 
--- Lines 60-120: Prove linearity properties
-axiom wedge_add ... : wedge (α + β) γ = wedge α γ + wedge β γ
-axiom wedge_smul ... : wedge (c • α) β = c • wedge α β
-axiom wedge_assoc ... : wedge (wedge α β) γ = wedge α (wedge β γ)
-axiom smoothExtDeriv_wedge ... : smoothExtDeriv (wedge α β) = ...
-axiom hodgeStar_add ... : hodgeStar (α + β) = hodgeStar α + hodgeStar β
-axiom hodgeStar_smul ... : hodgeStar (r • α) = r • hodgeStar α
+-- Lines 115-129: Hodge star properties
+axiom hodgeStar_add {k : ℕ} (α β) : hodgeStar (α + β) = hodgeStar α + hodgeStar β
+axiom hodgeStar_smul_real {k : ℕ} (r α) : hodgeStar (r • α) = r • hodgeStar α
+axiom hodgeStar_hodgeStar {k : ℕ} (α) : hodgeStar (hodgeStar α) = (-1)^(k*(2*n-k)) • α
 
--- Lines 125-143: Convert to defs
+-- Lines 135-154: Adjoint derivative
 opaque adjointDeriv {k : ℕ} (ω : SmoothForm n X k) : SmoothForm n X (k - 1)
-opaque laplacian {k : ℕ} (ω : SmoothForm n X k) : SmoothForm n X k
-opaque lefschetzLambda {k : ℕ} (η : SmoothForm n X k) : SmoothForm n X (k - 2)
+axiom adjointDeriv_add {k : ℕ} (α β) : adjointDeriv (α + β) = adjointDeriv α + adjointDeriv β
+axiom adjointDeriv_smul_real {k : ℕ} (r α) : adjointDeriv (r • α) = r • adjointDeriv α
+axiom adjointDeriv_squared {k : ℕ} (α) : adjointDeriv (adjointDeriv α) = 0
 
-axiom laplacian_add ... : laplacian (α + β) = laplacian α + laplacian β
+-- Lines 163-192: Laplacian
+opaque laplacian {k : ℕ} (ω : SmoothForm n X k) : SmoothForm n X k
+axiom laplacian_add {k : ℕ} (α β) : laplacian (α + β) = laplacian α + laplacian β
+axiom laplacian_smul_real {k : ℕ} (r α) : laplacian (r • α) = r • laplacian α
+axiom isHarmonic_implies_closed {k : ℕ} (ω) : laplacian ω = 0 → smoothExtDeriv ω = 0
+axiom isHarmonic_implies_coclosed {k : ℕ} (ω) : laplacian ω = 0 → adjointDeriv ω = 0
+
+-- Lines 203-216: Lefschetz operators
+opaque lefschetzLambda {k : ℕ} (η : SmoothForm n X k) : SmoothForm n X (k - 2)
+axiom lefschetzL_add {k : ℕ} [K : KahlerManifold n X] (α β) : lefschetzL (α + β) = lefschetzL α + lefschetzL β
+axiom lefschetzLambda_add {k : ℕ} (α β) : lefschetzLambda (α + β) = lefschetzLambda α + lefschetzLambda β
+axiom lefschetz_commutator {k : ℕ} (α) : ...
 ```
 
-### Hodge/Analytic/Norms.lean (19 items)
+### Hodge/Analytic/Norms.lean (23 items)
 
 ```lean
--- Line 22: Convert to def using sSup
+-- Line 26: Convert to def using sSup
 opaque pointwiseComass {n : ℕ} {X : Type*} ... (α : SmoothForm n X k) (x : X) : ℝ
 
--- Lines 27-58: Prove from definition
+-- Lines 31-62: Prove from definition
 axiom pointwiseComass_nonneg ... : pointwiseComass α x ≥ 0
-axiom pointwiseComass_continuous ... : Continuous (pointwiseComass α)
 axiom pointwiseComass_zero ... : pointwiseComass 0 x = 0
 axiom pointwiseComass_add_le ... : pointwiseComass (α + β) x ≤ pointwiseComass α x + pointwiseComass β x
 axiom pointwiseComass_smul ... : pointwiseComass (c • α) x = |c| * pointwiseComass α x
+axiom SmoothForm.neg_eq_neg_one_smul ... : -α = (-1 : ℝ) • α
+axiom pointwiseComass_continuous ... : Continuous (pointwiseComass α)
 
--- Lines 75-111: Prove from pointwiseComass
-axiom comass_bddAbove ... : BddAbove (Set.range (pointwiseComass α))
-axiom comass_zero ... : comass (0 : SmoothForm n X k) = 0
+-- Lines 106-144: Comass properties
 axiom comass_add_le ... : comass (α + β) ≤ comass α + comass β
 axiom comass_smul ... : comass (c • α) = |c| * comass α
-axiom comass_nonneg ... : comass α ≥ 0
 axiom comass_eq_zero_iff ... : comass α = 0 ↔ α = 0
 
--- Lines 130-162: Convert to defs and prove
+-- Lines 153-190: Inner products
 opaque pointwiseInner {n : ℕ} {X : Type*} ... (α β : SmoothForm n X k) (x : X) : ℝ
 axiom pointwiseInner_self_nonneg ... : pointwiseInner α α x ≥ 0
-opaque L2Inner ... (α β : SmoothForm n X k) : ℝ
+opaque L2Inner {n : ℕ} {X : Type*} ... (α β : SmoothForm n X k) : ℝ
 axiom L2Inner_add_left ... : L2Inner (α + β) γ = L2Inner α γ + L2Inner β γ
 axiom L2Inner_smul_left ... : L2Inner (c • α) β = c * L2Inner α β
+axiom L2Inner_self_nonneg ... : L2Inner α α ≥ 0
 
--- Lines 187-199: Prove or keep as deep theorems
-axiom energy_minimizer ... : ...
-axiom trace_L2_control ... : ∃ C : ℝ, C > 0 ∧ comass α ≤ C * L2NormForm α
+-- Lines 212-307: Deep theorems
+axiom energy_minimizer ... : harmonic representative minimizes energy
+axiom trace_L2_control ... : ∃ C > 0, comass α ≤ C * L2NormForm α
+axiom pointwiseInner_comm ... : pointwiseInner α β = pointwiseInner β α
+axiom L2Inner_comm ... : L2Inner α β = L2Inner β α
+axiom L2Inner_cauchy_schwarz ... : |L2Inner α β| ≤ L2NormForm α * L2NormForm β
+axiom L2NormForm_add_le ... : L2NormForm (α + β) ≤ L2NormForm α + L2NormForm β
+axiom L2NormForm_smul ... : L2NormForm (c • α) = |c| * L2NormForm α
 ```
 
 ## Deliverables
 
-- [ ] Convert all 20 `opaque`/`axiom` in `Basic.lean` to `def`/`theorem`
-- [ ] Convert all 14 in `Forms.lean`
-- [ ] Convert all 19 in `Norms.lean`
-- [ ] Total: 53 items
+- [ ] Convert all 28 `opaque`/`axiom` in `Basic.lean` to `def`/`theorem`
+- [ ] Convert all 31 in `Forms.lean`
+- [ ] Convert all 23 in `Norms.lean`
+- [ ] **Total: 82 items**
 - [ ] Provide complete, compilable code for each
 
 ## Key Mathlib References
@@ -257,6 +285,7 @@ Mathlib.Analysis.NormedSpace.Basic
 Mathlib.Topology.ContinuousFunction.Compact
 Mathlib.LinearAlgebra.ExteriorAlgebra.Basic
 Mathlib.Analysis.InnerProductSpace.Basic
+Mathlib.Geometry.Manifold.MFDeriv.Basic
 ```
 
 ---
@@ -267,79 +296,105 @@ Mathlib.Analysis.InnerProductSpace.Basic
 
 | File | Axioms/Opaques |
 |------|----------------|
-| `Hodge/Analytic/Currents.lean` | 5 |
-| `Hodge/Analytic/FlatNorm.lean` | 9 |
-| `Hodge/Analytic/IntegralCurrents.lean` | 8 |
-| `Hodge/Analytic/Calibration.lean` | 4 |
-| **TOTAL** | **26** |
+| `Hodge/Analytic/Currents.lean` | 16 |
+| `Hodge/Analytic/FlatNorm.lean` | 11 |
+| `Hodge/Analytic/IntegralCurrents.lean` | 12 |
+| `Hodge/Analytic/Calibration.lean` | 5 |
+| **TOTAL** | **44** |
 
 ## Full Axiom List
 
-### Hodge/Analytic/Currents.lean (5 items)
+### Hodge/Analytic/Currents.lean (16 items)
 
 ```lean
--- Line 110: Convert to def
-opaque mass (T : Current n X k) : ℝ
+-- Lines 36-55: Current linearity
+axiom map_add' ... : T.toFun (ω + η) = T.toFun ω + T.toFun η
+axiom map_smul' ... : T.toFun (c • ω) = c * T.toFun ω
+axiom zero (n k) : Current n X k  -- zero current
 
--- Lines 112-115: Prove from definition
-axiom mass_nonneg (T : Current n X k) : mass T ≥ 0
+-- Lines 64-76: Current operations
+opaque add_curr (T₁ T₂ : Current n X k) : Current n X k
+opaque neg_curr (T : Current n X k) : Current n X k
+opaque smul_curr (r : ℝ) (T : Current n X k) : Current n X k
+
+-- Lines 85-94: Mass
+opaque mass (T : Current n X k) : ℝ
+axiom mass_nonneg (T) : mass T ≥ 0
 axiom mass_zero : mass (0 : Current n X k) = 0
-axiom mass_neg (T : Current n X k) : mass (-T) = mass T
-axiom mass_add_le (S T : Current n X k) : mass (S + T) ≤ mass S + mass T
+axiom mass_neg (T) : mass (-T) = mass T
+axiom mass_add_le (S T) : mass (S + T) ≤ mass S + mass T
+axiom mass_smul (r T) : mass (r • T) = |r| * mass T
+axiom is_bounded (T) : ∃ M, ∀ ω, |T.toFun ω| ≤ M * comass ω
+axiom zero_toFun (ω) : (0 : Current n X k).toFun ω = 0
+
+-- Lines 101-107: Boundary
+opaque boundary (T : Current n X (k + 1)) : Current n X k
+axiom boundary_boundary (T) : boundary (boundary T) = 0
 ```
 
-### Hodge/Analytic/FlatNorm.lean (9 items)
+### Hodge/Analytic/FlatNorm.lean (11 items)
 
 ```lean
--- Line 27: Convert to def using infimum
+-- Line 26: Flat norm
 opaque flatNorm {k : ℕ} (T : Current n X k) : ℝ
 
--- Lines 30-51: Prove from definition
-axiom flatNorm_nonneg {k : ℕ} (T : Current n X k) : flatNorm T ≥ 0
-axiom flatNorm_zero {k : ℕ} : flatNorm (0 : Current n X k) = 0
-axiom flatNorm_eq_zero_iff {k : ℕ} (T : Current n X k) : flatNorm T = 0 ↔ T = 0
-axiom flatNorm_neg {k : ℕ} (T : Current n X k) : flatNorm (-T) = flatNorm T
-axiom flatNorm_add_le {k : ℕ} (S T : Current n X k) : flatNorm (S + T) ≤ flatNorm S + flatNorm T
-axiom flatNorm_le_mass {k : ℕ} (T : Current n X k) : flatNorm T ≤ Current.mass T
-axiom eval_le_flatNorm {k : ℕ} (T : Current n X k) (ψ : SmoothForm n X k) : |T ψ| ≤ comass ψ * flatNorm T
-axiom flatNorm_boundary_le {k : ℕ} (T : Current n X (k + 1)) : flatNorm (boundary T) ≤ flatNorm T
+-- Lines 29-61: Flat norm properties
+axiom flatNorm_nonneg (T) : flatNorm T ≥ 0
+axiom flatNorm_zero : flatNorm (0 : Current n X k) = 0
+axiom eval_le_mass (T ψ) : |T.toFun ψ| ≤ comass ψ * mass T
+axiom eval_le_flatNorm (T ψ) : |T.toFun ψ| ≤ comass ψ * flatNorm T
+axiom flatNorm_le_mass (T) : flatNorm T ≤ mass T
+axiom flatNorm_add_le (S T) : flatNorm (S + T) ≤ flatNorm S + flatNorm T
+axiom flatNorm_neg (T) : flatNorm (-T) = flatNorm T
+axiom flatNorm_eq_zero_iff (T) : flatNorm T = 0 ↔ T = 0
+axiom flatNorm_smul (c T) : flatNorm (c • T) = |c| * flatNorm T
+axiom flatNorm_boundary_le (T) : flatNorm (boundary T) ≤ flatNorm T
 ```
 
-### Hodge/Analytic/IntegralCurrents.lean (8 items)
+### Hodge/Analytic/IntegralCurrents.lean (12 items)
 
 ```lean
--- Line 24-27: Convert to defs
+-- Lines 27-30: Rectifiability
 opaque isRectifiable (k : ℕ) (S : Set X) : Prop
-axiom isRectifiable_empty (k : ℕ) : isRectifiable k (∅ : Set X)
-axiom isRectifiable_union (k : ℕ) (S₁ S₂ : Set X) : isRectifiable k S₁ → isRectifiable k S₂ → isRectifiable k (S₁ ∪ S₂)
+axiom isRectifiable_empty (k) : isRectifiable k (∅ : Set X)
+axiom isRectifiable_union (k S₁ S₂) : isRectifiable k S₁ → isRectifiable k S₂ → isRectifiable k (S₁ ∪ S₂)
 
--- Lines 33-47: Prove integrality properties
-opaque isIntegral {k : ℕ} (T : Current n X k) : Prop
-axiom isIntegral_add {k : ℕ} (S T : Current n X k) : isIntegral S → isIntegral T → isIntegral (S + T)
-axiom isIntegral_zero_current (k : ℕ) [Nonempty X] : isIntegral (0 : Current n X k)
-axiom isIntegral_smul {k : ℕ} (c : ℤ) (T : Current n X k) : isIntegral T → isIntegral (c • T)
-axiom isIntegral_boundary {k : ℕ} (T : Current n X (k + 1)) : isIntegral T → isIntegral (boundary T)
+-- Lines 36-45: Polyhedral chains
+opaque IntegralPolyhedralChain (n : ℕ) (X : Type*) (k : ℕ) : Set (Current n X k)
+axiom polyhedral_add (S T) : S ∈ IntegralPolyhedralChain → T ∈ IntegralPolyhedralChain → (S + T) ∈ IntegralPolyhedralChain
+axiom polyhedral_zero : (0 : Current n X k) ∈ IntegralPolyhedralChain n X k
+axiom polyhedral_smul (c : ℤ) (T) : T ∈ IntegralPolyhedralChain → (c • T) ∈ IntegralPolyhedralChain
+axiom polyhedral_boundary (T) : T ∈ IntegralPolyhedralChain → boundary T ∈ IntegralPolyhedralChain
+
+-- Lines 55-66: Integrality
+axiom isIntegral_add (S T) : isIntegral S → isIntegral T → isIntegral (S + T)
+axiom isIntegral_zero_current (k) : isIntegral (0 : Current n X k)
+axiom isIntegral_smul (c : ℤ) (T) : isIntegral T → isIntegral (c • T)
+axiom isIntegral_boundary (T) : isIntegral T → isIntegral (boundary T)
 ```
 
-### Hodge/Analytic/Calibration.lean (4 items)
+### Hodge/Analytic/Calibration.lean (5 items)
 
 ```lean
--- Lines 36-55: Prove calibration properties
-axiom wirtinger_comass_bound (p : ℕ) : comass (omegaPow n X p) ≤ 1
-axiom calibration_inequality {k : ℕ} (T : Current n X k) (ψ : CalibratingForm n X k) : T ψ.toFun ≤ mass T
+-- Line 35: Wirtinger inequality
+axiom wirtinger_comass_bound (p) : comass (omegaPow n X p) ≤ 1
 
--- Lines 79-85: Keep as classical or prove
-axiom spine_theorem {k : ℕ} (T S G : Current n X k) (ψ : CalibratingForm n X k) ...
-axiom mass_lsc {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k) : ... mass T_limit ≤ liminf mass(T_i)
+-- Lines 54-84: Calibration
+axiom calibration_inequality (T ψ) : T.toFun ψ.form ≤ mass T
+axiom spine_theorem (T S G ψ) : ...
+axiom mass_lsc (T : ℕ → Current) (T_limit) : mass T_limit ≤ liminf (mass ∘ T)
+
+-- Line 92: Limit calibration (⚠️ STRATEGY-CRITICAL)
+axiom limit_is_calibrated (T : ℕ → Current) (T_limit) (ψ) : ... → is_calibrated T_limit ψ
 ```
 
 ## Deliverables
 
-- [x] Convert all 5 in `Currents.lean`
-- [x] Convert all 9 in `FlatNorm.lean`
-- [x] Convert all 8 in `IntegralCurrents.lean`
-- [x] Convert all 4 in `Calibration.lean`
-- [x] Total: 26 items
+- [ ] Convert all 16 in `Currents.lean`
+- [ ] Convert all 11 in `FlatNorm.lean`
+- [ ] Convert all 12 in `IntegralCurrents.lean`
+- [ ] Convert all 5 in `Calibration.lean`
+- [ ] **Total: 44 items**
 
 ## Key Definitions Needed
 
@@ -355,93 +410,91 @@ def mass (T : Current n X k) : ℝ :=
 
 ---
 
-# 🤖 AGENT 3: Grassmannian & Cone Geometry
+# 🤖 AGENT 3: Grassmannian & Kähler Geometry
 
 ## Ownership
 
 | File | Axioms/Opaques |
 |------|----------------|
-| `Hodge/Analytic/Grassmannian.lean` | 10 |
+| `Hodge/Analytic/Grassmannian.lean` | 11 |
 | `Hodge/Kahler/Cone.lean` | 4 |
-| `Hodge/Kahler/TypeDecomposition.lean` | 9 |
-| `Hodge/Kahler/Manifolds.lean` | 9 |
+| `Hodge/Kahler/TypeDecomposition.lean` | 10 |
+| `Hodge/Kahler/Manifolds.lean` | 7 |
 | **TOTAL** | **32** |
 
 ## Full Axiom List
 
-### Hodge/Analytic/Grassmannian.lean (10 items)
+### Hodge/Analytic/Grassmannian.lean (11 items)
 
 ```lean
--- Lines 44-52: Volume forms
+-- Lines 43-51: Volume forms
 opaque IsVolumeFormOn {n : ℕ} {X : Type*} ... (x : X) (p : ℕ) (V : Submodule ℂ ...) (ω : ...) : Prop
 axiom IsVolumeFormOn_nonzero ... : IsVolumeFormOn x p V ω → ω ≠ 0
 
--- Lines 70-96: Existence and smoothness
-axiom exists_volume_form_of_submodule_axiom (p : ℕ) (x : X) (V : Submodule ℂ ...) (hV : finrank V = p) :
-    ∃ ω, IsVolumeFormOn x p V ω
-axiom simpleCalibratedForm_is_smooth (p : ℕ) (x : X) (V : Submodule ℂ ...) : IsSmoothAlternating ...
+-- Lines 69-97: Existence and calibration
+axiom exists_volume_form_of_submodule_axiom (p x V) (hV : finrank V = p) : ∃ ω, IsVolumeFormOn x p V ω
+axiom simpleCalibratedForm (p x V) : ...
 
--- Lines 142-167: Distance to cone
+-- Lines 121-152: Cone geometry
+axiom calibratedCone_hull_pointed (p x) : pointed (calibratedCone p x)
 opaque distToCone (p : ℕ) (α : SmoothForm n X (2 * p)) (x : X) : ℝ
-axiom distToCone_nonneg (p : ℕ) (α : SmoothForm n X (2 * p)) (x : X) : distToCone p α x ≥ 0
+axiom distToCone_nonneg (p α x) : distToCone p α x ≥ 0
 opaque coneDefect (p : ℕ) (α : SmoothForm n X (2 * p)) : ℝ
-axiom coneDefect_nonneg (p : ℕ) (α : SmoothForm n X (2 * p)) : coneDefect p α ≥ 0
-axiom radial_minimization ... : ∃ t_opt, ...
-axiom dist_cone_sq_formula ... : (distToCone p α x)^2 = ...
+axiom coneDefect_nonneg (p α) : coneDefect p α ≥ 0
+axiom radial_minimization (x ξ α) : ∃ t_opt, ...
+axiom dist_cone_sq_formula (p α x) : (distToCone p α x)^2 = ...
 ```
 
 ### Hodge/Kahler/Cone.lean (4 items)
 
 ```lean
--- Lines 66-106: Wirtinger and cone interior
-axiom wirtinger_pairing (p : ℕ) (x : X) (ξ : SmoothForm n X (2 * p)) (hξ : ξ ∈ simpleCalibratedForms p x) :
-    pointwiseInner (omegaPow_point p x) ξ x = 1
-axiom omegaPow_in_interior (p : ℕ) (x : X) : omegaPow_point p x ∈ interior (stronglyPositiveCone p x)
-axiom exists_uniform_interior_radius (p : ℕ) [CompactSpace X] [Nonempty X] :
-    ∃ r : ℝ, r > 0 ∧ ∀ x, Metric.ball (omegaPow_point p x) r ⊆ stronglyPositiveCone p x
-axiom caratheodory_decomposition (p : ℕ) (x : X) (α : SmoothForm n X (2 * p)) (hα : α ∈ stronglyPositiveCone p x) :
+-- Lines 65-105: Wirtinger and cone structure
+axiom wirtinger_pairing (p x ξ) (hξ) : pointwiseInner (omegaPow_point p x) ξ x = 1
+axiom omegaPow_in_interior (p x) : omegaPow_point p x ∈ interior (stronglyPositiveCone p x)
+axiom exists_uniform_interior_radius (p) [CompactSpace X] [Nonempty X] :
+    ∃ r > 0, ∀ x, Metric.ball (omegaPow_point p x) r ⊆ stronglyPositiveCone p x
+axiom caratheodory_decomposition (p x α) (hα : α ∈ stronglyPositiveCone p x) :
     ∃ (ξ : Fin (n.choose p + 1) → SmoothForm n X (2 * p)) (c : Fin (n.choose p + 1) → ℝ), ...
 ```
 
-### Hodge/Kahler/TypeDecomposition.lean (9 items)
+### Hodge/Kahler/TypeDecomposition.lean (10 items)
 
 ```lean
--- Line 59: Convert to def
-opaque isPQForm (n : ℕ) (X : Type u) ... (p q : ℕ) (ω : SmoothForm n X (p + q)) : Prop
+-- Line 56: (p,q)-form predicate
+opaque isPQForm (n X p q) (ω : SmoothForm n X (p + q)) : Prop
 
--- Lines 72-130: Prove type decomposition properties
-axiom zero_is_pq (n : ℕ) (X : Type u) ... (p q : ℕ) : isPQForm n X ... p q 0
-axiom isPQForm_wedge ... : isPQForm n X p q α → isPQForm n X r s β → isPQForm n X (p+r) (q+s) (wedge α β)
-axiom omega_is_1_1_axiom ... : isPQForm n X 1 1 (K.omega_form)
-axiom unitForm_is_0_0 ... : isPQForm n X 0 0 unitForm
-axiom omega_pow_is_p_p_axiom ... : isPQForm n X p p (omegaPow n X p)
-axiom omega_pow_isClosed (p : ℕ) : isClosed (omegaPow n X p)
-axiom omega_pow_is_rational (p : ℕ) : isRationalClass ⟦omegaPow n X p, omega_pow_isClosed p⟧
-axiom isClosed_omegaPow_scaled (p : ℕ) : IsFormClosed ((1 / (p.factorial : ℝ)) • omegaPow n X p)
+-- Lines 69-132: Type decomposition properties
+axiom zero_is_pq (n X p q) : isPQForm n X p q 0
+axiom isPQForm_wedge ... : isPQForm n X p q α → isPQForm n X r s β → isPQForm n X (p+r) (q+s) (smoothWedge α β)
+axiom omega_is_1_1_axiom : isPQForm n X 1 1 K.omega_form
+opaque kahlerPow (p : ℕ) : SmoothForm n X (2 * p)
+axiom unitForm_is_0_0 : isPPFormTD n X 0 unitForm
+axiom omega_pow_is_p_p_axiom (p) : isPPFormTD n X p (kahlerPow p)
+axiom omega_pow_IsFormClosed (p) : IsFormClosed (kahlerPow p)
+axiom omega_pow_is_rational (p) : isRationalClass ⟦kahlerPow p, omega_pow_IsFormClosed p⟧
+axiom IsFormClosed_omegaPow_scaled (p) : IsFormClosed ((1 / (p.factorial : ℝ)) • kahlerPow p)
 ```
 
-### Hodge/Kahler/Manifolds.lean (9 items)
+### Hodge/Kahler/Manifolds.lean (7 items)
 
 ```lean
--- Lines 27-59: Kähler manifold axioms
-axiom kahlerMetric_symm (x : X) (v w : TangentSpace ...) : K.kahlerMetric x v w = conj (K.kahlerMetric x w v)
+-- Lines 26-54: Kähler manifold axioms
+axiom kahlerMetric_symm (x v w) : K.kahlerMetric x v w = conj (K.kahlerMetric x w v)
 axiom isRationalClass_wedge ... : isRationalClass η₁ → isRationalClass η₂ → isRationalClass (η₁ * η₂)
-axiom isRationalClass_smul_rat ... (q : ℚ) : isRationalClass η → isRationalClass (q • η)
 axiom omega_isClosed : IsFormClosed K.omega_form
 axiom omega_is_rational : isRationalClass ⟦K.omega_form, omega_isClosed⟧
-axiom isRationalClass_add ... : isRationalClass η₁ → isRationalClass η₂ → isRationalClass (η₁ + η₂)
-axiom zero_is_rational {k : ℕ} : isRationalClass (0 : DeRhamCohomologyClass n X k)
-axiom unitForm_isClosed : IsFormClosed unitForm
+axiom zero_is_rational {k} : isRationalClass (0 : DeRhamCohomologyClass n X k)
+axiom unitForm_isClosed : IsFormClosed (unitForm : SmoothForm n X 0)
 axiom unitForm_is_rational : isRationalClass ⟦unitForm, unitForm_isClosed⟧
 ```
 
 ## Deliverables
 
-- [ ] Convert all 10 in `Grassmannian.lean`
+- [ ] Convert all 11 in `Grassmannian.lean`
 - [ ] Convert all 4 in `Cone.lean`
-- [ ] Convert all 9 in `TypeDecomposition.lean`
-- [ ] Convert all 9 in `Manifolds.lean`
-- [ ] Total: 32 items
+- [ ] Convert all 10 in `TypeDecomposition.lean`
+- [ ] Convert all 7 in `Manifolds.lean`
+- [ ] **Total: 32 items**
 
 ---
 
@@ -451,133 +504,128 @@ axiom unitForm_is_rational : isRationalClass ⟦unitForm, unitForm_isClosed⟧
 
 | File | Axioms/Opaques |
 |------|----------------|
-| `Hodge/Classical/GAGA.lean` | 18 |
+| `Hodge/Classical/GAGA.lean` | 10 |
 | `Hodge/Classical/HarveyLawson.lean` | 10 |
-| `Hodge/Classical/Bergman.lean` | 10 |
-| `Hodge/Analytic/SheafTheory.lean` | 10 |
-| `Hodge/Classical/Lefschetz.lean` | 5 |
+| `Hodge/Classical/Lefschetz.lean` | 7 |
+| `Hodge/Analytic/SheafTheory.lean` | 5 |
+| `Hodge/Classical/Bergman.lean` | 4 |
 | `Hodge/Classical/FedererFleming.lean` | 2 |
 | `Hodge/Classical/SerreVanishing.lean` | 1 |
-| **TOTAL** | **56** |
+| **TOTAL** | **39** |
 
 ## Full Axiom List
 
-### Hodge/Classical/GAGA.lean (18 items)
+### Hodge/Classical/GAGA.lean (10 items)
 
 ```lean
--- Algebraic set axioms (convert to defs with proper structure)
-opaque IsAlgebraicSet {n : ℕ} {X : Type*} ... (Z : Set X) : Prop
-axiom IsAlgebraicSet_empty : IsAlgebraicSet (∅ : Set X)
-axiom IsAlgebraicSet_univ : IsAlgebraicSet (Set.univ : Set X)
-axiom IsAlgebraicSet_union : IsAlgebraicSet Z₁ → IsAlgebraicSet Z₂ → IsAlgebraicSet (Z₁ ∪ Z₂)
-axiom IsAlgebraicSet_inter : IsAlgebraicSet Z₁ → IsAlgebraicSet Z₂ → IsAlgebraicSet (Z₁ ∩ Z₂)
-axiom IsAlgebraicSet_isClosed : IsAlgebraicSet Z → IsClosed Z
-axiom IsAlgebraicSet_nontrivial : ∃ Z : Set X, IsAlgebraicSet Z ∧ Z ≠ ∅ ∧ Z ≠ Set.univ
+-- Line 20: Zariski closed predicate
+opaque IsZariskiClosed {n : ℕ} (X : Type u) ... (Z : Set X) : Prop
 
--- Fundamental class axioms
-opaque FundamentalClassSet (n : ℕ) (X : Type u) ... (p : ℕ) (Z : Set X) : SmoothForm n X (2 * p)
-axiom FundamentalClassSet_isClosed ... : IsFormClosed (FundamentalClassSet n X p Z)
-axiom FundamentalClassSet_rational ... : isRationalClass ⟦FundamentalClassSet n X p Z, ...⟧
-axiom FundamentalClassSet_intersection_power_eq ...
+-- Lines 48-81: Algebraic set properties
+axiom IsAlgebraicSet_empty (n X) : IsAlgebraicSet (∅ : Set X)
+axiom IsAlgebraicSet_univ (n X) : IsAlgebraicSet (Set.univ : Set X)
+axiom IsAlgebraicSet_union (n X Z₁ Z₂) : IsAlgebraicSet Z₁ → IsAlgebraicSet Z₂ → IsAlgebraicSet (Z₁ ∪ Z₂)
+axiom IsAlgebraicSet_intersection (n X Z₁ Z₂) : IsAlgebraicSet Z₁ → IsAlgebraicSet Z₂ → IsAlgebraicSet (Z₁ ∩ Z₂)
+axiom IsAlgebraicSet_isClosed (n X Z) : IsAlgebraicSet Z → IsClosed Z
+axiom IsAlgebraicSet_isAnalyticSet (n X Z) : IsAlgebraicSet Z → IsAnalyticSet Z
 
--- Hyperplane axioms
-axiom exists_hyperplane_algebraic : ∃ H : Set X, IsAlgebraicSet H ∧ ...
+-- Line 93: GAGA bridge (⚠️ KEEP AS AXIOM - classical pillar)
+axiom serre_gaga {p} (V : AnalyticSubvariety n X) (hV_codim : V.codim = p) : ∃ W : AlgebraicSubvariety n X, ...
 
--- GAGA bridge
-axiom IsAlgebraicSet_isAnalyticSet : IsAlgebraicSet Z → IsAnalyticSet Z
-axiom serre_gaga : ... -- KEEP AS AXIOM
-
--- Algebraic intersection
-opaque algebraic_intersection_power (_Z : Set X) (k : ℕ) : Set X
-axiom algebraic_intersection_power_is_algebraic ...
+-- Lines 167-172: Fundamental class
+axiom FundamentalClassSet_additive (p Z₁ Z₂) (h_disjoint) : FundamentalClassSet p (Z₁ ∪ Z₂) = ...
+axiom FundamentalClassSet_rational (p Z) (h : isAlgebraicSubvariety n X Z) : isRationalClass ⟦FundamentalClassSet p Z, ...⟧
 ```
 
 ### Hodge/Classical/HarveyLawson.lean (10 items)
 
 ```lean
--- Analytic set axioms
+-- Line 24: Analytic set predicate
 opaque IsAnalyticSet {n : ℕ} {X : Type*} ... (S : Set X) : Prop
+
+-- Lines 29-65: Analytic set properties
 axiom IsAnalyticSet_empty : IsAnalyticSet (∅ : Set X)
 axiom IsAnalyticSet_univ : IsAnalyticSet (Set.univ : Set X)
-axiom IsAnalyticSet_union : IsAnalyticSet S₁ → IsAnalyticSet S₂ → IsAnalyticSet (S₁ ∪ S₂)
-axiom IsAnalyticSet_inter : IsAnalyticSet S₁ → IsAnalyticSet S₂ → IsAnalyticSet (S₁ ∩ S₂)
-axiom IsAnalyticSet_isClosed : IsAnalyticSet S → IsClosed S
-axiom IsAnalyticSet_nontrivial : ∃ S : Set X, IsAnalyticSet S ∧ S ≠ ∅ ∧ S ≠ Set.univ
+axiom IsAnalyticSet_union (S₁ S₂) : IsAnalyticSet S₁ → IsAnalyticSet S₂ → IsAnalyticSet (S₁ ∪ S₂)
+axiom IsAnalyticSet_inter (S₁ S₂) : IsAnalyticSet S₁ → IsAnalyticSet S₂ → IsAnalyticSet (S₁ ∩ S₂)
+axiom IsAnalyticSet_isClosed (S) : IsAnalyticSet S → IsClosed S
+axiom IsAnalyticSet_nontrivial : ∃ S, IsAnalyticSet S ∧ S ≠ ∅ ∧ S ≠ Set.univ
 
--- Harvey-Lawson theorem
-axiom harvey_lawson_theorem ... -- KEEP AS AXIOM
-axiom harvey_lawson_represents ...
-axiom flat_limit_of_cycles_is_cycle ... -- PROVE THIS
+-- Lines 110-118: Harvey-Lawson (⚠️ KEEP AS AXIOM - classical pillar)
+axiom harvey_lawson_theorem (hyp : HarveyLawsonHypothesis n X k) : ∃ V : AnalyticSubvariety n X, ...
+axiom harvey_lawson_represents (hyp : HarveyLawsonHypothesis n X k) : ...
+axiom flat_limit_of_cycles_is_cycle ... -- ⚠️ STRATEGY-CRITICAL: boundary continuous in flat norm
 ```
 
-### Hodge/Classical/Bergman.lean (10 items)
+### Hodge/Classical/Lefschetz.lean (7 items)
 
 ```lean
--- Holomorphic structures (convert to defs)
-opaque partial_deriv {k : ℕ} (ω : SmoothForm n X k) : SmoothForm n X (k + 1)
-opaque partial_bar_deriv {k : ℕ} (ω : SmoothForm n X k) : SmoothForm n X (k + 1)
-opaque log_h {L : HolomorphicLineBundle n X} (h : HermitianMetric L) : SmoothForm n X 0
-opaque L2InnerProduct (L : HolomorphicLineBundle n X) ...
-opaque log_KM (L : HolomorphicLineBundle n X) ...
-opaque SectionsVanishingToOrder (L : HolomorphicLineBundle n X) ...
+-- Line 19: Wedge product on cohomology
+axiom ofForm_wedge_add (n X k l ω η ω' η') : ...
 
--- Bergman/Tian axioms
-axiom tian_convergence ... -- KEEP AS AXIOM
-axiom jet_surjectivity_axiom ...
-axiom IsHolomorphic_tensor_axiom ...
+-- Lines 27-61: Lefschetz operator
+opaque lefschetz_operator (n X k) : DeRhamCohomologyClass n X k → DeRhamCohomologyClass n X (k + 2)
+axiom lefschetz_operator_eval (n X k η) : lefschetz_operator n X k η = η * ⟦K.omega_form, ...⟧
+axiom hard_lefschetz_bijective (n X p') : Function.Bijective (lefschetz_operator^(n - 2*p'))
+opaque lefschetz_inverse_cohomology (n X k) : DeRhamCohomologyClass n X k → DeRhamCohomologyClass n X (k - 2)
+
+-- Lines 83-91: Hard Lefschetz (⚠️ KEEP AS AXIOMS - classical pillar)
+axiom hard_lefschetz_isomorphism {p'} (h_range : p' ≤ n / 2) : ...
+axiom hard_lefschetz_inverse_form {p} (hp : p > n / 2) : ...
 ```
 
-### Hodge/Analytic/SheafTheory.lean (10 items)
+### Hodge/Analytic/SheafTheory.lean (5 items)
 
 ```lean
--- Sheaf cohomology (convert to proper definitions)
-opaque SheafCohomology {n : ℕ} {X : Type u} ... (F : CoherentSheaf n X) (q : ℕ) : Type u
-axiom SheafCohomology.instAddCommGroup ... : AddCommGroup (SheafCohomology F q)
-axiom SheafCohomology.instModule ... : Module ℂ (SheafCohomology F q)
-axiom SheafCohomology.finiteDimensional ... : FiniteDimensional ℂ (SheafCohomology F q)
+-- Line 58: Finite dimensionality
+axiom SheafCohomology.finiteDimensional' (F q) : FiniteDimensional ℂ (SheafCohomology F q)
 
--- Vanishing predicate
-opaque vanishes {n : ℕ} {X : Type u} ... (F : CoherentSheaf n X) (q : ℕ) : Prop
-axiom vanishes_iff_subsingleton ... : vanishes F q ↔ Subsingleton (SheafCohomology F q)
-
--- Structure sheaf
-opaque structureSheafAsCoherent (n : ℕ) (X : Type u) ... : CoherentSheaf n X
-axiom h0_structure_sheaf_nonvanishing ... : ¬ vanishes (structureSheafAsCoherent n X) 0
+-- Lines 89-121: Structure sheaf
+axiom structureSheafAsCoherent (n X) : CoherentSheaf n X
+axiom h0_structure_sheaf_nonvanishing : ¬ vanishes (structureSheafAsCoherent n X) 0
+axiom structureSheaf_exists (n X) : ∃ F : CoherentSheaf n X, ...
+axiom idealSheaf_exists (Z) : ∃ I : CoherentSheaf n X, ...
 ```
 
-### Hodge/Classical/Lefschetz.lean (5 items)
+### Hodge/Classical/Bergman.lean (4 items)
 
 ```lean
-axiom hard_lefschetz_isomorphism ... -- KEEP AS AXIOM
-axiom hard_lefschetz_inverse_form ... -- KEEP AS AXIOM
-axiom lefschetz_on_cohomology ...
-axiom lefschetz_inverse_cohomology ...
-axiom lefschetz_compatibility ...
+-- Lines 101-119: Holomorphic sections
+axiom IsHolomorphic_add (L s₁ s₂) : IsHolomorphic s₁ → IsHolomorphic s₂ → IsHolomorphic (s₁ + s₂)
+axiom IsHolomorphic_smul (L c s) : IsHolomorphic s → IsHolomorphic (c • s)
+
+-- Lines 189-218: Bergman/Tian (⚠️ KEEP AS AXIOM - classical pillar)
+axiom tian_convergence (L : HolomorphicLineBundle n X) [IsAmple L] : ...
+axiom jet_surjectivity (L x k) [IsAmple L] : ...
 ```
 
 ### Hodge/Classical/FedererFleming.lean (2 items)
 
 ```lean
-axiom federer_fleming_compactness ... -- KEEP AS AXIOM
-axiom deformation_theorem ...
+-- Line 30: Deformation theorem
+axiom deformation_theorem (k T ε) (hε : ε > 0) : ∃ P S, ...
+
+-- Line 59: Federer-Fleming (⚠️ KEEP AS AXIOM - classical pillar)
+axiom federer_fleming_compactness (k) : ...
 ```
 
 ### Hodge/Classical/SerreVanishing.lean (1 item)
 
 ```lean
-axiom serre_vanishing ... -- KEEP AS AXIOM
+-- Line 31: Serre vanishing (⚠️ KEEP AS AXIOM - classical pillar)
+axiom serre_vanishing (L : HolomorphicLineBundle n X) [IsAmple L] : ...
 ```
 
 ## Deliverables
 
-- [ ] Convert 18 in `GAGA.lean` (keeping `serre_gaga` as axiom)
-- [ ] Convert 10 in `HarveyLawson.lean` (keeping `harvey_lawson_theorem` as axiom)
-- [ ] Convert 10 in `Bergman.lean` (keeping `tian_convergence` as axiom)
-- [ ] Convert 10 in `SheafTheory.lean`
-- [ ] Convert 5 in `Lefschetz.lean` (keeping `hard_lefschetz_*` as axioms)
-- [ ] Convert 2 in `FedererFleming.lean` (keeping compactness as axiom)
+- [ ] Convert 10 in `GAGA.lean` (keeping `serre_gaga` as axiom)
+- [ ] Convert 10 in `HarveyLawson.lean` (keeping `harvey_lawson_theorem/represents` as axioms)
+- [ ] Convert 7 in `Lefschetz.lean` (keeping `hard_lefschetz_*` as axioms)
+- [ ] Convert 5 in `SheafTheory.lean`
+- [ ] Convert 4 in `Bergman.lean` (keeping `tian_convergence` as axiom)
+- [ ] Convert 2 in `FedererFleming.lean` (keeping `federer_fleming_compactness` as axiom)
 - [ ] Keep 1 in `SerreVanishing.lean` as axiom
-- [ ] Total: 56 items (minus ~8 allowed axioms = 48 to convert)
+- [ ] **Total: 39 items (minus ~8 classical pillars = 31 to convert)**
 
 ---
 
@@ -587,97 +635,83 @@ axiom serre_vanishing ... -- KEEP AS AXIOM
 
 | File | Axioms/Opaques |
 |------|----------------|
-| `Hodge/Kahler/Microstructure.lean` | 24 |
-| `Hodge/Kahler/SignedDecomp.lean` | 1 + **7 ERRORS** |
+| `Hodge/Kahler/Microstructure.lean` | 8 |
+| `Hodge/Kahler/SignedDecomp.lean` | 2 |
 | `Hodge/Kahler/Main.lean` | 3 |
-| `Hodge/Utils/BaranyGrinberg.lean` | 1 |
-| **TOTAL** | **29 + fix errors** |
-
-## CRITICAL: Fix Build Errors First
-
-```
-error: Hodge/Kahler/SignedDecomp.lean:89:28: Tactic `rewrite` failed
-error: Hodge/Kahler/SignedDecomp.lean:96:8: Tactic `rewrite` failed  
-error: Hodge/Kahler/SignedDecomp.lean:113:57: unsolved goals
-error: Hodge/Kahler/SignedDecomp.lean:128:16: Unknown identifier `inv_mul_lt_iff`
-error: Hodge/Kahler/SignedDecomp.lean:127:19: unsolved goals
-error: Hodge/Kahler/SignedDecomp.lean:136:35: Type mismatch
-error: Hodge/Kahler/SignedDecomp.lean:107:19: unsolved goals
-```
+| `Hodge/Utils/BaranyGrinberg.lean` | 1 (keep as axiom) |
+| **TOTAL** | **14** |
 
 ## Full Axiom List
 
-### Hodge/Kahler/Microstructure.lean (24 items)
+### Hodge/Kahler/Microstructure.lean (8 items)
 
 ```lean
--- Complex submanifold
-opaque IsComplexSubmanifold (Y : Set X) (p : ℕ) : Prop
-axiom local_sheet_realization (p : ℕ) (x : X) (ξ : SmoothForm n X (2 * p)) ...
+-- Line 41: Local realization
+axiom local_sheet_realization (p x ξ) (hξ : ξ ∈ simpleCalibratedForms p x) :
+    ∃ Y, IsComplexSubmanifold Y p ∧ x ∈ Y ∧ tangent_to_ξ Y x ξ
 
--- Cubulation
-axiom cubulation_exists (h : ℝ) (hh : h > 0) : Cubulation n X h
+-- Line 90: Integer transport (uses Barany-Grinberg)
+axiom integer_transport (p C target) : ∃ int_flow, IsValidIntegerApproximation ...
 
--- Integer approximation
-opaque IsValidIntegerApproximation ... : Prop
-axiom IsValidIntegerApproximation_edge_bound ...
-axiom integer_transport (p : ℕ) {h : ℝ} (C : Cubulation n X h) (target : Flow C) : ∃ int_flow, IsValidIntegerApproximation ...
+-- Lines 105-108: Pairing and current conversion
+opaque SmoothForm.pairing {p} (α : SmoothForm n X (2*p)) (β : SmoothForm n X (2*(n-p))) : ℝ
+opaque RawSheetSum.toIntegralCurrent {p hscale} ... : IntegralCurrent n X (2 * (n - p))
 
--- Gluing
-opaque IsValidGluing ... : Prop
-axiom gluing_estimate ...
-opaque RawSheetSum.toIntegralCurrent ...
-opaque HasBoundedFlatNorm ... : Prop
-axiom gluing_flat_norm_bound ...
-opaque HasBoundedCalibrationDefect ... : Prop
-axiom calibration_defect_from_gluing ...
-
--- Calibrated flow and glue cells
-opaque calibratedFlow {p : ℕ} (γ : SmoothForm n X (2 * p)) (ψ : CalibratingForm n X (2 * (n - p))) {h : ℝ} (C : Cubulation n X h) : Flow C
-opaque glueCells {p : ℕ} {h : ℝ} (C : Cubulation n X h) (int_flow : DirectedEdge C → ℤ) : IntegralCurrent n X (2 * (n - p))
-axiom glueCells_isCycle ...
-axiom glueCells_mass_bound ...
-axiom glueCells_calibration_defect ...
-axiom IsValidIntegerApproximation_divergence_free ...
-axiom calibratedFlow_divergence_free ...
-
--- Microstructure sequence
-axiom microstructureSequence_defect_bound ...
-axiom exists_flow_mass_bound ...
-axiom microstructureSequence_flatnorm_bound ...
-axiom microstructureSequence_flat_limit_exists ...
+-- Lines 120-160: Gluing estimates
+axiom gluing_estimate (p h C) ... : flat_norm_bound ∧ calibration_defect_bound
+axiom cubulation_exists (h) (hh : h > 0) : Cubulation n X h
+axiom gluing_flat_norm_bound (p h hh C) : ...
+axiom calibration_defect_from_gluing (p h hh C) : ...
 ```
 
-### Hodge/Kahler/SignedDecomp.lean (1 axiom + errors)
+### Hodge/Kahler/SignedDecomp.lean (2 items)
 
 ```lean
-axiom form_is_bounded_axiom {k : ℕ} (α : SmoothForm n X k) : ∃ M : ℝ, M > 0 ∧ ∀ x, pointwiseComass α x ≤ M
+-- Line 27: Boundedness (prove using compactness)
+axiom form_is_bounded {k} (α : SmoothForm n X k) : ∃ M > 0, ∀ x, pointwiseComass α x ≤ M
 
--- ALSO: Fix the 7 tactic errors in signed_decomposition theorem attempt
+-- Line 58: Signed decomposition (⚠️ STRATEGY-CRITICAL)
+axiom signed_decomposition {p} (γ : SmoothForm n X (2*p)) (h_closed : IsFormClosed γ) (h_rational : isRationalClass ⟦γ, h_closed⟧) :
+    ∃ (γ₊ γ₋ : SmoothForm n X (2*p)), γ = γ₊ - γ₋ ∧ γ₊ ∈ stronglyPositiveCone p ∧ γ₋ ∈ stronglyPositiveCone p
 ```
 
 ### Hodge/Kahler/Main.lean (3 items)
 
 ```lean
-axiom integration_represents_fundamental {p : ℕ} (V : AnalyticSubvariety n X) ...
-axiom microstructure_limit_represents_class {p : ℕ} (γ : SmoothForm n X (2 * p)) ...
-opaque CurrentRepresentsClass {k : ℕ} (T : Current n X (2 * (n - p))) (η : DeRhamCohomologyClass n X (2 * p)) : Prop
+-- Line 94: Harvey-Lawson produces fundamental class (⚠️ STRATEGY-CRITICAL)
+axiom harvey_lawson_fundamental_class {p} (T_limit : IntegralCurrent n X (2*(n-p))) (η : DeRhamCohomologyClass n X (2*p))
+    (h_hl : HarveyLawsonHypothesis_satisfied T_limit) : ∃ V : AlgebraicSubvariety n X, ...
+
+-- Line 143: ωᵖ represents multiple
+axiom omega_pow_represents_multiple {p} (c : ℚ) (hc : c > 0) : ...
+
+-- Line 150: Lefschetz lift (⚠️ STRATEGY-CRITICAL)
+axiom lefschetz_lift_signed_cycle {p p'} (γ₊ γ₋ : SmoothForm n X (2*p)) (h_decomp : ...) :
+    ∃ (γ'₊ γ'₋ : SmoothForm n X (2*p')), ...
 ```
 
 ### Hodge/Utils/BaranyGrinberg.lean (1 item)
 
 ```lean
+-- Line 52: Bárány-Grinberg (⚠️ KEEP AS AXIOM - deep combinatorics, published 1981)
 axiom barany_grinberg (v : ι → (Fin d → ℝ)) (hv : ∀ i j, |v i j| ≤ 1) (w : Fin d → ℝ) (hw : ‖w‖ ≤ 1/d) :
-    ∃ (f : ι → ℤ), ... -- KEEP AS AXIOM (deep combinatorics)
+    ∃ (f : ι → ℤ), ...
 ```
 
 ## Deliverables
 
-- [ ] **FIRST: Fix all 7 errors in SignedDecomp.lean**
-- [ ] Convert all 24 in `Microstructure.lean`
-- [ ] Convert 1 in `SignedDecomp.lean`
+- [ ] Convert all 8 in `Microstructure.lean`
+- [ ] Convert 2 in `SignedDecomp.lean`
 - [ ] Convert 3 in `Main.lean`
 - [ ] Keep `barany_grinberg` as axiom
-- [ ] Total: 29 items (28 to convert)
+- [ ] **Total: 14 items (13 to convert)**
+
+## ⚠️ STRATEGY-CRITICAL ITEMS
+
+These axioms encode the core mathematical substance:
+1. **`signed_decomposition`** - Decomposing rational (p,p) forms into positive parts
+2. **`harvey_lawson_fundamental_class`** - HL limit produces algebraic variety
+3. **`lefschetz_lift_signed_cycle`** - Lefschetz lifting preserves decomposition
 
 ---
 
@@ -685,12 +719,12 @@ axiom barany_grinberg (v : ι → (Fin d → ℝ)) (hv : ∀ i j, |v i j| ≤ 1)
 
 | Agent | Files | Total Items | Must Convert | Can Keep |
 |-------|-------|-------------|--------------|----------|
-| **1** | Basic, Forms, Norms | 53 | 53 | 0 |
-| **2** | Currents, FlatNorm, IntegralCurrents, Calibration | 26 | 26 | 0 |
+| **1** | Basic, Forms, Norms | 82 | 82 | 0 |
+| **2** | Currents, FlatNorm, IntegralCurrents, Calibration | 44 | 44 | 0 |
 | **3** | Grassmannian, Cone, TypeDecomp, Manifolds | 32 | 32 | 0 |
-| **4** | GAGA, HarveyLawson, Bergman, SheafTheory, Lefschetz, FF, SV | 56 | 48 | 8 |
-| **5** | Microstructure, SignedDecomp, Main, BaranyGrinberg + **FIX ERRORS** | 29 | 28 | 1 |
-| **TOTAL** | 22 files | **196** | **187** | **9** |
+| **4** | GAGA, HarveyLawson, Bergman, SheafTheory, Lefschetz, FF, SV | 39 | 31 | 8 |
+| **5** | Microstructure, SignedDecomp, Main, BaranyGrinberg | 14 | 13 | 1 |
+| **TOTAL** | 22 files | **211** | **202** | **9** |
 
 ---
 
@@ -702,49 +736,46 @@ axiom barany_grinberg (v : ι → (Fin d → ℝ)) (hv : ∀ i j, |v i j| ≤ 1)
 You are Agent 1 working on the Hodge Conjecture Lean formalization.
 
 ## YOUR FILES
-- Hodge/Basic.lean (20 axioms/opaques)
-- Hodge/Analytic/Forms.lean (14 axioms/opaques)
-- Hodge/Analytic/Norms.lean (19 axioms/opaques)
+- Hodge/Basic.lean (28 axioms/opaques)
+- Hodge/Analytic/Forms.lean (31 axioms/opaques)
+- Hodge/Analytic/Norms.lean (23 axioms/opaques)
 
 ## YOUR TASK
-Convert ALL 53 axioms and opaques to theorems and concrete definitions.
+Convert ALL 82 axioms and opaques to theorems and concrete definitions.
 
-## SPECIFIC ITEMS
+## KEY CONVERSIONS
 
-### Hodge/Basic.lean
-1. opaque IsSmoothAlternating → def using smooth section predicate
-2. axiom smoothFormTopologicalSpace_axiom → instance using product topology
-3. axioms isSmoothAlternating_zero/add/neg/smul/sub → prove from def
-4. opaque smoothExtDeriv → def using Mathlib exterior derivative
-5. axioms smoothExtDeriv_extDeriv/add/smul → prove from def
-6. axioms instAddCommGroupDeRhamCohomologyClass, instModuleDeRhamCohomologyClass, instModuleRealDeRhamCohomologyClass → prove as instances using Quotient API
-7. axiom instHMulDeRhamCohomologyClass → prove wedge product descends to quotient
-8. axioms ofForm_add/sub/smul_rat/smul_real → prove using Quotient.liftOn
-9. opaque isRationalClass → def using actual rationality condition
+### Hodge/Basic.lean (28 items)
+- opaque SmoothForm → def using alternating maps on tangent bundle
+- SmoothForm.instAddCommGroup/instModuleComplex/instModuleReal → instance proofs
+- opaque smoothExtDeriv → def using Mathlib exterior derivative
+- axioms smoothExtDeriv_add/smul → prove linearity from def
+- axioms instAddCommGroupDeRhamCohomologyClass, instModuleDeRhamCohomologyClass → prove using Quotient API
+- axiom instHMulDeRhamCohomologyClass → prove wedge product descends to quotient
+- axioms ofForm_add/smul/neg/smul_real → prove using Quotient.liftOn
+- opaque isRationalClass → def using actual rationality condition
+- axioms isRationalClass_zero/add/smul_rat/mul → prove from def
 
-### Hodge/Analytic/Forms.lean
-1. opaque unitForm → def as constant 1 form
-2. opaque wedge → def using exterior algebra wedge
-3. opaque hodgeStar → def using Hodge star operator
-4. axioms wedge_add/smul/assoc → prove from def
-5. axiom smoothExtDeriv_wedge → prove Leibniz rule
-6. axioms hodgeStar_add/smul → prove linearity
-7. opaque adjointDeriv → def as δ = ±*d*
-8. opaque laplacian → def as Δ = dδ + δd
-9. axiom laplacian_add → prove linearity
-10. opaque lefschetzLambda → def using interior product with ω
+### Hodge/Analytic/Forms.lean (31 items)
+- opaque smoothWedge → def using exterior algebra wedge
+- axioms smoothWedge_add_left/right/smul/assoc/comm → prove from def
+- axiom smoothExtDeriv_wedge → prove Leibniz rule
+- opaque unitForm → def as constant 1 form
+- opaque hodgeStar → def using Hodge star operator
+- axioms hodgeStar_add/smul/hodgeStar → prove from def
+- opaque adjointDeriv → def as δ = ±*d*
+- opaque laplacian → def as Δ = dδ + δd
+- opaque lefschetzLambda → def using interior product with ω
 
-### Hodge/Analytic/Norms.lean
-1. opaque pointwiseComass → def using sSup { |ω(v)| : ‖v‖ ≤ 1 }
-2. axioms pointwiseComass_* → prove from def
-3. def comass using iSup of pointwiseComass (already done, but verify)
-4. axioms comass_* → prove from def
-5. opaque pointwiseInner → def using Hermitian inner product on forms
-6. axiom pointwiseInner_self_nonneg → prove from def
-7. opaque L2Inner → def as ∫ pointwiseInner dμ
-8. axioms L2Inner_add_left/smul_left → prove from def
-9. axiom energy_minimizer → prove or mark as deep (Hodge theory)
-10. axiom trace_L2_control → prove Sobolev embedding or mark as deep
+### Hodge/Analytic/Norms.lean (23 items)
+- opaque pointwiseComass → def using sSup { |ω(v)| : ‖v‖ ≤ 1 }
+- axioms pointwiseComass_nonneg/zero/add_le/smul/continuous → prove from def
+- axioms comass_add_le/smul/eq_zero_iff → prove from pointwiseComass
+- opaque pointwiseInner → def using Hermitian inner product on forms
+- opaque L2Inner → def as ∫ pointwiseInner dμ
+- axioms L2Inner_add_left/smul_left/self_nonneg/comm/cauchy_schwarz → prove
+- axiom energy_minimizer → prove or cite Hodge theory
+- axiom trace_L2_control → prove Sobolev embedding
 
 ## RULES
 - NO sorry, NO admit
@@ -753,8 +784,6 @@ Convert ALL 53 axioms and opaques to theorems and concrete definitions.
 - Document non-obvious steps
 
 ## OUTPUT FORMAT
-Provide complete replacement code for each file section. Use this format:
-
 ```lean
 -- FILE: Hodge/Basic.lean
 -- REPLACING: lines X-Y
@@ -762,7 +791,7 @@ Provide complete replacement code for each file section. Use this format:
 <your code here>
 ```
 
-Provide ALL 53 items.
+Provide ALL 82 items.
 ```
 
 ## Agent 2 Prompt
@@ -771,49 +800,46 @@ Provide ALL 53 items.
 You are Agent 2 working on the Hodge Conjecture Lean formalization.
 
 ## YOUR FILES
-- Hodge/Analytic/Currents.lean (5 axioms/opaques)
-- Hodge/Analytic/FlatNorm.lean (9 axioms/opaques)
-- Hodge/Analytic/IntegralCurrents.lean (8 axioms/opaques)
-- Hodge/Analytic/Calibration.lean (4 axioms/opaques)
+- Hodge/Analytic/Currents.lean (16 axioms/opaques)
+- Hodge/Analytic/FlatNorm.lean (11 axioms/opaques)
+- Hodge/Analytic/IntegralCurrents.lean (12 axioms/opaques)
+- Hodge/Analytic/Calibration.lean (5 axioms/opaques)
 
 ## YOUR TASK
-Convert ALL 26 axioms and opaques to theorems and concrete definitions.
+Convert ALL 44 axioms and opaques to theorems and concrete definitions.
 
-## SPECIFIC ITEMS
+## KEY CONVERSIONS
 
-### Hodge/Analytic/Currents.lean
-1. opaque mass → def as sSup { |T(ψ)| / comass(ψ) : comass(ψ) > 0 }
-2. axiom mass_nonneg → prove sSup of nonneg is nonneg
-3. axiom mass_zero → prove 0 current gives 0 mass
-4. axiom mass_neg → prove |(-T)(ψ)| = |T(ψ)|
-5. axiom mass_add_le → prove triangle inequality
+### Hodge/Analytic/Currents.lean (16 items)
+- axiom map_add'/map_smul' → prove linearity of currents
+- axiom zero → define zero current
+- opaque add_curr/neg_curr/smul_curr → def as pointwise operations
+- opaque mass → def as sSup { |T(ψ)| / comass(ψ) : comass(ψ) > 0 }
+- axioms mass_nonneg/zero/neg/add_le/smul → prove from def
+- axiom is_bounded → prove currents are bounded
+- opaque boundary → def using Stokes
+- axiom boundary_boundary → prove ∂∂ = 0
 
-### Hodge/Analytic/FlatNorm.lean
-1. opaque flatNorm → def as sInf { mass(S) + mass(R) : T = S + ∂R }
-2. axiom flatNorm_nonneg → prove sInf of nonneg
-3. axiom flatNorm_zero → prove infimum achieved at S=R=0
-4. axiom flatNorm_eq_zero_iff → prove iff T = 0
-5. axiom flatNorm_neg → prove -T has same decomposition
-6. axiom flatNorm_add_le → prove by combining decompositions
-7. axiom flatNorm_le_mass → prove by taking R = 0
-8. axiom eval_le_flatNorm → prove |T(ψ)| ≤ |S(ψ)| + |∂R(ψ)| ≤ ...
-9. axiom flatNorm_boundary_le → prove ∂(∂R) = 0
+### Hodge/Analytic/FlatNorm.lean (11 items)
+- opaque flatNorm → def as sInf { mass(S) + mass(R) : T = S + ∂R }
+- axioms flatNorm_nonneg/zero/eq_zero_iff/neg/add_le/smul → prove from def
+- axiom flatNorm_le_mass → prove by taking R = 0
+- axiom eval_le_mass/eval_le_flatNorm → prove evaluation bounds
+- axiom flatNorm_boundary_le → prove using ∂∂ = 0
 
-### Hodge/Analytic/IntegralCurrents.lean
-1. opaque isRectifiable → def using rectifiable sets from Mathlib
-2. axiom isRectifiable_empty → prove empty set is rectifiable
-3. axiom isRectifiable_union → prove union of rectifiable is rectifiable
-4. opaque isIntegral → def as integer multiplicity condition
-5. axiom isIntegral_add → prove from def
-6. axiom isIntegral_zero_current → prove 0 has multiplicity 0
-7. axiom isIntegral_smul → prove c ∈ ℤ preserves integrality
-8. axiom isIntegral_boundary → prove boundary of integral is integral
+### Hodge/Analytic/IntegralCurrents.lean (12 items)
+- opaque isRectifiable → def using rectifiable sets from Mathlib
+- axioms isRectifiable_empty/union → prove
+- opaque IntegralPolyhedralChain → def as polyhedral chains with ℤ coefficients
+- axioms polyhedral_add/zero/smul/boundary → prove closure properties
+- axioms isIntegral_add/zero_current/smul/boundary → prove
 
-### Hodge/Analytic/Calibration.lean
-1. axiom wirtinger_comass_bound → prove ‖ω^p/p!‖ ≤ 1 using Wirtinger inequality
-2. axiom calibration_inequality → prove T(ψ) ≤ mass(T) for calibrating ψ
-3. axiom spine_theorem → prove or cite Harvey-Lawson decomposition
-4. axiom mass_lsc → prove lower semicontinuity of mass in flat topology
+### Hodge/Analytic/Calibration.lean (5 items)
+- axiom wirtinger_comass_bound → prove ‖ω^p/p!‖ ≤ 1
+- axiom calibration_inequality → prove T(ψ) ≤ mass(T)
+- axiom spine_theorem → cite Harvey-Lawson
+- axiom mass_lsc → prove lower semicontinuity
+- axiom limit_is_calibrated → ⚠️ STRATEGY-CRITICAL
 
 ## RULES
 - NO sorry, NO admit
@@ -828,7 +854,7 @@ Convert ALL 26 axioms and opaques to theorems and concrete definitions.
 <your code here>
 ```
 
-Provide ALL 26 items.
+Provide ALL 44 items.
 ```
 
 ## Agent 3 Prompt
@@ -837,55 +863,49 @@ Provide ALL 26 items.
 You are Agent 3 working on the Hodge Conjecture Lean formalization.
 
 ## YOUR FILES
-- Hodge/Analytic/Grassmannian.lean (10 axioms/opaques)
+- Hodge/Analytic/Grassmannian.lean (11 axioms/opaques)
 - Hodge/Kahler/Cone.lean (4 axioms/opaques)
-- Hodge/Kahler/TypeDecomposition.lean (9 axioms/opaques)
-- Hodge/Kahler/Manifolds.lean (9 axioms/opaques)
+- Hodge/Kahler/TypeDecomposition.lean (10 axioms/opaques)
+- Hodge/Kahler/Manifolds.lean (7 axioms/opaques)
 
 ## YOUR TASK
 Convert ALL 32 axioms and opaques to theorems and concrete definitions.
 
-## SPECIFIC ITEMS
+## KEY CONVERSIONS
 
-### Hodge/Analytic/Grassmannian.lean
-1. opaque IsVolumeFormOn → def as nonzero top form on subspace
-2. axiom IsVolumeFormOn_nonzero → prove from def
-3. axiom exists_volume_form_of_submodule_axiom → prove by constructing e₁∧...∧eₚ
-4. axiom simpleCalibratedForm_is_smooth → prove smooth dependence on parameters
-5. opaque distToCone → def as inf { ‖α - β‖ : β ∈ cone }
-6. axiom distToCone_nonneg → prove inf of nonneg
-7. opaque coneDefect → def as iSup of distToCone over x
-8. axiom coneDefect_nonneg → prove from def
-9. axiom radial_minimization → prove by calculus (minimize ‖α - tξ‖²)
-10. axiom dist_cone_sq_formula → prove projection formula
+### Hodge/Analytic/Grassmannian.lean (11 items)
+- opaque IsVolumeFormOn → def as nonzero top form on subspace
+- axiom IsVolumeFormOn_nonzero → prove from def
+- axiom exists_volume_form_of_submodule_axiom → prove by constructing e₁∧...∧eₚ
+- axiom simpleCalibratedForm → construct calibrated form
+- axiom calibratedCone_hull_pointed → prove cone is pointed
+- opaque distToCone → def as inf { ‖α - β‖ : β ∈ cone }
+- opaque coneDefect → def as iSup of distToCone over x
+- axiom distToCone_nonneg/coneDefect_nonneg → prove
+- axiom radial_minimization/dist_cone_sq_formula → prove projection
 
-### Hodge/Kahler/Cone.lean
-1. axiom wirtinger_pairing → prove ⟨ω^p/p!, vol_V⟩ = 1 for complex p-plane V
-2. axiom omegaPow_in_interior → prove using wirtinger_pairing + all pairings > 0
-3. axiom exists_uniform_interior_radius → prove using compactness + continuity
-4. axiom caratheodory_decomposition → prove using Carathéodory's theorem for cones
+### Hodge/Kahler/Cone.lean (4 items)
+- axiom wirtinger_pairing → prove ⟨ω^p/p!, vol_V⟩ = 1
+- axiom omegaPow_in_interior → prove using wirtinger_pairing
+- axiom exists_uniform_interior_radius → prove using compactness
+- axiom caratheodory_decomposition → prove using Carathéodory's theorem
 
-### Hodge/Kahler/TypeDecomposition.lean
-1. opaque isPQForm → def using Dolbeault type decomposition
-2. axiom zero_is_pq → prove 0 is (p,q) for all p,q
-3. axiom isPQForm_wedge → prove wedge preserves type
-4. axiom omega_is_1_1_axiom → prove ω is (1,1) from Kähler definition
-5. axiom unitForm_is_0_0 → prove 1 is (0,0)
-6. axiom omega_pow_is_p_p_axiom → prove ω^p is (p,p)
-7. axiom omega_pow_isClosed → prove dω^p = 0 from dω = 0
-8. axiom omega_pow_is_rational → prove from integrality of Kähler class
-9. axiom isClosed_omegaPow_scaled → prove scaling preserves closedness
+### Hodge/Kahler/TypeDecomposition.lean (10 items)
+- opaque isPQForm → def using Dolbeault type decomposition
+- axiom zero_is_pq → prove 0 is (p,q) for all p,q
+- axiom isPQForm_wedge → prove wedge preserves type
+- axiom omega_is_1_1_axiom → prove ω is (1,1)
+- opaque kahlerPow → def as ω^p / p!
+- axiom unitForm_is_0_0/omega_pow_is_p_p_axiom → prove type
+- axiom omega_pow_IsFormClosed/is_rational → prove from Kähler
+- axiom IsFormClosed_omegaPow_scaled → prove scaling preserves
 
-### Hodge/Kahler/Manifolds.lean
-1. axiom kahlerMetric_symm → prove Hermitian symmetry
-2. axiom isRationalClass_wedge → prove product of rational is rational
-3. axiom isRationalClass_smul_rat → prove q • rational is rational
-4. axiom omega_isClosed → prove dω = 0 (Kähler condition)
-5. axiom omega_is_rational → prove from integral Kähler class
-6. axiom isRationalClass_add → prove sum of rational is rational
-7. axiom zero_is_rational → prove 0 is rational
-8. axiom unitForm_isClosed → prove d(1) = 0
-9. axiom unitForm_is_rational → prove 1 is rational
+### Hodge/Kahler/Manifolds.lean (7 items)
+- axiom kahlerMetric_symm → prove Hermitian symmetry
+- axiom isRationalClass_wedge → prove product of rational is rational
+- axiom omega_isClosed/is_rational → prove from Kähler condition
+- axiom zero_is_rational → prove 0 is rational
+- axiom unitForm_isClosed/is_rational → prove d(1) = 0
 
 ## RULES
 - NO sorry, NO admit
@@ -908,69 +928,51 @@ Provide ALL 32 items.
 You are Agent 4 working on the Hodge Conjecture Lean formalization.
 
 ## YOUR FILES
-- Hodge/Classical/GAGA.lean (18 axioms/opaques)
+- Hodge/Classical/GAGA.lean (10 axioms/opaques)
 - Hodge/Classical/HarveyLawson.lean (10 axioms/opaques)
-- Hodge/Classical/Bergman.lean (10 axioms/opaques)
-- Hodge/Analytic/SheafTheory.lean (10 axioms/opaques)
-- Hodge/Classical/Lefschetz.lean (5 axioms/opaques)
+- Hodge/Classical/Lefschetz.lean (7 axioms/opaques)
+- Hodge/Analytic/SheafTheory.lean (5 axioms/opaques)
+- Hodge/Classical/Bergman.lean (4 axioms/opaques)
 - Hodge/Classical/FedererFleming.lean (2 axioms/opaques)
 - Hodge/Classical/SerreVanishing.lean (1 axiom)
 
 ## YOUR TASK
-Convert 48 of 56 items. Keep these 8 as axioms (classical pillars):
-- serre_gaga
-- harvey_lawson_theorem
-- harvey_lawson_represents
-- hard_lefschetz_isomorphism
-- hard_lefschetz_inverse_form
-- tian_convergence
-- federer_fleming_compactness
-- serre_vanishing
+Convert 31 of 39 items. Keep these 8 as axioms (classical pillars):
+- serre_gaga, harvey_lawson_theorem, harvey_lawson_represents
+- hard_lefschetz_isomorphism, hard_lefschetz_inverse_form
+- tian_convergence, federer_fleming_compactness, serre_vanishing
 
-## SPECIFIC ITEMS
+## KEY CONVERSIONS
 
-### Hodge/Classical/GAGA.lean (18 items, keep serre_gaga)
-1. opaque IsAlgebraicSet → def using Zariski closed
-2. axioms IsAlgebraicSet_empty/univ/union/inter/isClosed/nontrivial → prove
-3. opaque FundamentalClassSet → def as integration current
-4. axioms FundamentalClassSet_* → prove
-5. axiom exists_hyperplane_algebraic → prove projective has hyperplanes
-6. axiom IsAlgebraicSet_isAnalyticSet → prove algebraic ⊂ analytic
-7. opaque algebraic_intersection_power → def as iterated intersection
-8. axiom algebraic_intersection_power_is_algebraic → prove
+### Hodge/Classical/GAGA.lean (10 items, keep serre_gaga)
+- opaque IsZariskiClosed → def using polynomial vanishing
+- axioms IsAlgebraicSet_empty/univ/union/intersection/isClosed → prove
+- axiom IsAlgebraicSet_isAnalyticSet → prove algebraic ⊂ analytic
+- axiom FundamentalClassSet_additive/rational → prove
 
 ### Hodge/Classical/HarveyLawson.lean (10 items, keep hl_theorem/represents)
-1. opaque IsAnalyticSet → def using local analytic equations
-2. axioms IsAnalyticSet_* → prove closure properties
-3. axiom flat_limit_of_cycles_is_cycle → prove ∂ continuous in flat norm
+- opaque IsAnalyticSet → def using local analytic equations
+- axioms IsAnalyticSet_empty/univ/union/inter/isClosed/nontrivial → prove
+- axiom flat_limit_of_cycles_is_cycle → ⚠️ STRATEGY-CRITICAL
 
-### Hodge/Classical/Bergman.lean (10 items, keep tian_convergence)
-1. opaque partial_deriv → def as ∂
-2. opaque partial_bar_deriv → def as ∂̄
-3. opaque log_h → def as log of metric
-4. opaque L2InnerProduct → def as L² pairing
-5. opaque log_KM → def
-6. opaque SectionsVanishingToOrder → def
-7. axiom jet_surjectivity_axiom → prove surjectivity
-8. axiom IsHolomorphic_tensor_axiom → prove tensor of holomorphic
+### Hodge/Classical/Lefschetz.lean (7 items, keep hard_lefschetz_*)
+- axiom ofForm_wedge_add → prove wedge on cohomology
+- opaque lefschetz_operator → def as multiplication by [ω]
+- axiom lefschetz_operator_eval → prove evaluation
+- axiom hard_lefschetz_bijective → prove bijectivity
+- opaque lefschetz_inverse_cohomology → def as inverse
 
-### Hodge/Analytic/SheafTheory.lean (10 items)
-1. opaque SheafCohomology → def using derived functors (or axiomatize structure)
-2. axioms SheafCohomology.inst* → provide instances
-3. opaque vanishes → def as H^q = 0
-4. axiom vanishes_iff_subsingleton → prove
-5. opaque structureSheafAsCoherent → def
-6. axiom h0_structure_sheaf_nonvanishing → prove H^0(𝒪) ≠ 0
+### Hodge/Analytic/SheafTheory.lean (5 items)
+- axiom SheafCohomology.finiteDimensional' → prove
+- axiom structureSheafAsCoherent/h0_structure_sheaf_nonvanishing → prove
+- axiom structureSheaf_exists/idealSheaf_exists → prove
 
-### Hodge/Classical/Lefschetz.lean (5 items, keep hard_lefschetz_*)
-1. axiom lefschetz_on_cohomology → prove L acts on cohomology
-2. axiom lefschetz_inverse_cohomology → prove inverse exists
-3. axiom lefschetz_compatibility → prove compatibility
+### Hodge/Classical/Bergman.lean (4 items, keep tian_convergence)
+- axiom IsHolomorphic_add/smul → prove linearity
+- axiom jet_surjectivity → prove
 
 ### Hodge/Classical/FedererFleming.lean (2 items, keep compactness)
-1. axiom deformation_theorem → prove or mark as deep
-
-### Hodge/Classical/SerreVanishing.lean (1 item, keep as axiom)
+- axiom deformation_theorem → prove or cite
 
 ## RULES
 - NO sorry, NO admit
@@ -984,7 +986,7 @@ Convert 48 of 56 items. Keep these 8 as axioms (classical pillars):
 <your code here>
 ```
 
-Provide ALL 48 items to convert.
+Provide ALL 31 items to convert.
 ```
 
 ## Agent 5 Prompt
@@ -993,99 +995,89 @@ Provide ALL 48 items to convert.
 You are Agent 5 working on the Hodge Conjecture Lean formalization.
 
 ## YOUR FILES
-- Hodge/Kahler/Microstructure.lean (24 axioms/opaques)
-- Hodge/Kahler/SignedDecomp.lean (1 axiom + 7 BUILD ERRORS)
+- Hodge/Kahler/Microstructure.lean (8 axioms/opaques)
+- Hodge/Kahler/SignedDecomp.lean (2 axioms/opaques)
 - Hodge/Kahler/Main.lean (3 axioms/opaques)
 - Hodge/Utils/BaranyGrinberg.lean (1 axiom - keep as is)
 
-## CRITICAL: FIX BUILD ERRORS FIRST
-
-The build is currently broken. These errors MUST be fixed before anything else:
-
-```
-error: Hodge/Kahler/SignedDecomp.lean:89:28: Tactic `rewrite` failed
-error: Hodge/Kahler/SignedDecomp.lean:96:8: Tactic `rewrite` failed  
-error: Hodge/Kahler/SignedDecomp.lean:113:57: unsolved goals
-error: Hodge/Kahler/SignedDecomp.lean:128:16: Unknown identifier `inv_mul_lt_iff`
-error: Hodge/Kahler/SignedDecomp.lean:127:19: unsolved goals
-error: Hodge/Kahler/SignedDecomp.lean:136:35: Type mismatch
-error: Hodge/Kahler/SignedDecomp.lean:107:19: unsolved goals
-```
-
-Fix these errors. Use `sorry` ONLY if absolutely necessary and document why.
-
 ## YOUR TASK
-After fixing errors, convert 28 of 29 items. Keep `barany_grinberg` as axiom.
+Convert 13 of 14 items. Keep `barany_grinberg` as axiom.
 
-## SPECIFIC ITEMS
+## KEY CONVERSIONS
 
-### Hodge/Kahler/SignedDecomp.lean (fix errors + 1 axiom)
-1. FIX ALL 7 ERRORS in the signed_decomposition proof
-2. axiom form_is_bounded_axiom → prove using compactness of X
+### Hodge/Kahler/SignedDecomp.lean (2 items)
+- axiom form_is_bounded → prove using compactness of X
+- axiom signed_decomposition → ⚠️ STRATEGY-CRITICAL: decompose rational (p,p) forms
 
-### Hodge/Kahler/Microstructure.lean (24 items)
-1. opaque IsComplexSubmanifold → def
-2. axiom local_sheet_realization → prove
-3. axiom cubulation_exists → prove using standard mesh construction
-4. opaque IsValidIntegerApproximation → def
-5. axiom IsValidIntegerApproximation_edge_bound → prove
-6. axiom integer_transport → prove using Barany-Grinberg
-7. opaque IsValidGluing → def
-8. axiom gluing_estimate → prove
-9. opaque RawSheetSum.toIntegralCurrent → def
-10. opaque HasBoundedFlatNorm → def
-11. axiom gluing_flat_norm_bound → prove
-12. opaque HasBoundedCalibrationDefect → def
-13. axiom calibration_defect_from_gluing → prove
-14. opaque calibratedFlow → def
-15. opaque glueCells → def
-16. axiom glueCells_isCycle → prove ∂ = 0
-17. axiom glueCells_mass_bound → prove
-18. axiom glueCells_calibration_defect → prove
-19. axiom IsValidIntegerApproximation_divergence_free → prove
-20. axiom calibratedFlow_divergence_free → prove
-21. axiom microstructureSequence_defect_bound → prove
-22. axiom exists_flow_mass_bound → prove
-23. axiom microstructureSequence_flatnorm_bound → prove
-24. axiom microstructureSequence_flat_limit_exists → prove using FF compactness
+### Hodge/Kahler/Microstructure.lean (8 items)
+- axiom local_sheet_realization → prove local complex submanifold exists
+- axiom integer_transport → prove using Barany-Grinberg
+- opaque SmoothForm.pairing → def as integration pairing
+- opaque RawSheetSum.toIntegralCurrent → def conversion to current
+- axiom gluing_estimate/gluing_flat_norm_bound/calibration_defect_from_gluing → prove bounds
+- axiom cubulation_exists → prove mesh construction
 
 ### Hodge/Kahler/Main.lean (3 items)
-1. axiom integration_represents_fundamental → prove
-2. axiom microstructure_limit_represents_class → prove
-3. opaque CurrentRepresentsClass → def
+- axiom harvey_lawson_fundamental_class → ⚠️ STRATEGY-CRITICAL: HL limit is algebraic
+- axiom omega_pow_represents_multiple → prove ωᵖ represents scalar class
+- axiom lefschetz_lift_signed_cycle → ⚠️ STRATEGY-CRITICAL: Lefschetz lift
+
+## ⚠️ STRATEGY-CRITICAL ITEMS (highest priority!)
+
+These encode the core mathematical substance of the proof:
+1. `signed_decomposition` - decomposing rational (p,p) forms into positive parts
+2. `harvey_lawson_fundamental_class` - HL limit produces algebraic variety
+3. `lefschetz_lift_signed_cycle` - Lefschetz lifting preserves decomposition
 
 ## RULES
-- NO sorry, NO admit (except to fix blocking errors, documented)
+- NO sorry, NO admit
 - 🔴 **DO NOT RUN `lake build`** 🔴 — The coordinator runs builds, not you!
 
 ## OUTPUT FORMAT
 ```lean
 -- FILE: Hodge/Kahler/SignedDecomp.lean
--- FIX FOR: error at line 89
-
-<your fixed code>
-```
-
-Then:
-```lean
--- FILE: Hodge/Kahler/Microstructure.lean
 -- REPLACING: lines X-Y
 
 <your code here>
 ```
 
-Fix errors FIRST, then provide ALL 28 items to convert.
+Provide ALL 13 items to convert.
 ```
 
 ---
 
 # 📈 Progress Tracker
 
-| Agent | Items | Completed | Remaining |
-|-------|-------|-----------|-----------|
-| 1 | 53 | 0 | 53 |
-| 2 | 26 | 26 | 0 |
-| 3 | 32 | 32 | 0 |
-| 4 | 56 (48 to convert) | 48 | 8 |
-| 5 | 29 (28 to convert) + errors | 28 | 1 |
-| **TOTAL** | **196** | **134** | **62** |
+**Last Updated:** 2024-12-31
+**Build Status:** ✅ PASSES
+
+| Agent | Files | Items | To Convert | Status |
+|-------|-------|-------|------------|--------|
+| 1 | Basic, Forms, Norms | 82 | 82 | 🔴 Not started |
+| 2 | Currents, FlatNorm, IntegralCurrents, Calibration | 44 | 44 | 🔴 Not started |
+| 3 | Grassmannian, Cone, TypeDecomp, Manifolds | 32 | 32 | 🔴 Not started |
+| 4 | GAGA, HarveyLawson, Bergman, SheafTheory, Lefschetz, FF, SV | 39 | 31 | 🔴 Not started |
+| 5 | Microstructure, SignedDecomp, Main, BaranyGrinberg | 14 | 13 | 🔴 Not started |
+| **TOTAL** | 22 files | **211** | **202** | — |
+
+## Classical Pillars (keep as axioms)
+
+These 9 axioms represent deep published theorems that can remain as axioms:
+1. `serre_gaga` - Serre 1956
+2. `harvey_lawson_theorem` - Harvey-Lawson 1982
+3. `harvey_lawson_represents` - Harvey-Lawson 1982
+4. `hard_lefschetz_isomorphism` - Lefschetz 1924, Hodge 1941
+5. `hard_lefschetz_inverse_form` - Lefschetz 1924, Hodge 1941
+6. `tian_convergence` - Tian 1990
+7. `federer_fleming_compactness` - Federer-Fleming 1960
+8. `serre_vanishing` - Serre 1955
+9. `barany_grinberg` - Bárány-Grinberg 1981
+
+## Strategy-Critical Axioms (must convert!)
+
+These 6 axioms encode the core mathematical substance and MUST be proven:
+1. `signed_decomposition` - Agent 5
+2. `harvey_lawson_fundamental_class` - Agent 5
+3. `lefschetz_lift_signed_cycle` - Agent 5
+4. `flat_limit_of_cycles_is_cycle` - Agent 4
+5. `limit_is_calibrated` - Agent 2
