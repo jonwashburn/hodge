@@ -2,16 +2,39 @@ import Hodge.Basic
 import Mathlib.Analysis.InnerProductSpace.Basic
 
 /-!
-# Track B.1: Differential Forms on Complex Manifolds
+# Differential Forms on Complex Manifolds
 
 This file defines operations on smooth differential forms including:
-- Wedge product
-- Hodge star operator
-- Adjoint derivative (codifferential)
-- Laplacian
+- Wedge product (∧)
+- Hodge star operator (⋆)
+- Adjoint derivative / codifferential (δ)
+- Hodge Laplacian (Δ = dδ + δd)
+- Lefschetz operators (L and Λ)
 
-Since `SmoothForm` is opaque, we axiomatize the key properties and provide
-derived theorems where possible.
+## Axiom Categories
+
+### Structural Axioms (Required for Opaque Operations)
+Since `smoothWedge`, `hodgeStar`, `adjointDeriv`, and `laplacian` are opaque,
+we axiomatize their algebraic properties:
+- Wedge product: associativity, distributivity, graded commutativity
+- Hodge star: linearity, involutivity (⋆⋆ = ±1)
+- Codifferential: linearity, δ² = 0
+- Laplacian: linearity
+
+### Differential Structure Axioms
+- `smoothExtDeriv_extDeriv`: d² = 0 (fundamental property of exterior derivative)
+- `smoothExtDeriv_wedge`: Leibniz rule for wedge products
+- `isFormClosed_wedge`: Closed forms are closed under wedge product
+
+### Harmonic Forms
+- `isHarmonic_implies_closed`: Harmonic ⟹ closed
+- `isHarmonic_implies_coclosed`: Harmonic ⟹ coclosed
+
+### Lefschetz Structure
+- `lefschetz_commutator`: [Λ, L] = (n - k)·id on k-forms
+
+All axioms express standard facts from Kähler geometry that cannot be derived
+from the abstract opaque structure.
 -/
 
 noncomputable section
@@ -119,6 +142,7 @@ axiom hodgeStar_add {k : ℕ} (α β : SmoothForm n X k) :
 axiom hodgeStar_smul_real {k : ℕ} (r : ℝ) (α : SmoothForm n X k) :
     ⋆(r • α) = r • (⋆α)
 
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] in
 /-- Hodge star of zero is zero. -/
 theorem hodgeStar_zero {k : ℕ} : ⋆(0 : SmoothForm n X k) = 0 := by
   have h := hodgeStar_smul_real (0 : ℝ) (0 : SmoothForm n X k)
@@ -144,6 +168,7 @@ axiom adjointDeriv_add {k : ℕ} (α β : SmoothForm n X k) :
 axiom adjointDeriv_smul_real {k : ℕ} (r : ℝ) (α : SmoothForm n X k) :
     δ (r • α) = r • (δ α)
 
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] in
 /-- Adjoint derivative of zero is zero. -/
 theorem adjointDeriv_zero {k : ℕ} : δ(0 : SmoothForm n X k) = 0 := by
   have h := adjointDeriv_smul_real (0 : ℝ) (0 : SmoothForm n X k)
@@ -172,6 +197,7 @@ axiom laplacian_add {k : ℕ} (α β : SmoothForm n X k) :
 axiom laplacian_smul_real {k : ℕ} (r : ℝ) (α : SmoothForm n X k) :
     Δ (r • α) = r • (Δ α)
 
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] in
 /-- Laplacian of zero is zero. -/
 theorem laplacian_zero {k : ℕ} : Δ(0 : SmoothForm n X k) = 0 := by
   have h := laplacian_smul_real (0 : ℝ) (0 : SmoothForm n X k)
@@ -181,6 +207,7 @@ theorem laplacian_zero {k : ℕ} : Δ(0 : SmoothForm n X k) = 0 := by
 /-- A form is harmonic if it is in the kernel of the Laplacian. -/
 def IsHarmonic {k : ℕ} (ω : SmoothForm n X k) : Prop := Δ ω = 0
 
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] in
 /-- Zero is harmonic. -/
 theorem isHarmonic_zero {k : ℕ} : IsHarmonic (0 : SmoothForm n X k) := laplacian_zero
 

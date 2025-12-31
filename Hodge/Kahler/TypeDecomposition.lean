@@ -114,6 +114,7 @@ axiom unitForm_is_0_0 :
 /-- The p-th power of the Kähler form ω^p is a (p,p)-form. -/
 axiom omega_pow_is_p_p_axiom (p : ℕ) : isPPFormTD n X p (kahlerPow (n := n) (X := X) p)
 
+omit [ProjectiveComplexManifold n X] K in
 /-- The p-th power of the Kähler form ω^p is a (p,p)-form. -/
 theorem omega_pow_is_p_p (p : ℕ) : isPPFormTD n X p (kahlerPow (n := n) (X := X) p) :=
   omega_pow_is_p_p_axiom p

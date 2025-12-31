@@ -27,26 +27,44 @@ opaque pointwiseComass {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     {k : ℕ} (α : SmoothForm n X k) (x : X) : ℝ
 
--- Axiomatize the key properties of pointwise comass
+/-! ### Pointwise Comass Properties (Structural Axioms)
+
+These axioms express the standard norm properties of the pointwise comass.
+They are axiomatic because `pointwiseComass` and `SmoothForm` are opaque.
+These properties would be derivable if the underlying structures were transparent.
+-/
+
+/-- **Pointwise Comass Non-negativity** (Structural).
+    The supremum of norms is always non-negative. -/
 axiom pointwiseComass_nonneg {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     {k : ℕ} (α : SmoothForm n X k) (x : X) : pointwiseComass α x ≥ 0
 
+/-- **Pointwise Comass of Zero** (Structural).
+    The zero form has zero comass at every point. -/
 axiom pointwiseComass_zero {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     (x : X) {k : ℕ} : pointwiseComass (0 : SmoothForm n X k) x = 0
 
+/-- **Pointwise Comass Triangle Inequality** (Structural).
+    The comass of a sum is bounded by the sum of comasses.
+    This is the triangle inequality for the operator norm. -/
 axiom pointwiseComass_add_le {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     {k : ℕ} (α β : SmoothForm n X k) (x : X) :
     pointwiseComass (α + β) x ≤ pointwiseComass α x + pointwiseComass β x
 
+/-- **Pointwise Comass Homogeneity** (Structural).
+    The comass scales by the absolute value of the scalar.
+    This is the homogeneity property of norms. -/
 axiom pointwiseComass_smul {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     {k : ℕ} (r : ℝ) (α : SmoothForm n X k) (x : X) :
     pointwiseComass (r • α) x = |r| * pointwiseComass α x
 
--- Axiom: Negation equals scalar multiplication by -1 (for opaque SmoothForm)
+/-- **Negation as Scalar Multiplication** (Structural).
+    For opaque `SmoothForm`, we axiomatize that negation equals
+    scalar multiplication by -1, which holds for any module. -/
 axiom SmoothForm.neg_eq_neg_one_smul {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     {k : ℕ} (α : SmoothForm n X k) : (-α) = (-1 : ℝ) • α
@@ -58,7 +76,16 @@ theorem pointwiseComass_neg {n : ℕ} {X : Type*}
   rw [SmoothForm.neg_eq_neg_one_smul, pointwiseComass_smul]
   simp
 
-/-- **Berge's Maximum Theorem**: Pointwise comass is continuous for smooth forms. -/
+/-- **Berge's Maximum Theorem**: Pointwise comass is continuous for smooth forms.
+
+    This is a consequence of Berge's Maximum Theorem: the supremum of a jointly
+    continuous function over a continuously-varying compact set is continuous.
+    Here, the unit ball in the tangent space varies continuously with the base point,
+    and the alternating map `α(x)` varies smoothly in x.
+
+    Reference: [C. Berge, "Topological Spaces", 1963, Theorem VI.3.1]
+
+    This must remain an axiom since `pointwiseComass` and `SmoothForm` are opaque. -/
 axiom pointwiseComass_continuous {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
@@ -139,22 +166,38 @@ theorem comass_neg {n : ℕ} {X : Type*}
   simp
 
 /-- **Comass Norm Definiteness** (Standard).
-    The comass norm of a form is zero if and only if the form is identically zero. -/
+    The comass norm of a form is zero if and only if the form is identically zero.
+
+    This is the positive-definiteness property of the comass norm, which follows from:
+    1. For non-zero smooth forms, there exists a point where the form is non-zero
+    2. At such a point, the supremum over unit tangent vectors is positive
+    3. Hence the global supremum (comass) is positive
+
+    Reference: [H. Federer, "Geometric Measure Theory", 1969, Section 1.8]
+
+    This must remain an axiom since `SmoothForm` and `pointwiseComass` are opaque. -/
 axiom comass_eq_zero_iff {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [CompactSpace X] [Nonempty X]
     {k : ℕ} (α : SmoothForm n X k) :
     comass α = 0 ↔ α = 0
 
-/-! ## L2 Inner Product -/
+/-! ## L2 Inner Product
 
-/-- Pointwise inner product of differential forms. -/
+The L2 inner product on smooth forms is induced by the Riemannian metric
+on the manifold. For a Kähler manifold, this metric is compatible with the
+complex structure and induces a Hermitian inner product on each fiber.
+-/
+
+/-- Pointwise inner product of differential forms.
+    This is the fiberwise inner product induced by the Riemannian/Kähler metric. -/
 opaque pointwiseInner {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α β : SmoothForm n X k) (x : X) : ℝ
 
-/-- The pointwise inner product is non-negative for self-pairing. -/
+/-- **Pointwise Inner Product Positivity** (Structural).
+    The inner product of a form with itself is non-negative, as for any inner product. -/
 axiom pointwiseInner_self_nonneg {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
@@ -168,24 +211,33 @@ def pointwiseNorm {n : ℕ} {X : Type*}
     {k : ℕ} (α : SmoothForm n X k) (x : X) : ℝ :=
   Real.sqrt (pointwiseInner α α x)
 
-/-- Global L2 inner product of two k-forms. -/
+/-- Global L2 inner product of two k-forms.
+    Defined abstractly as the integral of the pointwise inner product over X. -/
 opaque L2Inner {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α β : SmoothForm n X k) : ℝ
 
+/-- **L2 Inner Product Left Additivity** (Structural).
+    The L2 inner product is additive in the first argument.
+    This follows from linearity of integration. -/
 axiom L2Inner_add_left {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α₁ α₂ β : SmoothForm n X k) :
     L2Inner (α₁ + α₂) β = L2Inner α₁ β + L2Inner α₂ β
 
+/-- **L2 Inner Product Scalar Left Linearity** (Structural).
+    The L2 inner product is ℝ-linear in the first argument. -/
 axiom L2Inner_smul_left {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (r : ℝ) (α β : SmoothForm n X k) :
     L2Inner (r • α) β = r * L2Inner α β
 
+/-- **L2 Inner Product Positivity** (Structural).
+    The L2 inner product of a form with itself is non-negative.
+    This follows from pointwise non-negativity and integration. -/
 axiom L2Inner_self_nonneg {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
@@ -258,14 +310,16 @@ theorem L2NormForm_sq_eq_energy {n : ℕ} {X : Type*}
   unfold L2NormForm energy
   rw [Real.sq_sqrt (L2Inner_self_nonneg α)]
 
-/-- Pointwise inner product is symmetric. -/
+/-- **Pointwise Inner Product Symmetry** (Structural).
+    The pointwise inner product is symmetric, as for any inner product space. -/
 axiom pointwiseInner_comm {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α β : SmoothForm n X k) (x : X) :
     pointwiseInner α β x = pointwiseInner β α x
 
-/-- L2 inner product is symmetric. -/
+/-- **L2 Inner Product Symmetry** (Structural).
+    The L2 inner product is symmetric, following from pointwise symmetry and linearity of integration. -/
 axiom L2Inner_comm {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
@@ -288,21 +342,26 @@ theorem L2Inner_smul_right {n : ℕ} {X : Type*}
     L2Inner α (r • β) = r * L2Inner α β := by
   rw [L2Inner_comm α (r • β), L2Inner_smul_left, L2Inner_comm β α]
 
-/-- Cauchy-Schwarz inequality for L2 inner product. -/
+/-- **Cauchy-Schwarz Inequality** (Structural).
+    The standard Cauchy-Schwarz inequality for the L2 inner product.
+    This follows from the pointwise Cauchy-Schwarz and integration. -/
 axiom L2Inner_cauchy_schwarz {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α β : SmoothForm n X k) :
     (L2Inner α β) ^ 2 ≤ (L2Inner α α) * (L2Inner β β)
 
-/-- Triangle inequality for L2 norm. -/
+/-- **L2 Norm Triangle Inequality** (Structural).
+    The L2 norm satisfies the triangle inequality, as for any norm derived from an inner product. -/
 axiom L2NormForm_add_le {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α β : SmoothForm n X k) :
     L2NormForm (α + β) ≤ L2NormForm α + L2NormForm β
 
-/-- L2 norm homogeneity. -/
+/-- **L2 Norm Homogeneity** (Structural).
+    The L2 norm is absolutely homogeneous: ‖r • α‖ = |r| · ‖α‖.
+    This follows from the inner product properties: ⟨rα, rα⟩ = r²⟨α, α⟩. -/
 axiom L2NormForm_smul {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]

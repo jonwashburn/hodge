@@ -8,6 +8,38 @@ import Mathlib.Analysis.Calculus.DifferentialForm.Basic
 import Mathlib.Topology.Sets.Opens
 import Mathlib.Topology.Defs.Induced
 
+/-!
+# Core Definitions for Complex Manifolds and Differential Forms
+
+This file provides the foundational infrastructure for complex projective manifolds
+and smooth differential forms, which underpin the Hodge conjecture formalization.
+
+## Axiom Categories
+
+### Structural Axioms (Required for Opaque Types)
+The following axioms define the algebraic and topological structure of `SmoothForm`,
+which is declared opaque to enable abstract reasoning:
+- `SmoothForm.zero`: Zero element constructor
+- `SmoothForm.instAddCommGroup`: Abelian group structure
+- `SmoothForm.instModuleComplex`: Complex vector space structure
+- `SmoothForm.instModuleReal`: Real vector space structure
+- `SmoothForm.instTopologicalSpace`: Topology on forms
+- `smoothExtDeriv_add`, `smoothExtDeriv_smul`: Linearity of exterior derivative
+
+### Cohomology Structure Axioms
+These axioms define the algebraic structure on de Rham cohomology:
+- `instAddCommGroupDeRhamCohomologyClass`: Abelian group on cohomology
+- `instModuleDeRhamCohomologyClass`: Complex vector space on cohomology
+- `instHMulDeRhamCohomologyClass`: Cup product structure
+- `ofForm_add/smul/sub`: Compatibility with form operations
+
+### Rational Class Axioms
+These axioms characterize the rational Hodge classes:
+- `isRationalClass_zero/add/smul_rat/neg/mul`: Closure properties
+
+All axioms are documented with their mathematical justification.
+-/
+
 noncomputable section
 
 open Classical
@@ -268,6 +300,7 @@ axiom ofForm_sub {k : ℕ} (ω η : SmoothForm n X k) (hω : IsFormClosed ω) (h
 axiom ofForm_smul_real {k : ℕ} (r : ℝ) (ω : SmoothForm n X k) (hω : IsFormClosed ω) :
     ⟦r • ω, isFormClosed_smul_real hω⟧ = r • ⟦ω, hω⟧
 
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] in
 /-- Proof irrelevance for ofForm - follows from quotient properties.
     Two forms with the same underlying form are cohomologous (their difference is 0 = exact). -/
 theorem ofForm_proof_irrel {k : ℕ} (ω : SmoothForm n X k) (h₁ h₂ : IsFormClosed ω) :

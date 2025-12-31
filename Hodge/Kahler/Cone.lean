@@ -28,12 +28,14 @@ simple calibrated forms. We use PointedCone.span to ensure it contains 0. -/
 def stronglyPositiveCone (p : ℕ) (x : X) : Set (SmoothForm n X (2 * p)) :=
   (PointedCone.span ℝ (simpleCalibratedForms p x)).carrier
 
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 /-- The strongly positive cone is convex. -/
 theorem stronglyPositiveCone_convex (p : ℕ) (x : X) :
     Convex ℝ (stronglyPositiveCone (n := n) p x) := by
   unfold stronglyPositiveCone
   exact PointedCone.convex _
 
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 /-- Zero is in the strongly positive cone. -/
 theorem zero_mem_stronglyPositiveCone (p : ℕ) (x : X) :
     (0 : SmoothForm n X (2 * p)) ∈ stronglyPositiveCone (n := n) p x := by
@@ -50,6 +52,7 @@ def isConePositive {p : ℕ} (α : SmoothForm n X (2 * p)) : Prop :=
 def omegaPow_point (p : ℕ) (_x : X) : SmoothForm n X (2 * p) :=
   omegaPow p
 
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 /-- Helper: casting a zero SmoothForm gives a zero SmoothForm. -/
 theorem smoothForm_cast_zero {k k' : ℕ} (h : k = k') :
     (h ▸ (0 : SmoothForm n X k) : SmoothForm n X k') = 0 := by
