@@ -141,7 +141,7 @@ axiom harvey_lawson_represents {k : ℕ} (hyp : HarveyLawsonHypothesis n X k) :
 
 /-- **Flat Limit of Cycles is a Cycle** (Federer, 1960).
 
-    **Deep Theorem Citation**: If a sequence of integral currents that are cycles
+    **Theorem**: If a sequence of integral currents that are cycles
     (have zero boundary) converges in flat norm to a limit, then the limit is also
     a cycle. This follows from the continuity of the boundary operator in the
     flat norm topology.
@@ -150,18 +150,72 @@ axiom harvey_lawson_represents {k : ℕ} (hyp : HarveyLawsonHypothesis n X k) :
     Reference: [F. Morgan, "Geometric Measure Theory: A Beginner's Guide", Academic Press,
     5th edition, 2016, Chapter 7].
 
-    **Status**: This is a fundamental result in geometric measure theory. The flat norm
-    provides a weak-* like topology in which the boundary operator is continuous.
+    **Proof Strategy**: The boundary operator is continuous in flat norm
+    (flatNorm_boundary_le). Since each T_seq i is a cycle (boundary = 0),
+    and T_seq i → T_limit in flat norm, we have boundary(T_limit) = 0.
 
-    **Strategy-Critical**: This is one of the 8 strategy-critical axioms, used to ensure
-    the flat limit of the microstructure sequence is a cycle. -/
-axiom flat_limit_of_cycles_is_cycle {k : ℕ}
+    **Strategy-Critical**: This is one of the 8 strategy-critical axioms, now proved,
+    used to ensure the flat limit of the microstructure sequence is a cycle. -/
+theorem flat_limit_of_cycles_is_cycle {k : ℕ}
     (T_seq : ℕ → IntegralCurrent n X k)
     (T_limit : IntegralCurrent n X k)
     (h_cycles : ∀ i, (T_seq i).isCycleAt)
     (h_conv : Filter.Tendsto (fun i => flatNorm ((T_seq i).toFun - T_limit.toFun))
               Filter.atTop (nhds 0)) :
-    T_limit.isCycleAt
+    T_limit.isCycleAt := by
+  -- From h_cycles 0, we extract the dimension witness k' and proof that k = k' + 1
+  obtain ⟨k', h_dim, h_bdy_0⟩ := h_cycles 0
+  -- Use the same dimension witness for T_limit
+  refine ⟨k', h_dim, ?_⟩
+  -- Substitute k = k' + 1 to simplify types
+  subst h_dim
+  -- We need to show: Current.boundary T_limit.toFun = 0
+  -- The key insight: flatNorm(boundary(T_limit)) ≤ flatNorm(T_seq i - T_limit) for all i
+  -- and the RHS tends to 0
+  by_contra h_nonzero
+  -- If boundary(T_limit) ≠ 0, then flatNorm(boundary(T_limit)) > 0
+  have h_pos : flatNorm (Current.boundary T_limit.toFun) > 0 := by
+    have h_ne : flatNorm (Current.boundary T_limit.toFun) ≠ 0 := by
+      intro h_eq
+      apply h_nonzero
+      exact (flatNorm_eq_zero_iff _).mp h_eq
+    exact lt_of_le_of_ne (flatNorm_nonneg _) (Ne.symm h_ne)
+  -- Set ε = flatNorm(boundary(T_limit)) / 2 > 0
+  set ε := flatNorm (Current.boundary T_limit.toFun) / 2 with hε_def
+  have hε_pos : ε > 0 := by linarith
+  -- By convergence, there exists N such that for all i ≥ N, flatNorm(T_seq i - T_limit) < ε
+  rw [Metric.tendsto_atTop] at h_conv
+  obtain ⟨N, hN⟩ := h_conv ε hε_pos
+  specialize hN N (le_refl N)
+  -- dist is |a - b|, and we have dist(flatNorm(...), 0) < ε
+  simp only [Real.dist_0_eq_abs, abs_of_nonneg (flatNorm_nonneg _)] at hN
+  -- For i = N, we have T_seq N is a cycle
+  obtain ⟨k'', h_dim', h_bdy_N⟩ := h_cycles N
+  -- k' = k'' since both equal k - 1
+  have h_k_eq : k' = k'' := by omega
+  subst h_k_eq
+  -- Substitute to simplify
+  simp only at h_bdy_0 h_bdy_N
+  -- We have: boundary(T_seq N) = 0 and flatNorm(T_seq N - T_limit) < ε
+  -- Therefore: boundary(T_seq N - T_limit) = boundary(T_seq N) - boundary(T_limit)
+  --          = 0 - boundary(T_limit) = -boundary(T_limit)
+  -- And: flatNorm(boundary(T_seq N - T_limit)) ≤ flatNorm(T_seq N - T_limit) < ε
+  have h_bdy_diff : flatNorm (Current.boundary ((T_seq N).toFun - T_limit.toFun)) < ε := by
+    calc flatNorm (Current.boundary ((T_seq N).toFun - T_limit.toFun))
+        ≤ flatNorm ((T_seq N).toFun - T_limit.toFun) := flatNorm_boundary_le _
+      _ < ε := hN
+  -- But boundary(T_seq N - T_limit) = -boundary(T_limit)
+  have h_bdy_sub : Current.boundary ((T_seq N).toFun - T_limit.toFun) =
+                   -(Current.boundary T_limit.toFun) := by
+    rw [Current.boundary_sub, h_bdy_N]
+    -- 0 - x = 0 + -x = -x (by zero_add)
+    show 0 + -(Current.boundary T_limit.toFun) = -(Current.boundary T_limit.toFun)
+    rw [Current.zero_add]
+  -- So flatNorm(boundary(T_limit)) = flatNorm(-boundary(T_limit)) < ε = flatNorm(boundary(T_limit))/2
+  rw [h_bdy_sub, flatNorm_neg] at h_bdy_diff
+  -- This gives flatNorm(boundary(T_limit)) < flatNorm(boundary(T_limit)) / 2
+  -- which contradicts flatNorm(boundary(T_limit)) > 0
+  linarith
 
 /-- **Corollary: Any calibrated limit from the microstructure is a cycle** -/
 theorem calibrated_limit_is_cycle {k : ℕ}

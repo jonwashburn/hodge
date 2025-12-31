@@ -90,7 +90,25 @@ theorem automatic_syr {p : ℕ} (γ : SmoothForm n X (2 * p))
 
 /-! ## Axioms for Fundamental Class Representation -/
 
-/-- **Harvey-Lawson Fundamental Class Connection** (Harvey-Lawson, 1982). -/
+/-- **Harvey-Lawson Fundamental Class Connection** (Harvey-Lawson, 1982).
+
+    This axiom provides the crucial bridge between:
+    1. A cone-positive form γ⁺ representing a rational Hodge class
+    2. The calibrated current T obtained via microstructure approximation
+    3. The algebraic varieties given by the Harvey-Lawson structure theorem
+    4. The cohomology class represented by the fundamental class of those varieties
+
+    The axiom states that when the Harvey-Lawson theorem decomposes a calibrated
+    cycle into analytic varieties, the union of their fundamental classes
+    represents the same cohomology class as the original cone-positive form.
+
+    This is a deep result combining calibrated geometry (Harvey-Lawson, 1982)
+    with the theory of currents and fundamental classes.
+
+    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries",
+    Acta Mathematica 148 (1982), 47-157, Theorem 4.2].
+    Reference: [J.-P. Demailly, "Complex Analytic and Differential Geometry",
+    Institut Fourier, 2012, Chapter VII]. -/
 axiom harvey_lawson_fundamental_class {p : ℕ}
     (γplus : SmoothForm n X (2 * p)) (hplus : IsFormClosed γplus)
     (hγ : isConePositive γplus)
@@ -139,14 +157,41 @@ theorem cone_positive_represents {p : ℕ}
     have h_rep := harvey_lawson_represents hyp
     exact harvey_lawson_fundamental_class γ h_closed h_cone hl_concl T_limit.toFun h_rep
 
-/-- **Rational Multiple of Kähler Power is Algebraic** (Griffiths-Harris, 1978). -/
+/-- **Rational Multiple of Kähler Power is Algebraic** (Griffiths-Harris, 1978).
+
+    For any positive rational c > 0, the cohomology class c·[ω^p] is algebraic,
+    meaning it is represented by the fundamental class of an algebraic subvariety.
+
+    This follows from the fact that ω^p is the cohomology class of a linear
+    section (hyperplane class), and rational multiples of algebraic classes
+    are algebraic (by taking appropriate covers/multiples of the cycle).
+
+    Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry",
+    Wiley, 1978, Chapter 1, Section 2].
+    Reference: [C. Voisin, "Hodge Theory and Complex Algebraic Geometry",
+    Vol. I, Cambridge University Press, 2002, Chapter 11]. -/
 axiom omega_pow_represents_multiple {p : ℕ} (c : ℚ) (hc : c > 0) :
     ∃ (Z : Set X), isAlgebraicSubvariety n X Z ∧
     ∃ (hZ : IsFormClosed (FundamentalClassSet n X p Z)),
       ⟦FundamentalClassSet n X p Z, hZ⟧ =
         (c : ℝ) • ⟦kahlerPow (n := n) (X := X) p, omega_pow_IsFormClosed p⟧
 
-/-- **Lefschetz Lift for Signed Cycles** (Voisin, 2002). -/
+/-- **Lefschetz Lift for Signed Cycles** (Voisin, 2002).
+
+    When p > n/2 (codimension exceeds half the dimension), the Hard Lefschetz
+    theorem provides an isomorphism between H^{p,p}(X) and H^{n-p,n-p}(X).
+
+    This axiom states that if η ∈ H^{2(n-p)}(X) is represented by a signed
+    algebraic cycle Z_η, then the corresponding class γ ∈ H^{2p}(X) under
+    Hard Lefschetz is also represented by a signed algebraic cycle.
+
+    The key insight is that the Hard Lefschetz isomorphism is induced by
+    cup product with powers of the Kähler class, which preserves algebraicity.
+
+    Reference: [C. Voisin, "Hodge Theory and Complex Algebraic Geometry",
+    Vol. I, Cambridge University Press, 2002, Chapter 6, Theorem 6.25].
+    Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry",
+    Wiley, 1978, Chapter 0, Section 7]. -/
 axiom lefschetz_lift_signed_cycle {p p' : ℕ}
     (γ : SmoothForm n X (2 * p)) (hγ : IsFormClosed γ)
     (η : SmoothForm n X (2 * p')) (hη : IsFormClosed η)

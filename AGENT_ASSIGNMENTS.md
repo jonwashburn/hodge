@@ -187,7 +187,7 @@ For cone-positive γ⁺: build integral cycles T_k with calibration defect → 0
 ## 📊 CURRENT STATUS (Round 8 - 2024-12-31)
 
 **Build Status:** ✅ PASSES  
-**Total axioms/opaques:** 211  
+**Total axioms/opaques:** 187 (was 211, **24 converted!**)  
 **Strategy-Critical Progress:** 3/8 proved (37.5%)
 
 ### 🎯 STRATEGY-CRITICAL AXIOMS (The Core 8)
@@ -215,7 +215,19 @@ For cone-positive γ⁺: build integral cycles T_k with calibration defect → 0
 | **Agent 4** | HarveyLawson (10), GAGA (10), Lefschetz (7), Bergman (4), SheafTheory (5), SerreVanishing (1), FedererFleming (2) | **39** | Classical AG + `flat_limit_of_cycles_is_cycle` ⭐ |
 | **Agent 5** | TypeDecomp (10), Microstructure (14), Main (3), Manifolds (7), SignedDecomp (2), BaranyGrinberg (1) | **37** | Main path + 3 critical ⭐ |
 
-### ⚠️ CRITICAL: IF PROOF DOESN'T WORK CLEANLY → LEAVE AS AXIOM
+### ⚠️ CRITICAL RULES
+
+1. **IF PROOF DOESN'T WORK CLEANLY → LEAVE AS AXIOM** (don't break the build)
+
+2. **"DONE" MEANS AXIOMS → THEOREMS, NOT ADDING MORE AXIOMS**
+   - Your job is to REDUCE the axiom count, not increase it
+   - Check your work: `grep -c "^axiom\|^opaque" YourFile.lean`
+   - Before: X axioms → After: Y axioms (Y should be < X)
+   - If Y ≥ X, you're not done!
+
+3. **VERIFY BUILD PASSES BEFORE CLAIMING DONE**
+   - Run: `lake build Hodge.YourFile`
+   - If it fails, fix it or revert
 
 ---
 

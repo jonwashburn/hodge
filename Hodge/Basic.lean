@@ -119,6 +119,11 @@ axiom smoothExtDeriv_smul {n : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSp
     {k : ℕ} (c : ℂ) (ω : SmoothForm n X k) :
     smoothExtDeriv (c • ω) = c • smoothExtDeriv ω
 
+/-- Exterior derivative is ℝ-linear. -/
+axiom smoothExtDeriv_smul_real {n : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    {k : ℕ} (r : ℝ) (ω : SmoothForm n X k) :
+    smoothExtDeriv (r • ω) = r • smoothExtDeriv ω
+
 /-- Exterior derivative of zero is zero. -/
 theorem smoothExtDeriv_zero {n : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     {k : ℕ} : smoothExtDeriv (0 : SmoothForm n X k) = 0 := by
@@ -178,8 +183,12 @@ theorem isFormClosed_smul {n : ℕ} {X : Type u} {k : ℕ} [TopologicalSpace X] 
   simp
 
 /-- Scalar multiple of a closed form is closed (ℝ). -/
-axiom isFormClosed_smul_real {n : ℕ} {X : Type u} {k : ℕ} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    {r : ℝ} {ω : SmoothForm n X k} : IsFormClosed ω → IsFormClosed (r • ω)
+theorem isFormClosed_smul_real {n : ℕ} {X : Type u} {k : ℕ} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    {r : ℝ} {ω : SmoothForm n X k} : IsFormClosed ω → IsFormClosed (r • ω) := by
+  intro hω
+  unfold IsFormClosed at *
+  rw [smoothExtDeriv_smul_real, hω]
+  simp
 
 /-- A form is exact. -/
 def IsExact {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
@@ -193,6 +202,31 @@ structure ClosedForm (n : ℕ) (X : Type u) (k : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] where
   val : SmoothForm n X k
   property : IsFormClosed val
+
+namespace ClosedForm
+
+variable {n : ℕ} {X : Type u} {k : ℕ} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+
+/-- Addition of closed forms. -/
+def add (ω η : ClosedForm n X k) : ClosedForm n X k :=
+  ⟨ω.val + η.val, isFormClosed_add ω.property η.property⟩
+
+/-- Zero closed form. -/
+def zero : ClosedForm n X k := ⟨0, isFormClosed_zero⟩
+
+/-- Negation of a closed form. -/
+def neg (ω : ClosedForm n X k) : ClosedForm n X k :=
+  ⟨-ω.val, isFormClosed_neg ω.property⟩
+
+instance : Add (ClosedForm n X k) := ⟨add⟩
+instance : Zero (ClosedForm n X k) := ⟨zero⟩
+instance : Neg (ClosedForm n X k) := ⟨neg⟩
+
+@[simp] lemma add_val (ω η : ClosedForm n X k) : (ω + η).val = ω.val + η.val := rfl
+@[simp] lemma zero_val : (0 : ClosedForm n X k).val = 0 := rfl
+@[simp] lemma neg_val (ω : ClosedForm n X k) : (-ω).val = -ω.val := rfl
+
+end ClosedForm
 
 /-- Kähler Manifold Structure. -/
 class KahlerManifold (n : ℕ) (X : Type u)
@@ -256,12 +290,31 @@ variable {n : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpa
 
 instance (k : ℕ) : Zero (DeRhamCohomologyClass n X k) := ⟨Quotient.mk _ ⟨0, isFormClosed_zero⟩⟩
 
--- Axiomatize the algebraic structures on cohomology since SmoothForm is opaque
+/-- **De Rham Cohomology Group Structure** (Standard).
+
+    The de Rham cohomology H^k_dR(X) forms an abelian group under addition
+    of cohomology classes. The addition is induced by addition of representative
+    forms: [ω] + [η] = [ω + η].
+
+    This must be axiomatized because:
+    1. The quotient structure requires showing addition respects cohomologous
+    2. With opaque SmoothForm, we cannot derive associativity/commutativity
+
+    Reference: [G. de Rham, "Variétés Différentiables", 1955]. -/
 axiom instAddCommGroupDeRhamCohomologyClass {n : ℕ} {X : Type u} [TopologicalSpace X]
     [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] (k : ℕ) : AddCommGroup (DeRhamCohomologyClass n X k)
 attribute [instance] instAddCommGroupDeRhamCohomologyClass
 
+/-- **De Rham Cohomology Module Structure** (Standard).
+
+    The de Rham cohomology H^k_dR(X) is a ℂ-vector space via scalar multiplication
+    of representative forms: c · [ω] = [c · ω].
+
+    This must be axiomatized because the module axioms require showing that
+    scalar multiplication respects cohomologous forms.
+
+    Reference: [G. de Rham, "Variétés Différentiables", 1955]. -/
 axiom instModuleDeRhamCohomologyClass {n : ℕ} {X : Type u} [TopologicalSpace X]
     [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] (k : ℕ) : Module ℂ (DeRhamCohomologyClass n X k)
@@ -274,6 +327,15 @@ axiom smulRat_DeRhamCohomologyClass {n : ℕ} {X : Type u} [TopologicalSpace X]
     DeRhamCohomologyClass n X k
 
 instance (k : ℕ) : SMul ℚ (DeRhamCohomologyClass n X k) := ⟨smulRat_DeRhamCohomologyClass k⟩
+
+/-- **SMul Compatibility** (Standard).
+    The ℚ-scaling on cohomology classes is compatible with the ℝ-scaling via coercion.
+    That is, for q : ℚ, q • c = (q : ℝ) • c. -/
+axiom smul_rat_eq_smul_real {n : ℕ} {X : Type u} {k : ℕ}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    (q : ℚ) (c : DeRhamCohomologyClass n X k) :
+    q • c = (q : ℝ) • c
 
 axiom instHMulDeRhamCohomologyClass (n : ℕ) (X : Type u) (k l : ℕ) [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] : HMul (DeRhamCohomologyClass n X k) (DeRhamCohomologyClass n X l) (DeRhamCohomologyClass n X (k + l))
@@ -319,25 +381,35 @@ opaque isRationalClass {n : ℕ} {X : Type u} {k : ℕ}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] (η : DeRhamCohomologyClass n X k) : Prop
 
+/-- **Zero is Rational** (Trivial).
+    The zero class is rational because it is represented by the zero form,
+    which has all rational periods (all zero). -/
 axiom isRationalClass_zero {n : ℕ} {X : Type u} {k : ℕ}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] : isRationalClass (0 : DeRhamCohomologyClass n X k)
 
-/-- Rational classes are closed under addition. -/
+/-- **Rational Classes are Closed Under Addition** (Standard).
+    If η₁ and η₂ have rational periods, then η₁ + η₂ has rational periods.
+    This follows from the additivity of integration over cycles.
+    Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry", 1978]. -/
 axiom isRationalClass_add {n : ℕ} {X : Type u} {k : ℕ}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     (η₁ η₂ : DeRhamCohomologyClass n X k) :
     isRationalClass η₁ → isRationalClass η₂ → isRationalClass (η₁ + η₂)
 
-/-- Rational classes are closed under rational scaling. -/
+/-- **Rational Classes are Closed Under Rational Scaling** (Standard).
+    If η has rational periods, then q·η has rational periods for any q ∈ ℚ.
+    This follows from the linearity of integration: ∫_γ q·ω = q · ∫_γ ω. -/
 axiom isRationalClass_smul_rat {n : ℕ} {X : Type u} {k : ℕ}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     (q : ℚ) (η : DeRhamCohomologyClass n X k) :
     isRationalClass η → isRationalClass (q • η)
 
-/-- Rational classes are closed under negation. -/
+/-- **Rational Classes are Closed Under Negation** (Standard).
+    If η has rational periods, then -η has rational periods.
+    This follows from ∫_γ (-ω) = -∫_γ ω. -/
 axiom isRationalClass_neg {n : ℕ} {X : Type u} {k : ℕ}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
@@ -354,7 +426,11 @@ theorem isRationalClass_sub {n : ℕ} {X : Type u} {k : ℕ}
   rw [sub_eq_add_neg]
   exact isRationalClass_add η₁ (-η₂) h1 (isRationalClass_neg η₂ h2)
 
-/-- Rational classes are closed under wedge product. -/
+/-- **Rational Classes are Closed Under Cup Product** (Hodge Theory).
+    If η₁ and η₂ have rational periods, then their cup product η₁ ∪ η₂ has rational periods.
+    This is a consequence of the fact that the cup product on cohomology is induced by
+    the wedge product of forms, and the wedge of rational forms has rational periods.
+    Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry", 1978, Ch. 0]. -/
 axiom isRationalClass_mul {n : ℕ} {X : Type u} {k l : ℕ}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]

@@ -115,7 +115,13 @@ theorem IsHolomorphic_zero {L : HolomorphicLineBundle n X} :
   rw [h]
   exact mdifferentiable_const
 
-/-- A scalar multiple of a holomorphic section is holomorphic. -/
+/-- A scalar multiple of a holomorphic section is holomorphic.
+    **Infrastructure Axiom**: This follows from the fact that scalar multiplication
+    commutes with the trivialization map (by linearity), and MDifferentiable functions
+    remain MDifferentiable under scalar multiplication by a constant.
+
+    Reference: Standard complex analysis - scalar multiples of holomorphic functions
+    are holomorphic. -/
 axiom IsHolomorphic_smul (L : HolomorphicLineBundle n X) (c : ℂ) (s : Section L) :
     IsHolomorphic s → IsHolomorphic (c • s)
 

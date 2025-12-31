@@ -80,13 +80,22 @@ axiom smoothWedge_smul_left {k l : ℕ} (c : ℂ) (ω : SmoothForm n X k) (η : 
 axiom smoothWedge_assoc {k l m : ℕ} (α : SmoothForm n X k) (β : SmoothForm n X l) (γ : SmoothForm n X m) :
     HEq ((α ⋏ β) ⋏ γ) (α ⋏ (β ⋏ γ))
 
+omit [IsManifold (𝓒_complex n) ⊤ X] in
 /-- Wedge product with zero on the right. -/
-axiom smoothWedge_zero_right {k l : ℕ} (ω : SmoothForm n X k) :
-    (ω ⋏ (0 : SmoothForm n X l)) = 0
+theorem smoothWedge_zero_right {k l : ℕ} (ω : SmoothForm n X k) :
+    (ω ⋏ (0 : SmoothForm n X l)) = 0 := by
+  -- 0 = (0 : ℂ) • 0, and by smoothWedge_smul_right, ω ⋏ (c • η) = c • (ω ⋏ η)
+  have h : (0 : SmoothForm n X l) = (0 : ℂ) • (0 : SmoothForm n X l) := by simp
+  rw [h, smoothWedge_smul_right]
+  simp
 
+omit [IsManifold (𝓒_complex n) ⊤ X] in
 /-- Wedge product with zero on the left. -/
-axiom smoothWedge_zero_left {k l : ℕ} (η : SmoothForm n X l) :
-    ((0 : SmoothForm n X k) ⋏ η) = 0
+theorem smoothWedge_zero_left {k l : ℕ} (η : SmoothForm n X l) :
+    ((0 : SmoothForm n X k) ⋏ η) = 0 := by
+  have h : (0 : SmoothForm n X k) = (0 : ℂ) • (0 : SmoothForm n X k) := by simp
+  rw [h, smoothWedge_smul_left]
+  simp
 
 /-- Wedge product is graded commutative: α ∧ β = (-1)^{kl} β ∧ α (heterogeneous). -/
 axiom smoothWedge_comm {k l : ℕ} (α : SmoothForm n X k) (β : SmoothForm n X l) :
@@ -104,13 +113,20 @@ abbrev smoothWedge_smul {k l : ℕ} (c : ℂ) (ω : SmoothForm n X k) (η : Smoo
 -- Note: smoothExtDeriv_add, smoothExtDeriv_smul, smoothExtDeriv_zero, smoothExtDeriv_neg
 -- are defined in Basic.lean
 
-/-- d² = 0: The exterior derivative squared is zero. -/
+/-- **d² = 0: The Exterior Derivative is Nilpotent** (Fundamental Property).
+
+    The exterior derivative squared is zero: d(dω) = 0 for all forms ω.
+    This is the defining property that makes de Rham cohomology well-defined.
+
+    **Proof Sketch**: In local coordinates, d = ∑ᵢ dxⁱ ∧ ∂/∂xⁱ.
+    Then d² involves ∂²/∂xⁱ∂xʲ which is symmetric, but dxⁱ ∧ dxʲ is antisymmetric.
+    The contraction of symmetric with antisymmetric is zero.
+
+    Reference: [É. Cartan, "Leçons sur les invariants intégraux", 1922]. -/
 axiom smoothExtDeriv_extDeriv {k : ℕ} (ω : SmoothForm n X k) :
     smoothExtDeriv (smoothExtDeriv ω) = 0
 
-/-- Exterior derivative is ℝ-linear. -/
-axiom smoothExtDeriv_smul_real {k : ℕ} (r : ℝ) (ω : SmoothForm n X k) :
-    smoothExtDeriv (r • ω) = r • smoothExtDeriv ω
+-- Note: smoothExtDeriv_smul_real is now defined in Basic.lean
 
 /-- Leibniz rule for exterior derivative and wedge product (existence form).
     d(α ∧ β) ≃ dα ∧ β + (-1)^k α ∧ dβ where degrees are suitably identified. -/
@@ -211,11 +227,26 @@ omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [Kahler
 /-- Zero is harmonic. -/
 theorem isHarmonic_zero {k : ℕ} : IsHarmonic (0 : SmoothForm n X k) := laplacian_zero
 
-/-- Harmonic forms are closed. -/
+/-- **Harmonic Forms are Closed** (Hodge Theory).
+
+    If ω is harmonic (Δω = 0), then ω is closed (dω = 0).
+
+    **Proof Sketch**: On a compact Kähler manifold, the Laplacian satisfies
+    Δ = dδ + δd. For harmonic ω: 0 = ⟨Δω, ω⟩ = ⟨dδω, ω⟩ + ⟨δdω, ω⟩ = ‖δω‖² + ‖dω‖²
+    Hence dω = 0.
+
+    Reference: [W.V.D. Hodge, "The Theory and Applications of Harmonic Integrals", 1941]. -/
 axiom isHarmonic_implies_closed {k : ℕ} (ω : SmoothForm n X k) :
     IsHarmonic ω → IsFormClosed ω
 
-/-- Harmonic forms are coclosed (δω = 0). -/
+/-- **Harmonic Forms are Coclosed** (Hodge Theory).
+
+    If ω is harmonic (Δω = 0), then ω is coclosed (δω = 0).
+
+    **Proof Sketch**: Same as above - the Bochner formula gives
+    0 = ‖δω‖² + ‖dω‖², hence δω = 0.
+
+    Reference: [W.V.D. Hodge, "The Theory and Applications of Harmonic Integrals", 1941]. -/
 axiom isHarmonic_implies_coclosed {k : ℕ} (ω : SmoothForm n X k) :
     IsHarmonic ω → δ ω = 0
 
@@ -231,7 +262,15 @@ opaque lefschetzLambda {k : ℕ} (η : SmoothForm n X k) : SmoothForm n X (k - 2
 
 notation:max "Λ" η:max => lefschetzLambda η
 
-/-- Lefschetz L is additive. -/
+/-- Lefschetz L is additive.
+
+    **Proof Sketch**: By definition, `lefschetzL η = (Nat.add_comm 2 k) ▸ (ω ∧ η)`.
+    Using `smoothWedge_add_right`: `ω ∧ (α + β) = (ω ∧ α) + (ω ∧ β)`.
+    The result follows from the fact that the type coercion `▸` commutes with addition.
+
+    This remains an axiom because the distribution of `Eq.rec` over addition
+    requires that the Module structure on SmoothForm respects type casts,
+    which cannot be shown with opaque `SmoothForm`. -/
 axiom lefschetzL_add {k : ℕ} [K : KahlerManifold n X] (α β : SmoothForm n X k) :
     lefschetzL (α + β) = lefschetzL α + lefschetzL β
 
@@ -239,7 +278,17 @@ axiom lefschetzL_add {k : ℕ} [K : KahlerManifold n X] (α β : SmoothForm n X 
 axiom lefschetzLambda_add {k : ℕ} (α β : SmoothForm n X k) :
     Λ (α + β) = Λ α + Λ β
 
-/-- [Λ, L] commutator relation (heterogeneous due to degree arithmetic). -/
+/-- **Lefschetz Commutator Relation** (Kähler Geometry).
+
+    The Lefschetz operators L (wedge with ω) and Λ (contraction by ω) satisfy
+    the fundamental commutator relation: [Λ, L] = (n - k)·id on k-forms.
+
+    **Proof Sketch**: This follows from the sl(2,ℝ) representation theory.
+    The operators L, Λ, and H = [L, Λ] form an sl(2) triple with
+    [H, L] = 2L, [H, Λ] = -2Λ, [Λ, L] = H. On k-forms, H acts as (n-k)·id.
+
+    Reference: [W.V.D. Hodge, "The Theory and Applications of Harmonic Integrals", 1941]
+               [P. Griffiths and J. Harris, "Principles of Algebraic Geometry", 1978, Ch. 0.7]. -/
 axiom lefschetz_commutator {k : ℕ} (α : SmoothForm n X k) :
     ∃ (term1 term2 : SmoothForm n X k),
       HEq (Λ (lefschetzL α)) term1 ∧

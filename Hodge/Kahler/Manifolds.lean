@@ -45,7 +45,8 @@ axiom omega_is_rational : isRationalClass ⟦K.omega_form, omega_isClosed⟧
 -- isRationalClass_add is defined in Basic.lean
 
 /-- The zero class is rational. -/
-axiom zero_is_rational {k : ℕ} : isRationalClass (0 : DeRhamCohomologyClass n X k)
+theorem zero_is_rational {k : ℕ} : isRationalClass (0 : DeRhamCohomologyClass n X k) :=
+  isRationalClass_zero
 
 /-- **Axiom: Unit form is closed.** -/
 axiom unitForm_isClosed : IsFormClosed (unitForm : SmoothForm n X 0)

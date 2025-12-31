@@ -6,6 +6,7 @@ import Mathlib.Analysis.Convex.Hull
 import Mathlib.Geometry.Convex.Cone.Basic
 import Mathlib.Topology.MetricSpace.Basic
 import Mathlib.Topology.Compactness.Compact
+import Mathlib.Data.NNReal.Defs
 
 /-!
 
@@ -48,9 +49,10 @@ def isConePositive {p : ℕ} (α : SmoothForm n X (2 * p)) : Prop :=
 
 /-! ## Kähler Power -/
 
-/-- The p-th power of the Kähler form ω^p at a point x. -/
+/-- The p-th power of the Kähler form ω^p at a point x.
+    Uses the proper kahlerPow from TypeDecomposition rather than the placeholder omegaPow. -/
 def omegaPow_point (p : ℕ) (_x : X) : SmoothForm n X (2 * p) :=
-  omegaPow p
+  kahlerPow p
 
 omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 /-- Helper: casting a zero SmoothForm gives a zero SmoothForm. -/
@@ -120,5 +122,55 @@ theorem compact_pos_has_pos_inf {Y : Type*} [TopologicalSpace Y] [CompactSpace Y
   obtain ⟨y₀, _, hy₀⟩ := hc.exists_isMinOn hne hf_cont.continuousOn
   use f y₀, hf_pos y₀
   intro y; exact hy₀ (mem_univ y)
+
+/-! ## Cone Scaling Properties -/
+
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
+/-- **Pointed Cone Scaling** (Standard convex analysis).
+    Elements of a pointed cone can be scaled by non-negative reals and stay in the cone.
+    This follows from the definition of PointedCone.span. -/
+theorem stronglyPositiveCone_scale (p : ℕ) (x : X) (α : SmoothForm n X (2 * p))
+    (hα : α ∈ stronglyPositiveCone p x) (c : ℝ) (hc : c ≥ 0) :
+    c • α ∈ stronglyPositiveCone p x := by
+  unfold stronglyPositiveCone at *
+  -- PointedCone is a Submodule over {c : ℝ // 0 ≤ c}, so we create the subtype element
+  exact Submodule.smul_mem _ ⟨c, hc⟩ hα
+
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
+/-- **ω^p is Cone Positive** (Demailly, 2012).
+    The Kähler power ω^p is in the strongly positive cone at each point.
+    This follows from `omegaPow_in_interior` since interior ⊆ closure = cone. -/
+theorem kahlerPow_isConePositive (p : ℕ) : isConePositive (kahlerPow (n := n) (X := X) p) := by
+  intro x
+  exact interior_subset (omegaPow_in_interior p x)
+
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
+/-- **Positive Multiple of ω^p is Cone Positive** (Corollary).
+    For any c > 0, c • ω^p is cone-positive. -/
+theorem kahlerPow_smul_isConePositive (p : ℕ) (c : ℝ) (hc : c > 0) :
+    isConePositive (c • kahlerPow (n := n) (X := X) p) := by
+  intro x
+  exact stronglyPositiveCone_scale p x (kahlerPow p) (kahlerPow_isConePositive p x) c (le_of_lt hc)
+
+/-- **Shifting by Large ω^p Makes Forms Cone Positive** (Key Lemma for Signed Decomposition).
+    For any form γ with bounded pointwise comass, adding a sufficiently large
+    multiple N of ω^p makes γ + N·ω^p cone-positive.
+
+    The proof uses:
+    1. ω^p is in the interior of the cone with uniform radius r (exists_uniform_interior_radius)
+    2. γ has bounded comass M (form_is_bounded)
+    3. For N > M/r, pointwiseComass(γ/N) < r, so γ/N + ω^p is within r of ω^p
+    4. Hence γ/N + ω^p ∈ K_p(x) for all x
+    5. Scaling by N gives γ + N·ω^p ∈ K_p(x)
+
+    Reference: [J.-P. Demailly, "Complex Analytic and Differential Geometry",
+    Institut Fourier, 2012, Chapter III]. -/
+axiom shift_makes_conePositive (p : ℕ) (γ : SmoothForm n X (2 * p)) :
+    ∃ N : ℝ, N > 0 ∧ isConePositive (γ + N • kahlerPow p)
+
+/-- **Rational Shift Suffices** (Density of ℚ in ℝ).
+    The above also works for rational N, by approximation. -/
+axiom shift_makes_conePositive_rat (p : ℕ) (γ : SmoothForm n X (2 * p)) :
+    ∃ N : ℚ, N > 0 ∧ isConePositive (γ + (N : ℝ) • kahlerPow p)
 
 end

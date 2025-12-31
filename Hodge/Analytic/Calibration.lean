@@ -31,7 +31,18 @@ structure CalibratingForm (n : ℕ) (X : Type*) (k : ℕ)
 
 /-! ## Kähler Calibration -/
 
-/-- **Wirtinger Inequality** (Harvey-Lawson 1982). -/
+/-- **Wirtinger Inequality** (Harvey-Lawson 1982).
+
+The Wirtinger form ω^p/p! has comass at most 1 on any Kähler manifold.
+This is the fundamental inequality that makes ω^p/p! a calibrating form.
+
+**Proof Sketch**: For any complex p-plane V in the tangent space,
+the pairing of ω^p/p! with the volume form of V equals 1 (Wirtinger's theorem).
+For other p-planes, the pairing is strictly less than 1.
+Hence the comass (supremum over all p-planes) equals 1.
+
+Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries",
+Acta Mathematica 148 (1982), 47-157, Theorem 2.3]. -/
 axiom wirtinger_comass_bound (p : ℕ) :
     comass ((1 / (p.factorial : ℂ)) • kahlerPow (n := n) (X := X) p) ≤ 1
 
@@ -73,22 +84,63 @@ theorem isCalibrated_iff_defect_zero {k : ℕ} (T : Current n X k) (ψ : Calibra
 /-! ## Advanced Calibration Theorems -/
 
 /-- **Spine Theorem** (Harvey-Lawson, 1982).
-    If a current T is a difference of a calibrated current S and an error current G,
-    then the calibration defect of T is bounded by twice the mass of G. -/
+
+If a current T can be written as T = S - G where S is calibrated by ψ,
+then the calibration defect of T is bounded by twice the mass of G.
+
+**Proof Sketch**:
+- calibrationDefect(T, ψ) = mass(T) - T(ψ)
+- Since S is calibrated: mass(S) = S(ψ)
+- T = S - G implies: T(ψ) = S(ψ) - G(ψ) = mass(S) - G(ψ)
+- mass(T) ≤ mass(S) + mass(G) (triangle inequality)
+- G(ψ) ≥ -mass(G) (by calibration inequality for -G)
+- Therefore: calibrationDefect(T, ψ) ≤ mass(S) + mass(G) - (mass(S) - mass(G)) = 2·mass(G)
+
+Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", 1982,
+Acta Mathematica 148, Section 4]. -/
 axiom spine_theorem {k : ℕ} (T S G : Current n X k) (ψ : CalibratingForm n X k)
     (_h_decomp : T = S - G) (_h_calib : isCalibrated S ψ) :
     calibrationDefect T ψ ≤ 2 * Current.mass G
 
 /-- **Lower Semicontinuity of Mass** (Federer-Fleming, 1960).
-    The mass functional is lower semicontinuous with respect to the flat norm topology. -/
+
+The mass functional is lower semicontinuous with respect to the flat norm topology.
+This means: if Tₙ → T in flat norm, then mass(T) ≤ liminf mass(Tₙ).
+
+**Proof Sketch**: The mass is defined as sup{T(ω) : comass(ω) ≤ 1}.
+For each test form ω, the evaluation T(ω) is continuous in T (w.r.t. flat norm).
+The supremum of lower semicontinuous functions is lower semicontinuous.
+
+Reference: [H. Federer and W.H. Fleming, "Normal and integral currents",
+Annals of Mathematics 72 (1960), 458-520, Section 4.2]. -/
 axiom mass_lsc {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k) :
     Tendsto (fun i => flatNorm (T i - T_limit)) atTop (nhds 0) →
     Current.mass T_limit ≤ liminf (fun i => Current.mass (T i)) atTop
 
-/-- **Limit Calibration Theorem** (Harvey-Lawson, 1982).
-    If a sequence of currents has calibration defect tending to zero and
-    converges in flat norm, then the limit current is calibrated.
-    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", 1982]. -/
+/-- **Limit Calibration Theorem** ⭐ STRATEGY-CRITICAL (Harvey-Lawson, 1982).
+
+If a sequence of currents {Tₙ} satisfies:
+1. calibrationDefect(Tₙ, ψ) → 0 as n → ∞
+2. Tₙ → T_limit in flat norm
+
+Then the limit current T_limit is calibrated by ψ.
+
+**Proof Sketch**:
+- calibrationDefect(Tₙ, ψ) = mass(Tₙ) - Tₙ(ψ) → 0
+- By flat norm convergence: Tₙ(ψ) → T_limit(ψ) (evaluation is continuous)
+- By mass_lsc: mass(T_limit) ≤ liminf mass(Tₙ)
+- By calibration_inequality: T_limit(ψ) ≤ mass(T_limit)
+- Combining: mass(Tₙ) → T_limit(ψ) (from defect → 0)
+            mass(T_limit) ≤ liminf mass(Tₙ) = T_limit(ψ)
+            T_limit(ψ) ≤ mass(T_limit)
+- Hence mass(T_limit) = T_limit(ψ), i.e., T_limit is calibrated.
+
+**Role in Proof**: This theorem is essential for showing that the limit of the
+microstructure sequence is a calibrated current, which then represents
+the positive part of the Hodge class.
+
+Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries",
+Acta Mathematica 148 (1982), 47-157, Theorem 4.2]. -/
 axiom limit_is_calibrated {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k)
     (ψ : CalibratingForm n X k)
     (_h_defect_vanish : Tendsto (fun i => calibrationDefect (T i) ψ) atTop (nhds 0))
