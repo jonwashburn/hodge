@@ -44,6 +44,23 @@ theorem zero_mem_stronglyPositiveCone (p : ℕ) (x : X) :
 def isConePositive {p : ℕ} (α : SmoothForm n X (2 * p)) : Prop :=
   ∀ x, α ∈ stronglyPositiveCone p x
 
+/-- The strongly positive cone is closed under addition.
+    This follows from PointedCone.span being a submodule. -/
+theorem stronglyPositiveCone_add_mem (p : ℕ) (x : X)
+    (α β : SmoothForm n X (2 * p))
+    (hα : α ∈ stronglyPositiveCone (n := n) p x)
+    (hβ : β ∈ stronglyPositiveCone (n := n) p x) :
+    α + β ∈ stronglyPositiveCone (n := n) p x := by
+  unfold stronglyPositiveCone at *
+  exact Submodule.add_mem _ hα hβ
+
+/-- Addition of cone-positive forms is cone-positive. -/
+theorem isConePositive_add {p : ℕ} (α β : SmoothForm n X (2 * p))
+    (hα : isConePositive α) (hβ : isConePositive β) :
+    isConePositive (α + β) := by
+  intro x
+  exact stronglyPositiveCone_add_mem p x α β (hα x) (hβ x)
+
 /-! ## Kähler Power -/
 
 /-- The p-th power of the Kähler form ω^p at a point x. -/

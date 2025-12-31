@@ -57,13 +57,19 @@ axiom smoothWedge_smul_left {k l : ℕ} (c : ℂ) (ω : SmoothForm n X k) (η : 
 axiom smoothWedge_assoc {k l m : ℕ} (α : SmoothForm n X k) (β : SmoothForm n X l) (γ : SmoothForm n X m) :
     HEq ((α ⋏ β) ⋏ γ) (α ⋏ (β ⋏ γ))
 
-/-- Wedge product with zero on the right. -/
-axiom smoothWedge_zero_right {k l : ℕ} (ω : SmoothForm n X k) :
-    (ω ⋏ (0 : SmoothForm n X l)) = 0
+/-- Wedge product with zero on the right (derived from smul). -/
+theorem smoothWedge_zero_right {k l : ℕ} (ω : SmoothForm n X k) :
+    (ω ⋏ (0 : SmoothForm n X l)) = 0 := by
+  have h : (0 : SmoothForm n X l) = (0 : ℂ) • (0 : SmoothForm n X l) := by simp
+  rw [h, smoothWedge_smul_right]
+  simp
 
-/-- Wedge product with zero on the left. -/
-axiom smoothWedge_zero_left {k l : ℕ} (η : SmoothForm n X l) :
-    ((0 : SmoothForm n X k) ⋏ η) = 0
+/-- Wedge product with zero on the left (derived from smul). -/
+theorem smoothWedge_zero_left {k l : ℕ} (η : SmoothForm n X l) :
+    ((0 : SmoothForm n X k) ⋏ η) = 0 := by
+  have h : (0 : SmoothForm n X k) = (0 : ℂ) • (0 : SmoothForm n X k) := by simp
+  rw [h, smoothWedge_smul_left]
+  simp
 
 /-- Wedge product is graded commutative: α ∧ β = (-1)^{kl} β ∧ α (heterogeneous). -/
 axiom smoothWedge_comm {k l : ℕ} (α : SmoothForm n X k) (β : SmoothForm n X l) :
@@ -85,9 +91,7 @@ abbrev smoothWedge_smul {k l : ℕ} (c : ℂ) (ω : SmoothForm n X k) (η : Smoo
 axiom smoothExtDeriv_extDeriv {k : ℕ} (ω : SmoothForm n X k) :
     smoothExtDeriv (smoothExtDeriv ω) = 0
 
-/-- Exterior derivative is ℝ-linear. -/
-axiom smoothExtDeriv_smul_real {k : ℕ} (r : ℝ) (ω : SmoothForm n X k) :
-    smoothExtDeriv (r • ω) = r • smoothExtDeriv ω
+-- Note: smoothExtDeriv_smul_real is already defined in Basic.lean
 
 /-- Leibniz rule for exterior derivative and wedge product (existence form).
     d(α ∧ β) ≃ dα ∧ β + (-1)^k α ∧ dβ where degrees are suitably identified. -/
@@ -204,7 +208,8 @@ opaque lefschetzLambda {k : ℕ} (η : SmoothForm n X k) : SmoothForm n X (k - 2
 
 notation:max "Λ" η:max => lefschetzLambda η
 
-/-- Lefschetz L is additive. -/
+/-- Lefschetz L is additive.
+    Note: Cannot prove directly because ▸ transport doesn't distribute over addition definitionally. -/
 axiom lefschetzL_add {k : ℕ} [K : KahlerManifold n X] (α β : SmoothForm n X k) :
     lefschetzL (α + β) = lefschetzL α + lefschetzL β
 

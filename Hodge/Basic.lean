@@ -87,6 +87,11 @@ axiom smoothExtDeriv_smul {n : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSp
     {k : ℕ} (c : ℂ) (ω : SmoothForm n X k) :
     smoothExtDeriv (c • ω) = c • smoothExtDeriv ω
 
+/-- Exterior derivative is ℝ-linear. -/
+axiom smoothExtDeriv_smul_real {n : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    {k : ℕ} (r : ℝ) (ω : SmoothForm n X k) :
+    smoothExtDeriv (r • ω) = r • smoothExtDeriv ω
+
 /-- Exterior derivative of zero is zero. -/
 theorem smoothExtDeriv_zero {n : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     {k : ℕ} : smoothExtDeriv (0 : SmoothForm n X k) = 0 := by
@@ -146,8 +151,12 @@ theorem isFormClosed_smul {n : ℕ} {X : Type u} {k : ℕ} [TopologicalSpace X] 
   simp
 
 /-- Scalar multiple of a closed form is closed (ℝ). -/
-axiom isFormClosed_smul_real {n : ℕ} {X : Type u} {k : ℕ} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    {r : ℝ} {ω : SmoothForm n X k} : IsFormClosed ω → IsFormClosed (r • ω)
+theorem isFormClosed_smul_real {n : ℕ} {X : Type u} {k : ℕ} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    {r : ℝ} {ω : SmoothForm n X k} : IsFormClosed ω → IsFormClosed (r • ω) := by
+  intro hω
+  unfold IsFormClosed at *
+  rw [smoothExtDeriv_smul_real, hω]
+  simp
 
 /-- A form is exact. -/
 def IsExact {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]

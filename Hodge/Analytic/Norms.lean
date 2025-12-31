@@ -32,10 +32,6 @@ axiom pointwiseComass_nonneg {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     {k : ℕ} (α : SmoothForm n X k) (x : X) : pointwiseComass α x ≥ 0
 
-axiom pointwiseComass_zero {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    (x : X) {k : ℕ} : pointwiseComass (0 : SmoothForm n X k) x = 0
-
 axiom pointwiseComass_add_le {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     {k : ℕ} (α β : SmoothForm n X k) (x : X) :
@@ -45,6 +41,14 @@ axiom pointwiseComass_smul {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     {k : ℕ} (r : ℝ) (α : SmoothForm n X k) (x : X) :
     pointwiseComass (r • α) x = |r| * pointwiseComass α x
+
+/-- Pointwise comass of zero is zero (derived from smul). -/
+theorem pointwiseComass_zero {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    (x : X) {k : ℕ} : pointwiseComass (0 : SmoothForm n X k) x = 0 := by
+  have h : (0 : SmoothForm n X k) = (0 : ℝ) • (0 : SmoothForm n X k) := by simp
+  rw [h, pointwiseComass_smul]
+  simp
 
 -- Axiom: Negation equals scalar multiplication by -1 (for opaque SmoothForm)
 axiom SmoothForm.neg_eq_neg_one_smul {n : ℕ} {X : Type*}
@@ -289,6 +293,61 @@ theorem L2Inner_smul_right {n : ℕ} {X : Type*}
     L2Inner α (r • β) = r * L2Inner α β := by
   rw [L2Inner_comm α (r • β), L2Inner_smul_left, L2Inner_comm β α]
 
+/-- L2 inner product with zero on left. -/
+theorem L2Inner_zero_left {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    {k : ℕ} (β : SmoothForm n X k) :
+    L2Inner (0 : SmoothForm n X k) β = 0 := by
+  have h := L2Inner_smul_left (0 : ℝ) (0 : SmoothForm n X k) β
+  simp at h
+  exact h
+
+/-- L2 inner product with zero on right. -/
+theorem L2Inner_zero_right {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    {k : ℕ} (α : SmoothForm n X k) :
+    L2Inner α (0 : SmoothForm n X k) = 0 := by
+  rw [L2Inner_comm, L2Inner_zero_left]
+
+/-- L2 inner product with negation on left. -/
+theorem L2Inner_neg_left {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    {k : ℕ} (α β : SmoothForm n X k) :
+    L2Inner (-α) β = -L2Inner α β := by
+  rw [SmoothForm.neg_eq_neg_one_smul, L2Inner_smul_left]
+  ring
+
+/-- L2 inner product with negation on right. -/
+theorem L2Inner_neg_right {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    {k : ℕ} (α β : SmoothForm n X k) :
+    L2Inner α (-β) = -L2Inner α β := by
+  rw [L2Inner_comm, L2Inner_neg_left, L2Inner_comm]
+
+/-- L2 norm of zero is zero. -/
+theorem L2NormForm_zero {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    {k : ℕ} : L2NormForm (0 : SmoothForm n X k) = 0 := by
+  unfold L2NormForm
+  rw [L2Inner_zero_left]
+  simp
+
+/-- L2 norm of negation equals L2 norm. -/
+theorem L2NormForm_neg {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    {k : ℕ} (α : SmoothForm n X k) : L2NormForm (-α) = L2NormForm α := by
+  unfold L2NormForm
+  have h1 : L2Inner (-α) (-α) = -L2Inner α (-α) := L2Inner_neg_left α (-α)
+  have h2 : L2Inner α (-α) = -L2Inner α α := L2Inner_neg_right α α
+  rw [h1, h2]
+  ring_nf
+
 /-- Cauchy-Schwarz inequality for L2 inner product. -/
 axiom L2Inner_cauchy_schwarz {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
@@ -296,18 +355,61 @@ axiom L2Inner_cauchy_schwarz {n : ℕ} {X : Type*}
     {k : ℕ} (α β : SmoothForm n X k) :
     (L2Inner α β) ^ 2 ≤ (L2Inner α α) * (L2Inner β β)
 
-/-- Triangle inequality for L2 norm. -/
-axiom L2NormForm_add_le {n : ℕ} {X : Type*}
+/-- Triangle inequality for L2 norm (derived from Cauchy-Schwarz).
+    Standard proof: ‖α + β‖² = ⟨α,α⟩ + 2⟨α,β⟩ + ⟨β,β⟩ ≤ (‖α‖ + ‖β‖)² -/
+theorem L2NormForm_add_le {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α β : SmoothForm n X k) :
-    L2NormForm (α + β) ≤ L2NormForm α + L2NormForm β
+    L2NormForm (α + β) ≤ L2NormForm α + L2NormForm β := by
+  -- Expand ⟨α+β, α+β⟩ = ⟨α,α⟩ + 2⟨α,β⟩ + ⟨β,β⟩
+  have h_sq : L2Inner (α + β) (α + β) = L2Inner α α + 2 * L2Inner α β + L2Inner β β := by
+    rw [L2Inner_add_left, L2Inner_add_right, L2Inner_add_right, L2Inner_comm β α]; ring
+  -- ‖α‖² = ⟨α,α⟩
+  have h_norm_sq_α : (L2NormForm α) ^ 2 = L2Inner α α := by
+    unfold L2NormForm; rw [Real.sq_sqrt (L2Inner_self_nonneg α)]
+  have h_norm_sq_β : (L2NormForm β) ^ 2 = L2Inner β β := by
+    unfold L2NormForm; rw [Real.sq_sqrt (L2Inner_self_nonneg β)]
+  -- Cauchy-Schwarz: (⟨α,β⟩)² ≤ ⟨α,α⟩⟨β,β⟩ = ‖α‖²‖β‖² = (‖α‖‖β‖)²
+  have hcs := L2Inner_cauchy_schwarz α β
+  have hcs' : (L2Inner α β) ^ 2 ≤ (L2NormForm α * L2NormForm β) ^ 2 := by
+    calc (L2Inner α β) ^ 2 ≤ L2Inner α α * L2Inner β β := hcs
+         _ = (L2NormForm α) ^ 2 * (L2NormForm β) ^ 2 := by rw [h_norm_sq_α, h_norm_sq_β]
+         _ = (L2NormForm α * L2NormForm β) ^ 2 := by ring
+  have hprod_nonneg : 0 ≤ L2NormForm α * L2NormForm β :=
+    mul_nonneg (L2NormForm_nonneg α) (L2NormForm_nonneg β)
+  -- From x² ≤ y² and y ≥ 0, get |x| ≤ y, hence x ≤ y
+  have h_ab_bound : L2Inner α β ≤ L2NormForm α * L2NormForm β := by
+    have hab : |L2Inner α β| ≤ L2NormForm α * L2NormForm β := by
+      rw [← Real.sqrt_sq hprod_nonneg, ← Real.sqrt_sq_eq_abs]
+      exact Real.sqrt_le_sqrt hcs'
+    exact le_trans (le_abs_self _) hab
+  -- ‖α+β‖² ≤ (‖α‖ + ‖β‖)²
+  have h_ineq : L2Inner (α + β) (α + β) ≤ (L2NormForm α + L2NormForm β) ^ 2 := by
+    rw [h_sq]
+    have h_rhs : (L2NormForm α + L2NormForm β) ^ 2 =
+        (L2NormForm α) ^ 2 + 2 * (L2NormForm α * L2NormForm β) + (L2NormForm β) ^ 2 := by ring
+    rw [h_rhs, h_norm_sq_α, h_norm_sq_β]
+    linarith [h_ab_bound]
+  -- Take sqrt
+  have h_sum_nonneg : 0 ≤ L2NormForm α + L2NormForm β :=
+    add_nonneg (L2NormForm_nonneg α) (L2NormForm_nonneg β)
+  unfold L2NormForm
+  calc Real.sqrt (L2Inner (α + β) (α + β))
+       ≤ Real.sqrt ((L2NormForm α + L2NormForm β) ^ 2) := Real.sqrt_le_sqrt h_ineq
+     _ = L2NormForm α + L2NormForm β := Real.sqrt_sq h_sum_nonneg
+     _ = Real.sqrt (L2Inner α α) + Real.sqrt (L2Inner β β) := rfl
 
-/-- L2 norm homogeneity. -/
-axiom L2NormForm_smul {n : ℕ} {X : Type*}
+/-- L2 norm homogeneity (derived from inner product linearity). -/
+theorem L2NormForm_smul {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (r : ℝ) (α : SmoothForm n X k) :
-    L2NormForm (r • α) = |r| * L2NormForm α
+    L2NormForm (r • α) = |r| * L2NormForm α := by
+  unfold L2NormForm
+  rw [L2Inner_smul_left, L2Inner_smul_right]
+  -- sqrt(r * (r * x)) = sqrt(r² * x) = |r| * sqrt(x)
+  have h1 : r * (r * L2Inner α α) = r ^ 2 * L2Inner α α := by ring
+  rw [h1, Real.sqrt_mul (sq_nonneg r), Real.sqrt_sq_eq_abs]
 
 end

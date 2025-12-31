@@ -127,9 +127,10 @@ axiom omega_pow_IsFormClosed (p : ℕ) : IsFormClosed (kahlerPow (n := n) (X := 
 axiom omega_pow_is_rational (p : ℕ) : isRationalClass ⟦kahlerPow (n := n) (X := X) p, omega_pow_IsFormClosed p⟧
 
 /-- **Theorem: scaled Kähler power is closed.**
-    This is the standard fact that \(d(\omega^p)=0\) and hence also
-    \(d(\omega^p/p!)=0\). -/
-axiom IsFormClosed_omegaPow_scaled (p : ℕ) :
-    IsFormClosed ((1 / (p.factorial : ℂ)) • kahlerPow (n := n) (X := X) p)
+    This is the standard fact that d(ω^p) = 0 and hence also d(ω^p/p!) = 0.
+    Follows from omega_pow_IsFormClosed and isFormClosed_smul. -/
+theorem IsFormClosed_omegaPow_scaled (p : ℕ) :
+    IsFormClosed ((1 / (p.factorial : ℂ)) • kahlerPow (n := n) (X := X) p) :=
+  isFormClosed_smul (omega_pow_IsFormClosed p)
 
 end
