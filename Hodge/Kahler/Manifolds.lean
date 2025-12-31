@@ -34,9 +34,7 @@ axiom isRationalClass_wedge {k l : ℕ}
     (η₁ : DeRhamCohomologyClass n X k) (η₂ : DeRhamCohomologyClass n X l) :
     isRationalClass η₁ → isRationalClass η₂ → isRationalClass (η₁ * η₂)
 
-/-- Scalar multiplication by a rational number preserves rationality. -/
-axiom isRationalClass_smul_rat {k : ℕ} (q : ℚ) (η : DeRhamCohomologyClass n X k) :
-    isRationalClass η → isRationalClass (q • η)
+-- isRationalClass_smul_rat is defined in Basic.lean
 
 /-- **Axiom: Kähler form is closed (dω = 0).** -/
 axiom omega_isClosed : IsFormClosed (K.omega_form)
@@ -44,9 +42,7 @@ axiom omega_isClosed : IsFormClosed (K.omega_form)
 /-- The Kähler form represents a rational cohomology class. -/
 axiom omega_is_rational : isRationalClass ⟦K.omega_form, omega_isClosed⟧
 
-/-- Addition of rational classes is rational. -/
-axiom isRationalClass_add {k : ℕ} (η₁ η₂ : DeRhamCohomologyClass n X k) :
-    isRationalClass η₁ → isRationalClass η₂ → isRationalClass (η₁ + η₂)
+-- isRationalClass_add is defined in Basic.lean
 
 /-- The zero class is rational. -/
 axiom zero_is_rational {k : ℕ} : isRationalClass (0 : DeRhamCohomologyClass n X k)

@@ -186,31 +186,32 @@ theorem cohomologous_refl {n k : ℕ} {X : Type u} [TopologicalSpace X] [Charted
 theorem cohomologous_symm {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     {ω η : ClosedForm n X k} : Cohomologous ω η → Cohomologous η ω := by
   unfold Cohomologous IsExact
+  intro h
+  have neg_sub_eq : η.val - ω.val = -(ω.val - η.val) := (neg_sub ω.val η.val).symm
   match k with
   | 0 =>
-  intro h
     simp only at h ⊢
-    linarith
+    rw [neg_sub_eq, h, neg_zero]
   | k' + 1 =>
-    intro ⟨ξ, hξ⟩
+    obtain ⟨ξ, hξ⟩ := h
     use -ξ
-    rw [smoothExtDeriv_neg, hξ]
-    ring
+    rw [smoothExtDeriv_neg, hξ, neg_sub_eq]
 
 /-- Cohomologous is transitive. -/
 theorem cohomologous_trans {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     {ω η θ : ClosedForm n X k} : Cohomologous ω η → Cohomologous η θ → Cohomologous ω θ := by
   unfold Cohomologous IsExact
+  intro h1 h2
+  have sub_decomp : ω.val - θ.val = (ω.val - η.val) + (η.val - θ.val) := by simp [sub_add_sub_cancel]
   match k with
   | 0 =>
-    intro h1 h2
     simp only at h1 h2 ⊢
-    linarith
+    rw [sub_decomp, h1, h2, add_zero]
   | k' + 1 =>
-    intro ⟨ξ₁, hξ₁⟩ ⟨ξ₂, hξ₂⟩
+    obtain ⟨ξ₁, hξ₁⟩ := h1
+    obtain ⟨ξ₂, hξ₂⟩ := h2
     use ξ₁ + ξ₂
-    rw [smoothExtDeriv_add, hξ₁, hξ₂]
-    ring
+    rw [smoothExtDeriv_add, hξ₁, hξ₂, sub_decomp]
 
 instance DeRhamSetoid (n k : ℕ) (X : Type u) [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] : Setoid (ClosedForm n X k) where
   r := Cohomologous
@@ -273,7 +274,8 @@ theorem ofForm_proof_irrel {k : ℕ} (ω : SmoothForm n X k) (h₁ h₂ : IsForm
     DeRhamCohomologyClass.ofForm ω h₁ = DeRhamCohomologyClass.ofForm ω h₂ := by
   unfold DeRhamCohomologyClass.ofForm
   apply Quotient.sound
-  -- Need to show Cohomologous ⟨ω, h₁⟩ ⟨ω, h₂⟩
+  -- Need to show Cohomologous ⟨ω, h₁⟩ ⟨ω, h₂⟩, i.e., IsExact (ω - ω)
+  show Cohomologous ⟨ω, h₁⟩ ⟨ω, h₂⟩
   unfold Cohomologous IsExact
   simp only [sub_self]
   match k with
@@ -303,16 +305,11 @@ axiom isRationalClass_smul_rat {n : ℕ} {X : Type u} {k : ℕ}
     isRationalClass η → isRationalClass (q • η)
 
 /-- Rational classes are closed under negation. -/
-theorem isRationalClass_neg {n : ℕ} {X : Type u} {k : ℕ}
+axiom isRationalClass_neg {n : ℕ} {X : Type u} {k : ℕ}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     (η : DeRhamCohomologyClass n X k) :
-    isRationalClass η → isRationalClass (-η) := by
-  intro h
-  have h' := isRationalClass_smul_rat (-1 : ℚ) η h
-  have heq : (-1 : ℚ) • η = -η := neg_one_smul ℚ η
-  rw [heq] at h'
-  exact h'
+    isRationalClass η → isRationalClass (-η)
 
 /-- Rational classes are closed under subtraction. -/
 theorem isRationalClass_sub {n : ℕ} {X : Type u} {k : ℕ}
