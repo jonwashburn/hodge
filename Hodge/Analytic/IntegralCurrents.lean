@@ -74,7 +74,8 @@ def IntegralPolyhedralChain (n : ℕ) (X : Type*) (k : ℕ)
 
 /-- **Primitive Polyhedral Currents Axiom**
     There exists a set of primitive currents (simplices) that generate the space of
-    polyhedral chains. -/
+    polyhedral chains.
+    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 1960]. -/
 axiom primitivePolyhedralCurrents (n : ℕ) (X : Type*) (k : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] : Set (Current n X k)
@@ -97,7 +98,8 @@ theorem polyhedral_smul {k : ℕ} (c : ℤ) (T : Current n X k) :
 
 /-- **Boundary of Polyhedral Chains Axiom**
     The boundary of a polyhedral chain is again a polyhedral chain of lower dimension.
-    This is a combinatorial property of simplices. -/
+    This is a combinatorial property of simplices.
+    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 1960, Section 4]. -/
 axiom polyhedral_boundary_axiom {k : ℕ} (T : Current n X (k + 1)) :
     T ∈ IntegralPolyhedralChain n X (k + 1) → Current.boundary T ∈ IntegralPolyhedralChain n X k
 

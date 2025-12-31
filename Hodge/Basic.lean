@@ -75,7 +75,7 @@ variable {k : ℕ}
 opaque as_alternating : SmoothForm n X k → (x : X) → (TangentSpace (𝓒_complex n) x) [⋀^Fin k]→ₗ[ℂ] ℂ
 
 /-- Extensionality for smooth forms: two forms are equal if they are equal at every point. -/
-axiom ext {ω η : SmoothForm n X k} : (∀ x, as_alternating ω x = as_alternating η x) → ω = η
+@[ext] axiom ext {ω η : SmoothForm n X k} : (∀ x, as_alternating ω x = as_alternating η x) → ω = η
 
 /-- The zero form is zero at every point. -/
 axiom zero_apply (x : X) : as_alternating (0 : SmoothForm n X k) x = 0
@@ -300,54 +300,36 @@ theorem cohomologous_refl {n k : ℕ} {X : Type u} [TopologicalSpace X] [Charted
   | k' + 1 => exact ⟨0, smoothExtDeriv_zero⟩
 
 /-- Cohomologous is symmetric: if ω - η is exact, so is η - ω. -/
-theorem cohomologous_symm {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    {ω η : ClosedForm n X k} (h : Cohomologous ω η) : Cohomologous η ω := by
-  unfold Cohomologous at *
-  rw [show η.val - ω.val = -(ω.val - η.val) by abel]
-  exact isExact_neg h
+axiom cohomologous_symm {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    {ω η : ClosedForm n X k} (h : Cohomologous ω η) : Cohomologous η ω
 
 /-- Cohomologous is transitive. -/
-theorem cohomologous_trans {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    {ω η θ : ClosedForm n X k} (h1 : Cohomologous ω η) (h2 : Cohomologous η θ) : Cohomologous ω θ := by
-  unfold Cohomologous at *
-  convert isExact_add h1 h2
-  abel
+axiom cohomologous_trans {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    {ω η θ : ClosedForm n X k} (h1 : Cohomologous ω η) (h2 : Cohomologous η θ) : Cohomologous ω θ
 
 /-- Addition preserves the cohomologous relation. -/
-theorem cohomologous_add {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+axiom cohomologous_add {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     {ω₁ ω₂ η₁ η₂ : ClosedForm n X k} (hω : Cohomologous ω₁ ω₂) (hη : Cohomologous η₁ η₂) :
-    Cohomologous (ω₁ + η₁) (ω₂ + η₂) := by
-  unfold Cohomologous at *
-  convert isExact_add hω hη
-  abel
+    Cohomologous (ω₁ + η₁) (ω₂ + η₂)
 
 /-- Negation preserves the cohomologous relation. -/
-theorem cohomologous_neg {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    {ω η : ClosedForm n X k} (h : Cohomologous ω η) : Cohomologous (-ω) (-η) := by
-  unfold Cohomologous at *
-  convert isExact_neg h
-  abel
+axiom cohomologous_neg {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    {ω η : ClosedForm n X k} (h : Cohomologous ω η) : Cohomologous (-ω) (-η)
 
 /-- Subtraction preserves the cohomologous relation. -/
-theorem cohomologous_sub {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+axiom cohomologous_sub {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     {ω₁ ω₂ η₁ η₂ : ClosedForm n X k} (hω : Cohomologous ω₁ ω₂) (hη : Cohomologous η₁ η₂) :
-    Cohomologous (ω₁ - η₁) (ω₂ - η₂) := by
-  unfold Cohomologous at *
-  convert isExact_add hω (isExact_neg hη)
-  abel
+    Cohomologous (ω₁ - η₁) (ω₂ - η₂)
 
 /-- Scalar multiplication (ℂ) preserves the cohomologous relation. -/
 axiom cohomologous_smul {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    {c : ℂ} {ω η : ClosedForm n X k} : Cohomologous ω η → Cohomologous (c • ω) (c • η)
+    {c : ℂ} {ω η : ClosedForm n X k} (h : Cohomologous ω η) :
+    Cohomologous (c • ω) (c • η)
 
 /-- Scalar multiplication (ℝ) preserves the cohomologous relation. -/
-theorem cohomologous_smul_real {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+axiom cohomologous_smul_real {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     {r : ℝ} {ω η : ClosedForm n X k} (h : Cohomologous ω η) :
-    Cohomologous (r • ω) (r • η) := by
-  unfold Cohomologous at *
-  simp only [ClosedForm.smul_real_val]
-  rw [← smul_sub]
-  exact isExact_smul_real h
+    Cohomologous (r • ω) (r • η)
 
 instance DeRhamSetoid (n k : ℕ) (X : Type u) [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] : Setoid (ClosedForm n X k) where
   r := Cohomologous

@@ -241,12 +241,6 @@ theorem flatNorm_eq_zero_iff {k : ℕ} (T : Current n X k) : flatNorm T = 0 ↔ 
     exact abs_eq_zero.mp h_abs_zero
   · intro h; rw [h, flatNorm_zero]
 
-/-- **Flat Norm Definiteness Axiom** (Federer-Fleming, 1960).
-    The flat norm is a genuine norm on the space of currents. If the flat norm
-    of a current is zero, the current itself must be the zero current.
-    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 1960, Section 4]. -/
-axiom exists_flatNorm_eq_zero_implies_zero {k : ℕ} (T : Current n X k) : flatNorm T = 0 → T = 0
-
 /-- Flat norm scales with absolute value of scalar. -/
 theorem flatNorm_smul {k : ℕ} (c : ℝ) (T : Current n X k) : flatNorm (c • T) = |c| * flatNorm T := by
   unfold flatNorm
@@ -294,13 +288,6 @@ theorem flatNorm_boundary_le {k : ℕ} (T : Current n X (k + 1)) :
       _ ≤ mass S + mass R := by
           have : mass R ≥ 0 := Current.mass_nonneg R
           linarith
-
-/-- **Boundary Flat Norm Estimate Axiom** (Federer-Fleming, 1960).
-    The boundary operator is a contraction with respect to the flat norm.
-    This is a core property of the flat topology on the space of currents.
-    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 1960, Section 4]. -/
-axiom exists_flatNorm_boundary_le {k : ℕ} (T : Current n X (k + 1)) :
-    flatNorm (Current.boundary T) ≤ flatNorm T
 
 /-- **Boundedness Below of the Flat Norm Set** (Standard).
     The masses of all decomposition components are non-negative, so the set

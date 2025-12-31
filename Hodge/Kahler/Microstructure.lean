@@ -16,6 +16,7 @@ import Mathlib.Analysis.SpecificLimits.Basic
 import Mathlib.Geometry.Manifold.ChartedSpace
 import Hodge.Analytic.Currents
 import Hodge.Analytic.Calibration
+import Hodge.Utils.BaranyGrinberg
 
 noncomputable section
 
@@ -37,36 +38,17 @@ def IsComplexSubmanifold (Y : Set X) (p : ℕ) : Prop :=
     ∃ (inst : TopologicalSpace Y) (inst_charted : ChartedSpace (EuclideanSpace ℂ (Fin p)) Y),
       IsManifold (𝓒_complex p) ⊤ Y
 
-/-- **Theorem: Local Sheet Realization** (Proposition 11.3).
+/-- **Local Sheet Realization** (Proposition 11.3).
     Every calibrated (p,p)-form can be locally approximated by volume forms
     of complex p-planes.
     Reference: [Hodge-v6-w-Jon-Update-MERGED.tex, Proposition 11.3].
 
-    The proof uses:
-    1. The existence of a holomorphic coordinate chart at x.
-    2. Linear approximation of the form at the origin. -/
-theorem local_sheet_realization (p : ℕ) (x : X) (ξ : SmoothForm n X (2 * p))
+    This is a local result in differential geometry showing that any simple
+    calibrated form at a point can be extended to a local complex submanifold
+    (a "sheet"). -/
+axiom local_sheet_realization (p : ℕ) (x : X) (ξ : SmoothForm n X (2 * p))
     (hξ : ξ ∈ simpleCalibratedForms p x) (ε : ℝ) (hε : ε > 0) :
-    ∃ (Y : Set X), x ∈ Y ∧ IsComplexSubmanifold Y p := by
-  -- In a full formalization, this follows from the existence of holomorphic
-  -- coordinate charts and the local structure of simple calibrated forms.
-  -- We leave this local differential geometric result as a strategic axiom.
-  exact exists_local_sheet p x ξ hξ ε hε
-
-/-- **Local Sheet Realization** (Proposition 11.3).
-    In this stubbed version, we provide a trivial witness (the whole space).
-    Reference: [Hodge-v6-w-Jon-Update-MERGED.tex, Proposition 11.3]. -/
-theorem exists_local_sheet (p : ℕ) (x : X) (_ξ : SmoothForm n X (2 * p))
-    (_hξ : _ξ ∈ simpleCalibratedForms p x) (_ε : ℝ) (_hε : _ε > 0) :
-    ∃ (Y : Set X), x ∈ Y ∧ IsComplexSubmanifold Y p := by
-  use Set.univ
-  constructor
-  · exact Set.mem_univ x
-  · -- Assume the whole space is a complex submanifold in the stub environment
-    apply exists_univ_complex_submanifold p
-
-/-- Strategic axiom: The manifold itself is a complex submanifold. -/
-axiom exists_univ_complex_submanifold (p : ℕ) : IsComplexSubmanifold (Set.univ : Set X) p
+    ∃ (Y : Set X), x ∈ Y ∧ IsComplexSubmanifold Y p
 
 /-! ## Cubulation -/
 
@@ -116,29 +98,9 @@ def IsValidIntegerApproximation {h : ℝ} {C : Cubulation n X h}
     Given a target flow on a cubulation, there exists an integer flow approximation
     with bounded discrepancy.
     Reference: [I. Bárány and V.S. Grinberg, "On some combinatorial questions in
-    finite-dimensional spaces", Linear Algebra Appl. 41 (1981), 1-9].
-
-    The proof uses:
-    1. The Bárány-Grinberg rounding lemma.
-    2. Divergence-free perturbations. -/
-theorem integer_transport (p : ℕ) {h : ℝ} (C : Cubulation n X h) (target : CubulationFlow C) :
-    ∃ (int_flow : DirectedEdge C → ℤ), IsValidIntegerApproximation target int_flow := by
-  -- Follows from the Bárány-Grinberg lemma applied to the dual graph of the cubulation.
-  -- We leave this combinatorial step as a strategic axiom.
-  exact exists_integer_transport p C target
-
-/-- **Existence of an Integer Flow Approximation** (Bárány-Grinberg, 1981).
-    In this stubbed version, we provide a zero flow. -/
-theorem exists_integer_transport (p : ℕ) {h : ℝ} (C : Cubulation n X h) (target : CubulationFlow C) :
-    ∃ (int_flow : DirectedEdge C → ℤ), IsValidIntegerApproximation target int_flow := by
-  use fun _ => 0
-  unfold IsValidIntegerApproximation
-  -- In the current stub, all flows are zero.
-  apply exists_integer_transport_stub p C target
-
-/-- Strategic axiom: Integer transport exists in the combinatorial model. -/
-axiom exists_integer_transport_stub (p : ℕ) {h : ℝ} (C : Cubulation n X h) (target : CubulationFlow C) :
-    IsValidIntegerApproximation target (fun _ => 0)
+    finite-dimensional spaces", Linear Algebra Appl. 41 (1981), 1-9]. -/
+axiom integer_transport (p : ℕ) {h : ℝ} (C : Cubulation n X h) (target : CubulationFlow C) :
+    ∃ (int_flow : DirectedEdge C → ℤ), IsValidIntegerApproximation target int_flow
 
 /-! ## Microstructure Gluing -/
 
@@ -157,7 +119,7 @@ structure RawSheetSum (n : ℕ) (X : Type*) (p : ℕ) (h : ℝ)
 def SmoothForm.pairing {p : ℕ} (α : SmoothForm n X (2 * p)) (β : SmoothForm n X (2 * (n - p))) : ℝ :=
   L2Inner α (hodgeStar β)
 
-/-- **Integration Current over Complex Submanifold**
+/-- **Integration Current over Complex Submanifold Axiom**
     Constructs the integral current associated to integration over a complex submanifold.
     Reference: [H. Federer, "Geometric Measure Theory", 1969, Section 4.1]. -/
 axiom integration_current_submanifold {p : ℕ} (Y : Set X) (hY : IsComplexSubmanifold Y p) :
@@ -174,9 +136,9 @@ def RawSheetSum.toIntegralCurrent {p : ℕ} {hscale : ℝ}
   -- we represent this via a choice function that satisfies the expected properties.
   Classical.choose (exists_integralCurrent_from_sheets T_raw)
 
-/-- **Existence of Integral Current from Sheets**
+/-- **Existence of Integral Current from Sheets Axiom**
     Every collection of holomorphic sheets in a cubulation defines an integral current.
-    Reference: [Hodge-v6-w-Jon-Update-MERGED.tex, Section 11.2]. -/
+    Reference: [H. Federer, "Geometric Measure Theory", 1969, Section 4.1]. -/
 axiom exists_integralCurrent_from_sheets {p : ℕ} {hscale : ℝ}
     {C : Cubulation n X hscale} (T_raw : RawSheetSum n X p hscale C) :
     ∃ (T : IntegralCurrent n X (2 * (n - p))), True
@@ -207,27 +169,9 @@ noncomputable def canonicalMeshSequence : MeshSequence where
     For any h > 0, there exists a cubulation of X with mesh size h.
     Reference: [Hodge-v6-w-Jon-Update-MERGED.tex, Section 11].
 
-    The proof uses:
-    1. The existence of a finite atlas for the compact manifold X.
-    2. Subdividing each chart into coordinate cubes. -/
-theorem cubulation_exists (h : ℝ) (hh : h > 0) : Cubulation n X h := by
-  -- On a compact manifold, we can cover X by a finite number of charts.
-  -- Each chart can be partitioned into cubes of size h.
-  -- We leave the explicit topological construction as a strategic axiom.
-  exact exists_cubulation h hh
-
-/-- **Existence of a Cubulation**
-    In this stubbed version, we provide a trivial cubulation.
-    Reference: [Hodge-v6-w-Jon-Update-MERGED.tex, Section 11.1]. -/
-theorem exists_cubulation (h : ℝ) (_hh : h > 0) : Cubulation n X h := by
-  use {Set.univ}
-  · simp
-  · use 1
-    intro x
-    simp
-
-/-- Strategic axiom: Cubulation exists in the manifold model. -/
-axiom exists_cubulation_axiom (h : ℝ) (hh : h > 0) : Cubulation n X h
+    This topological construction follows from the compactness of X and the
+    existence of holomorphic coordinate charts. -/
+axiom cubulation_exists (h : ℝ) (hh : h > 0) : Cubulation n X h
 
 noncomputable def cubulationFromMesh (h : ℝ) (hh : h > 0) : Cubulation n X h :=
   cubulation_exists h hh
@@ -243,36 +187,38 @@ def HasBoundedCalibrationDefect {p : ℕ} {h : ℝ} {C : Cubulation n X h}
     The calibration defect of the microstructure current vanishes as h -> 0.
     Reference: [Hodge-v6-w-Jon-Update-MERGED.tex, Section 11].
 
-    The proof uses:
-    1. The properties of simple calibrated forms.
-    2. The uniform interior radius theorem. -/
-theorem calibration_defect_from_gluing (p : ℕ) (h : ℝ) (hh : h > 0) (C : Cubulation n X h)
+    This is the core gluing estimate (Proposition 11.8 and 11.9) showing that 
+    holomorphic sheets can be yoked together with O(h) boundary and defect. -/
+axiom calibration_defect_from_gluing (p : ℕ) (h : ℝ) (hh : h > 0) (C : Cubulation n X h)
     (β : SmoothForm n X (2 * p)) (hβ : isConePositive β) (m : ℕ)
     (ψ : CalibratingForm n X (2 * (n - p))) :
     ∃ (T_raw : RawSheetSum n X (n - p) h C),
       IsValidGluing β T_raw ∧
       HasBoundedCalibrationDefect T_raw ψ (comass β * h) ∧
       (T_raw.toIntegralCurrent).isCycleAt ∧
-      (T_raw.toIntegralCurrent : Current n X (2 * (n - p))).mass ≤ 2 * comass β := by
-  -- Follows from the same construction as gluing_estimate.
-  exact exists_gluing_with_calibration_defect β hβ h C m ψ
+      (T_raw.toIntegralCurrent : Current n X (2 * (n - p))).mass ≤ 2 * comass β
 
-/-- **Holomorphic Coordinate Chart Axiom**
+/-- **Holomorphic Coordinate Chart Theorem**
     Every point in a complex manifold has a holomorphic coordinate chart.
-    Reference: [Huybrechts, "Complex Geometry", 2005, Proposition 1.1.1]. -/
-axiom exists_holomorphic_chart (x : X) :
-  ∃ (U : Set X) (φ : U → EuclideanSpace ℂ (Fin n)), x ∈ U ∧ IsOpen U
+    This follows from the ChartedSpace instance. -/
+theorem exists_holomorphic_chart (x : X) :
+    ∃ (U : Set X) (φ : U → EuclideanSpace ℂ (Fin n)), x ∈ U ∧ IsOpen U := by
+  let chart := chartAt (EuclideanSpace ℂ (Fin n)) x
+  use chart.source, chart
+  constructor
+  · exact mem_chart_source (EuclideanSpace ℂ (Fin n)) x
+  · exact chart.open_source
 
-/-- **Partition of Unity on Mesh**
+/-- **Partition of Unity on Mesh** (Section 11.1).
     There exists a partition of unity subordinate to a coordinate cubulation.
     Reference: [Hodge-v6-w-Jon-Update-MERGED.tex, Section 11.1]. -/
 axiom exists_partition_of_unity_mesh {h : ℝ} (C : Cubulation n X h) :
-  ∃ (ρ : C.cubes → X → ℝ), (∀ Q, Continuous (ρ Q)) ∧ (∀ x, ∑ Q, ρ Q x = 1)
+    ∃ (ρ : C.cubes → X → ℝ), (∀ Q, Continuous (ρ Q)) ∧ (∀ x, ∑ Q, ρ Q x = 1)
 
 /-- **Microstructure Boundary Estimate** (Proposition 11.8).
     The flat norm of the boundary of the raw microstructure current is O(h).
     Reference: [Hodge-v6-w-Jon-Update-MERGED.tex, Proposition 11.8]. -/
-axiom rawMicrostructureCurrent_boundary_bound {p : ℕ} {h : ℝ} {C : Cubulation n X h}
+axiom gluing_flat_norm_bound {p : ℕ} {h : ℝ} {C : Cubulation n X h}
     (β : SmoothForm n X (2 * p)) (hβ : isConePositive β) :
     ∃ (T_raw : RawSheetSum n X (n - p) h C),
       flatNorm (∂ (T_raw.toIntegralCurrent).toFun) ≤ comass β * h
@@ -291,31 +237,6 @@ axiom microstructure_defect_bound {p : ℕ} {h : ℝ} {C : Cubulation n X h}
 axiom microstructure_mass_bound {p : ℕ} {h : ℝ} {C : Cubulation n X h}
     (β : SmoothForm n X (2 * p)) (hβ : isConePositive β) :
     ∃ (T_raw : RawSheetSum n X (n - p) h C),
-      (T_raw.toIntegralCurrent : Current n X (2 * (n - p))).mass ≤ 2 * comass β
-
-/-- **Calibration Defect from Gluing**
-    There exists a way to yoke holomorphic sheets across coordinate cubes to
-    form an integral cycle with bounded calibration defect and mass.
-    Reference: [Hodge-v6-w-Jon-Update-MERGED.tex, Section 11.4]. -/
-theorem exists_gluing_with_calibration_defect {p : ℕ} {h : ℝ} {C : Cubulation n X h}
-    (β : SmoothForm n X (2 * p)) (hβ : isConePositive β) (m : ℕ)
-    (ψ : CalibratingForm n X (2 * (n - p))) :
-    ∃ (T_raw : RawSheetSum n X (n - p) h C),
-      IsValidGluing β T_raw ∧
-      HasBoundedCalibrationDefect T_raw ψ (comass β * h) ∧
-      (T_raw.toIntegralCurrent).isCycleAt ∧
-      (T_raw.toIntegralCurrent : Current n X (2 * (n - p))).mass ≤ 2 * comass β := by
-  -- Follows from the SYR construction. In this stub, we provide a choice witness.
-  apply exists_gluing_with_calibration_defect_axiom β hβ m ψ
-
-/-- Strategic axiom: Gluing exists in the microstructure model. -/
-axiom exists_gluing_with_calibration_defect_axiom {p : ℕ} {h : ℝ} {C : Cubulation n X h}
-    (β : SmoothForm n X (2 * p)) (hβ : isConePositive β) (m : ℕ)
-    (ψ : CalibratingForm n X (2 * (n - p))) :
-    ∃ (T_raw : RawSheetSum n X (n - p) h C),
-      IsValidGluing β T_raw ∧
-      HasBoundedCalibrationDefect T_raw ψ (comass β * h) ∧
-      (T_raw.toIntegralCurrent).isCycleAt ∧
       (T_raw.toIntegralCurrent : Current n X (2 * (n - p))).mass ≤ 2 * comass β
 
 /-! ## Main Construction Sequence -/

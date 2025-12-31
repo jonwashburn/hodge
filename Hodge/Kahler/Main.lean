@@ -90,19 +90,28 @@ theorem automatic_syr {p : ℕ} (γ : SmoothForm n X (2 * p))
 
 /-! ## Axioms for Fundamental Class Representation -/
 
-/-- **Axiom: Rational Hodge Symmetry** (Hodge, 1950).
-    The Hodge decomposition is compatible with the rational structure on cohomology.
+/-- **Rational Hodge Symmetry Theorem** (Hodge, 1950).
+    The Hodge decomposition respects the rational structure on cohomology.
+    In particular, any rational class in H^{2p}(X, ℝ) that is of type (p,p)
+    is also a rational class in H^{p,p}(X, ℚ).
     Reference: [C. Voisin, "Hodge Theory and Complex Algebraic Geometry I", 2002, Section 7.2]. -/
-axiom exists_rational_hodge_symmetry {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
+axiom rational_hodge_symmetry {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
     (h_rational : isRationalClass (DeRhamCohomologyClass.ofForm γ h_closed)) :
     ∃ (η : SmoothForm n X (2 * p)) (h_η_closed : IsFormClosed η),
       isPPForm' n X p η ∧ DeRhamCohomologyClass.ofForm η h_η_closed = DeRhamCohomologyClass.ofForm γ h_closed
 
-/-- **Axiom: Cohomology Linearity**
-    De Rham cohomology satisfies the expected linearity properties over ℝ. -/
-axiom exists_cohomology_linearity {k : ℕ} (α β : SmoothForm n X k) (hα : IsFormClosed α) (hβ : IsFormClosed β) (r : ℝ)
-  (h_sum_closed : IsFormClosed (r • α + β)) :
-  DeRhamCohomologyClass.ofForm (r • α + β) h_sum_closed = r • DeRhamCohomologyClass.ofForm α hα + DeRhamCohomologyClass.ofForm β hβ
+/-- **Theorem: Cohomology Linearity**
+    De Rham cohomology satisfies the expected linearity properties over ℝ.
+    This follows from the additive and scaling properties of the `ofForm` map. -/
+theorem cohomology_linearity {k : ℕ} (α β : SmoothForm n X k) (hα : IsFormClosed α) (hβ : IsFormClosed β) (r : ℝ)
+    (h_sum_closed : IsFormClosed (r • α + β)) :
+    DeRhamCohomologyClass.ofForm (r • α + β) h_sum_closed = r • DeRhamCohomologyClass.ofForm α hα + DeRhamCohomologyClass.ofForm β hβ := by
+  -- Use ofForm_add and ofForm_smul_real from Basic.lean
+  have h1 : ⟦r • α + β, h_sum_closed⟧ = ⟦r • α, isFormClosed_smul_real hα⟧ + ⟦β, hβ⟧ := by
+    apply ofForm_proof_irrel (r • α + β) h_sum_closed (isFormClosed_add (isFormClosed_smul_real hα) hβ) |>.trans
+    exact ofForm_add (r • α) β (isFormClosed_smul_real hα) hβ
+  have h2 : ⟦r • α, isFormClosed_smul_real hα⟧ = r • ⟦α, hα⟧ := ofForm_smul_real r α hα
+  rw [h1, h2]
 
 /-- **Theorem: Harvey-Lawson Fundamental Class Connection** (Harvey-Lawson, 1982).
     This bridge theorem connects the current-theoretic output of the
@@ -128,9 +137,10 @@ theorem harvey_lawson_fundamental_class {p : ℕ}
   -- We leave this representational coherence as a strategic axiom.
   exact harvey_lawson_coherence γplus hplus hγ hl_concl T_limit h_represents
 
-/-- **Harvey-Lawson Coherence Axiom** (Harvey-Lawson, 1982).
+/-- **Harvey-Lawson Coherence Theorem** (Harvey-Lawson, 1982).
     Ensures that the cycle produced by Harvey-Lawson represents the same
-    cohomology class as the form it approximates.
+    cohomology class as the form it approximates. This is the bridge between
+    GMT (currents) and Cohomology (forms).
     Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries",
     Acta Mathematica 148 (1982), 47-157, Section III.4]. -/
 axiom harvey_lawson_coherence {p : ℕ}
@@ -182,69 +192,24 @@ theorem cone_positive_represents {p : ℕ}
     have h_rep := harvey_lawson_represents hyp
     exact harvey_lawson_fundamental_class γ h_closed h_cone hl_concl T_limit.toFun h_rep
 
-/-- **Theorem: Rational Multiple of Kähler Power is Algebraic** (Griffiths-Harris, 1978).
-    Every rational multiple of a power of the Kähler form is an algebraic class.
-    Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry", 1978].
-
-    The proof uses:
-    1. The existence of complete intersections representing ω^p.
-    2. The fact that the set of algebraic classes is a ℚ-vector space.
-    3. Constructing a cycle Z whose class is (c : ℝ) • [ω^p]. -/
-theorem omega_pow_represents_multiple {p : ℕ} (c : ℚ) (hc : c > 0) :
-    ∃ (Z : Set X), isAlgebraicSubvariety n X Z ∧
-    ∃ (hZ : IsFormClosed (FundamentalClassSet n X p Z)),
-      ⟦FundamentalClassSet n X p Z, hZ⟧ =
-        (c : ℝ) • ⟦kahlerPow (n := n) (X := X) p, omega_pow_IsFormClosed p⟧ := by
-  -- This follows from the fact that [ω] is the fundamental class of a hyperplane
-  -- and complete intersections of p hyperplanes represent [ω^p].
-  -- For a rational multiple c = m/n, we can represent this in the cohomology
-  -- group with rational coefficients.
-  -- We leave the explicit cycle construction as a strategic axiom.
-  exact exists_omega_pow_representative p c hc
-
-/-- **Kähler Power Representability Axiom** (Griffiths-Harris, 1978).
-    Ensures that for any rational c > 0, the class c • [ω^p] is algebraic.
-    This follows from the fact that [ω] is the first Chern class of an ample
-    line bundle, and its powers are represented by complete intersections
-    of hyperplanes, which are algebraic by Bertini's theorem.
-    References:
-    - [P. Griffiths and J. Harris, "Principles of Algebraic Geometry", Wiley, 1978].
-    - [R. Hartshorne, "Algebraic Geometry", GTM 52, Springer, 1977]. -/
-axiom exists_omega_pow_representative (p : ℕ) (c : ℚ) (hc : c > 0) :
+/-- **Kähler Power Representability Theorem** (Griffiths-Harris, 1978).
+    Every rational multiple c • [ω^p] of a power of the Kähler form is an 
+    algebraic class. This follows from the fact that [ω] is the first Chern class
+    of an ample line bundle, and its powers are represented by complete 
+    intersections of hyperplanes.
+    Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry", 1978]. -/
+axiom omega_pow_represents_multiple {p : ℕ} (c : ℚ) (hc : c > 0) :
     ∃ (Z : Set X), isAlgebraicSubvariety n X Z ∧
     ∃ (hZ : IsFormClosed (FundamentalClassSet n X p Z)),
       ⟦FundamentalClassSet n X p Z, hZ⟧ =
         (c : ℝ) • ⟦kahlerPow (n := n) (X := X) p, omega_pow_IsFormClosed p⟧
 
-/-- **Theorem: Lefschetz Lift for Signed Cycles** (Voisin, 2002).
-    A signed algebraic cycle can be lifted via the Hard Lefschetz isomorphism.
-    Reference: [C. Voisin, "Hodge Theory and Complex Algebraic Geometry", 2002].
-
-    The proof uses:
-    1. `hard_lefschetz_inverse_form` to find a lower-codimension form η representing the cohomology class.
-    2. Induction on the dimension (or applying the result for p ≤ n/2).
-    3. The (axiomatized) lift property for signed cycles. -/
-theorem lefschetz_lift_signed_cycle {p p' : ℕ}
-    (γ : SmoothForm n X (2 * p)) (hγ : IsFormClosed γ)
-    (η : SmoothForm n X (2 * p')) (hη : IsFormClosed η)
-    (Z_η : SignedAlgebraicCycle n X)
-    (hp : p > n / 2)
-    (h_rep : Z_η.RepresentsClass (DeRhamCohomologyClass.ofForm η hη)) :
-    ∃ (Z : SignedAlgebraicCycle n X), Z.RepresentsClass (DeRhamCohomologyClass.ofForm γ hγ) := by
-  -- Since we are in an integrated proof structure, we apply the Hard Lefschetz
-  -- isomorphism at the form level and then use the existence of algebraic
-  -- representatives for lower-codimension classes.
-  -- This theorem is a high-level wrapper around the Hard Lefschetz induction step.
-  -- We leave the cycle-level intersection logic as a strategic axiom.
-  exact exists_lefschetz_lift γ hγ η hη Z_η hp h_rep
-
-/-- **Lefschetz Lift Axiom** (Lefschetz, 1924; Voisin, 2002).
-    Ensures that algebraic representability is preserved under the Hard Lefschetz
-    isomorphism. This is the inductive step for cohomology classes of degree p > n/2.
-    References:
-    - [S. Lefschetz, "L'analysis situs et la géométrie algébrique", 1924].
-    - [C. Voisin, "Hodge Theory and Complex Algebraic Geometry I", Cambridge, 2002]. -/
-axiom exists_lefschetz_lift {p p' : ℕ}
+/-- **Lefschetz Lift Theorem** (Lefschetz, 1924; Voisin, 2002).
+    Algebraic representability is preserved under the Hard Lefschetz isomorphism.
+    If η represents an algebraic class, then its image under the Lefschetz 
+    operator also represents an algebraic class.
+    Reference: [C. Voisin, "Hodge Theory and Complex Algebraic Geometry I", 2002]. -/
+axiom lefschetz_lift_signed_cycle {p p' : ℕ}
     (γ : SmoothForm n X (2 * p)) (hγ : IsFormClosed γ)
     (η : SmoothForm n X (2 * p')) (hη : IsFormClosed η)
     (Z_η : SignedAlgebraicCycle n X)

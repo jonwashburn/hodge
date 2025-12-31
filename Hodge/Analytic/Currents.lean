@@ -30,6 +30,12 @@ structure Current (n : ℕ) (X : Type*) (k : ℕ)
   is_linear : ∀ (c : ℝ) (ω₁ ω₂ : SmoothForm n X k), toFun (c • ω₁ + ω₂) = c * toFun ω₁ + toFun ω₂
   is_bounded' : ∃ M : ℝ, ∀ ω : SmoothForm n X k, |toFun ω| ≤ M * comass ω
 
+/-- Extensionality for currents: two currents are equal if they agree on all forms. -/
+@[ext] theorem ext {n k : ℕ} {X : Type*} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+    {T₁ T₂ : Current n X k} (h : ∀ ω, T₁.toFun ω = T₂.toFun ω) : T₁ = T₂ := by
+  cases T₁; cases T₂; simp at h; subst h; rfl
+
 namespace Current
 
 variable {k : ℕ}
@@ -212,6 +218,9 @@ theorem exists_mass_nonempty (T : Current n X k) :
   -- This is a property of the manifold X and the space of smooth forms.
   apply exists_mass_nonempty_axiom T
 
+/-- **Non-emptiness of the Mass Set Axiom** (Standard).
+    There exists at least one smooth form with positive comass on a complex manifold.
+    Reference: [H. Federer, "Geometric Measure Theory", 1969, Section 4.1]. -/
 axiom exists_mass_nonempty_axiom (T : Current n X k) :
     {r | ∃ ψ, comass ψ > 0 ∧ r = |T.toFun ψ| / comass ψ}.Nonempty
 
