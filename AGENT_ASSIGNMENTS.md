@@ -184,36 +184,50 @@ For cone-positive γ⁺: build integral cycles T_k with calibration defect → 0
 
 ---
 
-## 📊 CURRENT STATUS (Round 3 - 2024-12-31)
+## 📊 CURRENT STATUS (Round 4 - 2024-12-31)
 
 **Build Status:** ✅ PASSES  
-**Total axioms/opaques:** 211  
-**Rounds 1 & 2:** REVERTED (build errors)
+**Total axioms/opaques:** 194 (was 211, **17 converted!**)  
+**Progress:** 8% reduction
 
-| File | Axioms | Owner |
-|------|--------|-------|
-| Forms.lean | 36 | Agent 1 |
-| Basic.lean | 30 | Agent 1 |
-| Norms.lean | 23 | Agent 1 |
-| IntegralCurrents.lean | 12 | Agent 2 |
-| Grassmannian.lean | 11 | Agent 3 |
-| TypeDecomposition.lean | 10 | Agent 3 |
-| HarveyLawson.lean | 10 | Agent 4 |
-| GAGA.lean | 10 | Agent 4 |
-| FlatNorm.lean | 9 | Agent 2 |
-| Microstructure.lean | 8 | Agent 5 |
-| Currents.lean | 8 | Agent 2 |
-| Manifolds.lean | 7 | Agent 3 |
-| Lefschetz.lean | 7 | Agent 4 |
-| SheafTheory.lean | 5 | Agent 4 |
-| Cone.lean | 4 | Agent 3 |
-| Bergman.lean | 4 | Agent 4 |
-| Calibration.lean | 4 | Agent 2 |
-| Main.lean | 3 | Agent 5 |
-| SignedDecomp.lean | 2 | Agent 5 |
-| FedererFleming.lean | 2 | Agent 4 |
-| BaranyGrinberg.lean | 1 | Agent 5 (keep) |
-| SerreVanishing.lean | 1 | Agent 4 (keep) |
+### Agent 1 Feedback (Important!)
+Most axioms in Agent 1's files are **structural** due to `opaque SmoothForm`:
+- Basic.lean: SmoothForm is opaque, so algebraic instances must remain axioms
+- Forms.lean: smoothWedge, hodgeStar, etc. are opaque with axiomatized properties  
+- Norms.lean: pointwiseComass, L2Inner are opaque; deep theorems need infrastructure
+
+**Recommendation for Agent 1:** Focus on proving theorems that follow FROM existing axioms rather than replacing opaques.
+
+| File | Axioms | Owner | Status |
+|------|--------|-------|--------|
+| Forms.lean | 28 | Agent 1 | 🟡 Structural |
+| Basic.lean | 28 | Agent 1 | 🟡 Structural |
+| Norms.lean | 20 | Agent 1 | 🟡 Structural |
+| Currents.lean | 16 | Agent 2 | ⏳ Pending |
+| IntegralCurrents.lean | 12 | Agent 2 | ⏳ Pending |
+| FlatNorm.lean | 11 | Agent 2 | ⏳ Pending |
+| HarveyLawson.lean | 10 | Agent 4 | ⏳ Pending |
+| GAGA.lean | 10 | Agent 4 | ⏳ Pending |
+| TypeDecomposition.lean | 9 | Agent 3 | ⏳ Pending |
+| Microstructure.lean | 8 | Agent 5 | ⏳ Pending |
+| Lefschetz.lean | 7 | Agent 4 | ⏳ Pending |
+| SheafTheory.lean | 5 | Agent 4 | ⏳ Pending |
+| Calibration.lean | 5 | Agent 2 | ⏳ Pending |
+| Manifolds.lean | 4 | Agent 3 | ✅ Some converted |
+| Cone.lean | 4 | Agent 3 | ✅ Some converted |
+| Grassmannian.lean | 4 | Agent 3 | ✅ 7 converted! |
+| Bergman.lean | 4 | Agent 4 | ⏳ Pending |
+| Main.lean | 3 | Agent 5 | ⏳ Pending |
+| SignedDecomp.lean | 2 | Agent 5 | ⏳ Pending |
+| FedererFleming.lean | 2 | Agent 4 | ⏳ Pending |
+| BaranyGrinberg.lean | 1 | Agent 5 | 🔒 Keep as axiom |
+| SerreVanishing.lean | 1 | Agent 4 | 🔒 Keep as axiom |
+
+### Files with Build Errors (Reverted)
+These files had changes but broke the build - agents need to fix:
+- SignedDecomp.lean, Lefschetz.lean, Currents.lean, Bergman.lean
+- SheafTheory.lean, IntegralCurrents.lean, Calibration.lean, FedererFleming.lean
+- HarveyLawson.lean, GAGA.lean
 
 ### ⚠️ CRITICAL: IF PROOF DOESN'T WORK CLEANLY → LEAVE AS AXIOM
 
