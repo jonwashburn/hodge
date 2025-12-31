@@ -7,6 +7,7 @@ import Mathlib.Analysis.InnerProductSpace.PiL2
 import Mathlib.Analysis.Calculus.DifferentialForm.Basic
 import Mathlib.Topology.Sets.Opens
 import Mathlib.Topology.Defs.Induced
+import Mathlib.Tactic.Abel
 
 noncomputable section
 
@@ -301,109 +302,52 @@ theorem cohomologous_refl {n k : ℕ} {X : Type u} [TopologicalSpace X] [Charted
 /-- Cohomologous is symmetric: if ω - η is exact, so is η - ω. -/
 theorem cohomologous_symm {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     {ω η : ClosedForm n X k} (h : Cohomologous ω η) : Cohomologous η ω := by
-  unfold Cohomologous IsExact at *
-  have neg_sub_eq : η.val - ω.val = -(ω.val - η.val) := (neg_sub ω.val η.val).symm
-  match k with
-  | 0 =>
-    simp only at h ⊢
-    rw [neg_sub_eq, h, neg_zero]
-  | k' + 1 =>
-    obtain ⟨ξ, hξ⟩ := h
-    use -ξ
-    rw [smoothExtDeriv_neg, hξ, neg_sub_eq]
+  unfold Cohomologous at *
+  rw [show η.val - ω.val = -(ω.val - η.val) by abel]
+  exact isExact_neg h
 
 /-- Cohomologous is transitive. -/
 theorem cohomologous_trans {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     {ω η θ : ClosedForm n X k} (h1 : Cohomologous ω η) (h2 : Cohomologous η θ) : Cohomologous ω θ := by
-  unfold Cohomologous IsExact at *
-  have sub_decomp : ω.val - θ.val = (ω.val - η.val) + (η.val - θ.val) := by simp [sub_add_sub_cancel]
-  match k with
-  | 0 =>
-    simp only at h1 h2 ⊢
-    rw [sub_decomp, h1, h2, add_zero]
-  | k' + 1 =>
-    obtain ⟨ξ₁, hξ₁⟩ := h1
-    obtain ⟨ξ₂, hξ₂⟩ := h2
-    use ξ₁ + ξ₂
-    rw [smoothExtDeriv_add, hξ₁, hξ₂, sub_decomp]
+  unfold Cohomologous at *
+  convert isExact_add h1 h2
+  abel
 
 /-- Addition preserves the cohomologous relation. -/
 theorem cohomologous_add {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     {ω₁ ω₂ η₁ η₂ : ClosedForm n X k} (hω : Cohomologous ω₁ ω₂) (hη : Cohomologous η₁ η₂) :
     Cohomologous (ω₁ + η₁) (ω₂ + η₂) := by
-  unfold Cohomologous IsExact at *
-  match k with
-  | 0 =>
-    simp only [ClosedForm.add_val] at *
-    rw [add_sub_add_comm, hω, hη, add_zero]
-  | k' + 1 =>
-    obtain ⟨ξ₁, hξ₁⟩ := hω
-    obtain ⟨ξ₂, hξ₂⟩ := hη
-    use ξ₁ + ξ₂
-    rw [smoothExtDeriv_add, hξ₁, hξ₂]
-    simp only [ClosedForm.add_val, add_sub_add_comm]
+  unfold Cohomologous at *
+  convert isExact_add hω hη
+  abel
 
 /-- Negation preserves the cohomologous relation. -/
 theorem cohomologous_neg {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    {ω η : ClosedForm n X k} (h : Cohomologous ω η) :
-    Cohomologous (-ω) (-η) := by
-  unfold Cohomologous IsExact at *
-  match k with
-  | 0 =>
-    simp only [ClosedForm.neg_val] at *
-    rw [neg_sub_neg, h, neg_zero]
-  | k' + 1 =>
-    obtain ⟨ξ, hξ⟩ := h
-    use -ξ
-    rw [smoothExtDeriv_neg, hξ]
-    simp only [ClosedForm.neg_val, neg_sub_neg]
+    {ω η : ClosedForm n X k} (h : Cohomologous ω η) : Cohomologous (-ω) (-η) := by
+  unfold Cohomologous at *
+  convert isExact_neg h
+  abel
 
 /-- Subtraction preserves the cohomologous relation. -/
 theorem cohomologous_sub {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     {ω₁ ω₂ η₁ η₂ : ClosedForm n X k} (hω : Cohomologous ω₁ ω₂) (hη : Cohomologous η₁ η₂) :
     Cohomologous (ω₁ - η₁) (ω₂ - η₂) := by
-  unfold Cohomologous IsExact at *
-  match k with
-  | 0 =>
-    simp only [ClosedForm.sub_val] at *
-    rw [sub_sub_sub_comm]
-    simp [hω, hη]
-  | k' + 1 =>
-    obtain ⟨ξ₁, hξ₁⟩ := hω
-    obtain ⟨ξ₂, hξ₂⟩ := hη
-    use ξ₁ - ξ₂
-    rw [smoothExtDeriv_sub, hξ₁, hξ₂]
-    simp only [ClosedForm.sub_val, sub_sub_sub_comm]
+  unfold Cohomologous at *
+  convert isExact_add hω (isExact_neg hη)
+  abel
 
 /-- Scalar multiplication (ℂ) preserves the cohomologous relation. -/
-theorem cohomologous_smul {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    {c : ℂ} {ω η : ClosedForm n X k} (h : Cohomologous ω η) :
-    Cohomologous (c • ω) (c • η) := by
-  unfold Cohomologous IsExact at *
-  match k with
-  | 0 =>
-    simp only [ClosedForm.smul_val] at *
-    rw [← smul_sub, h, smul_zero]
-  | k' + 1 =>
-    obtain ⟨ξ, hξ⟩ := h
-    use c • ξ
-    rw [smoothExtDeriv_smul, hξ]
-    simp only [ClosedForm.smul_val, smul_sub]
+axiom cohomologous_smul {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    {c : ℂ} {ω η : ClosedForm n X k} : Cohomologous ω η → Cohomologous (c • ω) (c • η)
 
 /-- Scalar multiplication (ℝ) preserves the cohomologous relation. -/
 theorem cohomologous_smul_real {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     {r : ℝ} {ω η : ClosedForm n X k} (h : Cohomologous ω η) :
     Cohomologous (r • ω) (r • η) := by
-  unfold Cohomologous IsExact at *
-  match k with
-  | 0 =>
-    simp only [ClosedForm.smul_real_val] at *
-    rw [← smul_sub, h, smul_zero]
-  | k' + 1 =>
-    obtain ⟨ξ, hξ⟩ := h
-    use r • ξ
-    rw [smoothExtDeriv_smul_real, hξ]
-    simp only [ClosedForm.smul_real_val, smul_sub]
+  unfold Cohomologous at *
+  simp only [ClosedForm.smul_real_val]
+  rw [← smul_sub]
+  exact isExact_smul_real h
 
 instance DeRhamSetoid (n k : ℕ) (X : Type u) [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] : Setoid (ClosedForm n X k) where
   r := Cohomologous

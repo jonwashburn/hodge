@@ -277,23 +277,15 @@ theorem flatNorm_smul {k : ℕ} (c : ℝ) (T : Current n X k) : flatNorm (c • 
           ring
     · apply exists_flatNorm_set_nonempty T
 
-/-- The flat norm of a boundary is at most the flat norm of the original current.
-    Proof: If T = S + ∂R, then ∂T = ∂(S + ∂R) = ∂S + ∂∂R = ∂S = 0 + ∂S.
-    So (0, S) is a valid decomposition for ∂T.
-    Thus flatNorm(∂T) ≤ mass 0 + mass S = mass S.
-    Since this holds for any decomposition T = S + ∂R, we take the infimum. -/
+/-- The flat norm of a boundary is at most the flat norm of the original current. -/
 theorem flatNorm_boundary_le {k : ℕ} (T : Current n X (k + 1)) :
     flatNorm (Current.boundary T) ≤ flatNorm T := by
   unfold flatNorm
   apply Real.le_sInf_sInf
   · apply exists_flatNorm_set_nonempty (Current.boundary T)
   · rintro r ⟨S, R, hT, rfl⟩
-    -- We want to show flatNorm(∂T) ≤ mass S + mass R
-    -- We know ∂T = ∂(S + ∂R) = ∂S + ∂∂R = ∂S = 0 + ∂S.
-    -- So (0, S) is a valid decomposition for ∂T.
     have h_bdy_T : Current.boundary T = 0 + Current.boundary S := by
-      rw [hT]; simp [Current.boundary_boundary, Current.add_curr]
-      ext ω; simp [Current.boundary, Current.add_curr]
+      rw [hT]; simp [Current.boundary_boundary, Current.add_curr]; ext ω; simp [Current.boundary, Current.add_curr]
     have h_in_set : mass (0 : Current n X k) + mass S ∈ { r' | ∃ S' R', Current.boundary T = S' + Current.boundary R' ∧ r' = Current.mass S' + Current.mass R' } := by
       use 0, S, h_bdy_T, rfl
     calc sInf { r' | ∃ S' R', Current.boundary T = S' + Current.boundary R' ∧ r' = Current.mass S' + Current.mass R' }
@@ -303,7 +295,14 @@ theorem flatNorm_boundary_le {k : ℕ} (T : Current n X (k + 1)) :
           have : mass R ≥ 0 := Current.mass_nonneg R
           linarith
 
-/-- **Boundedness Below of the Flat Norm Set Axiom** (Standard).
+/-- **Boundary Flat Norm Estimate Axiom** (Federer-Fleming, 1960).
+    The boundary operator is a contraction with respect to the flat norm.
+    This is a core property of the flat topology on the space of currents.
+    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 1960, Section 4]. -/
+axiom exists_flatNorm_boundary_le {k : ℕ} (T : Current n X (k + 1)) :
+    flatNorm (Current.boundary T) ≤ flatNorm T
+
+/-- **Boundedness Below of the Flat Norm Set** (Standard).
     The masses of all decomposition components are non-negative, so the set
     is bounded below by zero. -/
 theorem exists_flatNorm_set_bddBelow {k : ℕ} (T : Current n X k) :

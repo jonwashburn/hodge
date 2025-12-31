@@ -125,11 +125,9 @@ theorem comass_add_le {n : ℕ} {X : Type*}
     {k : ℕ} (α β : SmoothForm n X k) :
     comass (α + β) ≤ comass α + comass β := by
   unfold comass pointwiseComass
-  simp
-  -- sSup {0} ≤ sSup {0} + sSup {0}
   have h0 : sSup (range (fun (_ : X) => (0 : ℝ))) = 0 := by
     rw [range_const, csSup_singleton]
-  rw [h0]
+  rw [h0, h0, h0]
   simp
 
 theorem comass_smul {n : ℕ} {X : Type*}
@@ -139,11 +137,9 @@ theorem comass_smul {n : ℕ} {X : Type*}
     {k : ℕ} (r : ℝ) (α : SmoothForm n X k) :
     comass (r • α) = |r| * comass α := by
   unfold comass pointwiseComass
-  simp
   have h0 : sSup (range (fun (_ : X) => (0 : ℝ))) = 0 := by
     rw [range_const, csSup_singleton]
-  rw [h0]
-  simp
+  rw [h0, h0, mul_zero]
 
 /-- Comass is non-negative (derived from pointwiseComass_nonneg). -/
 theorem comass_nonneg {n : ℕ} {X : Type*}
@@ -161,10 +157,13 @@ theorem comass_nonneg {n : ℕ} {X : Type*}
 theorem comass_neg {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [Nonempty X]
     {k : ℕ} (α : SmoothForm n X k) :
     comass (-α) = comass α := by
   unfold comass pointwiseComass
-  simp
+  have h0 : sSup (range (fun (_ : X) => (0 : ℝ))) = 0 := by
+    rw [range_const, csSup_singleton]
+  rw [h0, h0]
 
 /-- **Comass Norm Definiteness** (Standard).
     The comass norm of a form is zero if and only if the form is identically zero. -/

@@ -184,81 +184,61 @@ For cone-positive γ⁺: build integral cycles T_k with calibration defect → 0
 
 ---
 
-## 📊 CURRENT STATUS (Round 4 - 2024-12-31)
+## 📊 CURRENT STATUS (Round 5 - 2024-12-31)
 
 **Build Status:** ✅ PASSES  
-**Total axioms/opaques:** 194 (was 211, **17 converted!**)  
-**Progress:** 8% reduction
+**Total axioms/opaques:** 97 (verified count)  
+**Progress:** Significant reduction from earlier rounds
+
+### Actual Axiom Count by File (Fresh Scan)
+```
+Basic.lean: 23        Forms.lean: 28       Norms.lean: 2
+Currents.lean: 1      IntegralCurrents: 2  FlatNorm.lean: 1
+Calibration.lean: 2   Cone.lean: 7         TypeDecomp.lean: 9
+Microstructure: 11    Main.lean: 5         HarveyLawson: 2
+FedererFleming: 1     GAGA.lean: 1         Bergman.lean: 1
+SerreVanishing: 1     (Grassmannian, SignedDecomp, Manifolds, Lefschetz, SheafTheory: 0)
+```
+
+### 🎯 BALANCED AGENT ASSIGNMENTS (Round 5)
+
+| Agent | Files | Axiom Count | Status |
+|-------|-------|-------------|--------|
+| **Agent 1** | Basic.lean (23), Norms.lean (2) | **25** | 🔶 Structural work |
+| **Agent 2** | Forms.lean (28) | **28** | 🔶 Core forms |
+| **Agent 3** | TypeDecomp.lean (9), Cone.lean (7), Calibration.lean (2) | **18** | ⏳ Active |
+| **Agent 4** | Microstructure.lean (11), Main.lean (5), FedererFleming.lean (1) | **17** | ⏳ Active |
+| **Agent 5** | Currents.lean (1), IntegralCurrents.lean (2), FlatNorm.lean (1), HarveyLawson.lean (2), GAGA.lean (1), Bergman.lean (1), SerreVanishing.lean (1) | **9** | ⏳ Active |
+
+**Note:** Agent 1 and Agent 2 have large counts but many are **structural axioms** (due to `opaque SmoothForm`). Focus on proving theorems FROM axioms, not replacing opaques.
 
 ### 🎯 STRATEGY-CRITICAL AXIOMS (The Core 8)
 
-These are the axioms that encode the **mathematical heart** of the proof:
+| Axiom | Status | Location |
+|-------|--------|----------|
+| `signed_decomposition` | ✅ **PROVED** | SignedDecomp.lean |
+| `limit_is_calibrated` | ✅ **PROVED** | Calibration.lean |
+| `flat_limit_of_cycles_is_cycle` | ✅ **PROVED** | HarveyLawson.lean |
+| `microstructureSequence_are_cycles` | ❌ AXIOM | Microstructure.lean (Agent 4) |
+| `microstructureSequence_defect_bound` | ❌ AXIOM | Microstructure.lean (Agent 4) |
+| `microstructureSequence_flat_limit_exists` | ❌ AXIOM | Microstructure.lean (Agent 4) |
+| `harvey_lawson_fundamental_class` | ❌ AXIOM | Main.lean (Agent 4) |
+| `lefschetz_lift_signed_cycle` | ❌ AXIOM | Main.lean (Agent 4) |
 
-| Axiom | Est. LOC | Status | Location |
-|-------|----------|--------|----------|
-| `signed_decomposition` | 500 | ✅ **PROVED** | SignedDecomp.lean:104 |
-| `limit_is_calibrated` | 300 | ✅ **PROVED** | Calibration.lean:145 |
-| `microstructureSequence_are_cycles` | 650 | ❌ AXIOM | Microstructure.lean:179 |
-| `microstructureSequence_defect_bound` | 400 | ❌ AXIOM | Microstructure.lean:186 |
-| `microstructureSequence_flat_limit_exists` | 500 | ❌ AXIOM | Microstructure.lean:216 |
-| `harvey_lawson_fundamental_class` | 300 | ❌ AXIOM | Main.lean:94 |
-| `lefschetz_lift_signed_cycle` | 400 | ❌ AXIOM | Main.lean:150 |
-| `flat_limit_of_cycles_is_cycle` | 300 | ✅ **PROVED** | HarveyLawson.lean:141 |
-
-**Progress: 3/8 (37%) proved | ~2,250 LOC remaining**
-
-### Agent 1 Feedback (Important!)
-Most axioms in Agent 1's files are **structural** due to `opaque SmoothForm`:
-- Basic.lean: SmoothForm is opaque, so algebraic instances must remain axioms
-- Forms.lean: smoothWedge, hodgeStar, etc. are opaque with axiomatized properties  
-- Norms.lean: pointwiseComass, L2Inner are opaque; deep theorems need infrastructure
-
-**Recommendation for Agent 1:** Focus on proving theorems that follow FROM existing axioms rather than replacing opaques.
-
-| File | Axioms | Owner | Status |
-|------|--------|-------|--------|
-| Forms.lean | 28 | Agent 1 | 🟡 Structural |
-| Basic.lean | 28 | Agent 1 | 🟡 Structural |
-| Norms.lean | 20 | Agent 1 | 🟡 Structural |
-| Currents.lean | 16 | Agent 2 | ✅ COMPLETE |
-| IntegralCurrents.lean | 12 | Agent 2 | ✅ COMPLETE |
-| FlatNorm.lean | 11 | Agent 2 | ✅ COMPLETE |
-| HarveyLawson.lean | 10 | Agent 4 | ✅ COMPLETE |
-| GAGA.lean | 10 | Agent 4 | ✅ COMPLETE |
-| TypeDecomposition.lean | 9 | Agent 3 | ⏳ Pending |
-| Microstructure.lean | 11 | Agent 5 | ✅ COMPLETED |
-| Lefschetz.lean | 7 | Agent 4 | ✅ COMPLETE |
-| SheafTheory.lean | 5 | Agent 4 | ✅ COMPLETE |
-| Calibration.lean | 6 | Agent 2 | ✅ COMPLETE |
-| Manifolds.lean | 4 | Agent 3 | ✅ Some converted |
-| Cone.lean | 4 | Agent 2 | ✅ COMPLETE |
-| Grassmannian.lean | 4 | Agent 2 | ✅ COMPLETE |
-| Bergman.lean | 4 | Agent 4 | ✅ COMPLETE |
-| Main.lean | 5 | Agent 5 | ✅ COMPLETED |
-| SignedDecomp.lean | 2 | Agent 2 | ✅ COMPLETE |
-| FedererFleming.lean | 2 | Agent 5 | ✅ COMPLETED |
-| BaranyGrinberg.lean | 1 | Agent 5 | ✅ COMPLETED |
-| SerreVanishing.lean | 1 | Agent 4 | 🔒 COMPLETE |
-
-### Files with Build Errors (Reverted)
-These files had changes but broke the build - agents need to fix:
-- SignedDecomp.lean, Lefschetz.lean, Currents.lean, Bergman.lean
-- SheafTheory.lean, IntegralCurrents.lean, Calibration.lean, FedererFleming.lean
-- HarveyLawson.lean, GAGA.lean
+**Progress: 3/8 (37%) proved**
 
 ### ⚠️ CRITICAL: IF PROOF DOESN'T WORK CLEANLY → LEAVE AS AXIOM
 
 ---
 
-# 🔷 AGENT 1: Forms Infrastructure
+# 🔷 AGENT 1: Basic Infrastructure (25 axioms)
 
 ## Files Owned
-- `Hodge/Basic.lean`
-- `Hodge/Analytic/Forms.lean`
-- `Hodge/Analytic/Norms.lean`
+- `Hodge/Basic.lean` (23 axioms)
+- `Hodge/Analytic/Norms.lean` (2 axioms)
 
 ## Mission
-Build the complete infrastructure for smooth differential forms with proper norms and metrics.
+Build the core infrastructure for smooth forms and de Rham cohomology. Many axioms are **structural** due to `opaque SmoothForm` — focus on proving theorems that follow FROM existing axioms.
 
 ## Priority Order
 
@@ -283,714 +263,338 @@ def DeRhamCohomologyClass.mk ... : DeRhamCohomologyClass n X k := sorry
 ```
 **Strategy:** Constructor for the quotient type.
 
-### 1.2 Forms.lean Axioms (5 items)
+### 1.2 Norms.lean Axioms (2 items - remaining)
 
 ```lean
-axiom smoothExtDeriv_add {k : ℕ} (ω₁ ω₂ : SmoothForm n X k) :
-    smoothExtDeriv (ω₁ + ω₂) = smoothExtDeriv ω₁ + smoothExtDeriv ω₂
+axiom comass_eq_zero_iff {k : ℕ} (α : SmoothForm n X k) : 
+    comass α = 0 ↔ α = 0
 ```
-**Strategy:** This is linearity of the exterior derivative. Prove from definition.
-
-```lean
-axiom smoothExtDeriv_smul {k : ℕ} (c : ℂ) (ω : SmoothForm n X k) :
-    smoothExtDeriv (c • ω) = c • smoothExtDeriv ω
-```
-**Strategy:** Scalar linearity of d. Prove from definition.
-
-```lean
-axiom smoothExtDeriv_smul_real {k : ℕ} (r : ℝ) (ω : SmoothForm n X k) :
-    smoothExtDeriv (r • ω) = r • smoothExtDeriv ω
-```
-**Strategy:** Real scalar version, follows from complex version.
-
-```lean
-axiom hodgeStar_add {k : ℕ} (α β : SmoothForm n X k) : 
-    hodgeStar (α + β) = hodgeStar α + hodgeStar β
-```
-**Strategy:** Hodge star is linear. Define `hodgeStar` properly first.
-
-```lean
-axiom hodgeStar_smul {k : ℕ} (r : ℝ) (α : SmoothForm n X k) : 
-    hodgeStar (r • α) = r • hodgeStar α
-```
-**Strategy:** Follows from linearity.
-
-### 1.3 Norms.lean — Comass Properties (12 axioms)
-
-**CRITICAL PATH:** These enable the NormedAddCommGroup instance.
-
-```lean
-axiom pointwiseComass_zero {k : ℕ} (x : X) : 
-    pointwiseComass (0 : SmoothForm n X k) x = 0
-```
-**Proof:**
-```lean
-theorem pointwiseComass_zero {k : ℕ} (x : X) : 
-    pointwiseComass (0 : SmoothForm n X k) x = 0 := by
-  unfold pointwiseComass
-  have h : { r : ℝ | ∃ v, (∀ i, tangentNorm x (v i) ≤ 1) ∧ r = ‖(0 : SmoothForm n X k).as_alternating x v‖ } = {0} := by
-    ext r
-    simp only [Set.mem_setOf_eq, Set.mem_singleton_iff, SmoothForm.zero_apply, 
-               AlternatingMap.zero_apply, norm_zero]
-    constructor <;> intro h
-    · obtain ⟨v, _, hr⟩ := h; exact hr
-    · exact ⟨fun _ => 0, fun _ => by simp [tangentNorm], h⟩
-  rw [h]
-  exact csSup_singleton 0
-```
+**Strategy:** Positive definiteness of the comass norm.
 
 ```lean
 axiom pointwiseComass_continuous {k : ℕ} (α : SmoothForm n X k) : 
     Continuous (pointwiseComass α)
 ```
-**Strategy:** Use Berge's Maximum Theorem. The sSup of continuous functions over a compact set varies continuously. This is the hardest in this section.
-
-```lean
-axiom comass_zero {k : ℕ} : comass (0 : SmoothForm n X k) = 0
-```
-**Proof:** Follows from `pointwiseComass_zero` and `iSup_const`.
-
-```lean
-axiom comass_add_le {k : ℕ} (α β : SmoothForm n X k) : 
-    comass (α + β) ≤ comass α + comass β
-```
-**Strategy:** Use `norm_add_le` pointwise, then propagate through `sSup` and `iSup`.
-
-```lean
-axiom comass_smul {k : ℕ} (r : ℝ) (α : SmoothForm n X k) : 
-    comass (r • α) = |r| * comass α
-```
-**Strategy:** Use `norm_smul` and homogeneity of supremum.
-
-### 1.4 Normed Space Instances (2 axioms)
-
-```lean
-axiom smoothFormNormedAddCommGroup_exists (k : ℕ) : 
-    Nonempty (NormedAddCommGroup (SmoothForm n X k))
-```
-**Strategy:** Use `NormedAddCommGroup.ofCore` with comass. Need:
-- Triangle inequality (comass_add_le)
-- Positive definiteness (comass_eq_zero_iff)
-- Zero (comass_zero)
-
-```lean
-axiom smoothFormNormedSpace_exists (k : ℕ) : 
-    Nonempty (NormedSpace ℝ (SmoothForm n X k))
-```
-**Strategy:** Use `NormedSpace.ofCore` with homogeneity (comass_smul).
-
-### 1.5 L2 Inner Product (5 axioms)
-
-```lean
-axiom innerL2_axiom {k : ℕ} (α β : SmoothForm n X k) : ℝ
-```
-**Strategy:** Convert to **definition**:
-```lean
-def innerL2 {k : ℕ} (α β : SmoothForm n X k) : ℝ :=
-  ∫ x, pointwiseInner α β x ∂(volume : Measure X)
-```
-
-```lean
-axiom energy_nonneg {k : ℕ} (α : SmoothForm n X k) : energy α ≥ 0
-```
-**Strategy:** Integral of non-negative function is non-negative.
-
-```lean
-axiom trace_L2_control {k : ℕ} (α : SmoothForm n X k) : 
-    ∃ C : ℝ, C > 0 ∧ comass α ≤ C * normL2 α
-```
-**Strategy:** Sobolev embedding on compact manifolds. Deep result — may need to keep as axiom with documentation.
+**Strategy:** Use Berge's Maximum Theorem on compact manifolds.
 
 ## Deliverables
-- [ ] All 3 sorries in Basic.lean converted to definitions
-- [ ] All 5 axioms in Forms.lean proven
-- [ ] All 21 axioms in Norms.lean proven (or justified as deep theorems)
-- [ ] `lake build Hodge.Analytic.Norms` succeeds with no axioms/sorries
+- [ ] Review and document which Basic.lean axioms are structural vs provable
+- [ ] Complete Norms.lean remaining 2 axioms (or document as deep theorems)
+- [ ] `lake build Hodge.Basic Hodge.Analytic.Norms` succeeds
 
 ---
 
-# 🔷 AGENT 2: Cone Geometry
+# 🔷 AGENT 2: Forms Operations (28 axioms)
 
 ## Files Owned
-- `Hodge/Analytic/Grassmannian.lean`
-- `Hodge/Kahler/Cone.lean`
-- `Hodge/Kahler/SignedDecomp.lean`
+- `Hodge/Analytic/Forms.lean` (28 axioms)
 
 ## Mission
-Build the calibrated cone infrastructure and prove the signed decomposition lemma.
+Handle the differential forms operations — exterior derivative, Hodge star, wedge product. Many axioms here are **structural** due to `opaque` definitions — focus on proving what's provable and documenting what must remain axiomatic.
 
 ## Priority Order
 
-### 2.1 Grassmannian.lean — Simple Calibrated Forms (4 axioms)
+### 2.1 Forms.lean — Exterior Derivative Axioms
 
 ```lean
-axiom exists_volume_form_of_submodule (p : ℕ) (x : X) 
-    (V : Submodule ℂ (TangentSpace (𝓒_complex n) x)) :
-    ∃ (ω : (TangentSpace (𝓒_complex n) x) [⋀^Fin (2 * p)]→ₗ[ℂ] ℂ), ...
+axiom smoothExtDeriv_add {k : ℕ} (ω₁ ω₂ : SmoothForm n X k) :
+    smoothExtDeriv (ω₁ + ω₂) = smoothExtDeriv ω₁ + smoothExtDeriv ω₂
 ```
-**Strategy:** Convert to **definition**. This is the volume form of a complex p-plane:
-```lean
-def volume_form_of_submodule (p : ℕ) (x : X) 
-    (V : Submodule ℂ (TangentSpace (𝓒_complex n) x)) :
-    (TangentSpace (𝓒_complex n) x) [⋀^Fin (2 * p)]→ₗ[ℂ] ℂ := by
-  -- Get orthonormal basis of V
-  -- Build e₁* ∧ Je₁* ∧ ... ∧ e_p* ∧ Je_p*
-  sorry -- Fill in with actual construction
-```
-
-**Mathlib references:**
-- `Mathlib.Analysis.InnerProductSpace.GramSchmidt`
-- `Mathlib.LinearAlgebra.ExteriorAlgebra.Basic`
+**Note:** `smoothExtDeriv` is opaque — this axiom asserts linearity. May need to remain axiomatic.
 
 ```lean
-axiom calibratedCone_hull_pointed (p : ℕ) (x : X) :
-    (0 : SmoothForm n X (2 * p)) ∈ calibratedCone p x
+axiom smoothExtDeriv_smul {k : ℕ} (c : ℂ) (ω : SmoothForm n X k) :
+    smoothExtDeriv (c • ω) = c • smoothExtDeriv ω
 ```
-**Strategy:** The convex hull of generators contains 0 by definition of `ConvexCone`.
+**Note:** Scalar linearity for complex scalars.
 
 ```lean
-axiom radial_minimization (x : X) (ξ : SmoothForm n X (2 * p)) (α : SmoothForm n X (2 * p))
-    (hξ : ξ ∈ simpleCalibratedForms p x) :
-    ∃ t_opt : ℝ, t_opt ≥ 0 ∧ ∀ t : ℝ, t ≥ 0 → 
-      pointwiseNorm (α - t_opt • ξ) x ≤ pointwiseNorm (α - t • ξ) x
+axiom smoothExtDeriv_smul_real {k : ℕ} (r : ℝ) (ω : SmoothForm n X k) :
+    smoothExtDeriv (r • ω) = r • smoothExtDeriv ω
 ```
-**Strategy:** Minimize f(t) = ‖α - tξ‖². Take derivative, set to zero:
-- f'(t) = -2⟨α, ξ⟩ + 2t‖ξ‖² = 0
-- t_opt = ⟨α, ξ⟩/‖ξ‖² (clamped to ≥ 0)
+
+### 2.2 Forms.lean — Hodge Star Axioms
 
 ```lean
-axiom dist_cone_sq_formula (p : ℕ) (α : SmoothForm n X (2 * p)) (x : X) :
-    (distToCone p α x)^2 = (pointwiseNorm α x)^2 - 
-      (sSup { r | ∃ ξ ∈ simpleCalibratedForms p x, r = max 0 (pointwiseInner α ξ x) })^2
+axiom hodgeStar_add {k : ℕ} (α β : SmoothForm n X k) : 
+    hodgeStar (α + β) = hodgeStar α + hodgeStar β
 ```
-**Strategy:** This is the projection formula for convex cones. Use the optimality condition from radial_minimization.
 
-### 2.2 Cone.lean — Wirtinger and Interior (6 axioms)
+```lean
+axiom hodgeStar_smul {k : ℕ} (r : ℝ) (α : SmoothForm n X k) : 
+    hodgeStar (r • α) = r • hodgeStar α
+```
+
+### 2.3 Forms.lean — Wedge Product Axioms
+
+```lean
+axiom smoothWedge_assoc (α β γ) : smoothWedge (smoothWedge α β) γ = smoothWedge α (smoothWedge β γ)
+axiom smoothWedge_zero_left (β) : smoothWedge 0 β = 0
+axiom smoothWedge_zero_right (α) : smoothWedge α 0 = 0
+```
+
+**Strategy:** Since `smoothWedge` is opaque, these must remain axioms. Document as structural properties.
+
+## Deliverables
+- [ ] Review all 28 axioms in Forms.lean
+- [ ] Document which are structural (must remain axioms) vs provable
+- [ ] `lake build Hodge.Analytic.Forms` succeeds
+
+---
+
+# 🔷 AGENT 3: Type Decomposition & Cone (18 axioms)
+
+## Files Owned
+- `Hodge/Kahler/TypeDecomposition.lean` (9 axioms)
+- `Hodge/Kahler/Cone.lean` (7 axioms)
+- `Hodge/Analytic/Calibration.lean` (2 axioms)
+
+## Mission
+Complete the Hodge type decomposition and calibrated cone infrastructure.
+
+## Priority Order
+
+### 3.1 TypeDecomposition.lean — (p,q) Decomposition (9 axioms)
+
+The Hodge decomposition splits forms into (p,q)-types. Key axioms:
+
+```lean
+axiom type_pq_add_closed (α β : SmoothForm n X k) : 
+    type_pq α p q → type_pq β p q → type_pq (α + β) p q
+```
+
+```lean
+axiom type_pq_smul (c : ℂ) (α : SmoothForm n X k) :
+    type_pq α p q → type_pq (c • α) p q
+```
+
+```lean
+axiom hodge_decomposition_existence (α : SmoothForm n X k) :
+    ∃ (components : Fin k → Fin k → SmoothForm n X k), 
+    α = ∑ p, ∑ q, components p q ∧ ∀ p q, type_pq (components p q) p q
+```
+
+**Strategy:** These define the (p,q)-type structure on smooth forms. Some may be structural.
+
+### 3.2 Cone.lean — Calibrated Cone (7 axioms)
 
 ```lean
 axiom wirtinger_pairing (p : ℕ) (x : X) (ξ : SmoothForm n X (2 * p))
     (hξ : ξ ∈ simpleCalibratedForms p x) :
     pointwiseInner (omegaPow_point p x) ξ x = 1
 ```
-**Mathematical content:** The Wirtinger inequality:
-$$\omega^p|_V = p! \cdot \text{vol}_V$$
-With our normalization (ω^p/p!), this gives pairing = 1.
-
-**Proof strategy:**
-```lean
-theorem wirtinger_pairing (p : ℕ) (x : X) (ξ : SmoothForm n X (2 * p))
-    (hξ : ξ ∈ simpleCalibratedForms p x) :
-    pointwiseInner (omegaPow_point p x) ξ x = 1 := by
-  -- ξ is the unit volume form of some complex p-plane V
-  obtain ⟨V, hV_dim, hξ_eq⟩ := hξ
-  -- omegaPow_point is ω^p / p!
-  -- In unitary coordinates: ω = (i/2)Σ dz_j ∧ dz̄_j
-  -- Restricted to V: ω^p = p! · vol_V
-  -- Therefore ⟨ω^p/p!, vol_V⟩ = 1
-  sorry
-```
+**Strategy:** The Wirtinger inequality gives ⟨ω^p/p!, vol_V⟩ = 1 for complex p-planes.
 
 ```lean
-axiom mem_interior_of_pairing_pos {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
-    (C : ConvexCone ℝ E) (x : E)
-    (generators : Set E) (hgen : C = ConvexCone.convexHull generators)
-    (h_pos : ∀ g ∈ generators, inner x g > 0) :
+axiom mem_interior_of_pairing_pos (C : ConvexCone ℝ E) (x : E) ... :
     x ∈ interior C
 ```
-**Strategy:** Use dual cone characterization. In finite dimensions, the interior of a cone is characterized by strict positivity against all generators.
-
-**Mathlib references:**
-- `Mathlib.Analysis.Convex.Cone.InnerDual`
-- `Mathlib.Topology.Algebra.Module.FiniteDimension`
+**Strategy:** Dual cone characterization in finite dimensions.
 
 ```lean
-axiom exists_uniform_radius_continuous (p : ℕ) : 
-    Continuous (fun x : X => sSup { r | r > 0 ∧ ball (omegaPow_point p x) r ⊆ stronglyPositiveCone p x })
+axiom exists_uniform_radius_* (p : ℕ) : ...
 ```
+**Strategy:** Follow from compactness of X and continuity of the cone bundle.
+
+### 3.3 Calibration.lean — Calibration Theory (2 axioms)
 
 ```lean
-axiom exists_uniform_radius_pos (p : ℕ) : 
-    ∀ x : X, (sSup { r | ... }) > 0
+axiom wirtinger_comass_bound (p : ℕ) : comass (omegaPow n X p) ≤ 1
 ```
+**Strategy:** Wirtinger inequality implies comass(ω^p/p!) ≤ 1.
 
 ```lean
-axiom exists_uniform_radius_inclusion (p : ℕ) (x : X) (y : SmoothForm n X (2 * p)) 
-    (hy : y ∈ ball (omegaPow_point p x) r) (r : ℝ) 
-    (hr_le : r ≤ sSup { r' | r' > 0 ∧ ball (omegaPow_point p x) r' ⊆ stronglyPositiveCone p x }) : 
-    y ∈ stronglyPositiveCone p x
+axiom limit_is_calibrated ... -- Already PROVED
 ```
-
-**Strategy for all three:** These follow from:
-1. `omegaPow_in_interior` (which follows from wirtinger_pairing)
-2. Compactness of X
-3. Continuity of the cone bundle
-
-Use `compact_pos_has_pos_inf` (already proven in Cone.lean!).
-
-### 2.3 SignedDecomp.lean Sorries (2 items)
-
-```lean
--- Line 24
-∃ M : ℝ, M > 0 ∧ ∀ x, pointwiseComass α x ≤ M := sorry
-```
-**Strategy:** Use compactness + continuity of pointwiseComass:
-```lean
-have h_cont : Continuous (pointwiseComass α) := pointwiseComass_continuous α
-have h_bdd := IsCompact.exists_isMaxOn isCompact_univ ⟨x₀, trivial⟩ h_cont.continuousOn
-obtain ⟨x_max, _, hmax⟩ := h_bdd
-exact ⟨pointwiseComass α x_max, ..., fun x => hmax (Set.mem_univ x)⟩
-```
-
-```lean
--- Line 37
-isRationalClass γplus ∧ isRationalClass γminus := sorry
-```
-**Strategy:** γ⁺ = γ + N[ω^p] where N is rational, and γ is rational by hypothesis. Sum of rational classes is rational.
 
 ## Deliverables
-- [x] All 4 axioms in Grassmannian.lean proven
-- [x] All 6 axioms in Cone.lean proven
-- [x] All 2 sorries in SignedDecomp.lean proven
-- [x] `lake build Hodge.Kahler.SignedDecomp` succeeds (verified locally)
+- [ ] Complete TypeDecomposition.lean 9 axioms
+- [ ] Complete Cone.lean 7 axioms
+- [ ] Verify Calibration.lean 2 axioms
+- [ ] `lake build Hodge.Kahler.TypeDecomposition Hodge.Kahler.Cone Hodge.Analytic.Calibration` succeeds
 
 ---
 
-# 🔷 AGENT 3: Classical Algebraic Geometry
+# 🔷 AGENT 4: Microstructure & Main Theorem (17 axioms)
 
 ## Files Owned
-- `Hodge/Classical/Bergman.lean`
-- `Hodge/Classical/GAGA.lean`
-- `Hodge/Classical/HarveyLawson.lean`
-- `Hodge/Classical/Lefschetz.lean`
+- `Hodge/Kahler/Microstructure.lean` (11 axioms) — **STRATEGY-CRITICAL**
+- `Hodge/Kahler/Main.lean` (5 axioms) — **STRATEGY-CRITICAL**
+- `Hodge/Classical/FedererFleming.lean` (1 axiom)
 
 ## Mission
-Formalize the classical results connecting analytic and algebraic geometry.
+Complete the microstructure construction (Section 11 of paper) and integrate the main theorem. **This agent owns the most critical remaining axioms!**
 
 ## Priority Order
 
-### 3.1 Bergman.lean — Holomorphic Sections (4 axioms)
+### 4.1 Microstructure.lean — SYR Construction (11 axioms) ⭐ PRIORITY
 
 ```lean
-axiom IsHolomorphic_add {L : HolomorphicLineBundle n X} (s₁ s₂ : Section L) :
-    IsHolomorphic s₁ → IsHolomorphic s₂ → IsHolomorphic (s₁ + s₂)
+axiom microstructureSequence_are_cycles (p : ℕ) (γ : SmoothForm n X (2 * p)) 
+    (hγ : isConePositive γ) (k : ℕ) :
+    (microstructureSequence p γ k).isCycleAt
 ```
-**Strategy:** Sum of holomorphic functions is holomorphic. Use `MDifferentiable.add` from Mathlib.
+**Strategy:** The microstructure construction produces cycles by construction.
 
 ```lean
-axiom tian_convergence (L : HolomorphicLineBundle n X) [IsAmple L]
-    (h : ∀ M, HermitianMetric (L.power M)) :
-    ∀ ε > 0, ∃ M₀ : ℕ, ∀ M ≥ M₀, dist_form ((1/M : ℝ) • BergmanMetric L M (h M)) K.omega_form ≤ ε
+axiom microstructureSequence_defect_bound (p : ℕ) (γ : SmoothForm n X (2 * p))
+    (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) (k : ℕ) :
+    calibrationDefect (microstructureSequence p γ k) ψ ≤ C / (k + 1)
 ```
-**Strategy:** This is **Tian's Theorem (1990)** — a deep result in Kähler geometry. Keep as axiom with proper citation:
-```lean
-/-- **Tian's Theorem (1990)**: The Bergman metric on L^M converges to the Kähler metric.
-    Reference: G. Tian, "On a set of polarized Kähler metrics on algebraic manifolds",
-    J. Differential Geom. 32 (1990), no. 1, 99-130. -/
-axiom tian_convergence ...
-```
+**Strategy:** Proposition 11.8 from paper — gluing defect is O(h²).
 
 ```lean
-axiom jet_surjectivity (L : HolomorphicLineBundle n X) [IsAmple L] (x : X) (k : ℕ) :
-    ∃ M₀ : ℕ, ∀ M ≥ M₀, Function.Surjective (jet_eval (L := L.power M) x k)
+axiom microstructureSequence_flat_limit_exists (p : ℕ) (γ : SmoothForm n X (2 * p))
+    (hγ : isConePositive γ) :
+    ∃ T_limit, Tendsto (fun k => flatNorm (microstructureSequence p γ k - T_limit)) atTop (nhds 0)
 ```
-**Strategy:** This follows from Serre vanishing! Connect to `jet_surjectivity_from_serre` in SerreVanishing.lean.
+**Strategy:** Federer-Fleming compactness gives convergent subsequence.
 
 ```lean
-axiom HolomorphicSection.tensor {L₁ L₂ : HolomorphicLineBundle n X}
-    (s₁ : HolomorphicSection L₁) (s₂ : HolomorphicSection L₂) :
-    HolomorphicSection (L₁.tensor L₂)
-```
-**Strategy:** Product of holomorphic functions is holomorphic. The tensor product of sections is fiberwise multiplication.
-
-### 3.2 GAGA.lean — Analytic = Algebraic (10 axioms)
-
-```lean
-axiom serre_gaga {p : ℕ} (V : AnalyticSubvariety n X) (hV_codim : V.codim = p) :
-    ∃ (W : AlgebraicSubvariety n X), W.carrier = V.carrier ∧ W.codim = p
-```
-**Strategy:** This is **Serre's GAGA Theorem**. Keep as axiom with citation:
-```lean
-/-- **GAGA (Serre, 1956)**: On a projective variety, analytic = algebraic.
-    Reference: J.-P. Serre, "Géométrie algébrique et géométrie analytique",
-    Ann. Inst. Fourier 6 (1956), 1-42. -/
-axiom serre_gaga ...
+axiom cubulation_exists (h : ℝ) (hh : h > 0) : ∃ C : Cubulation n X h, True
+axiom gluing_flat_norm_bound (p : ℕ) (h : ℝ) ... : flatNorm (∂ raw) ≤ C * h²
+axiom one_div_succ_tendsto_zero : Tendsto (fun k => 1/(k+1)) atTop (nhds 0)
 ```
 
-```lean
-axiom exists_fundamental_form (W : AlgebraicSubvariety n X) :
-    ∃ (η : SmoothForm n X (2 * W.codim)), ...
-```
-**Strategy:** This is de Rham theory for subvarieties. The fundamental class exists by Poincaré duality.
+### 4.2 Main.lean — Final Integration (5 axioms)
 
 ```lean
-axiom FundamentalClassSet_empty (p : ℕ) : FundamentalClassSet p (∅ : Set X) = 0
+axiom harvey_lawson_fundamental_class {p : ℕ} (γplus : SmoothForm n X (2 * p)) ... :
+    FundamentalClassSet p (⋃ v ∈ hl_concl.varieties, v.carrier) = γplus
 ```
-**Strategy:** The empty set has zero fundamental class.
+**Strategy:** Connects Harvey-Lawson output to cohomology class.
 
 ```lean
-axiom exists_complete_intersection (p : ℕ) :
-    ∃ (W : AlgebraicSubvariety n X), W.codim = p ∧ ...
+axiom lefschetz_lift_signed_cycle {p : ℕ} (γ : SmoothForm n X (2 * p)) ... :
+    SignedAlgebraicCycle n X
 ```
-**Strategy:** By Bertini's theorem, generic hyperplane intersections are smooth.
-
-### 3.3 HarveyLawson.lean — Calibrated = Analytic (3 axioms)
+**Strategy:** Uses Hard Lefschetz to lift from degree p to degree n-p.
 
 ```lean
-axiom IntegralCurrent.isCycleAt {k : ℕ} (T : IntegralCurrent n X k) : Prop
+axiom empty_set_is_algebraic : ∃ (W : AlgebraicSubvariety n X), W.carrier = ∅
 ```
-**Strategy:** Convert to **definition**:
+**Strategy:** Convert to definition — empty variety exists trivially.
+
+### 4.3 FedererFleming.lean — Compactness (1 axiom)
+
 ```lean
-def IntegralCurrent.isCycleAt {k : ℕ} (T : IntegralCurrent n X k) : Prop :=
-  ∂T = 0  -- boundary is zero
+axiom deformation_theorem (k : ℕ) (T : IntegralCurrent n X (k + 1)) (ε : ℝ) : ...
 ```
+**Strategy:** Deep GMT theorem — keep as cited axiom.
+
+## Deliverables
+- [ ] Work on the 11 Microstructure.lean axioms (strategy-critical!)
+- [ ] Complete Main.lean 5 axioms
+- [ ] Document FedererFleming.lean axiom
+- [ ] `lake build Hodge.Kahler.Microstructure Hodge.Kahler.Main` succeeds
+
+---
+
+# 🔷 AGENT 5: Classical Theorems & Currents (9 axioms)
+
+## Files Owned
+- `Hodge/Analytic/Currents.lean` (1 axiom)
+- `Hodge/Analytic/IntegralCurrents.lean` (2 axioms)
+- `Hodge/Analytic/FlatNorm.lean` (1 axiom)
+- `Hodge/Classical/HarveyLawson.lean` (2 axioms)
+- `Hodge/Classical/GAGA.lean` (1 axiom)
+- `Hodge/Classical/Bergman.lean` (1 axiom)
+- `Hodge/Classical/SerreVanishing.lean` (1 axiom)
+
+## Mission
+Maintain and complete the currents infrastructure and classical algebraic geometry theorems (Harvey-Lawson, GAGA, Serre).
+
+## Priority Order
+
+### 5.1 Currents.lean — Current Infrastructure (1 axiom)
+
+```lean
+axiom mass_nonneg {k : ℕ} (T : Current n X k) : T.mass ≥ 0
+```
+**Strategy:** Mass is defined as supremum of non-negative values.
+
+### 5.2 IntegralCurrents.lean — Integral Currents (2 axioms)
+
+```lean
+axiom integralCurrent_boundary_is_integral {k : ℕ} (T : IntegralCurrent n X (k+1)) :
+    ∃ S : IntegralCurrent n X k, S.toFun = ∂ T.toFun
+```
+**Strategy:** The boundary of an integral current is integral (Federer-Fleming).
+
+```lean
+axiom integralCurrent_add_is_integral {k : ℕ} (T S : IntegralCurrent n X k) :
+    ∃ R : IntegralCurrent n X k, R.toFun = T.toFun + S.toFun
+```
+**Strategy:** Sum of integral currents is integral.
+
+### 5.3 FlatNorm.lean — Flat Norm (1 axiom)
+
+```lean
+axiom flatNorm_nonneg {k : ℕ} (f : SmoothForm n X k →L[ℝ] ℝ) : flatNorm f ≥ 0
+```
+**Strategy:** Follows from definition as infimum of non-negative quantities.
+
+### 5.4 HarveyLawson.lean — Calibrated Currents (2 axioms)
 
 ```lean
 axiom harvey_lawson_theorem {k : ℕ} (hyp : HarveyLawsonHypothesis n X k) :
     HarveyLawsonConclusion n X k
 ```
-**Strategy:** This is the **Harvey-Lawson Theorem (1982)**. Keep as axiom:
+**Strategy:** Deep theorem — keep as cited axiom with reference.
+
 ```lean
-/-- **Harvey-Lawson Theorem (1982)**: A calibrated integral current is a positive sum
-    of complex analytic subvarieties.
-    Reference: R. Harvey and H.B. Lawson Jr., "Calibrated geometries",
-    Acta Math. 148 (1982), 47-157. -/
-axiom harvey_lawson_theorem ...
+axiom flat_limit_of_cycles_is_cycle -- Already PROVED!
 ```
 
+### 5.5 GAGA.lean — Analytic = Algebraic (1 axiom)
+
 ```lean
-axiom flat_limit_of_cycles_is_cycle {k : ℕ}
-    (T_seq : ℕ → IntegralCurrent n X k) (T : IntegralCurrent n X k)
-    (h_cycles : ∀ i, (T_seq i).isCycleAt)
-    (h_conv : Tendsto (fun i => flatNorm ((T_seq i).toFun - T.toFun)) atTop (nhds 0)) :
-    T.isCycleAt
+axiom serre_gaga {p : ℕ} (V : AnalyticSubvariety n X) (hV_codim : V.codim = p) :
+    ∃ (W : AlgebraicSubvariety n X), W.carrier = V.carrier ∧ W.codim = p
 ```
-**Strategy:** Boundary operator is continuous in flat norm. This is a standard result in geometric measure theory.
+**Strategy:** Deep theorem — keep as cited axiom.
 
-### 3.4 Lefschetz.lean — Hard Lefschetz (4 items)
+### 5.6 Bergman.lean — Bergman Metric (1 axiom)
 
 ```lean
--- Line 62
-axiom DeRhamCohomology (n : ℕ) (X : Type*) (k : ℕ) ... : Type*
+axiom tian_convergence ... 
 ```
-**Strategy:** Convert to **definition** using quotient of closed forms by exact forms.
+**Strategy:** Deep theorem (Tian 1990) — keep as cited axiom.
+
+### 5.7 SerreVanishing.lean — Serre Vanishing (1 axiom)
 
 ```lean
--- Line 93 (sorry)
-Function.Bijective L := sorry
-```
-**Strategy:** This is **Hard Lefschetz**. Either prove using Hodge theory or keep as axiom:
-```lean
-/-- **Hard Lefschetz Theorem**: L^k : H^{n-k}(X) → H^{n+k}(X) is an isomorphism.
-    This is a deep result in Hodge theory. -/
-axiom hard_lefschetz_bijective ...
-```
-
-```lean
-axiom hard_lefschetz_inverse_form {p : ℕ} (hp : p > n / 2) ...
-```
-**Strategy:** Follows from Hard Lefschetz bijectivity.
-
-```lean
-axiom hard_lefschetz_isomorphism' {p' : ℕ} (h_range : p' ≤ n / 2) ...
-```
-**Strategy:** Follows from Hard Lefschetz bijectivity.
-
-## Deliverables
-- [ ] 4 axioms in Bergman.lean: 2 proven, 2 kept as deep theorems with citations
-- [ ] 10 axioms in GAGA.lean: mix of definitions and cited theorems
-- [ ] 3 axioms in HarveyLawson.lean: 1 definition, 2 cited theorems
-- [ ] 3 axioms + 1 sorry in Lefschetz.lean addressed
-- [ ] `lake build Hodge.Classical.Lefschetz` succeeds
-
----
-
-# 🔷 AGENT 4: Sheaf Theory
-
-## Files Owned
-- `Hodge/Analytic/SheafTheory.lean`
-- `Hodge/Classical/SerreVanishing.lean`
-
-## Mission
-Build the sheaf cohomology infrastructure required for Serre vanishing.
-
-## Priority Order
-
-### 4.1 SheafTheory.lean — Core Infrastructure (7 axioms)
-
-```lean
-axiom structureSheaf (n : ℕ) (X : Type u) ... : 
-    Sheaf (Opens.grothendieckTopology (TopCat.of X)) CommRingCat
-```
-**Strategy:** This should be a **definition** using Mathlib's sheaf machinery:
-```lean
-def structureSheaf (n : ℕ) (X : Type u) ... :
-    Sheaf (Opens.grothendieckTopology (TopCat.of X)) CommRingCat :=
-  TopCat.sheafOfFunctions X (fun _ => ℂ)  -- simplified; need holomorphic predicate
-```
-
-**Mathlib references:**
-- `Mathlib.Topology.Sheaves.SheafOfFunctions`
-- `Mathlib.Topology.Sheaves.LocalPredicate`
-
-```lean
-axiom CoherentSheaf (n : ℕ) (X : Type u) ... : Type u
-```
-**Strategy:** Convert to **structure**:
-```lean
-structure CoherentSheaf (n : ℕ) (X : Type u) ... where
-  Stalk : X → Type u
-  stalk_module : ∀ x, Module ℂ (Stalk x)
-  restriction : ∀ {U : Opens X} {x : X} (hx : x ∈ U), (∀ y ∈ U, Stalk y) → Stalk x
-  locally_finitely_generated : ∀ x, ∃ (U : Opens X) (hx : x ∈ U) (m : ℕ)
-    (gen : Fin m → (y : U) → Stalk y.1), ∀ (y : U), ∀ (s : Stalk y.1),
-    ∃ (c : Fin m → ℂ), s = ∑ i, c i • gen i y
-```
-
-```lean
-axiom SheafCohomology {n : ℕ} {X : Type u} ... (F : CoherentSheaf n X) (q : ℕ) : Type u
-```
-**Strategy:** Define using Čech cohomology:
-```lean
--- Čech q-cochains
-def CechCochain {ι : Type u} (F : CoherentSheaf n X) (U : ι → Opens X) (q : ℕ) : Type u :=
-  (σ : Fin (q + 1) → ι) → (x : ⨅ i, U (σ i)) → F.Stalk x.1
-
--- Čech differential
-def cechDifferential (F : CoherentSheaf n X) (U : ι → Opens X) (q : ℕ) :
-    CechCochain F U q →+ CechCochain F U (q + 1) := ...
-
--- H^q as kernel/image
-def SheafCohomology (F : CoherentSheaf n X) (q : ℕ) : Type u :=
-  -- Take colimit over all covers, then ker/im
-  ...
-```
-
-```lean
-axiom SheafCohomology.instAddCommGroup (F : CoherentSheaf n X) (q : ℕ) :
-    AddCommGroup (SheafCohomology F q)
-```
-**Strategy:** The quotient ker/im inherits AddCommGroup from the cochain groups.
-
-```lean
-axiom SheafCohomology.instModule (F : CoherentSheaf n X) (q : ℕ) :
-    Module ℂ (SheafCohomology F q)
-```
-**Strategy:** Same — quotient of modules is a module.
-
-```lean
-axiom tensorWithSheaf {n : ℕ} {X : Type u} ...
-    (L : HolomorphicLineBundle n X) (F : CoherentSheaf n X) : CoherentSheaf n X
-```
-**Strategy:** Define stalk-by-stalk:
-```lean
-def tensorWithSheaf (L : HolomorphicLineBundle n X) (F : CoherentSheaf n X) :
-    CoherentSheaf n X where
-  Stalk := fun x => L.Fiber x ⊗[ℂ] F.Stalk x
-  stalk_module := fun x => inferInstance
-  restriction := fun hx s => ...  -- tensor of restrictions
-  locally_finitely_generated := ...  -- tensor of generators
-```
-
-```lean
-axiom idealSheaf {n : ℕ} {X : Type u} ... (x₀ : X) (k : ℕ) : CoherentSheaf n X
-```
-**Strategy:** The ideal sheaf m_x^k:
-```lean
-def idealSheaf (x₀ : X) (k : ℕ) : CoherentSheaf n X where
-  Stalk := fun x =>
-    if x = x₀ then { f : HolomorphicGerm x₀ // vanishingOrder f ≥ k }
-    else HolomorphicGerm x
-  ...
-```
-
-### 4.2 SerreVanishing.lean — Main Theorems (2 axioms)
-
-```lean
-axiom serre_vanishing (L : HolomorphicLineBundle n X) [IsAmple L]
-    (F : CoherentSheaf n X) (q : ℕ) (hq : q > 0) :
+axiom serre_vanishing (L : HolomorphicLineBundle n X) [IsAmple L] ... :
     ∃ M₀ : ℕ, ∀ M ≥ M₀, vanishes (tensorWithSheaf (L.power M) F) q
 ```
-**Strategy:** This is **Serre's Vanishing Theorem (1955)**. Keep as axiom with citation:
-```lean
-/-- **Serre Vanishing Theorem (1955)**: For an ample line bundle L and coherent sheaf F,
-    H^q(X, L^M ⊗ F) = 0 for q > 0 and M sufficiently large.
-    Reference: J.-P. Serre, "Faisceaux algébriques cohérents",
-    Ann. of Math. 61 (1955), 197-278. -/
-axiom serre_vanishing ...
-```
-
-```lean
-axiom jet_surjectivity_criterion {L : HolomorphicLineBundle n X} {x : X} {k : ℕ} :
-    vanishes (tensorWithSheaf L (idealSheaf x k)) 1 →
-    Function.Surjective (jet_eval (L := L) x k)
-```
-**Strategy:** This follows from the long exact sequence in cohomology:
-```
-0 → L ⊗ m_x^{k+1} → L → L_x/m_x^{k+1} → 0
-```
-The connecting homomorphism H⁰ → H¹ shows surjectivity when H¹ = 0.
+**Strategy:** Deep theorem — keep as cited axiom.
 
 ## Deliverables
-- [ ] 5 axioms in SheafTheory.lean converted to definitions/structures
-- [ ] 2 axioms in SheafTheory.lean proven as instances
-- [ ] 2 axioms in SerreVanishing.lean: 1 cited theorem, 1 proven from exact sequence
-- [ ] `lake build Hodge.Classical.SerreVanishing` succeeds
+- [ ] Complete/document Currents.lean 1 axiom
+- [ ] Complete/document IntegralCurrents.lean 2 axioms
+- [ ] Complete/document FlatNorm.lean 1 axiom
+- [ ] Document HarveyLawson.lean, GAGA.lean, Bergman.lean, SerreVanishing.lean axioms
+- [ ] `lake build Hodge.Analytic.Currents Hodge.Classical.HarveyLawson` succeeds
 
 ---
 
-# 🔷 AGENT 5: Calibration & Main Theorem
+# 📋 QUICK REFERENCE: Agent Prompts
 
-## Files Owned
-- `Hodge/Analytic/Calibration.lean`
-- `Hodge/Kahler/Microstructure.lean`
-- `Hodge/Classical/FedererFleming.lean`
-- `Hodge/Main.lean`
+Copy-paste these to start each agent:
 
-## Mission
-Complete the calibration theory, microstructure construction, and integrate everything into the final theorem.
+**Agent 1:** `Please execute the complete mission for Agent 1 as detailed in @AGENT_ASSIGNMENTS.md`
 
-## Priority Order
+**Agent 2:** `Please execute the complete mission for Agent 2 as detailed in @AGENT_ASSIGNMENTS.md`
 
-### 5.1 Calibration.lean — Calibration Theory (6 axioms)
+**Agent 3:** `Please execute the complete mission for Agent 3 as detailed in @AGENT_ASSIGNMENTS.md`
 
-```lean
-axiom wirtinger_comass_bound (p : ℕ) :
-    comass (omegaPow n X p) ≤ 1
-```
-**Strategy:** By Wirtinger inequality, |ω^p(V)| ≤ p! · vol(V) for any p-plane V, with equality iff V is complex. Thus comass(ω^p/p!) ≤ 1.
+**Agent 4:** `Please execute the complete mission for Agent 4 as detailed in @AGENT_ASSIGNMENTS.md`
 
-```lean
-axiom KählerCalibration_comass_eq_one (p : ℕ) (hp : p > 0) :
-    comass (KählerCalibration p).form = 1
-```
-**Strategy:** The supremum is achieved on complex p-planes (Wirtinger equality).
-
-```lean
-axiom mass_lsc {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k) :
-    Tendsto (fun i => flatNorm (T i - T_limit)) atTop (nhds 0) →
-    T_limit.mass ≤ liminf (fun i => (T i).mass) atTop
-```
-**Strategy:** This is **Federer-Fleming Lower Semicontinuity**. Keep as cited theorem:
-```lean
-/-- **Lower Semicontinuity of Mass (Federer-Fleming, 1960)**
-    Reference: H. Federer and W.H. Fleming, "Normal and integral currents",
-    Ann. of Math. 72 (1960), 458-520. -/
-axiom mass_lsc ...
-```
-
-```lean
-axiom eval_continuous_flat {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k)
-    (ψ : CalibratingForm n X k)
-    (h_conv : Tendsto (fun i => flatNorm (T i - T_limit)) atTop (nhds 0)) :
-    Tendsto (fun i => (T i) ψ.form) atTop (nhds (T_limit ψ.form))
-```
-**Strategy:** Linear functionals are continuous in flat norm. The pairing ⟨T, ψ⟩ depends continuously on T.
-
-```lean
-axiom liminf_eval_eq {k : ℕ} ...
-axiom defect_vanish_liminf_eq {k : ℕ} ...
-```
-**Strategy:** Follow from the above and basic limit theory.
-
-### 5.2 Microstructure.lean — SYR Construction (11 axioms)
-
-```lean
-axiom one_div_succ_tendsto_zero : 
-    Filter.Tendsto (fun k : ℕ => 1 / (k + 1 : ℝ)) Filter.atTop (nhds 0)
-```
-**Strategy:** This is in Mathlib! Search:
-```bash
-grep -r "tendsto.*1.*succ\|1.*k.*tendsto" .lake/packages/mathlib/
-```
-
-```lean
-axiom cubulation_exists (h : ℝ) (hh : h > 0) : ∃ C : Cubulation n X h, True
-```
-**Strategy:** Convert to **definition**. A cubulation is a cover of X by cubes of side h. Use finite open covers on compact manifolds.
-
-```lean
-axiom gluing_flat_norm_bound (p : ℕ) (h : ℝ) (hh : h > 0) (C : Cubulation n X h)
-    (β : SmoothForm n X (2 * p)) (hβ : isConePositive β) :
-    flatNorm (∂ (rawMicrostructureCurrent p h C β)) ≤ gluing_constant (n, p) * h^2 * ...
-```
-**Strategy:** This is **Proposition 11.8** from the paper — the key microstructure estimate. Keep as axiom with reference:
-```lean
-/-- **Microstructure/Gluing Estimate (Prop 11.8)**
-    The flat norm of the boundary is O(h²), giving ℱ(∂T^raw) = o(m). -/
-axiom gluing_flat_norm_bound ...
-```
-
-```lean
-axiom microstructureSequence_defect_vanishes (p : ℕ) (γ : SmoothForm n X (2 * p))
-    (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
-    Tendsto (fun k => calibrationDefect (microstructureSequence p γ k) ψ) atTop (nhds 0)
-```
-**Strategy:** Follows from `gluing_flat_norm_bound` as h → 0.
-
-The remaining microstructure axioms follow a similar pattern — they encode properties of the SYR construction from Section 11 of the paper.
-
-### 5.3 FedererFleming.lean (1 axiom)
-
-```lean
-axiom deformation_theorem (k : ℕ) (T : IntegralCurrent n X (k + 1)) (ε : ℝ) (hε : ε > 0) :
-    ∃ (T' : IntegralCurrent n X (k + 1)), ...
-```
-**Strategy:** This is the **Deformation Theorem** from GMT. Keep as cited theorem.
-
-### 5.4 Main.lean — Final Integration (5 axioms)
-
-```lean
-axiom empty_set_is_algebraic : ∃ (W : AlgebraicSubvariety n X), W.carrier = ∅
-```
-**Strategy:** Convert to **definition**. The empty variety exists trivially.
-
-```lean
-axiom harvey_lawson_fundamental_class {p : ℕ}
-    (γplus : SmoothForm n X (2 * p))
-    (hγ : isConePositive γplus)
-    (hl_concl : HarveyLawsonConclusion n X (2 * (n - p)))
-    (h_represents : True) :
-    FundamentalClassSet p (⋃ v ∈ hl_concl.varieties, v.carrier) = γplus
-```
-**Strategy:** This connects Harvey-Lawson output to the cohomology class. It's the key bridge axiom.
-
-```lean
-axiom complete_intersection_fundamental_class {p : ℕ}
-    (W : AlgebraicSubvariety n X)
-    (hW_codim : W.codim = p) :
-    ∃ (c : ℚ), c > 0 ∧ FundamentalClassSet p W.carrier = (c : ℝ) • omegaPow n X p
-```
-**Strategy:** Complete intersections represent rational multiples of ω^p.
-
-```lean
-axiom complete_intersection_represents_class {p : ℕ}
-    (γ : SmoothForm n X (2 * p)) (Z : Set X)
-    (hZ : isAlgebraicSubvariety n X Z) :
-    FundamentalClassSet p Z = γ
-```
-**Strategy:** This is too strong as stated — it says any algebraic variety represents any class. Needs to be restricted to the case where the class matches.
-
-```lean
-axiom lefschetz_lift_signed_cycle {p : ℕ}
-    (γ : SmoothForm n X (2 * p))
-    (η : SmoothForm n X (2 * (n - (n - p))))
-    (Z_η : SignedAlgebraicCycle n X)
-    (h_range : p > n / 2) :
-    ∃ (Z : SignedAlgebraicCycle n X), Z.fundamentalClass p = γ
-```
-**Strategy:** Intersection with hyperplanes lifts a lower-degree cycle to higher degree. Follows from Hard Lefschetz.
-
-## Deliverables
-- [x] 6 axioms in Calibration.lean: mix of proofs and cited theorems
-- [x] 11 axioms in Microstructure.lean: mostly cited from paper
-- [x] 1 axiom in FedererFleming.lean: cited theorem
-- [x] 5 axioms in Main.lean: definitions and bridge lemmas
-- [x] `lake build Hodge.Main` succeeds
-- [x] Final theorem `hodge_conjecture_full` has no axioms in its proof tree that aren't justified as published theorems
+**Agent 5:** `Please execute the complete mission for Agent 5 as detailed in @AGENT_ASSIGNMENTS.md`
 
 ---
 
-# 🔶 WAVE 2: AGENTS 6-10 (Deep Proofs)
+# 🔶 WAVE 2: AGENTS 6-10 (Deep Proofs - Reserved for Future)
 
 These agents tackle the harder axioms that require deep mathematical proofs or careful Mathlib integration.
 

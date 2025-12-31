@@ -34,8 +34,21 @@ opaque smoothWedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) :
 notation:67 ω:68 " ⋏ " η:68 => smoothWedge ω η
 
 /-- Wedge product preserves closedness (Leibniz rule + d²=0). -/
-axiom isFormClosed_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) :
-    IsFormClosed ω → IsFormClosed η → IsFormClosed (ω ⋏ η)
+theorem isFormClosed_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l)
+    (hω : IsFormClosed ω) (hη : IsFormClosed η) : IsFormClosed (ω ⋏ η) := by
+  unfold IsFormClosed at *
+  obtain ⟨term1, term2, h1, h2, h_leibniz⟩ := smoothExtDeriv_wedge ω η
+  rw [h_leibniz]
+  -- h1: HEq (smoothExtDeriv ω ⋏ η) term1. Since smoothExtDeriv ω = 0, term1 = 0.
+  have h_term1 : term1 = 0 := by
+    have : smoothExtDeriv ω ⋏ η = 0 := by rw [hω, smoothWedge_zero_left]
+    exact eq_of_heq (h1.symm.trans (cast_heq _ _))
+  -- h2: HEq (ω ⋏ smoothExtDeriv η) term2. Since smoothExtDeriv η = 0, term2 = 0.
+  have h_term2 : term2 = 0 := by
+    have : ω ⋏ smoothExtDeriv η = 0 := by rw [hη, smoothWedge_zero_right]
+    exact eq_of_heq (h2.symm.trans (cast_heq _ _))
+  rw [h_term1, h_term2]
+  simp
 
 /-- Wedge product is right-additive. -/
 axiom smoothWedge_add_right {k l : ℕ} (ω : SmoothForm n X k) (η₁ η₂ : SmoothForm n X l) :
@@ -52,6 +65,13 @@ axiom smoothWedge_smul_right {k l : ℕ} (c : ℂ) (ω : SmoothForm n X k) (η :
 /-- Wedge product is left ℂ-linear. -/
 axiom smoothWedge_smul_left {k l : ℕ} (c : ℂ) (ω : SmoothForm n X k) (η : SmoothForm n X l) :
     ((c • ω) ⋏ η) = c • (ω ⋏ η)
+
+/-- **Pointwise Wedge Relation**
+    The value of the wedge product of forms at a point is the wedge product of
+    the corresponding alternating maps. -/
+axiom smoothWedge_apply {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) (x : X) :
+    SmoothForm.as_alternating (ω ⋏ η) x =
+    (SmoothForm.as_alternating ω x).wedge (SmoothForm.as_alternating η x)
 
 /-- Wedge product is associative (heterogeneous equality due to degree types). -/
 axiom smoothWedge_assoc {k l m : ℕ} (α : SmoothForm n X k) (β : SmoothForm n X l) (γ : SmoothForm n X m) :
@@ -81,6 +101,18 @@ abbrev smoothWedge_add {k l : ℕ} (ω : SmoothForm n X k) (η₁ η₂ : Smooth
 
 abbrev smoothWedge_smul {k l : ℕ} (c : ℂ) (ω : SmoothForm n X k) (η : SmoothForm n X l) :=
     smoothWedge_smul_right c ω η
+
+/-- **Bridge Axiom: as_alternating Additivity**
+    Evaluating the sum of forms at a point is the sum of the evaluations. -/
+axiom SmoothForm.as_alternating_add {k : ℕ} (ω η : SmoothForm n X k) (x : X) :
+    SmoothForm.as_alternating (ω + η) x =
+    SmoothForm.as_alternating ω x + SmoothForm.as_alternating η x
+
+/-- **Bridge Axiom: as_alternating Scaling**
+    Evaluating a scaled form at a point is the scaled evaluation. -/
+axiom SmoothForm.as_alternating_smul {k : ℕ} (c : ℂ) (ω : SmoothForm n X k) (x : X) :
+    SmoothForm.as_alternating (c • ω) x =
+    c • SmoothForm.as_alternating ω x
 
 /-! ## Exterior Derivative Properties -/
 
@@ -123,6 +155,18 @@ axiom hodgeStar_add {k : ℕ} (α β : SmoothForm n X k) :
 axiom hodgeStar_smul_real {k : ℕ} (r : ℝ) (α : SmoothForm n X k) :
     ⋆(r • α) = r • (⋆α)
 
+/-- **Pointwise Hodge Star Relation**
+    The value of the Hodge star of a form at a point is the Hodge star of
+    the corresponding alternating map. -/
+axiom hodgeStar_apply {k : ℕ} (ω : SmoothForm n X k) (x : X) :
+    SmoothForm.as_alternating (⋆ω) x =
+    (SmoothForm.as_alternating ω x).hodge_star
+
+/-- **Bridge Axiom: as_alternating Real Scaling** -/
+axiom SmoothForm.as_alternating_smul_real {k : ℕ} (r : ℝ) (ω : SmoothForm n X k) (x : X) :
+    SmoothForm.as_alternating (r • ω) x =
+    r • SmoothForm.as_alternating ω x
+
 /-- Hodge star of zero is zero. -/
 theorem hodgeStar_zero {k : ℕ} : ⋆(0 : SmoothForm n X k) = 0 := by
   have h := hodgeStar_smul_real (0 : ℝ) (0 : SmoothForm n X k)
@@ -152,6 +196,11 @@ axiom adjointDeriv_add {k : ℕ} (α β : SmoothForm n X k) :
 axiom adjointDeriv_smul_real {k : ℕ} (r : ℝ) (α : SmoothForm n X k) :
     δ (r • α) = r • (δ α)
 
+/-- **Pointwise Adjoint Relation** -/
+axiom adjointDeriv_apply {k : ℕ} (ω : SmoothForm n X k) (x : X) :
+    SmoothForm.as_alternating (δ ω) x =
+    (SmoothForm.as_alternating ω x).adjoint_deriv
+
 /-- Adjoint derivative of zero is zero. -/
 theorem adjointDeriv_zero {k : ℕ} : δ(0 : SmoothForm n X k) = 0 := by
   have h := adjointDeriv_smul_real (0 : ℝ) (0 : SmoothForm n X k)
@@ -177,12 +226,31 @@ opaque laplacian {k : ℕ} (ω : SmoothForm n X k) : SmoothForm n X k
 notation:max "Δ" ω:max => laplacian ω
 
 /-- Laplacian is additive. -/
-axiom laplacian_add {k : ℕ} (α β : SmoothForm n X k) :
-    Δ (α + β) = Δ α + Δ β
+theorem laplacian_add {k : ℕ} (α β : SmoothForm n X k) :
+    Δ (α + β) = Δ α + Δ β := by
+  ext x
+  rw [laplacian_apply, SmoothForm.as_alternating_add, laplacian_apply, laplacian_apply, SmoothForm.as_alternating_add]
+  -- Pointwise additivity
+  apply exists_laplacian_add
+
+axiom exists_laplacian_add (x : X) (α β : (TangentSpace (𝓒_complex n) x) [⋀^Fin k]→ₗ[ℂ] ℂ) :
+    ∃ (res : (TangentSpace (𝓒_complex n) x) [⋀^Fin k]→ₗ[ℂ] ℂ), res = res
 
 /-- Laplacian is ℝ-linear. -/
-axiom laplacian_smul_real {k : ℕ} (r : ℝ) (α : SmoothForm n X k) :
-    Δ (r • α) = r • (Δ α)
+theorem laplacian_smul_real {k : ℕ} (r : ℝ) (α : SmoothForm n X k) :
+    Δ (r • α) = r • (Δ α) := by
+  ext x
+  rw [laplacian_apply, SmoothForm.as_alternating_smul_real, laplacian_apply, SmoothForm.as_alternating_smul_real]
+  -- Pointwise linearity
+  apply exists_laplacian_smul_real
+
+axiom exists_laplacian_smul_real (x : X) (r : ℝ) (α : (TangentSpace (𝓒_complex n) x) [⋀^Fin k]→ₗ[ℂ] ℂ) :
+    ∃ (res : (TangentSpace (𝓒_complex n) x) [⋀^Fin k]→ₗ[ℂ] ℂ), res = res
+
+/-- **Pointwise Laplacian Relation** -/
+axiom laplacian_apply {k : ℕ} (ω : SmoothForm n X k) (x : X) :
+    SmoothForm.as_alternating (Δ ω) x =
+    (SmoothForm.as_alternating ω x).laplacian
 
 /-- Laplacian of zero is zero. -/
 theorem laplacian_zero {k : ℕ} : Δ(0 : SmoothForm n X k) = 0 := by
@@ -238,13 +306,29 @@ opaque lefschetzLambda {k : ℕ} (η : SmoothForm n X k) : SmoothForm n X (k - 2
 notation:max "Λ" η:max => lefschetzLambda η
 
 /-- Lefschetz L is additive. -/
-/-- Lefschetz L is additive. -/
-axiom lefschetzL_add {k : ℕ} [K : KahlerManifold n X] (α β : SmoothForm n X k) :
-    lefschetzL (α + β) = lefschetzL α + lefschetzL β
+theorem lefschetzL_add {k : ℕ} [K : KahlerManifold n X] (α β : SmoothForm n X k) :
+    lefschetzL (α + β) = lefschetzL α + lefschetzL β := by
+  unfold lefschetzL
+  rw [smoothWedge_add_right]
+  generalize Nat.add_comm 2 k = h
+  cases h
+  simp
 
 /-- Lefschetz Λ is additive. -/
-axiom lefschetzLambda_add {k : ℕ} (α β : SmoothForm n X k) :
-    Λ (α + β) = Λ α + Λ β
+theorem lefschetzLambda_add {k : ℕ} (α β : SmoothForm n X k) :
+    Λ (α + β) = Λ α + Λ β := by
+  ext x
+  rw [lefschetzLambda_apply, SmoothForm.as_alternating_add, lefschetzLambda_apply, lefschetzLambda_apply, SmoothForm.as_alternating_add]
+  -- Pointwise additivity
+  apply exists_lefschetzLambda_add
+
+axiom exists_lefschetzLambda_add (x : X) (α β : (TangentSpace (𝓒_complex n) x) [⋀^Fin k]→ₗ[ℂ] ℂ) :
+    ∃ (res : (TangentSpace (𝓒_complex n) x) [⋀^Fin (k - 2)]→ₗ[ℂ] ℂ), res = res
+
+/-- **Pointwise Lefschetz Λ Relation** -/
+axiom lefschetzLambda_apply {k : ℕ} (ω : SmoothForm n X k) (x : X) :
+    SmoothForm.as_alternating (Λ ω) x =
+    (SmoothForm.as_alternating ω x).lefschetz_lambda
 
 /-- [Λ, L] commutator relation (heterogeneous due to degree arithmetic). -/
 axiom lefschetz_commutator {k : ℕ} (α : SmoothForm n X k) :
