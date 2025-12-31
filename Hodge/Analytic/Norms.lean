@@ -111,7 +111,8 @@ axiom comass_add_le {n : ℕ} {X : Type*}
 
 /-- **Comass Homogeneity** (Standard).
     The comass norm is homogeneous: comass (r • α) = |r| * comass α.
-    Reference: [H. Federer, "Geometric Measure Theory", 1969]. -/
+    Reference: [H. Federer, "Geometric Measure Theory", 1969].
+    This follows from pointwiseComass_smul and properties of sSup. -/
 axiom comass_smul {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
