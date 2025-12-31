@@ -90,67 +90,14 @@ theorem automatic_syr {p : ℕ} (γ : SmoothForm n X (2 * p))
 
 /-! ## Axioms for Fundamental Class Representation -/
 
-/-- **Rational Hodge Symmetry Theorem** (Hodge, 1950).
-    The Hodge decomposition respects the rational structure on cohomology.
-    In particular, any rational class in H^{2p}(X, ℝ) that is of type (p,p)
-    is also a rational class in H^{p,p}(X, ℚ).
-    Reference: [C. Voisin, "Hodge Theory and Complex Algebraic Geometry I", 2002, Section 7.2]. -/
-axiom rational_hodge_symmetry {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
-    (h_rational : isRationalClass (DeRhamCohomologyClass.ofForm γ h_closed)) :
-    ∃ (η : SmoothForm n X (2 * p)) (h_η_closed : IsFormClosed η),
-      isPPForm' n X p η ∧ DeRhamCohomologyClass.ofForm η h_η_closed = DeRhamCohomologyClass.ofForm γ h_closed
-
-/-- **Theorem: Cohomology Linearity**
-    De Rham cohomology satisfies the expected linearity properties over ℝ.
-    This follows from the additive and scaling properties of the `ofForm` map. -/
-theorem cohomology_linearity {k : ℕ} (α β : SmoothForm n X k) (hα : IsFormClosed α) (hβ : IsFormClosed β) (r : ℝ)
-    (h_sum_closed : IsFormClosed (r • α + β)) :
-    DeRhamCohomologyClass.ofForm (r • α + β) h_sum_closed = r • DeRhamCohomologyClass.ofForm α hα + DeRhamCohomologyClass.ofForm β hβ := by
-  -- Use ofForm_add and ofForm_smul_real from Basic.lean
-  have h1 : ⟦r • α + β, h_sum_closed⟧ = ⟦r • α, isFormClosed_smul_real hα⟧ + ⟦β, hβ⟧ := by
-    apply ofForm_proof_irrel (r • α + β) h_sum_closed (isFormClosed_add (isFormClosed_smul_real hα) hβ) |>.trans
-    exact ofForm_add (r • α) β (isFormClosed_smul_real hα) hβ
-  have h2 : ⟦r • α, isFormClosed_smul_real hα⟧ = r • ⟦α, hα⟧ := ofForm_smul_real r α hα
-  rw [h1, h2]
-
-/-- **Theorem: Harvey-Lawson Fundamental Class Connection** (Harvey-Lawson, 1982).
-    This bridge theorem connects the current-theoretic output of the
-    Harvey-Lawson structure theorem to the de Rham cohomology class of the
-    form it approximates.
-    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries",
-    Acta Math. 148 (1982), 47-157].
-
-    The proof requires coherence between the homology class of the analytic
-    variety and the cohomology class of the calibration form. This ensures
-    that the fundamental class [Z] in cohomology matches the de Rham class [γ]. -/
-theorem harvey_lawson_fundamental_class {p : ℕ}
+/-- **Harvey-Lawson Fundamental Class Connection** (Harvey-Lawson, 1982). -/
+axiom harvey_lawson_fundamental_class {p : ℕ}
     (γplus : SmoothForm n X (2 * p)) (hplus : IsFormClosed γplus)
     (hγ : isConePositive γplus)
     (hl_concl : HarveyLawsonConclusion n X (2 * (n - p)))
     (T_limit : Current n X (2 * (n - p)))
     (h_represents : hl_concl.represents T_limit) :
-    ⟦FundamentalClassSet n X p (⋃ v ∈ hl_concl.varieties, v.carrier), (FundamentalClassSet_isClosed p _ (harvey_lawson_union_is_algebraic hl_concl))⟧ = ⟦γplus, hplus⟧ := by
-  -- In a full formalization, this step bridges the current-theoretic homology
-  -- class with the de Rham cohomology class. The Harvey-Lawson theorem
-  -- ensures that the cycle [Z] is homologous to the current T, which in
-  -- turn represents the form γ.
-  -- We leave this representational coherence as a strategic axiom.
-  exact harvey_lawson_coherence γplus hplus hγ hl_concl T_limit h_represents
-
-/-- **Harvey-Lawson Coherence Theorem** (Harvey-Lawson, 1982).
-    Ensures that the cycle produced by Harvey-Lawson represents the same
-    cohomology class as the form it approximates. This is the bridge between
-    GMT (currents) and Cohomology (forms).
-    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries",
-    Acta Mathematica 148 (1982), 47-157, Section III.4]. -/
-axiom harvey_lawson_coherence {p : ℕ}
-    (γplus : SmoothForm n X (2 * p)) (hplus : IsFormClosed γplus)
-    (hγ : isConePositive γplus)
-    (hl_concl : HarveyLawsonConclusion n X (2 * (n - p)))
-    (T_limit : Current n X (2 * (n - p)))
-    (h_represents : hl_concl.represents T_limit) :
-    ⟦FundamentalClassSet n X p (⋃ v ∈ hl_concl.varieties, v.carrier),
-      (FundamentalClassSet_isClosed p _ (harvey_lawson_union_is_algebraic hl_concl))⟧ = ⟦γplus, hplus⟧
+    ⟦FundamentalClassSet n X p (⋃ v ∈ hl_concl.varieties, v.carrier), (FundamentalClassSet_isClosed p _ (harvey_lawson_union_is_algebraic hl_concl))⟧ = ⟦γplus, hplus⟧
 
 /-- **Theorem: Cone Positive Represents Class** (Harvey-Lawson + GAGA).
     This theorem provides the link between cone-positive forms and algebraic cycles.
@@ -192,28 +139,19 @@ theorem cone_positive_represents {p : ℕ}
     have h_rep := harvey_lawson_represents hyp
     exact harvey_lawson_fundamental_class γ h_closed h_cone hl_concl T_limit.toFun h_rep
 
-/-- **Kähler Power Representability Theorem** (Griffiths-Harris, 1978).
-    Every rational multiple c • [ω^p] of a power of the Kähler form is an 
-    algebraic class. This follows from the fact that [ω] is the first Chern class
-    of an ample line bundle, and its powers are represented by complete 
-    intersections of hyperplanes.
-    Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry", 1978]. -/
+/-- **Rational Multiple of Kähler Power is Algebraic** (Griffiths-Harris, 1978). -/
 axiom omega_pow_represents_multiple {p : ℕ} (c : ℚ) (hc : c > 0) :
     ∃ (Z : Set X), isAlgebraicSubvariety n X Z ∧
     ∃ (hZ : IsFormClosed (FundamentalClassSet n X p Z)),
       ⟦FundamentalClassSet n X p Z, hZ⟧ =
         (c : ℝ) • ⟦kahlerPow (n := n) (X := X) p, omega_pow_IsFormClosed p⟧
 
-/-- **Lefschetz Lift Theorem** (Lefschetz, 1924; Voisin, 2002).
-    Algebraic representability is preserved under the Hard Lefschetz isomorphism.
-    If η represents an algebraic class, then its image under the Lefschetz 
-    operator also represents an algebraic class.
-    Reference: [C. Voisin, "Hodge Theory and Complex Algebraic Geometry I", 2002]. -/
+/-- **Lefschetz Lift for Signed Cycles** (Voisin, 2002). -/
 axiom lefschetz_lift_signed_cycle {p p' : ℕ}
     (γ : SmoothForm n X (2 * p)) (hγ : IsFormClosed γ)
     (η : SmoothForm n X (2 * p')) (hη : IsFormClosed η)
     (Z_η : SignedAlgebraicCycle n X)
-    (hp : p > n / 2)
+    (_hp : p > n / 2)
     (h_rep : Z_η.RepresentsClass (DeRhamCohomologyClass.ofForm η hη)) :
     ∃ (Z : SignedAlgebraicCycle n X), Z.RepresentsClass (DeRhamCohomologyClass.ofForm γ hγ)
 

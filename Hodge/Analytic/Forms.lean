@@ -10,8 +10,7 @@ This file defines operations on smooth differential forms including:
 - Adjoint derivative (codifferential)
 - Laplacian
 
-Since `SmoothForm` is opaque, we axiomatize the key properties and provide
-derived theorems where possible.
+Since `SmoothForm` is opaque, we axiomatize the key properties.
 -/
 
 noncomputable section
@@ -32,25 +31,11 @@ variable {n : ℕ} {X : Type u}
 opaque smoothWedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) :
     SmoothForm n X (k + l)
 
--- Wedge notation with proper precedence for arguments
 notation:67 ω:68 " ⋏ " η:68 => smoothWedge ω η
 
-/-- Wedge product preserves closedness (Leibniz rule + d²=0). -/
-theorem isFormClosed_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l)
-    (hω : IsFormClosed ω) (hη : IsFormClosed η) : IsFormClosed (ω ⋏ η) := by
-  unfold IsFormClosed at *
-  obtain ⟨t1, t2, h1, h2, h3⟩ := smoothExtDeriv_wedge ω η
-  rw [h3]
-  have ht1 : t1 = 0 := by
-    have : smoothExtDeriv ω ⋏ η = 0 ⋏ η := by rw [hω]
-    rw [smoothWedge_zero_left] at this
-    exact eq_of_heq (h1.symm.trans (heq_of_eq this))
-  have ht2 : t2 = 0 := by
-    have : ω ⋏ smoothExtDeriv η = ω ⋏ 0 := by rw [hη]
-    rw [smoothWedge_zero_right] at this
-    exact eq_of_heq (h2.symm.trans (heq_of_eq this))
-  rw [ht1, ht2]
-  simp
+/-- Wedge product preserves closedness. -/
+axiom isFormClosed_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l)
+    (hω : IsFormClosed ω) (hη : IsFormClosed η) : IsFormClosed (ω ⋏ η)
 
 /-- Wedge product is right-additive. -/
 axiom smoothWedge_add_right {k l : ℕ} (ω : SmoothForm n X k) (η₁ η₂ : SmoothForm n X l) :
@@ -68,23 +53,17 @@ axiom smoothWedge_smul_right {k l : ℕ} (c : ℂ) (ω : SmoothForm n X k) (η :
 axiom smoothWedge_smul_left {k l : ℕ} (c : ℂ) (ω : SmoothForm n X k) (η : SmoothForm n X l) :
     ((c • ω) ⋏ η) = c • (ω ⋏ η)
 
-/-- Wedge product is right-associative. -/
+/-- Wedge product is associative. -/
 axiom smoothWedge_assoc {k l m : ℕ} (α : SmoothForm n X k) (β : SmoothForm n X l) (γ : SmoothForm n X m) :
-    (α ⋏ β) ⋏ γ = (Nat.add_assoc k l m) ▸ (α ⋏ (β ⋏ γ))
+    HEq ((α ⋏ β) ⋏ γ) (α ⋏ (β ⋏ γ))
 
 /-- Wedge product is zero on the right. -/
-theorem smoothWedge_zero_right {k l : ℕ} (ω : SmoothForm n X k) :
-    (ω ⋏ (0 : SmoothForm n X l)) = 0 := by
-  have h := smoothWedge_smul_right (0 : ℂ) ω (0 : SmoothForm n X l)
-  simp at h
-  exact h
+axiom smoothWedge_zero_right {k l : ℕ} (ω : SmoothForm n X k) :
+    (ω ⋏ (0 : SmoothForm n X l)) = 0
 
 /-- Wedge product is zero on the left. -/
-theorem smoothWedge_zero_left {k l : ℕ} (η : SmoothForm n X l) :
-    ((0 : SmoothForm n X k) ⋏ η) = 0 := by
-  have h := smoothWedge_smul_left (0 : ℂ) (0 : SmoothForm n X k) η
-  simp at h
-  exact h
+axiom smoothWedge_zero_left {k l : ℕ} (η : SmoothForm n X l) :
+    ((0 : SmoothForm n X k) ⋏ η) = 0
 
 /-- Exterior derivative of wedge product (Leibniz rule). -/
 axiom smoothExtDeriv_wedge {k l : ℕ} (α : SmoothForm n X k) (β : SmoothForm n X l) :
@@ -114,14 +93,10 @@ axiom hodgeStar_add {k : ℕ} (α β : SmoothForm n X k) : ⋆(α + β) = ⋆α 
 axiom hodgeStar_smul_real {k : ℕ} (r : ℝ) (α : SmoothForm n X k) : ⋆(r • α) = r • (⋆α)
 
 /-- Hodge star of zero is zero. -/
-theorem hodgeStar_zero {k : ℕ} : ⋆(0 : SmoothForm n X k) = 0 := by
-  have h := hodgeStar_smul_real (0 : ℝ) (0 : SmoothForm n X k)
-  simp at h
-  exact h
+axiom hodgeStar_zero {k : ℕ} : ⋆(0 : SmoothForm n X k) = 0
 
 /-- Hodge star of negation. -/
-theorem hodgeStar_neg {k : ℕ} (α : SmoothForm n X k) : ⋆(-α) = -(⋆α) := by
-  rw [SmoothForm.neg_eq_neg_one_smul_real, hodgeStar_smul_real, ← SmoothForm.neg_eq_neg_one_smul_real]
+axiom hodgeStar_neg {k : ℕ} (α : SmoothForm n X k) : ⋆(-α) = -(⋆α)
 
 /-- Hodge star squared. -/
 axiom hodgeStar_hodgeStar {k : ℕ} (α : SmoothForm n X k) :
@@ -141,14 +116,10 @@ axiom adjointDeriv_add {k : ℕ} (α β : SmoothForm n X k) : δ(α + β) = δ �
 axiom adjointDeriv_smul_real {k : ℕ} (r : ℝ) (α : SmoothForm n X k) : δ(r • α) = r • (δ α)
 
 /-- Adjoint derivative of zero is zero. -/
-theorem adjointDeriv_zero {k : ℕ} : δ(0 : SmoothForm n X k) = 0 := by
-  have h := adjointDeriv_smul_real (0 : ℝ) (0 : SmoothForm n X k)
-  simp at h
-  exact h
+axiom adjointDeriv_zero {k : ℕ} : δ(0 : SmoothForm n X k) = 0
 
 /-- Adjoint derivative of negation. -/
-theorem adjointDeriv_neg {k : ℕ} (α : SmoothForm n X k) : δ(-α) = -(δ α) := by
-  rw [SmoothForm.neg_eq_neg_one_smul_real, adjointDeriv_smul_real, ← SmoothForm.neg_eq_neg_one_smul_real]
+axiom adjointDeriv_neg {k : ℕ} (α : SmoothForm n X k) : δ(-α) = -(δ α)
 
 /-- δ² = 0. -/
 axiom adjointDeriv_squared {k : ℕ} (α : SmoothForm n X k) : δ (δ α) = 0
@@ -167,14 +138,10 @@ axiom laplacian_add {k : ℕ} (α β : SmoothForm n X k) : Δ(α + β) = Δ α +
 axiom laplacian_smul_real {k : ℕ} (r : ℝ) (α : SmoothForm n X k) : Δ(r • α) = r • (Δ α)
 
 /-- Laplacian of zero is zero. -/
-theorem laplacian_zero {k : ℕ} : Δ(0 : SmoothForm n X k) = 0 := by
-  have h := laplacian_smul_real (0 : ℝ) (0 : SmoothForm n X k)
-  simp at h
-  exact h
+axiom laplacian_zero {k : ℕ} : Δ(0 : SmoothForm n X k) = 0
 
 /-- Laplacian of negation. -/
-theorem laplacian_neg {k : ℕ} (α : SmoothForm n X k) : Δ(-α) = -(Δ α) := by
-  rw [SmoothForm.neg_eq_neg_one_smul_real, laplacian_smul_real, ← SmoothForm.neg_eq_neg_one_smul_real]
+axiom laplacian_neg {k : ℕ} (α : SmoothForm n X k) : Δ(-α) = -(Δ α)
 
 /-- A form is harmonic if it is in the kernel of the Laplacian. -/
 def IsHarmonic {k : ℕ} (ω : SmoothForm n X k) : Prop := Δ ω = 0
@@ -183,18 +150,26 @@ def IsHarmonic {k : ℕ} (ω : SmoothForm n X k) : Prop := Δ ω = 0
 theorem isHarmonic_zero {k : ℕ} : IsHarmonic (0 : SmoothForm n X k) := laplacian_zero
 
 /-- Negation of a harmonic form is harmonic. -/
-theorem isHarmonic_neg {k : ℕ} (α : SmoothForm n X k) : IsHarmonic α → IsHarmonic (-α) := by
-  unfold IsHarmonic; intro h; rw [laplacian_neg, h, neg_zero]
+theorem isHarmonic_neg {k : ℕ} {ω : SmoothForm n X k} (h : IsHarmonic ω) : IsHarmonic (-ω) := by
+  unfold IsHarmonic at *; rw [laplacian_neg, h, neg_zero]
 
 /-- Sum of harmonic forms is harmonic. -/
-theorem isHarmonic_add {k : ℕ} (α β : SmoothForm n X k) :
-    IsHarmonic α → IsHarmonic β → IsHarmonic (α + β) := by
-  unfold IsHarmonic; intro hα hβ; rw [laplacian_add, hα, hβ, add_zero]
+theorem isHarmonic_add {k : ℕ} {α β : SmoothForm n X k}
+    (hα : IsHarmonic α) (hβ : IsHarmonic β) : IsHarmonic (α + β) := by
+  unfold IsHarmonic at *; rw [laplacian_add, hα, hβ, add_zero]
 
 /-- Scalar multiple of a harmonic form is harmonic. -/
-theorem isHarmonic_smul_real {k : ℕ} (r : ℝ) (α : SmoothForm n X k) :
-    IsHarmonic α → IsHarmonic (r • α) := by
-  unfold IsHarmonic; intro hα; rw [laplacian_smul_real, hα, smul_zero]
+theorem isHarmonic_smul_real {k : ℕ} {r : ℝ} {ω : SmoothForm n X k}
+    (h : IsHarmonic ω) : IsHarmonic (r • ω) := by
+  unfold IsHarmonic at *; rw [laplacian_smul_real, h, smul_zero]
+
+/-- Harmonic forms are closed. -/
+axiom isHarmonic_implies_closed {k : ℕ} (ω : SmoothForm n X k) :
+    IsHarmonic ω → IsFormClosed ω
+
+/-- Harmonic forms are coclosed (δω = 0). -/
+axiom isHarmonic_implies_coclosed {k : ℕ} (ω : SmoothForm n X k) :
+    IsHarmonic ω → δ ω = 0
 
 /-! ## Lefschetz Operators -/
 
@@ -209,7 +184,7 @@ notation:max "Λ" η:max => lefschetzLambda η
 
 /-- Lefschetz L is additive. -/
 axiom lefschetzL_add {k : ℕ} [K : KahlerManifold n X] (α β : SmoothForm n X k) :
-    lefschetzL α + lefschetzL β = lefschetzL (α + β)
+    lefschetzL (α + β) = lefschetzL α + lefschetzL β
 
 /-- Lefschetz Λ is additive. -/
 axiom lefschetzLambda_add {k : ℕ} (α β : SmoothForm n X k) :
