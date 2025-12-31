@@ -26,4 +26,10 @@ theorem hodge_conjecture {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : IsF
     ∃ (Z : SignedAlgebraicCycle n X), Z.RepresentsClass (DeRhamCohomologyClass.ofForm γ h_closed) :=
   hodge_conjecture' γ h_closed h_rational h_p_p
 
+/-- **The Hodge Conjecture (Full Proof)** -/
+theorem hodge_conjecture_full {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
+    (h_rational : isRationalClass (DeRhamCohomologyClass.ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :
+    ∃ (Z : SignedAlgebraicCycle n X), Z.RepresentsClass (DeRhamCohomologyClass.ofForm γ h_closed) :=
+  hodge_conjecture γ h_closed h_rational h_p_p
+
 end

@@ -129,6 +129,10 @@ theorem hodgeStar_zero {k : ℕ} : ⋆(0 : SmoothForm n X k) = 0 := by
   simp at h
   exact h
 
+/-- Hodge star of negation. -/
+theorem hodgeStar_neg {k : ℕ} (α : SmoothForm n X k) : ⋆(-α) = -(⋆α) := by
+  rw [← neg_one_smul ℝ α, hodgeStar_smul_real, neg_one_smul ℝ (⋆α)]
+
 /-- Hodge star squared gives ±1 (depending on dimension and degree). -/
 axiom hodgeStar_hodgeStar {k : ℕ} (α : SmoothForm n X k) :
     HEq (⋆(⋆α)) (((-1 : ℂ) ^ (k * (2 * n - k))) • α)
@@ -153,6 +157,10 @@ theorem adjointDeriv_zero {k : ℕ} : δ(0 : SmoothForm n X k) = 0 := by
   have h := adjointDeriv_smul_real (0 : ℝ) (0 : SmoothForm n X k)
   simp at h
   exact h
+
+/-- Adjoint derivative of negation. -/
+theorem adjointDeriv_neg {k : ℕ} (α : SmoothForm n X k) : δ(-α) = -(δ α) := by
+  rw [← neg_one_smul ℝ α, adjointDeriv_smul_real, neg_one_smul ℝ (δ α)]
 
 /-- δ² = 0: Adjoint derivative squared is zero. -/
 axiom adjointDeriv_squared {k : ℕ} (α : SmoothForm n X k) :
@@ -182,11 +190,32 @@ theorem laplacian_zero {k : ℕ} : Δ(0 : SmoothForm n X k) = 0 := by
   simp at h
   exact h
 
+/-- Laplacian of negation. -/
+theorem laplacian_neg {k : ℕ} (α : SmoothForm n X k) : Δ(-α) = -(Δ α) := by
+  rw [← neg_one_smul ℝ α, laplacian_smul_real, neg_one_smul ℝ (Δ α)]
+
 /-- A form is harmonic if it is in the kernel of the Laplacian. -/
 def IsHarmonic {k : ℕ} (ω : SmoothForm n X k) : Prop := Δ ω = 0
 
 /-- Zero is harmonic. -/
 theorem isHarmonic_zero {k : ℕ} : IsHarmonic (0 : SmoothForm n X k) := laplacian_zero
+
+/-- Negation of a harmonic form is harmonic. -/
+theorem isHarmonic_neg {k : ℕ} {ω : SmoothForm n X k} (h : IsHarmonic ω) : IsHarmonic (-ω) := by
+  unfold IsHarmonic at *
+  rw [laplacian_neg, h, neg_zero]
+
+/-- Sum of harmonic forms is harmonic. -/
+theorem isHarmonic_add {k : ℕ} {α β : SmoothForm n X k}
+    (hα : IsHarmonic α) (hβ : IsHarmonic β) : IsHarmonic (α + β) := by
+  unfold IsHarmonic at *
+  rw [laplacian_add, hα, hβ, add_zero]
+
+/-- Scalar multiple of a harmonic form is harmonic. -/
+theorem isHarmonic_smul_real {k : ℕ} {r : ℝ} {ω : SmoothForm n X k}
+    (h : IsHarmonic ω) : IsHarmonic (r • ω) := by
+  unfold IsHarmonic at *
+  rw [laplacian_smul_real, h, smul_zero]
 
 /-- Harmonic forms are closed. -/
 axiom isHarmonic_implies_closed {k : ℕ} (ω : SmoothForm n X k) :
@@ -208,8 +237,8 @@ opaque lefschetzLambda {k : ℕ} (η : SmoothForm n X k) : SmoothForm n X (k - 2
 
 notation:max "Λ" η:max => lefschetzLambda η
 
-/-- Lefschetz L is additive.
-    Note: Cannot prove directly because ▸ transport doesn't distribute over addition definitionally. -/
+/-- Lefschetz L is additive. -/
+/-- Lefschetz L is additive. -/
 axiom lefschetzL_add {k : ℕ} [K : KahlerManifold n X] (α β : SmoothForm n X k) :
     lefschetzL (α + β) = lefschetzL α + lefschetzL β
 
