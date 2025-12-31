@@ -1,8 +1,8 @@
 # Hodge Conjecture Lean Formalization: Full Sprint Plan
 
 **Generated:** 2024-12-30  
-**Last Update:** 2024-12-30 (file corruption fixed)  
-**Build Status:** 🟡 18 errors in Forms.lean — Agent 1 must fix  
+**Last Update:** 2024-12-30 (progress check)  
+**Build Status:** 🔴 24 errors in Basic.lean — Agent 1 must fix  
 **Total Axioms/Opaques:** 196  
 **Target:** Convert all to theorems/defs (except ~12 classical pillars)
 
@@ -71,10 +71,10 @@ Everything else. This includes:
 | File | Axioms/Opaques | Assigned To |
 |------|----------------|-------------|
 | `Hodge/Kahler/Microstructure.lean` | 24 | Agent 5 (🟢 Complete) |
-| `Hodge/Basic.lean` | 20 | Agent 1 |
+| `Hodge/Basic.lean` | 20 | Agent 1 (🔴 24 errors - FIX FIRST) |
 | `Hodge/Analytic/Norms.lean` | 19 | Agent 1 |
 | `Hodge/Classical/GAGA.lean` | 18 | Agent 4 (🟢 Complete) |
-| `Hodge/Analytic/Forms.lean` | 14 | Agent 1 (🔴 18 errors) |
+| `Hodge/Analytic/Forms.lean` | 14 | Agent 1 (⏳ blocked by Basic.lean) |
 | `Hodge/Classical/HarveyLawson.lean` | 10 | Agent 4 (🟢 Complete) |
 | `Hodge/Classical/Bergman.lean` | 10 | Agent 4 (✅ builds) |
 | `Hodge/Analytic/SheafTheory.lean` | 10 | Agent 4 (🟢 Complete) |
@@ -95,30 +95,31 @@ Everything else. This includes:
 
 ---
 
-## 🔧 CURRENT BUILD ERRORS (18 total)
+## 🔧 CURRENT BUILD ERRORS (24 total)
 
-### File: `Hodge/Analytic/Forms.lean` (18 errors) — Agent 1
+### File: `Hodge/Basic.lean` (24 errors) — Agent 1 PRIORITY
 
 | Line | Error Type |
 |------|------------|
-| 59 | `AlternatingMap.wedge` doesn't exist |
-| 60 | Unknown `isSmoothAlternating_wedge` |
-| 67-77 | Unsolved goals (wedge proofs) |
-| 105 | Unknown `extDeriv_wedge` |
-| 121 | Unknown `omegaPow` |
-| 127 | `AlternatingMap.star` doesn't exist |
-| 131-134 | Unknown `add_apply`, `smul_real_apply` |
-| 140 | omega could not prove goal |
-| 145 | Failed to synthesize typeclass |
-| 164 | `AlternatingMap.lambda` doesn't exist |
+| 56 | `AlternatingMap.wedge` doesn't exist |
+| 122 | Failed to synthesize typeclass |
+| 163-164 | Unsolved goals, unexpected token `calc` |
+| 213-218 | Unsolved goals (5 errors) |
+| 255-274 | Type mismatch, typeclass failures (10+ errors) |
+| 295-299 | No goals to be solved, unsolved goals, missing `HSMul ℚ` |
+
+### Root Cause Analysis
+
+The main issues are:
+1. **Missing wedge product**: `AlternatingMap.wedge` not defined in Mathlib
+2. **Typeclass issues**: Missing instances for cohomology operations
+3. **Proof failures**: Several `calc` blocks and `simp` steps failing
 
 ### ✅ Files that build successfully
 
 - `Hodge/CategoryTheory/Filtration/Basic.lean` ✅
 - `Hodge/CategoryTheory/Filtration/Opposed.lean` ✅
 - `Hodge/CategoryTheory/Filtration/InducedOnGr.lean` ✅
-- `Hodge/Analytic/Currents.lean` ✅
-- `Hodge/Classical/Bergman.lean` ✅
 
 ---
 
