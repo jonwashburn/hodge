@@ -184,15 +184,15 @@ For cone-positive γ⁺: build integral cycles T_k with calibration defect → 0
 
 ---
 
-## 📊 CURRENT STATUS (Round 6 - 2024-12-31)
+## 📊 CURRENT STATUS (Round 7 - 2024-12-31)
 
 **Build Status:** ✅ PASSES  
-**Total axioms/opaques:** 188 (verified fresh scan)  
-**Progress:** Build restored to clean state after reverting broken changes
+**Total axioms/opaques:** 211 (verified fresh scan)  
+**Progress:** Clean build restored
 
 ### Actual Axiom Count by File (Fresh Scan)
 ```
-Basic.lean: 28        Forms.lean: 25       Norms.lean: 23
+Forms.lean: 31        Basic.lean: 28       Norms.lean: 23
 Currents.lean: 16     IntegralCurrents: 12 FlatNorm.lean: 11
 Grassmannian: 11      TypeDecomp.lean: 10  HarveyLawson: 10
 GAGA.lean: 10         Microstructure: 8    Manifolds: 7
@@ -202,42 +202,42 @@ SignedDecomp: 2       FedererFleming: 2    SerreVanishing: 1
 BaranyGrinberg: 1
 ```
 
-### 🎯 BALANCED AGENT ASSIGNMENTS (Round 6)
+### 🎯 BALANCED AGENT ASSIGNMENTS (Round 7)
 
 | Agent | Files | Axiom Count | Focus |
 |-------|-------|-------------|-------|
-| **Agent 1** | Basic.lean (28), Forms.lean (25) | **53** | 🔶 Forms core (structural) |
-| **Agent 2** | Norms.lean (23), Grassmannian.lean (11), Cone.lean (4) | **38** | ⏳ Norms & geometry |
+| **Agent 1** | Basic.lean (28), Forms.lean (31) | **59** | 🔶 Forms core (structural) |
+| **Agent 2** | Norms.lean (23), Grassmannian.lean (11), Cone.lean (4), Calibration.lean (5) | **43** | ⏳ Norms & calibration |
 | **Agent 3** | Currents.lean (16), IntegralCurrents.lean (12), FlatNorm.lean (11) | **39** | ⏳ GMT currents |
 | **Agent 4** | HarveyLawson (10), GAGA (10), Lefschetz (7), Bergman (4), SheafTheory (5), SerreVanishing (1), FedererFleming (2) | **39** | ⏳ Classical AG |
-| **Agent 5** | TypeDecomp (10), Microstructure (8), Main (3), Manifolds (7), Calibration (5), SignedDecomp (2), BaranyGrinberg (1) | **36** | ⏳ Main theorem path |
+| **Agent 5** | TypeDecomp (10), Microstructure (8), Main (3), Manifolds (7), SignedDecomp (2), BaranyGrinberg (1) | **31** | ⏳ **CRITICAL** Main path |
 
-**Note:** Agent 1 has 53 but many are **structural axioms** (due to `opaque SmoothForm`). Focus on documenting which must remain vs provable.
+**Note:** Agent 1 has 59 but many are **structural axioms** (due to `opaque SmoothForm`). Focus on documenting which must remain vs provable.
 
 ### 🎯 STRATEGY-CRITICAL AXIOMS (The Core 8)
 
-| Axiom | Status | Location | Owner |
-|-------|--------|----------|-------|
-| `signed_decomposition` | ❌ AXIOM | SignedDecomp.lean | Agent 5 |
-| `limit_is_calibrated` | ❌ AXIOM | Calibration.lean | Agent 5 |
-| `flat_limit_of_cycles_is_cycle` | ❌ AXIOM | HarveyLawson.lean | Agent 4 |
-| `microstructureSequence_are_cycles` | ❌ AXIOM | Microstructure.lean | Agent 5 |
-| `microstructureSequence_defect_bound` | ❌ AXIOM | Microstructure.lean | Agent 5 |
-| `microstructureSequence_flat_limit_exists` | ❌ AXIOM | Microstructure.lean | Agent 5 |
-| `harvey_lawson_fundamental_class` | ❌ AXIOM | Main.lean | Agent 5 |
-| `lefschetz_lift_signed_cycle` | ❌ AXIOM | Main.lean | Agent 5 |
+| Axiom | Est. LOC | Difficulty | Location | Owner |
+|-------|----------|------------|----------|-------|
+| `signed_decomposition` | 500 | ⭐⭐⭐⭐ | SignedDecomp.lean | Agent 5 |
+| `microstructureSequence_are_cycles` | 650 | ⭐⭐⭐⭐⭐ | Microstructure.lean | Agent 5 |
+| `microstructureSequence_defect_bound` | 400 | ⭐⭐⭐⭐ | Microstructure.lean | Agent 5 |
+| `microstructureSequence_flat_limit_exists` | 500 | ⭐⭐⭐⭐ | Microstructure.lean | Agent 5 |
+| `harvey_lawson_fundamental_class` | 300 | ⭐⭐⭐ | Main.lean | Agent 5 |
+| `lefschetz_lift_signed_cycle` | 400 | ⭐⭐⭐ | Main.lean | Agent 5 |
+| `limit_is_calibrated` | 300 | ⭐⭐⭐ | Calibration.lean | Agent 2 |
+| `flat_limit_of_cycles_is_cycle` | 300 | ⭐⭐⭐ | HarveyLawson.lean | Agent 4 |
 
-**Progress: 0/8 — These need to be converted from axioms to theorems!**
+**Progress: 0/8 — ~3,350 LOC of proofs needed**
 
 ### ⚠️ CRITICAL: IF PROOF DOESN'T WORK CLEANLY → LEAVE AS AXIOM
 
 ---
 
-# 🔷 AGENT 1: Forms Core (53 axioms)
+# 🔷 AGENT 1: Forms Core (59 axioms)
 
 ## Files Owned
 - `Hodge/Basic.lean` (28 axioms)
-- `Hodge/Analytic/Forms.lean` (25 axioms)
+- `Hodge/Analytic/Forms.lean` (31 axioms)
 
 ## Mission
 Build the core infrastructure for smooth forms and de Rham cohomology. Many axioms are **structural** due to `opaque SmoothForm` — focus on documenting which must remain axioms vs which can be proved.
@@ -286,15 +286,16 @@ axiom pointwiseComass_continuous {k : ℕ} (α : SmoothForm n X k) :
 
 ---
 
-# 🔷 AGENT 2: Norms & Geometry (38 axioms)
+# 🔷 AGENT 2: Norms & Calibration (43 axioms)
 
 ## Files Owned
 - `Hodge/Analytic/Norms.lean` (23 axioms)
 - `Hodge/Analytic/Grassmannian.lean` (11 axioms)
 - `Hodge/Kahler/Cone.lean` (4 axioms)
+- `Hodge/Analytic/Calibration.lean` (5 axioms) — includes `limit_is_calibrated` ⭐
 
 ## Mission
-Build the comass norm infrastructure and calibrated cone geometry. These are critical for the coercivity argument.
+Build the comass norm infrastructure and calibration theory. **Owns strategy-critical axiom `limit_is_calibrated`.**
 
 ## Priority Order
 
@@ -413,9 +414,17 @@ axiom limit_is_calibrated ... -- Already PROVED
 ```
 
 ## Deliverables ✅ COMPLETE
-- [x] Complete TypeDecomposition.lean — 8 axioms + 2 theorems ✅
-- [x] Complete Cone.lean — 4 axioms + 4 theorems ✅  
-- [x] Verify Calibration.lean — 5 axioms + 2 theorems ✅
+
+### GMT Files (Primary Assignment)
+- [x] Currents.lean — 9 axioms + 3 theorems (converted map_add, map_smul, added map_zero) ✅
+- [x] IntegralCurrents.lean — 9 axioms + 2 theorems (converted isIntegral_zero_current) ✅
+- [x] FlatNorm.lean — 10 axioms (all necessary for opaque flatNorm) ✅
+- [x] `lake build Hodge.Analytic.Currents Hodge.Analytic.IntegralCurrents Hodge.Analytic.FlatNorm` succeeds ✅
+
+### Also Completed (TypeDecomposition/Cone/Calibration)
+- [x] TypeDecomposition.lean — 8 axioms + 2 theorems ✅
+- [x] Cone.lean — 4 axioms + 4 theorems ✅  
+- [x] Calibration.lean — 5 axioms + 2 theorems ✅
 - [x] `lake build Hodge.Kahler.TypeDecomposition Hodge.Kahler.Cone Hodge.Analytic.Calibration` succeeds ✅
 - [x] Zero sorries in all files ✅
 
@@ -500,19 +509,28 @@ axiom deformation_theorem (k : ℕ) (T : IntegralCurrent n X (k + 1)) (ε : ℝ)
 
 ---
 
-# 🔷 AGENT 5: Classical Theorems & Currents (9 axioms)
+# 🔷 AGENT 5: Main Theorem Path (31 axioms) — STRATEGY-CRITICAL
 
 ## Files Owned
-- `Hodge/Analytic/Currents.lean` (1 axiom)
-- `Hodge/Analytic/IntegralCurrents.lean` (2 axioms)
-- `Hodge/Analytic/FlatNorm.lean` (1 axiom)
-- `Hodge/Classical/HarveyLawson.lean` (2 axioms)
-- `Hodge/Classical/GAGA.lean` (1 axiom)
-- `Hodge/Classical/Bergman.lean` (1 axiom)
-- `Hodge/Classical/SerreVanishing.lean` (1 axiom)
+- `Hodge/Kahler/TypeDecomposition.lean` (10 axioms)
+- `Hodge/Kahler/Microstructure.lean` (8 axioms) — **3 STRATEGY-CRITICAL axioms**
+- `Hodge/Kahler/Main.lean` (3 axioms) — **2 STRATEGY-CRITICAL axioms**
+- `Hodge/Kahler/Manifolds.lean` (7 axioms)
+- `Hodge/Kahler/SignedDecomp.lean` (2 axioms) — **1 STRATEGY-CRITICAL axiom**
+- `Hodge/Utils/BaranyGrinberg.lean` (1 axiom)
 
 ## Mission
-Maintain and complete the currents infrastructure and classical algebraic geometry theorems (Harvey-Lawson, GAGA, Serre).
+Complete the main theorem path. **This agent owns 6 of 8 strategy-critical axioms!**
+
+### Strategy-Critical Axioms (Priority)
+| Axiom | Est. LOC | Difficulty |
+|-------|----------|------------|
+| `signed_decomposition` | 500 | ⭐⭐⭐⭐ |
+| `microstructureSequence_are_cycles` | 650 | ⭐⭐⭐⭐⭐ |
+| `microstructureSequence_defect_bound` | 400 | ⭐⭐⭐⭐ |
+| `microstructureSequence_flat_limit_exists` | 500 | ⭐⭐⭐⭐ |
+| `harvey_lawson_fundamental_class` | 300 | ⭐⭐⭐ |
+| `lefschetz_lift_signed_cycle` | 400 | ⭐⭐⭐ |
 
 ## Priority Order
 

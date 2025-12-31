@@ -54,3 +54,4 @@ axiom unitForm_isClosed : IsFormClosed (unitForm : SmoothForm n X 0)
 axiom unitForm_is_rational : isRationalClass ⟦(unitForm : SmoothForm n X 0), unitForm_isClosed⟧
 
 end
+

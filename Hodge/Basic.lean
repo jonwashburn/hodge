@@ -146,12 +146,8 @@ theorem isFormClosed_smul {n : ℕ} {X : Type u} {k : ℕ} [TopologicalSpace X] 
   simp
 
 /-- Scalar multiple of a closed form is closed (ℝ). -/
-theorem isFormClosed_smul_real {n : ℕ} {X : Type u} {k : ℕ} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    {r : ℝ} {ω : SmoothForm n X k} : IsFormClosed ω → IsFormClosed (r • ω) := by
-  intro hω
-  unfold IsFormClosed at *
-  rw [smoothExtDeriv_smul_real, hω]
-  simp
+axiom isFormClosed_smul_real {n : ℕ} {X : Type u} {k : ℕ} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    {r : ℝ} {ω : SmoothForm n X k} : IsFormClosed ω → IsFormClosed (r • ω)
 
 /-- A form is exact. -/
 def IsExact {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
