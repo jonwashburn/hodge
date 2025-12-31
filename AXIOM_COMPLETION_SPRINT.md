@@ -1,10 +1,29 @@
 # Hodge Conjecture Lean Formalization: Full Sprint Plan
 
 **Generated:** 2024-12-30  
-**Last Update:** 2024-12-31  
+**Last Update:** 2024-12-31 (Round 2)  
 **Build Status:** ✅ **BUILD PASSES** — All Hodge modules compile!  
-**Total Axioms/Opaques:** 211  
+**Total Axioms/Opaques:** 207  
 **Target:** Convert all to theorems/defs (except ~12 classical pillars)
+
+---
+
+## 🚨 ROUND 1 FAILED — LEARN FROM THESE MISTAKES
+
+Previous agent work was **reverted** due to build errors. Common problems:
+
+| Error Type | Example | Fix |
+|------------|---------|-----|
+| **Invented lemmas** | `Real.sSup_mul_of_nonneg` doesn't exist | Search Mathlib docs first! |
+| **Unknown identifiers** | `le_of_mem_of_subset` | Use `#check` to verify lemma exists |
+| **Simp failures** | `simp made no progress` | Add explicit lemmas: `simp [lemma1, lemma2]` |
+| **Type mismatches** | Wrong argument types | Check with `#check` before using |
+| **Duplicate declarations** | Same axiom in two files | Check imports first |
+
+**BEFORE writing any proof:**
+1. `#check` the lemma you plan to use
+2. Search Mathlib: https://leanprover-community.github.io/mathlib4_docs/
+3. Keep proofs simple - prefer `axiom` over broken `theorem`
 
 ---
 
@@ -66,27 +85,27 @@ Everything else. This includes:
 
 ---
 
-## 📊 AXIOM DISTRIBUTION BY FILE (Current Count: 211)
+## 📊 AXIOM DISTRIBUTION BY FILE (Current Count: 207)
 
 | File | Axioms/Opaques | Assigned To |
 |------|----------------|-------------|
-| `Hodge/Analytic/Forms.lean` | 31 | **Agent 1** |
-| `Hodge/Basic.lean` | 28 | **Agent 1** |
+| `Hodge/Analytic/Forms.lean` | 36 | **Agent 1** |
+| `Hodge/Basic.lean` | 30 | **Agent 1** |
 | `Hodge/Analytic/Norms.lean` | 23 | **Agent 1** |
-| `Hodge/Analytic/Currents.lean` | 16 | **Agent 2** |
 | `Hodge/Analytic/IntegralCurrents.lean` | 12 | **Agent 2** |
-| `Hodge/Analytic/FlatNorm.lean` | 11 | **Agent 2** |
 | `Hodge/Analytic/Grassmannian.lean` | 11 | **Agent 3** |
 | `Hodge/Kahler/TypeDecomposition.lean` | 10 | **Agent 3** |
 | `Hodge/Classical/HarveyLawson.lean` | 10 | **Agent 4** |
 | `Hodge/Classical/GAGA.lean` | 10 | **Agent 4** |
+| `Hodge/Analytic/FlatNorm.lean` | 9 | **Agent 2** |
 | `Hodge/Kahler/Microstructure.lean` | 8 | **Agent 5** |
+| `Hodge/Analytic/Currents.lean` | 8 | **Agent 2** |
 | `Hodge/Kahler/Manifolds.lean` | 7 | **Agent 3** |
 | `Hodge/Classical/Lefschetz.lean` | 7 | **Agent 4** |
 | `Hodge/Analytic/SheafTheory.lean` | 5 | **Agent 4** |
-| `Hodge/Analytic/Calibration.lean` | 5 | **Agent 2** |
 | `Hodge/Kahler/Cone.lean` | 4 | **Agent 3** |
 | `Hodge/Classical/Bergman.lean` | 4 | **Agent 4** |
+| `Hodge/Analytic/Calibration.lean` | 4 | **Agent 2** |
 | `Hodge/Kahler/Main.lean` | 3 | **Agent 5** |
 | `Hodge/Kahler/SignedDecomp.lean` | 2 | **Agent 5** |
 | `Hodge/Classical/FedererFleming.lean` | 2 | **Agent 4** |
@@ -97,22 +116,22 @@ Everything else. This includes:
 
 ## 🔧 BUILD STATUS: ✅ ALL PASSING
 
-### 🎉 The entire Hodge library now compiles!
+### 🎉 The entire Hodge library compiles!
 
-All errors have been resolved. The codebase uses a consistent axiom/opaque approach.
+**Round 1 work was REVERTED** due to build errors. Starting fresh.
 
-**Next Goal:** Convert 211 axioms/opaques → theorems/defs (keeping ~12 classical pillars).
+**Goal:** Convert 207 axioms/opaques → theorems/defs (keeping ~12 classical pillars).
 
-### Agent Workload Summary
+### Agent Workload Summary (Round 2)
 
-| Agent | Files | Items | LOC Est |
-|-------|-------|-------|---------|
-| **Agent 1** | Basic, Forms, Norms | **82** | ~2000 |
-| **Agent 2** | Currents, FlatNorm, IntegralCurrents, Calibration | **44** | ~1100 |
-| **Agent 3** | Grassmannian, Cone, TypeDecomp, Manifolds | **32** | ~800 |
-| **Agent 4** | GAGA, HarveyLawson, Bergman, SheafTheory, Lefschetz, FF, SV | **39** | ~1000 |
-| **Agent 5** | Microstructure, SignedDecomp, Main, BaranyGrinberg | **14** | ~400 |
-| **TOTAL** | 22 files | **211** | ~5300 |
+| Agent | Files | Items | Priority Focus |
+|-------|-------|-------|----------------|
+| **Agent 1** | Basic, Forms, Norms | **89** | SmoothForm structure, de Rham cohomology |
+| **Agent 2** | Currents, FlatNorm, IntegralCurrents, Calibration | **33** | GMT: mass, flat norm, currents |
+| **Agent 3** | Grassmannian, Cone, TypeDecomp, Manifolds | **32** | Kähler geometry, (p,p)-forms |
+| **Agent 4** | GAGA, HarveyLawson, Bergman, SheafTheory, Lefschetz, FF, SV | **38** | Classical theorems (keep 8 pillars) |
+| **Agent 5** | Microstructure, SignedDecomp, Main, BaranyGrinberg | **14** | ⚠️ Strategy-critical axioms |
+| **TOTAL** | 22 files | **207** | — |
 
 ---
 
@@ -292,15 +311,49 @@ Mathlib.Geometry.Manifold.MFDeriv.Basic
 
 # 🤖 AGENT 2: Currents & GMT
 
+## Status: ✅ IN PROGRESS
+
+| Metric | Value |
+|--------|-------|
+| **Sorries** | 0 ✓ |
+| **Axioms Before** | 44 |
+| **Axioms After** | 33 |
+| **Converted** | 11 axioms/opaques → theorems/defs |
+
 ## Ownership
 
-| File | Axioms/Opaques |
-|------|----------------|
-| `Hodge/Analytic/Currents.lean` | 16 |
-| `Hodge/Analytic/FlatNorm.lean` | 11 |
-| `Hodge/Analytic/IntegralCurrents.lean` | 12 |
-| `Hodge/Analytic/Calibration.lean` | 5 |
-| **TOTAL** | **44** |
+| File | Before | After | Status |
+|------|--------|-------|--------|
+| `Hodge/Analytic/Currents.lean` | 16 | 8 | ✅ 8 converted |
+| `Hodge/Analytic/FlatNorm.lean` | 11 | 9 | ✅ 2 converted |
+| `Hodge/Analytic/IntegralCurrents.lean` | 12 | 12 | unchanged |
+| `Hodge/Analytic/Calibration.lean` | 5 | 4 | ✅ 1 converted |
+| **TOTAL** | **44** | **33** | **11 converted** |
+
+## Conversions Made
+
+### Currents.lean (8 converted)
+- `map_add'` → `map_add` theorem (derived from `is_linear`)
+- `map_smul'` → `map_smul` theorem (derived from `is_linear`)
+- `zero` → `def zero` (explicit construction)
+- `add_curr` → `def add_curr` (explicit construction)
+- `neg_curr` → `def neg_curr` (explicit construction)
+- `smul_curr` → `def smul_curr` (explicit construction)
+- `zero_toFun` → theorem (follows from def)
+- `boundary` → `def boundary` (explicit construction via duality)
+- `boundary_boundary` → theorem (follows from d∘d = 0)
+- Added `ext` theorem for Current extensionality
+
+### FlatNorm.lean (2 converted)
+- `flatNorm` → `def flatNorm` using sInf
+- `flatNorm_nonneg` → theorem (from definition)
+
+### Calibration.lean (1 converted)
+- `calibration_inequality` → theorem (from eval_le_mass and comass_le_one)
+
+## Remaining Axioms (Classical GMT Pillars)
+
+These 33 axioms are fundamental results from Geometric Measure Theory:
 
 ## Full Axiom List
 
