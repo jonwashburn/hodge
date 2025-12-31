@@ -1,16 +1,22 @@
 # Hodge Conjecture Lean Formalization: Full Sprint Plan
 
 **Generated:** 2024-12-30  
-**Last Update:** 2024-12-31 (Round 2)  
+**Last Update:** 2024-12-31 (Round 3)  
 **Build Status:** ✅ **BUILD PASSES** — All Hodge modules compile!  
-**Total Axioms/Opaques:** 207  
+**Total Axioms/Opaques:** 211  
 **Target:** Convert all to theorems/defs (except ~12 classical pillars)
 
 ---
 
-## 🚨 ROUND 1 FAILED — LEARN FROM THESE MISTAKES
+## 🚨 ROUNDS 1 & 2 FAILED — BUILD ERRORS REVERTED
 
-Previous agent work was **reverted** due to build errors. Common problems:
+Agent work was **reverted TWICE** due to build errors. **THIS MUST STOP.**
+
+### THE #1 RULE: If you can't prove it cleanly, LEAVE IT AS AN AXIOM
+
+It's better to leave 10 axioms unconverted than to submit code that breaks the build.
+
+Common problems that caused reverts:
 
 | Error Type | Example | Fix |
 |------------|---------|-----|
@@ -85,7 +91,7 @@ Everything else. This includes:
 
 ---
 
-## 📊 AXIOM DISTRIBUTION BY FILE (Current Count: 207)
+## 📊 AXIOM DISTRIBUTION BY FILE (Current Count: 211)
 
 | File | Axioms/Opaques | Assigned To |
 |------|----------------|-------------|
@@ -118,20 +124,32 @@ Everything else. This includes:
 
 ### 🎉 The entire Hodge library compiles!
 
-**Round 1 work was REVERTED** due to build errors. Starting fresh.
+**Rounds 1 & 2 were REVERTED** due to build errors. Round 3 starting fresh.
 
-**Goal:** Convert 207 axioms/opaques → theorems/defs (keeping ~12 classical pillars).
+**Goal:** Convert 211 axioms/opaques → theorems/defs (keeping ~12 classical pillars).
 
-### Agent Workload Summary (Round 2)
+### Agent Workload Summary (Round 3)
 
 | Agent | Files | Items | Priority Focus |
 |-------|-------|-------|----------------|
 | **Agent 1** | Basic, Forms, Norms | **89** | SmoothForm structure, de Rham cohomology |
 | **Agent 2** | Currents, FlatNorm, IntegralCurrents, Calibration | **33** | GMT: mass, flat norm, currents |
 | **Agent 3** | Grassmannian, Cone, TypeDecomp, Manifolds | **32** | Kähler geometry, (p,p)-forms |
-| **Agent 4** | GAGA, HarveyLawson, Bergman, SheafTheory, Lefschetz, FF, SV | **38** | Classical theorems (keep 8 pillars) |
+| **Agent 4** | GAGA, HarveyLawson, Bergman, SheafTheory, Lefschetz, FF, SV | **39** | Classical theorems (keep 8 pillars) |
 | **Agent 5** | Microstructure, SignedDecomp, Main, BaranyGrinberg | **14** | ⚠️ Strategy-critical axioms |
-| **TOTAL** | 22 files | **207** | — |
+| **TOTAL** | 22 files | **211** | — |
+
+### ⚠️ CRITICAL INSTRUCTION FOR ALL AGENTS
+
+```
+IF your proof doesn't work cleanly:
+   → STOP
+   → Leave it as `axiom` 
+   → Move to the next item
+   → DO NOT submit broken code
+
+One working theorem > Ten broken theorems
+```
 
 ---
 
