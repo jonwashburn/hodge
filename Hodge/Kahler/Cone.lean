@@ -48,7 +48,7 @@ def isConePositive {p : ℕ} (α : SmoothForm n X (2 * p)) : Prop :=
 
 /-- The p-th power of the Kähler form ω^p at a point x. -/
 def omegaPow_point (p : ℕ) (_x : X) : SmoothForm n X (2 * p) :=
-  omegaPow n X p
+  omegaPow p
 
 /-- Helper: casting a zero SmoothForm gives a zero SmoothForm. -/
 theorem smoothForm_cast_zero {k k' : ℕ} (h : k = k') :
@@ -119,4 +119,3 @@ theorem compact_pos_has_pos_inf {Y : Type*} [TopologicalSpace Y] [CompactSpace Y
   intro y; exact hy₀ (mem_univ y)
 
 end
-

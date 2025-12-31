@@ -52,10 +52,10 @@ axiom isRationalClass_add {k : ℕ} (η₁ η₂ : DeRhamCohomologyClass n X k) 
 axiom zero_is_rational {k : ℕ} : isRationalClass (0 : DeRhamCohomologyClass n X k)
 
 /-- **Axiom: Unit form is closed.** -/
-axiom unitForm_isClosed : IsFormClosed (unitForm (n := n) (X := X))
+axiom unitForm_isClosed : IsFormClosed (unitForm : SmoothForm n X 0)
 
 /-- The unit form represents a rational cohomology class. -/
-axiom unitForm_is_rational : isRationalClass ⟦unitForm (n := n) (X := X), unitForm_isClosed⟧
+axiom unitForm_is_rational : isRationalClass ⟦(unitForm : SmoothForm n X 0), unitForm_isClosed⟧
 
 end
 

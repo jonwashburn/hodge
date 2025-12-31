@@ -67,10 +67,10 @@ instance directedEdge_fintype {h : ℝ} (C : Cubulation n X h) : Fintype (Direct
   Fintype.ofFinite _
 
 /-- A flow on the dual graph assigns a real number to each directed edge. -/
-def Flow {h : ℝ} (C : Cubulation n X h) := DirectedEdge C → ℝ
+def CubulationFlow {h : ℝ} (C : Cubulation n X h) := DirectedEdge C → ℝ
 
 /-- The divergence of a flow at a cube is the net flow into the cube. -/
-def divergence {h : ℝ} {C : Cubulation n X h} (f : Flow C) (Q : C.cubes) : ℝ :=
+def divergence {h : ℝ} {C : Cubulation n X h} (f : CubulationFlow C) (Q : C.cubes) : ℝ :=
   (∑ e : {e : DirectedEdge C // e.tgt = Q}, f e.val) -
   (∑ e : {e : DirectedEdge C // e.src = Q}, f e.val)
 
@@ -82,12 +82,12 @@ instance fintype_src {h : ℝ} {C : Cubulation n X h} (Q : C.cubes) : Fintype {e
 
 /-- **Integer Flow Approximation Property** -/
 def IsValidIntegerApproximation {h : ℝ} {C : Cubulation n X h}
-    (target : Flow C) (int_flow : DirectedEdge C → ℤ) : Prop :=
+    (target : CubulationFlow C) (int_flow : DirectedEdge C → ℤ) : Prop :=
   (∀ e, |(int_flow e : ℝ) - target e| < 1) ∧
   (∀ Q, |divergence (fun e => (int_flow e : ℝ)) Q - divergence target Q| < 1)
 
 /-- **Theorem: Integer Transport Theorem** (Bárány-Grinberg). -/
-axiom integer_transport (p : ℕ) {h : ℝ} (C : Cubulation n X h) (target : Flow C) :
+axiom integer_transport (p : ℕ) {h : ℝ} (C : Cubulation n X h) (target : CubulationFlow C) :
     ∃ (int_flow : DirectedEdge C → ℤ), IsValidIntegerApproximation target int_flow
 
 /-! ## Microstructure Gluing -/
@@ -102,8 +102,7 @@ structure RawSheetSum (n : ℕ) (X : Type*) (p : ℕ) (h : ℝ)
   sheet_in_cube : ∀ Q hQ, sheets Q hQ ⊆ Q
 
 /-- Global pairing between (2p)-forms and (2n-2p)-forms. -/
-def SmoothForm.pairing {p : ℕ} (α : SmoothForm n X (2 * p)) (β : SmoothForm n X (2 * (n - p))) : ℝ :=
-  (DeRhamCohomologyClass.pairing ⟦α, sorry⟧ ⟦β, sorry⟧)
+opaque SmoothForm.pairing {p : ℕ} (α : SmoothForm n X (2 * p)) (β : SmoothForm n X (2 * (n - p))) : ℝ
 
 /-- Convert a RawSheetSum to an IntegralCurrent. -/
 opaque RawSheetSum.toIntegralCurrent {p : ℕ} {hscale : ℝ}

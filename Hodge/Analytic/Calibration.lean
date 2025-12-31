@@ -26,19 +26,19 @@ structure CalibratingForm (n : ℕ) (X : Type*) (k : ℕ)
     [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] where
   form : SmoothForm n X k
-  is_closed : isClosed form
+  is_closed : IsFormClosed form
   comass_le_one : comass form ≤ 1
 
 /-! ## Kähler Calibration -/
 
 /-- **Wirtinger Inequality** (Harvey-Lawson 1982). -/
 axiom wirtinger_comass_bound (p : ℕ) :
-    comass ((1 / (p.factorial : ℂ)) • omegaPow n X p) ≤ 1
+    comass ((1 / (p.factorial : ℂ)) • kahlerPow (n := n) (X := X) p) ≤ 1
 
 /-- The Kähler calibration ω^p/p! as a 2p-form. -/
 def KählerCalibration (p : ℕ) : CalibratingForm n X (2 * p) where
-  form := (1 / (p.factorial : ℂ)) • omegaPow n X p
-  is_closed := isClosed_omegaPow_scaled p
+  form := (1 / (p.factorial : ℂ)) • kahlerPow p
+  is_closed := IsFormClosed_omegaPow_scaled p
   comass_le_one := wirtinger_comass_bound p
 
 /-! ## Calibration and Mass -/
@@ -96,4 +96,3 @@ axiom limit_is_calibrated {k : ℕ} (T : ℕ → Current n X k) (T_limit : Curre
     isCalibrated T_limit ψ
 
 end
-

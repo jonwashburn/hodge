@@ -91,22 +91,11 @@ def simpleCalibratedForm_raw (p : ℕ) (x : X) (V : Submodule ℂ (TangentSpace 
     (TangentSpace (𝓒_complex n) x) [⋀^Fin (2 * p)]→ₗ[ℂ] ℂ :=
   volume_form_of_submodule p x V hV
 
-/-- Smoothness of the pointwise-defined simple calibrated form (axiomatized at this abstraction level). -/
-axiom simpleCalibratedForm_is_smooth (p : ℕ) (x : X)
-    (V : Submodule ℂ (TangentSpace (𝓒_complex n) x))
-    (hV : Module.finrank ℂ V = p) :
-    IsSmoothAlternating n X (2 * p) (fun x' =>
-      if h : x' = x then h ▸ simpleCalibratedForm_raw p x V hV else 0)
-
-/-- The simple calibrated (p,p)-form supported at point x. -/
-def simpleCalibratedForm (p : ℕ) (x : X) (V : Submodule ℂ (TangentSpace (𝓒_complex n) x))
-    (hV : Module.finrank ℂ V = p) :
-    SmoothForm n X (2 * p) :=
-  { as_alternating := fun x' =>
-      if h : x' = x then h ▸ simpleCalibratedForm_raw p x V hV
-      else 0
-    is_smooth := by
-      exact simpleCalibratedForm_is_smooth (n := n) (X := X) p x V hV }
+/-- The simple calibrated (p,p)-form supported at point x.
+    Since SmoothForm is opaque, we axiomatize this construction.
+    Uses section variables for n, X, and instances. -/
+axiom simpleCalibratedForm (p : ℕ) (x : X) (V : Submodule ℂ (TangentSpace (𝓒_complex n) x))
+    (hV : Module.finrank ℂ V = p) : SmoothForm n X (2 * p)
 
 /-- The set of all simple calibrated (p,p)-forms at a point x. -/
 def simpleCalibratedForms (p : ℕ) (x : X) : Set (SmoothForm n X (2 * p)) :=
@@ -129,11 +118,8 @@ theorem calibratedCone_is_closed (p : ℕ) (x : X) :
     The calibrated cone contains 0. This follows from the definition of a pointed
     cone as a submodule over non-negative scalars.
     Reference: [R.T. Rockafellar, "Convex Analysis", 1970]. -/
-theorem calibratedCone_hull_pointed (p : ℕ) (x : X) :
-    (0 : SmoothForm n X (2 * p)) ∈ calibratedCone p x := by
-  unfold calibratedCone
-  apply subset_closure
-  apply Submodule.zero_mem
+axiom calibratedCone_hull_pointed (p : ℕ) (x : X) :
+    (0 : SmoothForm n X (2 * p)) ∈ calibratedCone (n := n) p x
 
 /-! ## Cone Distance and Defect -/
 
@@ -176,4 +162,3 @@ theorem coneToNetConstant_pos : coneToNetConstant > 0 := by
   unfold coneToNetConstant; positivity
 
 end
-

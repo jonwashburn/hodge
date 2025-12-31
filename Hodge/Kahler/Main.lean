@@ -144,7 +144,7 @@ axiom omega_pow_represents_multiple {p : ℕ} (c : ℚ) (hc : c > 0) :
     ∃ (Z : Set X), isAlgebraicSubvariety n X Z ∧
     ∃ (hZ : IsFormClosed (FundamentalClassSet n X p Z)),
       ⟦FundamentalClassSet n X p Z, hZ⟧ =
-        (c : ℝ) • ⟦omegaPow n X p, omega_pow_isClosed (n := n) (X := X) p⟧
+        (c : ℝ) • ⟦kahlerPow (n := n) (X := X) p, omega_pow_IsFormClosed p⟧
 
 /-- **Lefschetz Lift for Signed Cycles** (Voisin, 2002). -/
 axiom lefschetz_lift_signed_cycle {p p' : ℕ}
@@ -180,8 +180,7 @@ theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : Is
   ·
     -- Signed decomposition of the (p,p) rational class
     let sd :=
-      signed_decomposition (n := n) (X := X) γ h_closed h_p_p
-        (DeRhamCohomologyClass.ofForm γ h_closed) h_rational
+      signed_decomposition (n := n) (X := X) γ h_closed h_p_p h_rational
 
     -- γplus is cone positive, so it has an algebraic representative
     obtain ⟨Zplus, hZplus_alg, hZplus_rep_raw⟩ :=
@@ -208,15 +207,14 @@ theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : Is
     -- Use the `ofForm_sub` axiom to turn this into subtraction in cohomology.
     have hsub :
         ⟦FundamentalClassSet n X p Zplus - FundamentalClassSet n X p Zminus,
-          isFormClosed_sub (n := n) (X := X) (k := 2 * p)
-            (FundamentalClassSet n X p Zplus) (FundamentalClassSet n X p Zminus)
+          isFormClosed_sub
             (FundamentalClassSet_isClosed (n := n) (X := X) p Zplus hZplus_alg)
             (FundamentalClassSet_isClosed (n := n) (X := X) p Zminus hZminus_alg)⟧
           =
         ⟦FundamentalClassSet n X p Zplus, FundamentalClassSet_isClosed (n := n) (X := X) p Zplus hZplus_alg⟧
           -
         ⟦FundamentalClassSet n X p Zminus, FundamentalClassSet_isClosed (n := n) (X := X) p Zminus hZminus_alg⟧ := by
-      simpa using (ofForm_sub (n := n) (X := X) (k := 2 * p)
+      simpa using (ofForm_sub
         (FundamentalClassSet n X p Zplus) (FundamentalClassSet n X p Zminus)
         (FundamentalClassSet_isClosed (n := n) (X := X) p Zplus hZplus_alg)
         (FundamentalClassSet_isClosed (n := n) (X := X) p Zminus hZminus_alg))
@@ -227,15 +225,13 @@ theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : Is
             SignedAlgebraicCycle.fundamentalClass_isClosed (n := n) (X := X) p Z⟧
           =
         ⟦FundamentalClassSet n X p Zplus - FundamentalClassSet n X p Zminus,
-            isFormClosed_sub (n := n) (X := X) (k := 2 * p)
-              (FundamentalClassSet n X p Zplus) (FundamentalClassSet n X p Zminus)
+            isFormClosed_sub
               (FundamentalClassSet_isClosed (n := n) (X := X) p Zplus hZplus_alg)
               (FundamentalClassSet_isClosed (n := n) (X := X) p Zminus hZminus_alg)⟧ := by
-      simpa using (ofForm_proof_irrel (n := n) (X := X) (k := 2 * p)
+      simpa using (ofForm_proof_irrel
         (FundamentalClassSet n X p Zplus - FundamentalClassSet n X p Zminus)
         (SignedAlgebraicCycle.fundamentalClass_isClosed (n := n) (X := X) p Z)
-        (isFormClosed_sub (n := n) (X := X) (k := 2 * p)
-          (FundamentalClassSet n X p Zplus) (FundamentalClassSet n X p Zminus)
+        (isFormClosed_sub
           (FundamentalClassSet_isClosed (n := n) (X := X) p Zplus hZplus_alg)
           (FundamentalClassSet_isClosed (n := n) (X := X) p Zminus hZminus_alg)))
 
@@ -249,8 +245,7 @@ theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : Is
               SignedAlgebraicCycle.fundamentalClass_isClosed (n := n) (X := X) p Z⟧ := by
                 rfl
       _ = ⟦FundamentalClassSet n X p Zplus - FundamentalClassSet n X p Zminus,
-              isFormClosed_sub (n := n) (X := X) (k := 2 * p)
-                (FundamentalClassSet n X p Zplus) (FundamentalClassSet n X p Zminus)
+              isFormClosed_sub
                 (FundamentalClassSet_isClosed (n := n) (X := X) p Zplus hZplus_alg)
                 (FundamentalClassSet_isClosed (n := n) (X := X) p Zminus hZminus_alg)⟧ := hcycle_witness
       _ = ⟦FundamentalClassSet n X p Zplus, FundamentalClassSet_isClosed (n := n) (X := X) p Zplus hZplus_alg⟧
@@ -276,16 +271,16 @@ theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : Is
             -- First turn the ω^p representation into a γminus representation.
             have h_gamma_minus_class :
                 ⟦sd.γminus, sd.h_minus_closed⟧ =
-                  (sd.N : ℝ) • ⟦omegaPow n X p, omega_pow_isClosed (n := n) (X := X) p⟧ := by
+                  (sd.N : ℝ) • ⟦kahlerPow (n := n) (X := X) p, omega_pow_IsFormClosed p⟧ := by
               -- Use `sd.h_gamma_minus : γminus = N·ω^p` without rewriting (to avoid dependent elimination issues).
-              have hω_closed : IsFormClosed (omegaPow n X p) :=
-                omega_pow_isClosed (n := n) (X := X) p
-              have h_rhs_closed : IsFormClosed ((sd.N : ℝ) • omegaPow n X p) :=
-                isFormClosed_smul (n := n) (X := X) (k := 2 * p) (sd.N : ℂ) (omegaPow n X p) hω_closed
+              have hω_closed : IsFormClosed (kahlerPow (n := n) (X := X) p) :=
+                omega_pow_IsFormClosed p
+              have h_rhs_closed : IsFormClosed ((sd.N : ℝ) • kahlerPow (n := n) (X := X) p) :=
+                isFormClosed_smul_real hω_closed
 
               -- First, turn the form equality into a cohomology equality by congruence.
               have h_eq_class :
-                  ⟦sd.γminus, sd.h_minus_closed⟧ = ⟦(sd.N : ℝ) • omegaPow n X p, h_rhs_closed⟧ := by
+                  ⟦sd.γminus, sd.h_minus_closed⟧ = ⟦(sd.N : ℝ) • kahlerPow (n := n) (X := X) p, h_rhs_closed⟧ := by
                 -- Replace the RHS form using `sd.h_gamma_minus`, and then use proof-irrelevance on the closedness witness.
                 -- `ofForm_proof_irrel` handles the closedness witness mismatch.
                 have h1 : ⟦sd.γminus, sd.h_minus_closed⟧ =
@@ -301,7 +296,7 @@ theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : Is
                 -- We keep it simple: rewrite the RHS form directly and then use proof irrelevance.
                 have h2 :
                     ⟦sd.γminus, (by simpa [sd.h_gamma_minus] using h_rhs_closed)⟧ =
-                      ⟦(sd.N : ℝ) • omegaPow n X p, h_rhs_closed⟧ := by
+                      ⟦(sd.N : ℝ) • kahlerPow (n := n) (X := X) p, h_rhs_closed⟧ := by
                   -- change the form by rewriting
                   -- `sd.h_gamma_minus` is an equality of forms; rewrite the `ω` argument.
                   -- After rewriting, the proof term is unchanged by proof irrelevance.
@@ -311,23 +306,23 @@ theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : Is
 
               -- Second, use ℝ-linearity of `ofForm` to compute the RHS class.
               have h_smul :
-                  ⟦(sd.N : ℝ) • omegaPow n X p, h_rhs_closed⟧ =
-                    (sd.N : ℝ) • ⟦omegaPow n X p, hω_closed⟧ := by
+                  ⟦(sd.N : ℝ) • kahlerPow (n := n) (X := X) p, h_rhs_closed⟧ =
+                    (sd.N : ℝ) • ⟦kahlerPow (n := n) (X := X) p, hω_closed⟧ := by
                 -- `ofForm_smul_real` gives this with the specific witness `isFormClosed_smul ...`;
                 -- align witnesses using `ofForm_proof_irrel`.
                 have h3 :
-                    ⟦(sd.N : ℝ) • omegaPow n X p,
-                      isFormClosed_smul (n := n) (X := X) (k := 2 * p) (sd.N : ℂ) (omegaPow n X p) hω_closed⟧
+                    ⟦(sd.N : ℝ) • kahlerPow (n := n) (X := X) p,
+                      isFormClosed_smul_real hω_closed⟧
                       =
-                    (sd.N : ℝ) • ⟦omegaPow n X p, hω_closed⟧ := by
-                  simpa using (ofForm_smul_real (n := n) (X := X) (k := 2 * p) (sd.N : ℝ) (omegaPow n X p) hω_closed)
+                    (sd.N : ℝ) • ⟦kahlerPow (n := n) (X := X) p, hω_closed⟧ := by
+                  simpa using (ofForm_smul_real (sd.N : ℝ) (kahlerPow (n := n) (X := X) p) hω_closed)
                 have h4 :
-                    ⟦(sd.N : ℝ) • omegaPow n X p, h_rhs_closed⟧ =
-                      ⟦(sd.N : ℝ) • omegaPow n X p,
-                        isFormClosed_smul (n := n) (X := X) (k := 2 * p) (sd.N : ℂ) (omegaPow n X p) hω_closed⟧ :=
-                  ofForm_proof_irrel (n := n) (X := X) (k := 2 * p)
-                    ((sd.N : ℝ) • omegaPow n X p) h_rhs_closed
-                    (isFormClosed_smul (n := n) (X := X) (k := 2 * p) (sd.N : ℂ) (omegaPow n X p) hω_closed)
+                    ⟦(sd.N : ℝ) • kahlerPow (n := n) (X := X) p, h_rhs_closed⟧ =
+                      ⟦(sd.N : ℝ) • kahlerPow (n := n) (X := X) p,
+                        isFormClosed_smul_real hω_closed⟧ :=
+                  ofForm_proof_irrel
+                    ((sd.N : ℝ) • kahlerPow (n := n) (X := X) p) h_rhs_closed
+                    (isFormClosed_smul_real hω_closed)
                 exact h4.trans h3
 
               -- Combine.
@@ -335,7 +330,7 @@ theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : Is
             -- Now use the ω^p representation for Zminus.
             have hZminus_class :
                 ⟦FundamentalClassSet n X p Zminus, FundamentalClassSet_isClosed (n := n) (X := X) p Zminus hZminus_alg⟧
-                  = (sd.N : ℝ) • ⟦omegaPow n X p, omega_pow_isClosed (n := n) (X := X) p⟧ := by
+                  = (sd.N : ℝ) • ⟦kahlerPow (n := n) (X := X) p, omega_pow_IsFormClosed p⟧ := by
               -- First align the closedness witness for `[Zminus]`.
               have hw_minus :
                   ⟦FundamentalClassSet n X p Zminus, FundamentalClassSet_isClosed (n := n) (X := X) p Zminus hZminus_alg⟧
@@ -353,7 +348,7 @@ theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : Is
               -- chain equalities through (N:ℝ)•⟦ω^p⟧
               calc
                 ⟦FundamentalClassSet n X p Zminus, FundamentalClassSet_isClosed (n := n) (X := X) p Zminus hZminus_alg⟧
-                    = (sd.N : ℝ) • ⟦omegaPow n X p, omega_pow_isClosed (n := n) (X := X) p⟧ := hZminus_class
+                    = (sd.N : ℝ) • ⟦kahlerPow (n := n) (X := X) p, omega_pow_IsFormClosed p⟧ := hZminus_class
                 _ = ⟦sd.γminus, sd.h_minus_closed⟧ := by simpa using h_gamma_minus_class.symm
             -- apply it
             simpa [this]
@@ -363,12 +358,12 @@ theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : Is
             -- Use `ofForm_sub` in the other direction.
             -- Closedness of `γplus - γminus` follows from closedness of each.
             have hdiff_closed : IsFormClosed (sd.γplus - sd.γminus) :=
-              isFormClosed_sub (n := n) (X := X) (k := 2 * p) sd.γplus sd.γminus sd.h_plus_closed sd.h_minus_closed
+              isFormClosed_sub sd.h_plus_closed sd.h_minus_closed
             -- `ofForm_sub` gives: ⟦γplus - γminus⟧ = ⟦γplus⟧ - ⟦γminus⟧
             have hsub' :
                 ⟦sd.γplus - sd.γminus, hdiff_closed⟧ = ⟦sd.γplus, sd.h_plus_closed⟧ - ⟦sd.γminus, sd.h_minus_closed⟧ :=
               by
-                simpa using (ofForm_sub (n := n) (X := X) (k := 2 * p) sd.γplus sd.γminus sd.h_plus_closed sd.h_minus_closed)
+                simpa using (ofForm_sub sd.γplus sd.γminus sd.h_plus_closed sd.h_minus_closed)
             -- rewrite using h_eq : γ = γplus - γminus
             -- and then show both sides are equal in cohomology.
             -- Use `Subtype.ext`-style rewriting on the form equality.
