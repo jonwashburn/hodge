@@ -16,7 +16,7 @@ Reproduce with:
 lake env lean DependencyCheck.lean
 ```
 
-Current output (38 axioms as of 2024-12-30):
+Current output (38 axioms in proof chain, 194 total axioms/opaques in codebase):
 
 ```
 'hodge_conjecture'' depends on axioms: [FundamentalClassSet_isClosed,
@@ -189,6 +189,23 @@ For cone-positive γ⁺: build integral cycles T_k with calibration defect → 0
 **Build Status:** ✅ PASSES  
 **Total axioms/opaques:** 194 (was 211, **17 converted!**)  
 **Progress:** 8% reduction
+
+### 🎯 STRATEGY-CRITICAL AXIOMS (The Core 8)
+
+These are the axioms that encode the **mathematical heart** of the proof:
+
+| Axiom | Est. LOC | Status | Location |
+|-------|----------|--------|----------|
+| `signed_decomposition` | 500 | ✅ **PROVED** | SignedDecomp.lean:104 |
+| `limit_is_calibrated` | 300 | ✅ **PROVED** | Calibration.lean:145 |
+| `microstructureSequence_are_cycles` | 650 | ❌ AXIOM | Microstructure.lean:179 |
+| `microstructureSequence_defect_bound` | 400 | ❌ AXIOM | Microstructure.lean:186 |
+| `microstructureSequence_flat_limit_exists` | 500 | ❌ AXIOM | Microstructure.lean:216 |
+| `harvey_lawson_fundamental_class` | 300 | ❌ AXIOM | Main.lean:94 |
+| `lefschetz_lift_signed_cycle` | 400 | ❌ AXIOM | Main.lean:150 |
+| `flat_limit_of_cycles_is_cycle` | 300 | ❌ AXIOM | HarveyLawson.lean:118 |
+
+**Progress: 2/8 (25%) proved | ~2,550 LOC remaining**
 
 ### Agent 1 Feedback (Important!)
 Most axioms in Agent 1's files are **structural** due to `opaque SmoothForm`:
