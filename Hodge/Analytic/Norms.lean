@@ -50,16 +50,13 @@ theorem pointwiseComass_zero {n : ℕ} {X : Type*}
   rw [h, pointwiseComass_smul]
   simp
 
--- Axiom: Negation equals scalar multiplication by -1 (for opaque SmoothForm)
-axiom SmoothForm.neg_eq_neg_one_smul {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    {k : ℕ} (α : SmoothForm n X k) : (-α) = (-1 : ℝ) • α
+-- Note: SmoothForm.neg_eq_neg_one_smul_real is defined in Basic.lean
 
 theorem pointwiseComass_neg {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     {k : ℕ} (α : SmoothForm n X k) (x : X) :
     pointwiseComass (-α) x = pointwiseComass α x := by
-  rw [SmoothForm.neg_eq_neg_one_smul, pointwiseComass_smul]
+  rw [SmoothForm.neg_eq_neg_one_smul_real, pointwiseComass_smul]
   simp
 
 /-- **Berge's Maximum Theorem**: Pointwise comass is continuous for smooth forms. -/
@@ -140,7 +137,7 @@ theorem comass_neg {n : ℕ} {X : Type*}
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α : SmoothForm n X k) :
     comass (-α) = comass α := by
-  rw [SmoothForm.neg_eq_neg_one_smul, comass_smul]
+  rw [SmoothForm.neg_eq_neg_one_smul_real, comass_smul]
   simp
 
 /-- **Comass Norm Definiteness** (Standard).
@@ -317,7 +314,7 @@ theorem L2Inner_neg_left {n : ℕ} {X : Type*}
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α β : SmoothForm n X k) :
     L2Inner (-α) β = -L2Inner α β := by
-  rw [SmoothForm.neg_eq_neg_one_smul, L2Inner_smul_left]
+  rw [SmoothForm.neg_eq_neg_one_smul_real, L2Inner_smul_left]
   ring
 
 /-- L2 inner product with negation on right. -/

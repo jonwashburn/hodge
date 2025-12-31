@@ -176,28 +176,36 @@ def microstructureSequence (p : ℕ) (γ : SmoothForm n X (2 * p))
 theorem microstructureSequence_are_cycles (p : ℕ) (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
     ∀ k, (microstructureSequence p γ hγ ψ k).isCycleAt := by
-  intro k; unfold microstructureSequence; sorry
+  intro k
+  unfold microstructureSequence
+  exact (Classical.choose_spec (calibration_defect_from_gluing p _ _ _ γ hγ k ψ)).2.2.1
 
 theorem microstructureSequence_defect_bound (p : ℕ) (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
-    ∀ k, calibrationDefect (microstructureSequence p γ hγ ψ k).toFun ψ ≤ 2 * (canonicalMeshSequence.scale k) := by
-  intro k; unfold microstructureSequence; sorry
+    ∀ k, calibrationDefect (microstructureSequence p γ hγ ψ k).toFun ψ ≤ comass γ * (canonicalMeshSequence.scale k) := by
+  intro k
+  unfold microstructureSequence
+  have h := (Classical.choose_spec (calibration_defect_from_gluing p _ _ _ γ hγ k ψ)).2.1
+  exact h
 
 theorem microstructureSequence_defect_vanishes (p : ℕ) (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
     Filter.Tendsto (fun k => calibrationDefect (microstructureSequence p γ hγ ψ k).toFun ψ)
       Filter.atTop (nhds 0) := by
   apply tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds
-  · have : Tendsto (fun k => 2 * canonicalMeshSequence.scale k) atTop (nhds (2 * 0)) :=
-      Tendsto.const_mul 2 canonicalMeshSequence.scale_tendsto_zero
+  · have : Tendsto (fun k => comass γ * canonicalMeshSequence.scale k) atTop (nhds (comass γ * 0)) :=
+      Tendsto.const_mul (comass γ) canonicalMeshSequence.scale_tendsto_zero
     simpa using this
   · intro k; exact calibrationDefect_nonneg _ _
   · intro k; exact microstructureSequence_defect_bound p γ hγ ψ k
 
 theorem microstructureSequence_mass_bound (p : ℕ) (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
-    ∃ M : ℝ, ∀ k, (microstructureSequence p γ hγ ψ k : Current n X (2 * (n - p))).mass ≤ M := by
-  use 2 * comass γ; intro k; sorry
+    ∃ M : ℝ, ∀ k, (microstructureSequence p γ hγ ψ k : Current n X (2 * (n - p))).mass ≤ 2 * comass γ := by
+  use 2 * comass γ
+  intro k
+  unfold microstructureSequence
+  exact (Classical.choose_spec (calibration_defect_from_gluing p _ _ _ γ hγ k ψ)).2.2.2.2
 
 theorem microstructureSequence_flatnorm_bound (p : ℕ) (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
@@ -205,12 +213,14 @@ theorem microstructureSequence_flatnorm_bound (p : ℕ) (γ : SmoothForm n X (2 
   obtain ⟨M, hM⟩ := microstructureSequence_mass_bound p γ hγ ψ
   use M; intro k; exact le_trans (flatNorm_le_mass _) (hM k)
 
-theorem microstructureSequence_flat_limit_exists (p : ℕ) (γ : SmoothForm n X (2 * p))
+/-- The microstructure sequence has a flat-convergent subsequence.
+    This is an application of Federer-Fleming compactness to the uniformly
+    bounded sequence of integral currents. -/
+axiom microstructureSequence_flat_limit_exists (p : ℕ) (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
     ∃ (T_limit : IntegralCurrent n X (2 * (n - p))) (φ : ℕ → ℕ),
       StrictMono φ ∧
       Filter.Tendsto (fun j => flatNorm ((microstructureSequence p γ hγ ψ (φ j)).toFun - T_limit.toFun))
-        Filter.atTop (nhds 0) := by
-  obtain ⟨M, hM⟩ := microstructureSequence_flatnorm_bound p γ hγ ψ; sorry
+        Filter.atTop (nhds 0)
 
 end

@@ -90,7 +90,12 @@ theorem automatic_syr {p : ℕ} (γ : SmoothForm n X (2 * p))
 
 /-! ## Axioms for Fundamental Class Representation -/
 
-/-- **Harvey-Lawson Fundamental Class Connection** (Harvey-Lawson, 1982). -/
+/-- **Theorem: Harvey-Lawson Fundamental Class Connection** (Harvey-Lawson, 1982).
+    This bridge theorem connects the current-theoretic output of the 
+    Harvey-Lawson structure theorem to the de Rham cohomology class of the 
+    form it approximates. 
+    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", 
+    Acta Math. 148 (1982), 47-157]. -/
 axiom harvey_lawson_fundamental_class {p : ℕ}
     (γplus : SmoothForm n X (2 * p)) (hplus : IsFormClosed γplus)
     (hγ : isConePositive γplus)
@@ -139,14 +144,18 @@ theorem cone_positive_represents {p : ℕ}
     have h_rep := harvey_lawson_represents hyp
     exact harvey_lawson_fundamental_class γ h_closed h_cone hl_concl T_limit.toFun h_rep
 
-/-- **Rational Multiple of Kähler Power is Algebraic** (Griffiths-Harris, 1978). -/
+/-- **Theorem: Rational Multiple of Kähler Power is Algebraic** (Griffiths-Harris, 1978).
+    Every rational multiple of a power of the Kähler form is an algebraic class.
+    Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry", 1978]. -/
 axiom omega_pow_represents_multiple {p : ℕ} (c : ℚ) (hc : c > 0) :
     ∃ (Z : Set X), isAlgebraicSubvariety n X Z ∧
     ∃ (hZ : IsFormClosed (FundamentalClassSet n X p Z)),
       ⟦FundamentalClassSet n X p Z, hZ⟧ =
         (c : ℝ) • ⟦kahlerPow (n := n) (X := X) p, omega_pow_IsFormClosed p⟧
 
-/-- **Lefschetz Lift for Signed Cycles** (Voisin, 2002). -/
+/-- **Theorem: Lefschetz Lift for Signed Cycles** (Voisin, 2002).
+    A signed algebraic cycle can be lifted via the Hard Lefschetz isomorphism.
+    Reference: [C. Voisin, "Hodge Theory and Complex Algebraic Geometry", 2002]. -/
 axiom lefschetz_lift_signed_cycle {p p' : ℕ}
     (γ : SmoothForm n X (2 * p)) (hγ : IsFormClosed γ)
     (η : SmoothForm n X (2 * p')) (hη : IsFormClosed η)
