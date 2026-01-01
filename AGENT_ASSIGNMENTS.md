@@ -56,10 +56,10 @@ Current output (38 axioms in proof chain, 194 total axioms/opaques in codebase):
 **P1 - Pipeline Integrity:**
 | # | Axiom | Description | Status |
 |---|-------|-------------|--------|
-| 7 | `limit_is_calibrated` | From mass LSC + calibration inequality | ❌ **NEEDS PROOF** (Calibration.lean:144) |
+| 7 | `limit_is_calibrated` | From mass LSC + calibration inequality | ✅ **THEOREM** (Calibration.lean:193) |
 | 8 | `flat_limit_of_cycles_is_cycle` | Continuity of ∂ in flat norm | ✅ THEOREM |
 
-**Progress: 5/8 (62.5%) — Only 3 axioms remain in critical path!**
+**Progress: 6/8 (75%) — Only 2 axioms remain in critical path!**
 
 ### KEEP as Documented Axioms:
 - `hard_lefschetz_inverse_form` (Hard Lefschetz - large project)
@@ -224,13 +224,13 @@ For cone-positive γ⁺: build integral cycles T_k with calibration defect → 0
 
 ---
 
-## 📊 CURRENT STATUS (Round 10 - 2026-01-01)
+## 📊 CURRENT STATUS (Round 11 - 2026-01-01)
 
 **Build Status:** ✅ PASSES (7825 jobs completed)  
-**Total axioms:** 182  
+**Total axioms:** 175 (-7 from last round!)  
 **Total opaques:** 32  
-**Grand Total:** 214 axioms/opaques  
-**Strategy-Critical Progress:** 5/8 proved (62.5%) — Only 3 critical axioms remain!
+**Grand Total:** 207 axioms/opaques  
+**Strategy-Critical Progress:** 6/8 proved (75%) — Only 2 critical axioms remain!
 
 ### ⚠️ STUB AUDIT COMPLETE
 Reverted ALL stub definitions to honest axioms/opaques:
@@ -294,11 +294,13 @@ Reverted ALL stub definitions to honest axioms/opaques:
 
 ### ⭐ STRATEGY-CRITICAL ASSIGNMENTS
 
-| Agent | Critical Axiom | Location | Priority |
-|-------|---------------|----------|----------|
-| **Agent 3** | `limit_is_calibrated` | Calibration.lean:144 | ⭐⭐⭐ P1 |
-| **Agent 5** | `harvey_lawson_fundamental_class` | Main.lean:112 | ⭐⭐⭐ P0 |
-| **Agent 5** | `lefschetz_lift_signed_cycle` | Main.lean:195 | ⭐⭐⭐ P0 |
+| Agent | Critical Axiom | Location | Priority | Status |
+|-------|---------------|----------|----------|--------|
+| **Agent 3** | `limit_is_calibrated` | Calibration.lean:193 | P1 | ✅ THEOREM |
+| **Agent 5** | `harvey_lawson_fundamental_class` | Main.lean:112 | ⭐⭐⭐ P0 | ❌ NEEDS PROOF |
+| **Agent 5** | `lefschetz_lift_signed_cycle` | Main.lean:195 | ⭐⭐⭐ P0 | ❌ NEEDS PROOF |
+
+**Only Agent 5 has remaining critical axioms!**
 
 ### ⚠️ CRITICAL RULES
 
@@ -570,23 +572,21 @@ axiom smoothWedge_zero_right (α) : smoothWedge α 0 = 0
 
 ---
 
-# 🔷 AGENT 3: Currents & Calibration (47 axioms) — 10 Sessions
+# 🔷 AGENT 3: Currents & Calibration (45 axioms) — 10 Sessions
 
-## ⭐⭐⭐ STRATEGY-CRITICAL ASSIGNMENT: `limit_is_calibrated`
+## ✅ STRATEGY-CRITICAL COMPLETE: `limit_is_calibrated` is now a THEOREM!
 
-**Your #1 priority is proving `limit_is_calibrated` (Calibration.lean:144)**
-
-This is P1 in the pipeline - required for the main theorem!
+**Great work! P1 axiom `limit_is_calibrated` (Calibration.lean:193) proved!**
 
 ## Files Owned
-- `Hodge/Analytic/Currents.lean` (12 axioms + 1 opaque = 13)
-- `Hodge/Analytic/IntegralCurrents.lean` (10 axioms + 2 opaques = 12)
+- `Hodge/Analytic/Currents.lean` (10 axioms + 1 opaque = 11)
+- `Hodge/Analytic/IntegralCurrents.lean` (9 axioms + 2 opaques = 11)
 - `Hodge/Analytic/FlatNorm.lean` (10 axioms + 1 opaque = 11)
-- `Hodge/Analytic/Calibration.lean` (5 axioms) — **`limit_is_calibrated` HERE ⭐**
+- `Hodge/Analytic/Calibration.lean` (4 axioms) — **`limit_is_calibrated` ✅ THEOREM**
 - `Hodge/Kahler/Cone.lean` (6 axioms)
 
 ## Mission
-**PRIORITY: Prove `limit_is_calibrated` using mass_lsc + calibration_inequality**
+Continue converting remaining axioms to theorems. No more critical axioms in your files!
 
 ## Complete Axiom List — Currents.lean (8)
 ```
