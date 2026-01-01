@@ -41,37 +41,37 @@ Current output (38 axioms in proof chain, 194 total axioms/opaques in codebase):
 
 ## 🎯 GOAL: Formalize the Hodge Conjecture Proof
 
-### ⭐ Priority Axioms to PROVE (not stub!)
+### Priority Axioms to PROVE (not stub):
 
-**P0 - Strategy Critical (MUST COMPLETE):**
-| # | Axiom | Location | Est. LOC | Status |
-|---|-------|----------|----------|--------|
-| 1 | `signed_decomposition` | SignedDecomp.lean:70 | 500 | ✅ DEF (complete) |
-| 2 | `microstructureSequence_are_cycles` | (theorem) | 650 | ✅ THEOREM |
-| 3 | `microstructureSequence_defect_bound` | (theorem) | 400 | ✅ THEOREM |
-| 4 | `microstructureSequence_flat_limit_exists` | (theorem) | 500 | ✅ THEOREM |
-| 5 | `harvey_lawson_fundamental_class` | Main.lean:112 | 300 | ❌ NEEDS PROOF |
-| 6 | `lefschetz_lift_signed_cycle` | Main.lean:195 | 400 | ❌ NEEDS PROOF |
+**P0 - Strategy Critical (Must Complete):**
+| # | Axiom | Description | Status |
+|---|-------|-------------|--------|
+| 1 | `signed_decomposition` | Rationality → decomposition | ✅ DEF (complete) |
+| 2 | `microstructureSequence_are_cycles` | ∂ = 0 for approximants | ✅ THEOREM |
+| 3 | `microstructureSequence_defect_bound` | Calibration defect estimate | ✅ THEOREM |
+| 4 | `microstructureSequence_flat_limit_exists` | Federer-Fleming compactness | ✅ THEOREM |
+| 5 | `harvey_lawson_fundamental_class` | De Rham class identification | ❌ **NEEDS PROOF** (Main.lean:112) |
+| 6 | `lefschetz_lift_signed_cycle` | Hyperplane intersection compatibility | ❌ **NEEDS PROOF** (Main.lean:195) |
 
 **P1 - Pipeline Integrity:**
-| # | Axiom | Location | Est. LOC | Status |
-|---|-------|----------|----------|--------|
-| 7 | `limit_is_calibrated` | Calibration.lean:144 | 300 | ❌ NEEDS PROOF |
-| 8 | `flat_limit_of_cycles_is_cycle` | HarveyLawson.lean:159 | 300 | ✅ THEOREM |
+| # | Axiom | Description | Status |
+|---|-------|-------------|--------|
+| 7 | `limit_is_calibrated` | From mass LSC + calibration inequality | ❌ **NEEDS PROOF** (Calibration.lean:144) |
+| 8 | `flat_limit_of_cycles_is_cycle` | Continuity of ∂ in flat norm | ✅ THEOREM |
 
-**Progress: 6/8 (75%) — Only 3 axioms remain in critical path!**
+**Progress: 5/8 (62.5%) — Only 3 axioms remain in critical path!**
 
-### ✅ KEEP as Documented Axioms (Deep Published Theorems):
-- `hard_lefschetz_bijective` / `hard_lefschetz_inverse_form` (Hard Lefschetz - large project)
-- `serre_gaga` (GAGA - requires AG formalization)
-- `harvey_lawson_theorem` (Harvey-Lawson structure theorem)
-- `federer_fleming_compactness` (GMT compactness - large project)
+### KEEP as Documented Axioms:
+- `hard_lefschetz_inverse_form` (Hard Lefschetz - large project)
+- `serre_gaga` (GAGA - large AG formalization)
+- `harvey_lawson_theorem` (HL structure theorem)
+- `federer_fleming_compactness` (GMT compactness)
 - `mass_lsc` (Lower semicontinuity of mass)
-- Interface axioms (~22 total - algebraic properties of opaque types)
+- Interface axioms (22 total - algebraic properties)
 
-### ❌ HOW TO PROVE (NOT STUBS):
+### HOW TO PROVE:
 1. **Use Mathlib infrastructure** (MeasureTheory, Topology, Analysis)
-2. **Build faithful models** — NOT stub definitions like `def mass := 0`
+2. **Build faithful models** — NOT stub definitions
 3. **Each proof must follow from actual mathematical definitions**
 4. **Document proof strategy with paper citations**
 
@@ -319,11 +319,14 @@ Reverted ALL stub definitions to honest axioms/opaques:
 # 🔷 AGENT 1: Forms Core (57 axioms) — 10 Sessions
 
 ## Files Owned
-- `Hodge/Basic.lean` (29 axioms)
-- `Hodge/Analytic/Forms.lean` (28 axioms)
+- `Hodge/Basic.lean` (24 axioms + 5 opaques = 29)
+- `Hodge/Analytic/Forms.lean` (22 axioms + 6 opaques = 28)
 
 ## Mission
-Convert axioms to theorems where possible. Many are structural due to `opaque SmoothForm`.
+Convert structural axioms to theorems where mathematically valid. Many axioms here are **interface axioms** for `opaque SmoothForm` - these may need to remain axioms.
+
+## ⚠️ IMPORTANT: No Strategy-Critical Axioms in These Files
+Focus on reducing axiom count through legitimate proofs, NOT stubs.
 
 ## Complete Axiom List — Basic.lean (28)
 ```
@@ -444,11 +447,14 @@ axiom pointwiseComass_continuous {k : ℕ} (α : SmoothForm n X k) :
 # 🔷 AGENT 2: Norms & Geometry (32 axioms) — 10 Sessions
 
 ## Files Owned
-- `Hodge/Analytic/Norms.lean` (22 axioms)
-- `Hodge/Analytic/Grassmannian.lean` (10 axioms)
+- `Hodge/Analytic/Norms.lean` (19 axioms + 3 opaques = 22)
+- `Hodge/Analytic/Grassmannian.lean` (7 axioms + 3 opaques = 10)
 
 ## Mission
-Build comass norms and Grassmannian geometry infrastructure.
+Build comass norms and calibrated Grassmannian geometry.
+
+## ⚠️ No Strategy-Critical Axioms in These Files
+Focus on proving norm properties from Mathlib. These support the GMT infrastructure.
 
 ## Complete Axiom List — Norms.lean (23)
 ```
@@ -564,17 +570,23 @@ axiom smoothWedge_zero_right (α) : smoothWedge α 0 = 0
 
 ---
 
-# 🔷 AGENT 3: Currents & Calibration (34 axioms) — 10 Sessions
+# 🔷 AGENT 3: Currents & Calibration (47 axioms) — 10 Sessions
+
+## ⭐⭐⭐ STRATEGY-CRITICAL ASSIGNMENT: `limit_is_calibrated`
+
+**Your #1 priority is proving `limit_is_calibrated` (Calibration.lean:144)**
+
+This is P1 in the pipeline - required for the main theorem!
 
 ## Files Owned
-- `Hodge/Analytic/Currents.lean` (8 axioms — 7 axioms + 1 opaque)
-- `Hodge/Analytic/IntegralCurrents.lean` (12 axioms — 10 axioms + 2 opaques)
-- `Hodge/Analytic/FlatNorm.lean` (3 axioms)
-- `Hodge/Analytic/Calibration.lean` (5 axioms) — **includes `limit_is_calibrated` ⭐**
+- `Hodge/Analytic/Currents.lean` (12 axioms + 1 opaque = 13)
+- `Hodge/Analytic/IntegralCurrents.lean` (10 axioms + 2 opaques = 12)
+- `Hodge/Analytic/FlatNorm.lean` (10 axioms + 1 opaque = 11)
+- `Hodge/Analytic/Calibration.lean` (5 axioms) — **`limit_is_calibrated` HERE ⭐**
 - `Hodge/Kahler/Cone.lean` (6 axioms)
 
 ## Mission
-Complete integral currents and calibration. **PRIORITY: Prove `limit_is_calibrated` (Calibration.lean:144, 300 LOC, ⭐⭐⭐)**
+**PRIORITY: Prove `limit_is_calibrated` using mass_lsc + calibration_inequality**
 
 ## Complete Axiom List — Currents.lean (8)
 ```
@@ -684,19 +696,22 @@ axiom limit_is_calibrated ... -- Already PROVED
 
 ---
 
-# 🔷 AGENT 4: Classical Algebraic Geometry (38 axioms) — 10 Sessions
+# 🔷 AGENT 4: Classical Algebraic Geometry (43 axioms) — 10 Sessions
 
 ## Files Owned
-- `Hodge/Classical/HarveyLawson.lean` (9 axioms) — **includes `flat_limit_of_cycles_is_cycle` ⭐**
-- `Hodge/Classical/GAGA.lean` (10 axioms)
-- `Hodge/Classical/Lefschetz.lean` (7 axioms)
-- `Hodge/Classical/Bergman.lean` (4 axioms)
+- `Hodge/Classical/HarveyLawson.lean` (8 axioms + 1 opaque = 9) — `flat_limit_of_cycles_is_cycle` ✅ DONE
+- `Hodge/Classical/GAGA.lean` (12 axioms + 2 opaques = 14) — FundamentalClassSet now opaque
+- `Hodge/Classical/Lefschetz.lean` (5 axioms + 2 opaques = 7)
+- `Hodge/Classical/Bergman.lean` (4 axioms + 1 opaque = 5) — SectionsVanishingToOrder now opaque
 - `Hodge/Analytic/SheafTheory.lean` (5 axioms)
 - `Hodge/Classical/SerreVanishing.lean` (1 axiom)
 - `Hodge/Classical/FedererFleming.lean` (2 axioms)
 
 ## Mission
-Classical AG theorems. **PRIORITY: Prove `flat_limit_of_cycles_is_cycle` (300 LOC, ⭐⭐⭐)**
+Classical AG theorems. Focus on reducing axiom count through legitimate proofs.
+
+## ✅ `flat_limit_of_cycles_is_cycle` is now a THEOREM (P1 complete!)
+No strategy-critical axioms remain in your files.
 
 ## Complete Axiom List — HarveyLawson.lean (10)
 ```
@@ -838,16 +853,24 @@ axiom deformation_theorem (k : ℕ) (T : IntegralCurrent n X (k + 1)) (ε : ℝ)
 
 # 🔷 AGENT 5: Main Theorem Path (34 axioms) — 10 Sessions — STRATEGY-CRITICAL
 
+## ⭐⭐⭐ YOU OWN 2 OF THE 3 REMAINING CRITICAL AXIOMS
+
+**Your #1 priorities are:**
+1. `harvey_lawson_fundamental_class` (Main.lean:112) — De Rham class identification
+2. `lefschetz_lift_signed_cycle` (Main.lean:195) — Hyperplane intersection compatibility
+
+These are P0 axioms - the proof cannot complete without them!
+
 ## Files Owned
-- `Hodge/Kahler/TypeDecomposition.lean` (9 axioms — 7 axioms + 2 opaques)
-- `Hodge/Kahler/Microstructure.lean` (14 axioms — 12 axioms + 2 opaques)
-- `Hodge/Kahler/Main.lean` (3 axioms) — **2 STRATEGY-CRITICAL**
+- `Hodge/Kahler/TypeDecomposition.lean` (7 axioms + 2 opaques = 9)
+- `Hodge/Kahler/Microstructure.lean` (12 axioms + 2 opaques = 14)
+- `Hodge/Kahler/Main.lean` (3 axioms) — **2 STRATEGY-CRITICAL HERE ⭐⭐**
 - `Hodge/Kahler/Manifolds.lean` (6 axioms)
-- `Hodge/Kahler/SignedDecomp.lean` (1 axiom) — **`signed_decomposition` is now COMPLETE!**
+- `Hodge/Kahler/SignedDecomp.lean` (1 axiom) — `signed_decomposition` ✅ DONE
 - `Hodge/Utils/BaranyGrinberg.lean` (1 axiom)
 
 ## Mission
-Complete main theorem path. **Owns 2 remaining strategy-critical axioms!**
+**PROVE the 2 remaining P0 axioms in Main.lean!**
 
 ### Strategy-Critical Status
 | Axiom | Est. LOC | Status |
