@@ -184,35 +184,64 @@ For cone-positive γ⁺: build integral cycles T_k with calibration defect → 0
 
 ---
 
-## 📊 CURRENT STATUS (Round 9 - 2024-12-31)
+## 📊 CURRENT STATUS (Round 10 - 2026-01-01)
 
-**Build Status:** ✅ PASSES  
-**Total axioms/opaques:** 187 (was 211, **24 converted!**)  
-**Strategy-Critical Progress:** 3/8 proved (37.5%)
+**Build Status:** ✅ PASSES (7825 jobs completed)  
+**Total axioms:** 167  
+**Total opaques:** 28  
+**Grand Total:** 195 axioms/opaques  
+**Strategy-Critical Progress:** 5/8 proved (62.5%) — Only 3 critical axioms remain!
+
+### 📁 AXIOM/OPAQUE COUNT BY FILE (Fresh Scan)
+
+| File | Axioms | Opaques | Total |
+|------|--------|---------|-------|
+| Basic.lean | 24 | 5 | 29 |
+| Forms.lean | 22 | 6 | 28 |
+| Norms.lean | 19 | 3 | 22 |
+| Microstructure.lean | 12 | 2 | 14 |
+| IntegralCurrents.lean | 10 | 2 | 12 |
+| Grassmannian.lean | 7 | 3 | 10 |
+| GAGA.lean | 9 | 1 | 10 |
+| HarveyLawson.lean | 8 | 1 | 9 |
+| TypeDecomposition.lean | 7 | 2 | 9 |
+| Currents.lean | 7 | 1 | 8 |
+| Lefschetz.lean | 5 | 2 | 7 |
+| Manifolds.lean | 6 | 0 | 6 |
+| Cone.lean | 6 | 0 | 6 |
+| SheafTheory.lean | 5 | 0 | 5 |
+| Calibration.lean | 5 | 0 | 5 |
+| Bergman.lean | 4 | 0 | 4 |
+| Main.lean | 3 | 0 | 3 |
+| FlatNorm.lean | 3 | 0 | 3 |
+| FedererFleming.lean | 2 | 0 | 2 |
+| BaranyGrinberg.lean | 1 | 0 | 1 |
+| SignedDecomp.lean | 1 | 0 | 1 |
+| SerreVanishing.lean | 1 | 0 | 1 |
 
 ### 🎯 STRATEGY-CRITICAL AXIOMS (The Core 8)
 
 | Axiom | Est. LOC | Status | Owner |
 |-------|----------|--------|-------|
-| `signed_decomposition` | 500 | ❌ AXIOM | Agent 5 |
+| `signed_decomposition` | 500 | ✅ **DEF (complete)** (SignedDecomp.lean:70) | — |
 | `microstructureSequence_are_cycles` | 650 | ✅ **THEOREM** | — |
 | `microstructureSequence_defect_bound` | 400 | ✅ **THEOREM** | — |
 | `microstructureSequence_flat_limit_exists` | 500 | ✅ **THEOREM** | — |
-| `harvey_lawson_fundamental_class` | 300 | ❌ AXIOM | Agent 5 |
-| `lefschetz_lift_signed_cycle` | 400 | ❌ AXIOM | Agent 5 |
-| `limit_is_calibrated` | 300 | ❌ AXIOM | Agent 3 |
-| `flat_limit_of_cycles_is_cycle` | 300 | ❌ AXIOM | Agent 4 |
+| `harvey_lawson_fundamental_class` | 300 | ❌ AXIOM (Main.lean:112) | Agent 5 |
+| `lefschetz_lift_signed_cycle` | 400 | ❌ AXIOM (Main.lean:195) | Agent 5 |
+| `limit_is_calibrated` | 300 | ❌ AXIOM (Calibration.lean:144) | Agent 3 |
+| `flat_limit_of_cycles_is_cycle` | 300 | ✅ **THEOREM** (HarveyLawson.lean:159) | — |
 
-**Completed: 1,550 LOC | Remaining: 1,800 LOC**
+**Progress: 5/8 proved (62.5%) — Only 3 strategy-critical axioms remain!**
 
-### 🎯 REBALANCED AGENT ASSIGNMENTS (Round 9 — Fresh Counts)
+### 🎯 REBALANCED AGENT ASSIGNMENTS (Round 10 — Fresh Counts)
 
 | Agent | Files | Axiom Count | Focus |
 |-------|-------|-------------|-------|
 | **Agent 1** | Basic.lean (29), Forms.lean (28) | **57** | Forms infrastructure (structural) |
 | **Agent 2** | Norms.lean (22), Grassmannian.lean (10) | **32** | Norms & geometry |
-| **Agent 3** | IntegralCurrents.lean (12), FlatNorm.lean (3), Calibration.lean (5), Cone.lean (6) | **26** | Currents + `limit_is_calibrated` ⭐ |
-| **Agent 4** | HarveyLawson (9), GAGA (10), Lefschetz (7), Bergman (4), SheafTheory (5), SerreVanishing (1), FedererFleming (2) | **38** | Classical AG + `flat_limit_of_cycles_is_cycle` ⭐ |
+| **Agent 3** | Currents.lean (8), IntegralCurrents.lean (12), FlatNorm.lean (3), Calibration.lean (5), Cone.lean (6) | **34** | Currents + `limit_is_calibrated` ⭐ |
+| **Agent 4** | HarveyLawson (9), GAGA (10), Lefschetz (7), Bergman (4), SheafTheory (5), SerreVanishing (1), FedererFleming (2) | **38** | Classical AG theorems |
 | **Agent 5** | TypeDecomp (9), Microstructure (14), Main (3), Manifolds (6), SignedDecomp (1), BaranyGrinberg (1) | **34** | Main path + 3 critical ⭐ |
 
 ### ⚠️ CRITICAL RULES
@@ -479,117 +508,96 @@ axiom smoothWedge_zero_right (α) : smoothWedge α 0 = 0
 
 ---
 
-# 🔷 AGENT 3: Currents & Calibration (26 axioms) — 10 Sessions
+# 🔷 AGENT 3: Currents & Calibration (34 axioms) — 10 Sessions
 
 ## Files Owned
-- `Hodge/Analytic/IntegralCurrents.lean` (12 axioms)
+- `Hodge/Analytic/Currents.lean` (8 axioms — 7 axioms + 1 opaque)
+- `Hodge/Analytic/IntegralCurrents.lean` (12 axioms — 10 axioms + 2 opaques)
 - `Hodge/Analytic/FlatNorm.lean` (3 axioms)
 - `Hodge/Analytic/Calibration.lean` (5 axioms) — **includes `limit_is_calibrated` ⭐**
 - `Hodge/Kahler/Cone.lean` (6 axioms)
 
 ## Mission
-Complete integral currents and calibration. **PRIORITY: Prove `limit_is_calibrated` (300 LOC, ⭐⭐⭐)**
+Complete integral currents and calibration. **PRIORITY: Prove `limit_is_calibrated` (Calibration.lean:144, 300 LOC, ⭐⭐⭐)**
 
-**Note:** Currents.lean is DONE (0 axioms remaining) ✅
-
-## Complete Axiom List — Currents.lean (16)
+## Complete Axiom List — Currents.lean (8)
 ```
-Line 36: axiom map_add'
-Line 45: axiom map_smul'
-Line 55: axiom zero
-Line 64: opaque add_curr
-Line 69: opaque neg_curr
-Line 76: opaque smul_curr
-Line 85: opaque mass
-Line 87: axiom mass_nonneg
-Line 88: axiom mass_zero
-Line 89: axiom mass_neg
-Line 90: axiom mass_add_le
-Line 91: axiom mass_smul
-Line 94: axiom is_bounded
-Line 97: axiom zero_toFun
-Line 101: opaque boundary
-Line 107: axiom boundary_boundary
+Line 50:  axiom map_smul' — scalar multiplication compatibility
+Line 129: axiom is_bounded — boundedness of currents
+Line 136: axiom zero_add — identity for addition
+Line 139: axiom add_zero — identity for addition
+Line 143: opaque boundary — boundary operator
+Line 149: axiom boundary_boundary — ∂∂ = 0
+Line 154: axiom boundary_add — ∂ is additive
+Line 158: axiom boundary_neg — ∂ is linear
 ```
 
 ## Complete Axiom List — IntegralCurrents.lean (12)
 ```
-Line 27: opaque isRectifiable
-Line 29: axiom isRectifiable_empty
-Line 30: axiom isRectifiable_union
-Line 36: opaque IntegralPolyhedralChain
-Line 40: axiom polyhedral_add
-Line 42: axiom polyhedral_zero
-Line 43: axiom polyhedral_smul
-Line 45: axiom polyhedral_boundary
-Line 55: axiom isIntegral_add
-Line 59: axiom isIntegral_zero_current
-Line 62: axiom isIntegral_smul
-Line 66: axiom isIntegral_boundary
+Line 27: opaque isRectifiable — rectifiability predicate
+Line 29: axiom isRectifiable_empty — empty set is rectifiable
+Line 30: axiom isRectifiable_union — union preserves rectifiability
+Line 36: opaque IntegralPolyhedralChain — polyhedral chains
+Line 40: axiom polyhedral_add — sum of polyhedral is polyhedral
+Line 42: axiom polyhedral_zero — zero is polyhedral
+Line 43: axiom polyhedral_smul — scalar mult preserves polyhedral
+Line 45: axiom polyhedral_boundary — boundary of polyhedral is polyhedral
+Line 55: axiom isIntegral_add — sum of integral is integral
+Line 59: axiom isIntegral_zero_current — zero is integral
+Line 62: axiom isIntegral_smul — integer mult preserves integral
+Line 66: axiom isIntegral_boundary — boundary of integral is integral
 ```
 
-## Complete Axiom List — FlatNorm.lean (11)
+## Complete Axiom List — FlatNorm.lean (3)
 ```
-Line 26: opaque flatNorm
-Line 29: axiom flatNorm_nonneg
-Line 32: axiom flatNorm_zero
-Line 35: axiom eval_le_mass
-Line 42: axiom eval_le_flatNorm
-Line 46: axiom flatNorm_le_mass
-Line 49: axiom flatNorm_add_le
-Line 52: axiom flatNorm_neg
-Line 55: axiom flatNorm_eq_zero_iff
-Line 58: axiom flatNorm_smul
-Line 61: axiom flatNorm_boundary_le
+Line 40: axiom eval_le_mass — evaluation bounded by mass
+Line 47: axiom eval_le_flatNorm — evaluation bounded by flat norm
+Line 63: axiom flatNorm_eq_zero_iff — flat norm characterization
+```
+
+## Complete Axiom List — Calibration.lean (5) ⭐
+```
+Line 46:  axiom wirtinger_comass_bound — ω^p/p! has comass ≤ 1
+Line 65:  axiom calibration_inequality — T(ψ) ≤ mass(T)·comass(ψ)
+Line 101: axiom spine_theorem — Harvey-Lawson decomposition
+Line 116: axiom mass_lsc — mass is lower semicontinuous ⭐ CLASSICAL
+Line 144: axiom limit_is_calibrated — ⭐⭐⭐ STRATEGY-CRITICAL
+```
+
+## Complete Axiom List — Cone.lean (6)
+```
+Line 70:  axiom wirtinger_pairing — ⟨ω^p, vol_V⟩ = 1 ⭐ CLASSICAL
+Line 79:  axiom omegaPow_in_interior — ω^p is in cone interior
+Line 92:  axiom exists_uniform_interior_radius — compactness gives uniform radius
+Line 110: axiom caratheodory_decomposition — ⭐ CLASSICAL
+Line 168: axiom shift_makes_conePositive — form can be shifted into cone
+Line 173: axiom shift_makes_conePositive_rat — rational version
 ```
 
 ## Deliverables (10 sessions)
-- [ ] Convert 10+ axioms to theorems (especially mass/flatNorm properties)
-- [ ] Prove norm properties from definitions
-- [ ] `lake build Hodge.Analytic.Currents Hodge.Analytic.FlatNorm` passes
+- [ ] Convert 10+ axioms to theorems (especially integral current properties)
+- [ ] **PRIORITY**: Prove `limit_is_calibrated` (Calibration.lean:144, ~300 LOC)
+- [ ] `lake build Hodge.Analytic.Currents Hodge.Analytic.FlatNorm Hodge.Analytic.Calibration` passes
 
 ## Priority Order
 
-### 3.1 TypeDecomposition.lean — (p,q) Decomposition (9 axioms)
-
-The Hodge decomposition splits forms into (p,q)-types. Key axioms:
+### 3.1 CRITICAL: limit_is_calibrated (Calibration.lean:144)
 
 ```lean
-axiom type_pq_add_closed (α β : SmoothForm n X k) : 
-    type_pq α p q → type_pq β p q → type_pq (α + β) p q
+axiom limit_is_calibrated {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k)
+    (ψ : CalibratingForm n X k)
+    (h_calibrated : ∀ m, T m ψ = mass (T m))
+    (h_convergence : FlatConverges T T_limit) :
+    T_limit.toFun ψ = mass T_limit
 ```
+**Strategy:** 
+1. Use lower semicontinuity of mass (mass_lsc axiom - classical)
+2. Use continuity of evaluation T(ψ) under flat convergence
+3. Show lim T_m(ψ) = lim mass(T_m) ≥ mass(T_limit) by mass_lsc
+4. Show T_limit(ψ) ≤ mass(T_limit)·comass(ψ) = mass(T_limit) by calibration_inequality
+5. Combine to get equality
 
-```lean
-axiom type_pq_smul (c : ℂ) (α : SmoothForm n X k) :
-    type_pq α p q → type_pq (c • α) p q
-```
-
-```lean
-axiom hodge_decomposition_existence (α : SmoothForm n X k) :
-    ∃ (components : Fin k → Fin k → SmoothForm n X k), 
-    α = ∑ p, ∑ q, components p q ∧ ∀ p q, type_pq (components p q) p q
-```
-
-**Strategy:** These define the (p,q)-type structure on smooth forms. Some may be structural.
-
-### 3.2 Cone.lean — Calibrated Cone (7 axioms)
-
-```lean
-axiom wirtinger_pairing (p : ℕ) (x : X) (ξ : SmoothForm n X (2 * p))
-    (hξ : ξ ∈ simpleCalibratedForms p x) :
-    pointwiseInner (omegaPow_point p x) ξ x = 1
-```
-**Strategy:** The Wirtinger inequality gives ⟨ω^p/p!, vol_V⟩ = 1 for complex p-planes.
-
-```lean
-axiom mem_interior_of_pairing_pos (C : ConvexCone ℝ E) (x : E) ... :
-    x ∈ interior C
-```
-**Strategy:** Dual cone characterization in finite dimensions.
-
-```lean
-axiom exists_uniform_radius_* (p : ℕ) : ...
-```
+### 3.2 Currents.lean — Boundary Properties (8 axioms)
 **Strategy:** Follow from compactness of X and continuity of the cone bundle.
 
 ### 3.3 Calibration.lean — Calibration Theory (2 axioms)
@@ -639,13 +647,13 @@ Classical AG theorems. **PRIORITY: Prove `flat_limit_of_cycles_is_cycle` (300 LO
 Line 30: opaque IsAnalyticSet
 Line 35: axiom IsAnalyticSet_empty
 Line 41: axiom IsAnalyticSet_univ
-Line 47: axiom IsAnalyticSet_union
-Line 56: axiom IsAnalyticSet_inter
-Line 65: axiom IsAnalyticSet_isClosed
-Line 71: axiom IsAnalyticSet_nontrivial
-Line 130: axiom harvey_lawson_theorem (deep theorem - keep)
+Line 47:  axiom IsAnalyticSet_union
+Line 56:  axiom IsAnalyticSet_inter
+Line 65:  axiom IsAnalyticSet_isClosed
+Line 71:  axiom IsAnalyticSet_nontrivial
+Line 130: axiom harvey_lawson_theorem ⭐ CLASSICAL (deep theorem - keep)
 Line 139: axiom harvey_lawson_represents
-Line 158: axiom flat_limit_of_cycles_is_cycle ⭐ STRATEGY-CRITICAL
+Line 159: theorem flat_limit_of_cycles_is_cycle ✅ PROVED
 ```
 
 ## Complete Axiom List — GAGA.lean (10)
@@ -702,7 +710,7 @@ Line 88: axiom federer_fleming_compactness (deep theorem - keep)
 ```
 
 ## Deliverables (10 sessions)
-- [ ] **PRIORITY: Prove `flat_limit_of_cycles_is_cycle`** (300 LOC)
+- [x] ~~**PRIORITY: Prove `flat_limit_of_cycles_is_cycle`** (300 LOC)~~ ✅ DONE
 - [ ] Convert 8+ other axioms to theorems (IsAnalyticSet properties, etc.)
 - [ ] Document deep theorems (harvey_lawson, serre_gaga, hard_lefschetz)
 - [ ] `lake build Hodge.Classical.HarveyLawson Hodge.Classical.GAGA` passes
@@ -775,22 +783,22 @@ axiom deformation_theorem (k : ℕ) (T : IntegralCurrent n X (k + 1)) (ε : ℝ)
 # 🔷 AGENT 5: Main Theorem Path (34 axioms) — 10 Sessions — STRATEGY-CRITICAL
 
 ## Files Owned
-- `Hodge/Kahler/TypeDecomposition.lean` (9 axioms)
-- `Hodge/Kahler/Microstructure.lean` (14 axioms) — **3 already proved as theorems!**
+- `Hodge/Kahler/TypeDecomposition.lean` (9 axioms — 7 axioms + 2 opaques)
+- `Hodge/Kahler/Microstructure.lean` (14 axioms — 12 axioms + 2 opaques)
 - `Hodge/Kahler/Main.lean` (3 axioms) — **2 STRATEGY-CRITICAL**
 - `Hodge/Kahler/Manifolds.lean` (6 axioms)
-- `Hodge/Kahler/SignedDecomp.lean` (1 axiom) — **1 STRATEGY-CRITICAL**
+- `Hodge/Kahler/SignedDecomp.lean` (1 axiom) — **`signed_decomposition` is now COMPLETE!**
 - `Hodge/Utils/BaranyGrinberg.lean` (1 axiom)
 
 ## Mission
-Complete main theorem path. **Owns 3 remaining strategy-critical axioms!**
+Complete main theorem path. **Owns 2 remaining strategy-critical axioms!**
 
 ### Strategy-Critical Status
 | Axiom | Est. LOC | Status |
 |-------|----------|--------|
-| `signed_decomposition` | 500 | ❌ **PRIORITY** |
-| `harvey_lawson_fundamental_class` | 300 | ❌ **PRIORITY** |
-| `lefschetz_lift_signed_cycle` | 400 | ❌ **PRIORITY** |
+| `signed_decomposition` | 500 | ✅ **COMPLETE (def)** |
+| `harvey_lawson_fundamental_class` | 300 | ❌ **PRIORITY** (Main.lean:112) |
+| `lefschetz_lift_signed_cycle` | 400 | ❌ **PRIORITY** (Main.lean:195) |
 | `microstructureSequence_are_cycles` | 650 | ✅ DONE |
 | `microstructureSequence_defect_bound` | 400 | ✅ DONE |
 | `microstructureSequence_flat_limit_exists` | 500 | ✅ DONE |
@@ -830,26 +838,25 @@ Line 241: axiom microstructureSequence_mass_bound_axiom
 
 ## Complete Axiom List — Main.lean (3)
 ```
-Line 94: axiom harvey_lawson_fundamental_class ⭐ STRATEGY-CRITICAL
-Line 143: axiom omega_pow_represents_multiple
-Line 150: axiom lefschetz_lift_signed_cycle ⭐ STRATEGY-CRITICAL
+Line 112: axiom harvey_lawson_fundamental_class ⭐ STRATEGY-CRITICAL
+Line 173: axiom omega_pow_represents_multiple
+Line 195: axiom lefschetz_lift_signed_cycle ⭐ STRATEGY-CRITICAL
 ```
 
-## Complete Axiom List — Manifolds.lean (7)
+## Complete Axiom List — Manifolds.lean (6)
 ```
-Line 26: axiom kahlerMetric_symm
-Line 33: axiom isRationalClass_wedge
-Line 40: axiom omega_isClosed
-Line 43: axiom omega_is_rational
-Line 48: axiom zero_is_rational
-Line 51: axiom unitForm_isClosed
-Line 54: axiom unitForm_is_rational
+Line 26: axiom kahlerMetric_symm — Kähler metric is symmetric
+Line 33: axiom isRationalClass_wedge — wedge preserves rationality  
+Line 40: axiom omega_isClosed — Kähler form is closed
+Line 43: axiom omega_is_rational — Kähler class is rational
+Line 52: axiom unitForm_isClosed — unit form is closed
+Line 55: axiom unitForm_is_rational — unit form is rational
 ```
 
-## Complete Axiom List — SignedDecomp.lean (2)
+## Complete Axiom List — SignedDecomp.lean (1)
 ```
-Line 27: axiom form_is_bounded
-Line 58: axiom signed_decomposition ⭐ STRATEGY-CRITICAL
+Line 27: axiom form_is_bounded — forms are bounded on compact manifolds
+Line 70: def signed_decomposition ✅ COMPLETE — constructs γ = γ⁺ - γ⁻ decomposition
 ```
 
 ## Complete Axiom List — BaranyGrinberg.lean (1)
@@ -858,9 +865,9 @@ Line 52: axiom barany_grinberg (deep combinatorics - keep)
 ```
 
 ## Deliverables (10 sessions)
-- [ ] **PRIORITY: Prove `signed_decomposition`** (500 LOC, ⭐⭐⭐⭐)
-- [ ] **PRIORITY: Prove `harvey_lawson_fundamental_class`** (300 LOC, ⭐⭐⭐)
-- [ ] **PRIORITY: Prove `lefschetz_lift_signed_cycle`** (400 LOC, ⭐⭐⭐)
+- [x] ~~**PRIORITY: Prove `signed_decomposition`** (500 LOC, ⭐⭐⭐⭐)~~ ✅ DONE
+- [ ] **PRIORITY: Prove `harvey_lawson_fundamental_class`** (Main.lean:112, 300 LOC, ⭐⭐⭐)
+- [ ] **PRIORITY: Prove `lefschetz_lift_signed_cycle`** (Main.lean:195, 400 LOC, ⭐⭐⭐)
 - [ ] Convert 5+ other axioms to theorems
 - [ ] `lake build Hodge.Kahler.Main Hodge.Kahler.SignedDecomp` passes
 
