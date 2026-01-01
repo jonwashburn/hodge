@@ -320,7 +320,9 @@ axiom instModuleDeRhamCohomologyClass {n : ℕ} {X : Type u} [TopologicalSpace X
     [ProjectiveComplexManifold n X] [KahlerManifold n X] (k : ℕ) : Module ℂ (DeRhamCohomologyClass n X k)
 attribute [instance] instModuleDeRhamCohomologyClass
 
--- SMul ℚ for rational cohomology classes
+/-- **Rational Scalar Multiplication on Cohomology** (Standard).
+    For q ∈ ℚ and [ω] ∈ H^k(X), we have q · [ω] = [q · ω].
+    This is well-defined because scalar multiplication respects cohomology. -/
 axiom smulRat_DeRhamCohomologyClass {n : ℕ} {X : Type u} [TopologicalSpace X]
     [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] (k : ℕ) (q : ℚ) (c : DeRhamCohomologyClass n X k) :
@@ -377,6 +379,16 @@ theorem ofForm_proof_irrel {k : ℕ} (ω : SmoothForm n X k) (h₁ h₂ : IsForm
   | 0 => rfl
   | k' + 1 => exact ⟨0, smoothExtDeriv_zero⟩
 
+/-- **Rational Cohomology Classes** (Hodge Theory).
+
+    A cohomology class η ∈ H^k(X, ℂ) is *rational* if it lies in the image of
+    H^k(X, ℚ) → H^k(X, ℂ), i.e., if there exists a representative form whose
+    periods over all integral cycles are rational numbers.
+
+    This is the central notion in the Hodge conjecture: we want to show that
+    every rational (p,p)-class is algebraic.
+
+    Reference: [W.V.D. Hodge, "The Theory and Applications of Harmonic Integrals", 1941]. -/
 opaque isRationalClass {n : ℕ} {X : Type u} {k : ℕ}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] (η : DeRhamCohomologyClass n X k) : Prop
@@ -439,6 +451,19 @@ axiom isRationalClass_mul {n : ℕ} {X : Type u} {k l : ℕ}
 
 def omegaPow (p : ℕ) : SmoothForm n X (2 * p) := 0
 
+/-- **(p,p)-Form Predicate** (Hodge Theory).
+
+    A 2p-form ω is of type (p,p) if, in any local holomorphic coordinates (z¹,...,zⁿ),
+    it can be written as ω = ∑ f_{I,J} dz^I ∧ dz̄^J where |I| = |J| = p.
+
+    This is the key condition for Hodge classes: a cohomology class is Hodge if and only
+    if it can be represented by a closed (p,p)-form.
+
+    This is opaque because:
+    1. Requires the complex structure on the tangent bundle
+    2. SmoothForm is opaque, so type decomposition cannot be computed
+
+    Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry", 1978, Ch. 0.7]. -/
 opaque isPPForm' (n : ℕ) (X : Type u) [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] (p : ℕ) (ω : SmoothForm n X (2 * p)) : Prop
 

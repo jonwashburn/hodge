@@ -21,20 +21,18 @@ variable {n : ℕ} {X : Type*}
   [Nonempty X]
 
 /-- **The Flat Norm** (Federer-Fleming, 1960).
-    The flat norm of a current T is the infimum of M(S) + M(V) such that T = S + ∂V.
+    The flat norm of a current T is the infimum of M(S) + M(V) such that T = S + ∂V:
+    F(T) = inf { M(S) + M(V) : T = S + ∂V }
 
-    In this stub model, flatNorm is defined as 0 for all currents, which makes
-    the algebraic properties trivially provable.
+    This requires the full GMT machinery and is defined opaquely.
     Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 1960]. -/
-def flatNorm {k : ℕ} (_T : Current n X k) : ℝ := 0
+opaque flatNorm {k : ℕ} (T : Current n X k) : ℝ
 
-/-- The flat norm is non-negative. -/
-theorem flatNorm_nonneg {k : ℕ} (T : Current n X k) : flatNorm T ≥ 0 := by
-  unfold flatNorm; norm_num
+/-- The flat norm is non-negative (Federer-Fleming 1960). -/
+axiom flatNorm_nonneg {k : ℕ} (T : Current n X k) : flatNorm T ≥ 0
 
 /-- The flat norm of the zero current is zero. -/
-theorem flatNorm_zero {k : ℕ} : flatNorm (0 : Current n X k) = 0 := by
-  unfold flatNorm; rfl
+axiom flatNorm_zero {k : ℕ} : flatNorm (0 : Current n X k) = 0
 
 /-- Bound evaluation by mass. -/
 axiom eval_le_mass {k : ℕ} (T : Current n X k) (ψ : SmoothForm n X k) :
@@ -47,28 +45,25 @@ axiom eval_le_mass {k : ℕ} (T : Current n X k) (ψ : SmoothForm n X k) :
 axiom eval_le_flatNorm {k : ℕ} (T : Current n X k) (ψ : SmoothForm n X k) :
     |T.toFun ψ| ≤ flatNorm T * max (comass ψ) (comass (smoothExtDeriv ψ))
 
-/-- The flat norm is bounded above by the mass. -/
-theorem flatNorm_le_mass {k : ℕ} (T : Current n X k) : flatNorm T ≤ Current.mass T := by
-  unfold flatNorm Current.mass; norm_num
+/-- The flat norm is bounded above by the mass (Federer-Fleming 1960).
+    This follows since T = T + ∂0 with M(T) + M(0) = M(T). -/
+axiom flatNorm_le_mass {k : ℕ} (T : Current n X k) : flatNorm T ≤ Current.mass T
 
-/-- The flat norm satisfies the triangle inequality. -/
-theorem flatNorm_add_le {k : ℕ} (S T : Current n X k) : flatNorm (S + T) ≤ flatNorm S + flatNorm T := by
-  unfold flatNorm; norm_num
+/-- The flat norm satisfies the triangle inequality (Federer-Fleming 1960). -/
+axiom flatNorm_add_le {k : ℕ} (S T : Current n X k) : flatNorm (S + T) ≤ flatNorm S + flatNorm T
 
 /-- The flat norm is symmetric under negation. -/
-theorem flatNorm_neg {k : ℕ} (T : Current n X k) : flatNorm (-T) = flatNorm T := by
-  unfold flatNorm; rfl
+axiom flatNorm_neg {k : ℕ} (T : Current n X k) : flatNorm (-T) = flatNorm T
 
 /-- A current is zero iff its flat norm is zero. -/
 axiom flatNorm_eq_zero_iff {k : ℕ} (T : Current n X k) : flatNorm T = 0 ↔ T = 0
 
 /-- Flat norm scales with absolute value of scalar. -/
-theorem flatNorm_smul {k : ℕ} (c : ℝ) (T : Current n X k) : flatNorm (c • T) = |c| * flatNorm T := by
-  unfold flatNorm; simp
+axiom flatNorm_smul {k : ℕ} (c : ℝ) (T : Current n X k) : flatNorm (c • T) = |c| * flatNorm T
 
-/-- The flat norm of a boundary is at most the flat norm of the original current. -/
-theorem flatNorm_boundary_le {k : ℕ} (T : Current n X (k + 1)) :
-    flatNorm (Current.boundary T) ≤ flatNorm T := by
-  unfold flatNorm; norm_num
+/-- The flat norm of a boundary is at most the flat norm of the original current.
+    This follows since ∂T = 0 + ∂T with M(0) + M(T) = M(T) ≥ F(T). -/
+axiom flatNorm_boundary_le {k : ℕ} (T : Current n X (k + 1)) :
+    flatNorm (Current.boundary T) ≤ flatNorm T
 
 end
