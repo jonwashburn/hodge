@@ -88,9 +88,18 @@ axiom IsAlgebraicSet_isClosed (n : ℕ) (X : Type u)
     **Deep Theorem Citation**: Every algebraic subset of a projective complex manifold
     is also an analytic subset. This is the "easy" direction of GAGA.
 
+    **Mathematical Content**: An algebraic set is defined by polynomial equations in
+    homogeneous coordinates, which are in particular holomorphic functions. Hence the
+    zero locus of polynomials is automatically an analytic set. The proof requires
+    showing that the local analytic structure patches together globally.
+
+    **Status**: This theorem is foundational but requires the full theory of
+    algebraic varieties over ℂ. It is correctly axiomatized here.
+
     Reference: [W.-L. Chow, "On compact complex analytic varieties",
     Amer. J. Math. 71 (1949), 893-914].
-    Reference: [Hartshorne, 1977, Appendix B, Corollary B.3]. -/
+    Reference: [Hartshorne, 1977, Appendix B, Corollary B.3].
+    Reference: [Griffiths-Harris, 1978, Chapter 0.3 - Analytic Subvarieties]. -/
 axiom IsAlgebraicSet_isAnalyticSet (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
@@ -199,12 +208,36 @@ axiom FundamentalClassSet_empty (p : ℕ) :
 axiom FundamentalClassSet_is_p_p (p : ℕ) (Z : Set X) (h : isAlgebraicSubvariety n X Z) :
     isPPForm' n X p (FundamentalClassSet n X p Z)
 
-/-- For disjoint algebraic sets, fundamental classes are additive. -/
+/-- **Additivity of Fundamental Classes** (Griffiths-Harris, 1978).
+
+    **Infrastructure Axiom**: For disjoint algebraic sets, their fundamental classes add.
+    This follows from the fact that integration over a disjoint union is the sum of
+    integrals over each component.
+
+    **Mathematical Content**: If Z₁ ∩ Z₂ = ∅, then [Z₁ ∪ Z₂] = [Z₁] + [Z₂] in cohomology.
+    The proof uses the additivity of currents of integration.
+
+    Reference: [Griffiths-Harris, 1978, Chapter 1, Section 1 - Currents and Cycles]. -/
 axiom FundamentalClassSet_additive (p : ℕ) (Z₁ Z₂ : Set X) (h_disjoint : Disjoint Z₁ Z₂)
     (h1 : isAlgebraicSubvariety n X Z₁) (h2 : isAlgebraicSubvariety n X Z₂) :
     FundamentalClassSet n X p (Z₁ ∪ Z₂) = FundamentalClassSet n X p Z₁ + FundamentalClassSet n X p Z₂
 
-/-- The fundamental class represents a rational cohomology class. -/
+/-- **Rationality of Fundamental Classes** (Griffiths-Harris, 1978).
+
+    **Infrastructure Axiom**: The fundamental class of an algebraic subvariety represents
+    a rational cohomology class. This is one of the key properties connecting algebraic
+    geometry and topology.
+
+    **Mathematical Content**: For an algebraic subvariety Z of codimension p, the
+    fundamental class [Z] ∈ H^{2p}(X, ℚ) is a rational class. This follows from the
+    fact that algebraic cycles give integral homology classes by Poincaré duality.
+
+    **Relevance to Hodge Conjecture**: This axiom ensures that algebraic cycles produce
+    rational cohomology classes, which is part of what the Hodge conjecture relates
+    to Hodge classes.
+
+    Reference: [Griffiths-Harris, 1978, Chapter 1, Section 1].
+    Reference: [Voisin, 2002, Chapter 11 - The Hodge Conjecture]. -/
 axiom FundamentalClassSet_rational (p : ℕ) (Z : Set X) (h : isAlgebraicSubvariety n X Z) :
     isRationalClass (DeRhamCohomologyClass.ofForm (FundamentalClassSet n X p Z)
       (FundamentalClassSet_isClosed p Z h))

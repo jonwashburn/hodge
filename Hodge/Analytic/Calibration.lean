@@ -117,6 +117,55 @@ axiom mass_lsc {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k) :
     Tendsto (fun i => flatNorm (T i - T_limit)) atTop (nhds 0) →
     Current.mass T_limit ≤ liminf (fun i => Current.mass (T i)) atTop
 
+/-! ## Evaluation Continuity under Flat Convergence -/
+
+/-- Evaluation of currents is Lipschitz continuous in the flat norm topology.
+    The difference in evaluations is bounded by flat norm times comass bounds. -/
+theorem eval_diff_le_flatNorm_diff {k : ℕ} (S T : Current n X k) (ψ : SmoothForm n X k) :
+    |S.toFun ψ - T.toFun ψ| ≤ flatNorm (S - T) * max (comass ψ) (comass (smoothExtDeriv ψ)) := by
+  -- Use linearity: S(ψ) - T(ψ) = (S - T)(ψ)
+  have h_lin : S.toFun ψ - T.toFun ψ = (S - T).toFun ψ := rfl
+  rw [h_lin]
+  exact eval_le_flatNorm (S - T) ψ
+
+/-- If a sequence of currents converges in flat norm, the evaluations converge. -/
+theorem eval_tendsto_of_flatNorm_tendsto {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k)
+    (ψ : SmoothForm n X k)
+    (h_conv : Tendsto (fun i => flatNorm (T i - T_limit)) atTop (nhds 0)) :
+    Tendsto (fun i => (T i).toFun ψ) atTop (nhds (T_limit.toFun ψ)) := by
+  rw [Metric.tendsto_atTop] at h_conv ⊢
+  intro ε hε
+  -- Get the comass bound
+  set C := max (comass ψ) (comass (smoothExtDeriv ψ)) with hC_def
+  by_cases hC : C = 0
+  · -- If C = 0, evaluation difference is always 0
+    use 0
+    intro n _
+    rw [dist_eq_norm, Real.norm_eq_abs]
+    have h_bound := eval_diff_le_flatNorm_diff (T n) T_limit ψ
+    -- Since C = max ... = 0, we have max ... = 0
+    have hmax : max (comass ψ) (comass (smoothExtDeriv ψ)) = 0 := hC
+    rw [hmax, mul_zero] at h_bound
+    linarith [abs_nonneg ((T n).toFun ψ - T_limit.toFun ψ)]
+  · -- If C > 0, use it as denominator
+    have hC_pos : C > 0 := by
+      have h_nn := comass_nonneg ψ
+      push_neg at hC
+      exact lt_of_le_of_ne (le_max_of_le_left h_nn) (Ne.symm hC)
+    obtain ⟨N, hN⟩ := h_conv (ε / C) (div_pos hε hC_pos)
+    use N
+    intro n hn
+    specialize hN n hn
+    rw [Real.dist_eq, sub_zero] at hN
+    have h_bound := eval_diff_le_flatNorm_diff (T n) T_limit ψ
+    rw [dist_eq_norm, Real.norm_eq_abs]
+    have h_fn_nn : flatNorm (T n - T_limit) ≥ 0 := flatNorm_nonneg _
+    calc |((T n).toFun ψ) - T_limit.toFun ψ|
+        ≤ flatNorm (T n - T_limit) * C := h_bound
+      _ ≤ |flatNorm (T n - T_limit)| * C := mul_le_mul_of_nonneg_right (le_abs_self _) (le_of_lt hC_pos)
+      _ < (ε / C) * C := mul_lt_mul_of_pos_right hN hC_pos
+      _ = ε := div_mul_cancel₀ ε (ne_of_gt hC_pos)
+
 /-- **Limit Calibration Theorem** ⭐ STRATEGY-CRITICAL (Harvey-Lawson, 1982).
 
 If a sequence of currents {Tₙ} satisfies:
@@ -141,10 +190,41 @@ the positive part of the Hodge class.
 
 Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries",
 Acta Mathematica 148 (1982), 47-157, Theorem 4.2]. -/
-axiom limit_is_calibrated {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k)
+theorem limit_is_calibrated {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k)
     (ψ : CalibratingForm n X k)
-    (_h_defect_vanish : Tendsto (fun i => calibrationDefect (T i) ψ) atTop (nhds 0))
-    (_h_conv : Tendsto (fun i => flatNorm (T i - T_limit)) atTop (nhds 0)) :
-    isCalibrated T_limit ψ
+    (h_defect_vanish : Tendsto (fun i => calibrationDefect (T i) ψ) atTop (nhds 0))
+    (h_conv : Tendsto (fun i => flatNorm (T i - T_limit)) atTop (nhds 0)) :
+    isCalibrated T_limit ψ := by
+  unfold isCalibrated
+  -- Step 1: Evaluation is continuous under flat convergence
+  have h_eval_conv : Tendsto (fun i => (T i).toFun ψ.form) atTop (nhds (T_limit.toFun ψ.form)) :=
+    eval_tendsto_of_flatNorm_tendsto T T_limit ψ.form h_conv
+  -- Step 2: From defect → 0, we get mass(Tᵢ) - Tᵢ(ψ) → 0
+  -- This means mass(Tᵢ) → Tᵢ(ψ), and since Tᵢ(ψ) → T_limit(ψ), we have mass(Tᵢ) → T_limit(ψ)
+  have h_defect_eq : ∀ i, calibrationDefect (T i) ψ = Current.mass (T i) - (T i).toFun ψ.form := by
+    intro i; rfl
+  -- Step 3: mass(Tᵢ) = calibrationDefect + Tᵢ(ψ), and both parts converge
+  have h_mass_conv : Tendsto (fun i => Current.mass (T i)) atTop (nhds (T_limit.toFun ψ.form)) := by
+    have h1 : ∀ i, Current.mass (T i) = calibrationDefect (T i) ψ + (T i).toFun ψ.form := by
+      intro i
+      unfold calibrationDefect
+      ring
+    simp_rw [h1]
+    convert Tendsto.add h_defect_vanish h_eval_conv using 1
+    simp only [zero_add]
+  -- Step 4: By lower semicontinuity, mass(T_limit) ≤ liminf mass(Tᵢ)
+  have h_lsc := mass_lsc T T_limit h_conv
+  -- Step 5: Since mass(Tᵢ) → T_limit(ψ), liminf = lim = T_limit(ψ)
+  have h_liminf_eq : liminf (fun i => Current.mass (T i)) atTop = T_limit.toFun ψ.form := by
+    exact h_mass_conv.liminf_eq
+  -- Step 6: Therefore mass(T_limit) ≤ T_limit(ψ)
+  have h_mass_le_eval : Current.mass T_limit ≤ T_limit.toFun ψ.form := by
+    calc Current.mass T_limit ≤ liminf (fun i => Current.mass (T i)) atTop := h_lsc
+      _ = T_limit.toFun ψ.form := h_liminf_eq
+  -- Step 7: By calibration inequality, T_limit(ψ) ≤ mass(T_limit)
+  have h_eval_le_mass : T_limit.toFun ψ.form ≤ Current.mass T_limit :=
+    calibration_inequality T_limit ψ
+  -- Step 8: Combine to get equality
+  linarith
 
 end

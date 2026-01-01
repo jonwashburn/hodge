@@ -97,7 +97,24 @@ def IsHolomorphic {L : HolomorphicLineBundle n X} (s : Section L) : Prop :=
   ∀ x : X, ∃ (U : Opens X) (_hx : x ∈ U) (φ : ∀ y ∈ U, L.Fiber y ≃ₗ[ℂ] ℂ),
     MDifferentiable (𝓒_complex n) 𝓒_ℂ (fun y : ↥U => φ y y.property (s y))
 
-/-- The sum of two holomorphic sections is holomorphic. -/
+/-- **The sum of two holomorphic sections is holomorphic.**
+
+    **Infrastructure Axiom**: This is a standard result in complex analysis stating that
+    the sum of holomorphic functions is holomorphic. The proof would require showing that
+    if s₁ and s₂ are each MDifferentiable in some local trivialization, then s₁ + s₂ is
+    MDifferentiable in a common trivialization covering both.
+
+    The formal proof requires:
+    1. Taking the intersection of the open sets from each section's holomorphicity witness
+    2. Using that transition functions between trivializations are holomorphic
+    3. Applying `MDifferentiable.add` to the sum of trivialized functions
+
+    This is axiomatized because the bundle's `transition_holomorphic` property uses a
+    placeholder definition that doesn't capture the full transition function structure
+    needed to compose trivializations.
+
+    Reference: [Griffiths-Harris, 1978, Chapter 0.5 - Holomorphic Functions on Complex Manifolds].
+    Reference: Standard complex analysis - sums of holomorphic functions are holomorphic. -/
 axiom IsHolomorphic_add (L : HolomorphicLineBundle n X) (s₁ s₂ : Section L) :
     IsHolomorphic s₁ → IsHolomorphic s₂ → IsHolomorphic (s₁ + s₂)
 
@@ -116,14 +133,29 @@ theorem IsHolomorphic_zero {L : HolomorphicLineBundle n X} :
   exact mdifferentiable_const
 
 /-- A scalar multiple of a holomorphic section is holomorphic.
-    **Infrastructure Axiom**: This follows from the fact that scalar multiplication
-    commutes with the trivialization map (by linearity), and MDifferentiable functions
-    remain MDifferentiable under scalar multiplication by a constant.
+    This follows from the fact that scalar multiplication commutes with the trivialization
+    map (by linearity), and MDifferentiable functions remain MDifferentiable under
+    scalar multiplication by a constant.
 
     Reference: Standard complex analysis - scalar multiples of holomorphic functions
     are holomorphic. -/
-axiom IsHolomorphic_smul (L : HolomorphicLineBundle n X) (c : ℂ) (s : Section L) :
-    IsHolomorphic s → IsHolomorphic (c • s)
+theorem IsHolomorphic_smul (L : HolomorphicLineBundle n X) (c : ℂ) (s : Section L) :
+    IsHolomorphic s → IsHolomorphic (c • s) := by
+  intro hs x
+  -- Get the local trivialization from s's holomorphicity at x
+  obtain ⟨U, hx, ⟨φ, hφ⟩⟩ := hs x
+  refine ⟨U, hx, ⟨φ, ?_⟩⟩
+  -- Show that c • s is MDifferentiable in this trivialization
+  -- Key: φ y hy (c • s y) = c • φ y hy (s y) by linearity
+  have h : (fun y : ↥U => φ y y.property ((c • s) y)) =
+           (fun y : ↥U => c • φ y y.property (s y)) := by
+    ext y
+    -- (c • s) y = c • (s y) by definition of Pi.smul
+    -- φ (c • v) = c • φ v by LinearEquiv.map_smul
+    exact (φ y y.property).map_smul c (s y)
+  rw [h]
+  -- MDifferentiable for c • f follows from MDifferentiable for f
+  exact hφ.const_smul c
 
 /-- The space of global holomorphic sections H^0(X, L). -/
 def HolomorphicSection (L : HolomorphicLineBundle n X) : Submodule ℂ (Section L) where
@@ -249,9 +281,16 @@ noncomputable def jet_eval (L : HolomorphicLineBundle n X) (x : X) (k : ℕ) :
     Reference: [Griffiths-Harris, 1978, Chapter 1.5].
     Reference: [Hartshorne, 1977, Chapter III, Corollary 5.3].
 
-    **Note**: This axiom is actually provable from `serre_vanishing` via
-    `jet_surjectivity_from_serre` in SerreVanishing.lean, but is kept for
-    historical compatibility. -/
+    **REDUNDANT AXIOM**: This is fully proved in `Hodge.Classical.SerreVanishing` as
+    `jet_surjectivity_from_serre` using the Serre vanishing theorem. This axiom is
+    retained for backward compatibility but all new code should use
+    `jet_surjectivity_from_serre` instead.
+
+    Proof strategy (in SerreVanishing.lean):
+    1. Apply `serre_vanishing` to the ideal sheaf I_x^{k+1} tensored with L^M
+    2. For large M, H^1(X, L^M ⊗ I_x^{k+1}) = 0
+    3. By the long exact sequence, the restriction map H^0(X, L^M) → J^k_x(L^M) is surjective
+    4. This gives jet surjectivity via `jet_surjectivity_criterion` -/
 axiom jet_surjectivity (L : HolomorphicLineBundle n X) [IsAmple L] (x : X) (k : ℕ) :
     ∃ M₀ : ℕ, ∀ M ≥ M₀, Function.Surjective (jet_eval (L.power M) x k)
 

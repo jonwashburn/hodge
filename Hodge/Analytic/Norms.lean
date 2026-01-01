@@ -4,6 +4,7 @@ import Mathlib.Analysis.InnerProductSpace.Basic
 import Mathlib.Analysis.Complex.Basic
 import Mathlib.Order.ConditionallyCompleteLattice.Basic
 import Mathlib.Analysis.Normed.Module.Multilinear.Basic
+import Mathlib.Topology.Order.Monotone
 
 /-!
 # Track B.2: Norms and Metrics
@@ -18,6 +19,7 @@ comass and L2 norms rather than proving them from first principles.
 noncomputable section
 
 open Classical Set Filter
+open scoped Pointwise
 
 set_option autoImplicit false
 
@@ -151,10 +153,10 @@ theorem comass_add_le {n : ℕ} {X : Type*}
           · apply le_csSup (comass_bddAbove β)
             exact mem_range_self x
 
-/-- **Comass Homogeneity** (Standard).
-    The comass norm is homogeneous: comass (r • α) = |r| * comass α.
-    Derived from pointwise homogeneity.
-    Reference: [H. Federer, "Geometric Measure Theory", 1969]. -/
+/-- **Comass Scalar Multiplication** (Geometric Measure Theory).
+    The comass scales by the absolute value of the scalar: comass(r·α) = |r| · comass(α).
+    This follows from the homogeneity of norms.
+    Reference: [H. Federer, "Geometric Measure Theory", 1969, Section 4.1]. -/
 axiom comass_smul {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
@@ -369,25 +371,54 @@ axiom L2Inner_cauchy_schwarz {n : ℕ} {X : Type*}
     {k : ℕ} (α β : SmoothForm n X k) :
     (L2Inner α β) ^ 2 ≤ (L2Inner α α) * (L2Inner β β)
 
-/-- **L2 Norm Triangle Inequality** (Structural).
+/-- **L2 Norm Triangle Inequality** (Derived from Cauchy-Schwarz).
     The L2 norm satisfies the triangle inequality, as for any norm derived from an inner product.
 
     This follows from Cauchy-Schwarz: ‖α+β‖² = ⟨α,α⟩ + 2⟨α,β⟩ + ⟨β,β⟩ ≤ (‖α‖ + ‖β‖)²
-    since ⟨α,β⟩ ≤ ‖α‖‖β‖ by Cauchy-Schwarz. However, the proof requires careful handling
-    of square roots and is left as an axiom for cleaner formalization. -/
-axiom L2NormForm_add_le {n : ℕ} {X : Type*}
+    since ⟨α,β⟩ ≤ ‖α‖‖β‖ by Cauchy-Schwarz.
+
+    Reference: [H. Federer, "Geometric Measure Theory", 1969, Section 4.1]. -/
+theorem L2NormForm_add_le {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α β : SmoothForm n X k) :
-    L2NormForm (α + β) ≤ L2NormForm α + L2NormForm β
+    L2NormForm (α + β) ≤ L2NormForm α + L2NormForm β := by
+  unfold L2NormForm
+  -- Use sqrt_le_left: √x ≤ y ↔ x ≤ y² (for y ≥ 0)
+  rw [Real.sqrt_le_left (add_nonneg (Real.sqrt_nonneg _) (Real.sqrt_nonneg _))]
+  -- Goal: L2Inner (α + β) (α + β) ≤ (√(L2Inner α α) + √(L2Inner β β))²
+  -- Expand inner product of sum
+  rw [L2Inner_add_left, L2Inner_add_right, L2Inner_add_right]
+  rw [L2Inner_comm β α]  -- L2Inner β α = L2Inner α β
+  -- Expand RHS: (sqrt(α·α) + sqrt(β·β))² = α·α + 2·√(α·α)·√(β·β) + β·β
+  rw [add_sq, Real.sq_sqrt (L2Inner_self_nonneg α), Real.sq_sqrt (L2Inner_self_nonneg β)]
+  -- Goal: α·α + α·β + (α·β + β·β) ≤ α·α + 2·√(α·α)·√(β·β) + β·β
+  -- Simplify LHS
+  ring_nf
+  -- Need: 2·(α·β) ≤ 2·√(α·α)·√(β·β)
+  -- i.e., α·β ≤ √(α·α)·√(β·β)
+  -- This follows from Cauchy-Schwarz: (α·β)² ≤ (α·α)·(β·β)
+  have cs := L2Inner_cauchy_schwarz α β
+  have key : L2Inner α β ≤ Real.sqrt (L2Inner α α) * Real.sqrt (L2Inner β β) := by
+    rw [← Real.sqrt_mul (L2Inner_self_nonneg α)]
+    apply Real.le_sqrt_of_sq_le
+    exact cs
+  linarith
 
-/-- **L2 Norm Homogeneity** (Structural).
+/-- **L2 Norm Homogeneity** (Derived from inner product properties).
     The L2 norm is absolutely homogeneous: ‖r • α‖ = |r| · ‖α‖.
     This follows from the inner product properties: ⟨rα, rα⟩ = r²⟨α, α⟩. -/
-axiom L2NormForm_smul {n : ℕ} {X : Type*}
+theorem L2NormForm_smul {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (r : ℝ) (α : SmoothForm n X k) :
-    L2NormForm (r • α) = |r| * L2NormForm α
+    L2NormForm (r • α) = |r| * L2NormForm α := by
+  unfold L2NormForm
+  -- L2Inner (r • α) (r • α) = r * L2Inner α (r • α) = r * r * L2Inner α α = r² * L2Inner α α
+  rw [L2Inner_smul_left, L2Inner_smul_right]
+  -- Now we have sqrt(r * r * L2Inner α α) = |r| * sqrt(L2Inner α α)
+  rw [← mul_assoc]
+  rw [show r * r = r ^ 2 from sq r ▸ rfl]
+  rw [Real.sqrt_mul (sq_nonneg r), Real.sqrt_sq_eq_abs]
 
 end

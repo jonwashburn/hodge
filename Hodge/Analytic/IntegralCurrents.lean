@@ -56,7 +56,14 @@ axiom isIntegral_add {k : ℕ} (S T : Current n X k) :
     isIntegral S → isIntegral T → isIntegral (S + T)
 
 /-- **Theorem: Zero current is integral.** -/
-axiom isIntegral_zero_current (k : ℕ) : isIntegral (0 : Current n X k)
+theorem isIntegral_zero_current (k : ℕ) : isIntegral (0 : Current n X k) := by
+  intro ε hε
+  use 0, polyhedral_zero
+  have h : (0 : Current n X k) - 0 = 0 := by
+    show (0 : Current n X k) + -(0 : Current n X k) = 0
+    rw [Current.neg_zero_current, Current.add_zero]
+  rw [h, flatNorm_zero]
+  exact hε
 
 /-- **Theorem: Integer Scaling of Integral Currents is Integral.** -/
 axiom isIntegral_smul {k : ℕ} (c : ℤ) (T : Current n X k) :

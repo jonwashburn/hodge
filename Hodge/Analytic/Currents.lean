@@ -87,6 +87,12 @@ def neg_curr (T : Current n X k) : Current n X k where
 
 instance : Neg (Current n X k) := ⟨neg_curr⟩
 
+/-- Negation of zero is zero. -/
+theorem neg_zero_current : -(0 : Current n X k) = 0 := by
+  show neg_curr (zero n X k) = zero n X k
+  unfold neg_curr zero
+  simp only [neg_zero]
+
 instance : Sub (Current n X k) := ⟨fun T₁ T₂ => T₁ + -T₂⟩
 
 /-- Scalar multiplication of currents: (r • T)(ω) = r * T(ω). -/
@@ -133,11 +139,25 @@ axiom is_bounded (T : Current n X k) : ∃ M : ℝ, ∀ ω : SmoothForm n X k, |
 theorem zero_toFun (ω : SmoothForm n X k) : (0 : Current n X k).toFun ω = 0 := by
   rfl
 
+/-- Extensionality for currents: two currents are equal iff they agree on all forms. -/
+@[ext]
+theorem ext {S T : Current n X k} (h : ∀ ω, S.toFun ω = T.toFun ω) : S = T := by
+  cases S; cases T
+  simp only [Current.mk.injEq]
+  funext ω
+  exact h ω
+
 /-- Zero is a left identity for addition. -/
-axiom zero_add (T : Current n X k) : 0 + T = T
+theorem zero_add (T : Current n X k) : 0 + T = T := by
+  ext ω
+  show (0 : Current n X k).toFun ω + T.toFun ω = T.toFun ω
+  simp [zero_toFun]
 
 /-- Zero is a right identity for addition. -/
-axiom add_zero (T : Current n X k) : T + 0 = T
+theorem add_zero (T : Current n X k) : T + 0 = T := by
+  ext ω
+  show T.toFun ω + (0 : Current n X k).toFun ω = T.toFun ω
+  simp [zero_toFun]
 
 /-- **Boundary operator on currents** (Federer, 1969).
     The boundary ∂T is defined by duality: (∂T)(ω) = T(dω). -/

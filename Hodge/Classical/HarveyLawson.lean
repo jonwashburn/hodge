@@ -118,15 +118,32 @@ structure HarveyLawsonConclusion (n : ℕ) (X : Type*) (k : ℕ)
     A calibrated current on a Kähler manifold is represented by integration over a
     finite union of complex analytic subvarieties with positive integer multiplicities.
 
-    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries",
-    Acta Math. 148 (1982), 47-157, Theorem 4.1].
+    **Mathematical Content**:
+    Let T be an integral current on a Kähler manifold X that is:
+    1. A cycle (∂T = 0)
+    2. Calibrated by the Kähler form (or a power of it)
+
+    Then T is represented by integration over a finite union of complex analytic
+    subvarieties V₁, ..., Vₘ with positive integer multiplicities n₁, ..., nₘ:
+        T = Σᵢ nᵢ [Vᵢ]
+
+    **Key Proof Ideas** (from the literature):
+    1. Regularity theory for calibrated currents
+    2. Unique continuation for complex analytic sets
+    3. Compactness of the space of analytic varieties
 
     **Status**: This is a deep foundational result that requires complex analysis
     and geometric measure theory beyond Mathlib's current scope. It is correctly
     axiomatized with full hypothesis/conclusion structure.
 
-    **Usage in Main Proof**: This theorem is applied to the flat limit of the
-    microstructure sequence to obtain the representing analytic cycles. -/
+    **Role in Main Proof**: After the microstructure construction produces a sequence
+    of approximating cycles, and Federer-Fleming compactness gives a flat limit,
+    this theorem converts the calibrated limit into analytic subvarieties. Combined
+    with GAGA, these become algebraic subvarieties, completing the Hodge conjecture.
+
+    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries",
+    Acta Math. 148 (1982), 47-157, Theorem 4.1].
+    Reference: [F. Morgan, "Geometric Measure Theory", 5th ed., 2016, Chapter 8]. -/
 axiom harvey_lawson_theorem {k : ℕ} (hyp : HarveyLawsonHypothesis n X k) :
     HarveyLawsonConclusion n X k
 

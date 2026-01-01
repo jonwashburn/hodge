@@ -15,7 +15,21 @@ universe u
 ## Track A.3.1: Hard Lefschetz Theorem
 -/
 
-/-- Linearity of wedging with a closed form on cohomology classes. -/
+/-- **Linearity of Wedge Product on Cohomology** (Standard).
+
+    **Infrastructure Axiom**: The wedge product with a closed form is linear on cohomology
+    classes. Specifically, [ω ∧ (η₁ + η₂)] = [ω ∧ η₁] + [ω ∧ η₂].
+
+    **Mathematical Content**: This follows from:
+    1. The wedge product of smooth forms is bilinear: ω ∧ (η₁ + η₂) = ω ∧ η₁ + ω ∧ η₂
+    2. Addition of closed forms is closed
+    3. The quotient map to cohomology respects addition
+
+    This is axiomatized because the quotient structure for DeRhamCohomologyClass uses
+    placeholder definitions that don't directly support this computation.
+
+    Reference: [Warner, "Foundations of Differentiable Manifolds and Lie Groups", 1983].
+    Reference: [Bott-Tu, "Differential Forms in Algebraic Topology", 1982, Chapter 1]. -/
 axiom ofForm_wedge_add (n : ℕ) (X : Type u) [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
     {p : ℕ} (ω : SmoothForm n X 2) (hω : IsFormClosed ω) (η₁ η₂ : SmoothForm n X p) (h₁ : IsFormClosed η₁) (h₂ : IsFormClosed η₂) :
@@ -101,11 +115,26 @@ variable {n : ℕ} {X : Type u}
     there exists a rational (p', p')-form in H^{2p'}(X) that maps to it under
     the Lefschetz operator.
 
+    **Mathematical Content**: The Hard Lefschetz theorem states that for a Kähler manifold
+    of complex dimension n and p ≤ n, the map L^{n-p}: H^p(X) → H^{2n-p}(X) is an isomorphism.
+    This theorem is proved using the representation theory of the Lie algebra sl(2,ℂ)
+    acting on the cohomology via the Lefschetz operator L, its dual Λ, and the Hodge
+    operator H.
+
+    **Key Properties Preserved**:
+    1. Rationality: Rational classes map to rational classes
+    2. Hodge type: (p,p)-classes map to (n-p, n-p)-classes (and vice versa by inverse)
+    3. Closedness: Closed forms map to closed forms
+
+    **Status**: This deep theorem requires the full Hodge theory machinery including
+    the Kähler identities [L, Λ] = H and the Lefschetz decomposition.
+
     Reference: [Griffiths-Harris, 1978, Chapter 0.7].
-    Reference: [Voisin, 2002, Theorem 6.24].
+    Reference: [Voisin, 2002, Theorem 6.24 and Chapter 6].
+    Reference: [D. Huybrechts, "Complex Geometry: An Introduction", Springer, 2005, Chapter 3].
 
     **Usage in Main Proof**: Allows lifting forms from high degree to low degree
-    while preserving rationality and Hodge type. -/
+    while preserving rationality and Hodge type. Essential for the case p > n/2. -/
 axiom hard_lefschetz_isomorphism {p' : ℕ} (h_range : p' ≤ n / 2)
     (γ : SmoothForm n X (2 * (n - p'))) (h_closed : IsFormClosed γ)
     (h_rat : isRationalClass (DeRhamCohomologyClass.ofForm γ h_closed)) (h_hodge : isPPForm' n X (n - p') γ) :
@@ -118,7 +147,17 @@ axiom hard_lefschetz_isomorphism {p' : ℕ} (h_range : p' ≤ n / 2)
     **Deep Theorem Citation**: For forms in high degree (p > n/2), we can find a
     corresponding form in complementary degree via the inverse Lefschetz isomorphism.
 
-    Reference: [Voisin, 2002, Chapter 6].
+    **Mathematical Content**: When p > n/2, we have n - p < n/2, so the form is in the
+    "upper half" of the Hodge diamond. The inverse Lefschetz map allows us to find a
+    form in the complementary "lower half" degree 2(n-p). This form has the same
+    rationality and Hodge type properties.
+
+    **Strategy in Hodge Proof**:
+    When the original (p,p)-class η has p > n/2, we apply this inverse to get a form
+    γ of type (n-p, n-p) with n-p < n/2. We then apply the microstructure construction
+    to γ (which works for p ≤ n/2) and use Lefschetz compatibility to lift back.
+
+    Reference: [Voisin, 2002, Chapter 6 - The Lefschetz Decomposition].
 
     **Usage in Main Proof**: Used in the case analysis when p > n/2 to reduce
     to the fundamental case where microstructure construction applies. -/
