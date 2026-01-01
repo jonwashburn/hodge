@@ -1,7 +1,7 @@
 # Hodge Conjecture Formalization: Completion Plan
 
 ## Goal
-Prove all 44 axioms in the `hodge_conjecture'` proof chain, leaving only Lean system axioms (propext, Classical.choice, Quot.sound).
+Prove all axioms in the `hodge_conjecture'` proof chain, leaving only Lean system axioms (propext, Classical.choice, Quot.sound).
 
 ---
 
@@ -10,165 +10,147 @@ Prove all 44 axioms in the `hodge_conjecture'` proof chain, leaving only Lean sy
 | Metric | Value |
 |--------|-------|
 | **Build** | ✅ Passes |
-| **Axioms in proof chain** | 44 |
-| **Target** | 0 custom axioms |
+| **Axioms in proof chain** | **35** |
+| **Target** | 0 custom axioms (or 1 with `serre_gaga`) |
 
 ---
 
-## The 44 Axioms: Prioritized Checklist
+## The 35 Axioms: Prioritized Checklist
 
 ### 🔴 P1: Strategy-Critical (2 axioms)
 
-These encode the core mathematical strategy. **Highest priority.**
-
-| # | Axiom | File:Line | Status | Owner | Notes |
-|---|-------|-----------|--------|-------|-------|
-| 1 | `harvey_lawson_fundamental_class` | Main.lean:112 | ❌ TODO | | Bridges current → cohomology class |
-| 2 | `lefschetz_lift_signed_cycle` | Main.lean:195 | ❌ TODO | | Hard Lefschetz lift preserves algebraicity |
-
-**Strategy:** These require either (a) building the Harvey-Lawson infrastructure properly, or (b) proving from existing axioms.
+| # | Axiom | File | Status | Owner |
+|---|-------|------|--------|-------|
+| 1 | `harvey_lawson_fundamental_class` | Main.lean:112 | ❌ TODO | Agent 4 |
+| 2 | `lefschetz_lift_signed_cycle` | Main.lean:195 | ❌ TODO | Agent 4 |
 
 ---
 
-### 🟠 P2: Microstructure Construction (5 axioms)
+### 🟠 P2: Microstructure Construction (4 axioms)
 
-These encode YOUR paper's construction. **Must be proven from the mathematical definitions.**
-
-| # | Axiom | File:Line | Status | Owner | Notes |
-|---|-------|-----------|--------|-------|-------|
-| 3 | `cubulation_exists` | Microstructure.lean:147 | ❌ TODO | | Existence of h-cubulation |
-| 4 | `calibration_defect_from_gluing` | Microstructure.lean:168 | ❌ TODO | | Defect bound from gluing |
-| 5 | `microstructureSequence_defect_bound_axiom` | Microstructure.lean:219 | ❌ TODO | | Sequence defect → 0 |
-| 6 | `microstructureSequence_mass_bound_axiom` | Microstructure.lean:241 | ❌ TODO | | Uniform mass bound |
-| 7 | `RawSheetSum.toIntegralCurrent_isCycle` | Microstructure.lean:116 | ❌ TODO | | ∂(sheet sum) = 0 |
-
-**Strategy:** These follow from the paper's constructions. Need to formalize the actual definitions.
+| # | Axiom | File | Status | Owner |
+|---|-------|------|--------|-------|
+| 3 | `calibration_defect_from_gluing` | Microstructure.lean | ❌ TODO | Agent 5 |
+| 4 | `gluing_mass_bound` | Microstructure.lean | ❌ TODO | Agent 5 |
+| 5 | `RawSheetSum.toIntegralCurrent_isCycle` | Microstructure.lean | ❌ TODO | Agent 5 |
+| 6 | `flat_limit_existence` | Microstructure.lean | ❌ TODO | Agent 5 |
 
 ---
 
-### 🟡 P3: Flat Norm / Mass (9 axioms)
+### 🟡 P3: Flat Norm / Mass (6 axioms)
 
-| # | Axiom | File:Line | Status | Owner | Notes |
-|---|-------|-----------|--------|-------|-------|
-| 8 | `flatNorm_nonneg` | FlatNorm.lean:32 | ❌ TODO | | Infimum of nonneg quantities |
-| 9 | `flatNorm_zero` | FlatNorm.lean:35 | ❌ TODO | | 0 = inf{0 + 0} |
-| 10 | `eval_le_flatNorm` | FlatNorm.lean:45 | ❌ TODO | | Duality estimate |
-| 11 | `flatNorm_le_mass` | FlatNorm.lean:50 | ❌ TODO | | Take S = 0 in infimum |
-| 12 | `flatNorm_neg` | FlatNorm.lean:56 | ❌ TODO | | Symmetry of norm |
-| 13 | `flatNorm_eq_zero_iff` | FlatNorm.lean:59 | ❌ TODO | | Norm = 0 ↔ T = 0 |
-| 14 | `flatNorm_boundary_le` | FlatNorm.lean:66 | ❌ TODO | | ‖∂T‖_F ≤ ‖T‖_F |
-| 15 | `flat_limit_existence` | Microstructure.lean:192 | ❌ TODO | | Federer-Fleming compactness |
-| 16 | `mass_lsc` | Calibration.lean:116 | ❌ TODO | | Lower semicontinuity |
-
-**Strategy:** Properties 8-14 should follow from the flat norm definition. 15-16 are classical results.
+| # | Axiom | File | Status | Owner |
+|---|-------|------|--------|-------|
+| 7 | `eval_le_flatNorm` | FlatNorm.lean | ❌ TODO | Agent 2 |
+| 8 | `flatNorm_boundary_le` | FlatNorm.lean | ❌ TODO | Agent 2 |
+| 9 | `flatNorm_eq_zero_iff` | FlatNorm.lean | ❌ TODO | Agent 2 |
+| 10 | `flatNorm_neg` | FlatNorm.lean | ❌ TODO | Agent 2 |
+| 11 | `mass_lsc` | Calibration.lean | ❌ TODO | Agent 2 |
+| 12 | `Current.mass_nonneg` | Currents.lean | ❌ TODO | Agent 2 |
+| 13 | `Current.mass_zero` | Currents.lean | ❌ TODO | Agent 2 |
 
 ---
 
-### 🟡 P4: Kähler / Calibration (8 axioms)
+### 🟡 P4: Kähler / Calibration (10 axioms)
 
-| # | Axiom | File:Line | Status | Owner | Notes |
-|---|-------|-----------|--------|-------|-------|
-| 17 | `wirtinger_comass_bound` | Calibration.lean:46 | ❌ TODO | | Wirtinger inequality |
-| 18 | `calibration_inequality` | Calibration.lean:65 | ❌ TODO | | T(ψ) ≤ mass(T) |
-| 19 | `simpleCalibratedForm` | Grassmannian.lean:106 | ❌ TODO | | Volume form on calibrated planes |
-| 20 | `omegaPow_in_interior` | Cone.lean:79 | ❌ TODO | | ω^p in interior of cone |
-| 21 | `omega_pow_IsFormClosed` | TypeDecomp.lean:125 | ❌ TODO | | d(ω^p) = 0 |
-| 22 | `omega_pow_is_rational` | TypeDecomp.lean:128 | ❌ TODO | | [ω^p] ∈ H²ᵖ(X,ℚ) |
-| 23 | `omega_pow_represents_multiple` | Main.lean:173 | ❌ TODO | | c·[ω^p] is algebraic |
-| 24 | `shift_makes_conePositive_rat` | Cone.lean:173 | ❌ TODO | | γ + c·ω^p is cone-positive |
-
-**Strategy:** 17-18 are classical calibration results. 21 follows from dω = 0. Others need Kähler geometry.
-
----
-
-### 🟢 P5: Form/Cohomology Structure (10 axioms)
-
-| # | Axiom | File:Line | Status | Owner | Notes |
-|---|-------|-----------|--------|-------|-------|
-| 25 | `SmoothForm.zero` | Basic.lean:71 | ❌ TODO | | Zero form exists |
-| 26 | `SmoothForm.instAddCommGroup` | Basic.lean:80 | ❌ TODO | | AddCommGroup instance |
-| 27 | `SmoothForm.instModuleComplex` | Basic.lean:84 | ❌ TODO | | ℂ-module instance |
-| 28 | `SmoothForm.instTopologicalSpace` | Basic.lean:93 | ❌ TODO | | Topology instance |
-| 29 | `smoothExtDeriv_add` | Basic.lean:113 | ❌ TODO | | d(ω + η) = dω + dη |
-| 30 | `smoothExtDeriv_smul` | Basic.lean:118 | ❌ TODO | | d(c·ω) = c·dω |
-| 31 | `smoothExtDeriv_smul_real` | Basic.lean:123 | ❌ TODO | | d(r·ω) = r·dω |
-| 32 | `instAddCommGroupDeRhamCohomologyClass` | Basic.lean:310 | ❌ TODO | | Quotient group |
-| 33 | `instModuleDeRhamCohomologyClass` | Basic.lean:324 | ❌ TODO | | Quotient module |
-| 34 | `smulRat_DeRhamCohomologyClass` | Basic.lean:332 | ❌ TODO | | ℚ-scaling |
-
-**Strategy:** 25-28 are opaque type interfaces (need transparent definitions). 29-31 need d linear. 32-34 use Quotient.lift.
+| # | Axiom | File | Status | Owner |
+|---|-------|------|--------|-------|
+| 14 | `wirtinger_comass_bound` | Calibration.lean | ❌ TODO | Agent 3 |
+| 15 | `calibration_inequality` | Calibration.lean | ❌ TODO | Agent 3 |
+| 16 | `simpleCalibratedForm` | Grassmannian.lean | ❌ TODO | Agent 3 |
+| 17 | `omegaPow_in_interior` | Cone.lean | ❌ TODO | Agent 3 |
+| 18 | `omega_pow_IsFormClosed` | TypeDecomp.lean | ❌ TODO | Agent 3 |
+| 19 | `omega_pow_is_rational` | TypeDecomp.lean | ❌ TODO | Agent 3 |
+| 20 | `omega_pow_represents_multiple` | Main.lean | ❌ TODO | Agent 3 |
+| 21 | `shift_makes_conePositive_rat` | Cone.lean | ❌ TODO | Agent 3 |
+| 22 | `conePositive_comass_bound` | Cone.lean | ❌ TODO | Agent 3 |
+| 23 | `pointwiseComass_nonneg` | Norms.lean | ❌ TODO | Agent 3 |
 
 ---
 
-### 🟢 P6: Quotient Operations (4 axioms)
+### 🟢 P5: Form/Cohomology Structure (8 axioms)
 
-| # | Axiom | File:Line | Status | Owner | Notes |
-|---|-------|-----------|--------|-------|-------|
-| 35 | `ofForm_add` | Basic.lean:361 | ❌ TODO | | [ω + η] = [ω] + [η] |
-| 36 | `ofForm_sub` | Basic.lean:367 | ❌ TODO | | [ω - η] = [ω] - [η] |
-| 37 | `ofForm_smul_real` | Basic.lean:370 | ❌ TODO | | [r·ω] = r·[ω] |
-| 38 | `smul_rat_eq_smul_real` | Basic.lean:342 | ❌ TODO | | q·[ω] = (q:ℝ)·[ω] |
-
-**Strategy:** All provable using `Quotient.lift₂` and the cohomology equivalence relation.
-
----
-
-### 🟢 P7: Other (7 axioms)
-
-| # | Axiom | File:Line | Status | Owner | Notes |
-|---|-------|-----------|--------|-------|-------|
-| 39 | `pointwiseComass_nonneg` | Norms.lean:41 | ❌ TODO | | Norm ≥ 0 |
-| 40 | `polyhedral_zero` | IntegralCurrents.lean:42 | ❌ TODO | | 0 ∈ polyhedral chains |
-| 41 | `serre_gaga` | GAGA.lean:149 | ❌ TODO | | **CLASSICAL PILLAR** |
-| 42 | `isPPForm_zero` | Basic.lean:477 | ❌ TODO | | 0 is a (p,p)-form |
-| 43 | `isRationalClass_zero` | Basic.lean:405 | ❌ TODO | | [0] is rational |
-| 44 | `isRationalClass_add` | Basic.lean:413 | ❌ TODO | | Closure under + |
-| 45 | `isRationalClass_smul_rat` | Basic.lean:422 | ❌ TODO | | Closure under ℚ |
-
-**Note:** `serre_gaga` (#41) is a deep theorem (Serre, 1956) — acceptable as the ONE classical pillar if needed.
+| # | Axiom | File | Status | Owner |
+|---|-------|------|--------|-------|
+| 24 | `SmoothForm.zero` | Basic.lean | ❌ TODO | Agent 1 |
+| 25 | `SmoothForm.instAddCommGroup` | Basic.lean | ❌ TODO | Agent 1 |
+| 26 | `SmoothForm.instModuleComplex` | Basic.lean | ❌ TODO | Agent 1 |
+| 27 | `SmoothForm.instTopologicalSpace` | Basic.lean | ❌ TODO | Agent 1 |
+| 28 | `smoothExtDeriv_add` | Basic.lean | ❌ TODO | Agent 1 |
+| 29 | `smoothExtDeriv_smul` | Basic.lean | ❌ TODO | Agent 1 |
+| 30 | `smoothExtDeriv_smul_real` | Basic.lean | ❌ TODO | Agent 1 |
+| 31 | `instAddCommGroupDeRhamCohomologyClass` | Basic.lean | ❌ TODO | Agent 1 |
+| 32 | `instModuleDeRhamCohomologyClass` | Basic.lean | ❌ TODO | Agent 1 |
 
 ---
 
-## Agent Assignments
+### 🟢 P6: Quotient Operations (3 axioms)
 
-| Agent | Priority | Axioms | Target |
-|-------|----------|--------|--------|
-| **Agent 1** | P5, P6 | #29-38 (Form/Cohomology + Quotient) | 10 axioms |
-| **Agent 2** | P3 | #8-16 (Flat Norm / Mass) | 9 axioms |
-| **Agent 3** | P4, P7 | #17-24, #39-45 (Kähler + Other) | 15 axioms |
-| **Agent 4** | P1 | #1-2 (Strategy-Critical) | 2 axioms |
-| **Agent 5** | P2 | #3-7 (Microstructure) | 5 axioms |
+| # | Axiom | File | Status | Owner |
+|---|-------|------|--------|-------|
+| 33 | `ofForm_add` | Basic.lean | ❌ TODO | Agent 1 |
+| 34 | `ofForm_sub` | Basic.lean | ❌ TODO | Agent 1 |
+| 35 | `ofForm_smul_real` | Basic.lean | ❌ TODO | Agent 1 |
 
 ---
 
-## Proof Strategies by Category
+### 🟢 P7: Classical Pillar (1 axiom)
 
-### P1: Strategy-Critical
+| # | Axiom | File | Status | Owner |
+|---|-------|------|--------|-------|
+| 36 | `serre_gaga` | GAGA.lean | ⚠️ CLASSICAL | Agent 5 |
+
+**Note:** `serre_gaga` is Serre's GAGA theorem (1956) — acceptable as the ONE allowed deep theorem.
+
+---
+
+## Agent Assignments Summary
+
+| Agent | Priority | Axiom Count | Focus |
+|-------|----------|-------------|-------|
+| **Agent 1** | P5, P6 | 12 | Form structure + quotient operations |
+| **Agent 2** | P3 | 7 | Flat norm + mass properties |
+| **Agent 3** | P4 | 10 | Kähler / calibration |
+| **Agent 4** | P1 | 2 | **Strategy-critical** (hardest) |
+| **Agent 5** | P2, P7 | 5 | Microstructure + GAGA |
+
+---
+
+## Proof Strategies
+
+### P1: Strategy-Critical (Agent 4)
 
 **`harvey_lawson_fundamental_class`:**
 - Currently `harvey_lawson_theorem` returns empty varieties (stub)
-- Need to: Either build actual variety construction OR prove the cohomology equality directly from existing axioms
+- Options: Build actual variety construction OR derive from existing axioms
 
 **`lefschetz_lift_signed_cycle`:**
-- Requires Hard Lefschetz inverse to preserve algebraicity
-- Check if `hard_lefschetz_inverse_form` provides enough structure
+- Use `hard_lefschetz_inverse_form` to construct the lift
+- Show algebraicity is preserved
 
-### P2: Microstructure
+### P2: Microstructure (Agent 5)
 
-These follow the paper's construction:
-1. Define `Cubulation` concretely (not opaque)
-2. Prove `cubulation_exists` using combinatorics
-3. Build sheet sums with explicit boundary computation
-4. Prove defect/mass bounds from the construction
+1. Prove `RawSheetSum.toIntegralCurrent_isCycle` — boundary of sheet sum is zero
+2. Prove `calibration_defect_from_gluing` — defect bound from explicit construction
+3. Prove `gluing_mass_bound` — mass bound from gluing
 
-### P6: Quotient Operations
+### P3: Flat Norm (Agent 2)
 
-Use this pattern:
 ```lean
-theorem ofForm_add ... := by
+theorem Current.mass_nonneg : mass T ≥ 0 := by
+  -- mass is defined as supremum, all quantities nonneg
+
+theorem flatNorm_neg : flatNorm (-T) = flatNorm T := by
+  -- Symmetry of the infimum definition
+```
+
+### P5-P6: Form Structure (Agent 1)
+
+```lean
+theorem ofForm_add (ω η) (hω hη) :
+    ofForm (ω + η) _ = ofForm ω hω + ofForm η hη := by
   apply Quotient.sound
-  -- Show: IsExact ((ω + η) - (ω' + η')) where ω ≈ ω', η ≈ η'
-  -- This follows from IsExact being closed under addition
+  -- Show cohomologous: (ω + η) - (ω + η) is exact (trivially)
 ```
 
 ---
@@ -180,7 +162,7 @@ theorem ofForm_add ... := by
   - `propext`
   - `Classical.choice`
   - `Quot.sound`
-  - (optionally) `serre_gaga` as the one classical pillar
+  - (optionally) `serre_gaga`
 
 ---
 
@@ -200,4 +182,3 @@ theorem ofForm_add ... := by
 - Harvey-Lawson, Acta Math. 148 (1982)
 - Federer-Fleming, Ann. Math. 72 (1960)
 - Serre, Ann. Inst. Fourier 6 (1956)
-

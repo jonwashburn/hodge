@@ -362,25 +362,110 @@ def DeRhamCohomologyClass.smul' {n k : ℕ} {X : Type u}
   Quotient.lift (fun ω => Quotient.mk _ ⟨c_scalar • ω.val, isFormClosed_smul ω.property⟩)
     (fun _ _ h => Quotient.sound (cohomologous_smul c_scalar _ _ h)) c
 
-/-- **De Rham Cohomology Group Structure** (Axiomatized).
-    The de Rham cohomology H^k_dR(X) forms an abelian group.
-    This is axiomatized because proving the group axioms with the quotient structure
-    requires explicit nsmul/zsmul definitions that interact with the opaque SmoothForm type.
-    Reference: [G. de Rham, "Variétés Différentiables", 1955]. -/
-axiom instAddCommGroupDeRhamCohomologyClass {n : ℕ} {X : Type u} [TopologicalSpace X]
-    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] (k : ℕ) : AddCommGroup (DeRhamCohomologyClass n X k)
-attribute [instance] instAddCommGroupDeRhamCohomologyClass
+/-- Subtraction on de Rham cohomology classes. -/
+def DeRhamCohomologyClass.sub' {n k : ℕ} {X : Type u}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    (c₁ c₂ : DeRhamCohomologyClass n X k) : DeRhamCohomologyClass n X k :=
+  DeRhamCohomologyClass.add' c₁ (DeRhamCohomologyClass.neg' c₂)
 
-/-- **De Rham Cohomology Module Structure** (Axiomatized).
-    The de Rham cohomology H^k_dR(X) forms a ℂ-module.
-    This is axiomatized because it requires showing the axiomatized AddCommGroup
-    is compatible with the ℂ-scalar multiplication.
+-- Basic type class instances for DeRhamCohomologyClass (required before AddCommGroup for nsmulRec/zsmulRec)
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] in
+instance instAddDeRhamCohomologyClass (k : ℕ) : Add (DeRhamCohomologyClass n X k) := ⟨DeRhamCohomologyClass.add'⟩
+
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] in
+instance instNegDeRhamCohomologyClass (k : ℕ) : Neg (DeRhamCohomologyClass n X k) := ⟨DeRhamCohomologyClass.neg'⟩
+
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] in
+instance instSubDeRhamCohomologyClass (k : ℕ) : Sub (DeRhamCohomologyClass n X k) := ⟨DeRhamCohomologyClass.sub'⟩
+
+/-- **De Rham Cohomology Group Structure** (Concrete).
+    The de Rham cohomology H^k_dR(X) forms an abelian group.
+    Operations defined via Quotient.lift on closed forms.
     Reference: [G. de Rham, "Variétés Différentiables", 1955]. -/
-axiom instModuleDeRhamCohomologyClass {n : ℕ} {X : Type u} [TopologicalSpace X]
+instance instAddCommGroupDeRhamCohomologyClass {n : ℕ} {X : Type u} [TopologicalSpace X]
     [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] (k : ℕ) : Module ℂ (DeRhamCohomologyClass n X k)
-attribute [instance] instModuleDeRhamCohomologyClass
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] (k : ℕ) : AddCommGroup (DeRhamCohomologyClass n X k) where
+  add_assoc := fun a b c => Quotient.inductionOn₃ a b c fun ωa ωb ωc =>
+    Quotient.sound (by
+      show Cohomologous _ _; unfold Cohomologous
+      cases k with
+      | zero => simp only [IsExact, ClosedForm.add_val, add_assoc, sub_self]
+      | succ k' => simp only [IsExact, ClosedForm.add_val, add_assoc, sub_self]; exact ⟨0, smoothExtDeriv_zero⟩)
+  zero_add := fun a => Quotient.inductionOn a fun ω =>
+    Quotient.sound (by
+      show Cohomologous _ _; unfold Cohomologous
+      cases k with
+      | zero => simp only [IsExact, ClosedForm.add_val, zero_add, sub_self]
+      | succ k' => simp only [IsExact, ClosedForm.add_val, zero_add, sub_self]; exact ⟨0, smoothExtDeriv_zero⟩)
+  add_zero := fun a => Quotient.inductionOn a fun ω =>
+    Quotient.sound (by
+      show Cohomologous _ _; unfold Cohomologous
+      cases k with
+      | zero => simp only [IsExact, ClosedForm.add_val, add_zero, sub_self]
+      | succ k' => simp only [IsExact, ClosedForm.add_val, add_zero, sub_self]; exact ⟨0, smoothExtDeriv_zero⟩)
+  sub_eq_add_neg := fun _ _ => rfl
+  neg_add_cancel := fun a => Quotient.inductionOn a fun ω =>
+    Quotient.sound (by
+      show Cohomologous _ _; unfold Cohomologous
+      cases k with
+      | zero => simp only [IsExact, ClosedForm.add_val, ClosedForm.neg_val, neg_add_cancel, sub_self]
+      | succ k' => simp only [IsExact, ClosedForm.add_val, ClosedForm.neg_val, neg_add_cancel, sub_self]; exact ⟨0, smoothExtDeriv_zero⟩)
+  add_comm := fun a b => Quotient.inductionOn₂ a b fun ωa ωb =>
+    Quotient.sound (by
+      show Cohomologous _ _; unfold Cohomologous
+      cases k with
+      | zero => simp only [IsExact, ClosedForm.add_val, add_comm, sub_self]
+      | succ k' => simp only [IsExact, ClosedForm.add_val, add_comm, sub_self]; exact ⟨0, smoothExtDeriv_zero⟩)
+  nsmul := nsmulRec
+  zsmul := zsmulRec
+
+-- SMul instance for complex scalars on cohomology classes (needed for Module)
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] in
+instance instSMulComplexDeRhamCohomologyClass (k : ℕ) : SMul ℂ (DeRhamCohomologyClass n X k) :=
+  ⟨DeRhamCohomologyClass.smul'⟩
+
+/-- **De Rham Cohomology Module Structure** (Concrete).
+    The de Rham cohomology H^k_dR(X) forms a ℂ-module.
+    Scalar multiplication defined via Quotient.lift on closed forms.
+    Reference: [G. de Rham, "Variétés Différentiables", 1955]. -/
+instance instModuleDeRhamCohomologyClass {n : ℕ} {X : Type u} [TopologicalSpace X]
+    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] (k : ℕ) : Module ℂ (DeRhamCohomologyClass n X k) where
+  one_smul := fun a => Quotient.inductionOn a fun ω =>
+    Quotient.sound (by
+      show Cohomologous _ _; unfold Cohomologous
+      cases k with
+      | zero => simp only [IsExact, one_smul, sub_self]
+      | succ k' => simp only [IsExact, one_smul, sub_self]; exact ⟨0, smoothExtDeriv_zero⟩)
+  mul_smul := fun r s a => Quotient.inductionOn a fun ω =>
+    Quotient.sound (by
+      show Cohomologous _ _; unfold Cohomologous
+      cases k with
+      | zero => simp only [IsExact, mul_smul, sub_self]
+      | succ k' => simp only [IsExact, mul_smul, sub_self]; exact ⟨0, smoothExtDeriv_zero⟩)
+  smul_zero := fun r => Quotient.sound (by
+    show Cohomologous _ _; unfold Cohomologous
+    cases k with
+    | zero => simp only [IsExact, smul_zero, sub_self]
+    | succ k' => simp only [IsExact, smul_zero, sub_self]; exact ⟨0, smoothExtDeriv_zero⟩)
+  smul_add := fun r a b => Quotient.inductionOn₂ a b fun ωa ωb =>
+    Quotient.sound (by
+      show Cohomologous _ _; unfold Cohomologous
+      cases k with
+      | zero => simp only [IsExact, ClosedForm.add_val, smul_add, sub_self]
+      | succ k' => simp only [IsExact, ClosedForm.add_val, smul_add, sub_self]; exact ⟨0, smoothExtDeriv_zero⟩)
+  add_smul := fun r s a => Quotient.inductionOn a fun ω =>
+    Quotient.sound (by
+      show Cohomologous _ _; unfold Cohomologous
+      cases k with
+      | zero => simp only [IsExact, ClosedForm.add_val, add_smul, sub_self]
+      | succ k' => simp only [IsExact, ClosedForm.add_val, add_smul, sub_self]; exact ⟨0, smoothExtDeriv_zero⟩)
+  zero_smul := fun a => Quotient.inductionOn a fun ω =>
+    Quotient.sound (by
+      show Cohomologous _ _; unfold Cohomologous
+      cases k with
+      | zero => simp only [IsExact, zero_smul, sub_self]
+      | succ k' => simp only [IsExact, zero_smul, sub_self]; exact ⟨0, smoothExtDeriv_zero⟩)
 
 /-- **Rational Scalar Multiplication on Cohomology** (Concrete).
     For q ∈ ℚ and [ω] ∈ H^k(X), we have q · [ω] = [(q:ℂ) · ω]. -/
@@ -418,10 +503,18 @@ def DeRhamCohomologyClass.ofForm {k : ℕ} (ω : SmoothForm n X k) (h : IsFormCl
 notation "⟦" ω "," h "⟧" => DeRhamCohomologyClass.ofForm ω h
 
 /-- Addition of forms lifts to cohomology classes.
-    The quotient map respects the additive structure on closed forms.
-    This is axiomatized because it relates the quotient structure to the axiomatized AddCommGroup. -/
-axiom ofForm_add {k : ℕ} (ω η : SmoothForm n X k) (hω : IsFormClosed ω) (hη : IsFormClosed η) :
-    ⟦ω + η, isFormClosed_add hω hη⟧ = ⟦ω, hω⟧ + ⟦η, hη⟧
+    The quotient map respects the additive structure on closed forms. -/
+theorem ofForm_add {k : ℕ} (ω η : SmoothForm n X k) (hω : IsFormClosed ω) (hη : IsFormClosed η) :
+    ⟦ω + η, isFormClosed_add hω hη⟧ = ⟦ω, hω⟧ + ⟦η, hη⟧ := by
+  apply Quotient.sound
+  show Cohomologous _ _
+  unfold Cohomologous
+  cases k with
+  | zero =>
+    simp only [IsExact, ClosedForm.add_val, sub_self]
+  | succ k' =>
+    simp only [IsExact, ClosedForm.add_val, sub_self]
+    exact ⟨0, smoothExtDeriv_zero⟩
 
 /-- Complex scalar mult of forms lifts to cohomology classes.
     The quotient map respects the ℂ-module structure on closed forms.
@@ -430,13 +523,13 @@ axiom ofForm_smul {k : ℕ} (c : ℂ) (ω : SmoothForm n X k) (hω : IsFormClose
     ⟦c • ω, isFormClosed_smul hω⟧ = c • ⟦ω, hω⟧
 
 /-- Subtraction of forms lifts to cohomology classes.
-    This is axiomatized because it relates the quotient structure to the axiomatized AddCommGroup. -/
+    This is axiomatized because the SmoothForm subtraction may differ from the quotient subtraction. -/
 axiom ofForm_sub {k : ℕ} (ω η : SmoothForm n X k) (hω : IsFormClosed ω) (hη : IsFormClosed η) :
     ⟦ω - η, isFormClosed_sub hω hη⟧ = ⟦ω, hω⟧ - ⟦η, hη⟧
 
 /-- Real scalar mult of forms lifts to cohomology classes.
     Note: Uses the ℂ-module structure via ℝ → ℂ embedding.
-    This is axiomatized because it relates the quotient structure to the axiomatized Module. -/
+    This is axiomatized because it involves coercions between ℝ and ℂ scalar multiplication. -/
 axiom ofForm_smul_real {k : ℕ} (r : ℝ) (ω : SmoothForm n X k) (hω : IsFormClosed ω) :
     ⟦r • ω, isFormClosed_smul_real hω⟧ = r • ⟦ω, hω⟧
 
