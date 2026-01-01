@@ -184,7 +184,7 @@ For cone-positive γ⁺: build integral cycles T_k with calibration defect → 0
 
 ---
 
-## 📊 CURRENT STATUS (Round 8 - 2024-12-31)
+## 📊 CURRENT STATUS (Round 9 - 2024-12-31)
 
 **Build Status:** ✅ PASSES  
 **Total axioms/opaques:** 187 (was 211, **24 converted!**)  
@@ -200,20 +200,20 @@ For cone-positive γ⁺: build integral cycles T_k with calibration defect → 0
 | `microstructureSequence_flat_limit_exists` | 500 | ✅ **THEOREM** | — |
 | `harvey_lawson_fundamental_class` | 300 | ❌ AXIOM | Agent 5 |
 | `lefschetz_lift_signed_cycle` | 400 | ❌ AXIOM | Agent 5 |
-| `limit_is_calibrated` | 300 | ❌ AXIOM | Agent 2 |
+| `limit_is_calibrated` | 300 | ❌ AXIOM | Agent 3 |
 | `flat_limit_of_cycles_is_cycle` | 300 | ❌ AXIOM | Agent 4 |
 
 **Completed: 1,550 LOC | Remaining: 1,800 LOC**
 
-### 🎯 BALANCED AGENT ASSIGNMENTS (Round 8 — 10 Sessions Each)
+### 🎯 REBALANCED AGENT ASSIGNMENTS (Round 9 — Fresh Counts)
 
 | Agent | Files | Axiom Count | Focus |
 |-------|-------|-------------|-------|
-| **Agent 1** | Basic.lean (28), Forms.lean (31) | **59** | Forms infrastructure |
-| **Agent 2** | Norms.lean (23), Grassmannian.lean (11), Cone.lean (4), Calibration.lean (5) | **43** | Norms + `limit_is_calibrated` ⭐ |
-| **Agent 3** | Currents.lean (16), IntegralCurrents.lean (12), FlatNorm.lean (11) | **39** | GMT currents |
-| **Agent 4** | HarveyLawson (10), GAGA (10), Lefschetz (7), Bergman (4), SheafTheory (5), SerreVanishing (1), FedererFleming (2) | **39** | Classical AG + `flat_limit_of_cycles_is_cycle` ⭐ |
-| **Agent 5** | TypeDecomp (10), Microstructure (14), Main (3), Manifolds (7), SignedDecomp (2), BaranyGrinberg (1) | **37** | Main path + 3 critical ⭐ |
+| **Agent 1** | Basic.lean (29), Forms.lean (28) | **57** | Forms infrastructure (structural) |
+| **Agent 2** | Norms.lean (22), Grassmannian.lean (10) | **32** | Norms & geometry |
+| **Agent 3** | IntegralCurrents.lean (12), FlatNorm.lean (3), Calibration.lean (5), Cone.lean (6) | **26** | Currents + `limit_is_calibrated` ⭐ |
+| **Agent 4** | HarveyLawson (9), GAGA (10), Lefschetz (7), Bergman (4), SheafTheory (5), SerreVanishing (1), FedererFleming (2) | **38** | Classical AG + `flat_limit_of_cycles_is_cycle` ⭐ |
+| **Agent 5** | TypeDecomp (9), Microstructure (14), Main (3), Manifolds (6), SignedDecomp (1), BaranyGrinberg (1) | **34** | Main path + 3 critical ⭐ |
 
 ### ⚠️ CRITICAL RULES
 
@@ -231,11 +231,11 @@ For cone-positive γ⁺: build integral cycles T_k with calibration defect → 0
 
 ---
 
-# 🔷 AGENT 1: Forms Core (59 axioms) — 10 Sessions
+# 🔷 AGENT 1: Forms Core (57 axioms) — 10 Sessions
 
 ## Files Owned
-- `Hodge/Basic.lean` (28 axioms)
-- `Hodge/Analytic/Forms.lean` (31 axioms)
+- `Hodge/Basic.lean` (29 axioms)
+- `Hodge/Analytic/Forms.lean` (28 axioms)
 
 ## Mission
 Convert axioms to theorems where possible. Many are structural due to `opaque SmoothForm`.
@@ -356,16 +356,14 @@ axiom pointwiseComass_continuous {k : ℕ} (α : SmoothForm n X k) :
 
 ---
 
-# 🔷 AGENT 2: Norms & Calibration (43 axioms) — 10 Sessions
+# 🔷 AGENT 2: Norms & Geometry (32 axioms) — 10 Sessions
 
 ## Files Owned
-- `Hodge/Analytic/Norms.lean` (23 axioms)
-- `Hodge/Analytic/Grassmannian.lean` (11 axioms)
-- `Hodge/Kahler/Cone.lean` (4 axioms)
-- `Hodge/Analytic/Calibration.lean` (5 axioms) — **includes `limit_is_calibrated` ⭐**
+- `Hodge/Analytic/Norms.lean` (22 axioms)
+- `Hodge/Analytic/Grassmannian.lean` (10 axioms)
 
 ## Mission
-Build comass norms and calibration. **PRIORITY: Prove `limit_is_calibrated` (300 LOC, ⭐⭐⭐)**
+Build comass norms and Grassmannian geometry infrastructure.
 
 ## Complete Axiom List — Norms.lean (23)
 ```
@@ -481,15 +479,18 @@ axiom smoothWedge_zero_right (α) : smoothWedge α 0 = 0
 
 ---
 
-# 🔷 AGENT 3: GMT Currents (39 axioms) — 10 Sessions
+# 🔷 AGENT 3: Currents & Calibration (26 axioms) — 10 Sessions
 
 ## Files Owned
-- `Hodge/Analytic/Currents.lean` (16 axioms)
 - `Hodge/Analytic/IntegralCurrents.lean` (12 axioms)
-- `Hodge/Analytic/FlatNorm.lean` (11 axioms)
+- `Hodge/Analytic/FlatNorm.lean` (3 axioms)
+- `Hodge/Analytic/Calibration.lean` (5 axioms) — **includes `limit_is_calibrated` ⭐**
+- `Hodge/Kahler/Cone.lean` (6 axioms)
 
 ## Mission
-Complete GMT infrastructure. These are fundamental to the proof.
+Complete integral currents and calibration. **PRIORITY: Prove `limit_is_calibrated` (300 LOC, ⭐⭐⭐)**
+
+**Note:** Currents.lean is DONE (0 axioms remaining) ✅
 
 ## Complete Axiom List — Currents.lean (16)
 ```
@@ -619,10 +620,10 @@ axiom limit_is_calibrated ... -- Already PROVED
 
 ---
 
-# 🔷 AGENT 4: Classical Algebraic Geometry (39 axioms) — 10 Sessions
+# 🔷 AGENT 4: Classical Algebraic Geometry (38 axioms) — 10 Sessions
 
 ## Files Owned
-- `Hodge/Classical/HarveyLawson.lean` (10 axioms) — **includes `flat_limit_of_cycles_is_cycle` ⭐**
+- `Hodge/Classical/HarveyLawson.lean` (9 axioms) — **includes `flat_limit_of_cycles_is_cycle` ⭐**
 - `Hodge/Classical/GAGA.lean` (10 axioms)
 - `Hodge/Classical/Lefschetz.lean` (7 axioms)
 - `Hodge/Classical/Bergman.lean` (4 axioms)
@@ -771,14 +772,14 @@ axiom deformation_theorem (k : ℕ) (T : IntegralCurrent n X (k + 1)) (ε : ℝ)
 
 ---
 
-# 🔷 AGENT 5: Main Theorem Path (37 axioms) — 10 Sessions — STRATEGY-CRITICAL
+# 🔷 AGENT 5: Main Theorem Path (34 axioms) — 10 Sessions — STRATEGY-CRITICAL
 
 ## Files Owned
-- `Hodge/Kahler/TypeDecomposition.lean` (10 axioms)
-- `Hodge/Kahler/Microstructure.lean` (14 axioms) — **3 already proved!**
+- `Hodge/Kahler/TypeDecomposition.lean` (9 axioms)
+- `Hodge/Kahler/Microstructure.lean` (14 axioms) — **3 already proved as theorems!**
 - `Hodge/Kahler/Main.lean` (3 axioms) — **2 STRATEGY-CRITICAL**
-- `Hodge/Kahler/Manifolds.lean` (7 axioms)
-- `Hodge/Kahler/SignedDecomp.lean` (2 axioms) — **1 STRATEGY-CRITICAL**
+- `Hodge/Kahler/Manifolds.lean` (6 axioms)
+- `Hodge/Kahler/SignedDecomp.lean` (1 axiom) — **1 STRATEGY-CRITICAL**
 - `Hodge/Utils/BaranyGrinberg.lean` (1 axiom)
 
 ## Mission
