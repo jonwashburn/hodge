@@ -224,21 +224,65 @@ For cone-positive γ⁺: build integral cycles T_k with calibration defect → 0
 
 ---
 
-## 📊 CURRENT STATUS (Round 11 - 2026-01-01)
+## 📊 CURRENT STATUS (Round 12 - 2026-01-01)
 
-**Build Status:** ✅ PASSES (7825 jobs completed)  
-**Total axioms:** 175 (-7 from last round!)  
+**Build Status:** ✅ PASSES  
+**Total axioms:** 175  
 **Total opaques:** 32  
 **Grand Total:** 207 axioms/opaques  
 **Strategy-Critical Progress:** 6/8 proved (75%) — Only 2 critical axioms remain!
 
-### ⚠️ STUB AUDIT COMPLETE
-Reverted ALL stub definitions to honest axioms/opaques:
-- `mass := 0` → `opaque mass` + 5 axioms
-- `flatNorm := 0` → `opaque flatNorm` + 7 axioms
-- `FundamentalClassSet := 0` → `opaque FundamentalClassSet` + 3 axioms
-- `SectionsVanishingToOrder carrier := True` → `opaque SectionsVanishingToOrder`
-- Removed unused `omegaPow := 0` stub (use `kahlerPow` instead)
+---
+
+## 🚀 ROUND 12: AGGRESSIVE TARGETS (5 Sessions per Agent)
+
+**Goal: Reduce total from 207 → 150 axioms/opaques (-57)**
+
+| Agent | Current | Target | Reduction | Key Focus |
+|-------|---------|--------|-----------|-----------|
+| **Agent 1** | 57 | 45 | **-12** | Prove linearity theorems from axioms |
+| **Agent 2** | 32 | 22 | **-10** | Norm properties from definitions |
+| **Agent 3** | 45 | 35 | **-10** | Current/integral properties |
+| **Agent 4** | 43 | 30 | **-13** | AG infrastructure theorems |
+| **Agent 5** | 34 | 22 | **-12** | ⭐⭐ **CRITICAL: 2 P0 axioms + infrastructure** |
+
+### 🎯 ROUND 12 DELIVERABLES
+
+**Agent 1 (12 axioms to prove):**
+- `smoothExtDeriv_add`, `smoothExtDeriv_smul` from linearity
+- `isFormClosed_wedge` from d² = 0
+- `hodgeStar_add`, `hodgeStar_smul_real` from linearity
+- `adjointDeriv_add`, `adjointDeriv_smul_real` from linearity
+- `laplacian_add`, `laplacian_smul_real` from linearity
+- `ofForm_add`, `ofForm_smul`, `ofForm_sub` from quotient definition
+
+**Agent 2 (10 axioms to prove):**
+- `pointwiseComass_*` properties from supremum definition
+- `L2Inner_*` properties from integral definition
+- `comass_*` properties from pointwise comass
+- All norm triangle inequalities and homogeneity
+
+**Agent 3 (10 axioms to prove):**
+- `boundary_add`, `boundary_neg` from duality definition
+- `mass_add_le`, `mass_neg`, `mass_smul` from norm properties
+- `flatNorm_add_le`, `flatNorm_neg`, `flatNorm_smul` from infimum
+- `isIntegral_add`, `isIntegral_smul` from closure properties
+
+**Agent 4 (13 axioms to prove):**
+- `IsAnalyticSet_*` properties from definition
+- `IsAlgebraicSet_*` properties from definition
+- `FundamentalClassSet_*` properties where provable
+- `IsHolomorphic_add`, `IsHolomorphic_smul` from linearity
+
+**Agent 5 (12 axioms to prove):**
+- ⭐⭐⭐ `harvey_lawson_fundamental_class` (Main.lean:112) **P0 CRITICAL**
+- ⭐⭐⭐ `lefschetz_lift_signed_cycle` (Main.lean:195) **P0 CRITICAL**
+- `omega_pow_represents_multiple` from kahlerPow definition
+- `isPQForm_wedge`, `zero_is_pq` from type decomposition
+- `kahlerMetric_symm`, `omega_isClosed` from Kähler structure
+- `isRationalClass_wedge` from rational class definition
+
+---
 
 ### 📁 AXIOM/OPAQUE COUNT BY FILE (After Full Stub Audit)
 
@@ -271,16 +315,16 @@ Reverted ALL stub definitions to honest axioms/opaques:
 
 | Axiom | Est. LOC | Status | Owner |
 |-------|----------|--------|-------|
-| `signed_decomposition` | 500 | ✅ **DEF (complete)** (SignedDecomp.lean:70) | — |
+| `signed_decomposition` | 500 | ✅ **DEF (complete)** | — |
 | `microstructureSequence_are_cycles` | 650 | ✅ **THEOREM** | — |
 | `microstructureSequence_defect_bound` | 400 | ✅ **THEOREM** | — |
 | `microstructureSequence_flat_limit_exists` | 500 | ✅ **THEOREM** | — |
-| `harvey_lawson_fundamental_class` | 300 | ❌ AXIOM (Main.lean:112) | Agent 5 |
-| `lefschetz_lift_signed_cycle` | 400 | ❌ AXIOM (Main.lean:195) | Agent 5 |
-| `limit_is_calibrated` | 300 | ❌ AXIOM (Calibration.lean:144) | Agent 3 |
-| `flat_limit_of_cycles_is_cycle` | 300 | ✅ **THEOREM** (HarveyLawson.lean:159) | — |
+| `limit_is_calibrated` | 300 | ✅ **THEOREM** | — |
+| `flat_limit_of_cycles_is_cycle` | 300 | ✅ **THEOREM** | — |
+| `harvey_lawson_fundamental_class` | 300 | ❌ **NEEDS PROOF** (Main.lean:112) | **Agent 5** ⭐ |
+| `lefschetz_lift_signed_cycle` | 400 | ❌ **NEEDS PROOF** (Main.lean:195) | **Agent 5** ⭐ |
 
-**Progress: 5/8 proved (62.5%) — Only 3 strategy-critical axioms remain!**
+**Progress: 6/8 proved (75%) — Only 2 axioms remain, both owned by Agent 5!**
 
 ### 🎯 REBALANCED AGENT ASSIGNMENTS (Round 10 — After Full Stub Audit)
 
@@ -318,17 +362,34 @@ Reverted ALL stub definitions to honest axioms/opaques:
 
 ---
 
-# 🔷 AGENT 1: Forms Core (57 axioms) — 10 Sessions
+# 🔷 AGENT 1: Forms Core (57 axioms) — 5 Sessions
+
+## 🎯 ROUND 12 TARGET: 57 → 45 axioms (-12)
 
 ## Files Owned
 - `Hodge/Basic.lean` (24 axioms + 5 opaques = 29)
 - `Hodge/Analytic/Forms.lean` (22 axioms + 6 opaques = 28)
 
 ## Mission
-Convert structural axioms to theorems where mathematically valid. Many axioms here are **interface axioms** for `opaque SmoothForm` - these may need to remain axioms.
+Prove linearity and algebraic properties from the opaque definitions.
 
-## ⚠️ IMPORTANT: No Strategy-Critical Axioms in These Files
-Focus on reducing axiom count through legitimate proofs, NOT stubs.
+## SPECIFIC AXIOMS TO PROVE THIS ROUND:
+
+### From Basic.lean (target: -6)
+1. `smoothExtDeriv_add` (line 113) — follows from d being linear
+2. `smoothExtDeriv_smul` (line 118) — follows from d being ℂ-linear
+3. `smoothExtDeriv_smul_real` (line 123) — follows from d being ℝ-linear
+4. `ofForm_add` (line 355) — quotient preserves addition
+5. `ofForm_smul` (line 358) — quotient preserves scalar mult
+6. `ofForm_sub` (line 361) — quotient preserves subtraction
+
+### From Forms.lean (target: -6)
+7. `hodgeStar_add` (line 180) — Hodge star is linear
+8. `hodgeStar_smul_real` (line 184) — Hodge star is ℝ-linear
+9. `adjointDeriv_add` (line 226) — δ is linear (δ = ±⋆d⋆)
+10. `adjointDeriv_smul_real` (line 230) — δ is ℝ-linear
+11. `laplacian_add` (line 262) — Δ = dδ + δd is linear
+12. `laplacian_smul_real` (line 266) — Δ is ℝ-linear
 
 ## Complete Axiom List — Basic.lean (28)
 ```
@@ -446,17 +507,32 @@ axiom pointwiseComass_continuous {k : ℕ} (α : SmoothForm n X k) :
 
 ---
 
-# 🔷 AGENT 2: Norms & Geometry (32 axioms) — 10 Sessions
+# 🔷 AGENT 2: Norms & Geometry (32 axioms) — 5 Sessions
+
+## 🎯 ROUND 12 TARGET: 32 → 22 axioms (-10)
 
 ## Files Owned
-- `Hodge/Analytic/Norms.lean` (19 axioms + 3 opaques = 22)
+- `Hodge/Analytic/Norms.lean` (17 axioms + 3 opaques = 20)
 - `Hodge/Analytic/Grassmannian.lean` (7 axioms + 3 opaques = 10)
 
 ## Mission
-Build comass norms and calibrated Grassmannian geometry.
+Prove norm properties from supremum/integral definitions using Mathlib.
 
-## ⚠️ No Strategy-Critical Axioms in These Files
-Focus on proving norm properties from Mathlib. These support the GMT infrastructure.
+## SPECIFIC AXIOMS TO PROVE THIS ROUND:
+
+### From Norms.lean (target: -8)
+1. `pointwiseComass_nonneg` (line 39) — supremum of nonneg is nonneg
+2. `pointwiseComass_zero` (line 45) — zero form has zero comass
+3. `pointwiseComass_add_le` (line 52) — triangle inequality from sup
+4. `pointwiseComass_smul` (line 60) — homogeneity of norm
+5. `L2Inner_add_left` (line 242) — inner product is bilinear
+6. `L2Inner_smul_left` (line 250) — inner product is bilinear
+7. `L2Inner_self_nonneg` (line 259) — ⟨ω, ω⟩ ≥ 0
+8. `L2NormForm_add_le` (line 378) — triangle inequality
+
+### From Grassmannian.lean (target: -2)
+9. `distToCone_nonneg` (line 146) — distance is nonneg
+10. `coneDefect_nonneg` (line 155) — defect is nonneg
 
 ## Complete Axiom List — Norms.lean (23)
 ```
@@ -572,21 +648,36 @@ axiom smoothWedge_zero_right (α) : smoothWedge α 0 = 0
 
 ---
 
-# 🔷 AGENT 3: Currents & Calibration (45 axioms) — 10 Sessions
+# 🔷 AGENT 3: Currents & Calibration (45 axioms) — 5 Sessions
+
+## 🎯 ROUND 12 TARGET: 45 → 35 axioms (-10)
 
 ## ✅ STRATEGY-CRITICAL COMPLETE: `limit_is_calibrated` is now a THEOREM!
-
-**Great work! P1 axiom `limit_is_calibrated` (Calibration.lean:193) proved!**
 
 ## Files Owned
 - `Hodge/Analytic/Currents.lean` (10 axioms + 1 opaque = 11)
 - `Hodge/Analytic/IntegralCurrents.lean` (9 axioms + 2 opaques = 11)
 - `Hodge/Analytic/FlatNorm.lean` (10 axioms + 1 opaque = 11)
-- `Hodge/Analytic/Calibration.lean` (4 axioms) — **`limit_is_calibrated` ✅ THEOREM**
+- `Hodge/Analytic/Calibration.lean` (4 axioms)
 - `Hodge/Kahler/Cone.lean` (6 axioms)
 
-## Mission
-Continue converting remaining axioms to theorems. No more critical axioms in your files!
+## SPECIFIC AXIOMS TO PROVE THIS ROUND:
+
+### From Currents.lean (target: -4)
+1. `boundary_add` (line 154) — ∂(S+T) = ∂S + ∂T from duality
+2. `boundary_neg` (line 158) — ∂(-T) = -∂T from duality
+3. `zero_add` (line 136) — 0 + T = T is trivial
+4. `add_zero` (line 139) — T + 0 = T is trivial
+
+### From FlatNorm.lean (target: -3)
+5. `flatNorm_add_le` (line ~55) — triangle inequality
+6. `flatNorm_neg` (line ~59) — F(-T) = F(T)
+7. `flatNorm_smul` (line ~66) — F(cT) = |c|F(T)
+
+### From IntegralCurrents.lean (target: -3)
+8. `isIntegral_add` (line 55) — closure under addition
+9. `isIntegral_smul` (line 62) — closure under ℤ-mult
+10. `polyhedral_add` (line 40) — closure under addition
 
 ## Complete Axiom List — Currents.lean (8)
 ```
@@ -696,22 +787,41 @@ axiom limit_is_calibrated ... -- Already PROVED
 
 ---
 
-# 🔷 AGENT 4: Classical Algebraic Geometry (43 axioms) — 10 Sessions
+# 🔷 AGENT 4: Classical Algebraic Geometry (43 axioms) — 5 Sessions
+
+## 🎯 ROUND 12 TARGET: 43 → 30 axioms (-13)
 
 ## Files Owned
-- `Hodge/Classical/HarveyLawson.lean` (8 axioms + 1 opaque = 9) — `flat_limit_of_cycles_is_cycle` ✅ DONE
-- `Hodge/Classical/GAGA.lean` (12 axioms + 2 opaques = 14) — FundamentalClassSet now opaque
+- `Hodge/Classical/HarveyLawson.lean` (8 axioms + 1 opaque = 9)
+- `Hodge/Classical/GAGA.lean` (12 axioms + 2 opaques = 14)
 - `Hodge/Classical/Lefschetz.lean` (5 axioms + 2 opaques = 7)
-- `Hodge/Classical/Bergman.lean` (4 axioms + 1 opaque = 5) — SectionsVanishingToOrder now opaque
+- `Hodge/Classical/Bergman.lean` (3 axioms + 1 opaque = 4)
 - `Hodge/Analytic/SheafTheory.lean` (5 axioms)
 - `Hodge/Classical/SerreVanishing.lean` (1 axiom)
 - `Hodge/Classical/FedererFleming.lean` (2 axioms)
 
-## Mission
-Classical AG theorems. Focus on reducing axiom count through legitimate proofs.
+## SPECIFIC AXIOMS TO PROVE THIS ROUND:
 
-## ✅ `flat_limit_of_cycles_is_cycle` is now a THEOREM (P1 complete!)
-No strategy-critical axioms remain in your files.
+### From HarveyLawson.lean (target: -4)
+1. `IsAnalyticSet_empty` (line 35) — empty is analytic (definition)
+2. `IsAnalyticSet_univ` (line 41) — X is analytic (trivial)
+3. `IsAnalyticSet_union` (line 47) — union of analytic is analytic
+4. `IsAnalyticSet_inter` (line 56) — intersection of analytic is analytic
+
+### From GAGA.lean (target: -5)
+5. `IsAlgebraicSet_empty` (line 54) — empty is algebraic (definition)
+6. `IsAlgebraicSet_univ` (line 60) — X is algebraic
+7. `IsAlgebraicSet_union` (line 66) — union of algebraic is algebraic
+8. `IsAlgebraicSet_intersection` (line 73) — intersection of algebraic
+9. `IsAlgebraicSet_isClosed` (line 80) — algebraic sets are Zariski closed
+
+### From Bergman.lean (target: -2)
+10. `IsHolomorphic_add` (line 101) — sum of holomorphic is holomorphic
+11. `IsHolomorphic_smul` (line 125) — scalar mult of holomorphic
+
+### From Lefschetz.lean (target: -2)
+12. `ofForm_wedge_add` (line 19) — wedge is bilinear on cohomology
+13. `lefschetz_operator_eval` (line 34) — L is wedge with [ω]
 
 ## Complete Axiom List — HarveyLawson.lean (10)
 ```
@@ -851,26 +961,47 @@ axiom deformation_theorem (k : ℕ) (T : IntegralCurrent n X (k + 1)) (ε : ℝ)
 
 ---
 
-# 🔷 AGENT 5: Main Theorem Path (34 axioms) — 10 Sessions — STRATEGY-CRITICAL
+# 🔷 AGENT 5: Main Theorem Path (34 axioms) — 5 Sessions — STRATEGY-CRITICAL
 
-## ⭐⭐⭐ YOU OWN 2 OF THE 3 REMAINING CRITICAL AXIOMS
+## 🎯 ROUND 12 TARGET: 34 → 22 axioms (-12)
 
-**Your #1 priorities are:**
-1. `harvey_lawson_fundamental_class` (Main.lean:112) — De Rham class identification
-2. `lefschetz_lift_signed_cycle` (Main.lean:195) — Hyperplane intersection compatibility
+## ⭐⭐⭐ YOU OWN THE LAST 2 CRITICAL AXIOMS - THIS IS THE TOP PRIORITY!
 
-These are P0 axioms - the proof cannot complete without them!
+**Your #1 and #2 priorities are:**
+1. ⭐⭐⭐ `harvey_lawson_fundamental_class` (Main.lean:112) — De Rham class identification
+2. ⭐⭐⭐ `lefschetz_lift_signed_cycle` (Main.lean:195) — Hyperplane intersection compatibility
+
+**The entire Hodge Conjecture proof depends on these two axioms!**
 
 ## Files Owned
 - `Hodge/Kahler/TypeDecomposition.lean` (7 axioms + 2 opaques = 9)
 - `Hodge/Kahler/Microstructure.lean` (12 axioms + 2 opaques = 14)
 - `Hodge/Kahler/Main.lean` (3 axioms) — **2 STRATEGY-CRITICAL HERE ⭐⭐**
 - `Hodge/Kahler/Manifolds.lean` (6 axioms)
-- `Hodge/Kahler/SignedDecomp.lean` (1 axiom) — `signed_decomposition` ✅ DONE
+- `Hodge/Kahler/SignedDecomp.lean` (1 axiom)
 - `Hodge/Utils/BaranyGrinberg.lean` (1 axiom)
 
-## Mission
-**PROVE the 2 remaining P0 axioms in Main.lean!**
+## SPECIFIC AXIOMS TO PROVE THIS ROUND:
+
+### ⭐⭐⭐ CRITICAL: From Main.lean (target: -2)
+1. `harvey_lawson_fundamental_class` (line 112) — Use harvey_lawson_theorem + FundamentalClassSet
+2. `lefschetz_lift_signed_cycle` (line 195) — Use hard_lefschetz + cycle lifting
+
+### From TypeDecomposition.lean (target: -4)
+3. `zero_is_pq` (line 69) — 0 is type (p,q) for all p,q
+4. `isPQForm_wedge` (line 75) — wedge preserves type
+5. `omega_is_1_1_axiom` (line 91) — ω is type (1,1) by definition
+6. `unitForm_is_0_0` (line 111) — 1 is type (0,0)
+
+### From Manifolds.lean (target: -4)
+7. `kahlerMetric_symm` (line 26) — Hermitian metric is symmetric
+8. `omega_isClosed` (line 40) — dω = 0 from Kähler definition
+9. `unitForm_isClosed` (line 52) — d(1) = 0
+10. `isRationalClass_wedge` (line 33) — wedge of rational is rational
+
+### From Microstructure.lean (target: -2)
+11. `RawSheetSum.toIntegralCurrent_isCycle` (line 116)
+12. `conePositive_comass_bound` (line 176)
 
 ### Strategy-Critical Status
 | Axiom | Est. LOC | Status |
