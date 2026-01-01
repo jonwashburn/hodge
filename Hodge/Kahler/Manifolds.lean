@@ -29,15 +29,18 @@ axiom kahlerMetric_symm (x : X) (v w : TangentSpace (𝓒_complex n) x) :
 
 /-! ## Rationality -/
 
-/-- The wedge product of two rational cohomology classes is rational. -/
-axiom isRationalClass_wedge {k l : ℕ}
+/-- The wedge product of two rational cohomology classes is rational.
+    This is just a re-export of `isRationalClass_mul` from Basic.lean. -/
+theorem isRationalClass_wedge {k l : ℕ}
     (η₁ : DeRhamCohomologyClass n X k) (η₂ : DeRhamCohomologyClass n X l) :
-    isRationalClass η₁ → isRationalClass η₂ → isRationalClass (η₁ * η₂)
+    isRationalClass η₁ → isRationalClass η₂ → isRationalClass (η₁ * η₂) :=
+  isRationalClass_mul η₁ η₂
 
 -- isRationalClass_smul_rat is defined in Basic.lean
 
-/-- **Axiom: Kähler form is closed (dω = 0).** -/
-axiom omega_isClosed : IsFormClosed (K.omega_form)
+/-- **Theorem: Kähler form is closed (dω = 0).**
+    This follows directly from the KahlerManifold class definition. -/
+theorem omega_isClosed : IsFormClosed (K.omega_form) := K.omega_closed
 
 /-- The Kähler form represents a rational cohomology class. -/
 axiom omega_is_rational : isRationalClass ⟦K.omega_form, omega_isClosed⟧

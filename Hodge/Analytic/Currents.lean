@@ -47,9 +47,23 @@ theorem map_add {n k : ℕ} {X : Type*} [TopologicalSpace X] [ChartedSpace (Eucl
     (T : Current n X k) (ω₁ ω₂ : SmoothForm n X k) : T.toFun (ω₁ + ω₂) = T.toFun ω₁ + T.toFun ω₂ :=
   map_add' T ω₁ ω₂
 
-axiom map_smul' {n k : ℕ} {X : Type*} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+/-- Scalar multiplication is linear (derived from is_linear axiom).
+    Proof: Set ω₂ = 0 in is_linear: toFun(c•ω₁ + 0) = c * toFun(ω₁) + toFun(0) = c * toFun(ω₁). -/
+theorem map_smul' {n k : ℕ} {X : Type*} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
-    (T : Current n X k) (r : ℝ) (ω : SmoothForm n X k) : T.toFun (r • ω) = r * T.toFun ω
+    (T : Current n X k) (r : ℝ) (ω : SmoothForm n X k) : T.toFun (r • ω) = r * T.toFun ω := by
+  -- First show toFun 0 = 0
+  have h_zero : T.toFun 0 = 0 := by
+    -- Using is_linear with c = 1, ω₁ = 0, ω₂ = 0:
+    -- toFun (1 • 0 + 0) = 1 * toFun 0 + toFun 0
+    -- toFun 0 = toFun 0 + toFun 0
+    have h := T.is_linear 1 0 0
+    simp only [one_smul, zero_add, one_mul] at h
+    linarith
+  -- Now use is_linear with ω₂ = 0
+  have h := T.is_linear r ω 0
+  simp only [add_zero] at h
+  rw [h, h_zero, add_zero]
 
 theorem map_smul {n k : ℕ} {X : Type*} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]

@@ -64,12 +64,13 @@ axiom pointwiseComass_smul {n : ℕ} {X : Type*}
     {k : ℕ} (r : ℝ) (α : SmoothForm n X k) (x : X) :
     pointwiseComass (r • α) x = |r| * pointwiseComass α x
 
-/-- **Negation as Scalar Multiplication** (Structural).
-    For opaque `SmoothForm`, we axiomatize that negation equals
-    scalar multiplication by -1, which holds for any module. -/
-axiom SmoothForm.neg_eq_neg_one_smul {n : ℕ} {X : Type*}
+/-- **Negation as Scalar Multiplication** (Derived from Module structure).
+    For any module, negation equals scalar multiplication by -1.
+    This follows from the standard Mathlib lemma `neg_one_smul`. -/
+theorem SmoothForm.neg_eq_neg_one_smul {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    {k : ℕ} (α : SmoothForm n X k) : (-α) = (-1 : ℝ) • α
+    {k : ℕ} (α : SmoothForm n X k) : (-α) = (-1 : ℝ) • α := by
+  rw [neg_one_smul]
 
 theorem pointwiseComass_neg {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
@@ -157,12 +158,45 @@ theorem comass_add_le {n : ℕ} {X : Type*}
     The comass scales by the absolute value of the scalar: comass(r·α) = |r| · comass(α).
     This follows from the homogeneity of norms.
     Reference: [H. Federer, "Geometric Measure Theory", 1969, Section 4.1]. -/
-axiom comass_smul {n : ℕ} {X : Type*}
+theorem comass_smul {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [Nonempty X]
     {k : ℕ} (r : ℝ) (α : SmoothForm n X k) :
-    comass (r • α) = |r| * comass α
+    comass (r • α) = |r| * comass α := by
+  unfold comass
+  -- pointwiseComass (r • α) x = |r| * pointwiseComass α x by pointwiseComass_smul
+  have h_range : range (pointwiseComass (r • α)) = (fun t => |r| * t) '' range (pointwiseComass α) := by
+    ext t
+    simp only [mem_range, mem_image]
+    constructor
+    · intro ⟨x, hx⟩
+      use pointwiseComass α x, ⟨x, rfl⟩
+      rw [← hx, pointwiseComass_smul]
+    · intro ⟨s, ⟨x, hx⟩, hs⟩
+      use x
+      rw [pointwiseComass_smul]
+      rw [hx, hs]
+  rw [h_range]
+  -- Now need: sSup ((fun t => |r| * t) '' S) = |r| * sSup S
+  by_cases hr : r = 0
+  · -- If r = 0, both sides are 0
+    subst hr
+    simp only [abs_zero, zero_mul]
+    -- After simp, goal is sSup ((fun _ => 0) '' range ...) = 0
+    have h0 : (fun a => (0 : ℝ)) '' range (pointwiseComass α) = {0} := by
+      ext t
+      simp only [mem_image, mem_range, mem_singleton_iff]
+      constructor
+      · intro ⟨_, _, hs⟩; exact hs.symm
+      · intro ht; obtain ⟨x⟩ : Nonempty X := inferInstance; exact ⟨pointwiseComass α x, ⟨x, rfl⟩, ht.symm⟩
+    rw [h0]
+    exact csSup_singleton (0 : ℝ)
+  · -- If r ≠ 0, use monotonicity of scaling
+    have hr_pos : |r| > 0 := abs_pos.mpr hr
+    have h_mono : Monotone (fun t => |r| * t) := fun _ _ hab => mul_le_mul_of_nonneg_left hab (le_of_lt hr_pos)
+    have h_cont : Continuous (fun t => |r| * t) := continuous_const.mul continuous_id
+    rw [Monotone.map_csSup_of_continuousAt h_cont.continuousAt h_mono (range_nonempty _) (comass_bddAbove α)]
 
 /-- Comass is non-negative (derived from pointwiseComass_nonneg). -/
 theorem comass_nonneg {n : ℕ} {X : Type*}

@@ -224,92 +224,120 @@ For cone-positive γ⁺: build integral cycles T_k with calibration defect → 0
 
 ---
 
-## 📊 CURRENT STATUS (Round 12 - 2026-01-01)
+## 📊 CURRENT STATUS (Round 13 - 2026-01-01)
 
 **Build Status:** ✅ PASSES  
-**Total axioms:** 175  
-**Total opaques:** 32  
-**Grand Total:** 207 axioms/opaques  
+**Total axioms:** 147  
+**Total opaques:** 29  
+**Grand Total:** 176 axioms/opaques  
 **Strategy-Critical Progress:** 6/8 proved (75%) — Only 2 critical axioms remain!
+**Progress:** Round 12 reduced 207 → 176 (-31 axioms/opaques)
 
 ---
 
-## 🚀 ROUND 12: AGGRESSIVE TARGETS (5 Sessions per Agent)
+## 🚀 ROUND 13: AGGRESSIVE TARGETS (5 Sessions per Agent)
 
-**Goal: Reduce total from 207 → 150 axioms/opaques (-57)**
+**Goal: Reduce total from 176 → 120 axioms/opaques (-56)**
 
 | Agent | Current | Target | Reduction | Key Focus |
 |-------|---------|--------|-----------|-----------|
-| **Agent 1** | 57 | 45 | **-12** | Prove linearity theorems from axioms |
-| **Agent 2** | 32 | 22 | **-10** | Norm properties from definitions |
-| **Agent 3** | 45 | 35 | **-10** | Current/integral properties |
-| **Agent 4** | 43 | 30 | **-13** | AG infrastructure theorems |
-| **Agent 5** | 34 | 22 | **-12** | ⭐⭐ **CRITICAL: 2 P0 axioms + infrastructure** |
+| **Agent 1** | 57 | 42 | **-15** | Prove linearity theorems (extDeriv, hodgeStar, etc.) |
+| **Agent 2** | 28 | 18 | **-10** | Norm properties (comass, L2, Grassmannian) |
+| **Agent 3** | 35 | 25 | **-10** | GMT: Currents, FlatNorm, IntegralCurrents |
+| **Agent 4** | 24 | 15 | **-9** | Classical AG: Lefschetz, Bergman, SheafTheory |
+| **Agent 5** | 32 | 20 | **-12** | ⭐⭐⭐ **2 P0 CRITICAL + Kähler infrastructure** |
 
-### 🎯 ROUND 12 DELIVERABLES
+### 🎯 ROUND 13 DELIVERABLES
 
-**Agent 1 (12 axioms to prove):**
-- `smoothExtDeriv_add`, `smoothExtDeriv_smul` from linearity
-- `isFormClosed_wedge` from d² = 0
-- `hodgeStar_add`, `hodgeStar_smul_real` from linearity
-- `adjointDeriv_add`, `adjointDeriv_smul_real` from linearity
-- `laplacian_add`, `laplacian_smul_real` from linearity
-- `ofForm_add`, `ofForm_smul`, `ofForm_sub` from quotient definition
+**Agent 1 (15 axioms → theorems):**
+1. `smoothExtDeriv_add` (Basic.lean) — from linearity of d
+2. `smoothExtDeriv_smul` (Basic.lean) — scalar multiplication
+3. `smoothExtDeriv_neg` (Basic.lean) — negation 
+4. `smoothExtDeriv_sub` (Basic.lean) — subtraction
+5. `hodgeStar_add` (Forms.lean) — Hodge star linearity
+6. `hodgeStar_smul_real` (Forms.lean) — real scalar
+7. `hodgeStar_involute` (Forms.lean) — ⋆(⋆ω) = ±ω
+8. `adjointDeriv_add` (Forms.lean) — codifferential linearity  
+9. `adjointDeriv_smul_real` (Forms.lean) — real scalar
+10. `laplacian_add` (Forms.lean) — Laplacian linearity
+11. `laplacian_smul_real` (Forms.lean) — real scalar
+12. `ofForm_add` (Basic.lean) — cohomology addition
+13. `ofForm_smul_real` (Basic.lean) — real scalar
+14. `ofForm_sub` (Basic.lean) — subtraction
+15. `instAddCommGroupDeRhamCohomologyClass` (Basic.lean) — full instance
 
-**Agent 2 (10 axioms to prove):**
-- `pointwiseComass_*` properties from supremum definition
-- `L2Inner_*` properties from integral definition
-- `comass_*` properties from pointwise comass
-- All norm triangle inequalities and homogeneity
+**Agent 2 (10 axioms → theorems):**
+1. `pointwiseComass_add_le` (Norms.lean) — triangle inequality
+2. `pointwiseComass_neg` (Norms.lean) — |-ω| = |ω|
+3. `pointwiseComass_smul` (Norms.lean) — |cω| = |c||ω|
+4. `L2Inner_add_left` (Norms.lean) — bilinearity
+5. `L2Inner_add_right` (Norms.lean) — bilinearity
+6. `L2Inner_smul_left` (Norms.lean) — scalar
+7. `L2Inner_smul_right` (Norms.lean) — scalar
+8. `comass_add_le` (Norms.lean) — triangle
+9. `calibratedGrass_*` (Grassmannian.lean) — 3 from structure
 
-**Agent 3 (10 axioms to prove):**
-- `boundary_add`, `boundary_neg` from duality definition
-- `mass_add_le`, `mass_neg`, `mass_smul` from norm properties
-- `flatNorm_add_le`, `flatNorm_neg`, `flatNorm_smul` from infimum
-- `isIntegral_add`, `isIntegral_smul` from closure properties
+**Agent 3 (10 axioms → theorems):**
+1. `boundary_add` (Currents.lean) — ∂(T+S) = ∂T + ∂S
+2. `boundary_neg` (Currents.lean) — ∂(-T) = -∂T
+3. `boundary_smul` (Currents.lean) — ∂(cT) = c∂T
+4. `flatNorm_add_le` (FlatNorm.lean) — triangle
+5. `flatNorm_neg` (FlatNorm.lean) — |−T|_F = |T|_F
+6. `flatNorm_smul` (FlatNorm.lean) — |cT|_F = |c||T|_F
+7. `isIntegral_add` (IntegralCurrents.lean) — closure under +
+8. `isIntegral_neg` (IntegralCurrents.lean) — closure under −
+9. `isIntegral_smul_int` (IntegralCurrents.lean) — closure under ℤ⋅
+10. `isCycle_zero` (IntegralCurrents.lean) — 0 is a cycle
 
-**Agent 4 (13 axioms to prove):**
-- `IsAnalyticSet_*` properties from definition
-- `IsAlgebraicSet_*` properties from definition
-- `FundamentalClassSet_*` properties where provable
-- `IsHolomorphic_add`, `IsHolomorphic_smul` from linearity
+**Agent 4 (9 axioms → theorems):**
+1. `lefschetz_operator_eval` (Lefschetz.lean) — L applied to class
+2. `hard_lefschetz_surjective` (Lefschetz.lean) — from bijective
+3. `IsHolomorphic_add` (Bergman.lean) — linearity
+4. `IsHolomorphic_smul` (Bergman.lean) — scalar
+5. `coherentSheaf_*` (SheafTheory.lean) — 3 from structure
+6. `idealSheaf_*` (SheafTheory.lean) — 2 from structure
 
-**Agent 5 (12 axioms to prove):**
-- ⭐⭐⭐ `harvey_lawson_fundamental_class` (Main.lean:112) **P0 CRITICAL**
-- ⭐⭐⭐ `lefschetz_lift_signed_cycle` (Main.lean:195) **P0 CRITICAL**
-- `omega_pow_represents_multiple` from kahlerPow definition
-- `isPQForm_wedge`, `zero_is_pq` from type decomposition
-- `kahlerMetric_symm`, `omega_isClosed` from Kähler structure
-- `isRationalClass_wedge` from rational class definition
+**Agent 5 (12 axioms → theorems):**
+1. ⭐⭐⭐ `harvey_lawson_fundamental_class` (Main.lean:112) — **P0 CRITICAL**
+2. ⭐⭐⭐ `lefschetz_lift_signed_cycle` (Main.lean:195) — **P0 CRITICAL**
+3. `isPQForm_add` (TypeDecomp.lean) — closure under +
+4. `isPQForm_neg` (TypeDecomp.lean) — closure under −
+5. `isPQForm_smul` (TypeDecomp.lean) — scalar
+6. `isPQForm_wedge` (TypeDecomp.lean) — wedge compatibility
+7. `omega_isClosed` (Manifolds.lean) — dω = 0
+8. `omega_is_rational` (Manifolds.lean) — ω ∈ H²(X,ℚ)
+9. `cubulation_exists'` (Microstructure.lean) — cubulation
+10. `local_sheet_realization` (Microstructure.lean) — sheets
+11. `gluing_flat_norm_bound` (Microstructure.lean) — bound
+12. `calibration_defect_from_gluing` (Microstructure.lean) — defect
 
 ---
 
-### 📁 AXIOM/OPAQUE COUNT BY FILE (After Full Stub Audit)
+### 📁 AXIOM/OPAQUE COUNT BY FILE (Fresh Scan Round 13)
 
 | File | Axioms | Opaques | Total | Notes |
 |------|--------|---------|-------|-------|
 | Basic.lean | 24 | 5 | 29 | Core SmoothForm infrastructure |
 | Forms.lean | 22 | 6 | 28 | Wedge, Hodge star, Laplacian |
-| Norms.lean | 19 | 3 | 22 | Comass, L2 norms |
-| Currents.lean | 12 | 1 | 13 | Mass now opaque (+5 axioms) |
-| **GAGA.lean** | **12** | **2** | **14** | **FundamentalClassSet now opaque (+3)** |
+| Norms.lean | 15 | 3 | 18 | Comass, L2 norms |
 | Microstructure.lean | 12 | 2 | 14 | Cubulation, gluing |
-| FlatNorm.lean | 10 | 1 | 11 | FlatNorm now opaque (+7 axioms) |
-| IntegralCurrents.lean | 10 | 2 | 12 | Integral currents |
-| HarveyLawson.lean | 8 | 1 | 9 | Harvey-Lawson theorem |
-| TypeDecomposition.lean | 7 | 2 | 9 | (p,q)-forms |
+| Currents.lean | 9 | 2 | 11 | Mass opaque |
+| FlatNorm.lean | 10 | 1 | 11 | FlatNorm opaque |
 | Grassmannian.lean | 7 | 3 | 10 | Calibrated Grassmannian |
-| Manifolds.lean | 6 | 0 | 6 | Kähler manifolds |
+| IntegralCurrents.lean | 7 | 2 | 9 | Integral currents |
+| TypeDecomposition.lean | 7 | 2 | 9 | (p,q)-forms |
+| Lefschetz.lean | 4 | 2 | 6 | Hard Lefschetz |
 | Cone.lean | 6 | 0 | 6 | Calibrated cone |
-| Lefschetz.lean | 5 | 2 | 7 | Hard Lefschetz |
 | SheafTheory.lean | 5 | 0 | 5 | Coherent sheaves |
-| Calibration.lean | 5 | 0 | 5 | **limit_is_calibrated here** |
-| **Bergman.lean** | 4 | **1** | **5** | **SectionsVanishingToOrder now opaque** |
-| Main.lean | 3 | 0 | 3 | **2 critical axioms here** |
+| Calibration.lean | 4 | 0 | 4 | ✅ limit_is_calibrated done |
+| Bergman.lean | 3 | 1 | 4 | Holomorphic sections |
+| Manifolds.lean | 4 | 0 | 4 | Kähler manifolds |
+| Main.lean | 3 | 0 | 3 | **2 critical axioms** |
 | FedererFleming.lean | 2 | 0 | 2 | Compactness |
-| BaranyGrinberg.lean | 1 | 0 | 1 | Combinatorics |
-| SignedDecomp.lean | 1 | 0 | 1 | ✅ signed_decomposition done |
 | SerreVanishing.lean | 1 | 0 | 1 | Serre vanishing |
+| SignedDecomp.lean | 1 | 0 | 1 | ✅ signed_decomposition done |
+| BaranyGrinberg.lean | 1 | 0 | 1 | Combinatorics |
+| **TOTAL** | **147** | **29** | **176** | Target: 120 |
 
 ### 🎯 STRATEGY-CRITICAL AXIOMS (The Core 8)
 
@@ -326,15 +354,15 @@ For cone-positive γ⁺: build integral cycles T_k with calibration defect → 0
 
 **Progress: 6/8 proved (75%) — Only 2 axioms remain, both owned by Agent 5!**
 
-### 🎯 REBALANCED AGENT ASSIGNMENTS (Round 10 — After Full Stub Audit)
+### 🎯 REBALANCED AGENT ASSIGNMENTS (Round 13)
 
-| Agent | Files | Axiom Count | Focus |
-|-------|-------|-------------|-------|
-| **Agent 1** | Basic.lean (29), Forms.lean (28) | **57** | Forms infrastructure (many structural) |
-| **Agent 2** | Norms.lean (22), Grassmannian.lean (10) | **32** | Norms & calibrated geometry |
-| **Agent 3** | Currents.lean (13), IntegralCurrents.lean (12), FlatNorm.lean (11), Calibration.lean (5), Cone.lean (6) | **47** | GMT + `limit_is_calibrated` ⭐⭐⭐ |
-| **Agent 4** | HarveyLawson (9), GAGA (14), Lefschetz (7), Bergman (5), SheafTheory (5), SerreVanishing (1), FedererFleming (2) | **43** | Classical AG theorems |
-| **Agent 5** | TypeDecomp (9), Microstructure (14), Main (3), Manifolds (6), SignedDecomp (1), BaranyGrinberg (1) | **34** | Main path: `harvey_lawson_fundamental_class` ⭐ + `lefschetz_lift_signed_cycle` ⭐ |
+| Agent | Files | Current | Target | Focus |
+|-------|-------|---------|--------|-------|
+| **Agent 1** | Basic.lean (29), Forms.lean (28) | **57** | **42** | Forms infrastructure (linearity proofs) |
+| **Agent 2** | Norms.lean (18), Grassmannian.lean (10) | **28** | **18** | Norms & calibrated geometry |
+| **Agent 3** | Currents.lean (11), FlatNorm.lean (11), IntegralCurrents.lean (9), Calibration.lean (4) | **35** | **25** | GMT: Current operations |
+| **Agent 4** | Lefschetz.lean (6), Bergman.lean (4), SheafTheory.lean (5), FedererFleming.lean (2), SerreVanishing.lean (1), Cone.lean (6) | **24** | **15** | Classical AG & cone theory |
+| **Agent 5** | Microstructure.lean (14), TypeDecomp.lean (9), Main.lean (3), Manifolds.lean (4), SignedDecomp.lean (1), BaranyGrinberg.lean (1) | **32** | **20** | ⭐⭐⭐ **2 P0 CRITICAL** + Kähler |
 
 ### ⭐ STRATEGY-CRITICAL ASSIGNMENTS
 
@@ -364,7 +392,7 @@ For cone-positive γ⁺: build integral cycles T_k with calibration defect → 0
 
 # 🔷 AGENT 1: Forms Core (57 axioms) — 5 Sessions
 
-## 🎯 ROUND 12 TARGET: 57 → 45 axioms (-12)
+## 🎯 ROUND 13 TARGET: 57 → 42 axioms (-15)
 
 ## Files Owned
 - `Hodge/Basic.lean` (24 axioms + 5 opaques = 29)
@@ -372,6 +400,7 @@ For cone-positive γ⁺: build integral cycles T_k with calibration defect → 0
 
 ## Mission
 Prove linearity and algebraic properties from the opaque definitions.
+**Focus on:** exterior derivative, Hodge star, adjoint derivative, Laplacian linearity.
 
 ## SPECIFIC AXIOMS TO PROVE THIS ROUND:
 
@@ -507,9 +536,9 @@ axiom pointwiseComass_continuous {k : ℕ} (α : SmoothForm n X k) :
 
 ---
 
-# 🔷 AGENT 2: Norms & Geometry (32 axioms) — 5 Sessions
+# 🔷 AGENT 2: Norms & Geometry (28 axioms) — 5 Sessions
 
-## 🎯 ROUND 12 TARGET: 32 → 22 axioms (-10)
+## 🎯 ROUND 13 TARGET: 28 → 18 axioms (-10)
 
 ## Files Owned
 - `Hodge/Analytic/Norms.lean` (17 axioms + 3 opaques = 20)
@@ -648,9 +677,9 @@ axiom smoothWedge_zero_right (α) : smoothWedge α 0 = 0
 
 ---
 
-# 🔷 AGENT 3: Currents & Calibration (45 axioms) — 5 Sessions
+# 🔷 AGENT 3: Currents & Calibration (35 axioms) — 5 Sessions
 
-## 🎯 ROUND 12 TARGET: 45 → 35 axioms (-10)
+## 🎯 ROUND 13 TARGET: 35 → 25 axioms (-10)
 
 ## ✅ STRATEGY-CRITICAL COMPLETE: `limit_is_calibrated` is now a THEOREM!
 
@@ -787,9 +816,9 @@ axiom limit_is_calibrated ... -- Already PROVED
 
 ---
 
-# 🔷 AGENT 4: Classical Algebraic Geometry (43 axioms) — 5 Sessions
+# 🔷 AGENT 4: Classical Algebraic Geometry (24 axioms) — 5 Sessions
 
-## 🎯 ROUND 12 TARGET: 43 → 30 axioms (-13)
+## 🎯 ROUND 13 TARGET: 24 → 15 axioms (-9)
 
 ## Files Owned
 - `Hodge/Classical/HarveyLawson.lean` (8 axioms + 1 opaque = 9)
@@ -961,9 +990,9 @@ axiom deformation_theorem (k : ℕ) (T : IntegralCurrent n X (k + 1)) (ε : ℝ)
 
 ---
 
-# 🔷 AGENT 5: Main Theorem Path (34 axioms) — 5 Sessions — STRATEGY-CRITICAL
+# 🔷 AGENT 5: Main Theorem Path (32 axioms) — 5 Sessions — STRATEGY-CRITICAL
 
-## 🎯 ROUND 12 TARGET: 34 → 22 axioms (-12)
+## 🎯 ROUND 13 TARGET: 32 → 20 axioms (-12)
 
 ## ⭐⭐⭐ YOU OWN THE LAST 2 CRITICAL AXIOMS - THIS IS THE TOP PRIORITY!
 
