@@ -139,6 +139,12 @@ theorem smoothExtDeriv_neg {n : ℕ} {X : Type u} [TopologicalSpace X] [ChartedS
   simp at h
   exact h
 
+/-- Exterior derivative of subtraction. -/
+theorem smoothExtDeriv_sub {n : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    {k : ℕ} (ω η : SmoothForm n X k) :
+    smoothExtDeriv (ω - η) = smoothExtDeriv ω - smoothExtDeriv η := by
+  rw [sub_eq_add_neg, smoothExtDeriv_add, smoothExtDeriv_neg, ← sub_eq_add_neg]
+
 /-- A form is closed. -/
 def IsFormClosed {n : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     {k : ℕ} (ω : SmoothForm n X k) : Prop := smoothExtDeriv ω = 0

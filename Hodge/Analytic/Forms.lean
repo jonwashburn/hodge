@@ -198,6 +198,11 @@ theorem hodgeStar_neg {k : ℕ} (α : SmoothForm n X k) : ⋆(-α) = -(⋆α) :=
   simp at h
   exact h
 
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] in
+/-- Hodge star of subtraction is subtraction of Hodge stars. -/
+theorem hodgeStar_sub {k : ℕ} (α β : SmoothForm n X k) : ⋆(α - β) = ⋆α - ⋆β := by
+  rw [sub_eq_add_neg, hodgeStar_add, hodgeStar_neg, ← sub_eq_add_neg]
+
 /-- Hodge star squared gives ±1 (depending on dimension and degree). -/
 axiom hodgeStar_hodgeStar {k : ℕ} (α : SmoothForm n X k) :
     HEq (⋆(⋆α)) (((-1 : ℂ) ^ (k * (2 * n - k))) • α)
@@ -244,6 +249,11 @@ theorem adjointDeriv_neg {k : ℕ} (α : SmoothForm n X k) : δ(-α) = -(δ α) 
   simp at h
   exact h
 
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] in
+/-- Adjoint derivative of subtraction is subtraction of adjoint derivatives. -/
+theorem adjointDeriv_sub {k : ℕ} (α β : SmoothForm n X k) : δ(α - β) = δ α - δ β := by
+  rw [sub_eq_add_neg, adjointDeriv_add, adjointDeriv_neg, ← sub_eq_add_neg]
+
 /-- δ² = 0: Adjoint derivative squared is zero. -/
 axiom adjointDeriv_squared {k : ℕ} (α : SmoothForm n X k) :
     δ (δ α) = 0
@@ -280,6 +290,11 @@ theorem laplacian_neg {k : ℕ} (α : SmoothForm n X k) : Δ(-α) = -(Δ α) := 
   simp at h
   exact h
 
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] in
+/-- Laplacian of subtraction is subtraction of Laplacians. -/
+theorem laplacian_sub {k : ℕ} (α β : SmoothForm n X k) : Δ(α - β) = Δ α - Δ β := by
+  rw [sub_eq_add_neg, laplacian_add, laplacian_neg, ← sub_eq_add_neg]
+
 /-- A form is harmonic if it is in the kernel of the Laplacian. -/
 def IsHarmonic {k : ℕ} (ω : SmoothForm n X k) : Prop := Δ ω = 0
 
@@ -305,6 +320,13 @@ omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [Kahler
 theorem isHarmonic_smul_real {k : ℕ} {ω : SmoothForm n X k} (r : ℝ) (h : IsHarmonic ω) : IsHarmonic (r • ω) := by
   unfold IsHarmonic at *
   rw [laplacian_smul_real, h, smul_zero]
+
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] in
+/-- Difference of harmonic forms is harmonic. -/
+theorem isHarmonic_sub {k : ℕ} {ω₁ ω₂ : SmoothForm n X k}
+    (h1 : IsHarmonic ω₁) (h2 : IsHarmonic ω₂) : IsHarmonic (ω₁ - ω₂) := by
+  rw [sub_eq_add_neg]
+  exact isHarmonic_add h1 (isHarmonic_neg h2)
 
 /-- **Harmonic Forms are Closed** (Hodge Theory).
 

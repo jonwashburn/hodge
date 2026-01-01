@@ -174,23 +174,44 @@ theorem add_zero (T : Current n X k) : T + 0 = T := by
   simp [zero_toFun]
 
 /-- **Boundary operator on currents** (Federer, 1969).
-    The boundary ∂T is defined by duality: (∂T)(ω) = T(dω). -/
-opaque boundary (T : Current n X (k + 1)) : Current n X k
+    The boundary ∂T is defined by duality: (∂T)(ω) = T(dω).
+
+    This is a concrete definition rather than an opaque axiom, allowing us to
+    derive properties like additivity and compatibility with negation. -/
+def boundary (T : Current n X (k + 1)) : Current n X k where
+  toFun := fun ω => T.toFun (smoothExtDeriv ω)
+  is_linear := fun c ω₁ ω₂ => by
+    -- Need: T(d(c • ω₁ + ω₂)) = c * T(d ω₁) + T(d ω₂)
+    -- By linearity of d: d(c • ω₁ + ω₂) = c • d ω₁ + d ω₂
+    rw [smoothExtDeriv_add, smoothExtDeriv_smul_real]
+    -- By linearity of T
+    exact T.is_linear c (smoothExtDeriv ω₁) (smoothExtDeriv ω₂)
 
 /-- A current is a cycle if its boundary is zero. -/
 def isCycle (T : Current n X (k + 1)) : Prop := T.boundary = 0
 
-/-- ∂∂ = 0: boundary of boundary is zero. -/
+/-- ∂∂ = 0: boundary of boundary is zero.
+    This follows from d∘d = 0 for the exterior derivative.
+    Proof: (∂∂T)(ω) = (∂T)(dω) = T(d(dω)) = T(0) = 0. -/
 axiom boundary_boundary (T : Current n X (k + 2)) : (boundary (boundary T)) = 0
 
 /-- **Boundary is additive** (Federer, 1969).
     The boundary operator is a group homomorphism.
-    This follows from the duality definition: (∂T)(ω) = T(dω). -/
-axiom boundary_add (S T : Current n X (k + 1)) : boundary (S + T) = boundary S + boundary T
+    Proof from duality: (∂(S+T))(ω) = (S+T)(dω) = S(dω) + T(dω) = (∂S)(ω) + (∂T)(ω). -/
+theorem boundary_add (S T : Current n X (k + 1)) : boundary (S + T) = boundary S + boundary T := by
+  ext ω
+  show (add_curr S T).toFun (smoothExtDeriv ω) = S.toFun (smoothExtDeriv ω) + T.toFun (smoothExtDeriv ω)
+  unfold add_curr
+  rfl
 
 /-- **Boundary of negation** (Federer, 1969).
-    The boundary of the negation is the negation of the boundary. -/
-axiom boundary_neg (T : Current n X (k + 1)) : boundary (-T) = -(boundary T)
+    The boundary of the negation is the negation of the boundary.
+    Proof from duality: (∂(-T))(ω) = (-T)(dω) = -T(dω) = -(∂T)(ω). -/
+theorem boundary_neg (T : Current n X (k + 1)) : boundary (-T) = -(boundary T) := by
+  ext ω
+  show (neg_curr T).toFun (smoothExtDeriv ω) = -(T.toFun (smoothExtDeriv ω))
+  unfold neg_curr
+  rfl
 
 /-- **Boundary of subtraction** (Federer, 1969). -/
 theorem boundary_sub (S T : Current n X (k + 1)) : boundary (S - T) = boundary S - boundary T := by

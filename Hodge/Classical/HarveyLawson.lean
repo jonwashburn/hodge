@@ -194,8 +194,8 @@ structure HarveyLawsonConclusion (n : ℕ) (X : Type*) (k : ℕ)
 def harvey_lawson_theorem {k : ℕ} (_hyp : HarveyLawsonHypothesis n X k) :
     HarveyLawsonConclusion n X k where
   varieties := ∅
-  multiplicities := fun ⟨_, h⟩ => absurd h (Finset.not_mem_empty _)
-  codim_correct := fun _ h => absurd h (Finset.not_mem_empty _)
+  multiplicities := fun ⟨_, h⟩ => absurd h (by simp)
+  codim_correct := fun _ h => absurd h (by simp)
   represents := fun _ => True
 
 /-- **Theorem: Harvey-Lawson conclusion represents the input current.**

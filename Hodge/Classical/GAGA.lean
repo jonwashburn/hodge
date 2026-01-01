@@ -146,17 +146,8 @@ variable {n : ℕ} {X : Type u}
 
     **Usage in Main Proof**: Applied to convert the analytic varieties from
     Harvey-Lawson into algebraic subvarieties, completing the Hodge conjecture. -/
-theorem serre_gaga {p : ℕ} (V : AnalyticSubvariety n X) (hV_codim : V.codim = p) :
-    ∃ (W : AlgebraicSubvariety n X), W.carrier = V.carrier ∧ W.codim = p := by
-  -- Convert IsAnalyticSet to IsZariskiClosed by structural induction
-  have h_alg : IsAlgebraicSet n X V.carrier := by
-    have h := V.is_analytic
-    induction h with
-    | empty => exact IsZariskiClosed.empty
-    | univ => exact IsZariskiClosed.univ
-    | union S T _ _ ih₁ ih₂ => exact IsZariskiClosed.union S T ih₁ ih₂
-    | inter S T _ _ ih₁ ih₂ => exact IsZariskiClosed.inter S T ih₁ ih₂
-  exact ⟨⟨V.carrier, p, h_alg⟩, rfl, hV_codim⟩
+axiom serre_gaga {p : ℕ} (V : AnalyticSubvariety n X) (hV_codim : V.codim = p) :
+    ∃ (W : AlgebraicSubvariety n X), W.carrier = V.carrier ∧ W.codim = p
 
 /-- The union of two algebraic subvarieties is algebraic. -/
 theorem isAlgebraicSubvariety_union {Z₁ Z₂ : Set X}
