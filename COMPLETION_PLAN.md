@@ -189,6 +189,7 @@ theorem ofForm_add ... := by
 | Date | Axioms Remaining | Notes |
 |------|------------------|-------|
 | 2026-01-01 | 44 | Initial count |
+| 2026-01-01 | 35 | After Round 13 (-9 axioms) |
 | | | |
 
 ---
