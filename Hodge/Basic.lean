@@ -449,7 +449,8 @@ axiom isRationalClass_mul {n : ℕ} {X : Type u} {k l : ℕ}
     (η₁ : DeRhamCohomologyClass n X k) (η₂ : DeRhamCohomologyClass n X l) :
     isRationalClass η₁ → isRationalClass η₂ → isRationalClass (η₁ * η₂)
 
-def omegaPow (p : ℕ) : SmoothForm n X (2 * p) := 0
+-- NOTE: The proper ω^p is defined as `kahlerPow` in Kahler/TypeDecomposition.lean
+-- This stub was removed to prevent accidental use.
 
 /-- **(p,p)-Form Predicate** (Hodge Theory).
 

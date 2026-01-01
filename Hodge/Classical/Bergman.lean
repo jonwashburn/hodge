@@ -211,13 +211,19 @@ axiom tian_convergence (L : HolomorphicLineBundle n X) [IsAmple L]
     ∀ ε > 0, ∃ M₀ : ℕ, ∀ M ≥ M₀,
       dist_form ((1 / M : ℝ) • BergmanMetric L M (h M)) (K.omega_form) ≤ ε
 
-/-- The subspace of holomorphic sections vanishing to order k at x. -/
-def SectionsVanishingToOrder (L : HolomorphicLineBundle n X) (x : X) (k : ℕ) :
-    Submodule ℂ ↥(HolomorphicSection L) where
-  carrier := { s | True } -- Placeholder
-  add_mem' _ _ := True.intro
-  zero_mem' := True.intro
-  smul_mem' _ _ _ := True.intro
+/-- The subspace of holomorphic sections vanishing to order k at x.
+
+    A section s vanishes to order k at x if in local coordinates centered at x,
+    all partial derivatives of order < k vanish at the origin.
+
+    This is defined opaquely because:
+    1. Requires local trivialization of L near x
+    2. Requires Taylor expansion in local coordinates
+    3. The vanishing condition depends on the complex structure
+
+    Reference: [Griffiths-Harris, 1978, Chapter 0.5]. -/
+opaque SectionsVanishingToOrder (L : HolomorphicLineBundle n X) (x : X) (k : ℕ) :
+    Submodule ℂ ↥(HolomorphicSection L)
 
 /-- The k-jet space of L at x. -/
 def JetSpace (L : HolomorphicLineBundle n X) (x : X) (k : ℕ) :=

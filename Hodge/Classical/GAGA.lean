@@ -169,28 +169,35 @@ theorem isAlgebraicSubvariety_intersection {Z₁ Z₂ : Set X}
 
 /-- **The Fundamental Class Map** (Griffiths-Harris, 1978).
     The fundamental class `[Z]` of an algebraic subvariety Z of codimension p is
-    a closed (p,p)-form representing the Poincaré dual of the homology class of Z. -/
-def FundamentalClassSet (n : ℕ) (X : Type u)
+    a closed (p,p)-form representing the Poincaré dual of the homology class of Z.
+
+    This is defined opaquely because constructing the fundamental class requires:
+    1. The current of integration over Z (geometric measure theory)
+    2. De Rham's theorem to get a smooth representative
+    3. The Hodge decomposition to get a harmonic representative
+
+    Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry",
+    Wiley, 1978, Chapter 1, Section 1]. -/
+opaque FundamentalClassSet (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    (p : ℕ) (Z : Set X) : SmoothForm n X (2 * p) :=
-  -- This is a placeholder definition
-  0
+    (p : ℕ) (Z : Set X) : SmoothForm n X (2 * p)
 
-/-- The fundamental class of an algebraic subvariety is closed. -/
-theorem FundamentalClassSet_isClosed (p : ℕ) (Z : Set X) (h : isAlgebraicSubvariety n X Z) :
-    IsFormClosed (FundamentalClassSet n X p Z) :=
-  isFormClosed_zero
+/-- The fundamental class of an algebraic subvariety is closed (Griffiths-Harris 1978).
+    This follows because algebraic subvarieties are cycles in homology. -/
+axiom FundamentalClassSet_isClosed (p : ℕ) (Z : Set X) (h : isAlgebraicSubvariety n X Z) :
+    IsFormClosed (FundamentalClassSet n X p Z)
 
-/-- The fundamental class of the empty set is zero. -/
-theorem FundamentalClassSet_empty (p : ℕ) :
-    FundamentalClassSet n X p (∅ : Set X) = 0 := rfl
+/-- The fundamental class of the empty set is zero.
+    The empty variety has no homology, so its dual form is zero. -/
+axiom FundamentalClassSet_empty (p : ℕ) :
+    FundamentalClassSet n X p (∅ : Set X) = 0
 
-/-- The fundamental class is a (p,p)-form. -/
-theorem FundamentalClassSet_is_p_p (p : ℕ) (Z : Set X) (h : isAlgebraicSubvariety n X Z) :
-    isPPForm' n X p (FundamentalClassSet n X p Z) :=
-  isPPForm_zero p
+/-- The fundamental class is a (p,p)-form (Griffiths-Harris 1978).
+    For an algebraic subvariety of codimension p, the Poincaré dual is type (p,p). -/
+axiom FundamentalClassSet_is_p_p (p : ℕ) (Z : Set X) (h : isAlgebraicSubvariety n X Z) :
+    isPPForm' n X p (FundamentalClassSet n X p Z)
 
 /-- For disjoint algebraic sets, fundamental classes are additive. -/
 axiom FundamentalClassSet_additive (p : ℕ) (Z₁ Z₂ : Set X) (h_disjoint : Disjoint Z₁ Z₂)
@@ -215,10 +222,6 @@ theorem FundamentalClass_isClosed (W : AlgebraicSubvariety n X) :
 theorem exists_fundamental_form (W : AlgebraicSubvariety n X) :
     ∃ (η : SmoothForm n X (2 * W.codim)), IsFormClosed η :=
   ⟨FundamentalClass (n := n) (X := X) W, FundamentalClass_isClosed (n := n) (X := X) W⟩
-
-/-- Coherence lemma: on algebraic subvarieties, `FundamentalClassSet` agrees with `FundamentalClass`. -/
-@[simp] theorem FundamentalClassSet_eq_FundamentalClass (W : AlgebraicSubvariety n X) :
-    FundamentalClassSet n X W.codim W.carrier = FundamentalClass (n := n) (X := X) W := rfl
 
 /-! ## ω^p is Algebraic (Complete Intersections) -/
 

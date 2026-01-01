@@ -227,34 +227,40 @@ For cone-positive γ⁺: build integral cycles T_k with calibration defect → 0
 ## 📊 CURRENT STATUS (Round 10 - 2026-01-01)
 
 **Build Status:** ✅ PASSES (7825 jobs completed)  
-**Total axioms:** 179 (after reverting stubs to axioms)  
-**Total opaques:** 30  
-**Grand Total:** 209 axioms/opaques  
-**Strategy-Critical Progress:** 6/8 proved (75%) — Only 3 critical axioms remain!
+**Total axioms:** 182  
+**Total opaques:** 32  
+**Grand Total:** 214 axioms/opaques  
+**Strategy-Critical Progress:** 5/8 proved (62.5%) — Only 3 critical axioms remain!
 
-⚠️ **STUB REVERT:** Reverted 14 stub definitions (`mass := 0`, `flatNorm := 0`) back to proper axioms. The previous "theorems" were just proving `0 ≤ 0`.
+### ⚠️ STUB AUDIT COMPLETE
+Reverted ALL stub definitions to honest axioms/opaques:
+- `mass := 0` → `opaque mass` + 5 axioms
+- `flatNorm := 0` → `opaque flatNorm` + 7 axioms
+- `FundamentalClassSet := 0` → `opaque FundamentalClassSet` + 3 axioms
+- `SectionsVanishingToOrder carrier := True` → `opaque SectionsVanishingToOrder`
+- Removed unused `omegaPow := 0` stub (use `kahlerPow` instead)
 
-### 📁 AXIOM/OPAQUE COUNT BY FILE (After Stub Revert)
+### 📁 AXIOM/OPAQUE COUNT BY FILE (After Full Stub Audit)
 
 | File | Axioms | Opaques | Total | Notes |
 |------|--------|---------|-------|-------|
 | Basic.lean | 24 | 5 | 29 | Core SmoothForm infrastructure |
 | Forms.lean | 22 | 6 | 28 | Wedge, Hodge star, Laplacian |
 | Norms.lean | 19 | 3 | 22 | Comass, L2 norms |
-| **Currents.lean** | **12** | 1 | **13** | **+5 (mass reverted from stub)** |
+| Currents.lean | 12 | 1 | 13 | Mass now opaque (+5 axioms) |
+| **GAGA.lean** | **12** | **2** | **14** | **FundamentalClassSet now opaque (+3)** |
 | Microstructure.lean | 12 | 2 | 14 | Cubulation, gluing |
-| **FlatNorm.lean** | **10** | **1** | **11** | **+7 (flatNorm reverted from stub)** |
+| FlatNorm.lean | 10 | 1 | 11 | FlatNorm now opaque (+7 axioms) |
 | IntegralCurrents.lean | 10 | 2 | 12 | Integral currents |
-| Grassmannian.lean | 7 | 3 | 10 | Calibrated Grassmannian |
-| GAGA.lean | 9 | 1 | 10 | Algebraic geometry |
 | HarveyLawson.lean | 8 | 1 | 9 | Harvey-Lawson theorem |
 | TypeDecomposition.lean | 7 | 2 | 9 | (p,q)-forms |
-| Lefschetz.lean | 5 | 2 | 7 | Hard Lefschetz |
+| Grassmannian.lean | 7 | 3 | 10 | Calibrated Grassmannian |
 | Manifolds.lean | 6 | 0 | 6 | Kähler manifolds |
 | Cone.lean | 6 | 0 | 6 | Calibrated cone |
+| Lefschetz.lean | 5 | 2 | 7 | Hard Lefschetz |
 | SheafTheory.lean | 5 | 0 | 5 | Coherent sheaves |
-| Calibration.lean | 5 | 0 | 5 | Calibration theory |
-| Bergman.lean | 4 | 0 | 4 | Bergman kernel |
+| Calibration.lean | 5 | 0 | 5 | **limit_is_calibrated here** |
+| **Bergman.lean** | 4 | **1** | **5** | **SectionsVanishingToOrder now opaque** |
 | Main.lean | 3 | 0 | 3 | **2 critical axioms here** |
 | FedererFleming.lean | 2 | 0 | 2 | Compactness |
 | BaranyGrinberg.lean | 1 | 0 | 1 | Combinatorics |
@@ -276,17 +282,23 @@ For cone-positive γ⁺: build integral cycles T_k with calibration defect → 0
 
 **Progress: 5/8 proved (62.5%) — Only 3 strategy-critical axioms remain!**
 
-### 🎯 REBALANCED AGENT ASSIGNMENTS (Round 10 — After Stub Revert)
+### 🎯 REBALANCED AGENT ASSIGNMENTS (Round 10 — After Full Stub Audit)
 
 | Agent | Files | Axiom Count | Focus |
 |-------|-------|-------------|-------|
 | **Agent 1** | Basic.lean (29), Forms.lean (28) | **57** | Forms infrastructure (many structural) |
 | **Agent 2** | Norms.lean (22), Grassmannian.lean (10) | **32** | Norms & calibrated geometry |
-| **Agent 3** | Currents.lean (13), IntegralCurrents.lean (12), FlatNorm.lean (11), Calibration.lean (5), Cone.lean (6) | **47** | GMT + `limit_is_calibrated` ⭐ |
-| **Agent 4** | HarveyLawson (9), GAGA (10), Lefschetz (7), Bergman (4), SheafTheory (5), SerreVanishing (1), FedererFleming (2) | **38** | Classical AG theorems |
-| **Agent 5** | TypeDecomp (9), Microstructure (14), Main (3), Manifolds (6), SignedDecomp (1), BaranyGrinberg (1) | **34** | Main path + 2 critical ⭐ |
+| **Agent 3** | Currents.lean (13), IntegralCurrents.lean (12), FlatNorm.lean (11), Calibration.lean (5), Cone.lean (6) | **47** | GMT + `limit_is_calibrated` ⭐⭐⭐ |
+| **Agent 4** | HarveyLawson (9), GAGA (14), Lefschetz (7), Bergman (5), SheafTheory (5), SerreVanishing (1), FedererFleming (2) | **43** | Classical AG theorems |
+| **Agent 5** | TypeDecomp (9), Microstructure (14), Main (3), Manifolds (6), SignedDecomp (1), BaranyGrinberg (1) | **34** | Main path: `harvey_lawson_fundamental_class` ⭐ + `lefschetz_lift_signed_cycle` ⭐ |
 
-**Note:** Agent 3 has the heaviest load after reverting stub definitions (mass, flatNorm). Consider rebalancing if needed.
+### ⭐ STRATEGY-CRITICAL ASSIGNMENTS
+
+| Agent | Critical Axiom | Location | Priority |
+|-------|---------------|----------|----------|
+| **Agent 3** | `limit_is_calibrated` | Calibration.lean:144 | ⭐⭐⭐ P1 |
+| **Agent 5** | `harvey_lawson_fundamental_class` | Main.lean:112 | ⭐⭐⭐ P0 |
+| **Agent 5** | `lefschetz_lift_signed_cycle` | Main.lean:195 | ⭐⭐⭐ P0 |
 
 ### ⚠️ CRITICAL RULES
 
