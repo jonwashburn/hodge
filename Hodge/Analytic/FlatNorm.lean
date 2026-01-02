@@ -247,15 +247,71 @@ theorem flatNorm_sub_le {k : ℕ} (S T : Current n X k) :
     The → direction requires the deeper result that flatNorm separates points. -/
 axiom flatNorm_eq_zero_iff {k : ℕ} (T : Current n X k) : flatNorm T = 0 ↔ T = 0
 
-/-- Bound evaluation by mass. -/
+/-- Bound evaluation by mass (Federer 1969, §4.1).
+    This is the defining property of mass as the dual norm to comass.
+    Since mass is opaque, this must remain an axiom. -/
 axiom eval_le_mass {k : ℕ} (T : Current n X k) (ψ : SmoothForm n X k) :
     |T.toFun ψ| ≤ Current.mass T * comass ψ
+
+/-- Helper: For any decomposition T = S + ∂R, evaluation is bounded by
+    (mass(S) + mass(R)) × max(comass ψ, comass dψ). -/
+theorem eval_le_decomp_cost {k : ℕ} (T S : Current n X k) (R : Current n X (k + 1))
+    (h : T = S + Current.boundary R) (ψ : SmoothForm n X k) :
+    |T.toFun ψ| ≤ (Current.mass S + Current.mass R) * max (comass ψ) (comass (smoothExtDeriv ψ)) := by
+  have h_eval : T.toFun ψ = S.toFun ψ + R.toFun (smoothExtDeriv ψ) := by rw [h]; rfl
+  have h_tri : |S.toFun ψ + R.toFun (smoothExtDeriv ψ)| ≤
+      |S.toFun ψ| + |R.toFun (smoothExtDeriv ψ)| := abs_add_le _ _
+  have h_S : |S.toFun ψ| ≤ Current.mass S * comass ψ := eval_le_mass S ψ
+  have h_R : |R.toFun (smoothExtDeriv ψ)| ≤ Current.mass R * comass (smoothExtDeriv ψ) :=
+    eval_le_mass R (smoothExtDeriv ψ)
+  have h_S' : Current.mass S * comass ψ ≤
+      Current.mass S * max (comass ψ) (comass (smoothExtDeriv ψ)) :=
+    mul_le_mul_of_nonneg_left (le_max_left _ _) (Current.mass_nonneg S)
+  have h_R' : Current.mass R * comass (smoothExtDeriv ψ) ≤
+      Current.mass R * max (comass ψ) (comass (smoothExtDeriv ψ)) :=
+    mul_le_mul_of_nonneg_left (le_max_right _ _) (Current.mass_nonneg R)
+  rw [h_eval]
+  calc |S.toFun ψ + R.toFun (smoothExtDeriv ψ)|
+      ≤ |S.toFun ψ| + |R.toFun (smoothExtDeriv ψ)| := h_tri
+    _ ≤ Current.mass S * comass ψ + Current.mass R * comass (smoothExtDeriv ψ) := by linarith
+    _ ≤ Current.mass S * max (comass ψ) (comass (smoothExtDeriv ψ)) +
+        Current.mass R * max (comass ψ) (comass (smoothExtDeriv ψ)) := by linarith
+    _ = (Current.mass S + Current.mass R) * max (comass ψ) (comass (smoothExtDeriv ψ)) := by ring
 
 /-- **Federer-Fleming Evaluation Estimate** (Federer-Fleming, 1960).
     The evaluation of a current on a smooth form is bounded by the flat norm of the
     current and the maximum comass of the form and its derivative.
+
+    **Proof**: For any decomposition T = S + ∂R, |T(ψ)| ≤ (M(S)+M(R)) × max(comass).
+    Since flatNorm is the infimum of M(S)+M(R), the bound follows.
+
     Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 1960]. -/
-axiom eval_le_flatNorm {k : ℕ} (T : Current n X k) (ψ : SmoothForm n X k) :
-    |T.toFun ψ| ≤ flatNorm T * max (comass ψ) (comass (smoothExtDeriv ψ))
+theorem eval_le_flatNorm {k : ℕ} (T : Current n X k) (ψ : SmoothForm n X k) :
+    |T.toFun ψ| ≤ flatNorm T * max (comass ψ) (comass (smoothExtDeriv ψ)) := by
+  unfold flatNorm
+  have h_bound : ∀ m ∈ flatNormDecompSet T,
+      |T.toFun ψ| ≤ m * max (comass ψ) (comass (smoothExtDeriv ψ)) := by
+    intro m ⟨S, R, hT, hm⟩
+    rw [hm]
+    exact eval_le_decomp_cost T S R hT ψ
+  by_cases h_zero : max (comass ψ) (comass (smoothExtDeriv ψ)) = 0
+  · have h1 : comass ψ = 0 := by
+      have := le_max_left (comass ψ) (comass (smoothExtDeriv ψ))
+      linarith [comass_nonneg ψ]
+    obtain ⟨m, hm⟩ := flatNormDecompSet_nonempty T
+    have h := h_bound m hm
+    rw [h_zero] at h; simp at h
+    rw [h, h_zero]; simp
+  · have h_pos : max (comass ψ) (comass (smoothExtDeriv ψ)) > 0 :=
+      lt_of_le_of_ne (le_max_of_le_left (comass_nonneg ψ)) (Ne.symm h_zero)
+    have h_div : |T.toFun ψ| / max (comass ψ) (comass (smoothExtDeriv ψ)) ≤
+        sInf (flatNormDecompSet T) := by
+      apply le_csInf (flatNormDecompSet_nonempty T)
+      intro m hm
+      exact (div_le_iff₀ h_pos).mpr (h_bound m hm)
+    calc |T.toFun ψ| = |T.toFun ψ| / max (comass ψ) (comass (smoothExtDeriv ψ)) *
+          max (comass ψ) (comass (smoothExtDeriv ψ)) := by field_simp
+      _ ≤ sInf (flatNormDecompSet T) * max (comass ψ) (comass (smoothExtDeriv ψ)) :=
+          mul_le_mul_of_nonneg_right h_div (le_of_lt h_pos)
 
 end

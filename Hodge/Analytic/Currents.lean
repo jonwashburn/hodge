@@ -122,36 +122,109 @@ instance : HSMul ℝ (Current n X k) (Current n X k) := ⟨smul_curr⟩
 /-- Integer scalar multiplication of currents. -/
 instance : HSMul ℤ (Current n X k) (Current n X k) := ⟨fun z T => (z : ℝ) • T⟩
 
+/-- Zero current evaluates to zero. -/
+theorem zero_toFun (ω : SmoothForm n X k) : (0 : Current n X k).toFun ω = 0 := rfl
+
+/-- Currents are bounded: evaluation is bounded by mass times comass.
+    This is the continuity condition on currents as linear functionals. -/
+axiom is_bounded (T : Current n X k) : ∃ M : ℝ, ∀ ω : SmoothForm n X k, |T.toFun ω| ≤ M * comass ω
+
+/-- Helper: (-T).toFun ω = -T.toFun ω by definition of negation. -/
+private theorem neg_toFun (T : Current n X k) (ω : SmoothForm n X k) :
+    (-T).toFun ω = -T.toFun ω := rfl
+
 /-- **Mass of a current** (Federer, 1969).
     The mass is the dual norm to the comass norm on forms:
-    M(T) = sup { T(ω) : comass(ω) ≤ 1 }
+    M(T) = sup { |T(ω)| : comass(ω) ≤ 1 }
 
-    This is defined opaquely as it requires the full GMT machinery.
+    This is now a concrete definition, allowing us to derive the key properties.
     Reference: [H. Federer, "Geometric Measure Theory", Springer 1969, §4.1]. -/
-opaque mass (T : Current n X k) : ℝ
+def mass (T : Current n X k) : ℝ :=
+  sSup { r : ℝ | ∃ ω : SmoothForm n X k, comass ω ≤ 1 ∧ r = |T.toFun ω| }
 
-/-- Mass is non-negative (Federer 1969, §4.1.7). -/
-axiom mass_nonneg (T : Current n X k) : mass T ≥ 0
+/-- The mass set is nonempty (contains 0 from the zero form). -/
+private theorem mass_set_nonempty (T : Current n X k) :
+    { r : ℝ | ∃ ω : SmoothForm n X k, comass ω ≤ 1 ∧ r = |T.toFun ω| }.Nonempty := by
+  use |T.toFun 0|
+  use 0
+  constructor
+  · rw [comass_zero]
+    norm_num
+  · rfl
 
-/-- Mass of zero current is zero. -/
-axiom mass_zero : mass (0 : Current n X k) = 0
+/-- The mass set is bounded above (by the bound from is_bounded). -/
+private theorem mass_set_bddAbove (T : Current n X k) :
+    BddAbove { r : ℝ | ∃ ω : SmoothForm n X k, comass ω ≤ 1 ∧ r = |T.toFun ω| } := by
+  obtain ⟨M, hM⟩ := T.is_bounded
+  use max M 0
+  intro r ⟨ω, hω_comass, hr⟩
+  rw [hr]
+  have h_bound : |T.toFun ω| ≤ M * comass ω := hM ω
+  have h_comass_nonneg : comass ω ≥ 0 := comass_nonneg ω
+  by_cases hM_nonneg : M ≥ 0
+  · -- Case M ≥ 0: |T.toFun ω| ≤ M * comass ω ≤ M * 1 = M = max M 0
+    calc |T.toFun ω| ≤ M * comass ω := h_bound
+      _ ≤ M * 1 := mul_le_mul_of_nonneg_left hω_comass hM_nonneg
+      _ = M := mul_one M
+      _ ≤ max M 0 := le_max_left M 0
+  · -- Case M < 0: must have |T.toFun ω| = 0
+    push_neg at hM_nonneg
+    have h1 : M * comass ω ≤ 0 := by nlinarith
+    have h2 : |T.toFun ω| ≤ 0 := le_trans h_bound h1
+    have h3 : |T.toFun ω| ≥ 0 := abs_nonneg _
+    have h4 : |T.toFun ω| = 0 := le_antisymm h2 h3
+    rw [h4]
+    exact le_max_right M 0
 
-/-- Mass is symmetric under negation. -/
-axiom mass_neg (T : Current n X k) : mass (-T) = mass T
+/-- **Mass is non-negative** (Federer 1969, §4.1.7).
+    Proof: Mass is the supremum of absolute values, which are non-negative. -/
+theorem mass_nonneg (T : Current n X k) : mass T ≥ 0 := by
+  unfold mass
+  apply Real.sSup_nonneg
+  intro r ⟨ω, _, hr⟩
+  rw [hr]
+  exact abs_nonneg _
+
+/-- **Mass of zero current is zero**.
+    Proof: The zero current evaluates to 0 on all forms, so |0(ω)| = 0. -/
+theorem mass_zero : mass (0 : Current n X k) = 0 := by
+  unfold mass
+  have h_set : { r : ℝ | ∃ ω : SmoothForm n X k, comass ω ≤ 1 ∧ r = |(0 : Current n X k).toFun ω| } = {0} := by
+    ext r
+    simp only [Set.mem_setOf_eq, Set.mem_singleton_iff]
+    constructor
+    · intro ⟨ω, _, hr⟩
+      rw [hr, zero_toFun, abs_zero]
+    · intro hr
+      use 0
+      constructor
+      · rw [comass_zero]; norm_num
+      · rw [hr, zero_toFun, abs_zero]
+  rw [h_set]
+  exact csSup_singleton 0
+
+/-- **Mass is symmetric under negation**.
+    Proof: |(-T)(ω)| = |-T(ω)| = |T(ω)|, so the sets are identical. -/
+theorem mass_neg (T : Current n X k) : mass (-T) = mass T := by
+  unfold mass
+  have h_set_eq : { r : ℝ | ∃ ω : SmoothForm n X k, comass ω ≤ 1 ∧ r = |(-T).toFun ω| } =
+                  { r : ℝ | ∃ ω : SmoothForm n X k, comass ω ≤ 1 ∧ r = |T.toFun ω| } := by
+    ext r
+    simp only [Set.mem_setOf_eq]
+    constructor
+    · intro ⟨ω, hω, hr⟩
+      use ω, hω
+      rw [hr, neg_toFun, abs_neg]
+    · intro ⟨ω, hω, hr⟩
+      use ω, hω
+      rw [hr, neg_toFun, abs_neg]
+  rw [h_set_eq]
 
 /-- Mass satisfies the triangle inequality (Federer 1969, §4.1.7). -/
 axiom mass_add_le (S T : Current n X k) : mass (S + T) ≤ mass S + mass T
 
 /-- Mass scales with absolute value of scalar. -/
 axiom mass_smul (r : ℝ) (T : Current n X k) : mass (r • T) = |r| * mass T
-
-/-- Currents are bounded: evaluation is bounded by mass times comass.
-    In the stub model with all evaluations finite, this is trivially satisfiable. -/
-axiom is_bounded (T : Current n X k) : ∃ M : ℝ, ∀ ω : SmoothForm n X k, |T.toFun ω| ≤ M * comass ω
-
-/-- Zero current evaluates to zero. -/
-theorem zero_toFun (ω : SmoothForm n X k) : (0 : Current n X k).toFun ω = 0 := by
-  rfl
 
 /-- Extensionality for currents: two currents are equal iff they agree on all forms. -/
 @[ext]

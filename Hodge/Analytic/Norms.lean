@@ -36,8 +36,22 @@ They are axiomatic because `pointwiseComass` and `SmoothForm` are opaque.
 These properties would be derivable if the underlying structures were transparent.
 -/
 
-/-- **Pointwise Comass Non-negativity** (Structural).
-    The supremum of norms is always non-negative. -/
+/-- **Pointwise Comass Non-negativity** (Interface Axiom for Opaque `pointwiseComass`).
+
+    The pointwise comass of any form at any point is non-negative: pointwiseComass α x ≥ 0.
+
+    **Mathematical Justification**: The pointwise comass is defined as:
+      pointwiseComass α x = sup { |α(v₁, ..., vₖ)| : ‖vᵢ‖ ≤ 1 }
+
+    Since absolute values are always non-negative, the supremum of a set of
+    non-negative real numbers is non-negative (or +∞, but forms are bounded).
+
+    **Why This is an Axiom**: The `pointwiseComass` function is opaque (its
+    implementation is hidden), so we cannot access its definition to prove
+    non-negativity. This axiom expresses the interface contract that
+    `pointwiseComass` behaves like the mathematical comass norm.
+
+    Reference: [H. Federer, "Geometric Measure Theory", Springer, 1969, Section 1.8]. -/
 axiom pointwiseComass_nonneg {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     {k : ℕ} (α : SmoothForm n X k) (x : X) : pointwiseComass α x ≥ 0

@@ -121,10 +121,48 @@ theorem omega_pow_is_p_p (p : ℕ) : isPPFormTD n X p (kahlerPow (n := n) (X := 
 
 /-! ## Rationality of Kähler Power -/
 
-/-- Kähler power is closed. -/
+/-- **Kähler Power is Closed** (Interface Axiom for Opaque `kahlerPow`).
+
+    The exterior derivative of ω^p is zero: d(ω^p) = 0.
+
+    **Mathematical Justification**: The Kähler form ω is closed (dω = 0) by definition
+    of a Kähler manifold. By the graded Leibniz rule for the exterior derivative:
+    d(α ∧ β) = dα ∧ β + (-1)^{deg α} α ∧ dβ
+
+    For ω^p = ω ∧ ω ∧ ... ∧ ω (p times), induction on p gives:
+    - Base case: d(ω^1) = dω = 0
+    - Inductive step: d(ω^{p+1}) = d(ω ∧ ω^p) = dω ∧ ω^p + (-1)^2 ω ∧ d(ω^p)
+                                 = 0 ∧ ω^p + ω ∧ 0 = 0
+
+    **Why This is an Axiom**: The `kahlerPow` function is opaque (its implementation
+    is hidden), so we cannot perform the induction. This axiom expresses the
+    interface contract that `kahlerPow p` behaves like the mathematical ω^p.
+
+    Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry",
+    Wiley, 1978, Chapter 0, Section 7]. -/
 axiom omega_pow_IsFormClosed (p : ℕ) : IsFormClosed (kahlerPow (n := n) (X := X) p)
 
-/-- Kähler power is rational. -/
+/-- **Kähler Power is Rational** (Classical Pillar).
+
+    The cohomology class [ω^p] lies in the rational cohomology H^{2p}(X, ℚ).
+
+    **Mathematical Justification**: For a smooth projective variety X ⊂ ℙ^N,
+    the Kähler form ω is the restriction of the Fubini-Study form on ℙ^N.
+    The class [ω] is the hyperplane class, which is integral (lies in H²(X, ℤ)).
+    Therefore [ω^p] = [ω]^p ∈ H^{2p}(X, ℤ) ⊂ H^{2p}(X, ℚ).
+
+    **Why This is an Axiom**: This is a classical pillar from algebraic geometry
+    that requires:
+    1. The embedding X ↪ ℙ^N and the Fubini-Study form
+    2. The comparison isomorphism between de Rham and singular cohomology
+    3. Integrality of the hyperplane class
+
+    These deep results are beyond the current formalization scope.
+
+    Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry",
+    Wiley, 1978, Chapter 1, Section 2].
+    Reference: [C. Voisin, "Hodge Theory and Complex Algebraic Geometry",
+    Vol. I, Cambridge University Press, 2002, Chapter 11]. -/
 axiom omega_pow_is_rational (p : ℕ) : isRationalClass ⟦kahlerPow (n := n) (X := X) p, omega_pow_IsFormClosed p⟧
 
 /-- **Theorem: scaled Kähler power is closed.**

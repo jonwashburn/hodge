@@ -63,45 +63,89 @@ class ProjectiveComplexManifold (n : ℕ) (X : Type u)
     non-trivial topological space has such sets. -/
 axiom exists_not_isClosed_set (X : Type*) [TopologicalSpace X] [Nonempty X] : ∃ S : Set X, ¬ IsClosed S
 
-/-- Smooth k-form on a complex n-manifold X. -/
-opaque SmoothForm (n : ℕ) (X : Type u) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] : Type u
+/-- Opaque smoothness predicate for pointwise alternating k-forms.
+    This captures the "smooth section" requirement without needing full smooth manifold theory. -/
+opaque IsSmoothAlternating (n : ℕ) (X : Type u)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    (k : ℕ) : ((x : X) → (TangentSpace (𝓒_complex n) x) [⋀^Fin k]→ₗ[ℂ] ℂ) → Prop
 
--- Define zero first with explicit parameters using axiom (opaque requires Inhabited which we don't have yet)
-axiom SmoothForm.zero (n : ℕ) (X : Type u) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] : SmoothForm n X k
+/-- A smooth k-form on a complex n-manifold X.
+    Defined as a structure to enable deriving algebraic instances from pointwise operations. -/
+@[ext]
+structure SmoothForm (n : ℕ) (X : Type u) (k : ℕ)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] where
+  as_alternating : (x : X) → (TangentSpace (𝓒_complex n) x) [⋀^Fin k]→ₗ[ℂ] ℂ
+  is_smooth : IsSmoothAlternating n X k as_alternating
 
--- Establish Inhabited instance immediately (required for opaque functions with SmoothForm args)
-instance SmoothForm.instInhabited (n : ℕ) (X : Type u) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] :
-    Inhabited (SmoothForm n X k) := ⟨SmoothForm.zero n X k⟩
+variable {n : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
 
--- Axiomatize the algebraic structure of SmoothForm first (priority 100 to take precedence)
-axiom SmoothForm.instAddCommGroup (n : ℕ) (X : Type u) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] : AddCommGroup (SmoothForm n X k)
-attribute [instance 100] SmoothForm.instAddCommGroup
+/-! ### Smoothness Closure Axioms (targeted, not structural) -/
 
-axiom SmoothForm.instModuleComplex (n : ℕ) (X : Type u) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] : Module ℂ (SmoothForm n X k)
-attribute [instance 100] SmoothForm.instModuleComplex
+axiom isSmoothAlternating_zero (k : ℕ) : IsSmoothAlternating n X k (fun _ => 0)
+axiom isSmoothAlternating_add (k : ℕ) (ω η : SmoothForm n X k) :
+    IsSmoothAlternating n X k (fun x => ω.as_alternating x + η.as_alternating x)
+axiom isSmoothAlternating_neg (k : ℕ) (ω : SmoothForm n X k) :
+    IsSmoothAlternating n X k (fun x => -ω.as_alternating x)
+axiom isSmoothAlternating_smul (k : ℕ) (c : ℂ) (ω : SmoothForm n X k) :
+    IsSmoothAlternating n X k (fun x => c • ω.as_alternating x)
+axiom isSmoothAlternating_sub (k : ℕ) (ω η : SmoothForm n X k) :
+    IsSmoothAlternating n X k (fun x => ω.as_alternating x - η.as_alternating x)
 
-axiom SmoothForm.instModuleReal (n : ℕ) (X : Type u) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] : Module ℝ (SmoothForm n X k)
-attribute [instance 100] SmoothForm.instModuleReal
+/-! ### Basic Type Class Instances (derived from pointwise ops) -/
 
--- Axiomatize the topological structure of SmoothForm
+instance (k : ℕ) : Zero (SmoothForm n X k) := ⟨⟨fun _ => 0, isSmoothAlternating_zero (n := n) (X := X) k⟩⟩
+instance (k : ℕ) : Add (SmoothForm n X k) := ⟨fun ω η => ⟨fun x => ω.as_alternating x + η.as_alternating x, isSmoothAlternating_add (n := n) (X := X) k ω η⟩⟩
+instance (k : ℕ) : Neg (SmoothForm n X k) := ⟨fun ω => ⟨fun x => -ω.as_alternating x, isSmoothAlternating_neg (n := n) (X := X) k ω⟩⟩
+instance (k : ℕ) : Sub (SmoothForm n X k) := ⟨fun ω η => ⟨fun x => ω.as_alternating x - η.as_alternating x, isSmoothAlternating_sub (n := n) (X := X) k ω η⟩⟩
+instance (k : ℕ) : SMul ℂ (SmoothForm n X k) := ⟨fun c ω => ⟨fun x => c • ω.as_alternating x, isSmoothAlternating_smul (n := n) (X := X) k c ω⟩⟩
+instance (k : ℕ) : Inhabited (SmoothForm n X k) := ⟨0⟩
+
+@[simp] lemma SmoothForm.zero_apply (k : ℕ) (x : X) : (0 : SmoothForm n X k).as_alternating x = 0 := rfl
+@[simp] lemma SmoothForm.add_apply (k : ℕ) (ω η : SmoothForm n X k) (x : X) : (ω + η).as_alternating x = ω.as_alternating x + η.as_alternating x := rfl
+@[simp] lemma SmoothForm.neg_apply (k : ℕ) (ω : SmoothForm n X k) (x : X) : (-ω).as_alternating x = -ω.as_alternating x := rfl
+@[simp] lemma SmoothForm.sub_apply (k : ℕ) (ω η : SmoothForm n X k) (x : X) : (ω - η).as_alternating x = ω.as_alternating x - η.as_alternating x := rfl
+@[simp] lemma SmoothForm.smul_apply (k : ℕ) (c : ℂ) (ω : SmoothForm n X k) (x : X) : (c • ω).as_alternating x = c • ω.as_alternating x := rfl
+
+/-! ### AddCommGroup Instance (Derived, eliminates axiom) -/
+
+instance SmoothForm.instAddCommGroup (n : ℕ) (X : Type u) (k : ℕ)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] : AddCommGroup (SmoothForm n X k) where
+  add_assoc α β γ := by ext x; simp [add_assoc]
+  zero_add α := by ext x; simp
+  add_zero α := by ext x; simp
+  add_comm α β := by ext x; simp [add_comm]
+  neg_add_cancel α := by ext x; simp
+  nsmul := nsmulRec
+  zsmul := zsmulRec
+  sub α β := α - β
+  sub_eq_add_neg α β := by ext x; simp [sub_eq_add_neg]
+
+/-! ### Module ℂ Instance (Derived, eliminates axiom) -/
+
+instance SmoothForm.instModuleComplex (n : ℕ) (X : Type u) (k : ℕ)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] : Module ℂ (SmoothForm n X k) where
+  one_smul α := by ext x; simp
+  mul_smul r s α := by ext x; simp [mul_smul]
+  smul_zero r := by ext x; simp
+  smul_add r α β := by ext x; simp [smul_add]
+  add_smul r s α := by ext x; simp [add_smul]
+  zero_smul α := by ext x; simp
+
+/-! ### Module ℝ Instance (Derived via scalar tower) -/
+
+instance SmoothForm.instModuleReal (n : ℕ) (X : Type u) (k : ℕ)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] : Module ℝ (SmoothForm n X k) :=
+  Module.compHom (SmoothForm n X k) Complex.ofRealHom
+
+/-! ### TopologicalSpace Instance (Axiomatized - specific topology choice) -/
+
 axiom SmoothForm.instTopologicalSpace (n : ℕ) (X : Type u) (k : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] : TopologicalSpace (SmoothForm n X k)
 attribute [instance 100] SmoothForm.instTopologicalSpace
 
-namespace SmoothForm
-
-variable {n : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-variable {k : ℕ}
-
-opaque as_alternating : SmoothForm n X k → (x : X) → (TangentSpace (𝓒_complex n) x) [⋀^Fin k]→ₗ[ℂ] ℂ
-
-end SmoothForm
+/-- SmoothForm.zero as def for backwards compatibility -/
+def SmoothForm.zero (n : ℕ) (X : Type u) (k : ℕ)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] : SmoothForm n X k := 0
 
 /-- Smooth Exterior Derivative. -/
 opaque smoothExtDeriv {n : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
@@ -359,7 +403,8 @@ def DeRhamCohomologyClass.neg' {n k : ℕ} {X : Type u}
 def DeRhamCohomologyClass.smul' {n k : ℕ} {X : Type u}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     (c_scalar : ℂ) (c : DeRhamCohomologyClass n X k) : DeRhamCohomologyClass n X k :=
-  Quotient.lift (fun ω => Quotient.mk _ ⟨c_scalar • ω.val, isFormClosed_smul ω.property⟩)
+  Quotient.lift
+    (fun (ω : ClosedForm n X k) => Quotient.mk (DeRhamSetoid n k X) ⟨c_scalar • ω.val, isFormClosed_smul ω.property⟩)
     (fun _ _ h => Quotient.sound (cohomologous_smul c_scalar _ _ h)) c
 
 /-- Subtraction on de Rham cohomology classes. -/
@@ -502,6 +547,7 @@ def DeRhamCohomologyClass.ofForm {k : ℕ} (ω : SmoothForm n X k) (h : IsFormCl
 
 notation "⟦" ω "," h "⟧" => DeRhamCohomologyClass.ofForm ω h
 
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] in
 /-- Addition of forms lifts to cohomology classes.
     The quotient map respects the additive structure on closed forms. -/
 theorem ofForm_add {k : ℕ} (ω η : SmoothForm n X k) (hω : IsFormClosed ω) (hη : IsFormClosed η) :
@@ -523,14 +569,29 @@ axiom ofForm_smul {k : ℕ} (c : ℂ) (ω : SmoothForm n X k) (hω : IsFormClose
     ⟦c • ω, isFormClosed_smul hω⟧ = c • ⟦ω, hω⟧
 
 /-- Subtraction of forms lifts to cohomology classes.
-    This is axiomatized because it depends on the quotient structure and subtraction
-    on the axiomatized AddCommGroup. -/
-axiom ofForm_sub {k : ℕ} (ω η : SmoothForm n X k) (hω : IsFormClosed ω) (hη : IsFormClosed η) :
-    ⟦ω - η, isFormClosed_sub hω hη⟧ = ⟦ω, hω⟧ - ⟦η, hη⟧
+    The quotient map respects the subtraction structure on closed forms.
+    Proof: Both sides have the same underlying form ω - η, so they're cohomologous. -/
+theorem ofForm_sub {k : ℕ} (ω η : SmoothForm n X k) (hω : IsFormClosed ω) (hη : IsFormClosed η) :
+    ⟦ω - η, isFormClosed_sub hω hη⟧ = ⟦ω, hω⟧ - ⟦η, hη⟧ := by
+  apply Quotient.sound
+  show Cohomologous _ _
+  unfold Cohomologous
+  -- LHS val = ω - η; RHS val = ω + (-η) = ω - η via ClosedForm operations
+  -- The difference is (ω - η) - (ω + (-η)) = 0 since sub_eq_add_neg
+  have h_eq : (ω - η) - (ω + (-η)) = (0 : SmoothForm n X k) := by
+    simp [sub_eq_add_neg]
+  cases k with
+  | zero =>
+    simp only [IsExact, ClosedForm.add_val, ClosedForm.neg_val, h_eq]
+  | succ k' =>
+    simp only [IsExact, ClosedForm.add_val, ClosedForm.neg_val, h_eq]
+    exact ⟨0, smoothExtDeriv_zero⟩
 
 /-- Real scalar mult of forms lifts to cohomology classes.
-    Note: Uses the ℂ-module structure via ℝ → ℂ embedding.
-    This is axiomatized because it involves coercions between ℝ and ℂ scalar multiplication. -/
+    Axiomatized due to subtle definitional mismatch between ℝ-module structures:
+    - SmoothForm uses Module.compHom Complex.ofRealHom
+    - DeRhamCohomologyClass uses algebra scalar tower via Algebra ℝ ℂ
+    Both yield (r : ℂ) • x provably, but not definitionally. -/
 axiom ofForm_smul_real {k : ℕ} (r : ℝ) (ω : SmoothForm n X k) (hω : IsFormClosed ω) :
     ⟦r • ω, isFormClosed_smul_real hω⟧ = r • ⟦ω, hω⟧
 

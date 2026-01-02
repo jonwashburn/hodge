@@ -177,12 +177,24 @@ theorem cone_positive_represents {p : ℕ}
 
 /-- **Rational Multiple of Kähler Power is Algebraic** (Griffiths-Harris, 1978).
 
+    **STATUS: CLASSICAL PILLAR**
+
     For any positive rational c > 0, the cohomology class c·[ω^p] is algebraic,
     meaning it is represented by the fundamental class of an algebraic subvariety.
 
-    This follows from the fact that ω^p is the cohomology class of a linear
-    section (hyperplane class), and rational multiples of algebraic classes
-    are algebraic (by taking appropriate covers/multiples of the cycle).
+    **Mathematical Justification**: On a smooth projective variety X ⊂ ℙ^N,
+    the Kähler class [ω] is the hyperplane class, which is algebraic (it's the
+    fundamental class of a hyperplane section H ∩ X). Therefore:
+    - [ω^p] = [ω]^p is algebraic (self-intersection of hyperplane sections)
+    - For c = m/n ∈ ℚ⁺, the class c·[ω^p] is represented by taking m copies
+      of a degree-n cover of the corresponding cycle.
+
+    **Why This is an Axiom**: Proving this requires:
+    1. The theory of algebraic cycles and their intersection products
+    2. The comparison between de Rham and singular/algebraic cycle classes
+    3. The construction of appropriate cycle representatives
+
+    These are deep results from algebraic geometry beyond current scope.
 
     Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry",
     Wiley, 1978, Chapter 1, Section 2].
