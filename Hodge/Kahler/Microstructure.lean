@@ -305,28 +305,32 @@ axiom calibration_defect_from_gluing (p : ℕ) (h : ℝ) (hh : h > 0) (C : Cubul
 axiom conePositive_comass_bound (p : ℕ) (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) : comass γ ≤ 2
 
-/-- **RawSheetSum to Integral Current Evaluation** (Technical Axiom).
+/-- **RawSheetSum to Integral Current Evaluation** (Proved).
 
     The underlying current of `toIntegralCurrent` evaluates to zero on all test forms.
 
-    **Mathematical Justification**: The `toCycleIntegralCurrent` construction builds
-    a cycle from `zeroCycleCurrent` or `zero_int`, both of which have `.toFun = 0`
-    (the zero current). After the type-level cast with `▸`, the underlying data
-    structure is preserved, so `.toFun` remains the zero functional.
-
-    **Why This is an Axiom**: The proof requires handling dependent type casts
-    that arise from the `by_cases` in `toCycleIntegralCurrent`. While mathematically
-    straightforward (the cast preserves the zero property), Lean's dependent
-    elimination tactics don't handle this cleanly without significant infrastructure.
-
-    **Role in Proof**: This axiom is used in `gluing_mass_bound` to show that
-    the mass of the glued current is bounded, which feeds into the flat norm
-    compactness argument for the microstructure sequence.
+    **Proof**: The `toCycleIntegralCurrent` construction builds a cycle from
+    `zeroCycleCurrent` or `zero_int`, both of which have `.toFun = 0`.
+    We unfold definitions and use `dif_pos`/`dif_neg` to handle both branches.
 
     Reference: [H. Federer, "Geometric Measure Theory", 1969, Section 4.2.25]. -/
-axiom RawSheetSum.toIntegralCurrent_toFun_eq_zero {p : ℕ} {hscale : ℝ}
+theorem RawSheetSum.toIntegralCurrent_toFun_eq_zero {p : ℕ} {hscale : ℝ}
     {C : Cubulation n X hscale} (T_raw : RawSheetSum n X p hscale C) :
-    T_raw.toIntegralCurrent.toFun = 0
+    T_raw.toIntegralCurrent.toFun = 0 := by
+  unfold RawSheetSum.toIntegralCurrent RawSheetSum.toCycleIntegralCurrent
+  -- Split on the by_cases
+  by_cases h : 2 * (n - p) ≥ 1
+  · -- Case: 2 * (n - p) ≥ 1, uses zeroCycleCurrent
+    simp only [h, ↓reduceDIte]
+    -- zeroCycleCurrent uses cast ▸ zeroCycleCurrent'
+    -- zeroCycleCurrent' has .current = zero_int, and zero_int.toFun = 0
+    unfold zeroCycleCurrent zeroCycleCurrent'
+    -- After the cast, the .current.toFun field is still 0
+    rfl
+  · -- Case: 2 * (n - p) < 1, uses zero_int directly
+    simp only [h, ↓reduceDIte]
+    -- The current is zero_int, so toFun = 0
+    rfl
 
 /-- **Mass bound for gluing construction** (Federer-Fleming, 1960).
     The integral current from gluing has mass bounded by a constant times the comass.
