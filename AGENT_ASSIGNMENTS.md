@@ -192,8 +192,8 @@ These are acceptable as axioms. **Document** why they're classical pillars:
 | `flat_limit_existence` | FF 1960 | ✓ Documented |
 | `mass_lsc` | Federer 1969 | ✓ Documented |
 | `calibration_defect_from_gluing` | FF 1960 | ✓ Documented |
-| `harvey_lawson_fundamental_class` | HL 1983 | Needs documentation |
-| `lefschetz_lift_signed_cycle` | Hard Lefschetz | Needs documentation |
+| `harvey_lawson_fundamental_class` | HL 1983 | ✓ Documented |
+| `lefschetz_lift_signed_cycle` | Hard Lefschetz | ✓ Documented |
 
 **Task:** Add docstrings explaining why these are classical pillars that require extensive Mathlib infrastructure to prove.
 
