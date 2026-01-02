@@ -174,7 +174,27 @@ theorem ofForm_add (ω η) (hω hη) :
 | 2026-01-01 | 35 | After Round 13 (-9 axioms) |
 | 2026-01-01 | 32 | After Round 14 (-3 axioms) |
 | 2026-01-01 | 30 | After Round 15 (-2 axioms) |
+| 2026-01-02 | 35 | Round 18: 35 custom axioms in proof chain |
 | | | |
+
+---
+
+## Permanent Axioms (Cannot Be Proved)
+
+The following axioms must remain as axioms due to opaque definitions:
+
+| Axiom | Reason |
+|-------|--------|
+| `pointwiseComass_nonneg` | `pointwiseComass` is opaque |
+| `pointwiseComass_zero` | `pointwiseComass` is opaque |
+| `pointwiseComass_smul` | `pointwiseComass` is opaque |
+| `pointwiseComass_continuous` | `pointwiseComass` is opaque |
+| `smoothExtDeriv_add` | `smoothExtDeriv` is opaque |
+| `smoothExtDeriv_smul` | `smoothExtDeriv` is opaque |
+| `conePositive_comass_bound` | Requires Carathéodory + comass of simple calibrated forms |
+| `simpleCalibratedForm` | Deep GMT construction |
+| `wirtinger_comass_bound` | Deep GMT result |
+| `serre_gaga` | Classical theorem (acceptable) |
 
 ---
 

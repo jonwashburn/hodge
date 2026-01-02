@@ -128,12 +128,47 @@ theorem isIntegral_zero_current (k : ℕ) : isIntegral (0 : Current n X k) := by
   rw [h, flatNorm_zero]
   exact hε
 
-/-- **Theorem: Integer Scaling of Integral Currents is Integral.**
+/-- **Theorem: Integer Scaling of Integral Currents is Integral** (Federer-Fleming, 1960).
     Proof: If c = 0, then c • T = 0 is integral by isIntegral_zero_current.
     If c ≠ 0, approximate T by polyhedral P with flatNorm(T-P) < ε/|c|.
     Then c • P is polyhedral, and flatNorm(c•T - c•P) = |c| · flatNorm(T-P) < ε. -/
-axiom isIntegral_smul {k : ℕ} (c : ℤ) (T : Current n X k) :
-    isIntegral T → isIntegral (c • T)
+theorem isIntegral_smul {k : ℕ} (c : ℤ) (T : Current n X k) :
+    isIntegral T → isIntegral (c • T) := by
+  intro hT
+  by_cases hc : c = 0
+  · -- Case c = 0: 0 • T = 0 which is integral
+    simp only [hc]
+    have h0 : (0 : ℤ) • T = (0 : Current n X k) := by
+      show ((0 : ℤ) : ℝ) • T = 0
+      simp only [Int.cast_zero]
+      exact Current.zero_smul T
+    rw [h0]
+    exact isIntegral_zero_current k
+  · -- Case c ≠ 0
+    unfold isIntegral at *
+    intro ε hε
+    have hc_abs_pos : |(c : ℝ)| > 0 := by
+      simp only [abs_pos]
+      exact Int.cast_ne_zero.mpr hc
+    -- Approximate T by polyhedral P with flatNorm(T-P) < ε/|c|
+    have heps_div : ε / |(c : ℝ)| > 0 := div_pos hε hc_abs_pos
+    obtain ⟨P, hP_poly, hP_approx⟩ := hT (ε / |(c : ℝ)|) heps_div
+    -- c • P is polyhedral
+    use c • P
+    constructor
+    · exact polyhedral_smul c P hP_poly
+    · -- flatNorm(c•T - c•P) = |c| · flatNorm(T-P) < ε
+      have h_diff : (c : ℤ) • T - c • P = c • (T - P) := by
+        show ((c : ℤ) : ℝ) • T - ((c : ℤ) : ℝ) • P = ((c : ℤ) : ℝ) • (T - P)
+        rw [Current.smul_sub]
+      rw [h_diff]
+      -- Integer smul is real smul
+      show flatNorm (((c : ℤ) : ℝ) • (T - P)) < ε
+      rw [flatNorm_smul]
+      have h1 : |(c : ℝ)| * flatNorm (T - P) < |(c : ℝ)| * (ε / |(c : ℝ)|) :=
+        mul_lt_mul_of_pos_left hP_approx hc_abs_pos
+      have h2 : |(c : ℝ)| * (ε / |(c : ℝ)|) = ε := mul_div_cancel₀ ε (ne_of_gt hc_abs_pos)
+      linarith
 
 /-- **The boundary of an integral current is integral.**
     Proof: Given ε > 0, approximate T by polyhedral P with flatNorm(T-P) < ε.

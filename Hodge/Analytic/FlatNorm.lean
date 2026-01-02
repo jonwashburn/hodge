@@ -227,19 +227,85 @@ theorem flatNorm_neg {k : ℕ} (T : Current n X k) : flatNorm (-T) = flatNorm T 
       rw [← h2, h]
     · rw [hm, Current.mass_neg, Current.mass_neg]
 
+/-- Helper lemma: if for all pairs (m₁, m₂) from two sets there exists an element
+    in another set that is ≤ m₁ + m₂, then the infimum of the third set is ≤ sum of infima. -/
+private theorem sInf_add_helper {S₁ S₂ S : Set ℝ}
+    (hS_ne : S.Nonempty) (hS_bdd : BddBelow S)
+    (hS₁_ne : S₁.Nonempty) (hS₁_bdd : BddBelow S₁)
+    (hS₂_ne : S₂.Nonempty) (hS₂_bdd : BddBelow S₂)
+    (h : ∀ m₁ ∈ S₁, ∀ m₂ ∈ S₂, ∃ m ∈ S, m ≤ m₁ + m₂) :
+    sInf S ≤ sInf S₁ + sInf S₂ := by
+  -- For any ε > 0, there exist m₁ ∈ S₁ and m₂ ∈ S₂ with m₁ < sInf S₁ + ε/2 and m₂ < sInf S₂ + ε/2
+  -- Then by h, there exists m ∈ S with m ≤ m₁ + m₂ < sInf S₁ + sInf S₂ + ε
+  -- So sInf S ≤ sInf S₁ + sInf S₂ + ε for all ε > 0
+  by_contra hne
+  push_neg at hne
+  -- hne : sInf S₁ + sInf S₂ < sInf S
+  -- Let gap = sInf S - (sInf S₁ + sInf S₂) > 0
+  set gap := sInf S - (sInf S₁ + sInf S₂) with hgap_def
+  have hgap_pos : gap > 0 := by linarith
+  -- There exist m₁ ∈ S₁ with m₁ < sInf S₁ + gap/3
+  have ⟨m₁, hm₁_in, hm₁_lt⟩ := exists_lt_of_csInf_lt hS₁_ne (by linarith : sInf S₁ < sInf S₁ + gap / 3)
+  -- There exist m₂ ∈ S₂ with m₂ < sInf S₂ + gap/3
+  have ⟨m₂, hm₂_in, hm₂_lt⟩ := exists_lt_of_csInf_lt hS₂_ne (by linarith : sInf S₂ < sInf S₂ + gap / 3)
+  -- By h, there exists m ∈ S with m ≤ m₁ + m₂
+  obtain ⟨m, hm_in, hm_le⟩ := h m₁ hm₁_in m₂ hm₂_in
+  -- But m ≤ m₁ + m₂ < sInf S₁ + gap/3 + sInf S₂ + gap/3 = sInf S₁ + sInf S₂ + 2*gap/3
+  have hm_lt : m < sInf S₁ + sInf S₂ + 2 * gap / 3 := calc
+    m ≤ m₁ + m₂ := hm_le
+    _ < (sInf S₁ + gap / 3) + (sInf S₂ + gap / 3) := by linarith
+    _ = sInf S₁ + sInf S₂ + 2 * gap / 3 := by ring
+  -- And sInf S ≤ m < sInf S₁ + sInf S₂ + 2*gap/3 = sInf S - gap/3
+  have h_contra : sInf S < sInf S := calc
+    sInf S ≤ m := csInf_le hS_bdd hm_in
+    _ < sInf S₁ + sInf S₂ + 2 * gap / 3 := hm_lt
+    _ = sInf S - gap / 3 := by rw [hgap_def]; ring
+    _ < sInf S := by linarith
+  linarith
+
 /-- The flat norm satisfies the triangle inequality (Federer-Fleming 1960).
-    Proof sketch: If T₁ = S₁ + ∂R₁ and T₂ = S₂ + ∂R₂,
+    Proof: If T₁ = S₁ + ∂R₁ and T₂ = S₂ + ∂R₂,
     then T₁ + T₂ = (S₁+S₂) + ∂(R₁+R₂) with cost M(S₁+S₂) + M(R₁+R₂)
-    ≤ M(S₁) + M(S₂) + M(R₁) + M(R₂) by triangle inequalities on mass.
-    This axiom is kept due to the complexity of infimum manipulation required. -/
-axiom flatNorm_add_le {k : ℕ} (T₁ T₂ : Current n X k) :
-    flatNorm (T₁ + T₂) ≤ flatNorm T₁ + flatNorm T₂
+    ≤ M(S₁) + M(S₂) + M(R₁) + M(R₂) by triangle inequalities on mass. -/
+theorem flatNorm_add_le {k : ℕ} (T₁ T₂ : Current n X k) :
+    flatNorm (T₁ + T₂) ≤ flatNorm T₁ + flatNorm T₂ := by
+  unfold flatNorm
+  apply sInf_add_helper (flatNormDecompSet_nonempty (T₁ + T₂))
+    (flatNormDecompSet_bddBelow (T₁ + T₂)) (flatNormDecompSet_nonempty T₁)
+    (flatNormDecompSet_bddBelow T₁) (flatNormDecompSet_nonempty T₂)
+    (flatNormDecompSet_bddBelow T₂)
+  intro m₁ hm₁ m₂ hm₂
+  obtain ⟨S₁, R₁, hT₁, hm₁_eq⟩ := hm₁
+  obtain ⟨S₂, R₂, hT₂, hm₂_eq⟩ := hm₂
+  -- T₁ + T₂ = (S₁ + S₂) + ∂(R₁ + R₂)
+  have h_decomp : T₁ + T₂ = (S₁ + S₂) + Current.boundary (R₁ + R₂) := by
+    rw [hT₁, hT₂, Current.boundary_add]
+    ext ω
+    show S₁.toFun ω + (Current.boundary R₁).toFun ω + (S₂.toFun ω + (Current.boundary R₂).toFun ω) =
+         S₁.toFun ω + S₂.toFun ω + ((Current.boundary R₁).toFun ω + (Current.boundary R₂).toFun ω)
+    ring
+  have h_cost_in : Current.mass (S₁ + S₂) + Current.mass (R₁ + R₂) ∈ flatNormDecompSet (T₁ + T₂) := by
+    refine ⟨S₁ + S₂, R₁ + R₂, h_decomp, rfl⟩
+  have h_cost_le : Current.mass (S₁ + S₂) + Current.mass (R₁ + R₂) ≤ m₁ + m₂ := by
+    rw [hm₁_eq, hm₂_eq]
+    calc Current.mass (S₁ + S₂) + Current.mass (R₁ + R₂)
+      ≤ (Current.mass S₁ + Current.mass S₂) + (Current.mass R₁ + Current.mass R₂) :=
+        add_le_add (Current.mass_add_le S₁ S₂) (Current.mass_add_le R₁ R₂)
+      _ = Current.mass S₁ + Current.mass R₁ + (Current.mass S₂ + Current.mass R₂) := by ring
+  exact ⟨Current.mass (S₁ + S₂) + Current.mass (R₁ + R₂), h_cost_in, h_cost_le⟩
 
 /-- Scalar multiplication distributes over current addition. -/
 theorem Current.smul_add {k : ℕ} (c : ℝ) (S T : Current n X k) :
     c • (S + T) = c • S + c • T := by
   ext ω
   show c * (S.toFun ω + T.toFun ω) = c * S.toFun ω + c * T.toFun ω
+  ring
+
+/-- Scalar multiplication distributes over current subtraction. -/
+theorem Current.smul_sub {k : ℕ} (c : ℝ) (S T : Current n X k) :
+    c • (S - T) = c • S - c • T := by
+  ext ω
+  show c * (S.toFun ω - T.toFun ω) = c * S.toFun ω - c * T.toFun ω
   ring
 
 /-- Scalar multiplication associates. -/
@@ -249,13 +315,86 @@ theorem Current.smul_smul {k : ℕ} (c d : ℝ) (T : Current n X k) :
   show c * (d * T.toFun ω) = (c * d) * T.toFun ω
   ring
 
-/-- Flat norm scales with absolute value of scalar (Federer-Fleming 1960).
-    Proof sketch: If T = S + ∂R is a decomposition, then c•T = c•S + ∂(c•R) with cost
-    M(c•S) + M(c•R) = |c|M(S) + |c|M(R) = |c|(M(S) + M(R)).
-    The decomposition set for c•T is exactly |c| times the decomposition set for T.
-    This axiom is kept due to the complexity of infimum scaling lemmas in Lean. -/
-axiom flatNorm_smul {k : ℕ} (c : ℝ) (T : Current n X k) :
-    flatNorm (c • T) = |c| * flatNorm T
+/-- Helper: decomposition sets scale with |c|. If m ∈ decomp(T), then |c|*m ∈ decomp(c•T). -/
+private theorem flatNormDecompSet_smul_mem {k : ℕ} (c : ℝ) (T : Current n X k)
+    (m : ℝ) (hm : m ∈ flatNormDecompSet T) :
+    |c| * m ∈ flatNormDecompSet (c • T) := by
+  obtain ⟨S, R, hT, hm_eq⟩ := hm
+  -- c•T = c•S + ∂(c•R)
+  have h_decomp : c • T = c • S + Current.boundary (c • R) := by
+    rw [hT, Current.smul_add, Current.boundary_smul]
+  refine ⟨c • S, c • R, h_decomp, ?_⟩
+  rw [hm_eq, Current.mass_smul, Current.mass_smul]
+  ring
+
+/-- Helper: decomposition sets scale with |c| inversely when c ≠ 0. -/
+private theorem flatNormDecompSet_smul_inv {k : ℕ} (c : ℝ) (hc : c ≠ 0) (T : Current n X k)
+    (m : ℝ) (hm : m ∈ flatNormDecompSet (c • T)) :
+    m / |c| ∈ flatNormDecompSet T := by
+  obtain ⟨S, R, hcT, hm_eq⟩ := hm
+  -- T = (1/c)•(c•T) = (1/c)•S + ∂((1/c)•R)
+  have h_decomp : T = c⁻¹ • S + Current.boundary (c⁻¹ • R) := by
+    have h_inv_smul : c⁻¹ • (c • T) = T := by
+      rw [Current.smul_smul, inv_mul_cancel₀ hc]
+      ext ω
+      show (1 : ℝ) * T.toFun ω = T.toFun ω
+      ring
+    rw [← h_inv_smul, hcT, Current.smul_add, Current.boundary_smul]
+  refine ⟨c⁻¹ • S, c⁻¹ • R, h_decomp, ?_⟩
+  rw [hm_eq, Current.mass_smul, Current.mass_smul]
+  have habs_ne : |c| ≠ 0 := abs_ne_zero.mpr hc
+  have h_abs_inv : |c⁻¹| = |c|⁻¹ := abs_inv c
+  rw [h_abs_inv]
+  field_simp
+
+/-- One-form smul identity. -/
+theorem Current.one_smul {k : ℕ} (T : Current n X k) : (1 : ℝ) • T = T := by
+  ext ω
+  show (1 : ℝ) * T.toFun ω = T.toFun ω
+  ring
+
+/-- Zero smul gives zero current. -/
+theorem Current.zero_smul {k : ℕ} (T : Current n X k) : (0 : ℝ) • T = 0 := by
+  ext ω
+  show (0 : ℝ) * T.toFun ω = (0 : Current n X k).toFun ω
+  simp only [zero_mul]
+  rfl
+
+theorem flatNorm_smul {k : ℕ} (c : ℝ) (T : Current n X k) :
+    flatNorm (c • T) = |c| * flatNorm T := by
+  by_cases hc : c = 0
+  · simp only [hc, abs_zero, zero_mul, Current.zero_smul, flatNorm_zero]
+  · -- Case c ≠ 0, so |c| > 0
+    have hc_abs_pos : |c| > 0 := abs_pos.mpr hc
+    have hc_abs_ne : |c| ≠ 0 := abs_ne_zero.mpr hc
+    apply le_antisymm
+    · -- flatNorm(c•T) ≤ |c| * flatNorm(T)
+      by_contra h_not_le
+      push_neg at h_not_le
+      set gap := flatNorm (c • T) - |c| * flatNorm T with hgap_def
+      have hgap_pos : gap > 0 := by linarith
+      have heps_pos : gap / (2 * |c|) > 0 := by positivity
+      have ⟨m, hm_in, hm_lt⟩ := exists_lt_of_csInf_lt (flatNormDecompSet_nonempty T)
+        (by linarith : flatNorm T < flatNorm T + gap / (2 * |c|))
+      have h_scaled_in := flatNormDecompSet_smul_mem c T m hm_in
+      have h_scaled_lt : |c| * m < |c| * flatNorm T + gap / 2 := by
+        have h1 : |c| * m < |c| * (flatNorm T + gap / (2 * |c|)) :=
+          mul_lt_mul_of_pos_left hm_lt hc_abs_pos
+        calc |c| * m < |c| * (flatNorm T + gap / (2 * |c|)) := h1
+          _ = |c| * flatNorm T + |c| * (gap / (2 * |c|)) := by ring
+          _ = |c| * flatNorm T + gap / 2 := by field_simp
+      have h_sInf_le : flatNorm (c • T) ≤ |c| * m :=
+        csInf_le (flatNormDecompSet_bddBelow (c • T)) h_scaled_in
+      linarith
+    · -- flatNorm(c•T) ≥ |c| * flatNorm(T)
+      apply le_csInf (flatNormDecompSet_nonempty (c • T))
+      intro m hm
+      have h_in := flatNormDecompSet_smul_inv c hc T m hm
+      have hsInf_le : flatNorm T ≤ m / |c| :=
+        csInf_le (flatNormDecompSet_bddBelow T) h_in
+      calc |c| * flatNorm T
+        ≤ |c| * (m / |c|) := mul_le_mul_of_nonneg_left hsInf_le (le_of_lt hc_abs_pos)
+        _ = m := by field_simp
 
 /-- Flat norm of difference is bounded by sum of flat norms.
     Follows from triangle inequality and symmetry under negation. -/

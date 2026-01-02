@@ -327,17 +327,12 @@ theorem boundary_boundary (T : Current n X (k + 2)) : (boundary (boundary T)) = 
   show T.toFun (smoothExtDeriv (smoothExtDeriv ω)) = 0
   rw [smoothExtDeriv_extDeriv]
   have h_zero : T.toFun 0 = 0 := by
-    have h := T.is_linear 1 0 0
-    simp only [one_smul, one_mul] at h
-    -- h : T.toFun (0 + 0) = T.toFun 0 + T.toFun 0
-    rw [add_zero] at h
-    -- h : T.toFun 0 = T.toFun 0 + T.toFun 0
-    -- From x = x + x, we get 0 = x (by subtracting x from both sides)
-    have h' : 0 = T.toFun 0 := by
-      have := sub_eq_zero.mpr h
-      simp only [add_sub_cancel_left] at this
-      exact this.symm
-    exact h'.symm
+    -- T.toFun 0 = T.toFun (0 • 0) = 0 * T.toFun 0 = 0
+    have h1 : (0 : ℝ) • (0 : SmoothForm n X (k + 2)) = 0 := zero_smul ℝ 0
+    have h2 := map_smul' T 0 0
+    rw [h1] at h2
+    simp at h2
+    exact h2
   exact h_zero
 
 /-- **Boundary is additive** (Federer, 1969).
