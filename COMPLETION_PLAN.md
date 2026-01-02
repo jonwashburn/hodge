@@ -172,6 +172,7 @@ theorem ofForm_add (ω η) (hω hη) :
 |------|------------------|-------|
 | 2026-01-01 | 44 | Initial count |
 | 2026-01-01 | 35 | After Round 13 (-9 axioms) |
+| 2026-01-01 | 32 | After Round 14 (-3 axioms) |
 | | | |
 
 ---
