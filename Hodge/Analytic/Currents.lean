@@ -153,7 +153,7 @@ private theorem mass_set_nonempty (T : Current n X k) :
   · rfl
 
 /-- The mass set is bounded above (by the bound from is_bounded). -/
-private theorem mass_set_bddAbove (T : Current n X k) :
+theorem mass_set_bddAbove (T : Current n X k) :
     BddAbove { r : ℝ | ∃ ω : SmoothForm n X k, comass ω ≤ 1 ∧ r = |T.toFun ω| } := by
   obtain ⟨M, hM⟩ := T.is_bounded
   use max M 0
@@ -220,11 +220,65 @@ theorem mass_neg (T : Current n X k) : mass (-T) = mass T := by
       rw [hr, neg_toFun, abs_neg]
   rw [h_set_eq]
 
-/-- Mass satisfies the triangle inequality (Federer 1969, §4.1.7). -/
-axiom mass_add_le (S T : Current n X k) : mass (S + T) ≤ mass S + mass T
+/-- Mass satisfies the triangle inequality (Federer 1969, §4.1.7).
+    Proof: For any ω with comass ω ≤ 1:
+    |(S + T)(ω)| ≤ |S(ω)| + |T(ω)| ≤ mass(S) + mass(T)
+    Taking the supremum yields mass(S + T) ≤ mass(S) + mass(T). -/
+theorem mass_add_le (S T : Current n X k) : mass (S + T) ≤ mass S + mass T := by
+  unfold mass
+  apply csSup_le (mass_set_nonempty (S + T))
+  intro r ⟨ω, hω_comass, hr⟩
+  rw [hr]
+  have h_add : (S + T).toFun ω = S.toFun ω + T.toFun ω := rfl
+  rw [h_add]
+  have h_tri : |S.toFun ω + T.toFun ω| ≤ |S.toFun ω| + |T.toFun ω| := abs_add_le _ _
+  have h_S_in : |S.toFun ω| ∈ { r : ℝ | ∃ ω : SmoothForm n X k, comass ω ≤ 1 ∧ r = |S.toFun ω| } :=
+    ⟨ω, hω_comass, rfl⟩
+  have h_S : |S.toFun ω| ≤ sSup { r : ℝ | ∃ ω : SmoothForm n X k, comass ω ≤ 1 ∧ r = |S.toFun ω| } :=
+    le_csSup (mass_set_bddAbove S) h_S_in
+  have h_T_in : |T.toFun ω| ∈ { r : ℝ | ∃ ω : SmoothForm n X k, comass ω ≤ 1 ∧ r = |T.toFun ω| } :=
+    ⟨ω, hω_comass, rfl⟩
+  have h_T : |T.toFun ω| ≤ sSup { r : ℝ | ∃ ω : SmoothForm n X k, comass ω ≤ 1 ∧ r = |T.toFun ω| } :=
+    le_csSup (mass_set_bddAbove T) h_T_in
+  linarith
 
-/-- Mass scales with absolute value of scalar. -/
-axiom mass_smul (r : ℝ) (T : Current n X k) : mass (r • T) = |r| * mass T
+/-- Mass scales with absolute value of scalar (Federer 1969, §4.1.7).
+    Proof: (r • T)(ω) = r * T(ω), so |(r • T)(ω)| = |r| * |T(ω)|.
+    The supremum of |r| times a set equals |r| times the supremum. -/
+theorem mass_smul (r : ℝ) (T : Current n X k) : mass (r • T) = |r| * mass T := by
+  unfold mass
+  have h_smul_toFun : ∀ ω : SmoothForm n X k, (r • T).toFun ω = r * T.toFun ω := fun ω => rfl
+  have h_set_eq : { s : ℝ | ∃ ω : SmoothForm n X k, comass ω ≤ 1 ∧ s = |(r • T).toFun ω| } =
+                  (fun t => |r| * t) '' { s : ℝ | ∃ ω : SmoothForm n X k, comass ω ≤ 1 ∧ s = |T.toFun ω| } := by
+    ext s
+    simp only [Set.mem_setOf_eq, Set.mem_image]
+    constructor
+    · intro ⟨ω, hω, hs⟩
+      use |T.toFun ω|
+      constructor
+      · exact ⟨ω, hω, rfl⟩
+      · rw [hs, h_smul_toFun, abs_mul]
+    · intro ⟨t, ⟨ω, hω, ht⟩, hs⟩
+      use ω, hω
+      rw [h_smul_toFun, abs_mul, ← ht, ← hs]
+  rw [h_set_eq]
+  by_cases hr : r = 0
+  · subst hr
+    simp only [abs_zero, zero_mul]
+    have h0 : (fun _ : ℝ => (0 : ℝ)) '' { s : ℝ | ∃ ω : SmoothForm n X k, comass ω ≤ 1 ∧ s = |T.toFun ω| } = {0} := by
+      ext t
+      simp only [Set.mem_image, Set.mem_setOf_eq, Set.mem_singleton_iff]
+      constructor
+      · intro ⟨_, _, hs⟩; exact hs.symm
+      · intro ht
+        obtain ⟨s, hs⟩ := mass_set_nonempty T
+        exact ⟨s, hs, ht.symm⟩
+    rw [h0]
+    exact csSup_singleton 0
+  · have hr_pos : |r| > 0 := abs_pos.mpr hr
+    have h_mono : Monotone (fun t => |r| * t) := fun _ _ hab => mul_le_mul_of_nonneg_left hab (le_of_lt hr_pos)
+    have h_cont : Continuous (fun t => |r| * t) := continuous_const.mul continuous_id
+    rw [Monotone.map_csSup_of_continuousAt h_cont.continuousAt h_mono (mass_set_nonempty T) (mass_set_bddAbove T)]
 
 /-- Extensionality for currents: two currents are equal iff they agree on all forms. -/
 @[ext]
@@ -266,7 +320,25 @@ def isCycle (T : Current n X (k + 1)) : Prop := T.boundary = 0
 /-- ∂∂ = 0: boundary of boundary is zero.
     This follows from d∘d = 0 for the exterior derivative.
     Proof: (∂∂T)(ω) = (∂T)(dω) = T(d(dω)) = T(0) = 0. -/
-axiom boundary_boundary (T : Current n X (k + 2)) : (boundary (boundary T)) = 0
+theorem boundary_boundary (T : Current n X (k + 2)) : (boundary (boundary T)) = 0 := by
+  ext ω
+  show (boundary T).toFun (smoothExtDeriv ω) = (0 : Current n X k).toFun ω
+  rw [zero_toFun]
+  show T.toFun (smoothExtDeriv (smoothExtDeriv ω)) = 0
+  rw [smoothExtDeriv_extDeriv]
+  have h_zero : T.toFun 0 = 0 := by
+    have h := T.is_linear 1 0 0
+    simp only [one_smul, one_mul] at h
+    -- h : T.toFun (0 + 0) = T.toFun 0 + T.toFun 0
+    rw [add_zero] at h
+    -- h : T.toFun 0 = T.toFun 0 + T.toFun 0
+    -- From x = x + x, we get 0 = x (by subtracting x from both sides)
+    have h' : 0 = T.toFun 0 := by
+      have := sub_eq_zero.mpr h
+      simp only [add_sub_cancel_left] at this
+      exact this.symm
+    exact h'.symm
+  exact h_zero
 
 /-- **Boundary is additive** (Federer, 1969).
     The boundary operator is a group homomorphism.

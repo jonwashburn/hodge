@@ -285,10 +285,40 @@ axiom calibration_defect_from_gluing (p : ℕ) (h : ℝ) (hh : h > 0) (C : Cubul
 axiom conePositive_comass_bound (p : ℕ) (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) : comass γ ≤ 2
 
-/-- The underlying current of toIntegralCurrent is the zero current. -/
-axiom RawSheetSum.toIntegralCurrent_toFun_eq_zero {p : ℕ} {hscale : ℝ}
+/-- Helper: Casting a CycleIntegralCurrent preserves toFun being 0. -/
+private theorem cast_cycle_toFun_eq_zero {k k' : ℕ} (h_eq : k = k')
+    (c : CycleIntegralCurrent n X k) (hc : c.current.toFun = 0) :
+    (h_eq ▸ c).current.toFun = 0 := by
+  subst h_eq
+  exact hc
+
+/-- Helper: zeroCycleCurrent' has zero toFun. -/
+private theorem zeroCycleCurrent'_toFun_eq_zero (k' : ℕ) :
+    (zeroCycleCurrent' (n := n) (X := X) k').current.toFun = 0 := by
+  unfold zeroCycleCurrent'
+  rfl
+
+/-- Helper: The zero cycle current has zero toFun. -/
+private theorem zeroCycleCurrent_toFun_eq_zero (k : ℕ) (hk : k ≥ 1) :
+    (zeroCycleCurrent (n := n) (X := X) k hk).current.toFun = 0 := by
+  unfold zeroCycleCurrent
+  apply cast_cycle_toFun_eq_zero
+  exact zeroCycleCurrent'_toFun_eq_zero (k - 1)
+
+/-- The underlying current of toIntegralCurrent is the zero current.
+    This is proved by unfolding the construction, which returns zeroCycleCurrent
+    or a zero integral current in all cases. -/
+theorem RawSheetSum.toIntegralCurrent_toFun_eq_zero {p : ℕ} {hscale : ℝ}
     {C : Cubulation n X hscale} (T_raw : RawSheetSum n X p hscale C) :
-    T_raw.toIntegralCurrent.toFun = 0
+    T_raw.toIntegralCurrent.toFun = 0 := by
+  unfold RawSheetSum.toIntegralCurrent RawSheetSum.toCycleIntegralCurrent
+  by_cases h : 2 * (n - p) ≥ 1
+  · -- Case: 2 * (n - p) ≥ 1, uses zeroCycleCurrent
+    simp only [h, ↓reduceDIte]
+    exact zeroCycleCurrent_toFun_eq_zero (2 * (n - p)) h
+  · -- Case: 2 * (n - p) < 1, uses zero_int directly
+    simp only [h, ↓reduceDIte]
+    rfl
 
 /-- **Mass bound for gluing construction** (Federer-Fleming, 1960).
     The integral current from gluing has mass bounded by a constant times the comass.

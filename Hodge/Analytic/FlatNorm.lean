@@ -128,13 +128,37 @@ theorem flatNorm_le_mass {k : ℕ} (T : Current n X k) : flatNorm T ≤ Current.
   show T.toFun ω = (T + (0 : Current n X k)).toFun ω
   rw [Current.add_zero]
 
-/-- The flat norm of a boundary is at most the flat norm of the original current.
-    This is a non-trivial result: ∂T = ∂S where T = S + ∂R, so flatNorm(∂T) ≤ flatNorm(T).
-    Proof: If T = S + ∂R with cost M(S) + M(R) = flatNorm(T), then ∂T = ∂S + 0
-    (since ∂∂R = 0), which has cost M(∂S) + 0 ≤ ... (requires mass bound on ∂).
-    This is axiomatized because it requires deeper GMT infrastructure. -/
-axiom flatNorm_boundary_le {k : ℕ} (T : Current n X (k + 1)) :
-    flatNorm (Current.boundary T) ≤ flatNorm T
+/-- The flat norm of a boundary is at most the flat norm of the original current (Federer-Fleming).
+    Proof: For any decomposition T = S + ∂R with cost M(S) + M(R):
+    - ∂T = ∂S + ∂∂R = ∂S (since ∂∂ = 0 by boundary_boundary)
+    - ∂T = ∂S = 0 + ∂S is a valid decomposition with cost M(0) + M(S) = M(S)
+    - So flatNorm(∂T) ≤ M(S) ≤ M(S) + M(R).
+    Taking infimum over all decompositions yields flatNorm(∂T) ≤ flatNorm(T). -/
+theorem flatNorm_boundary_le {k : ℕ} (T : Current n X (k + 1)) :
+    flatNorm (Current.boundary T) ≤ flatNorm T := by
+  unfold flatNorm
+  apply le_csInf (flatNormDecompSet_nonempty T)
+  intro m ⟨S, R, hT, hm⟩
+  have h_bdyT : Current.boundary T = Current.boundary S := by
+    calc Current.boundary T = Current.boundary (S + Current.boundary R) := by rw [hT]
+      _ = Current.boundary S + Current.boundary (Current.boundary R) := Current.boundary_add S _
+      _ = Current.boundary S + 0 := by rw [Current.boundary_boundary]
+      _ = Current.boundary S := Current.add_zero _
+  have h_decomp : Current.mass (0 : Current n X k) + Current.mass S ∈
+      flatNormDecompSet (Current.boundary T) := by
+    use 0, S
+    refine ⟨?_, rfl⟩
+    ext ω
+    rw [h_bdyT]
+    show (Current.boundary S).toFun ω = ((0 : Current n X k) + Current.boundary S).toFun ω
+    rw [Current.zero_add]
+  have h_le : sInf (flatNormDecompSet (Current.boundary T)) ≤
+      Current.mass (0 : Current n X k) + Current.mass S :=
+    csInf_le (flatNormDecompSet_bddBelow _) h_decomp
+  rw [Current.mass_zero, zero_add] at h_le
+  calc sInf (flatNormDecompSet (Current.boundary T)) ≤ Current.mass S := h_le
+    _ ≤ Current.mass S + Current.mass R := le_add_of_nonneg_right (Current.mass_nonneg R)
+    _ = m := hm.symm
 
 /-- The flat norm of a boundary is bounded by the mass. -/
 theorem flatNorm_boundary_le_mass {k : ℕ} (T : Current n X (k + 1)) :
@@ -242,16 +266,54 @@ theorem flatNorm_sub_le {k : ℕ} (S T : Current n X k) :
     _ ≤ flatNorm S + flatNorm (-T) := flatNorm_add_le S (-T)
     _ = flatNorm S + flatNorm T := by rw [flatNorm_neg]
 
-/-- A current is zero iff its flat norm is zero.
-    The ← direction follows from flatNorm_zero.
-    The → direction requires the deeper result that flatNorm separates points. -/
-axiom flatNorm_eq_zero_iff {k : ℕ} (T : Current n X k) : flatNorm T = 0 ↔ T = 0
-
-/-- Bound evaluation by mass (Federer 1969, §4.1).
+/-- **Bound evaluation by mass** (Federer 1969, §4.1).
     This is the defining property of mass as the dual norm to comass.
-    Since mass is opaque, this must remain an axiom. -/
-axiom eval_le_mass {k : ℕ} (T : Current n X k) (ψ : SmoothForm n X k) :
-    |T.toFun ψ| ≤ Current.mass T * comass ψ
+    For any current T and form ψ: |T(ψ)| ≤ mass(T) × comass(ψ).
+
+    **Proof**: The mass is defined as mass(T) = sup { |T(ω)| : comass(ω) ≤ 1 }.
+    - If comass(ψ) = 0, we use the boundedness of T to show |T(ψ)| = 0.
+    - If comass(ψ) > 0, normalize ψ to ψ' = ψ/comass(ψ) with comass 1.
+      Then |T(ψ')| ≤ mass(T) by definition, and |T(ψ)| = comass(ψ) × |T(ψ')|.
+
+    Reference: [H. Federer, "Geometric Measure Theory", Springer 1969, §4.1]. -/
+theorem eval_le_mass {k : ℕ} (T : Current n X k) (ψ : SmoothForm n X k) :
+    |T.toFun ψ| ≤ Current.mass T * comass ψ := by
+  by_cases h_zero : comass ψ = 0
+  · -- Case: comass ψ = 0
+    obtain ⟨M, hM⟩ := T.is_bounded
+    have h_bound : |T.toFun ψ| ≤ M * comass ψ := hM ψ
+    rw [h_zero, mul_zero] at h_bound
+    have h_nonneg : |T.toFun ψ| ≥ 0 := abs_nonneg _
+    have h_eq_zero : |T.toFun ψ| = 0 := le_antisymm h_bound h_nonneg
+    rw [h_eq_zero, h_zero, mul_zero]
+  · -- Case: comass ψ > 0
+    have h_pos : comass ψ > 0 := lt_of_le_of_ne (comass_nonneg ψ) (Ne.symm h_zero)
+    let c : ℝ := (comass ψ)⁻¹
+    let ψ' : SmoothForm n X k := c • ψ
+    have h_c_pos : c > 0 := inv_pos_of_pos h_pos
+    have h_comass_ψ' : comass ψ' ≤ 1 := by
+      show comass (c • ψ) ≤ 1
+      rw [comass_smul, abs_of_pos h_c_pos]
+      show (comass ψ)⁻¹ * comass ψ ≤ 1
+      rw [inv_mul_cancel₀ h_zero]
+    have h_in_set : |T.toFun ψ'| ∈ { r : ℝ | ∃ ω : SmoothForm n X k, comass ω ≤ 1 ∧ r = |T.toFun ω| } :=
+      ⟨ψ', h_comass_ψ', rfl⟩
+    have h_le_mass : |T.toFun ψ'| ≤ Current.mass T := by
+      unfold Current.mass
+      exact le_csSup (Current.mass_set_bddAbove T) h_in_set
+    have h_eval : T.toFun ψ = comass ψ * T.toFun ψ' := by
+      have h_prod_eq : comass ψ • ψ' = ψ := by
+        show comass ψ • (c • ψ) = ψ
+        rw [smul_smul, mul_inv_cancel₀ h_zero, one_smul]
+      have h_map : T.toFun (comass ψ • ψ') = comass ψ * T.toFun ψ' := Current.map_smul T (comass ψ) ψ'
+      rw [h_prod_eq] at h_map
+      exact h_map
+    calc |T.toFun ψ|
+        = |comass ψ * T.toFun ψ'| := by rw [h_eval]
+      _ = |comass ψ| * |T.toFun ψ'| := abs_mul _ _
+      _ = comass ψ * |T.toFun ψ'| := by rw [abs_of_pos h_pos]
+      _ ≤ comass ψ * Current.mass T := mul_le_mul_of_nonneg_left h_le_mass (le_of_lt h_pos)
+      _ = Current.mass T * comass ψ := mul_comm _ _
 
 /-- Helper: For any decomposition T = S + ∂R, evaluation is bounded by
     (mass(S) + mass(R)) × max(comass ψ, comass dψ). -/
@@ -313,5 +375,22 @@ theorem eval_le_flatNorm {k : ℕ} (T : Current n X k) (ψ : SmoothForm n X k) :
           max (comass ψ) (comass (smoothExtDeriv ψ)) := by field_simp
       _ ≤ sInf (flatNormDecompSet T) * max (comass ψ) (comass (smoothExtDeriv ψ)) :=
           mul_le_mul_of_nonneg_right h_div (le_of_lt h_pos)
+
+/-- A current is zero iff its flat norm is zero (Federer-Fleming).
+    The ← direction follows from flatNorm_zero.
+    The → direction: if flatNorm(T) = 0, then by eval_le_flatNorm,
+    |T(ψ)| ≤ 0 for all ψ, so T(ψ) = 0 for all ψ, hence T = 0 by extensionality. -/
+theorem flatNorm_eq_zero_iff {k : ℕ} (T : Current n X k) : flatNorm T = 0 ↔ T = 0 := by
+  constructor
+  · intro h_norm_zero
+    ext ψ
+    have h_bound := eval_le_flatNorm T ψ
+    rw [h_norm_zero, zero_mul] at h_bound
+    have h_nonneg : |T.toFun ψ| ≥ 0 := abs_nonneg _
+    have h_eq_zero : |T.toFun ψ| = 0 := le_antisymm h_bound h_nonneg
+    exact abs_eq_zero.mp h_eq_zero
+  · intro h_T_zero
+    rw [h_T_zero]
+    exact flatNorm_zero
 
 end

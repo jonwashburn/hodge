@@ -7,6 +7,7 @@ import Mathlib.Geometry.Convex.Cone.Basic
 import Mathlib.Topology.MetricSpace.Basic
 import Mathlib.Topology.Compactness.Compact
 import Mathlib.Data.NNReal.Defs
+import Mathlib.Data.Rat.Floor
 
 /-!
 
@@ -157,15 +158,26 @@ theorem stronglyPositiveCone_scale (p : ℕ) (x : X) (α : SmoothForm n X (2 * p
   -- PointedCone is a Submodule over {c : ℝ // 0 ≤ c}, so we create the subtype element
   exact Submodule.smul_mem _ ⟨c, hc⟩ hα
 
-omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
+/-- **ω^p is in the Strongly Positive Cone** (Demailly, 2012).
+    The Kähler power ω^p is expressible as a non-negative linear combination of
+    simple calibrated forms.
+
+    **Mathematical Justification**: By the Wirtinger inequality, ω^p pairs with value 1
+    with each simple calibrated form ξ_V. The form ω^p itself can be expressed in terms
+    of the calibration basis - specifically, ω^p/p! is the average of all calibrated
+    directions weighted by the Haar measure on the Grassmannian.
+
+    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries",
+    Acta Mathematica 148 (1982), 47-157]. -/
+axiom omegaPow_in_cone (p : ℕ) (x : X) :
+    (omegaPow_point (n := n) (X := X) p x) ∈ stronglyPositiveCone (n := n) p x
+
 /-- **ω^p is Cone Positive** (Demailly, 2012).
-    The Kähler power ω^p is in the strongly positive cone at each point.
-    This follows from `omegaPow_in_interior` since interior ⊆ closure = cone. -/
+    The Kähler power ω^p is in the strongly positive cone at each point. -/
 theorem kahlerPow_isConePositive (p : ℕ) : isConePositive (kahlerPow (n := n) (X := X) p) := by
   intro x
-  exact interior_subset (omegaPow_in_interior p x)
+  exact omegaPow_in_cone p x
 
-omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 /-- **Positive Multiple of ω^p is Cone Positive** (Corollary).
     For any c > 0, c • ω^p is cone-positive. -/
 theorem kahlerPow_smul_isConePositive (p : ℕ) (c : ℝ) (hc : c > 0) :
@@ -189,9 +201,53 @@ theorem kahlerPow_smul_isConePositive (p : ℕ) (c : ℝ) (hc : c > 0) :
 axiom shift_makes_conePositive (p : ℕ) (γ : SmoothForm n X (2 * p)) :
     ∃ N : ℝ, N > 0 ∧ isConePositive (γ + N • kahlerPow p)
 
+/-- **Cone Addition Closure** (Standard convex analysis).
+    The strongly positive cone is closed under addition. -/
+theorem stronglyPositiveCone_add (p : ℕ) (x : X) (α β : SmoothForm n X (2 * p))
+    (hα : α ∈ stronglyPositiveCone p x) (hβ : β ∈ stronglyPositiveCone p x) :
+    α + β ∈ stronglyPositiveCone p x := by
+  unfold stronglyPositiveCone at *
+  exact Submodule.add_mem _ hα hβ
+
+/-- **Cone Positivity is Additive** (Corollary).
+    If α and β are cone-positive, so is α + β. -/
+theorem isConePositive_add {p : ℕ} (α β : SmoothForm n X (2 * p))
+    (hα : isConePositive α) (hβ : isConePositive β) :
+    isConePositive (α + β) := by
+  intro x
+  exact stronglyPositiveCone_add p x α β (hα x) (hβ x)
+
 /-- **Rational Shift Suffices** (Density of ℚ in ℝ).
-    The above also works for rational N, by approximation. -/
-axiom shift_makes_conePositive_rat (p : ℕ) (γ : SmoothForm n X (2 * p)) :
-    ∃ N : ℚ, N > 0 ∧ isConePositive (γ + (N : ℝ) • kahlerPow p)
+    The above also works for rational N, by approximation.
+
+    **Proof**: From `shift_makes_conePositive`, we get some real N > 0 with
+    γ + N • ω^p cone-positive. Pick any rational q > N. Then:
+      γ + q • ω^p = (γ + N • ω^p) + (q - N) • ω^p
+    The first term is cone-positive by hypothesis. The second is a positive
+    scalar multiple of ω^p, which is cone-positive by `kahlerPow_isConePositive`.
+    Since the cone is closed under addition (`isConePositive_add`), the sum
+    is cone-positive. -/
+theorem shift_makes_conePositive_rat (p : ℕ) (γ : SmoothForm n X (2 * p)) :
+    ∃ N : ℚ, N > 0 ∧ isConePositive (γ + (N : ℝ) • kahlerPow p) := by
+  -- Get the real N from the existing axiom
+  obtain ⟨N, hN_pos, hN_cone⟩ := shift_makes_conePositive p γ
+  -- Find a rational q with N < q < N + 1 using density of ℚ in ℝ
+  obtain ⟨q, hN_lt_q, _⟩ := exists_rat_btwn (by linarith : N < N + 1)
+  -- q > N > 0, so q > 0
+  have hq_pos : (q : ℝ) > 0 := lt_trans hN_pos hN_lt_q
+  use q
+  constructor
+  · exact Rat.cast_pos.mp hq_pos
+  · -- Rewrite: γ + q • ω^p = (γ + N • ω^p) + (q - N) • ω^p
+    have h_split : γ + (q : ℝ) • kahlerPow p = (γ + N • kahlerPow p) + ((q : ℝ) - N) • kahlerPow p := by
+      rw [add_assoc, ← add_smul]
+      ring_nf
+    rw [h_split]
+    -- Apply additivity of cone positivity
+    apply isConePositive_add
+    · exact hN_cone
+    · -- (q - N) > 0, so (q - N) • ω^p is cone-positive
+      have hqN_pos : (q : ℝ) - N > 0 := sub_pos.mpr hN_lt_q
+      exact kahlerPow_smul_isConePositive p ((q : ℝ) - N) hqN_pos
 
 end
