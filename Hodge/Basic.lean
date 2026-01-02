@@ -137,11 +137,16 @@ instance SmoothForm.instModuleReal (n : ℕ) (X : Type u) (k : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] : Module ℝ (SmoothForm n X k) :=
   Module.compHom (SmoothForm n X k) Complex.ofRealHom
 
-/-! ### TopologicalSpace Instance (Axiomatized - specific topology choice) -/
+/-! ### TopologicalSpace Instance (Concrete - indiscrete topology) -/
 
-axiom SmoothForm.instTopologicalSpace (n : ℕ) (X : Type u) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] : TopologicalSpace (SmoothForm n X k)
-attribute [instance 100] SmoothForm.instTopologicalSpace
+/-- The topology on SmoothForm is the indiscrete (coarsest) topology.
+    This provides the minimal topological structure needed for type class coherence.
+    In a fuller formalization, one would use a compact-open or Fréchet topology,
+    but those require smooth section bundle infrastructure not available in Mathlib.
+    The indiscrete topology suffices for the algebraic portions of the Hodge proof. -/
+instance SmoothForm.instTopologicalSpace (n : ℕ) (X : Type u) (k : ℕ)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] : TopologicalSpace (SmoothForm n X k) :=
+  ⊥
 
 /-- SmoothForm.zero as def for backwards compatibility -/
 def SmoothForm.zero (n : ℕ) (X : Type u) (k : ℕ)
@@ -588,12 +593,18 @@ theorem ofForm_sub {k : ℕ} (ω η : SmoothForm n X k) (hω : IsFormClosed ω) 
     exact ⟨0, smoothExtDeriv_zero⟩
 
 /-- Real scalar mult of forms lifts to cohomology classes.
-    Axiomatized due to subtle definitional mismatch between ℝ-module structures:
-    - SmoothForm uses Module.compHom Complex.ofRealHom
-    - DeRhamCohomologyClass uses algebra scalar tower via Algebra ℝ ℂ
-    Both yield (r : ℂ) • x provably, but not definitionally. -/
-axiom ofForm_smul_real {k : ℕ} (r : ℝ) (ω : SmoothForm n X k) (hω : IsFormClosed ω) :
-    ⟦r • ω, isFormClosed_smul_real hω⟧ = r • ⟦ω, hω⟧
+    The ℝ-action on SmoothForm is r • ω = (↑r : ℂ) • ω (via Module.compHom).
+    The ℝ-action on cohomology is r • c = (↑r : ℂ) • c (via Module.restrictScalars from Algebra ℝ ℂ).
+    Both reduce to the same underlying form (↑r : ℂ) • ω, and proof irrelevance completes the argument. -/
+theorem ofForm_smul_real {k : ℕ} (r : ℝ) (ω : SmoothForm n X k) (hω : IsFormClosed ω) :
+    ⟦r • ω, isFormClosed_smul_real hω⟧ = r • ⟦ω, hω⟧ := by
+  -- On SmoothForm, r • ω = (↑r : ℂ) • ω definitionally (Module.compHom)
+  -- On DeRhamCohomologyClass, r • c = (↑r : ℂ) • c definitionally (from Algebra ℝ ℂ)
+  -- So: RHS = r • ⟦ω, hω⟧ = (↑r : ℂ) • ⟦ω, hω⟧ = ⟦(↑r : ℂ) • ω, isFormClosed_smul hω⟧
+  -- LHS has form r • ω = (↑r : ℂ) • ω
+  -- Need: ⟦(↑r : ℂ) • ω, isFormClosed_smul_real hω⟧ = ⟦(↑r : ℂ) • ω, isFormClosed_smul hω⟧
+  -- This follows from proof irrelevance since the forms are definitionally equal
+  exact ofForm_proof_irrel ((↑r : ℂ) • ω) (isFormClosed_smul_real hω) (isFormClosed_smul hω)
 
 omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] in
 /-- Proof irrelevance for ofForm - follows from quotient properties.

@@ -98,6 +98,9 @@ theorem omega_is_1_1 :
 
 /-! ## Kähler Power -/
 
+/-- Helper lemma: 2 + 2*p = 2*(p+1) -/
+private theorem two_add_two_mul (p : ℕ) : 2 + 2 * p = 2 * (p + 1) := by ring
+
 /-- The p-th power of the Kähler form ω^p.
 
 This is defined recursively:
@@ -105,7 +108,10 @@ This is defined recursively:
 - ω^{p+1} = ω ⋀ ω^p
 
 The form ω^p is a (p,p)-form of degree 2p. -/
-opaque kahlerPow (p : ℕ) : SmoothForm n X (2 * p)
+def kahlerPow (p : ℕ) : SmoothForm n X (2 * p) :=
+  match p with
+  | 0 => unitForm
+  | p + 1 => (two_add_two_mul p) ▸ (K.omega_form ⋏ kahlerPow p)
 
 /-- The unit form is of type (0,0). -/
 axiom unitForm_is_0_0 :
@@ -114,33 +120,46 @@ axiom unitForm_is_0_0 :
 /-- The p-th power of the Kähler form ω^p is a (p,p)-form. -/
 axiom omega_pow_is_p_p_axiom (p : ℕ) : isPPFormTD n X p (kahlerPow (n := n) (X := X) p)
 
-omit [ProjectiveComplexManifold n X] K in
 /-- The p-th power of the Kähler form ω^p is a (p,p)-form. -/
 theorem omega_pow_is_p_p (p : ℕ) : isPPFormTD n X p (kahlerPow (n := n) (X := X) p) :=
   omega_pow_is_p_p_axiom p
 
 /-! ## Rationality of Kähler Power -/
 
-/-- **Kähler Power is Closed** (Interface Axiom for Opaque `kahlerPow`).
+/-- Helper: type cast preserves closedness.
+    If h : k = k' and ω is closed, then h ▸ ω is also closed. -/
+private theorem isFormClosed_cast {k k' : ℕ} (h : k = k')
+    (ω : SmoothForm n X k) (hω : IsFormClosed ω) :
+    IsFormClosed (h ▸ ω : SmoothForm n X k') := by
+  subst h
+  exact hω
+
+/-- **Kähler Power is Closed** (Proved by Induction).
 
     The exterior derivative of ω^p is zero: d(ω^p) = 0.
 
-    **Mathematical Justification**: The Kähler form ω is closed (dω = 0) by definition
-    of a Kähler manifold. By the graded Leibniz rule for the exterior derivative:
-    d(α ∧ β) = dα ∧ β + (-1)^{deg α} α ∧ dβ
-
-    For ω^p = ω ∧ ω ∧ ... ∧ ω (p times), induction on p gives:
-    - Base case: d(ω^1) = dω = 0
-    - Inductive step: d(ω^{p+1}) = d(ω ∧ ω^p) = dω ∧ ω^p + (-1)^2 ω ∧ d(ω^p)
-                                 = 0 ∧ ω^p + ω ∧ 0 = 0
-
-    **Why This is an Axiom**: The `kahlerPow` function is opaque (its implementation
-    is hidden), so we cannot perform the induction. This axiom expresses the
-    interface contract that `kahlerPow p` behaves like the mathematical ω^p.
+    **Proof**: The Kähler form ω is closed (dω = 0) by definition of a Kähler manifold.
+    By induction on p:
+    - Base case (p = 0): ω^0 = unitForm, which is closed by `unitForm_isClosed`.
+    - Inductive step: ω^{p+1} = ω ∧ ω^p. By `isFormClosed_wedge`, the wedge product
+      of closed forms is closed. Since ω is closed (`omega_isClosed`) and ω^p is
+      closed by the induction hypothesis, ω^{p+1} is closed.
 
     Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry",
     Wiley, 1978, Chapter 0, Section 7]. -/
-axiom omega_pow_IsFormClosed (p : ℕ) : IsFormClosed (kahlerPow (n := n) (X := X) p)
+theorem omega_pow_IsFormClosed (p : ℕ) : IsFormClosed (kahlerPow (n := n) (X := X) p) := by
+  induction p with
+  | zero =>
+    -- ω^0 = unitForm
+    simp only [kahlerPow]
+    exact unitForm_isClosed
+  | succ p ih =>
+    -- ω^{p+1} = ω ∧ ω^p (with type cast)
+    simp only [kahlerPow]
+    -- The cast ▸ preserves closedness
+    apply isFormClosed_cast
+    -- ω ∧ ω^p is closed because both ω and ω^p are closed
+    exact isFormClosed_wedge K.omega_form (kahlerPow p) omega_isClosed ih
 
 /-- **Kähler Power is Rational** (Classical Pillar).
 

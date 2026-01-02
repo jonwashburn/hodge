@@ -316,16 +316,28 @@ axiom calibration_defect_from_gluing (p : ℕ) (h : ℝ) (hh : h > 0) (C : Cubul
 axiom conePositive_comass_bound (p : ℕ) (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) : comass γ ≤ 2
 
+/-- Helper: zeroCycleCurrent' has zero underlying current. -/
+private theorem zeroCycleCurrent'_toFun_eq_zero (k' : ℕ) :
+    (zeroCycleCurrent' (n := n) (X := X) k').current.toFun = 0 := by
+  unfold zeroCycleCurrent' zero_int
+  rfl
+
 /-- Helper: zeroCycleCurrent has zero underlying current.
-    This shows that the cast in zeroCycleCurrent preserves the zero property. -/
+    The proof uses the definitional behavior of Eq.rec on inductives. -/
 private theorem zeroCycleCurrent_toFun_eq_zero (k : ℕ) (hk : k ≥ 1) :
     (zeroCycleCurrent (n := n) (X := X) k hk).current.toFun = 0 := by
-  unfold zeroCycleCurrent zeroCycleCurrent'
-  -- The key: use the fact that cast (▸) of an equality proof
-  -- preserves the underlying data structure.
-  -- zeroCycleCurrent' k' has .current = zero_int, and zero_int.toFun = 0.
-  -- After the cast h_eq ▸ _, the .current.toFun is still definitionally 0.
-  simp only [zero_int]
+  unfold zeroCycleCurrent
+  -- The goal is: ((Nat.sub_add_cancel hk).symm ▸ zeroCycleCurrent' (k - 1)).current.toFun = 0
+  -- We use the fact that for this specific structure, the cast preserves the zero.
+  -- First, extract the equality
+  set h_eq := (Nat.sub_add_cancel hk).symm with hdef
+  -- Apply induction on the equality proof
+  -- The trick: generalize to k = k' + 1 form
+  obtain ⟨k', hk'⟩ : ∃ k', k = k' + 1 := ⟨k - 1, (Nat.sub_add_cancel hk).symm⟩
+  subst hk'
+  -- Now h_eq : k' + 1 = k' + 1, so the cast is identity
+  simp only [Nat.add_sub_cancel, eq_mpr_eq_cast, cast_eq]
+  exact zeroCycleCurrent'_toFun_eq_zero k'
 
 /-- **The underlying current of toIntegralCurrent is the zero current** (Constructive).
     This follows from the definition of `toCycleIntegralCurrent`, which constructs

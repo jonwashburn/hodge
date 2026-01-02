@@ -190,8 +190,45 @@ axiom shift_makes_conePositive (p : ℕ) (γ : SmoothForm n X (2 * p)) :
     ∃ N : ℝ, N > 0 ∧ isConePositive (γ + N • kahlerPow p)
 
 /-- **Rational Shift Suffices** (Density of ℚ in ℝ).
-    The above also works for rational N, by approximation. -/
-axiom shift_makes_conePositive_rat (p : ℕ) (γ : SmoothForm n X (2 * p)) :
-    ∃ N : ℚ, N > 0 ∧ isConePositive (γ + (N : ℝ) • kahlerPow p)
+
+    Given that some real N > 0 makes γ + N • ω^p cone-positive, we can find a
+    rational N' > N with the same property.
+
+    **Proof**: By `shift_makes_conePositive`, there exists N : ℝ, N > 0 with
+    γ + N • ω^p cone-positive. By density of ℚ in ℝ (`exists_rat_gt`),
+    we can find N' : ℚ with N' > N. Then:
+      γ + N' • ω^p = (γ + N • ω^p) + (N' - N) • ω^p
+
+    Since γ + N • ω^p ∈ K_p(x) (from shift_makes_conePositive) and
+    (N' - N) • ω^p ∈ K_p(x) (since N' - N > 0 and ω^p ∈ K_p(x) by kahlerPow_isConePositive),
+    their sum is in K_p(x) (as K_p(x) is a PointedCone.span, hence a Submodule). -/
+theorem shift_makes_conePositive_rat (p : ℕ) (γ : SmoothForm n X (2 * p)) :
+    ∃ N : ℚ, N > 0 ∧ isConePositive (γ + (N : ℝ) • kahlerPow p) := by
+  -- Get real N from the axiom
+  obtain ⟨N, hN_pos, hN_cone⟩ := shift_makes_conePositive p γ
+  -- Find a rational N' > N using density of ℚ in ℝ
+  obtain ⟨N', hN'_gt⟩ := exists_rat_gt N
+  -- N' > N > 0, so N' > 0
+  have hN'_pos : (0 : ℚ) < N' := by
+    have : (0 : ℝ) < N' := lt_trans hN_pos hN'_gt
+    exact Rat.cast_pos.mp this
+  refine ⟨N', hN'_pos, ?_⟩
+  -- Show that γ + N' • ω^p is cone-positive
+  intro x
+  -- Abbreviate the Kähler power for this proof
+  let ωp : SmoothForm n X (2 * p) := kahlerPow (n := n) (X := X) p
+  -- Key algebraic identity: γ + N' • ω^p = (γ + N • ω^p) + (N' - N) • ω^p
+  have h_split : γ + (N' : ℝ) • ωp = (γ + N • ωp) + ((N' : ℝ) - N) • ωp := by
+    rw [add_assoc, ← add_smul]
+    congr 1
+    ring
+  rw [h_split]
+  -- Both summands are in the cone
+  have h1 : (γ + N • ωp) ∈ stronglyPositiveCone (n := n) p x := hN_cone x
+  have h_diff_pos : (N' : ℝ) - N > 0 := sub_pos.mpr hN'_gt
+  have h2 : ((N' : ℝ) - N) • ωp ∈ stronglyPositiveCone (n := n) p x :=
+    stronglyPositiveCone_scale p x ωp (kahlerPow_isConePositive p x) _ (le_of_lt h_diff_pos)
+  -- Sum of cone elements is in the cone (PointedCone.span is a Submodule)
+  exact Submodule.add_mem _ h1 h2
 
 end
