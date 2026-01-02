@@ -273,16 +273,75 @@ theorem flatNorm_sub_le {k : ℕ} (S T : Current n X k) :
     _ ≤ flatNorm S + flatNorm (-T) := flatNorm_add_le S (-T)
     _ = flatNorm S + flatNorm T := by rw [flatNorm_neg]
 
-/-- A current is zero iff its flat norm is zero.
-    The ← direction follows from flatNorm_zero.
-    The → direction requires the deeper result that flatNorm separates points. -/
-axiom flatNorm_eq_zero_iff {k : ℕ} (T : Current n X k) : flatNorm T = 0 ↔ T = 0
-
-/-- Bound evaluation by mass (Federer 1969, §4.1).
+/-- **Bound evaluation by mass** (Federer 1969, §4.1).
     This is the defining property of mass as the dual norm to comass.
-    Since mass is opaque, this must remain an axiom. -/
-axiom eval_le_mass {k : ℕ} (T : Current n X k) (ψ : SmoothForm n X k) :
-    |T.toFun ψ| ≤ Current.mass T * comass ψ
+
+    **Proof**: If comass(ψ) = 0, then ψ = 0 and T(0) = 0.
+    If comass(ψ) > 0, scale ψ' = ψ/comass(ψ) so comass(ψ') = 1.
+    Then |T(ψ')| ≤ mass(T) by definition of mass as supremum.
+    By linearity: |T(ψ)| = comass(ψ) · |T(ψ')| ≤ comass(ψ) · mass(T). -/
+theorem eval_le_mass {k : ℕ} (T : Current n X k) (ψ : SmoothForm n X k) :
+    |T.toFun ψ| ≤ Current.mass T * comass ψ := by
+  by_cases h_zero : comass ψ = 0
+  · -- Case comass ψ = 0: then ψ = 0 and T(0) = 0
+    have h_ψ_zero : ψ = 0 := (comass_eq_zero_iff ψ).mp h_zero
+    subst h_ψ_zero
+    -- T.toFun 0 = 0 by linearity
+    have h_T0 : T.toFun 0 = 0 := by
+      have h := Current.map_smul' T 0 (0 : SmoothForm n X k)
+      simp only [zero_smul, zero_mul] at h
+      exact h
+    rw [h_T0, abs_zero, comass_zero, mul_zero]
+  · -- Case comass ψ > 0: scale to get comass = 1
+    have h_pos : comass ψ > 0 := lt_of_le_of_ne (comass_nonneg ψ) (Ne.symm h_zero)
+    let r := (comass ψ)⁻¹
+    have hr_pos : r > 0 := inv_pos.mpr h_pos
+    have hr_nonneg : r ≥ 0 := le_of_lt hr_pos
+    -- comass (r • ψ) = |r| * comass ψ = r * comass ψ = 1
+    have h_scaled_comass : comass (r • ψ) = 1 := by
+      rw [comass_smul r ψ, abs_of_nonneg hr_nonneg]
+      exact inv_mul_cancel₀ (ne_of_gt h_pos)
+    -- |T(r • ψ)| ≤ mass T (since comass(r • ψ) ≤ 1)
+    have h_scaled_bound : |T.toFun (r • ψ)| ≤ Current.mass T := by
+      unfold Current.mass
+      have h_mem : |T.toFun (r • ψ)| ∈ { s : ℝ | ∃ ω : SmoothForm n X k, comass ω ≤ 1 ∧ s = |T.toFun ω| } := by
+        use r • ψ
+        constructor
+        · rw [h_scaled_comass]
+        · rfl
+      -- The mass set is bounded above
+      have h_bdd : BddAbove { s : ℝ | ∃ ω : SmoothForm n X k, comass ω ≤ 1 ∧ s = |T.toFun ω| } := by
+        obtain ⟨M, hM⟩ := Current.is_bounded T
+        use max M 0
+        intro s ⟨ω, hω_comass, hs⟩
+        rw [hs]
+        have h_bound : |T.toFun ω| ≤ M * comass ω := hM ω
+        have h_comass_nonneg : comass ω ≥ 0 := comass_nonneg ω
+        by_cases hM_nonneg : M ≥ 0
+        · calc |T.toFun ω| ≤ M * comass ω := h_bound
+            _ ≤ M * 1 := mul_le_mul_of_nonneg_left hω_comass hM_nonneg
+            _ = M := mul_one M
+            _ ≤ max M 0 := le_max_left M 0
+        · push_neg at hM_nonneg
+          have h1 : M * comass ω ≤ 0 := by nlinarith
+          have h2 : |T.toFun ω| ≤ 0 := le_trans h_bound h1
+          have h3 : |T.toFun ω| ≥ 0 := abs_nonneg _
+          have h4 : |T.toFun ω| = 0 := le_antisymm h2 h3
+          rw [h4]; exact le_max_right M 0
+      exact le_csSup h_bdd h_mem
+    -- T(r • ψ) = r * T(ψ) by linearity
+    have h_linear : T.toFun (r • ψ) = r * T.toFun ψ := Current.map_smul' T r ψ
+    -- |r * T(ψ)| = r * |T(ψ)| since r > 0
+    have h_abs : |r * T.toFun ψ| = r * |T.toFun ψ| := by
+      rw [abs_mul, abs_of_nonneg hr_nonneg]
+    -- r * |T(ψ)| ≤ mass T
+    rw [h_linear, h_abs] at h_scaled_bound
+    -- |T(ψ)| ≤ mass T / r = mass T * comass ψ
+    have h1 : |T.toFun ψ| ≤ Current.mass T / r := (le_div_iff₀ hr_pos).mpr (by linarith)
+    -- Since r = (comass ψ)⁻¹, we have mass T / r = mass T * comass ψ
+    have h2 : Current.mass T / r = Current.mass T * comass ψ := by
+      rw [div_eq_mul_inv, inv_inv]
+    linarith
 
 /-- Helper: For any decomposition T = S + ∂R, evaluation is bounded by
     (mass(S) + mass(R)) × max(comass ψ, comass dψ). -/
@@ -344,5 +403,35 @@ theorem eval_le_flatNorm {k : ℕ} (T : Current n X k) (ψ : SmoothForm n X k) :
           max (comass ψ) (comass (smoothExtDeriv ψ)) := by field_simp
       _ ≤ sInf (flatNormDecompSet T) * max (comass ψ) (comass (smoothExtDeriv ψ)) :=
           mul_le_mul_of_nonneg_right h_div (le_of_lt h_pos)
+
+/-- **Flat Norm Separates Points** (Federer-Fleming, 1960).
+    A current is zero if and only if its flat norm is zero.
+
+    **Proof**:
+    - (←) If T = 0, then flatNorm T = 0 by `flatNorm_zero`.
+    - (→) If flatNorm T = 0, then by `eval_le_flatNorm`:
+          |T(ψ)| ≤ flatNorm(T) * max(comass ψ, comass dψ) = 0
+          for all ψ. So T(ψ) = 0 for all ψ, hence T = 0.
+
+    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 1960]. -/
+theorem flatNorm_eq_zero_iff {k : ℕ} (T : Current n X k) : flatNorm T = 0 ↔ T = 0 := by
+  constructor
+  · -- (→) flatNorm T = 0 → T = 0
+    intro h_flat_zero
+    -- Show T = 0 by extensionality: T.toFun ψ = 0 for all ψ
+    ext ψ
+    -- By eval_le_flatNorm: |T(ψ)| ≤ flatNorm(T) * max(comass ψ, comass dψ)
+    have h_bound : |T.toFun ψ| ≤ flatNorm T * max (comass ψ) (comass (smoothExtDeriv ψ)) :=
+      eval_le_flatNorm T ψ
+    -- Since flatNorm T = 0, we have |T(ψ)| ≤ 0
+    rw [h_flat_zero, zero_mul] at h_bound
+    -- |T(ψ)| ≤ 0 and |T(ψ)| ≥ 0 implies |T(ψ)| = 0
+    have h_abs_zero : |T.toFun ψ| = 0 := le_antisymm h_bound (abs_nonneg _)
+    -- |x| = 0 implies x = 0
+    exact abs_eq_zero.mp h_abs_zero
+  · -- (←) T = 0 → flatNorm T = 0
+    intro h_T_zero
+    rw [h_T_zero]
+    exact flatNorm_zero
 
 end
