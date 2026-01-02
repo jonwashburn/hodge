@@ -1,130 +1,193 @@
-# Agent Assignments: 25 Axioms → 8 Agents
+# Agent Assignments: 30 Proof-Chain Axioms → 8 Agents
 
-**Build:** ❌ FAILS (Fixing Hodge.Basic)
-**Progress:** 44 → 35 → 32 → 30 → 25 axioms  
-**Verified:** 25 axioms in `hodge_conjecture'` proof chain via `DependencyCheck.lean`
-
----
-
-## 🚫 CRITICAL RULES
-
-1. **NO `sorry`, `admit`, `native_decide`**
-2. **NO stub definitions** (e.g., `def mass := 0`)
-3. **Build MUST pass:** `lake build Hodge`
-4. **Test before commit:** Forward references will break build
-5. **IF PROOF DOESN'T WORK CLEANLY → LEAVE AS AXIOM**
+**Status:** Ready for Round 16  
+**Progress:** 44 → 30 axioms in proof chain  
+**Total axioms in codebase:** ~113 (only 30 block `hodge_conjecture'`)
 
 ---
 
-## Axiom Classification
+## ⚠️ CRITICAL RULES — READ BEFORE CODING
 
-### 🔴 CLASSICAL PILLARS — 8 axioms (Acceptable as Final Axioms)
-
-These are deep theorems requiring extensive Mathlib infrastructure:
-
-| Axiom | Reference | Complexity | Status |
-|-------|-----------|------------|--------|
-| `serre_gaga` | Serre GAGA 1956 | ~10,000 LOC | ✓ Documented |
-| `flat_limit_existence` | Federer-Fleming 1960 | ~5,000 LOC | ✓ Documented |
-| `mass_lsc` | Federer 1969 | ~3,000 LOC | ✓ Documented |
-| `calibration_defect_from_gluing` | FF Gluing 1960 | ~5,000 LOC | ✓ Documented |
-| `harvey_lawson_fundamental_class` | Harvey-Lawson 1983 | ~8,000 LOC | ✓ Documented |
-| `lefschetz_lift_signed_cycle` | Hard Lefschetz | ~6,000 LOC | ✓ Documented |
-| `omega_pow_is_rational` | Kähler/Hodge Theory | ~5,000 LOC | ✓ **PROVED** (theorem) |
-| `omegaPow_in_interior` | Demailly 2012 | ~4,000 LOC | ✓ Documented |
-| `omega_pow_represents_multiple` | Griffiths-Harris 1978 | ~7,000 LOC | ✓ Documented |
-
-### 🟡 INTERFACE AXIOMS — 10 axioms (Structural)
-
-Define algebraic structure on opaque types:
-
-| Axiom | Type | Notes | Status |
-|-------|------|-------|--------|
-| `smoothExtDeriv_add` | Derivative | d(ω+η) = dω + dη | ✓ PROVED |
-| `smoothExtDeriv_smul` | Derivative | d(c·ω) = c·dω | ✓ PROVED |
-| `pointwiseComass_nonneg` | Comass | Sup norm is non-negative | Pending |
-| `pointwiseComass_zero` | Comass | Sup norm of 0 is 0 | Pending |
-| `pointwiseComass_smul` | Comass | Homogeneity | Pending |
-| `pointwiseComass_continuous` | Comass | Continuity | Pending |
-| `comass_eq_zero_iff` | Comass | Norm property | Pending |
-| `Current.boundary_boundary` | Current | ∂² = 0 | Pending |
-| `Current.is_bounded` | Current | Continuity | Pending |
-| `ofForm_smul_real` | Quotient | [r·ω] = r·[ω] | Pending |
-
-### 🟢 HODGE-WEIGHT AXIOMS — 6 axioms (Must Prove)
-
-These carry mathematical substance for the proof:
-
-| Priority | Axiom | Hodge Weight | Status |
-|----------|-------|--------------|--------|
-| **P1** | `omega_pow_IsFormClosed` | **CRITICAL** — d(ω^p) = 0 | Pending |
-| **P2** | `shift_makes_conePositive_rat` | **HIGH** — rational shift | Pending |
-| **P2** | `wirtinger_comass_bound` | **HIGH** — Wirtinger inequality | Pending |
-| **P3** | `simpleCalibratedForm` | **MEDIUM** — volume form | Pending |
-| **P3** | `conePositive_comass_bound` | **MEDIUM** — uniform bound | Pending |
-| **P5** | `RawSheetSum.toIntegralCurrent_toFun_eq_zero` | **LOW** — technical | Pending |
+1. **TEST LOCALLY FIRST**: Run `lake build Hodge` before any commit
+2. **NO FORWARD REFERENCES**: Define theorems BEFORE using them
+3. **IF IT DOESN'T COMPILE → LEAVE AS AXIOM**: Don't break the build
+4. **ONE FILE AT A TIME**: Don't edit multiple files in one session
+5. **NO `sorry`, `admit`, or stub definitions**
 
 ---
 
-# Agent Assignments
+## Quick Start for Each Agent
 
-## 🔷 AGENT 1: Proved Axioms (Cleanup)
-- `isSmoothAlternating_*` (5 axioms) -> **PROVED**
-- `SmoothForm.instTopologicalSpace` -> **PROVED**
-- `smoothExtDeriv_smul_real` -> **PROVED**
-- `eval_le_mass` -> **PROVED**
-- `flatNorm_boundary_le` -> **PROVED**
-- `flatNorm_eq_zero_iff` -> **PROVED**
+```bash
+# 1. Pull latest
+git pull origin main
 
-## 🔷 AGENT 2: Exterior Derivative (2 axioms) → **PROVED**
-- `smoothExtDeriv_add` → **THEOREM** (via `map_add` on `smoothExtDerivLM`)
-- `smoothExtDeriv_smul` → **THEOREM** (via `map_smul` on `smoothExtDerivLM`)
+# 2. Make your changes to ONE file
 
-## 🔷 AGENT 5: Comass Interface (7 axioms)
-- `pointwiseComass_nonneg`
-- `pointwiseComass_zero`
-- `pointwiseComass_smul`
-- `pointwiseComass_continuous`
-- `comass_eq_zero_iff`
-- `conePositive_comass_bound`
-- `wirtinger_comass_bound` (Reassigned)
+# 3. Test build
+lake build Hodge
 
-## 🔷 AGENT 6: Kähler Powers (3 axioms)
-- `omega_pow_IsFormClosed`
-- `shift_makes_conePositive_rat`
-- `simpleCalibratedForm` (Reassigned)
-
-## 🔷 AGENT 7: Currents & Calibration (3 axioms)
-- `Current.boundary_boundary`
-- `Current.is_bounded`
-- `RawSheetSum.toIntegralCurrent_toFun_eq_zero`
-
-## 🔷 AGENT 8: Classical Pillars (8 axioms) — **DOCUMENT ONLY**
-- Documented 8 deep theorems with STATUS markers.
-- `omega_pow_is_rational` is now a **PROVED THEOREM** (not an axiom).
+# 4. If build passes, commit and push
+git add -A && git commit -m "Agent N: [description]" && git push
+```
 
 ---
 
-## Summary
+## The 30 Axioms in Proof Chain
 
-| Agent | Axioms | Type | Priority |
-|-------|--------|------|----------|
-| 1 | 0 | Cleanup | ✓ |
-| 2 | 0 | Interface | ✓ PROVED |
-| 5 | 7 | Comass | 🟢 Medium |
-| **6** | **3** | **Kähler** | 🟢 **HIGH** |
-| 7 | 3 | Currents | 🟢 Medium |
-| 8 | 8 | Classical | 🔴 Document ✓ |
+Verified via `lake env lean DependencyCheck.lean`:
+
+```
+calibration_defect_from_gluing     omegaPow_in_interior
+conePositive_comass_bound          omega_pow_IsFormClosed
+eval_le_mass                       omega_pow_is_rational
+flatNorm_boundary_le               omega_pow_represents_multiple
+flatNorm_eq_zero_iff               pointwiseComass_nonneg
+flat_limit_existence               pointwiseComass_zero
+harvey_lawson_fundamental_class    RawSheetSum.toIntegralCurrent_toFun_eq_zero
+isSmoothAlternating_add            serre_gaga
+isSmoothAlternating_neg            shift_makes_conePositive_rat
+isSmoothAlternating_smul           simpleCalibratedForm
+isSmoothAlternating_sub            smoothExtDeriv_add
+isSmoothAlternating_zero           smoothExtDeriv_smul
+lefschetz_lift_signed_cycle        smoothExtDeriv_smul_real
+mass_lsc                           SmoothForm.instTopologicalSpace
+ofForm_smul_real                   wirtinger_comass_bound
+```
+
+---
+
+# 🔷 AGENT 1: `isSmoothAlternating_*` (5 axioms)
+
+**File:** `Hodge/Basic.lean` (lines 84-92)
+
+| Axiom | Line | Strategy |
+|-------|------|----------|
+| `isSmoothAlternating_zero` | 84 | Zero function is alternating |
+| `isSmoothAlternating_add` | 85 | Sum of alternating is alternating |
+| `isSmoothAlternating_neg` | 87 | Negation preserves alternating |
+| `isSmoothAlternating_smul` | 89 | Scalar mult preserves alternating |
+| `isSmoothAlternating_sub` | 91 | sub = add ∘ neg |
+
+**Approach:** These follow from `AlternatingMap` being a submodule. Check if `IsSmoothAlternating` can be defined constructively.
+
+---
+
+# 🔷 AGENT 2: `smoothExtDeriv_*` (3 axioms)
+
+**File:** `Hodge/Basic.lean` (lines 157-169)
+
+| Axiom | Line | Strategy |
+|-------|------|----------|
+| `smoothExtDeriv_add` | 157 | d(ω + η) = dω + dη |
+| `smoothExtDeriv_smul` | 162 | d(c • ω) = c • dω |
+| `smoothExtDeriv_smul_real` | 167 | d(r • ω) = r • dω |
+
+**Approach:** If `smoothExtDeriv` wraps a linear map, these follow from linearity.
+
+---
+
+# 🔷 AGENT 3: Quotient + Topology (2 axioms)
+
+**Files:** `Hodge/Basic.lean`
+
+| Axiom | Strategy |
+|-------|----------|
+| `ofForm_smul_real` | Use `Quotient.sound` and `ofForm_proof_irrel` |
+| `SmoothForm.instTopologicalSpace` | Interface axiom — document or use Mathlib |
+
+---
+
+# 🔷 AGENT 4: Flat Norm (3 axioms)
+
+**File:** `Hodge/Analytic/FlatNorm.lean`
+
+| Axiom | Strategy |
+|-------|----------|
+| `eval_le_mass` | T(ψ) ≤ mass(T) × comass(ψ) — use mass definition |
+| `flatNorm_boundary_le` | ‖∂T‖ ≤ ‖T‖ — flat norm estimate |
+| `flatNorm_eq_zero_iff` | ‖T‖ = 0 ↔ T = 0 — separation |
+
+---
+
+# 🔷 AGENT 5: Comass (3 axioms)
+
+**Files:** `Hodge/Analytic/Norms.lean`, `Hodge/Kahler/Microstructure.lean`
+
+| Axiom | Strategy |
+|-------|----------|
+| `pointwiseComass_nonneg` | Supremum of norms ≥ 0 |
+| `pointwiseComass_zero` | comass(0) = 0 |
+| `conePositive_comass_bound` | Document as interface axiom |
+
+---
+
+# 🔷 AGENT 6: Kähler Powers (4 axioms) — **HIGH PRIORITY**
+
+**Files:** `Hodge/Kahler/TypeDecomposition.lean`, `Hodge/Kahler/Cone.lean`
+
+| Axiom | Hodge Weight |
+|-------|--------------|
+| `omega_pow_IsFormClosed` | **CRITICAL** — d(ω^p) = 0 |
+| `omega_pow_is_rational` | **CRITICAL** — [ω^p] ∈ H(X,ℚ) |
+| `omegaPow_in_interior` | **CRITICAL** — ω^p in cone interior |
+| `shift_makes_conePositive_rat` | **HIGH** — rational shift |
+
+---
+
+# 🔷 AGENT 7: Calibration (4 axioms)
+
+**Files:** `Hodge/Analytic/Calibration.lean`, `Hodge/Kahler/Microstructure.lean`
+
+| Axiom | Strategy |
+|-------|----------|
+| `wirtinger_comass_bound` | Classical Wirtinger inequality |
+| `simpleCalibratedForm` | Volume form calibration |
+| `omega_pow_represents_multiple` | May be classical pillar |
+| `RawSheetSum.toIntegralCurrent_toFun_eq_zero` | Technical — document |
+
+---
+
+# 🔷 AGENT 8: Classical Pillars (6 axioms) — **DOCUMENT ONLY**
+
+These are acceptable as final axioms. Add comprehensive docstrings:
+
+| Axiom | Reference | File |
+|-------|-----------|------|
+| `serre_gaga` | Serre 1956 | GAGA.lean |
+| `flat_limit_existence` | FF 1960 | Microstructure.lean |
+| `mass_lsc` | Federer 1969 | Calibration.lean |
+| `calibration_defect_from_gluing` | FF 1960 | Microstructure.lean |
+| `harvey_lawson_fundamental_class` | HL 1983 | Main.lean |
+| `lefschetz_lift_signed_cycle` | Hard Lefschetz | Main.lean |
+
+---
+
+## Summary Table
+
+| Agent | Axioms | Focus | Priority |
+|-------|--------|-------|----------|
+| 1 | 5 | `isSmoothAlternating_*` | 🟡 |
+| 2 | 3 | `smoothExtDeriv_*` | 🟡 |
+| 3 | 2 | Quotient + Topology | 🟡 |
+| 4 | 3 | Flat Norm | 🟢 |
+| 5 | 3 | Comass | 🟢 |
+| **6** | **4** | **Kähler Powers** | **🔴 HIGH** |
+| 7 | 4 | Calibration | 🟢 |
+| 8 | 6 | Classical Pillars | 📝 Document |
 
 ---
 
 ## Verification
 
+After making changes, verify:
+
 ```bash
-lake env lean DependencyCheck.lean 2>&1 | tail -n +2 | tr ',[]' '\n' | \
-  sed 's/^ *//' | grep -v "^$" | \
-  grep -v "propext\|Classical.choice\|Quot.sound" | \
-  grep -v "depends on axioms" | sort | uniq | wc -l
+# Build must pass
+lake build Hodge
+
+# Check axiom count in proof chain
+lake env lean DependencyCheck.lean 2>&1 | grep -v "propext\|Classical.choice\|Quot.sound" | grep -v "depends on" | wc -l
 ```
 
-**Current:** 24 → **Target:** 8 classical pillars
+**Current:** 30 → **Target:** 6 (classical pillars only)
