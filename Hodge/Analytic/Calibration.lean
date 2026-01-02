@@ -116,17 +116,24 @@ axiom spine_theorem {k : ℕ} (T S G : Current n X k) (ψ : CalibratingForm n X 
     (_h_decomp : T = S - G) (_h_calib : isCalibrated S ψ) :
     calibrationDefect T ψ ≤ 2 * Current.mass G
 
-/-- **Lower Semicontinuity of Mass** (Federer-Fleming, 1960).
+/-- **Lower Semicontinuity of Mass** (Federer, 1969).
 
-The mass functional is lower semicontinuous with respect to the flat norm topology.
-This means: if Tₙ → T in flat norm, then mass(T) ≤ liminf mass(Tₙ).
+    **STATUS: CLASSICAL PILLAR**
 
-**Proof Sketch**: The mass is defined as sup{T(ω) : comass(ω) ≤ 1}.
-For each test form ω, the evaluation T(ω) is continuous in T (w.r.t. flat norm).
-The supremum of lower semicontinuous functions is lower semicontinuous.
+    The mass functional is lower semicontinuous with respect to the flat norm topology.
+    This means: if Tₙ → T in flat norm, then mass(T) ≤ liminf mass(Tₙ).
 
-Reference: [H. Federer and W.H. Fleming, "Normal and integral currents",
-Annals of Mathematics 72 (1960), 458-520, Section 4.2]. -/
+    **Mathematical Content**: Mass is the supremum over a family of linear functionals
+    (evaluations on test forms with comass ≤ 1), and suprema of continuous functions
+    are lower semicontinuous.
+
+    **Why This is an Axiom**: Proving this requires full implementation of mass as a
+    supremum over test forms, continuity of evaluation under flat norm convergence,
+    and general theorems about semicontinuity of suprema.
+
+    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents",
+    Annals of Mathematics 72 (1960), 458-520, Section 4.2].
+    Reference: [H. Federer, "Geometric Measure Theory", Springer, 1969, Section 4.1.7]. -/
 axiom mass_lsc {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k) :
     Tendsto (fun i => flatNorm (T i - T_limit)) atTop (nhds 0) →
     Current.mass T_limit ≤ liminf (fun i => Current.mass (T i)) atTop
