@@ -116,37 +116,17 @@ axiom spine_theorem {k : ℕ} (T S G : Current n X k) (ψ : CalibratingForm n X 
     (_h_decomp : T = S - G) (_h_calib : isCalibrated S ψ) :
     calibrationDefect T ψ ≤ 2 * Current.mass G
 
-/-- **Lower Semicontinuity of Mass** (Federer, 1969).
+/-- **Lower Semicontinuity of Mass** (Federer-Fleming, 1960).
 
-    **STATUS: CLASSICAL PILLAR**
+The mass functional is lower semicontinuous with respect to the flat norm topology.
+This means: if Tₙ → T in flat norm, then mass(T) ≤ liminf mass(Tₙ).
 
-    The mass functional is lower semicontinuous with respect to the flat norm topology.
-    This means: if Tₙ → T in flat norm, then mass(T) ≤ liminf mass(Tₙ).
+**Proof Sketch**: The mass is defined as sup{T(ω) : comass(ω) ≤ 1}.
+For each test form ω, the evaluation T(ω) is continuous in T (w.r.t. flat norm).
+The supremum of lower semicontinuous functions is lower semicontinuous.
 
-    **Mathematical Content**: This is a fundamental property of the mass functional
-    in geometric measure theory. The key insight is that mass is the supremum over
-    a family of linear functionals (evaluations on test forms with comass ≤ 1),
-    and suprema of continuous functions are lower semicontinuous.
-
-    **Proof Sketch**: The mass is defined as sup{T(ω) : comass(ω) ≤ 1}.
-    For each test form ω, the evaluation T(ω) is continuous in T (w.r.t. flat norm).
-    The supremum of lower semicontinuous functions is lower semicontinuous.
-
-    **Why This is an Axiom**: Proving this requires:
-    1. Full implementation of mass as a supremum over test forms
-    2. Continuity of evaluation under flat norm convergence
-    3. General theorems about semicontinuity of suprema
-
-    These depend on the full GMT implementation of currents and norms.
-
-    **Usage in Main Proof**: This axiom is essential for `limit_is_calibrated`:
-    when the calibration defect vanishes along a sequence, the limit inherits
-    the calibration property via this lower semicontinuity.
-
-    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents",
-    Annals of Mathematics 72 (1960), 458-520, Section 4.2].
-    Reference: [H. Federer, "Geometric Measure Theory", Springer, 1969,
-    Section 4.1.7]. -/
+Reference: [H. Federer and W.H. Fleming, "Normal and integral currents",
+Annals of Mathematics 72 (1960), 458-520, Section 4.2]. -/
 axiom mass_lsc {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k) :
     Tendsto (fun i => flatNorm (T i - T_limit)) atTop (nhds 0) →
     Current.mass T_limit ≤ liminf (fun i => Current.mass (T i)) atTop
