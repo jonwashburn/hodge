@@ -4,71 +4,98 @@
 
 **Progress:** 44 → 35 → 32 → 30 axioms
 
-**Success:** `#print axioms hodge_conjecture'` shows only `propext`, `Classical.choice`, `Quot.sound` (+ ~5 classical pillars)
+**Verification:** `lake env lean DependencyCheck.lean` confirms all 30 are in proof chain.
 
 ---
 
 ## 🚫 RULES
 
 1. **NO `sorry`, `admit`, `trivial`, `native_decide`**
-2. **NO stub definitions** 
+2. **NO stub definitions** (e.g., `def mass := 0`)
 3. **Build passes:** `lake build Hodge`
-4. **Verify:** `lake env lean DependencyCheck.lean`
+4. **Verify:** Axiom removed from `DependencyCheck.lean` output
 
 ---
 
-## Current Status
+## Axiom Classification
 
-| Metric | Value |
-|--------|-------|
-| Build | ✅ Passes |
-| Axioms in proof chain | **30** |
-| Target | **~6** classical pillars |
+### 🔴 CLASSICAL PILLARS (Acceptable as Axioms) — 6 axioms
+Deep theorems from the literature. These are acceptable final axioms:
+
+| Axiom | Description | Reference |
+|-------|-------------|-----------|
+| `serre_gaga` | Algebraic = analytic on projective | Serre 1956 |
+| `flat_limit_existence` | Federer-Fleming compactness | FF 1960 |
+| `mass_lsc` | Lower semicontinuity of mass | Federer 1969 |
+| `calibration_defect_from_gluing` | GMT gluing estimate | FF 1960 |
+| `harvey_lawson_fundamental_class` | HL fundamental class | HL 1983 |
+| `lefschetz_lift_signed_cycle` | Lefschetz on cycles | Hard Lefschetz |
+
+### 🟡 INTERFACE AXIOMS (Opaque Type Structure) — 8 axioms
+These define algebraic structure on opaque types. May be provable via architecture change:
+
+| Axiom | Type | Strategy |
+|-------|------|----------|
+| `isSmoothAlternating_zero` | SmoothForm | Define predicate constructively |
+| `isSmoothAlternating_add` | SmoothForm | Define predicate constructively |
+| `isSmoothAlternating_neg` | SmoothForm | Define predicate constructively |
+| `isSmoothAlternating_smul` | SmoothForm | Define predicate constructively |
+| `isSmoothAlternating_sub` | SmoothForm | Define predicate constructively |
+| `SmoothForm.instTopologicalSpace` | SmoothForm | Use Mathlib topology |
+| `smoothExtDeriv_add` | Derivative | Follows from linearity if d is defined |
+| `smoothExtDeriv_smul` | Derivative | Follows from linearity if d is defined |
+
+### 🟢 HODGE-WEIGHT AXIOMS (Must Prove) — 16 axioms
+These carry mathematical substance for the Hodge conjecture:
+
+| Axiom | Hodge Weight | Why It Matters |
+|-------|--------------|----------------|
+| `omega_pow_IsFormClosed` | **HIGH** | d(ω^p) = 0 for Kähler form |
+| `omega_pow_is_rational` | **HIGH** | [ω^p] ∈ H(X,ℚ) |
+| `omega_pow_represents_multiple` | **HIGH** | Key algebraicity claim |
+| `omegaPow_in_interior` | **HIGH** | ω^p in cone interior |
+| `shift_makes_conePositive_rat` | **HIGH** | Rational shift into cone |
+| `wirtinger_comass_bound` | **HIGH** | Wirtinger inequality |
+| `simpleCalibratedForm` | **MEDIUM** | Volume form calibration |
+| `pointwiseComass_nonneg` | **MEDIUM** | Comass ≥ 0 |
+| `pointwiseComass_zero` | **MEDIUM** | Comass(0) = 0 |
+| `conePositive_comass_bound` | **MEDIUM** | Uniform comass bound |
+| `eval_le_mass` | **MEDIUM** | T(ψ) ≤ mass·comass |
+| `flatNorm_boundary_le` | **MEDIUM** | ‖∂T‖_flat ≤ ‖T‖_flat |
+| `flatNorm_eq_zero_iff` | **MEDIUM** | ‖T‖ = 0 ↔ T = 0 |
+| `smoothExtDeriv_smul_real` | **LOW** | d(r·ω) = r·dω |
+| `ofForm_smul_real` | **LOW** | [r·ω] = r·[ω] |
+| `RawSheetSum.toIntegralCurrent_toFun_eq_zero` | **LOW** | Technical cast |
 
 ---
 
-## The 30 Axioms
+## ✅ Recently Proved (Round 15)
 
-```
-calibration_defect_from_gluing     omega_pow_IsFormClosed
-conePositive_comass_bound          omega_pow_is_rational
-eval_le_mass                       omega_pow_represents_multiple
-flatNorm_boundary_le               omegaPow_in_interior
-flatNorm_eq_zero_iff               pointwiseComass_nonneg
-flat_limit_existence               pointwiseComass_zero
-harvey_lawson_fundamental_class    RawSheetSum.toIntegralCurrent_toFun_eq_zero
-isSmoothAlternating_add            serre_gaga
-isSmoothAlternating_neg            shift_makes_conePositive_rat
-isSmoothAlternating_smul           simpleCalibratedForm
-isSmoothAlternating_sub            smoothExtDeriv_add
-isSmoothAlternating_zero           smoothExtDeriv_smul
-lefschetz_lift_signed_cycle        smoothExtDeriv_smul_real
-mass_lsc                           SmoothForm.instTopologicalSpace
-ofForm_smul_real                   wirtinger_comass_bound
-```
-
-### ✅ Recently Proved (Round 15)
-- `mass_nonneg` → theorem
-- `mass_zero` → theorem
-- `mass_neg` → theorem
-- `eval_le_flatNorm` → theorem
-- `ofForm_sub` → theorem
-- `SmoothForm.zero` → def
+| Axiom | Now | Prover |
+|-------|-----|--------|
+| `mass` | def (supremum) | Agent 4 |
+| `mass_nonneg` | theorem | Agent 4 |
+| `mass_zero` | theorem | Agent 4 |
+| `mass_neg` | theorem | Agent 4 |
+| `eval_le_flatNorm` | theorem | Agent 5 |
+| `ofForm_sub` | theorem | Agent 3 |
+| `SmoothForm.zero` | def | Agent 1 |
 
 ---
 
-# 🔷 AGENT 1: SmoothForm Structure (4 axioms)
+# 🔷 AGENT 1: SmoothForm Predicate (5 axioms)
+
+**Goal:** Make `IsSmoothAlternating` constructive or prove these follow from structure.
 
 | Axiom | File | Strategy |
 |-------|------|----------|
-| `SmoothForm.zero` | Basic.lean | Interface axiom |
-| `SmoothForm.instAddCommGroup` | Basic.lean | Interface axiom |
-| `SmoothForm.instModuleComplex` | Basic.lean | Interface axiom |
-| `SmoothForm.instTopologicalSpace` | Basic.lean | Interface axiom |
+| `isSmoothAlternating_zero` | Basic.lean | Define: `0` satisfies alternating |
+| `isSmoothAlternating_add` | Basic.lean | Closure under addition |
+| `isSmoothAlternating_neg` | Basic.lean | Closure under negation |
+| `isSmoothAlternating_smul` | Basic.lean | Closure under scalar mult |
+| `isSmoothAlternating_sub` | Basic.lean | `sub = add ∘ neg` |
 
-**Strategy:** These are interface axioms for the opaque `SmoothForm` type. Options:
-1. Replace `opaque SmoothForm` with Mathlib's `DifferentialForm`
-2. Document as foundational interface (acceptable if truly opaque)
+**Approach:** If `IsSmoothAlternating` is defined as a predicate on functions, these should follow from the algebraic structure of `AlternatingMap`.
 
 ---
 
@@ -76,139 +103,132 @@ ofForm_smul_real                   wirtinger_comass_bound
 
 | Axiom | File | Strategy |
 |-------|------|----------|
-| `smoothExtDeriv_add` | Basic.lean | d(ω + η) = dω + dη |
-| `smoothExtDeriv_smul` | Basic.lean | d(c·ω) = c·dω |
-| `smoothExtDeriv_smul_real` | Basic.lean | d(r·ω) = r·dω |
+| `smoothExtDeriv_add` | Basic.lean | d is linear map |
+| `smoothExtDeriv_smul` | Basic.lean | d is ℂ-linear |
+| `smoothExtDeriv_smul_real` | Basic.lean | d is ℝ-linear |
 
-**Strategy:** If `smoothExtDeriv` is connected to Mathlib's `exteriorDerivative`, these follow from linearity. Check for a definitional axiom.
+**Approach:** If `smoothExtDeriv` wraps Mathlib's `exteriorDerivative`, these follow from linearity. Check how `smoothExtDeriv` is defined.
 
 ---
 
-# 🔷 AGENT 3: Quotient Operations (2 axioms)
+# 🔷 AGENT 3: Quotient + Topology (2 axioms)
 
 | Axiom | File | Strategy |
 |-------|------|----------|
-| `ofForm_sub` | Basic.lean | [ω - η] = [ω] - [η] |
-| `ofForm_smul_real` | Basic.lean | [r·ω] = r·[ω] |
+| `ofForm_smul_real` | Basic.lean | Quotient.sound |
+| `SmoothForm.instTopologicalSpace` | Basic.lean | Use Mathlib topology |
 
-**Strategy:** Use `Quotient.sound`:
+**Approach for `ofForm_smul_real`:**
 ```lean
-theorem ofForm_sub (ω η) (hω hη) :
-    ofForm (ω - η) _ = ofForm ω hω - ofForm η hη := by
+theorem ofForm_smul_real (r : ℝ) (ω) (hω) :
+    ⟦r • ω, _⟧ = r • ⟦ω, hω⟧ := by
   apply Quotient.sound
-  -- Show: Cohomologous ⟨ω - η, _⟩ ⟨..., _⟩
+  unfold Cohomologous IsExact
+  -- r • ω - r • ω' = r • (ω - ω') is exact if ω - ω' is exact
 ```
 
 ---
 
-# 🔷 AGENT 4: Mass Properties (3 axioms)
+# 🔷 AGENT 4: Flat Norm Properties (3 axioms)
 
 | Axiom | File | Strategy |
 |-------|------|----------|
-| `Current.mass_nonneg` | Currents.lean | mass ≥ 0 |
-| `Current.mass_zero` | Currents.lean | mass(0) = 0 |
-| `Current.mass_neg` | Currents.lean | mass(-T) = mass(T) |
+| `eval_le_mass` | FlatNorm.lean | Use mass definition |
+| `flatNorm_boundary_le` | FlatNorm.lean | Flat norm estimate |
+| `flatNorm_eq_zero_iff` | FlatNorm.lean | Infimum = 0 ↔ T = 0 |
 
-**Strategy:** If `mass` is defined as supremum:
-```lean
-theorem Current.mass_nonneg : mass T ≥ 0 := by
-  -- Supremum of nonneg quantities is nonneg
-```
+**Approach:** These depend on how `flatNorm` is defined. Check if it's an infimum over decompositions.
 
 ---
 
-# 🔷 AGENT 5: Flat Norm Properties (4 axioms)
+# 🔷 AGENT 5: Comass Properties (3 axioms)
 
 | Axiom | File | Strategy |
 |-------|------|----------|
-| `eval_le_flatNorm` | FlatNorm.lean | T(ψ) ≤ flatNorm T · comass ψ |
-| `eval_le_mass` | FlatNorm.lean | T(ψ) ≤ mass T · comass ψ |
-| `flatNorm_boundary_le` | FlatNorm.lean | flatNorm(∂T) ≤ flatNorm T |
-| `flatNorm_eq_zero_iff` | FlatNorm.lean | flatNorm T = 0 ↔ T = 0 |
+| `pointwiseComass_nonneg` | Norms.lean | Supremum of norms ≥ 0 |
+| `pointwiseComass_zero` | Norms.lean | Supremum over empty = 0 |
+| `conePositive_comass_bound` | Microstructure.lean | Document as interface |
 
-**Strategy:** These are fundamental flat norm estimates. Check if `flatNorm` has a concrete definition.
+**Approach:** If `comass` is a supremum of absolute values, these follow from norm properties.
 
 ---
 
-# 🔷 AGENT 6: Kähler / Calibration (6 axioms)
+# 🔷 AGENT 6: Kähler Power Properties (4 axioms) — **HIGH PRIORITY**
 
-| Axiom | File | Strategy |
-|-------|------|----------|
-| `omega_pow_IsFormClosed` | TypeDecomp.lean | d(ω^p) = 0 |
-| `omega_pow_is_rational` | TypeDecomp.lean | [ω^p] ∈ H(X,ℚ) |
-| `omega_pow_represents_multiple` | Main.lean | c·[ω^p] algebraic |
-| `omegaPow_in_interior` | Cone.lean | ω^p in interior |
-| `pointwiseComass_nonneg` | Norms.lean | comass ≥ 0 |
-| `conePositive_comass_bound` | Cone.lean | Comass bound |
+| Axiom | File | Hodge Weight |
+|-------|------|--------------|
+| `omega_pow_IsFormClosed` | TypeDecomp.lean | **HIGH** |
+| `omega_pow_is_rational` | TypeDecomp.lean | **HIGH** |
+| `omegaPow_in_interior` | Cone.lean | **HIGH** |
+| `shift_makes_conePositive_rat` | Cone.lean | **HIGH** |
 
-**Priority:** Start with `omega_pow_IsFormClosed` (induction on p) and `pointwiseComass_nonneg` (sup of nonneg).
+**Approach:**
+- `omega_pow_IsFormClosed`: d(ω^p) = 0 by induction using d(ω) = 0 and product rule
+- `omega_pow_is_rational`: Uses integral cohomology of Kähler manifolds
+- These are core Hodge theory — may require deep Mathlib
 
 ---
 
-# 🔷 AGENT 7: Calibration + Cone (5 axioms)
+# 🔷 AGENT 7: Calibration (4 axioms)
 
 | Axiom | File | Strategy |
 |-------|------|----------|
-| `wirtinger_comass_bound` | Calibration.lean | Wirtinger inequality |
+| `wirtinger_comass_bound` | Calibration.lean | Classical pillar |
 | `simpleCalibratedForm` | Grassmannian.lean | Volume form |
-| `shift_makes_conePositive_rat` | Cone.lean | γ + c·ω^p positive |
-| `mass_lsc` | Calibration.lean | Lower semicontinuity |
-| `flat_limit_existence` | Microstructure.lean | FF compactness |
+| `omega_pow_represents_multiple` | Main.lean | Classical pillar |
+| `RawSheetSum.toIntegralCurrent_toFun_eq_zero` | Microstructure.lean | Technical |
 
-**Note:** `mass_lsc` and `flat_limit_existence` are classical GMT results — may remain as axioms.
-
----
-
-# 🔷 AGENT 8: Strategy-Critical + Microstructure (5 axioms)
-
-| Axiom | File | Status |
-|-------|------|--------|
-| `harvey_lawson_fundamental_class` | Main.lean | ⚠️ CRITICAL |
-| `lefschetz_lift_signed_cycle` | Main.lean | ⚠️ CRITICAL |
-| `calibration_defect_from_gluing` | Microstructure.lean | Classical pillar |
-| `RawSheetSum.toIntegralCurrent_toFun_eq_zero` | Microstructure.lean | Cast issue |
-| `serre_gaga` | GAGA.lean | Classical pillar |
-
-**Strategy for #1-2:**
-1. Investigate `harvey_lawson_theorem` structure
-2. Check if derivable from existing axioms
-3. If not, document as classical pillars
+**Note:** `wirtinger_comass_bound` is a classical result from calibration theory.
 
 ---
 
-# Summary
+# 🔷 AGENT 8: Classical Pillars (6 axioms) — **DOCUMENT ONLY**
 
-| Agent | Axioms | Focus |
-|-------|--------|-------|
-| **1** | 4 | SmoothForm interface |
-| **2** | 3 | Exterior derivative linearity |
-| **3** | 2 | Quotient operations |
-| **4** | 3 | Mass properties |
-| **5** | 4 | Flat norm properties |
-| **6** | 6 | Kähler / omega powers |
-| **7** | 5 | Calibration + cone |
-| **8** | 5 | **Strategy-critical** + microstructure |
+These are acceptable as axioms. **Document** why they're classical pillars:
 
-**Total:** 32 axioms
+| Axiom | Reference | Status |
+|-------|-----------|--------|
+| `serre_gaga` | Serre 1956 | ✓ Documented |
+| `flat_limit_existence` | FF 1960 | ✓ Documented |
+| `mass_lsc` | Federer 1969 | ✓ Documented |
+| `calibration_defect_from_gluing` | FF 1960 | ✓ Documented |
+| `harvey_lawson_fundamental_class` | HL 1983 | Needs documentation |
+| `lefschetz_lift_signed_cycle` | Hard Lefschetz | Needs documentation |
 
----
-
-## Classical Pillars (Acceptable as Axioms)
-
-These are deep theorems from the literature:
-1. `serre_gaga` — Serre's GAGA (1956)
-2. `flat_limit_existence` — Federer-Fleming compactness (1960)
-3. `mass_lsc` — Lower semicontinuity of mass
-4. `calibration_defect_from_gluing` — GMT gluing estimate
-5. `harvey_lawson_fundamental_class` — HL fundamental class
-6. `lefschetz_lift_signed_cycle` — Lefschetz on cycles
+**Task:** Add docstrings explaining why these are classical pillars that require extensive Mathlib infrastructure to prove.
 
 ---
 
-## Verification
+## Summary
+
+| Agent | Count | Type | Priority |
+|-------|-------|------|----------|
+| **1** | 5 | Interface (SmoothForm) | 🟡 |
+| **2** | 3 | Interface (Derivative) | 🟡 |
+| **3** | 2 | Quotient + Topology | 🟡 |
+| **4** | 3 | Flat Norm | 🟢 Medium |
+| **5** | 3 | Comass | 🟢 Medium |
+| **6** | 4 | **Kähler Powers** | 🟢 **HIGH** |
+| **7** | 4 | Calibration | 🟢 Medium |
+| **8** | 6 | Classical Pillars | 🔴 Document |
+
+**Total:** 30 axioms
+
+---
+
+## Target End State
+
+After this round:
+- **~6 classical pillars** remain as documented axioms
+- **~0 interface axioms** (prove or document as opaque-type structure)
+- **~0 Hodge-weight axioms** (must be proved)
+
+---
+
+## Verification Command
 
 ```bash
 lake env lean DependencyCheck.lean 2>&1 | tail -n +2 | tr ',[]' '\n' | sed 's/^ *//' | grep -v "^$" | grep -v "propext\|Classical.choice\|Quot.sound" | grep -v "depends on axioms" | sort | uniq | wc -l
 ```
 
-**Current:** 32 → **Target:** ~6 classical pillars
+**Current:** 30 → **Target:** 6 (classical pillars only)
