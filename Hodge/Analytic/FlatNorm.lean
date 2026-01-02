@@ -149,21 +149,98 @@ theorem flatNorm_boundary_le_mass {k : ℕ} (T : Current n X (k + 1)) :
 
 /-! ## Axioms for Properties Requiring Deeper Infrastructure -/
 
-/-- The flat norm is symmetric under negation.
-    This follows from: if T = S + ∂R, then -T = -S + ∂(-R), with equal costs. -/
-axiom flatNorm_neg {k : ℕ} (T : Current n X k) : flatNorm (-T) = flatNorm T
+/-- Negation reverses addition of currents. -/
+theorem Current.neg_add {k : ℕ} (S T : Current n X k) : -(S + T) = -S + -T := by
+  ext ω
+  show -(S.toFun ω + T.toFun ω) = -S.toFun ω + -T.toFun ω
+  ring
+
+/-- Boundary commutes with negation. -/
+theorem Current.boundary_neg' {k : ℕ} (R : Current n X (k + 1)) :
+    Current.boundary (-R) = -Current.boundary R := by
+  ext ω
+  show (-R).toFun (smoothExtDeriv ω) = -(R.toFun (smoothExtDeriv ω))
+  rfl
+
+/-- The flat norm is symmetric under negation (Federer-Fleming 1960).
+    Proof: If T = S + ∂R is a decomposition, then -T = -S + ∂(-R) is a decomposition with
+    the same cost (since mass(-S) = mass(S) and mass(-R) = mass(R)).
+    Thus the decomposition sets for T and -T have identical values. -/
+theorem flatNorm_neg {k : ℕ} (T : Current n X k) : flatNorm (-T) = flatNorm T := by
+  unfold flatNorm
+  apply le_antisymm
+  · -- Show flatNorm(-T) ≤ flatNorm(T)
+    apply csInf_le_csInf (flatNormDecompSet_bddBelow (-T)) (flatNormDecompSet_nonempty T)
+    -- For any m in decomp(T), show m is in decomp(-T)
+    intro m ⟨S, R, hT, hm⟩
+    -- If T = S + ∂R, then -T = -S + ∂(-R)
+    use -S, -R
+    refine ⟨?_, ?_⟩
+    · -- -T = -S + ∂(-R)
+      ext ω
+      rw [Current.boundary_neg']
+      have h := congrArg (fun T' => (-T').toFun ω) hT
+      simp only [Current.neg_add] at h
+      exact h
+    · -- cost is the same
+      rw [hm, Current.mass_neg, Current.mass_neg]
+  · -- Show flatNorm(T) ≤ flatNorm(-T) by symmetry
+    apply csInf_le_csInf (flatNormDecompSet_bddBelow T) (flatNormDecompSet_nonempty (-T))
+    intro m ⟨S, R, hT, hm⟩
+    -- If -T = S + ∂R, then T = -S + ∂(-R)
+    use -S, -R
+    refine ⟨?_, ?_⟩
+    · ext ω
+      rw [Current.boundary_neg']
+      have h := congrArg (fun T' => (-T').toFun ω) hT
+      simp only [Current.neg_add] at h
+      -- h says: -(-T).toFun ω = (-S).toFun ω + (-∂R).toFun ω
+      -- We need: T.toFun ω = (-S).toFun ω + (∂(-R)).toFun ω
+      -- Since --T = T and ∂(-R) = -∂R:
+      have h2 : (-(-T)).toFun ω = T.toFun ω := by
+        show -(-T.toFun ω) = T.toFun ω
+        ring
+      rw [← h2, h]
+    · rw [hm, Current.mass_neg, Current.mass_neg]
 
 /-- The flat norm satisfies the triangle inequality (Federer-Fleming 1960).
-    This follows from: if T₁ = S₁ + ∂R₁ and T₂ = S₂ + ∂R₂,
-    then T₁ + T₂ = (S₁+S₂) + ∂(R₁+R₂) with cost bounded by sum of costs. -/
-axiom flatNorm_add_le {k : ℕ} (S T : Current n X k) :
-    flatNorm (S + T) ≤ flatNorm S + flatNorm T
+    Proof sketch: If T₁ = S₁ + ∂R₁ and T₂ = S₂ + ∂R₂,
+    then T₁ + T₂ = (S₁+S₂) + ∂(R₁+R₂) with cost M(S₁+S₂) + M(R₁+R₂)
+    ≤ M(S₁) + M(S₂) + M(R₁) + M(R₂) by triangle inequalities on mass.
+    This axiom is kept due to the complexity of infimum manipulation required. -/
+axiom flatNorm_add_le {k : ℕ} (T₁ T₂ : Current n X k) :
+    flatNorm (T₁ + T₂) ≤ flatNorm T₁ + flatNorm T₂
 
-/-- Flat norm scales with absolute value of scalar.
-    This follows from: if T = S + ∂R, then cT = cS + ∂(cR),
-    with mass(cS) = |c|·mass(S). -/
+/-- Scalar multiplication distributes over current addition. -/
+theorem Current.smul_add {k : ℕ} (c : ℝ) (S T : Current n X k) :
+    c • (S + T) = c • S + c • T := by
+  ext ω
+  show c * (S.toFun ω + T.toFun ω) = c * S.toFun ω + c * T.toFun ω
+  ring
+
+/-- Scalar multiplication associates. -/
+theorem Current.smul_smul {k : ℕ} (c d : ℝ) (T : Current n X k) :
+    c • (d • T) = (c * d) • T := by
+  ext ω
+  show c * (d * T.toFun ω) = (c * d) * T.toFun ω
+  ring
+
+/-- Flat norm scales with absolute value of scalar (Federer-Fleming 1960).
+    Proof sketch: If T = S + ∂R is a decomposition, then c•T = c•S + ∂(c•R) with cost
+    M(c•S) + M(c•R) = |c|M(S) + |c|M(R) = |c|(M(S) + M(R)).
+    The decomposition set for c•T is exactly |c| times the decomposition set for T.
+    This axiom is kept due to the complexity of infimum scaling lemmas in Lean. -/
 axiom flatNorm_smul {k : ℕ} (c : ℝ) (T : Current n X k) :
     flatNorm (c • T) = |c| * flatNorm T
+
+/-- Flat norm of difference is bounded by sum of flat norms.
+    Follows from triangle inequality and symmetry under negation. -/
+theorem flatNorm_sub_le {k : ℕ} (S T : Current n X k) :
+    flatNorm (S - T) ≤ flatNorm S + flatNorm T := by
+  -- S - T = S + (-T)
+  calc flatNorm (S - T) = flatNorm (S + -T) := rfl
+    _ ≤ flatNorm S + flatNorm (-T) := flatNorm_add_le S (-T)
+    _ = flatNorm S + flatNorm T := by rw [flatNorm_neg]
 
 /-- A current is zero iff its flat norm is zero.
     The ← direction follows from flatNorm_zero.

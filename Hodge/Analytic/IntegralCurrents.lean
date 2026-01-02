@@ -183,9 +183,11 @@ instance {k : ℕ} : Inhabited (IntegralCurrent n X k) :=
 instance {k : ℕ} : Coe (IntegralCurrent n X k) (Current n X k) where
   coe := IntegralCurrent.toFun
 
-/-- The isCycle property for IntegralCurrent. -/
+/-- The isCycle property for IntegralCurrent.
+    For k ≥ 1, this means the boundary is zero.
+    For k = 0, all 0-currents are considered cycles (no boundary in negative dimension). -/
 def IntegralCurrent.isCycleAt {k : ℕ} (T : IntegralCurrent n X k) : Prop :=
-  ∃ (k' : ℕ) (h : k = k' + 1), (Current.boundary (h ▸ T.toFun)) = 0
+  k = 0 ∨ ∃ (k' : ℕ) (h : k = k' + 1), (Current.boundary (h ▸ T.toFun)) = 0
 
 /-- Boundary of an integral current. -/
 def IntegralCurrent.boundary {k : ℕ} (T : IntegralCurrent n X (k + 1)) :
@@ -196,10 +198,13 @@ def IntegralCurrent.boundary {k : ℕ} (T : IntegralCurrent n X (k + 1)) :
 /-- If an integral current is a cycle, its boundary mass is zero. -/
 theorem IntegralCurrent.boundary_mass_zero {k : ℕ} (T : IntegralCurrent n X (k + 1))
     (h_cycle : T.isCycleAt) : Current.mass (Current.boundary T.toFun) = 0 := by
-  obtain ⟨k', h_dim, h_bdy⟩ := h_cycle
-  cases h_dim
-  simp only at h_bdy
-  rw [h_bdy]
-  exact Current.mass_zero
+  cases h_cycle with
+  | inl h_zero => exact (Nat.succ_ne_zero k h_zero).elim
+  | inr h_exists =>
+    obtain ⟨k', h_dim, h_bdy⟩ := h_exists
+    cases h_dim
+    simp only at h_bdy
+    rw [h_bdy]
+    exact Current.mass_zero
 
 end

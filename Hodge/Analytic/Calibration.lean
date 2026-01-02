@@ -61,9 +61,23 @@ def isCalibrated {k : ℕ} (T : Current n X k) (ψ : CalibratingForm n X k) : Pr
 /-- **Calibration Inequality** (Harvey-Lawson, 1982).
     For any current T and calibrating form ψ, the evaluation of T on ψ is bounded
     by the mass of T. This is the fundamental inequality of calibration theory.
+
+    **Proof**: By `eval_le_mass`, |T(ψ)| ≤ mass(T) * comass(ψ).
+    Since ψ is a calibrating form, comass(ψ) ≤ 1.
+    Since mass(T) ≥ 0 (by `mass_nonneg`), we have |T(ψ)| ≤ mass(T).
+    This implies T(ψ) ≤ mass(T).
+
     Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", 1982]. -/
-axiom calibration_inequality {k : ℕ} (T : Current n X k) (ψ : CalibratingForm n X k) :
-    T.toFun ψ.form ≤ Current.mass T
+theorem calibration_inequality {k : ℕ} (T : Current n X k) (ψ : CalibratingForm n X k) :
+    T.toFun ψ.form ≤ Current.mass T := by
+  have h1 : |T.toFun ψ.form| ≤ Current.mass T * comass ψ.form := eval_le_mass T ψ.form
+  have h2 : comass ψ.form ≤ 1 := ψ.comass_le_one
+  have h3 : Current.mass T ≥ 0 := Current.mass_nonneg T
+  have h4 : Current.mass T * comass ψ.form ≤ Current.mass T * 1 := by
+    apply mul_le_mul_of_nonneg_left h2 h3
+  have h5 : |T.toFun ψ.form| ≤ Current.mass T := by linarith
+  -- |x| ≤ y and y ≥ 0 implies x ≤ y
+  exact le_of_abs_le h5
 
 /-- The calibration defect measures how far T is from being calibrated. -/
 def calibrationDefect {k : ℕ} (T : Current n X k) (ψ : CalibratingForm n X k) : ℝ :=

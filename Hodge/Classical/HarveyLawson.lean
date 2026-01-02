@@ -227,10 +227,13 @@ theorem flat_limit_of_cycles_is_cycle {k : ℕ}
     (h_conv : Filter.Tendsto (fun i => flatNorm ((T_seq i).toFun - T_limit.toFun))
               Filter.atTop (nhds 0)) :
     T_limit.isCycleAt := by
-  -- From h_cycles 0, we extract the dimension witness k' and proof that k = k' + 1
-  obtain ⟨k', h_dim, h_bdy_0⟩ := h_cycles 0
+  -- Check if k = 0 (vacuously a cycle) or k ≥ 1
+  cases h_cycles 0 with
+  | inl h_zero => exact Or.inl h_zero
+  | inr h_exists =>
+  obtain ⟨k', h_dim, h_bdy_0⟩ := h_exists
   -- Use the same dimension witness for T_limit
-  refine ⟨k', h_dim, ?_⟩
+  refine Or.inr ⟨k', h_dim, ?_⟩
   -- Substitute k = k' + 1 to simplify types
   subst h_dim
   -- We need to show: Current.boundary T_limit.toFun = 0
@@ -254,7 +257,10 @@ theorem flat_limit_of_cycles_is_cycle {k : ℕ}
   -- dist is |a - b|, and we have dist(flatNorm(...), 0) < ε
   simp only [Real.dist_0_eq_abs, abs_of_nonneg (flatNorm_nonneg _)] at hN
   -- For i = N, we have T_seq N is a cycle
-  obtain ⟨k'', h_dim', h_bdy_N⟩ := h_cycles N
+  cases h_cycles N with
+  | inl h_zero => exact (Nat.succ_ne_zero k' h_zero).elim
+  | inr h_exists_N =>
+  obtain ⟨k'', h_dim', h_bdy_N⟩ := h_exists_N
   -- k' = k'' since both equal k - 1
   have h_k_eq : k' = k'' := by omega
   subst h_k_eq

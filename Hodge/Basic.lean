@@ -523,7 +523,8 @@ axiom ofForm_smul {k : ℕ} (c : ℂ) (ω : SmoothForm n X k) (hω : IsFormClose
     ⟦c • ω, isFormClosed_smul hω⟧ = c • ⟦ω, hω⟧
 
 /-- Subtraction of forms lifts to cohomology classes.
-    This is axiomatized because the SmoothForm subtraction may differ from the quotient subtraction. -/
+    This is axiomatized because it depends on the quotient structure and subtraction
+    on the axiomatized AddCommGroup. -/
 axiom ofForm_sub {k : ℕ} (ω η : SmoothForm n X k) (hω : IsFormClosed ω) (hη : IsFormClosed η) :
     ⟦ω - η, isFormClosed_sub hω hη⟧ = ⟦ω, hω⟧ - ⟦η, hη⟧
 
