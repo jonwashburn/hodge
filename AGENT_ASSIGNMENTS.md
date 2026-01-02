@@ -1,8 +1,8 @@
-# Agent Assignments: 32 Axioms → 8 Agents
+# Agent Assignments: 30 Axioms → 8 Agents
 
-**Mission:** Prove all 32 axioms in `hodge_conjecture'` proof chain.
+**Mission:** Prove all 30 axioms in `hodge_conjecture'` proof chain.
 
-**Progress:** 44 → 35 → 32 axioms
+**Progress:** 44 → 35 → 32 → 30 axioms
 
 **Success:** `#print axioms hodge_conjecture'` shows only `propext`, `Classical.choice`, `Quot.sound` (+ ~5 classical pillars)
 
@@ -22,31 +22,38 @@
 | Metric | Value |
 |--------|-------|
 | Build | ✅ Passes |
-| Axioms in proof chain | **32** |
-| Target | **~5** classical pillars |
+| Axioms in proof chain | **30** |
+| Target | **~6** classical pillars |
 
 ---
 
-## The 32 Axioms
+## The 30 Axioms
 
 ```
 calibration_defect_from_gluing     omega_pow_IsFormClosed
 conePositive_comass_bound          omega_pow_is_rational
-Current.mass_neg                   omega_pow_represents_multiple
-Current.mass_nonneg                pointwiseComass_nonneg
-Current.mass_zero                  RawSheetSum.toIntegralCurrent_toFun_eq_zero
-eval_le_flatNorm                   serre_gaga
-eval_le_mass                       shift_makes_conePositive_rat
-flatNorm_boundary_le               simpleCalibratedForm
-flatNorm_eq_zero_iff               smoothExtDeriv_add
-flat_limit_existence               smoothExtDeriv_smul
-harvey_lawson_fundamental_class    smoothExtDeriv_smul_real
-lefschetz_lift_signed_cycle        SmoothForm.instAddCommGroup
-mass_lsc                           SmoothForm.instModuleComplex
-ofForm_smul_real                   SmoothForm.instTopologicalSpace
-ofForm_sub                         SmoothForm.zero
-omegaPow_in_interior               wirtinger_comass_bound
+eval_le_mass                       omega_pow_represents_multiple
+flatNorm_boundary_le               omegaPow_in_interior
+flatNorm_eq_zero_iff               pointwiseComass_nonneg
+flat_limit_existence               pointwiseComass_zero
+harvey_lawson_fundamental_class    RawSheetSum.toIntegralCurrent_toFun_eq_zero
+isSmoothAlternating_add            serre_gaga
+isSmoothAlternating_neg            shift_makes_conePositive_rat
+isSmoothAlternating_smul           simpleCalibratedForm
+isSmoothAlternating_sub            smoothExtDeriv_add
+isSmoothAlternating_zero           smoothExtDeriv_smul
+lefschetz_lift_signed_cycle        smoothExtDeriv_smul_real
+mass_lsc                           SmoothForm.instTopologicalSpace
+ofForm_smul_real                   wirtinger_comass_bound
 ```
+
+### ✅ Recently Proved (Round 15)
+- `mass_nonneg` → theorem
+- `mass_zero` → theorem
+- `mass_neg` → theorem
+- `eval_le_flatNorm` → theorem
+- `ofForm_sub` → theorem
+- `SmoothForm.zero` → def
 
 ---
 
