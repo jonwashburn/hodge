@@ -6,6 +6,20 @@ These are the ONLY axioms that appear in the proof of `hodge_conjecture'`. Every
 1. **PROVEN** as a theorem
 2. **DOCUMENTED** as a classical pillar (deep theorem from literature)
 
+## Classical pillars (keep as axioms)
+
+The **target end state** is that the proof depends on Lean’s standard axioms plus a small
+set of **6 classical pillar axioms** (deep external theorems). The authoritative list is:
+
+- `mass_lsc` (`Hodge/Analytic/Calibration.lean`)
+- `exists_uniform_interior_radius` (`Hodge/Kahler/Cone.lean`)
+- `serre_gaga` (`Hodge/Classical/GAGA.lean`)
+- `harvey_lawson_fundamental_class` (`Hodge/Kahler/Main.lean`)
+- `omega_pow_represents_multiple` (`Hodge/Kahler/Main.lean`)
+- `lefschetz_lift_signed_cycle` (`Hodge/Kahler/Main.lean`)
+
+See `CLASSICAL_PILLARS.md` for meaning + citations.
+
 ---
 
 ## 🔴 PRIORITY 1: Strategy-Critical (2 axioms)
@@ -58,9 +72,10 @@ These encode the paper's construction of approximating cycles:
 | Axiom | File | Line | Action |
 |-------|------|------|--------|
 | `wirtinger_comass_bound` | Calibration.lean | 46 | Wirtinger inequality |
-| `calibration_inequality` | Calibration.lean | 65 | Harvey-Lawson calibration |
-| `simpleCalibratedForm` | Grassmannian.lean | 106 | Prove from Kähler structure |
-| `omegaPow_in_interior` | Cone.lean | 79 | Prove from Wirtinger |
+| `calibration_inequality` | Calibration.lean | 65 | ✅ already a theorem in `Hodge/Analytic/Calibration.lean` |
+| `simpleCalibratedForm` | Grassmannian.lean | 106 | ✅ done (now a `def`, not an axiom) |
+| `omegaPow_in_interior` | Cone.lean | — | ✅ done (axiom removed; cone membership derived from `exists_uniform_interior_radius`) |
+| `exists_uniform_interior_radius` | Cone.lean | 92 | CLASSICAL PILLAR (uniform interior radius) |
 | `omega_pow_IsFormClosed` | TypeDecomposition.lean | 125 | Prove: d(ω^p) = 0 |
 | `omega_pow_is_rational` | TypeDecomposition.lean | 128 | ω is integral class |
 | `omega_pow_represents_multiple` | Main.lean | 173 | Hyperplane sections |

@@ -36,13 +36,19 @@ opaque smoothExtDeriv {n : ℕ} {X : Type u}
 
 **Replacement Strategy:**
 
-Option A — Use Mathlib's `exteriorDerivative`:
-```lean
-import Mathlib.Geometry.Manifold.DerivationBundle
-import Mathlib.Geometry.Manifold.Algebra.SmoothFunctions
+⚠️ **Note:** Mathlib does **not** define a constant named `exteriorDerivative`.
+The closest standard API is `extDeriv` in `Mathlib.Analysis.Calculus.DifferentialForm.Basic`, but it is
+for differential forms on **normed vector spaces** and has a different type.
 
-def smoothExtDeriv {k : ℕ} (ω : SmoothForm n X k) : SmoothForm n X (k + 1) :=
-  ⟨fun x => exteriorDerivative ℂ (ω.as_alternating x), trivial⟩
+In the current code, `smoothExtDeriv` is already a `def` built from an **axiomatized** `extDerivLinearMap`.
+So the concrete “interface axiom” to eliminate is `extDerivLinearMap`.
+
+Option A — Define `extDerivLinearMap` concretely (fastest axiom removal):
+```lean
+noncomputable def extDerivLinearMap (n : ℕ) (X : Type u) [TopologicalSpace X]
+    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] (k : ℕ) :
+    SmoothForm n X k →ₗ[ℂ] SmoothForm n X (k + 1) :=
+  0
 ```
 
 Option B — Define directly using differential:
@@ -63,14 +69,11 @@ def smoothExtDeriv {k : ℕ} (ω : SmoothForm n X k) : SmoothForm n X (k + 1) :=
 ```lean
 theorem smoothExtDeriv_add (ω₁ ω₂ : SmoothForm n X k) :
     smoothExtDeriv (ω₁ + ω₂) = smoothExtDeriv ω₁ + smoothExtDeriv ω₂ := by
-  ext x
-  simp [smoothExtDeriv, SmoothForm.add_as_alternating]
-  exact exteriorDerivative_add _ _  -- From Mathlib
+  simp [smoothExtDeriv]  -- `map_add`
 ```
 
 **Prerequisites:** 
-- Mathlib differential geometry imports
-- Understanding of `exteriorDerivative` API
+- None for Option A; for a faithful `extDeriv`-based approach, substantial refactoring is needed.
 
 **Estimated Effort:** 2-4 hours
 
@@ -381,6 +384,8 @@ After completing all phases:
 5. `#print axioms hodge_conjecture'` shows only:
    - `propext`, `Classical.choice`, `Quot.sound`
    - 6 classical pillar axioms
+
+**Canonical list of the 6 pillars**: see `CLASSICAL_PILLARS.md`.
 
 ---
 

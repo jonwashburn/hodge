@@ -1,6 +1,8 @@
 # Hodge Conjecture Formalization in Lean 4
 
-This repository contains a **machine-checked Lean 4 proof** of the Hodge Conjecture (`hodge_conjecture'`), conditional on a set of 23 well-documented axioms corresponding to major theorems from the mathematical literature.
+This repository contains a **machine-checked Lean 4 proof term** of the Hodge Conjecture (`hodge_conjecture'`), conditional on an explicit set of project axioms (see `PROOF_CHAIN_AXIOMS.md`).
+
+The long-term refactoring target is that, after eliminating *interface axioms* coming from `opaque` APIs, the proof depends on Lean’s standard axioms plus **6 documented classical pillars** (see `CLASSICAL_PILLARS.md`).
 
 ## Mission Statement
 The goal of this project is to provide a **complete, machine-verifiable proof structure** for the Hodge Conjecture on projective complex manifolds. By using a calibration-theoretic approach (based on the work of Harvey-Lawson and others), we bridge the gap between analytic geometry (currents) and algebraic geometry (cycles).
@@ -17,44 +19,15 @@ theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : Is
 This theorem asserts that every rational (p,p)-class on a smooth projective complex manifold is represented by a signed algebraic cycle.
 
 ## Project Status
-- **Sorries**: 0 ✅
-- **Axioms**: 23 (All major published theorems) ✅
-- **Documentation**: All axioms have full citations in their docstrings. ✅
+- **Sorries**: run `grep -R "sorry\\|admit" Hodge/**/*.lean` to verify.
+- **Axioms**: see `PROOF_CHAIN_AXIOMS.md` (proof-chain list) and `CLASSICAL_PILLARS.md` (the 6 intended keep-as-axiom pillars).
+- **Documentation**: the classical pillars are cited in Lean docstrings and summarized in `CLASSICAL_PILLARS.md`.
 
 ## Axiom List & Citations
-The proof is conditional on the following 23 axioms, which are deep results that would require substantial Mathlib infrastructure to formalize from scratch.
+For the current, exact Lean dependency list, see:
 
-### Classical Algebraic & Complex Geometry
-- `serre_vanishing`: Serre (1955), Hartshorne (1977).
-- `serre_gaga`: Serre (1956), "Géométrie algébrique et géométrie analytique".
-- `hard_lefschetz_bijective`: Lefschetz (1924), Hodge (1941).
-- `tian_convergence`: Tian (1990), convergence of Bergman metrics.
-- `structureSheaf_exists`, `idealSheaf_exists`: Standard existence theorems for coherent sheaves.
-
-### Geometric Measure Theory (GMT)
-- `deformation_theorem`: Federer-Fleming (1960).
-- `federer_fleming_compactness`: Federer-Fleming (1960).
-- `harvey_lawson_theorem`: Harvey-Lawson (1982), structure of calibrated currents.
-- `flat_limit_of_cycles_is_cycle`: Harvey-Lawson (1982), Theorem 3.3.
-- `mass_lsc`: Lower semicontinuity of mass, Federer (1969).
-
-### Kähler Geometry & Cones
-- `wirtinger_pairing`: Wirtinger's inequality for Kähler manifolds.
-- `exists_uniform_interior_radius`: Lang (1999), uniform bound for the positive cone.
-- `caratheodory_decomposition`: Carathéodory's theorem on convex hulls.
-- `kahlerMetric_symm`: Symmetry of the metric induced by the Kähler form.
-- `microstructureSequence_are_cycles`: Core gluing property for microstructure currents.
-
-### Analytic Infrastructure
-- `comass_smul`: Homogeneity of the comass norm.
-- `energy_minimizer`: Existence of harmonic representatives (Hodge theory).
-- `trace_L2_control`: Sobolev embedding/trace inequality for forms.
-- `spine_theorem`: Harvey-Lawson (1982), calibration defect control.
-- `barany_grinberg`: Bárány-Grinberg rounding lemma (1981).
-
-### Bridge Axioms (Coherence)
-- `harvey_lawson_coherence`: Links Harvey-Lawson varieties to cohomology classes.
-- `exists_omega_pow_representative`: Algebraicity of rational multiples of the Kähler power.
+- `PROOF_CHAIN_AXIOMS.md` (full proof-chain axiom list + “prove vs keep” guidance)
+- `CLASSICAL_PILLARS.md` (the 6 intended keep-as-axiom pillars, with citations)
 
 ## Proof Structure Overview
 1. **Hard Lefschetz Reduction**: Reduce the problem to degree p ≤ n/2 using the Hard Lefschetz isomorphism.

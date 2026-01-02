@@ -94,17 +94,24 @@ def simpleCalibratedForm_raw (p : ℕ) (x : X) (V : Submodule ℂ (TangentSpace 
     (TangentSpace (𝓒_complex n) x) [⋀^Fin (2 * p)]→ₗ[ℂ] ℂ :=
   volume_form_of_submodule p x V hV
 
-/-- **Simple Calibrated Form Construction** (Structural Axiom).
+/-- **Simple Calibrated Form Construction**.
     The simple calibrated (p,p)-form supported at point x, associated to
     a complex p-plane V in the tangent space at x.
 
-    Since `SmoothForm` is opaque, we axiomatize this construction. The form
-    is characterized by being the Wirtinger form ω^p/p! restricted to V and
-    extended by zero orthogonally.
+    In this development, `SmoothForm` packages pointwise alternating forms with
+    a trivial smoothness predicate (`IsSmoothAlternating = True`). We therefore
+    define the form by taking `simpleCalibratedForm_raw` at `x` and `0` away from `x`.
 
     Reference: [Harvey-Lawson, "Calibrated geometries", 1982, Section 2]. -/
-axiom simpleCalibratedForm (p : ℕ) (x : X) (V : Submodule ℂ (TangentSpace (𝓒_complex n) x))
-    (hV : Module.finrank ℂ V = p) : SmoothForm n X (2 * p)
+def simpleCalibratedForm (p : ℕ) (x : X) (V : Submodule ℂ (TangentSpace (𝓒_complex n) x))
+    (hV : Module.finrank ℂ V = p) : SmoothForm n X (2 * p) :=
+  ⟨fun y => by
+      classical
+      by_cases h : y = x
+      · cases h
+        exact simpleCalibratedForm_raw (n := n) (X := X) p x V hV
+      · exact 0,
+    trivial⟩
 
 /-- The set of all simple calibrated (p,p)-forms at a point x. -/
 def simpleCalibratedForms (p : ℕ) (x : X) : Set (SmoothForm n X (2 * p)) :=
@@ -118,13 +125,11 @@ def simpleCalibratedForms (p : ℕ) (x : X) : Set (SmoothForm n X (2 * p)) :=
 def calibratedCone (p : ℕ) (x : X) : Set (SmoothForm n X (2 * p)) :=
   closure ((PointedCone.span ℝ (simpleCalibratedForms (n := n) p x)) : Set (SmoothForm n X (2 * p)))
 
-omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 /-- The calibrated cone is closed. -/
 theorem calibratedCone_is_closed (p : ℕ) (x : X) :
     IsClosed (calibratedCone (n := n) p x) :=
   isClosed_closure
 
-omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 /-- **Calibrated Cone is Pointed** (standard result in convex analysis).
     The calibrated cone contains 0. This follows from the definition of a pointed
     cone as a submodule over non-negative scalars.

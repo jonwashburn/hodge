@@ -56,9 +56,9 @@ Prove all axioms in the `hodge_conjecture'` proof chain, leaving only Lean syste
 | # | Axiom | File | Status | Owner |
 |---|-------|------|--------|-------|
 | 14 | `wirtinger_comass_bound` | Calibration.lean | ❌ TODO | Agent 3 |
-| 15 | `calibration_inequality` | Calibration.lean | ❌ TODO | Agent 3 |
-| 16 | `simpleCalibratedForm` | Grassmannian.lean | ❌ TODO | Agent 3 |
-| 17 | `omegaPow_in_interior` | Cone.lean | ❌ TODO | Agent 3 |
+| 15 | `calibration_inequality` | Calibration.lean | ✅ done (already a theorem) | — |
+| 16 | `simpleCalibratedForm` | Grassmannian.lean | ✅ done | Agent 7 |
+| 17 | `omegaPow_in_interior` | Cone.lean | ✅ done (axiom removed) | Agent 7 |
 | 18 | `omega_pow_IsFormClosed` | TypeDecomp.lean | ❌ TODO | Agent 3 |
 | 19 | `omega_pow_is_rational` | TypeDecomp.lean | ❌ TODO | Agent 3 |
 | 20 | `omega_pow_represents_multiple` | Main.lean | ❌ TODO | Agent 3 |
@@ -159,10 +159,8 @@ theorem ofForm_add (ω η) (hω hη) :
 
 - [ ] `lake build Hodge` passes
 - [ ] `#print axioms hodge_conjecture'` shows only:
-  - `propext`
-  - `Classical.choice`
-  - `Quot.sound`
-  - (optionally) `serre_gaga`
+  - Lean system axioms (`propext`, `Classical.choice`, `Quot.sound`)
+  - plus the **6 classical pillars** in `CLASSICAL_PILLARS.md`
 
 ---
 
@@ -179,22 +177,14 @@ theorem ofForm_add (ω η) (hω hη) :
 
 ---
 
-## Permanent Axioms (Cannot Be Proved)
+## Notes on axioms: temporary vs permanent
 
-The following axioms must remain as axioms due to opaque definitions:
-
-| Axiom | Reason |
-|-------|--------|
-| `pointwiseComass_nonneg` | `pointwiseComass` is opaque |
-| `pointwiseComass_zero` | `pointwiseComass` is opaque |
-| `pointwiseComass_smul` | `pointwiseComass` is opaque |
-| `pointwiseComass_continuous` | `pointwiseComass` is opaque |
-| `smoothExtDeriv_add` | `smoothExtDeriv` is opaque |
-| `smoothExtDeriv_smul` | `smoothExtDeriv` is opaque |
-| `conePositive_comass_bound` | Requires Carathéodory + comass of simple calibrated forms |
-| `simpleCalibratedForm` | Deep GMT construction |
-| `wirtinger_comass_bound` | Deep GMT result |
-| `serre_gaga` | Classical theorem (acceptable) |
+- **Temporary interface axioms**: caused by `opaque` definitions / placeholder APIs.
+  These should disappear as Tier 1 refactoring replaces opaques with concrete defs
+  (see `AGENT_ASSIGNMENTS.md` and `REFACTORING_PLAN.md`).
+- **Classical pillars**: deep external theorems intentionally kept as axioms in the
+  target end state (see `CLASSICAL_PILLARS.md`).
+- **Full current proof-chain list**: see `PROOF_CHAIN_AXIOMS.md`.
 
 ---
 

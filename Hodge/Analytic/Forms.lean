@@ -54,10 +54,6 @@ variable {n : ℕ} {X : Type*}
     The wedge product ω ∧ η of a k-form and an l-form is a (k+l)-form.
     It is bilinear, associative, and graded commutative: α ∧ β = (-1)^{kl} β ∧ α.
 
-    This is opaque because:
-    1. SmoothForm is opaque
-    2. The pointwise exterior product on fibers cannot be extracted
-
     Reference: [É. Cartan, "Leçons sur les invariants intégraux", 1922]. -/
 opaque smoothWedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) :
     SmoothForm n X (k + l)
