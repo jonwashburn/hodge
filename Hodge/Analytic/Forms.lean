@@ -214,9 +214,17 @@ theorem isFormClosed_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm 
 
 axiom smoothExtDeriv_extDeriv {k : ℕ} (ω : SmoothForm n X k) : smoothExtDeriv (smoothExtDeriv ω) = 0
 
--- Additional axioms for smoothExtDeriv linearity and continuity
-axiom smoothExtDeriv_add {k : ℕ} (ω₁ ω₂ : SmoothForm n X k) : smoothExtDeriv (ω₁ + ω₂) = smoothExtDeriv ω₁ + smoothExtDeriv ω₂
-axiom smoothExtDeriv_smul_real {k : ℕ} (r : ℝ) (ω : SmoothForm n X k) : smoothExtDeriv (r • ω) = r • smoothExtDeriv ω
+-- smoothExtDeriv linearity follows from extDerivLinearMap being a linear map
+theorem smoothExtDeriv_add {k : ℕ} (ω₁ ω₂ : SmoothForm n X k) : smoothExtDeriv (ω₁ + ω₂) = smoothExtDeriv ω₁ + smoothExtDeriv ω₂ :=
+  map_add _ ω₁ ω₂
+
+theorem smoothExtDeriv_smul {k : ℕ} (c : ℂ) (ω : SmoothForm n X k) : smoothExtDeriv (c • ω) = c • smoothExtDeriv ω :=
+  map_smul _ c ω
+
+theorem smoothExtDeriv_smul_real {k : ℕ} (r : ℝ) (ω : SmoothForm n X k) : smoothExtDeriv (r • ω) = r • smoothExtDeriv ω := by
+  have h : smoothExtDeriv ((r : ℂ) • ω) = (r : ℂ) • smoothExtDeriv ω := smoothExtDeriv_smul (r : ℂ) ω
+  simp only [Complex.real_smul] at h ⊢
+  exact h
 axiom smoothExtDeriv_continuous {k : ℕ} : Continuous (smoothExtDeriv (n := n) (X := X) (k := k))
 
 -- smoothExtDeriv_wedge (Leibniz rule for wedge) was removed as unused
