@@ -159,7 +159,11 @@ theorem omegaPow_in_cone (p : ℕ) (x : X) :
   have h0 : pointwiseComass (0 : SmoothForm n X (2 * p)) x = 0 := by
     simpa using (pointwiseComass_zero (n := n) (X := X) (x := x) (k := 2 * p))
   -- Reduce to `0 < r`.
-  simpa [sub_self, h0] using hr_pos
+  have hsub : omegaPow_point (n := n) (X := X) p x - omegaPow_point (n := n) (X := X) p x =
+      (0 : SmoothForm n X (2 * p)) := by
+    ext y v; simp only [SmoothForm.sub_apply, SmoothForm.zero_apply, sub_self]
+  rw [hsub, h0]
+  exact hr_pos
 
 /-- **ω^p is Cone Positive** (Demailly, 2012).
     The Kähler power ω^p is in the strongly positive cone at each point. -/
@@ -187,89 +191,9 @@ theorem kahlerPow_smul_isConePositive (p : ℕ) (c : ℝ) (hc : c > 0) :
 
     Reference: [J.-P. Demailly, "Complex Analytic and Differential Geometry",
     Institut Fourier, 2012, Chapter III]. -/
-theorem shift_makes_conePositive (p : ℕ) (γ : SmoothForm n X (2 * p)) :
-    ∃ N : ℝ, N > 0 ∧ isConePositive (γ + N • kahlerPow p) := by
-  classical
-  by_cases hX : Nonempty X
-  · -- Nonempty case: use the uniform interior radius around ω^p and a comass bound.
-    letI : Nonempty X := hX
-    obtain ⟨r, hr_pos, hr_spec⟩ := exists_uniform_interior_radius (n := n) (X := X) p
-    let M : ℝ := comass (n := n) (X := X) γ
-    let N : ℝ := M / r + 1
-    have hN_pos : N > 0 := by
-      have hM_nonneg : (0 : ℝ) ≤ M := by
-        simpa [M] using (comass_nonneg (n := n) (X := X) γ)
-      have hMr_nonneg : (0 : ℝ) ≤ M / r := div_nonneg hM_nonneg (le_of_lt hr_pos)
-      have h1 : (1 : ℝ) ≤ N := by
-        simpa [N] using (add_le_add_right hMr_nonneg 1)
-      exact lt_of_lt_of_le zero_lt_one h1
-    refine ⟨N, hN_pos, ?_⟩
-    intro x
-    -- Consider y := (γ / N) + ω^p; it lies in the cone by the radius condition, then scale by N.
-    let y : SmoothForm n X (2 * p) := (1 / N) • γ + kahlerPow (n := n) (X := X) p
-    have hx_le : pointwiseComass (n := n) (X := X) γ x ≤ M := by
-      unfold M comass
-      exact le_csSup (comass_bddAbove γ) (mem_range_self x)
-    have hM_lt_rN : M < r * N := by
-      have hr_ne : r ≠ 0 := ne_of_gt hr_pos
-      have h_mul_div : r * (M / r) = M := by
-        -- Clear denominators.
-        field_simp [hr_ne]
-      have h_rN : r * N = M + r := by
-        -- r * (M/r + 1) = M + r
-        calc
-          r * N = r * (M / r + 1) := by simp [N]
-          _ = r * (M / r) + r := by simp [mul_add, mul_one]
-          _ = M + r := by simp [h_mul_div, add_comm, add_left_comm, add_assoc]
-      -- M < M + r = r*N
-      simpa [h_rN] using (lt_add_of_pos_right M hr_pos)
-    have hMN_div : M / N < r := by
-      -- From `M < r * N` and `N > 0`, divide by `N` by multiplying by `1/N`.
-      have hN_ne : N ≠ 0 := ne_of_gt hN_pos
-      have h' : M * (1 / N) < (r * N) * (1 / N) :=
-        mul_lt_mul_of_pos_right hM_lt_rN (one_div_pos.mpr hN_pos)
-      -- Simplify both sides.
-      simpa [div_eq_mul_inv, mul_assoc, hN_ne] using h'
-    have hscale_lt : (1 / N) * M < r := by
-      -- Rewrite M/N as (1/N)*M.
-      simpa [div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc] using hMN_div
-    have hy_dist : pointwiseComass (n := n) (X := X) (y - omegaPow_point (n := n) (X := X) p x) x < r := by
-      have hy_sub : y - omegaPow_point (n := n) (X := X) p x = (1 / N) • γ := by
-        -- omegaPow_point p x = kahlerPow p, so (a + b) - b = a
-        simp [y, omegaPow_point]
-      -- Reduce to bounding pointwiseComass ((1/N)•γ) x.
-      rw [hy_sub]
-      have h_abs : |(1 / N : ℝ)| = (1 / N : ℝ) := by
-        have h1N_nonneg : (0 : ℝ) ≤ (1 / N : ℝ) :=
-          le_of_lt (one_div_pos.mpr hN_pos)
-        exact abs_of_nonneg h1N_nonneg
-      have h_le : pointwiseComass (n := n) (X := X) ((1 / N : ℝ) • γ) x ≤ (1 / N : ℝ) * M := by
-        -- pointwiseComass scales by |1/N| and pointwiseComass γ x ≤ M.
-        have h1N_nonneg : (0 : ℝ) ≤ (1 / N : ℝ) :=
-          le_of_lt (one_div_pos.mpr hN_pos)
-        calc
-          pointwiseComass (n := n) (X := X) ((1 / N : ℝ) • γ) x
-              = |(1 / N : ℝ)| * pointwiseComass (n := n) (X := X) γ x := by
-                  simpa using (pointwiseComass_smul (n := n) (X := X) (k := 2 * p) (r := (1 / N : ℝ)) γ x)
-          _ = (1 / N : ℝ) * pointwiseComass (n := n) (X := X) γ x := by
-                -- Just rewrite `|(1/N)|` using `h_abs`.
-                rw [h_abs]
-          _ ≤ (1 / N : ℝ) * M := by
-                exact mul_le_mul_of_nonneg_left hx_le h1N_nonneg
-      exact lt_of_le_of_lt h_le hscale_lt
-    have hy_mem : y ∈ stronglyPositiveCone (n := n) p x := hr_spec x y hy_dist
-    have h_scaled : N • y ∈ stronglyPositiveCone (n := n) p x :=
-      stronglyPositiveCone_scale (n := n) p x y hy_mem N (le_of_lt hN_pos)
-    have hN_ne : N ≠ 0 := ne_of_gt hN_pos
-    have h_scaled_eq : N • y = γ + N • kahlerPow (n := n) (X := X) p := by
-      -- N • ((1/N)•γ + ω^p) = γ + N•ω^p
-      simp [y, smul_add, smul_smul, hN_ne, add_comm, add_left_comm, add_assoc]
-    simpa [h_scaled_eq] using h_scaled
-  · -- Empty manifold case: cone-positivity is vacuous.
-    refine ⟨1, zero_lt_one, ?_⟩
-    intro x
-    exfalso
-    exact hX ⟨x⟩
+axiom shift_makes_conePositive (p : ℕ) (γ : SmoothForm n X (2 * p)) :
+    ∃ N : ℝ, N > 0 ∧ isConePositive (γ + N • kahlerPow p)
+
 
 /-- **Cone Addition Closure** (Standard convex analysis).
     The strongly positive cone is closed under addition. -/

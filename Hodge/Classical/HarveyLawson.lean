@@ -4,7 +4,7 @@ import Mathlib.Analysis.Complex.Basic
 
 noncomputable section
 
-open Classical TopologicalSpace
+open Classical TopologicalSpace Hodge
 
 set_option autoImplicit false
 

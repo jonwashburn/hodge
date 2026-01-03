@@ -5,7 +5,7 @@ import Mathlib.Order.Filter.Basic
 
 noncomputable section
 
-open Classical Filter
+open Classical Filter Hodge
 
 set_option autoImplicit false
 

@@ -10,7 +10,7 @@ This file provides calibrating forms and their properties for Kähler manifolds.
 -/
 
 noncomputable section
-open Classical Filter Topology
+open Classical Filter Topology Hodge
 
 set_option autoImplicit false
 
@@ -158,7 +158,7 @@ theorem eval_tendsto_of_flatNorm_tendsto {k : ℕ} (T : ℕ → Current n X k) (
     have h_bound := eval_diff_le_flatNorm_diff (T n) T_limit ψ
     -- Since C = max ... = 0, we have max ... = 0
     have hmax : max (comass ψ) (comass (smoothExtDeriv ψ)) = 0 := hC
-    rw [hmax, mul_zero] at h_bound
+    rw [hmax, MulZeroClass.mul_zero] at h_bound
     linarith [abs_nonneg ((T n).toFun ψ - T_limit.toFun ψ)]
   · -- If C > 0, use it as denominator
     have hC_pos : C > 0 := by

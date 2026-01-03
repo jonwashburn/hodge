@@ -214,6 +214,12 @@ theorem comass_add_le {n : ℕ} {X : Type*}
           · apply le_csSup (comass_bddAbove β)
             exact mem_range_self x
 
+/-- Comass scales with absolute value of scalar: comass(c • ω) = |c| * comass(ω). -/
+axiom comass_smul {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [CompactSpace X] [Nonempty X]
+    {k : ℕ} (c : ℝ) (ω : SmoothForm n X k) : comass (c • ω) = |c| * comass ω
+
 /-- Instance: NormedAddCommGroup on Smooth Forms (Axiom).
     **Blocker**: NormedAddCommGroup.ofCore API changed in Mathlib 4. -/
 axiom instNormedAddCommGroupSmoothForm {n : ℕ} {X : Type*}

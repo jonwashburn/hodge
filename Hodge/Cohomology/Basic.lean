@@ -83,6 +83,10 @@ attribute [instance] instModuleComplexDeRhamCohomologyClass
 axiom instSMulRationalDeRhamCohomologyClass (k : ℕ) : SMul ℚ (DeRhamCohomologyClass n X k)
 attribute [instance] instSMulRationalDeRhamCohomologyClass
 
+/-- Compatibility: rational scalar multiplication equals real scalar multiplication. -/
+axiom smul_rat_eq_smul_real {k : ℕ} (q : ℚ) (η : DeRhamCohomologyClass n X k) :
+    q • η = (q : ℝ) • η
+
 axiom instHMulDeRhamCohomologyClass (k l : ℕ) : HMul (DeRhamCohomologyClass n X k) (DeRhamCohomologyClass n X l) (DeRhamCohomologyClass n X (k + l))
 attribute [instance] instHMulDeRhamCohomologyClass
 

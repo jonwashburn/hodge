@@ -1,5 +1,6 @@
 import Hodge.Analytic.Currents
 import Hodge.Analytic.Norms
+import Hodge.Cohomology.Basic
 import Mathlib.Order.ConditionallyCompleteLattice.Basic
 
 /-!
@@ -27,12 +28,14 @@ The flat norm is the natural metric for the space of integral currents.
 
 noncomputable section
 
-open Classical Set
+open Classical Set Hodge
+
+set_option autoImplicit false
 
 variable {n : ℕ} {X : Type*}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X]
-  [ProjectiveComplexManifold n X] [KahlerManifold n X]
+  [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
   [Nonempty X] [CompactSpace X]
 
 /-! ## Auxiliary Lemmas -/
@@ -357,13 +360,13 @@ theorem Current.one_smul {k : ℕ} (T : Current n X k) : (1 : ℝ) • T = T := 
 theorem Current.zero_smul {k : ℕ} (T : Current n X k) : (0 : ℝ) • T = 0 := by
   ext ω
   show (0 : ℝ) * T.toFun ω = (0 : Current n X k).toFun ω
-  simp only [zero_mul]
+  simp only [MulZeroClass.zero_mul]
   rfl
 
 theorem flatNorm_smul {k : ℕ} (c : ℝ) (T : Current n X k) :
     flatNorm (c • T) = |c| * flatNorm T := by
   by_cases hc : c = 0
-  · simp only [hc, abs_zero, zero_mul, Current.zero_smul, flatNorm_zero]
+  · simp only [hc, abs_zero, MulZeroClass.zero_mul, Current.zero_smul, flatNorm_zero]
   · -- Case c ≠ 0, so |c| > 0
     have hc_abs_pos : |c| > 0 := abs_pos.mpr hc
     have hc_abs_ne : |c| ≠ 0 := abs_ne_zero.mpr hc
@@ -421,10 +424,10 @@ theorem eval_le_mass {k : ℕ} (T : Current n X k) (ψ : SmoothForm n X k) :
   · -- Case: comass ψ = 0
     obtain ⟨M, hM⟩ := T.is_bounded
     have h_bound : |T.toFun ψ| ≤ M * comass ψ := hM ψ
-    rw [h_zero, mul_zero] at h_bound
+    rw [h_zero, MulZeroClass.mul_zero] at h_bound
     have h_nonneg : |T.toFun ψ| ≥ 0 := abs_nonneg _
     have h_eq_zero : |T.toFun ψ| = 0 := le_antisymm h_bound h_nonneg
-    rw [h_eq_zero, h_zero, mul_zero]
+    rw [h_eq_zero, h_zero, MulZeroClass.mul_zero]
   · -- Case: comass ψ > 0
     have h_pos : comass ψ > 0 := lt_of_le_of_ne (comass_nonneg ψ) (Ne.symm h_zero)
     let c : ℝ := (comass ψ)⁻¹
@@ -524,7 +527,7 @@ theorem flatNorm_eq_zero_iff {k : ℕ} (T : Current n X k) : flatNorm T = 0 ↔ 
   · intro h_norm_zero
     ext ψ
     have h_bound := eval_le_flatNorm T ψ
-    rw [h_norm_zero, zero_mul] at h_bound
+    rw [h_norm_zero, MulZeroClass.zero_mul] at h_bound
     have h_nonneg : |T.toFun ψ| ≥ 0 := abs_nonneg _
     have h_eq_zero : |T.toFun ψ| = 0 := le_antisymm h_bound h_nonneg
     exact abs_eq_zero.mp h_eq_zero

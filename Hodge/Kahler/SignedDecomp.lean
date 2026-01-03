@@ -14,7 +14,7 @@ This file proves the signed decomposition theorem for rational Hodge classes.
 
 noncomputable section
 
-open Classical Set Filter
+open Classical Set Filter Hodge
 
 variable {n : ℕ} {X : Type*}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
@@ -44,7 +44,7 @@ theorem form_is_bounded {k : ℕ} (α : SmoothForm n X k) :
 
 /-- ω^p is a rational class. -/
 theorem omega_pow_is_rational_SD (p : ℕ) : isRationalClass ⟦kahlerPow (n := n) (X := X) p, omega_pow_IsFormClosed (n := n) (X := X) p⟧ :=
-  omega_pow_is_rational p
+  omega_pow_is_rational_TD p
 
 /-! ## Signed Decomposition -/
 
@@ -104,7 +104,7 @@ def signed_decomposition {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : IsF
 
   -- Step 5: Prove rationality
   let h_omega_rat : isRationalClass ⟦kahlerPow (n := n) (X := X) p, h_omega_closed⟧ :=
-    omega_pow_is_rational p
+    omega_pow_is_rational_TD p
 
   -- For γ⁻ = N·ω^p with N : ℚ, use rational scalar multiplication on a rational class
   let h_minus_rat : isRationalClass ⟦γminus, h_gamma_minus_closed⟧ :=
@@ -135,7 +135,9 @@ def signed_decomposition {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : IsF
       show γ = γplus - γminus
       simp only [γplus, γminus]
       -- Use: (γ + a) - a = γ
-      exact (add_sub_cancel_right γ ((N : ℝ) • kahlerPow p)).symm
+      ext x v
+      simp only [SmoothForm.sub_apply, SmoothForm.add_apply, SmoothForm.smul_apply]
+      simp only [add_sub_cancel_right]
     h_plus_cone := h_cone_plus
     h_minus_cone := h_minus_cone
     h_plus_rat := h_plus_rat

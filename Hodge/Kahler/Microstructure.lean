@@ -19,7 +19,7 @@ import Hodge.Analytic.Calibration
 
 noncomputable section
 
-open Classical BigOperators Filter Topology
+open Classical BigOperators Filter Topology Hodge
 
 set_option autoImplicit false
 

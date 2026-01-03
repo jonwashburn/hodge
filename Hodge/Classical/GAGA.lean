@@ -5,7 +5,7 @@ import Hodge.Classical.Lefschetz
 
 noncomputable section
 
-open Classical
+open Classical Hodge
 
 set_option autoImplicit false
 
@@ -229,7 +229,7 @@ theorem FundamentalClassSet_empty (p : ℕ) :
 theorem FundamentalClassSet_is_p_p (p : ℕ) (Z : Set X) (_h : isAlgebraicSubvariety n X Z) :
     isPPForm' n X p (FundamentalClassSet n X p Z) := by
   unfold FundamentalClassSet
-  exact isPPForm_zero p
+  exact isPPForm_zero (p := p)
 
 /-- **Additivity of Fundamental Classes**.
     **Proof**: 0 + 0 = 0, so additivity holds trivially for the zero form. -/
@@ -242,13 +242,13 @@ theorem FundamentalClassSet_additive (p : ℕ) (Z₁ Z₂ : Set X) (_h_disjoint 
 /-- **Rationality of Fundamental Classes**.
     **Proof**: The zero class is rational (by isRationalClass_zero). -/
 theorem FundamentalClassSet_rational (p : ℕ) (Z : Set X) (h : isAlgebraicSubvariety n X Z) :
-    isRationalClass (DeRhamCohomologyClass.ofForm (FundamentalClassSet n X p Z)
+    isRationalClass (ofForm (FundamentalClassSet n X p Z)
       (FundamentalClassSet_isClosed p Z h)) := by
   unfold FundamentalClassSet
   -- The zero form represents the zero cohomology class, which is rational
-  have h_zero : DeRhamCohomologyClass.ofForm (0 : SmoothForm n X (2 * p)) isFormClosed_zero =
+  have h_zero : ofForm (0 : SmoothForm n X (2 * p)) isFormClosed_zero =
                 (0 : DeRhamCohomologyClass n X (2 * p)) := by
-    unfold DeRhamCohomologyClass.ofForm
+    unfold ofForm
     rfl
   rw [h_zero]
   exact isRationalClass_zero

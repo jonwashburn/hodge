@@ -11,7 +11,7 @@ Since Current operations are opaque, most properties are axiomatized.
 
 noncomputable section
 
-open Classical MeasureTheory
+open Classical MeasureTheory Hodge
 
 set_option autoImplicit false
 
