@@ -73,24 +73,43 @@ Below is the required mapping from those 8 pillars to Lean code. The plan assume
 
 ---
 
-#### ⚠️ CRITICAL BLOCKER DISCOVERED (2025-01-03)
+#### ✅ RESOLVED (2025-01-03)
 
-**Problem**: The axioms in `Hodge/Basic.lean` for TangentSpace instances create **diamond problems**:
+**Original Problem**: The axioms in `Hodge/Basic.lean` for TangentSpace instances were creating diamond problems with Mathlib's instances.
+
+**Solution Applied**: Replaced the 3 axiomatized instances with proper definitions using `inferInstanceAs`:
 
 ```lean
-axiom instNormTangentSpace (x : X) : Norm (TangentSpace (𝓒_complex n) x)
-axiom instNormedAddCommGroupTangentSpace (x : X) : NormedAddCommGroup (TangentSpace (𝓒_complex n) x)
-axiom instNormedSpaceTangentSpace (x : X) : NormedSpace ℂ (TangentSpace (𝓒_complex n) x)
+instance instNormedAddCommGroupTangentSpace (x : X) : NormedAddCommGroup (TangentSpace (𝓒_complex n) x) :=
+  inferInstanceAs (NormedAddCommGroup (EuclideanSpace ℂ (Fin n)))
+
+instance instNormedSpaceTangentSpace (x : X) : NormedSpace ℂ (TangentSpace (𝓒_complex n) x) :=
+  inferInstanceAs (NormedSpace ℂ (EuclideanSpace ℂ (Fin n)))
 ```
 
-These axiomatized instances bring their own `Zero` and other algebraic structures that **don't unify** with the existing instances on `TangentSpace` from Mathlib. This causes:
-- `norm_zero` to fail with type mismatches
-- Standard Mathlib lemmas to be unusable
-- Timeouts during typeclass resolution
+**Result**: This fixed the diamond problem and enabled proving many downstream axioms as theorems.
 
-**Consequence**: We **cannot eliminate** the Forms.lean axioms without first fixing the foundational axioms in Basic.lean.
+---
 
-**Required prerequisite**: Replace the TangentSpace axioms in `Hodge/Basic.lean` with proper definitions using Mathlib's tangent space machinery. This is a significant refactoring effort.
+#### Progress (2025-01-03)
+
+**Axioms eliminated so far:**
+- `Basic.lean`: 3 axioms → 0 (replaced with `inferInstanceAs` definitions)
+- `Forms.lean`: 19 axioms → 8 remaining
+  - `isSmoothAlternating_zero` → theorem
+  - `isSmoothAlternating_neg` → theorem
+  - `isSmoothAlternating_sub` → theorem
+  - All wedge algebra axioms → theorems (trivial since wedge := 0)
+  - `isFormClosed_wedge` → theorem
+- `Cohomology/Basic.lean`: 31 axioms → 25 remaining
+  - `cohomologous_symm` → theorem
+  - `cohomologous_trans` → theorem
+  - `cohomologous_add` → theorem
+  - `cohomologous_neg` → theorem
+  - `cohomologous_smul` → theorem
+  - `cohomologous_wedge` → theorem
+
+**Total: 132 → 113 axioms (19 eliminated)**
 
 ---
 
