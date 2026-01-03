@@ -129,7 +129,11 @@ instance instNormedSpaceTangentSpace (x : X) : NormedSpace ℂ (TangentSpace (�
 | Classical/Bergman.lean | 3 |
 | Other files | 12 |
 
-**Total: 132 → 70 axioms (62 eliminated, 47% reduction)**
+**Total: 132 → 69 axioms (63 eliminated, 48% reduction)**
+
+**Latest (session 2):**
+- `Norms.lean`: `pointwiseComass_set_nonempty` → theorem (zero vector witness)
+- `Norms.lean`: `comass_nonneg` → theorem (Real.sSup_nonneg + pointwiseComass_nonneg)
 
 ---
 
@@ -144,10 +148,10 @@ instance instNormedSpaceTangentSpace (x : X) : NormedSpace ℂ (TangentSpace (�
 
 | File | Axioms | Notes |
 |------|--------|-------|
-| Analytic/Norms.lean | 10 | Norm infrastructure |
+| Analytic/Norms.lean | 8 | Norm infrastructure |
 | Analytic/Forms.lean | 8 | Form axioms, some provable |
 | Kahler/Microstructure.lean | 6 | New proof infrastructure |
-| Analytic/Currents.lean | 6 | Current axioms |
+| Analytic/Currents.lean | 7 | Current axioms (map_zero' added) |
 | Kahler/Manifolds.lean | 5 | Kähler operators |
 | Kahler/TypeDecomposition.lean | 4 | kahlerPow axioms |
 | Analytic/SheafTheory.lean | 4 | Sheaf infrastructure |
@@ -164,7 +168,7 @@ instance instNormedSpaceTangentSpace (x : X) : NormedSpace ℂ (TangentSpace (�
 | Classical/SerreVanishing.lean | 1 | Serre vanishing |
 | Analytic/IntegralCurrents.lean | 1 | Polyhedral boundary |
 | Utils/BaranyGrinberg.lean | 1 | Combinatorics (not imported) |
-| **TOTAL** | **70** |
+| **TOTAL** | **69** |
 
 ---
 
