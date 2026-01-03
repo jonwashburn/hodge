@@ -83,11 +83,53 @@ instance (k : ℕ) : Zero (DeRhamCohomologyClass n X k) := ⟨⟦0, isFormClosed
 
 /-! ### Well-definedness axioms -/
 
-axiom cohomologous_add {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    (ω₁ ω₁' ω₂ ω₂' : ClosedForm n X k) (h1 : ω₁ ≈ ω₁') (h2 : ω₂ ≈ ω₂') : (ω₁ + ω₂) ≈ (ω₁' + ω₂')
+theorem cohomologous_add {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    (ω₁ ω₁' ω₂ ω₂' : ClosedForm n X k) (h1 : ω₁ ≈ ω₁') (h2 : ω₂ ≈ ω₂') : (ω₁ + ω₂) ≈ (ω₁' + ω₂') := by
+  -- Unfold the Setoid relation to Cohomologous
+  show Cohomologous (ω₁ + ω₂) (ω₁' + ω₂')
+  unfold Cohomologous
+  have h1' : Cohomologous ω₁ ω₁' := h1
+  have h2' : Cohomologous ω₂ ω₂' := h2
+  unfold Cohomologous at h1' h2'
+  -- (ω₁ + ω₂).val - (ω₁' + ω₂').val = (ω₁.val - ω₁'.val) + (ω₂.val - ω₂'.val)
+  have hval_add : ∀ (f g : ClosedForm n X k), (f + g).val = f.val + g.val := fun _ _ => rfl
+  have heq : (ω₁ + ω₂).val - (ω₁' + ω₂').val = (ω₁.val - ω₁'.val) + (ω₂.val - ω₂'.val) := by
+    simp only [hval_add]
+    ext x v
+    simp only [SmoothForm.add_apply, SmoothForm.sub_apply, AlternatingMap.add_apply, AlternatingMap.sub_apply]
+    abel
+  rw [heq]
+  unfold IsExact at *
+  cases k with
+  | zero => simp [h1', h2']
+  | succ k' =>
+    obtain ⟨α, hα⟩ := h1'
+    obtain ⟨β, hβ⟩ := h2'
+    use α + β
+    rw [smoothExtDeriv_add, hα, hβ]
 
-axiom cohomologous_neg {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    (ω ω' : ClosedForm n X k) (h : ω ≈ ω') : (-ω) ≈ (-ω')
+theorem cohomologous_neg {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    (ω ω' : ClosedForm n X k) (h : ω ≈ ω') : (-ω) ≈ (-ω') := by
+  show Cohomologous (-ω) (-ω')
+  unfold Cohomologous
+  have h' : Cohomologous ω ω' := h
+  unfold Cohomologous at h'
+  -- (-ω).val - (-ω').val = -ω.val - (-ω'.val) = -ω.val + ω'.val = -(ω.val - ω'.val)
+  have hval_neg : ∀ (f : ClosedForm n X k), (-f).val = -f.val := fun _ => rfl
+  have heq : (-ω).val - (-ω').val = -(ω.val - ω'.val) := by
+    simp only [hval_neg]
+    ext x v
+    simp only [SmoothForm.sub_apply, SmoothForm.neg_apply, AlternatingMap.sub_apply, AlternatingMap.neg_apply]
+    -- Goal: -a - (-b) = b - a   =>   -a + b = b - a, which is true
+    abel
+  rw [heq]
+  unfold IsExact at *
+  cases k with
+  | zero => simp [h']
+  | succ k' =>
+    obtain ⟨β, hβ⟩ := h'
+    use -β
+    rw [smoothExtDeriv_neg, hβ]
 
 axiom cohomologous_smul {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     (c : ℂ) (ω ω' : ClosedForm n X k) (h : ω ≈ ω') :
