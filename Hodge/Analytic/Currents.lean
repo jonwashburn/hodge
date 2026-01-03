@@ -160,7 +160,12 @@ theorem mass_zero : mass (0 : Current n X k) = 0 := by
   rw [h_set]; exact csSup_singleton 0
 
 /-- **Mass is symmetric under negation**. -/
-axiom mass_neg (T : Current n X k) : mass (-T) = mass T
+theorem mass_neg (T : Current n X k) : mass (-T) = mass T := by
+  unfold mass
+  have h_eq : ∀ ω, |(-T).toFun ω| = |T.toFun ω| := fun ω => by
+    show |(-T.toFun ω)| = |T.toFun ω|
+    exact abs_neg _
+  simp_rw [h_eq]
 
 /-- Mass satisfies the triangle inequality. -/
 axiom mass_add_le (S T : Current n X k) : mass (S + T) ≤ mass S + mass T
