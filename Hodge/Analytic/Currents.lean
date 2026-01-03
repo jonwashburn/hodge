@@ -85,7 +85,7 @@ def neg_curr (T : Current n X k) : Current n X k where
 
 instance : Neg (Current n X k) := ⟨neg_curr⟩
 
-/-- Negation of zero is zero. -/
+/-- Negation of zero is zero. Trivial but requires structure equality. -/
 axiom neg_zero_current : -(0 : Current n X k) = 0
 
 instance : Sub (Current n X k) := ⟨fun T₁ T₂ => T₁ + -T₂⟩

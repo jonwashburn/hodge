@@ -147,6 +147,30 @@ instance instNormedSpaceTangentSpace (x : X) : NormedSpace ‚ÑÇ (TangentSpace (ù
 
 ---
 
+### Remaining 49 Axioms Analysis
+
+**8 Classical Pillars (to keep):**
+1. `serre_gaga` (GAGA.lean) - Pillar 1
+2. `federer_fleming_compactness` (FedererFleming.lean) - Pillar 2
+3. `mass_lsc` (Calibration.lean) - Pillar 3
+4. `spine_theorem` (Calibration.lean) - Pillar 4
+5. `harvey_lawson_fundamental_class` (Main.lean) - Pillar 5
+6. `hard_lefschetz_bijective` (Lefschetz.lean) - Pillar 6
+7. `exists_uniform_interior_radius` (Cone.lean) - Pillar 7
+8. `omega_pow_algebraic` (Main.lean) - Pillar 8
+
+**Additional candidates for "extended pillars":**
+- `energy_minimizer` (Hodge theorem - existence of harmonic representative)
+- `serre_vanishing` (foundational algebraic geometry)
+
+**Infrastructure axioms requiring major work:**
+- Forms.lean (8): `isSmoothAlternating_add/smul`, `extDerivLinearMap`, `smoothExtDeriv_*`
+- Currents.lean (7): `map_zero'`, `map_smul`, `neg_zero_current`, `is_bounded`, `mass_*`
+- Norms.lean (6): `pointwiseComass_*`, `comass_smul`, `instNormedAddCommGroup/Space`
+- Others (20): TypeDecomposition, Microstructure, Grassmannian, SheafTheory, etc.
+
+---
+
 #### Latest Session Progress
 
 **Additional axioms eliminated:**
