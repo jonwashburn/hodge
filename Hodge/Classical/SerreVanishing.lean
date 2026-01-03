@@ -9,7 +9,7 @@ import Hodge.Analytic.SheafTheory
 
 noncomputable section
 
-open Classical CategoryTheory TopologicalSpace
+open Classical CategoryTheory TopologicalSpace Hodge
 
 universe u
 

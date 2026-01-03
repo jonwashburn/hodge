@@ -11,7 +11,7 @@ This file contains properties and operators for Kähler manifolds.
 
 noncomputable section
 
-open Classical
+open Classical Hodge
 
 set_option autoImplicit false
 

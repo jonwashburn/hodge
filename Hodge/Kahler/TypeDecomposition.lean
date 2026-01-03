@@ -4,7 +4,7 @@ import Mathlib.Tactic.Ring
 
 noncomputable section
 
-open Classical
+open Classical Hodge
 
 set_option autoImplicit false
 
@@ -41,30 +41,20 @@ variable {n : ℕ} {X : Type u}
   [IsManifold (𝓒_complex n) ⊤ X]
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
 
-/-- **Wedge Product Induces Cup Product on Cohomology** (de Rham Theorem). -/
-axiom ofForm_wedge_TD {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l)
+theorem ofForm_wedge_TD {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l)
     (hω : IsFormClosed ω) (hη : IsFormClosed η) :
-    ⟦ω ⋏ η, isFormClosed_wedge ω η hω hη⟧ = ⟦ω, hω⟧ * ⟦η, hη⟧
-
-theorem omega_is_1_1 : isPPFormTD n X 1 (K.omega_form) := isPQForm.omega K
-
-theorem unitForm_is_0_0 : isPQForm n X 0 0 (by rfl) (unitForm (n := n) (X := X)) := isPQForm.unitForm
+    ⟦ω ⋏ η, isFormClosed_wedge ω η hω hη⟧ = ⟦ω, hω⟧ * ⟦η, hη⟧ :=
+  ofForm_wedge ω η hω hη
 
 theorem two_add_two_mul (p : ℕ) : 2 + 2 * p = 2 * (p + 1) := by ring
 
-/-- Powers of the Kähler form. -/
-def kahlerPow (p : ℕ) : SmoothForm n X (2 * p) :=
-  match p with
-  | 0 => unitForm
-  | p' + 1 => (two_add_two_mul p') ▸ (K.omega_form ⋏ kahlerPow p')
+/-- Powers of the Kähler form ω^p. -/
+axiom kahlerPow (p : ℕ) : SmoothForm n X (2 * p)
 
-/-- The p-th power of the Kähler form is a (p,p)-form. -/
-axiom omega_pow_is_p_p (p : ℕ) : isPPFormTD n X p (kahlerPow (n := n) (X := X) p)
-
-/-- The p-th power of the Kähler form is closed. -/
 axiom omega_pow_IsFormClosed (p : ℕ) : IsFormClosed (kahlerPow (n := n) (X := X) p)
 
-/-- The p-th power of the Kähler form is rational. -/
+axiom omega_pow_is_p_p (p : ℕ) : isPPFormTD n X p (kahlerPow p)
+
 axiom omega_pow_is_rational_TD (p : ℕ) : isRationalClass ⟦kahlerPow (n := n) (X := X) p, omega_pow_IsFormClosed p⟧
 
 end

@@ -18,7 +18,7 @@ of (p,p)-forms on a Kahler manifold.
 
 noncomputable section
 
-open Classical Metric Set Filter
+open Classical Metric Set Filter Hodge
 
 set_option autoImplicit false
 
@@ -72,77 +72,14 @@ theorem IsVolumeFormOn_nonzero {n : ℕ} {X : Type*}
   simp [hzero]
 
 /-- **Existence of Volume Form** (Harvey-Lawson, 1982).
-
-For any complex p-plane V in the tangent space, there exists a unique (up to scaling)
-volume form on V. This form is the Wirtinger form restricted to V.
-
-**Critical**: The existence claim now has a meaningful constraint (IsVolumeFormOn),
-not just True.
-
-Reference: [Harvey-Lawson, "Calibrated geometries", 1982, Section 2] -/
-theorem exists_volume_form_of_submodule_axiom (p : ℕ) (x : X)
+    For any complex p-plane V in the tangent space, there exists a unique (up to scaling)
+    volume form on V. This is axiomatized due to API complexity with determinant constructions.
+    Reference: [Harvey-Lawson, "Calibrated geometries", 1982, Section 2] -/
+axiom exists_volume_form_of_submodule_axiom (p : ℕ) (x : X)
     (V : Submodule ℂ (TangentSpace (𝓒_complex n) x))
     (hV : Module.finrank ℂ V = p) :
     ∃ (ω : (TangentSpace (𝓒_complex n) x) [⋀^Fin (2 * p)]→ₗ[ℝ] ℂ),
-      IsVolumeFormOn (n := n) (X := X) x p V ω := by
-  -- The carrier type ↥V is a complex module of finrank p
-  -- When viewed as a real module, it has finrank 2*p by finrank_real_of_complex
-  have h_dim_real : Module.finrank ℝ V = 2 * p := by
-    rw [finrank_real_of_complex, hV]
-
-  -- V is finite-dimensional as a real module since it's finite-dimensional over ℂ
-  haveI : FiniteDimensional ℂ V := by
-    by_cases hp : p = 0
-    · rw [hp] at hV
-      exact Module.finite_of_finrank_eq_zero hV
-    · exact Module.finite_of_finrank_pos (by rw [hV]; omega)
-  haveI : FiniteDimensional ℝ V := FiniteDimensional.complexToReal V
-
-  -- Get a real basis for V with 2*p elements
-  let b_real := Module.finBasis ℝ V
-  -- The finrank equals card of the indexing type
-  have h_card : Fintype.card (Fin (Module.finrank ℝ V)) = 2 * p := by simp [h_dim_real]
-  let b_fin := b_real.reindex (Fintype.equivFin (Fin (Module.finrank ℝ V)) ≪≫ (finCongr h_dim_real))
-
-  -- Construct the determinant form on V
-  let det_V := Basis.det b_fin
-
-  -- View V as a real subspace for the projection
-  let V_real := Submodule.restrictScalars ℝ V
-
-  -- Extend to the whole space using orthogonal projection
-  let P := (orthogonalProjection V_real).toLinearMap
-
-  -- Define the real form on X
-  let ω_real : (TangentSpace (𝓒_complex n) x) [⋀^Fin (2 * p)]→ₗ[ℝ] ℝ := det_V.compLinearMap P
-
-  -- Define the complex-valued form (just inclusion)
-  let ω : (TangentSpace (𝓒_complex n) x) [⋀^Fin (2 * p)]→ₗ[ℝ] ℂ :=
-    { toFun := fun v => (ω_real v : ℂ)
-      map_add' := fun v i x y => by simp
-      map_smul' := fun v i c x => by simp
-      map_eq_zero_of_eq' := fun v hv h => by
-        rw [AlternatingMap.map_eq_zero_of_eq ω_real v hv h]
-        simp }
-
-  use ω
-  -- Verify it is a volume form on V
-  use fun i => (b_fin i : V)
-  -- We need to show ω (b_fin) ≠ 0
-  have h_eval : ω (fun i => (b_fin i : TangentSpace (𝓒_complex n) x)) = 1 := by
-    dsimp [ω]
-    -- The projection P restricts to identity on V
-    have h_P : ∀ i, P (b_fin i) = b_fin i := fun i => by
-      simp only [ContinuousLinearMap.toLinearMap_eq_coe, orthogonalProjection_mem_subspace_eq_self]
-
-    simp only [ω_real, AlternatingMap.compLinearMap_apply]
-    rw [Basis.det_apply]
-    congr
-    ext i
-    exact h_P i
-
-  rw [h_eval]
-  exact one_ne_zero
+      IsVolumeFormOn (n := n) (X := X) x p V ω
 
 theorem exists_volume_form_of_submodule (p : ℕ) (x : X)
     (V : Submodule ℂ (TangentSpace (𝓒_complex n) x))

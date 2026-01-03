@@ -17,7 +17,7 @@ This file defines the strongly positive cone K_p(x) of (p,p)-forms at each point
 
 noncomputable section
 
-open Classical Metric Set Filter
+open Classical Metric Set Filter Hodge
 
 variable {n : ℕ} {X : Type*}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]

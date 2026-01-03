@@ -7,7 +7,7 @@ import Mathlib.Algebra.Module.LinearMap.Basic
 
 noncomputable section
 
-open Classical
+open Classical Hodge
 
 universe u
 
@@ -26,7 +26,7 @@ universe u
     Reference: [Warner, "Foundations of Differentiable Manifolds and Lie Groups", 1983].
     Reference: [Bott-Tu, "Differential Forms in Algebraic Topology", 1982, Chapter 1]. -/
 theorem ofForm_wedge_add (n : ℕ) (X : Type u) [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {p : ℕ} (ω : SmoothForm n X 2) (hω : IsFormClosed ω) (η₁ η₂ : SmoothForm n X p) (h₁ : IsFormClosed η₁) (h₂ : IsFormClosed η₂) :
     ⟦ω ⋏ (η₁ + η₂), isFormClosed_wedge ω (η₁ + η₂) hω (isFormClosed_add h₁ h₂)⟧ =
     ⟦ω ⋏ η₁, isFormClosed_wedge ω η₁ hω h₁⟧ + ⟦ω ⋏ η₂, isFormClosed_wedge ω η₂ hω h₂⟧ := by
@@ -55,13 +55,13 @@ theorem ofForm_wedge_add (n : ℕ) (X : Type u) [TopologicalSpace X] [ChartedSpa
     **Definition**: L(c) = [ω] ∪ c. -/
 def lefschetz_operator (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     (p : ℕ) : DeRhamCohomologyClass n X p →ₗ[ℂ] DeRhamCohomologyClass n X (p + 2) where
-  toFun c := ⟦K.omega_form, K.omega_closed⟧ * c
+  toFun c := ⟦KahlerManifold.omega_form, KahlerManifold.omega_closed⟧ * c
   map_add' η₁ η₂ := by
     -- [ω] * (η₁ + η₂) = [ω]*η₁ + [ω]*η₂ follows from add_mul
     -- wait, we need mul_add (right distributive)
-    exact mul_add ⟦K.omega_form, K.omega_closed⟧ η₁ η₂
+    exact mul_add ⟦KahlerManifold.omega_form, KahlerManifold.omega_closed⟧ η₁ η₂
   map_smul' r η := by
     -- [ω] * (r • η) = r • ([ω] * η)
     -- We have smul_rat_mul for rational r. For complex r, we need a similar theorem.
@@ -69,19 +69,19 @@ def lefschetz_operator (n : ℕ) (X : Type u)
     -- Since we are in an axiomatized environment, we can use a small axiom or a known property.
     -- Actually, Cohomology/Basic.lean should have smul_mul.
     -- Let's check.
-    exact mul_smul ⟦K.omega_form, K.omega_closed⟧ r η
+    exact mul_smul ⟦KahlerManifold.omega_form, KahlerManifold.omega_closed⟧ r η
 
 -- The Lefschetz operator maps cohomology classes to cohomology classes.
 -- This is now a theorem following from the definition.
 theorem lefschetz_operator_eval (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     (p : ℕ) (c : DeRhamCohomologyClass n X p) :
     ∃ (ω' : SmoothForm n X (p + 2)) (h_closed : IsFormClosed ω'),
     lefschetz_operator n X p c = ⟦ω', h_closed⟧ := by
   let L := lefschetz_operator n X p
   obtain ⟨ω, h_closed_ω⟩ := Quotient.exists_rep c
-  use K.omega_form ⋏ ω.val, isFormClosed_wedge K.omega_form ω.val K.omega_closed ω.property
+  use KahlerManifold.omega_form ⋏ ω.val, isFormClosed_wedge KahlerManifold.omega_form ω.val KahlerManifold.omega_closed ω.property
   -- [ω] * [η] = [ω ⋏ η] by definition/ofForm_wedge
   rw [lefschetz_operator]
   simp only [LinearMap.coe_mk, AddHom.coe_mk]
@@ -93,7 +93,7 @@ theorem lefschetz_operator_eval (n : ℕ) (X : Type u)
 /-- The iterated Lefschetz map L^k : H^p(X) → H^{p+2k}(X). -/
 def lefschetz_power (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     (p k : ℕ) : DeRhamCohomologyClass n X p →ₗ[ℂ] DeRhamCohomologyClass n X (p + 2 * k) :=
   match k with
   | 0 => LinearMap.id
@@ -125,7 +125,7 @@ def lefschetz_power (n : ℕ) (X : Type u)
     bijectivity is trivially satisfied when both sides are zero (subsingleton case). -/
 axiom hard_lefschetz_bijective (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     (p : ℕ) (_hp : p ≤ n) :
     Function.Bijective (lefschetz_power n X p (n - p))
 
@@ -133,7 +133,7 @@ axiom hard_lefschetz_bijective (n : ℕ) (X : Type u)
     **Definition**: We define the inverse as the zero map (placeholder). -/
 def lefschetz_inverse_cohomology (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     (p k : ℕ) (_h : p ≤ n) : DeRhamCohomologyClass n X (p + 2 * k) →ₗ[ℂ] DeRhamCohomologyClass n X p := 0
 
 -- **Lefschetz Compatibility** (Voisin, 2002).
@@ -149,7 +149,7 @@ def lefschetz_inverse_cohomology (n : ℕ) (X : Type u)
 variable {n : ℕ} {X : Type u}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X]
-  [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
+  [ProjectiveComplexManifold n X] [KahlerManifold n X]
   [Nonempty X]
 
 /-- **The Hard Lefschetz Isomorphism** (Lefschetz, 1924).
@@ -183,13 +183,13 @@ variable {n : ℕ} {X : Type u}
     and is a (p',p')-form by isPPForm_zero. -/
 theorem hard_lefschetz_isomorphism {p' : ℕ} (_h_range : p' ≤ n / 2)
     (_γ : SmoothForm n X (2 * (n - p'))) (_h_closed : IsFormClosed _γ)
-    (_h_rat : isRationalClass (DeRhamCohomologyClass.ofForm _γ _h_closed)) (_h_hodge : isPPForm' n X (n - p') _γ) :
+    (_h_rat : isRationalClass (ofForm _γ _h_closed)) (_h_hodge : isPPForm' n X (n - p') _γ) :
     ∃ (η : SmoothForm n X (2 * p')),
       ∃ (h_η_closed : IsFormClosed η),
-      isRationalClass (DeRhamCohomologyClass.ofForm η h_η_closed) ∧ isPPForm' n X p' η := by
+      isRationalClass (ofForm η h_η_closed) ∧ isPPForm' n X p' η := by
   use 0, isFormClosed_zero
   constructor
-  · have h_zero : DeRhamCohomologyClass.ofForm (0 : SmoothForm n X (2 * p')) isFormClosed_zero =
+  · have h_zero : ofForm (0 : SmoothForm n X (2 * p')) isFormClosed_zero =
                   (0 : DeRhamCohomologyClass n X (2 * p')) := rfl
     rw [h_zero]
     exact isRationalClass_zero
@@ -204,14 +204,14 @@ theorem hard_lefschetz_isomorphism {p' : ℕ} (_h_range : p' ≤ n / 2)
     and is an (n-p, n-p)-form by isPPForm_zero. -/
 theorem hard_lefschetz_inverse_form {p : ℕ} (_hp : p > n / 2)
     (_γ : SmoothForm n X (2 * p)) (_h_closed : IsFormClosed _γ) (_h_hodge : isPPForm' n X p _γ)
-    (_h_rat : isRationalClass (DeRhamCohomologyClass.ofForm _γ _h_closed)) :
+    (_h_rat : isRationalClass (ofForm _γ _h_closed)) :
     ∃ (η : SmoothForm n X (2 * (n - p))),
       ∃ (h_η_closed : IsFormClosed η),
-      isPPForm' n X (n - p) η ∧ isRationalClass (DeRhamCohomologyClass.ofForm η h_η_closed) := by
+      isPPForm' n X (n - p) η ∧ isRationalClass (ofForm η h_η_closed) := by
   use 0, isFormClosed_zero
   constructor
   · exact isPPForm_zero (n - p)
-  · have h_zero : DeRhamCohomologyClass.ofForm (0 : SmoothForm n X (2 * (n - p))) isFormClosed_zero =
+  · have h_zero : ofForm (0 : SmoothForm n X (2 * (n - p))) isFormClosed_zero =
                   (0 : DeRhamCohomologyClass n X (2 * (n - p))) := rfl
     rw [h_zero]
     exact isRationalClass_zero

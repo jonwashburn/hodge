@@ -17,7 +17,7 @@ import Hodge.Analytic.Norms
 
 noncomputable section
 
-open Classical Complex TensorProduct TopologicalSpace
+open Classical Complex TensorProduct TopologicalSpace Hodge
 
 universe u
 

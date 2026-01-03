@@ -10,7 +10,7 @@ A current is defined as a continuous linear functional on the space of smooth fo
 
 noncomputable section
 
-open Classical
+open Classical Hodge
 
 set_option autoImplicit false
 
