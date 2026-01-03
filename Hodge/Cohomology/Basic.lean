@@ -131,13 +131,42 @@ theorem cohomologous_neg {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedS
     use -β
     rw [smoothExtDeriv_neg, hβ]
 
-axiom cohomologous_smul {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+theorem cohomologous_smul {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     (c : ℂ) (ω ω' : ClosedForm n X k) (h : ω ≈ ω') :
-    (⟨c • ω.val, isFormClosed_smul ω.property⟩ : ClosedForm n X k) ≈ ⟨c • ω'.val, isFormClosed_smul ω'.property⟩
+    (⟨c • ω.val, isFormClosed_smul ω.property⟩ : ClosedForm n X k) ≈ ⟨c • ω'.val, isFormClosed_smul ω'.property⟩ := by
+  show Cohomologous _ _
+  unfold Cohomologous
+  have h' : Cohomologous ω ω' := h
+  unfold Cohomologous at h'
+  -- (c • ω.val) - (c • ω'.val) = c • (ω.val - ω'.val)
+  have heq : (c • ω.val) - (c • ω'.val) = c • (ω.val - ω'.val) := by
+    ext x v
+    simp only [SmoothForm.sub_apply, SmoothForm.smul_apply, AlternatingMap.sub_apply, AlternatingMap.smul_apply]
+    -- c * a - c * b = c * (a - b)
+    rw [← smul_sub]
+  rw [heq]
+  unfold IsExact at *
+  cases k with
+  | zero =>
+    -- h' : ω.val - ω'.val = 0, goal: c • (ω.val - ω'.val) = 0
+    simp [h']
+  | succ k' =>
+    -- h' : ∃ β, dβ = (ω.val - ω'.val), goal: ∃ β, dβ = c • (ω.val - ω'.val)
+    obtain ⟨β, hβ⟩ := h'
+    use c • β
+    -- Need: d(c • β) = c • dβ, but smoothExtDeriv is ℂ-linear (from extDerivLinearMap)
+    rw [← hβ]
+    -- smoothExtDeriv is defined as extDerivLinearMap, which is ℂ-linear
+    simp only [smoothExtDeriv, map_smul]
 
-axiom cohomologous_wedge {n k l : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+-- Note: Trivial since smoothWedge := 0; needs real proof once wedge is implemented
+theorem cohomologous_wedge {n k l : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     (ω₁ ω₁' : ClosedForm n X k) (ω₂ ω₂' : ClosedForm n X l) (h1 : ω₁ ≈ ω₁') (h2 : ω₂ ≈ ω₂') :
-    (⟨ω₁.val ⋏ ω₂.val, isFormClosed_wedge _ _ ω₁.property ω₂.property⟩ : ClosedForm n X (k + l)) ≈ ⟨ω₁'.val ⋏ ω₂'.val, isFormClosed_wedge _ _ ω₁'.property ω₂'.property⟩
+    (⟨ω₁.val ⋏ ω₂.val, isFormClosed_wedge _ _ ω₁.property ω₂.property⟩ : ClosedForm n X (k + l)) ≈ ⟨ω₁'.val ⋏ ω₂'.val, isFormClosed_wedge _ _ ω₁'.property ω₂'.property⟩ := by
+  -- Since smoothWedge is defined as 0, both sides are 0
+  show Cohomologous _ _
+  simp only [smoothWedge]
+  exact cohomologous_refl _
 
 /-! ### Algebraic Instances -/
 
