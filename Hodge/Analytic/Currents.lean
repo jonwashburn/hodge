@@ -126,7 +126,9 @@ instance : HSMul ℤ (Current n X k) (Current n X k) := ⟨fun z T => (z : ℝ) 
 theorem zero_toFun (ω : SmoothForm n X k) : (0 : Current n X k).toFun ω = 0 := rfl
 
 /-- Currents are bounded: evaluation is bounded by mass times comass.
-    This is the continuity condition on currents as linear functionals. -/
+    This is the continuity condition on currents as linear functionals.
+    This axiom captures the functional analysis fact that currents are continuous
+    linear functionals on the space of smooth forms with the comass topology. -/
 axiom is_bounded (T : Current n X k) : ∃ M : ℝ, ∀ ω : SmoothForm n X k, |T.toFun ω| ≤ M * comass ω
 
 /-- Helper: (-T).toFun ω = -T.toFun ω by definition of negation. -/
