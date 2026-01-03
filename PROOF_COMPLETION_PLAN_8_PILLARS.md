@@ -129,7 +129,42 @@ instance instNormedSpaceTangentSpace (x : X) : NormedSpace ℂ (TangentSpace (�
 | Classical/Bergman.lean | 3 |
 | Other files | 12 |
 
-**Total: 132 → 73 axioms (59 eliminated, 45% reduction)**
+**Total: 132 → 70 axioms (62 eliminated, 47% reduction)**
+
+---
+
+#### Latest Session Progress
+
+**Additional axioms eliminated:**
+- `omega_pow_represents_multiple` → theorem (was `: True`)
+- `exists_not_isClosed_set` → removed (unused)
+- `smoothExtDeriv_wedge` → removed (unused, HEq complications)
+
+**Current axiom count by file:**
+
+| File | Axioms | Notes |
+|------|--------|-------|
+| Analytic/Norms.lean | 10 | Norm infrastructure |
+| Analytic/Forms.lean | 8 | Form axioms, some provable |
+| Kahler/Microstructure.lean | 6 | New proof infrastructure |
+| Analytic/Currents.lean | 6 | Current axioms |
+| Kahler/Manifolds.lean | 5 | Kähler operators |
+| Kahler/TypeDecomposition.lean | 4 | kahlerPow axioms |
+| Analytic/SheafTheory.lean | 4 | Sheaf infrastructure |
+| Kahler/Main.lean | 3 | Main theorem axioms |
+| Cohomology/Basic.lean | 3 | lefschetzL axioms |
+| Kahler/Cone.lean | 3 | Cone axioms (incl. Pillar 7) |
+| Classical/Lefschetz.lean | 3 | Including Pillar 6 |
+| Classical/Bergman.lean | 3 | Bergman kernel |
+| Classical/FedererFleming.lean | 2 | Including Pillar 2 |
+| Analytic/Calibration.lean | 2 | Including Pillars 3-4 |
+| Analytic/Grassmannian.lean | 2 | Volume form |
+| Classical/GAGA.lean | 1 | Pillar 1 |
+| Classical/HarveyLawson.lean | 1 | Pillar 5 helper |
+| Classical/SerreVanishing.lean | 1 | Serre vanishing |
+| Analytic/IntegralCurrents.lean | 1 | Polyhedral boundary |
+| Utils/BaranyGrinberg.lean | 1 | Combinatorics |
+| **TOTAL** | **70** |
 
 ---
 

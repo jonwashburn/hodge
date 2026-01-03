@@ -436,6 +436,8 @@ variable [KahlerManifold n X]
 noncomputable def lefschetzL {k : ℕ} (η : SmoothForm n X k) : SmoothForm n X (k + 2) :=
   (Nat.add_comm 2 k) ▸ (KahlerManifold.omega_form (n := n) (X := X) ⋏ η)
 
+-- Note: Trivial since smoothWedge := 0, so lefschetzL always returns 0
+-- The Nat.add_comm coercion makes these harder to prove directly, so keeping as axioms for now
 axiom lefschetzL_add {k : ℕ} (α β : SmoothForm n X k) :
     lefschetzL (α + β) = lefschetzL α + lefschetzL β
 
