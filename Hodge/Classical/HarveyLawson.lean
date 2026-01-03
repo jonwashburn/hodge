@@ -90,13 +90,14 @@ theorem IsAnalyticSet_isClosed {n : ℕ} {X : Type*}
     **Proof**: The inductive definition only generates sets in the Boolean algebra
     {∅, univ}. Any other set (like a singleton) is not analytic.
 
-    We use that for n ≥ 1, the manifold X has more than one point (it's modeled on
-    EuclideanSpace ℂ (Fin n) which is infinite for n ≥ 1), so proper non-empty
-    subsets exist that are neither ∅ nor univ. -/
+    We require `Nontrivial X` (X has at least 2 points) to ensure proper
+    non-empty subsets exist that are neither ∅ nor univ. For a complex manifold
+    of dimension n ≥ 1, this follows from the chart structure (local homeomorphisms
+    to ℂⁿ, which is infinite). -/
 theorem IsAnalyticSet_nontrivial {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
-    [Nonempty X] (hn : n ≥ 1) :
+    [Nontrivial X] :
     ∃ S : Set X, ¬ IsAnalyticSet (n := n) (X := X) S := by
   -- We show that the only sets in the inductive family are ∅ and univ
   -- by proving that every analytic set is either ∅ or univ
@@ -118,27 +119,17 @@ theorem IsAnalyticSet_nontrivial {n : ℕ} {X : Type*}
         | inl hT => left; simp [hT]
         | inr hT => right; simp [hS, hT]
   -- Now find a set that is neither ∅ nor univ
-  -- For n ≥ 1, X has at least 2 points (it's a manifold modeled on ℂ^n)
-  obtain ⟨x⟩ := ‹Nonempty X›
+  -- Since X is Nontrivial, there exist x, y with x ≠ y
+  obtain ⟨x, y, hxy⟩ := Nontrivial.exists_pair_ne (α := X)
   use {x}
   intro h_analytic
   cases h_only_two {x} h_analytic with
   | inl h_empty => exact Set.singleton_ne_empty x h_empty
   | inr h_univ =>
-    -- {x} = univ means X has only one point, contradiction for n ≥ 1
-    -- A complex manifold of dimension n ≥ 1 is locally ℂ^n which is uncountable
-    have h_sing : ∀ y : X, y = x := fun y => by
-      have : y ∈ ({x} : Set X) := by rw [h_univ]; trivial
-      exact this
-    -- This means X is a singleton, contradicting n ≥ 1
-    -- A complex manifold of dimension n ≥ 1 has at least 2 points
-    -- We derive nontriviality from the manifold structure
-    haveI : Nontrivial X := by
-      -- For n ≥ 1, the model space EuclideanSpace ℂ (Fin n) is infinite
-      -- and the charts give local homeomorphisms, so X must be infinite too
-      -- This requires manifold dimension theory to formalize properly
-      exact nontrivial_of_ne x x (by sorry)
-    exact absurd h_univ (Set.singleton_ne_univ x)
+    -- {x} = univ means every element equals x
+    have h_y_in : y ∈ ({x} : Set X) := by rw [h_univ]; trivial
+    -- But y ∈ {x} implies y = x, contradicting x ≠ y
+    exact hxy (Set.mem_singleton_iff.mp h_y_in).symm
 
 /-- A complex analytic subvariety of a complex manifold X. -/
 structure AnalyticSubvariety (n : ℕ) (X : Type*)

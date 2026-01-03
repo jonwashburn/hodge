@@ -32,17 +32,15 @@ structure CalibratingForm (n : ℕ) (X : Type*) (k : ℕ)
 /-! ## Kähler Calibration -/
 
 /-- The Kähler calibration as a 2p-form.
-
-In a full development this would be the Wirtinger form \( \omega^p / p! \) together with
-the Wirtinger inequality (comass ≤ 1). In this repository’s current stubbed setup, the
-microstructure pipeline is independent of the specific calibrating form, so we use the
-zero form as a minimal calibrating form and avoid keeping a dedicated Wirtinger axiom. -/
+    Defined as the p-th power of the Kähler form, normalized.
+    In a Kähler manifold, this form calibrates complex p-dimensional submanifolds. -/
 def KählerCalibration (p : ℕ) : CalibratingForm n X (2 * p) where
-  form := 0
-  is_closed := isFormClosed_zero
+  form := kahlerPow p
+  is_closed := omega_pow_IsFormClosed p
   comass_le_one := by
-    -- comass(0) = 0 ≤ 1
-    simp [comass_zero, zero_le_one]
+    -- In a Kähler manifold, the comass of ω^p/p! is exactly 1.
+    -- We postulate this bound for the normalized form.
+    sorry
 
 /-! ## Calibration and Mass -/
 
@@ -90,23 +88,35 @@ theorem isCalibrated_iff_defect_zero {k : ℕ} (T : Current n X k) (ψ : Calibra
 /-! ## Advanced Calibration Theorems -/
 
 /-- **Spine Theorem** (Harvey-Lawson, 1982).
+    If a current T can be written as T = S - G where S is calibrated by ψ,
+    then the calibration defect of T is bounded by twice the mass of G.
 
-If a current T can be written as T = S - G where S is calibrated by ψ,
-then the calibration defect of T is bounded by twice the mass of G.
-
-**Proof Sketch**:
-- calibrationDefect(T, ψ) = mass(T) - T(ψ)
-- Since S is calibrated: mass(S) = S(ψ)
-- T = S - G implies: T(ψ) = S(ψ) - G(ψ) = mass(S) - G(ψ)
-- mass(T) ≤ mass(S) + mass(G) (triangle inequality)
-- G(ψ) ≥ -mass(G) (by calibration inequality for -G)
-- Therefore: calibrationDefect(T, ψ) ≤ mass(S) + mass(G) - (mass(S) - mass(G)) = 2·mass(G)
-
-Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", 1982,
-Acta Mathematica 148, Section 4]. -/
-axiom spine_theorem {k : ℕ} (T S G : Current n X k) (ψ : CalibratingForm n X k)
-    (_h_decomp : T = S - G) (_h_calib : isCalibrated S ψ) :
-    calibrationDefect T ψ ≤ 2 * Current.mass G
+    Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", 1982,
+    Acta Mathematica 148, Section 4]. -/
+theorem spine_theorem {k : ℕ} (T S G : Current n X k) (ψ : CalibratingForm n X k)
+    (h_decomp : T = S - G) (h_calib : isCalibrated S ψ) :
+    calibrationDefect T ψ ≤ 2 * Current.mass G := by
+  unfold calibrationDefect
+  rw [h_decomp]
+  -- mass(S - G) ≤ mass(S) + mass(G)
+  have h_mass : Current.mass (S - G) ≤ Current.mass S + Current.mass G := by
+    calc Current.mass (S - G) = Current.mass (S + -G) := rfl
+      _ ≤ Current.mass S + Current.mass (-G) := Current.mass_add_le S (-G)
+      _ = Current.mass S + Current.mass G := by rw [Current.mass_neg]
+  -- (S - G)(ψ) = S(ψ) - G(ψ)
+  have h_eval : (S - G).toFun ψ.form = S.toFun ψ.form - G.toFun ψ.form := rfl
+  -- Since S is calibrated, S(ψ) = mass(S)
+  have h_S_calib : S.toFun ψ.form = Current.mass S := h_calib.symm
+  -- G(ψ) ≥ -mass(G)
+  have h_G_eval : -Current.mass G ≤ G.toFun ψ.form := by
+    have h_neg_G := calibration_inequality (-G) ψ
+    have h_neg_G_eval : (-G).toFun ψ.form = -G.toFun ψ.form := rfl
+    have h_neg_G_mass : Current.mass (-G) = Current.mass G := Current.mass_neg G
+    rw [h_neg_G_eval, h_neg_G_mass] at h_neg_G
+    linarith
+  -- Put it all together
+  rw [h_eval, h_S_calib]
+  linarith
 
 /-- **Lower Semicontinuity of Mass** (Federer, 1969).
 
