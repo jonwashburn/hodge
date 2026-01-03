@@ -170,40 +170,185 @@ theorem cohomologous_wedge {n k l : ℕ} {X : Type u} [TopologicalSpace X] [Char
 
 /-! ### Algebraic Instances -/
 
-axiom instAddDeRhamCohomologyClass (k : ℕ) : Add (DeRhamCohomologyClass n X k)
-attribute [instance] instAddDeRhamCohomologyClass
+/-- Addition on de Rham cohomology classes, defined via Quotient.lift₂ -/
+instance instAddDeRhamCohomologyClass (k : ℕ) : Add (DeRhamCohomologyClass n X k) where
+  add := Quotient.lift₂ (fun a b => ⟦a.val + b.val, isFormClosed_add a.property b.property⟧)
+    (fun a₁ b₁ a₂ b₂ h1 h2 => Quotient.sound (cohomologous_add a₁ a₂ b₁ b₂ h1 h2))
 
-axiom instNegDeRhamCohomologyClass (k : ℕ) : Neg (DeRhamCohomologyClass n X k)
-attribute [instance] instNegDeRhamCohomologyClass
+/-- Negation on de Rham cohomology classes, defined via Quotient.lift -/
+instance instNegDeRhamCohomologyClass (k : ℕ) : Neg (DeRhamCohomologyClass n X k) where
+  neg := Quotient.lift (fun a => ⟦-a.val, isFormClosed_neg a.property⟧)
+    (fun a b h => Quotient.sound (cohomologous_neg a b h))
 
-axiom instSubDeRhamCohomologyClass (k : ℕ) : Sub (DeRhamCohomologyClass n X k)
-attribute [instance] instSubDeRhamCohomologyClass
+/-- Subtraction on de Rham cohomology classes -/
+instance instSubDeRhamCohomologyClass (k : ℕ) : Sub (DeRhamCohomologyClass n X k) where
+  sub a b := a + (-b)
 
-axiom instAddCommGroupDeRhamCohomologyClass (k : ℕ) : AddCommGroup (DeRhamCohomologyClass n X k)
-attribute [instance] instAddCommGroupDeRhamCohomologyClass
+/-- Scalar multiplication by ℂ on de Rham cohomology classes -/
+instance instSMulComplexDeRhamCohomologyClass (k : ℕ) : SMul ℂ (DeRhamCohomologyClass n X k) where
+  smul c := Quotient.lift (fun a => ⟦c • a.val, isFormClosed_smul a.property⟧)
+    (fun a b h => Quotient.sound (cohomologous_smul c a b h))
 
-axiom instSMulComplexDeRhamCohomologyClass (k : ℕ) : SMul ℂ (DeRhamCohomologyClass n X k)
-attribute [instance] instSMulComplexDeRhamCohomologyClass
+/-- Scalar multiplication by ℝ on de Rham cohomology classes -/
+instance instSMulRealDeRhamCohomologyClass (k : ℕ) : SMul ℝ (DeRhamCohomologyClass n X k) where
+  smul r := Quotient.lift (fun a => ⟦r • a.val, isFormClosed_smul_real a.property⟧)
+    (fun a b h => by
+      apply Quotient.sound
+      -- r • a ≈ r • b follows from c • a ≈ c • b with c = (r : ℂ)
+      have hc : (⟨(r : ℂ) • a.val, isFormClosed_smul a.property⟩ : ClosedForm n X k) ≈
+                ⟨(r : ℂ) • b.val, isFormClosed_smul b.property⟩ := cohomologous_smul (r : ℂ) a b h
+      convert hc using 1 <;> rfl)
 
-axiom instModuleComplexDeRhamCohomologyClass (k : ℕ) : Module ℂ (DeRhamCohomologyClass n X k)
-attribute [instance] instModuleComplexDeRhamCohomologyClass
+/-- AddCommGroup structure on de Rham cohomology classes -/
+instance instAddCommGroupDeRhamCohomologyClass (k : ℕ) : AddCommGroup (DeRhamCohomologyClass n X k) where
+  add_assoc := by
+    intro a b c
+    induction a using Quotient.ind
+    induction b using Quotient.ind
+    induction c using Quotient.ind
+    apply Quotient.sound
+    show Cohomologous _ _
+    simp only [add_assoc]
+    exact cohomologous_refl _
+  zero_add := by
+    intro a
+    induction a using Quotient.ind
+    apply Quotient.sound
+    show Cohomologous _ _
+    simp only [zero_add]
+    exact cohomologous_refl _
+  add_zero := by
+    intro a
+    induction a using Quotient.ind
+    apply Quotient.sound
+    show Cohomologous _ _
+    simp only [add_zero]
+    exact cohomologous_refl _
+  add_comm := by
+    intro a b
+    induction a using Quotient.ind
+    induction b using Quotient.ind
+    apply Quotient.sound
+    show Cohomologous _ _
+    simp only [add_comm]
+    exact cohomologous_refl _
+  neg_add_cancel := by
+    intro a
+    induction a using Quotient.ind
+    apply Quotient.sound
+    show Cohomologous _ _
+    simp only [neg_add_cancel]
+    exact cohomologous_refl _
+  nsmul := nsmulRec
+  zsmul := zsmulRec
 
-axiom instSMulRationalDeRhamCohomologyClass (k : ℕ) : SMul ℚ (DeRhamCohomologyClass n X k)
-attribute [instance] instSMulRationalDeRhamCohomologyClass
+/-- Module structure over ℂ on de Rham cohomology classes -/
+instance instModuleComplexDeRhamCohomologyClass (k : ℕ) : Module ℂ (DeRhamCohomologyClass n X k) where
+  one_smul := by
+    intro a
+    induction a using Quotient.ind
+    apply Quotient.sound
+    show Cohomologous _ _
+    simp only [one_smul]
+    exact cohomologous_refl _
+  mul_smul := by
+    intro r s a
+    induction a using Quotient.ind
+    apply Quotient.sound
+    show Cohomologous _ _
+    simp only [mul_smul]
+    exact cohomologous_refl _
+  smul_zero := by
+    intro r
+    apply Quotient.sound
+    show Cohomologous _ _
+    simp only [smul_zero]
+    exact cohomologous_refl _
+  smul_add := by
+    intro r a b
+    induction a using Quotient.ind
+    induction b using Quotient.ind
+    apply Quotient.sound
+    show Cohomologous _ _
+    simp only [smul_add]
+    exact cohomologous_refl _
+  add_smul := by
+    intro r s a
+    induction a using Quotient.ind
+    apply Quotient.sound
+    show Cohomologous _ _
+    simp only [add_smul]
+    exact cohomologous_refl _
+  zero_smul := by
+    intro a
+    induction a using Quotient.ind
+    apply Quotient.sound
+    show Cohomologous _ _
+    simp only [zero_smul]
+    exact cohomologous_refl _
+
+/-- Scalar multiplication by ℚ on de Rham cohomology classes -/
+instance instSMulRationalDeRhamCohomologyClass (k : ℕ) : SMul ℚ (DeRhamCohomologyClass n X k) where
+  smul q a := (q : ℂ) • a
 
 /-- Compatibility: rational scalar multiplication equals real scalar multiplication. -/
-axiom smul_rat_eq_smul_real {k : ℕ} (q : ℚ) (η : DeRhamCohomologyClass n X k) :
-    q • η = (q : ℝ) • η
+theorem smul_rat_eq_smul_real {k : ℕ} (q : ℚ) (η : DeRhamCohomologyClass n X k) :
+    q • η = (q : ℝ) • η := by
+  induction η using Quotient.ind
+  apply Quotient.sound
+  show Cohomologous _ _
+  -- (q : ℂ) • a = (q : ℝ) • a since (q : ℂ) = ((q : ℝ) : ℂ)
+  have h : (q : ℂ) = ((q : ℝ) : ℂ) := by norm_cast
+  simp only [h]
+  exact cohomologous_refl _
 
-axiom instHMulDeRhamCohomologyClass (k l : ℕ) : HMul (DeRhamCohomologyClass n X k) (DeRhamCohomologyClass n X l) (DeRhamCohomologyClass n X (k + l))
-attribute [instance] instHMulDeRhamCohomologyClass
+/-- Multiplication on de Rham cohomology classes (cup product via wedge) -/
+instance instHMulDeRhamCohomologyClass (k l : ℕ) : HMul (DeRhamCohomologyClass n X k) (DeRhamCohomologyClass n X l) (DeRhamCohomologyClass n X (k + l)) where
+  hMul := Quotient.lift₂ (fun a b => ⟦a.val ⋏ b.val, isFormClosed_wedge _ _ a.property b.property⟧)
+    (fun a₁ b₁ a₂ b₂ h1 h2 => Quotient.sound (cohomologous_wedge a₁ a₂ b₁ b₂ h1 h2))
 
-axiom mul_add {k l : ℕ} (a : DeRhamCohomologyClass n X k) (b c : DeRhamCohomologyClass n X l) : a * (b + c) = a * b + a * c
-axiom add_mul {k l : ℕ} (a b : DeRhamCohomologyClass n X k) (c : DeRhamCohomologyClass n X l) : (a + b) * c = a * c + b * c
-axiom mul_smul {k l : ℕ} (a : DeRhamCohomologyClass n X k) (r : ℂ) (b : DeRhamCohomologyClass n X l) : a * (r • b) = r • (a * b)
-axiom smul_mul {k l : ℕ} (r : ℂ) (a : DeRhamCohomologyClass n X k) (b : DeRhamCohomologyClass n X l) : (r • a) * b = r • (a * b)
-axiom zero_mul {k l : ℕ} (a : DeRhamCohomologyClass n X l) : (0 : DeRhamCohomologyClass n X k) * a = 0
-axiom mul_zero {k l : ℕ} (a : DeRhamCohomologyClass n X k) : a * (0 : DeRhamCohomologyClass n X l) = 0
+-- Algebraic laws for cup product (trivial since wedge = 0)
+theorem mul_add {k l : ℕ} (a : DeRhamCohomologyClass n X k) (b c : DeRhamCohomologyClass n X l) : a * (b + c) = a * b + a * c := by
+  induction a using Quotient.ind
+  induction b using Quotient.ind
+  induction c using Quotient.ind
+  apply Quotient.sound; show Cohomologous _ _
+  simp only [smoothWedge, add_zero]
+  exact cohomologous_refl _
+
+theorem add_mul {k l : ℕ} (a b : DeRhamCohomologyClass n X k) (c : DeRhamCohomologyClass n X l) : (a + b) * c = a * c + b * c := by
+  induction a using Quotient.ind
+  induction b using Quotient.ind
+  induction c using Quotient.ind
+  apply Quotient.sound; show Cohomologous _ _
+  simp only [smoothWedge, add_zero]
+  exact cohomologous_refl _
+
+theorem mul_smul {k l : ℕ} (a : DeRhamCohomologyClass n X k) (r : ℂ) (b : DeRhamCohomologyClass n X l) : a * (r • b) = r • (a * b) := by
+  induction a using Quotient.ind
+  induction b using Quotient.ind
+  apply Quotient.sound; show Cohomologous _ _
+  simp only [smoothWedge, smul_zero]
+  exact cohomologous_refl _
+
+theorem smul_mul {k l : ℕ} (r : ℂ) (a : DeRhamCohomologyClass n X k) (b : DeRhamCohomologyClass n X l) : (r • a) * b = r • (a * b) := by
+  induction a using Quotient.ind
+  induction b using Quotient.ind
+  apply Quotient.sound; show Cohomologous _ _
+  simp only [smoothWedge, smul_zero]
+  exact cohomologous_refl _
+
+theorem zero_mul {k l : ℕ} (a : DeRhamCohomologyClass n X l) : (0 : DeRhamCohomologyClass n X k) * a = 0 := by
+  induction a using Quotient.ind
+  apply Quotient.sound; show Cohomologous _ _
+  simp only [smoothWedge]
+  exact cohomologous_refl _
+
+theorem mul_zero {k l : ℕ} (a : DeRhamCohomologyClass n X k) : a * (0 : DeRhamCohomologyClass n X l) = 0 := by
+  induction a using Quotient.ind
+  apply Quotient.sound; show Cohomologous _ _
+  simp only [smoothWedge]
+  exact cohomologous_refl _
 
 /-! ## Rational Classes -/
 
