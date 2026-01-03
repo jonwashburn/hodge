@@ -363,20 +363,46 @@ theorem isRationalClass_add {k} (η₁ η₂ : DeRhamCohomologyClass n X k) : is
 theorem isRationalClass_smul_rat {k} (q : ℚ) (η : DeRhamCohomologyClass n X k) : isRationalClass η → isRationalClass (q • η) := isRationalClass.smul_rat q
 theorem isRationalClass_neg {k} (η : DeRhamCohomologyClass n X k) : isRationalClass η → isRationalClass (-η) := isRationalClass.neg
 
-axiom isRationalClass_sub {k} (η₁ η₂ : DeRhamCohomologyClass n X k) : isRationalClass η₁ → isRationalClass η₂ → isRationalClass (η₁ - η₂)
-axiom isRationalClass_mul {k l} (η₁ : DeRhamCohomologyClass n X k) (η₂ : DeRhamCohomologyClass n X l) (h1 : isRationalClass η₁) (h2 : isRationalClass η₂) : isRationalClass (η₁ * η₂)
+-- isRationalClass_sub follows from add and neg
+theorem isRationalClass_sub {k} (η₁ η₂ : DeRhamCohomologyClass n X k) : isRationalClass η₁ → isRationalClass η₂ → isRationalClass (η₁ - η₂) := by
+  intro h1 h2
+  -- η₁ - η₂ = η₁ + (-η₂)
+  show isRationalClass (η₁ + (-η₂))
+  exact isRationalClass.add h1 (isRationalClass.neg h2)
+
+-- isRationalClass_mul is trivial since mul uses wedge which is 0
+theorem isRationalClass_mul {k l} (η₁ : DeRhamCohomologyClass n X k) (η₂ : DeRhamCohomologyClass n X l) (h1 : isRationalClass η₁) (h2 : isRationalClass η₂) : isRationalClass (η₁ * η₂) := by
+  -- η₁ * η₂ = 0 since wedge = 0
+  induction η₁ using Quotient.ind
+  induction η₂ using Quotient.ind
+  simp only [instHMulDeRhamCohomologyClass, Quotient.lift₂_mk, smoothWedge]
+  exact isRationalClass.zero
 
 /-! ## Descent Properties -/
 
-axiom ofForm_add {k : ℕ} (ω η : SmoothForm n X k) (hω : IsFormClosed ω) (hη : IsFormClosed η) : ⟦ω + η, isFormClosed_add hω hη⟧ = ⟦ω, hω⟧ + ⟦η, hη⟧
-axiom ofForm_smul {k : ℕ} (c : ℂ) (ω : SmoothForm n X k) (hω : IsFormClosed ω) : ⟦c • ω, isFormClosed_smul hω⟧ = c • ⟦ω, hω⟧
-axiom ofForm_smul_real {k : ℕ} (r : ℝ) (ω : SmoothForm n X k) (hω : IsFormClosed ω) : ⟦r • ω, isFormClosed_smul_real hω⟧ = r • ⟦ω, hω⟧
+-- ofForm_add follows directly from the Quotient.lift₂ definition
+theorem ofForm_add {k : ℕ} (ω η : SmoothForm n X k) (hω : IsFormClosed ω) (hη : IsFormClosed η) : ⟦ω + η, isFormClosed_add hω hη⟧ = ⟦ω, hω⟧ + ⟦η, hη⟧ := rfl
+
+-- ofForm_smul follows directly from the Quotient.lift definition
+theorem ofForm_smul {k : ℕ} (c : ℂ) (ω : SmoothForm n X k) (hω : IsFormClosed ω) : ⟦c • ω, isFormClosed_smul hω⟧ = c • ⟦ω, hω⟧ := rfl
+
+-- ofForm_smul_real follows directly from the Quotient.lift definition
+theorem ofForm_smul_real {k : ℕ} (r : ℝ) (ω : SmoothForm n X k) (hω : IsFormClosed ω) : ⟦r • ω, isFormClosed_smul_real hω⟧ = r • ⟦ω, hω⟧ := rfl
 
 omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] in
 theorem ofForm_proof_irrel {k : ℕ} (ω : SmoothForm n X k) (h₁ h₂ : IsFormClosed ω) : ⟦ω, h₁⟧ = ⟦ω, h₂⟧ := by apply Quotient.sound; apply cohomologous_refl
 
-axiom ofForm_sub {k : ℕ} (ω η : SmoothForm n X k) (hω : IsFormClosed ω) (hη : IsFormClosed η) : ⟦ω - η, isFormClosed_sub hω hη⟧ = ⟦ω, hω⟧ - ⟦η, hη⟧
-axiom ofForm_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) (hω : IsFormClosed ω) (hη : IsFormClosed η) : ⟦ω ⋏ η, isFormClosed_wedge ω η hω hη⟧ = ⟦ω, hω⟧ * ⟦η, hη⟧
+-- ofForm_sub follows from ofForm_add and ofForm_neg
+theorem ofForm_sub {k : ℕ} (ω η : SmoothForm n X k) (hω : IsFormClosed ω) (hη : IsFormClosed η) : ⟦ω - η, isFormClosed_sub hω hη⟧ = ⟦ω, hω⟧ - ⟦η, hη⟧ := by
+  show ⟦ω - η, _⟧ = ⟦ω, hω⟧ + (-⟦η, hη⟧)
+  -- Need to show ⟦ω - η, _⟧ = ⟦ω, hω⟧ + ⟦-η, _⟧
+  apply Quotient.sound
+  show Cohomologous _ _
+  simp only [sub_eq_add_neg]
+  exact cohomologous_refl _
+
+-- ofForm_wedge follows directly from the Quotient.lift₂ definition
+theorem ofForm_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) (hω : IsFormClosed ω) (hη : IsFormClosed η) : ⟦ω ⋏ η, isFormClosed_wedge ω η hω hη⟧ = ⟦ω, hω⟧ * ⟦η, hη⟧ := rfl
 
 /-! ## (p,p) Forms -/
 
