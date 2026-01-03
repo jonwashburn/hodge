@@ -74,12 +74,14 @@ noncomputable def hodgeStar {k : ℕ} (_ω : SmoothForm n X k) : SmoothForm n X 
 
 notation:max "⋆" ω:max => hodgeStar ω
 
-axiom hodgeStar_add {k : ℕ} (α β : SmoothForm n X k) : ⋆(α + β) = ⋆α + ⋆β
-axiom hodgeStar_smul_real {k : ℕ} (r : ℝ) (α : SmoothForm n X k) : ⋆(r • α) = r • (⋆α)
+-- Note: Trivial since hodgeStar := 0; needs real proofs once properly implemented
+theorem hodgeStar_add {k : ℕ} (α β : SmoothForm n X k) : ⋆(α + β) = ⋆α + ⋆β := by simp only [hodgeStar, add_zero]
+theorem hodgeStar_smul_real {k : ℕ} (r : ℝ) (α : SmoothForm n X k) : ⋆(r • α) = r • (⋆α) := by simp only [hodgeStar, smul_zero]
 theorem hodgeStar_zero {k : ℕ} : ⋆(0 : SmoothForm n X k) = 0 := rfl
-axiom hodgeStar_neg {k : ℕ} (α : SmoothForm n X k) : ⋆(-α) = -(⋆α)
-axiom hodgeStar_sub {k : ℕ} (α β : SmoothForm n X k) : ⋆(α - β) = ⋆α - ⋆β
+theorem hodgeStar_neg {k : ℕ} (α : SmoothForm n X k) : ⋆(-α) = -(⋆α) := by simp only [hodgeStar, neg_zero]
+theorem hodgeStar_sub {k : ℕ} (α β : SmoothForm n X k) : ⋆(α - β) = ⋆α - ⋆β := by simp only [hodgeStar, sub_self]
 
+-- Note: HEq axiom kept since degree arithmetic is complex
 axiom hodgeStar_hodgeStar {k : ℕ} (α : SmoothForm n X k) :
     HEq (⋆(⋆α)) (((-1 : ℂ) ^ (k * (2 * n - k))) • α)
 
@@ -87,36 +89,48 @@ axiom hodgeStar_hodgeStar {k : ℕ} (α : SmoothForm n X k) :
 def adjointDeriv {k : ℕ} (_ω : SmoothForm n X k) : SmoothForm n X (k - 1) := 0
 notation:max "δ" ω:max => adjointDeriv ω
 
-axiom adjointDeriv_add {k : ℕ} (α β : SmoothForm n X k) : δ (α + β) = δ α + δ β
-axiom adjointDeriv_smul_real {k : ℕ} (r : ℝ) (α : SmoothForm n X k) : δ (r • α) = r • (δ α)
+-- Note: Trivial since adjointDeriv := 0; needs real proofs once properly implemented
+theorem adjointDeriv_add {k : ℕ} (α β : SmoothForm n X k) : δ (α + β) = δ α + δ β := by simp only [adjointDeriv, add_zero]
+theorem adjointDeriv_smul_real {k : ℕ} (r : ℝ) (α : SmoothForm n X k) : δ (r • α) = r • (δ α) := by simp only [adjointDeriv, smul_zero]
 theorem adjointDeriv_zero {k : ℕ} : δ(0 : SmoothForm n X k) = 0 := rfl
-axiom adjointDeriv_neg {k : ℕ} (α : SmoothForm n X k) : δ(-α) = -(δ α)
-axiom adjointDeriv_sub {k : ℕ} (α β : SmoothForm n X k) : δ(α - β) = δ α - δ β
-axiom adjointDeriv_squared {k : ℕ} (α : SmoothForm n X k) : δ (δ α) = 0
+theorem adjointDeriv_neg {k : ℕ} (α : SmoothForm n X k) : δ(-α) = -(δ α) := by simp only [adjointDeriv, neg_zero]
+theorem adjointDeriv_sub {k : ℕ} (α β : SmoothForm n X k) : δ(α - β) = δ α - δ β := by simp only [adjointDeriv, sub_self]
+theorem adjointDeriv_squared {k : ℕ} (α : SmoothForm n X k) : δ (δ α) = 0 := rfl
 
 /-! ## Hodge Laplacian -/
 
 noncomputable def laplacian {k : ℕ} (_ω : SmoothForm n X k) : SmoothForm n X k := 0
 notation:max "Δ" ω:max => laplacian ω
 
-axiom laplacian_add {k : ℕ} (α β : SmoothForm n X k) : Δ (α + β) = Δ α + Δ β
-axiom laplacian_smul_real {k : ℕ} (r : ℝ) (α : SmoothForm n X k) : Δ (r • α) = r • (Δ α)
+-- Note: Trivial since laplacian := 0; needs real proofs once properly implemented
+theorem laplacian_add {k : ℕ} (α β : SmoothForm n X k) : Δ (α + β) = Δ α + Δ β := by simp only [laplacian, add_zero]
+theorem laplacian_smul_real {k : ℕ} (r : ℝ) (α : SmoothForm n X k) : Δ (r • α) = r • (Δ α) := by simp only [laplacian, smul_zero]
 theorem laplacian_zero {k : ℕ} : Δ(0 : SmoothForm n X k) = 0 := rfl
-axiom laplacian_neg {k : ℕ} (α : SmoothForm n X k) : Δ(-α) = -(Δ α)
-axiom laplacian_sub {k : ℕ} (α β : SmoothForm n X k) : Δ(α - β) = Δ α - Δ β
+theorem laplacian_neg {k : ℕ} (α : SmoothForm n X k) : Δ(-α) = -(Δ α) := by simp only [laplacian, neg_zero]
+theorem laplacian_sub {k : ℕ} (α β : SmoothForm n X k) : Δ(α - β) = Δ α - Δ β := by simp only [laplacian, sub_self]
 
 def IsHarmonic {k : ℕ} (ω : SmoothForm n X k) : Prop := Δ ω = 0
 
 theorem isHarmonic_zero {k : ℕ} : IsHarmonic (0 : SmoothForm n X k) := rfl
-axiom isHarmonic_neg {k : ℕ} {ω : SmoothForm n X k} (h : IsHarmonic ω) : IsHarmonic (-ω)
-axiom isHarmonic_add {k : ℕ} {ω₁ ω₂ : SmoothForm n X k} (h1 : IsHarmonic ω₁) (h2 : IsHarmonic ω₂) : IsHarmonic (ω₁ + ω₂)
-axiom isHarmonic_smul_real {k : ℕ} {ω : SmoothForm n X k} (r : ℝ) (h : IsHarmonic ω) : IsHarmonic (r • ω)
-axiom isHarmonic_sub {k : ℕ} {ω₁ ω₂ : SmoothForm n X k} (h1 : IsHarmonic ω₁) (h2 : IsHarmonic ω₂) : IsHarmonic (ω₁ - ω₂)
 
+-- IsHarmonic properties follow from laplacian = 0 (all forms are harmonic since Δ = 0)
+theorem isHarmonic_neg {k : ℕ} {ω : SmoothForm n X k} (h : IsHarmonic ω) : IsHarmonic (-ω) := by
+  unfold IsHarmonic at *; simp only [laplacian_neg, h, neg_zero]
+theorem isHarmonic_add {k : ℕ} {ω₁ ω₂ : SmoothForm n X k} (h1 : IsHarmonic ω₁) (h2 : IsHarmonic ω₂) : IsHarmonic (ω₁ + ω₂) := by
+  unfold IsHarmonic at *; simp only [laplacian_add, h1, h2, add_zero]
+theorem isHarmonic_smul_real {k : ℕ} {ω : SmoothForm n X k} (r : ℝ) (h : IsHarmonic ω) : IsHarmonic (r • ω) := by
+  unfold IsHarmonic at *; simp only [laplacian_smul_real, h, smul_zero]
+theorem isHarmonic_sub {k : ℕ} {ω₁ ω₂ : SmoothForm n X k} (h1 : IsHarmonic ω₁) (h2 : IsHarmonic ω₂) : IsHarmonic (ω₁ - ω₂) := by
+  unfold IsHarmonic at *; simp only [laplacian_sub, h1, h2, sub_self]
+
+-- This axiom represents real Hodge theory: harmonic implies closed
+-- Cannot be derived from the stubs since Δ=0 but smoothExtDeriv may not be 0
 axiom isHarmonic_implies_closed {k : ℕ} (ω : SmoothForm n X k) :
     IsHarmonic ω → IsFormClosed ω
 
-axiom isHarmonic_implies_coclosed {k : ℕ} (ω : SmoothForm n X k) :
-    IsHarmonic ω → δ ω = 0
+-- Trivial since adjointDeriv = 0
+theorem isHarmonic_implies_coclosed {k : ℕ} (ω : SmoothForm n X k) :
+    IsHarmonic ω → δ ω = 0 := by
+  intro _; rfl
 
 end
