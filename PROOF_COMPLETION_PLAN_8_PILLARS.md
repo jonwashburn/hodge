@@ -129,7 +129,7 @@ instance instNormedSpaceTangentSpace (x : X) : NormedSpace ℂ (TangentSpace (�
 | Classical/Bergman.lean | 3 |
 | Other files | 12 |
 
-**Total: 132 → 49 axioms (83 eliminated, 63% reduction)**
+**Total: 132 → 47 axioms (85 eliminated, 64% reduction)**
 
 **Latest (session 2):**
 - `Norms.lean`: `pointwiseComass_set_nonempty` → theorem (zero vector witness)
@@ -145,9 +145,14 @@ instance instNormedSpaceTangentSpace (x : X) : NormedSpace ℂ (TangentSpace (�
 - `Bergman.lean`: `tian_convergence`, `jet_surjectivity` → removed (unused)
 - `SheafTheory.lean`: `h0_structure_sheaf_nonvanishing` → removed (unused)
 
+**Latest (session 3):**
+- `Forms.lean`: `smoothExtDeriv_add` → proved using `map_add` from linearity
+- `Forms.lean`: `smoothExtDeriv_smul_real` → proved using `map_smul` from linearity
+- Added `smoothExtDeriv_smul` for complex scalars
+
 ---
 
-### Remaining 49 Axioms Analysis
+### Remaining 47 Axioms Analysis
 
 **8 Classical Pillars (to keep):**
 1. `serre_gaga` (GAGA.lean) - Pillar 1
@@ -164,10 +169,10 @@ instance instNormedSpaceTangentSpace (x : X) : NormedSpace ℂ (TangentSpace (�
 - `serre_vanishing` (foundational algebraic geometry)
 
 **Infrastructure axioms requiring major work:**
-- Forms.lean (8): `isSmoothAlternating_add/smul`, `extDerivLinearMap`, `smoothExtDeriv_*`
+- Forms.lean (6): `isSmoothAlternating_add/smul`, `extDerivLinearMap`, `smoothExtDeriv_extDeriv/continuous`, `instTopologicalSpace`
 - Currents.lean (7): `map_zero'`, `map_smul`, `neg_zero_current`, `is_bounded`, `mass_*`
 - Norms.lean (6): `pointwiseComass_*`, `comass_smul`, `instNormedAddCommGroup/Space`
-- Others (20): TypeDecomposition, Microstructure, Grassmannian, SheafTheory, etc.
+- Others (18): TypeDecomposition (3), Microstructure (2), Grassmannian (2), SheafTheory (3), etc.
 
 ---
 
@@ -182,7 +187,7 @@ instance instNormedSpaceTangentSpace (x : X) : NormedSpace ℂ (TangentSpace (�
 
 | File | Axioms | Notes |
 |------|--------|-------|
-| Analytic/Forms.lean | 8 | Form axioms |
+| Analytic/Forms.lean | 6 | Form axioms |
 | Analytic/Currents.lean | 7 | Current axioms |
 | Analytic/Norms.lean | 6 | Norm infrastructure |
 | Kahler/TypeDecomposition.lean | 3 | kahlerPow axioms |
@@ -201,7 +206,7 @@ instance instNormedSpaceTangentSpace (x : X) : NormedSpace ℂ (TangentSpace (�
 | Analytic/IntegralCurrents.lean | 1 | Polyhedral boundary |
 | Kahler/Manifolds.lean | 1 | lefschetzLambdaLinearMap |
 | Utils/BaranyGrinberg.lean | 1 | Combinatorics (not imported) |
-| **TOTAL** | **49** |
+| **TOTAL** | **47** |
 
 ---
 
