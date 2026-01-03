@@ -1,4 +1,4 @@
-import Hodge.Basic
+import Hodge.Cohomology.Basic
 import Hodge.Analytic
 import Hodge.Kahler
 import Hodge.Classical

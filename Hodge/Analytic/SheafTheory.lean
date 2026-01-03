@@ -10,7 +10,7 @@ import Mathlib.Algebra.Category.ModuleCat.Sheaf
 import Mathlib.Algebra.BigOperators.Group.Finset.Defs
 import Mathlib.LinearAlgebra.TensorProduct.Basic
 import Mathlib.Data.Fin.Basic
-import Hodge.Basic
+import Hodge.Analytic.Forms
 import Hodge.Classical.Bergman
 
 /-!

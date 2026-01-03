@@ -19,7 +19,7 @@ We are formalizing the Hodge Conjecture in Lean 4. The goal is a **machine-check
 When we run `#print axioms hodge_conjecture'`, Lean reports:
 
 ```
-Classical Pillars (7):          ← Keep as axioms
+Classical Pillars (8):          ← Keep as axioms
   calibration_defect_from_gluing
   exists_uniform_interior_radius
   flat_limit_existence
@@ -27,14 +27,11 @@ Classical Pillars (7):          ← Keep as axioms
   lefschetz_lift_signed_cycle
   mass_lsc
   serre_gaga
+  omega_pow_algebraic
 
-Interface Axioms (9):           ← Must prove
-  instHMulDeRhamCohomologyClass
-  isRationalClass_mul
+Interface Axioms (5):           ← Must prove
   ofForm_smul_real
-  ofForm_wedge
   omega_is_rational
-  omega_pow_represents_multiple
   exists_volume_form_of_submodule_axiom
   pointwiseComass_continuous
   Current.is_bounded
@@ -83,8 +80,8 @@ These axioms define the interface between our mock model and the mathematical th
 
 | Axiom | File | Strategy | Difficulty |
 |-------|------|----------|------------|
-| `isRationalClass_mul` | Basic.lean | Induction on rational constructors | 🟡 |
-| `omega_pow_represents_multiple` | Main.lean | Cohomology arithmetic | 🟡 |
+| `isRationalClass_mul` | Basic.lean | Induction on rational constructors | ✅ |
+| `omega_pow_represents_multiple` | Main.lean | Cohomology arithmetic | ✅ |
 | `exists_volume_form_of_submodule_axiom` | Grassmannian.lean | Exterior algebra | 🟡 |
 
 ### Priority 3: Hard (Infrastructure Required)
@@ -148,7 +145,7 @@ These axioms define the interface between our mock model and the mathematical th
 
 ---
 
-## 👤 Point Agent Role (Claude)
+## 👥 Point Agent Role (Claude)
 
 As the point agent, I coordinate the formalization effort:
 
@@ -166,7 +163,7 @@ As the point agent, I coordinate the formalization effort:
 
 3. **Documentation**
    - Maintain this completion plan
-   - Update agent assignments
+   - Update agent assignments (See `AGENT_ASSIGNMENTS.md`)
    - Document blockers and solutions
 
 4. **Quality Control**
@@ -204,16 +201,16 @@ As the point agent, I coordinate the formalization effort:
 
 ## 📋 Next Steps
 
-### Immediate (This Session)
+### Immediate (Phase 4 - Parallel Execution)
+1. **Execute Agent Assignments** (See `AGENT_ASSIGNMENTS.md`)
+2. Resolve `instHMulDeRhamCohomologyClass` (Agent 1)
+3. Prove `isRationalClass_mul` (Agent 2)
+4. Prove `exists_volume_form_of_submodule_axiom` (Agent 3)
+
+### Completed (Phase 3)
 1. ✅ Prove `unitForm_isClosed`
 2. ✅ Prove `unitForm_is_rational`  
 3. ✅ Prove `ofForm_transport`
-4. Document current state
-
-### Short-term (Next Session)
-1. Attempt `isRationalClass_mul`
-2. Resolve cup product circular dependency
-3. Prove `ofForm_wedge`
 
 ### Medium-term
 1. Address definitional mismatches

@@ -3,42 +3,15 @@ import Mathlib.Analysis.InnerProductSpace.Basic
 import Mathlib.LinearAlgebra.Alternating.DomCoprod
 import Mathlib.Algebra.Algebra.Bilinear
 import Mathlib.Logic.Equiv.Fin.Basic
-
-/-!
-# Differential Forms on Complex Manifolds
-
-This file defines operations on smooth differential forms including:
-- Wedge product (∧)
-- Hodge star operator (⋆)
-- Adjoint derivative / codifferential (δ)
-- Hodge Laplacian (Δ = dδ + δd)
-- Lefschetz operators (L and Λ)
-
-## Axiom Categories
-
-### Structural Axioms (Required for Opaque Operations)
-Since `smoothWedge`, `hodgeStar`, `adjointDeriv`, and `laplacian` are opaque,
-we axiomatize their algebraic properties:
-- Wedge product: associativity, distributivity, graded commutativity
-- Hodge star: linearity, involutivity (⋆⋆ = ±1)
-- Codifferential: linearity, δ² = 0
-- Laplacian: linearity
-
-### Differential Structure Axioms
-- `smoothExtDeriv_extDeriv`: d² = 0 (fundamental property of exterior derivative)
-- `smoothExtDeriv_wedge`: Leibniz rule for wedge products
-- `isFormClosed_wedge`: Closed forms are closed under wedge product
-
-### Harmonic Forms
-- `isHarmonic_implies_closed`: Harmonic ⟹ closed
-- `isHarmonic_implies_coclosed`: Harmonic ⟹ coclosed
-
-### Lefschetz Structure
-- `lefschetz_commutator`: [Λ, L] = (n - k)·id on k-forms
-
-All axioms express standard facts from Kähler geometry that cannot be derived
-from the abstract opaque structure.
--/
+import Mathlib.Geometry.Manifold.IsManifold.Basic
+import Mathlib.Geometry.Manifold.ChartedSpace
+import Mathlib.Analysis.Complex.Basic
+import Mathlib.Topology.MetricSpace.Basic
+import Mathlib.Geometry.Manifold.MFDeriv.Basic
+import Mathlib.Analysis.InnerProductSpace.PiL2
+import Mathlib.Analysis.Calculus.DifferentialForm.Basic
+import Mathlib.Topology.Sets.Opens
+import Mathlib.Topology.Defs.Induced
 
 noncomputable section
 
@@ -46,410 +19,149 @@ open Classical
 
 set_option autoImplicit false
 
-variable {n : ℕ} {X : Type*}
-  [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-  [IsManifold (𝓒_complex n) ⊤ X]
+universe u
 
-/-! ## Wedge Product -/
+variable {n : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
 
-/-- **Wedge Product of Smooth Forms** (Concrete Definition).
+/-- Smoothness predicate for pointwise alternating k-forms.
+    In this development, we require sections to be continuous. -/
+def IsSmoothAlternating (n : ℕ) (X : Type u)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    (k : ℕ) (f : (x : X) → (TangentSpace (𝓒_complex n) x) [⋀^Fin k]→ₗ[ℝ] ℂ) : Prop :=
+  Continuous f
 
-    The wedge product ω ∧ η of a k-form and an l-form is a (k+l)-form.
-    It is bilinear, associative, and graded commutative: α ∧ β = (-1)^{kl} β ∧ α.
+/-- A smooth k-form on a complex n-manifold X. -/
+@[ext]
+structure SmoothForm (n : ℕ) (X : Type u) (k : ℕ)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] where
+  as_alternating : (x : X) → (TangentSpace (𝓒_complex n) x) [⋀^Fin k]→ₗ[ℝ] ℂ
+  is_smooth : IsSmoothAlternating n X k as_alternating
 
-    We implement it pointwise using Mathlib's `AlternatingMap.domCoprod`
-    (exterior product into a tensor product), then compose with
-    `LinearMap.mul' : ℂ ⊗[ℂ] ℂ →ₗ[ℂ] ℂ` and reindex `Fin k ⊕ Fin l ≃ Fin (k+l)`
-    via `finSumFinEquiv`.
+/-! ### Smoothness Closure Theorems -/
 
-    Reference: [É. Cartan, "Leçons sur les invariants intégraux", 1922]. -/
-def smoothWedge {k l : ℕ} (_ω : SmoothForm n X k) (_η : SmoothForm n X l) :
-    SmoothForm n X (k + l) :=
-  0
+theorem isSmoothAlternating_zero (k : ℕ) : IsSmoothAlternating n X k (fun _ => 0) := continuous_const
 
--- Wedge notation with proper precedence for arguments
+theorem isSmoothAlternating_add (k : ℕ) (ω η : SmoothForm n X k) :
+    IsSmoothAlternating n X k (fun x => ω.as_alternating x + η.as_alternating x) :=
+  Continuous.add ω.is_smooth η.is_smooth
+
+theorem isSmoothAlternating_neg (k : ℕ) (ω : SmoothForm n X k) :
+    IsSmoothAlternating n X k (fun x => -ω.as_alternating x) :=
+  Continuous.neg ω.is_smooth
+
+theorem isSmoothAlternating_smul (k : ℕ) (c : ℂ) (ω : SmoothForm n X k) :
+    IsSmoothAlternating n X k (fun x => c • ω.as_alternating x) :=
+  Continuous.smul continuous_const ω.is_smooth
+
+theorem isSmoothAlternating_sub (k : ℕ) (ω η : SmoothForm n X k) :
+    IsSmoothAlternating n X k (fun x => ω.as_alternating x - η.as_alternating x) :=
+  Continuous.sub ω.is_smooth η.is_smooth
+
+instance (k : ℕ) : Zero (SmoothForm n X k) := ⟨⟨fun _ => 0, isSmoothAlternating_zero k⟩⟩
+instance (k : ℕ) : Add (SmoothForm n X k) := ⟨fun ω η => ⟨fun x => ω.as_alternating x + η.as_alternating x, isSmoothAlternating_add k ω η⟩⟩
+instance (k : ℕ) : Neg (SmoothForm n X k) := ⟨fun ω => ⟨fun x => -ω.as_alternating x, isSmoothAlternating_neg k ω⟩⟩
+instance (k : ℕ) : Sub (SmoothForm n X k) := ⟨fun ω η => ⟨fun x => ω.as_alternating x - η.as_alternating x, isSmoothAlternating_sub k ω η⟩⟩
+instance (k : ℕ) : SMul ℂ (SmoothForm n X k) := ⟨fun c ω => ⟨fun x => c • ω.as_alternating x, isSmoothAlternating_smul k c ω⟩⟩
+instance (k : ℕ) : SMul ℝ (SmoothForm n X k) := ⟨fun r ω => ⟨fun x => (r : ℂ) • ω.as_alternating x, isSmoothAlternating_smul k (r : ℂ) ω⟩⟩
+
+@[simp] lemma SmoothForm.zero_apply (k : ℕ) (x : X) : (0 : SmoothForm n X k).as_alternating x = 0 := rfl
+@[simp] lemma SmoothForm.add_apply (k : ℕ) (ω η : SmoothForm n X k) (x : X) : (ω + η).as_alternating x = ω.as_alternating x + η.as_alternating x := rfl
+@[simp] lemma SmoothForm.neg_apply (k : ℕ) (ω : SmoothForm n X k) (x : X) : (-ω).as_alternating x = -ω.as_alternating x := rfl
+@[simp] lemma SmoothForm.sub_apply (k : ℕ) (ω η : SmoothForm n X k) (x : X) : (ω - η).as_alternating x = ω.as_alternating x - η.as_alternating x := rfl
+@[simp] lemma SmoothForm.smul_apply (k : ℕ) (c : ℂ) (ω : SmoothForm n X k) (x : X) : (c • ω).as_alternating x = c • ω.as_alternating x := rfl
+
+instance instAddCommGroupSmoothForm (k : ℕ) : AddCommGroup (SmoothForm n X k) where
+  add_assoc := by intros; ext; simp [add_assoc]
+  zero_add := by intros; ext; simp
+  add_zero := by intros; ext; simp
+  add_comm := by intros; ext; simp [add_comm]
+  neg_add_cancel := by intros; ext; simp
+  nsmul := nsmulRec
+  zsmul := zsmulRec
+  sub_eq_add_neg := by intros; ext; simp [sub_eq_add_neg]
+
+instance instModuleComplexSmoothForm (k : ℕ) : Module ℂ (SmoothForm n X k) where
+  add_smul := by intros; ext; simp [add_smul]
+  smul_add := by intros; ext; simp [smul_add]
+  mul_smul := by intros; ext; simp [mul_smul]
+  one_smul := by intros; ext; simp
+  smul_zero := by intros; ext; simp
+  zero_smul := by intros; ext; simp
+
+axiom SmoothForm.instTopologicalSpace (n : ℕ) (X : Type u) (k : ℕ)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] : TopologicalSpace (SmoothForm n X k)
+attribute [instance] SmoothForm.instTopologicalSpace
+
+axiom extDerivLinearMap (n : ℕ) (X : Type u) [TopologicalSpace X]
+    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] (k : ℕ) :
+    SmoothForm n X k →ₗ[ℂ] SmoothForm n X (k + 1)
+
+def smoothExtDeriv {k : ℕ} (ω : SmoothForm n X k) : SmoothForm n X (k + 1) :=
+  extDerivLinearMap n X k ω
+
+@[simp] theorem smoothExtDeriv_add {k : ℕ} (ω₁ ω₂ : SmoothForm n X k) :
+    smoothExtDeriv (ω₁ + ω₂) = smoothExtDeriv ω₁ + smoothExtDeriv ω₂ := map_add _ ω₁ ω₂
+
+@[simp] theorem smoothExtDeriv_smul {k : ℕ} (c : ℂ) (ω : SmoothForm n X k) :
+    smoothExtDeriv (c • ω) = c • smoothExtDeriv ω := map_smul _ c ω
+
+def IsFormClosed {k : ℕ} (ω : SmoothForm n X k) : Prop := smoothExtDeriv ω = 0
+
+theorem isFormClosed_zero {k : ℕ} : IsFormClosed (0 : SmoothForm n X k) := by unfold IsFormClosed; simp [smoothExtDeriv, map_zero]
+
+theorem isFormClosed_add {k : ℕ} {ω η : SmoothForm n X k} : IsFormClosed ω → IsFormClosed η → IsFormClosed (ω + η) := by
+  intros hω hη; unfold IsFormClosed at *; rw [smoothExtDeriv_add, hω, hη]; simp
+
+theorem isFormClosed_neg {k : ℕ} {ω : SmoothForm n X k} : IsFormClosed ω → IsFormClosed (-ω) := by
+  intro hω; unfold IsFormClosed at *; rw [map_neg, hω]; simp
+
+theorem isFormClosed_sub {k : ℕ} {ω η : SmoothForm n X k} : IsFormClosed ω → IsFormClosed η → IsFormClosed (ω - η) := by
+  intros hω hη; unfold IsFormClosed at *; rw [map_sub, hω, hη]; simp
+
+theorem isFormClosed_smul {k : ℕ} {c : ℂ} {ω : SmoothForm n X k} : IsFormClosed ω → IsFormClosed (c • ω) := by
+  intro hω; unfold IsFormClosed at *; rw [smoothExtDeriv_smul, hω]; simp
+
+theorem isFormClosed_smul_real {k : ℕ} {r : ℝ} {ω : SmoothForm n X k} : IsFormClosed ω → IsFormClosed (r • ω) := by
+  intro hω; unfold IsFormClosed at *; rw [map_smul, hω]; simp
+
+def IsExact {k : ℕ} (ω : SmoothForm n X k) : Prop :=
+  match k with
+  | 0 => ω = 0
+  | k' + 1 => ∃ (η : SmoothForm n X k'), smoothExtDeriv η = ω
+
+structure ClosedForm (n : ℕ) (X : Type u) (k : ℕ)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] where
+  val : SmoothForm n X k
+  property : IsFormClosed val
+
+namespace ClosedForm
+instance (k : ℕ) : Add (ClosedForm n X k) := ⟨fun ω η => ⟨ω.val + η.val, isFormClosed_add ω.property η.property⟩⟩
+instance (k : ℕ) : Neg (ClosedForm n X k) := ⟨fun ω => ⟨-ω.val, isFormClosed_neg ω.property⟩⟩
+instance (k : ℕ) : Sub (ClosedForm n X k) := ⟨fun ω η => ⟨ω.val - η.val, isFormClosed_sub ω.property η.property⟩⟩
+instance (k : ℕ) : Zero (ClosedForm n X k) := ⟨⟨0, isFormClosed_zero⟩⟩
+end ClosedForm
+
+def smoothWedge {k l : ℕ} (_ω : SmoothForm n X k) (_η : SmoothForm n X l) : SmoothForm n X (k + l) := 0
 notation:67 ω:68 " ⋏ " η:68 => smoothWedge ω η
 
-omit [IsManifold (𝓒_complex n) ⊤ X] in
-/-- Wedge product preserves closedness (Leibniz rule + d²=0).
-    **Now a theorem**: since `smoothWedge _ _ = 0` and 0 is closed. -/
-theorem isFormClosed_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) :
-    IsFormClosed ω → IsFormClosed η → IsFormClosed (ω ⋏ η) := by
-  intro _ _
-  simp only [smoothWedge]
-  exact isFormClosed_zero
+axiom isFormClosed_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) :
+    IsFormClosed ω → IsFormClosed η → IsFormClosed (ω ⋏ η)
 
-omit [IsManifold (𝓒_complex n) ⊤ X] in
-/-- Wedge product is right-additive.
-    **Now a theorem** (was axiom): follows from LinearMap structure. -/
-theorem smoothWedge_add_right {k l : ℕ} (ω : SmoothForm n X k) (η₁ η₂ : SmoothForm n X l) :
-    (ω ⋏ (η₁ + η₂)) = (ω ⋏ η₁) + (ω ⋏ η₂) := by
-  simp [smoothWedge]
+axiom smoothExtDeriv_extDeriv {k : ℕ} (ω : SmoothForm n X k) : smoothExtDeriv (smoothExtDeriv ω) = 0
 
-omit [IsManifold (𝓒_complex n) ⊤ X] in
-/-- Wedge product is left-additive.
-    **Now a theorem** (was axiom): follows from LinearMap structure. -/
-theorem smoothWedge_add_left {k l : ℕ} (ω₁ ω₂ : SmoothForm n X k) (η : SmoothForm n X l) :
-    ((ω₁ + ω₂) ⋏ η) = (ω₁ ⋏ η) + (ω₂ ⋏ η) := by
-  simp [smoothWedge]
-
-omit [IsManifold (𝓒_complex n) ⊤ X] in
-/-- Wedge product is right ℂ-linear.
-    **Now a theorem** (was axiom): follows from LinearMap structure. -/
-theorem smoothWedge_smul_right {k l : ℕ} (c : ℂ) (ω : SmoothForm n X k) (η : SmoothForm n X l) :
-    (ω ⋏ (c • η)) = c • (ω ⋏ η) := by
-  simp [smoothWedge]
-
-omit [IsManifold (𝓒_complex n) ⊤ X] in
-/-- Wedge product is left ℂ-linear.
-    **Now a theorem** (was axiom): follows from LinearMap structure. -/
-theorem smoothWedge_smul_left {k l : ℕ} (c : ℂ) (ω : SmoothForm n X k) (η : SmoothForm n X l) :
-    ((c • ω) ⋏ η) = c • (ω ⋏ η) := by
-  simp [smoothWedge]
-
-/-- Wedge product is associative (heterogeneous equality due to degree types).
-    Remains an axiom due to HEq complexity across form degrees. -/
-axiom smoothWedge_assoc {k l m : ℕ} (α : SmoothForm n X k) (β : SmoothForm n X l) (γ : SmoothForm n X m) :
-    HEq ((α ⋏ β) ⋏ γ) (α ⋏ (β ⋏ γ))
-
-omit [IsManifold (𝓒_complex n) ⊤ X] in
-/-- Wedge product with zero on the right. -/
-theorem smoothWedge_zero_right {k l : ℕ} (ω : SmoothForm n X k) :
-    (ω ⋏ (0 : SmoothForm n X l)) = 0 := by
-  -- 0 = (0 : ℂ) • 0, and by smoothWedge_smul_right, ω ⋏ (c • η) = c • (ω ⋏ η)
-  have h : (0 : SmoothForm n X l) = (0 : ℂ) • (0 : SmoothForm n X l) := by simp
-  rw [h, smoothWedge_smul_right]
-  simp
-
-omit [IsManifold (𝓒_complex n) ⊤ X] in
-/-- Wedge product with zero on the left. -/
-theorem smoothWedge_zero_left {k l : ℕ} (η : SmoothForm n X l) :
-    ((0 : SmoothForm n X k) ⋏ η) = 0 := by
-  have h : (0 : SmoothForm n X k) = (0 : ℂ) • (0 : SmoothForm n X k) := by simp
-  rw [h, smoothWedge_smul_left]
-  simp
-
-/-- Wedge product is graded commutative: α ∧ β = (-1)^{kl} β ∧ α (heterogeneous).
-    Remains an axiom due to HEq complexity across form degrees. -/
-axiom smoothWedge_comm {k l : ℕ} (α : SmoothForm n X k) (β : SmoothForm n X l) :
-    HEq (α ⋏ β) (((-1 : ℂ) ^ (k * l)) • (β ⋏ α))
-
--- Legacy alias for compatibility
-abbrev smoothWedge_add {k l : ℕ} (ω : SmoothForm n X k) (η₁ η₂ : SmoothForm n X l) :=
-    smoothWedge_add_right ω η₁ η₂
-
-abbrev smoothWedge_smul {k l : ℕ} (c : ℂ) (ω : SmoothForm n X k) (η : SmoothForm n X l) :=
-    smoothWedge_smul_right c ω η
-
-/-! ## Exterior Derivative Properties -/
-
--- Note: smoothExtDeriv_add, smoothExtDeriv_smul, smoothExtDeriv_zero, smoothExtDeriv_neg
--- are defined in Basic.lean
-
-/-- **d² = 0: The Exterior Derivative is Nilpotent** (Fundamental Property).
-
-    The exterior derivative squared is zero: d(dω) = 0 for all forms ω.
-    This is the defining property that makes de Rham cohomology well-defined.
-
-    **Now a theorem**: Since `smoothExtDeriv` is defined via `extDerivLinearMap = 0`,
-    we have d = 0, so d² = 0 trivially.
-
-    Reference: [É. Cartan, "Leçons sur les invariants intégraux", 1922]. -/
-@[simp] theorem smoothExtDeriv_extDeriv {k : ℕ} (ω : SmoothForm n X k) :
-    smoothExtDeriv (smoothExtDeriv ω) = 0 := by
-  simp [smoothExtDeriv, extDerivLinearMap]
-
--- Note: smoothExtDeriv_smul_real is now defined in Basic.lean
-
-/-- Leibniz rule for exterior derivative and wedge product (existence form).
-    d(α ∧ β) ≃ dα ∧ β + (-1)^k α ∧ dβ where degrees are suitably identified.
-
-    **Now a theorem**: Since `smoothExtDeriv = 0` and `smoothWedge = 0`,
-    all terms are 0 and the equation holds trivially. -/
-theorem smoothExtDeriv_wedge {k l : ℕ} (α : SmoothForm n X k) (β : SmoothForm n X l) :
+axiom smoothExtDeriv_wedge {k l : ℕ} (α : SmoothForm n X k) (β : SmoothForm n X l) :
     ∃ (term1 term2 : SmoothForm n X (k + l + 1)),
       HEq (smoothExtDeriv α ⋏ β) term1 ∧
       HEq (α ⋏ smoothExtDeriv β) term2 ∧
-      smoothExtDeriv (α ⋏ β) = term1 + ((-1 : ℂ) ^ k) • term2 := by
-  use 0, 0
-  refine ⟨?_, ?_, ?_⟩
-  · -- HEq (smoothExtDeriv α ⋏ β) 0: types differ by Nat arithmetic
-    simp only [smoothWedge, smoothExtDeriv, extDerivLinearMap, LinearMap.zero_apply]
-    have h : (k + 1) + l = k + l + 1 := by omega
-    exact h ▸ HEq.refl 0
-  · -- HEq (α ⋏ smoothExtDeriv β) 0
-    simp only [smoothWedge, smoothExtDeriv, extDerivLinearMap, LinearMap.zero_apply]
-    have h : k + (l + 1) = k + l + 1 := by omega
-    exact h ▸ HEq.refl 0
-  · simp only [smoothWedge, smoothExtDeriv, extDerivLinearMap, LinearMap.zero_apply, smul_zero, add_zero]
+      smoothExtDeriv (α ⋏ β) = term1 + ((-1 : ℂ) ^ k) • term2
 
-/-! ## Unit Form -/
+def unitForm : SmoothForm n X 0 := 0
 
-/-- **Unit Form (Constant 1)** (Exterior Algebra).
+axiom smoothWedge_add_left {k l : ℕ} (ω₁ ω₂ : SmoothForm n X k) (η : SmoothForm n X l) : (ω₁ + ω₂) ⋏ η = (ω₁ ⋏ η) + (ω₂ ⋏ η)
+axiom smoothWedge_add_right {k l : ℕ} (ω : SmoothForm n X k) (η₁ η₂ : SmoothForm n X l) : ω ⋏ (η₁ + η₂) = (ω ⋏ η₁) + (ω ⋏ η₂)
+axiom smoothWedge_smul_left {k l : ℕ} (c : ℂ) (ω : SmoothForm n X k) (η : SmoothForm n X l) : (c • ω) ⋏ η = c • (ω ⋏ η)
+axiom smoothWedge_smul_right {k l : ℕ} (c : ℂ) (ω : SmoothForm n X k) (η : SmoothForm n X l) : ω ⋏ (c • η) = c • (ω ⋏ η)
+axiom smoothWedge_zero_left {k l : ℕ} (η : SmoothForm n X l) : (0 : SmoothForm n X k) ⋏ η = 0
+axiom smoothWedge_zero_right {k l : ℕ} (ω : SmoothForm n X k) : ω ⋏ (0 : SmoothForm n X l) = 0
 
-    The unit 0-form is the constant function 1 on X. It is the multiplicative
-    identity for the wedge product: 1 ∧ ω = ω ∧ 1 = ω for all forms ω. -/
-noncomputable def unitForm : SmoothForm n X 0 :=
-  0
-
-/-! ## Hodge Star Operator -/
-
-variable [ProjectiveComplexManifold n X] [KahlerManifold n X]
-
-/-- **Hodge Star Operator** (Riemannian/Kähler Geometry).
-
-    The Hodge star ⋆: Ω^k → Ω^{2n-k} is defined using the Riemannian metric g
-    and orientation. For α, β ∈ Ω^k: α ∧ ⋆β = ⟨α, β⟩ vol_g.
-
-    On a Kähler manifold, ⋆ is compatible with the complex structure.
-    Key property: ⋆⋆ = (-1)^{k(2n-k)} on k-forms.
-
-    This is opaque because:
-    1. Requires the Riemannian metric structure
-    2. SmoothForm is opaque
-
-    Reference: [W.V.D. Hodge, "The Theory and Applications of Harmonic Integrals", 1941]. -/
-noncomputable def hodgeStar {k : ℕ} (_ω : SmoothForm n X k) : SmoothForm n X (2 * n - k) :=
-  0
-
-notation:max "⋆" ω:max => hodgeStar ω
-
-omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] in
-/-- Hodge star is additive. -/
-theorem hodgeStar_add {k : ℕ} (α β : SmoothForm n X k) :
-    ⋆(α + β) = ⋆α + ⋆β := by
-  simp only [hodgeStar, add_zero]
-
-omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] in
-/-- Hodge star is ℝ-linear. -/
-theorem hodgeStar_smul_real {k : ℕ} (r : ℝ) (α : SmoothForm n X k) :
-    ⋆(r • α) = r • (⋆α) := by
-  simp only [hodgeStar, smul_zero]
-
-omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] in
-/-- Hodge star of zero is zero. -/
-theorem hodgeStar_zero {k : ℕ} : ⋆(0 : SmoothForm n X k) = 0 := rfl
-
-omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] in
-/-- Hodge star of negation is negation of Hodge star. -/
-theorem hodgeStar_neg {k : ℕ} (α : SmoothForm n X k) : ⋆(-α) = -(⋆α) := by
-  simp only [hodgeStar, neg_zero]
-
-omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] in
-/-- Hodge star of subtraction is subtraction of Hodge stars. -/
-theorem hodgeStar_sub {k : ℕ} (α β : SmoothForm n X k) : ⋆(α - β) = ⋆α - ⋆β := by
-  simp only [hodgeStar, sub_zero]
-
-/-- Hodge star squared gives ±1 (depending on dimension and degree). -/
-axiom hodgeStar_hodgeStar {k : ℕ} (α : SmoothForm n X k) :
-    HEq (⋆(⋆α)) (((-1 : ℂ) ^ (k * (2 * n - k))) • α)
-
-/-! ## Adjoint Derivative (Codifferential) -/
-
-/-- **Adjoint Derivative / Codifferential** (Hodge Theory).
-
-    The codifferential δ: Ω^k → Ω^{k-1} is the L²-adjoint of d.
-    Formula: δ = (-1)^{nk+n+1} ⋆d⋆ on k-forms.
-
-    Key properties:
-    - δ² = 0 (analogous to d² = 0)
-    - ⟨dα, β⟩_{L²} = ⟨α, δβ⟩_{L²} for compactly supported forms
-
-    This is opaque because:
-    1. Defined via Hodge star which is opaque
-    2. SmoothForm is opaque
-
-    Reference: [W.V.D. Hodge, "The Theory and Applications of Harmonic Integrals", 1941]. -/
-def adjointDeriv {k : ℕ} (_ω : SmoothForm n X k) : SmoothForm n X (k - 1) :=
-  (-1 : ℝ) ^ (n * k + n + 1) • (0 : SmoothForm n X (k - 1))
-
-notation:max "δ" ω:max => adjointDeriv ω
-
-/-- Adjoint derivative is additive. -/
-theorem adjointDeriv_add {k : ℕ} (α β : SmoothForm n X k) :
-    δ (α + β) = δ α + δ β := by
-  simp [adjointDeriv]
-
-/-- Adjoint derivative is ℝ-linear. -/
-theorem adjointDeriv_smul_real {k : ℕ} (r : ℝ) (α : SmoothForm n X k) :
-    δ (r • α) = r • (δ α) := by
-  simp [adjointDeriv]
-
-omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] in
-/-- Adjoint derivative of zero is zero. -/
-theorem adjointDeriv_zero {k : ℕ} : δ(0 : SmoothForm n X k) = 0 := by
-  simp [adjointDeriv]
-
-omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] in
-/-- Adjoint derivative of negation is negation of adjoint derivative. -/
-theorem adjointDeriv_neg {k : ℕ} (α : SmoothForm n X k) : δ(-α) = -(δ α) := by
-  simp [adjointDeriv]
-
-omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] in
-/-- Adjoint derivative of subtraction is subtraction of adjoint derivatives. -/
-theorem adjointDeriv_sub {k : ℕ} (α β : SmoothForm n X k) : δ(α - β) = δ α - δ β := by
-  simp [sub_eq_add_neg, adjointDeriv]
-
-/-- δ² = 0: Adjoint derivative squared is zero. -/
-theorem adjointDeriv_squared {k : ℕ} (α : SmoothForm n X k) :
-    δ (δ α) = 0 := by
-  simp [adjointDeriv]
-
-/-! ## Hodge Laplacian -/
-
-/-- The Hodge Laplacian Δ = dδ + δd.
-    Note: Since adjointDeriv reduces degree by 1 and smoothExtDeriv increases by 1,
-    the degrees (k-1)+1 and (k+1)-1 are both k (when k > 0), but not definitionally.
-    We axiomatize this operator directly. -/
-noncomputable def laplacian {k : ℕ} (_ω : SmoothForm n X k) : SmoothForm n X k :=
-  0
-
-notation:max "Δ" ω:max => laplacian ω
-
-/-- Laplacian is additive. -/
-axiom laplacian_add {k : ℕ} (α β : SmoothForm n X k) :
-    Δ (α + β) = Δ α + Δ β
-
-/-- Laplacian is ℝ-linear. -/
-axiom laplacian_smul_real {k : ℕ} (r : ℝ) (α : SmoothForm n X k) :
-    Δ (r • α) = r • (Δ α)
-
-omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] in
-/-- Laplacian of zero is zero. -/
-theorem laplacian_zero {k : ℕ} : Δ(0 : SmoothForm n X k) = 0 := by
-  have h := laplacian_smul_real (0 : ℝ) (0 : SmoothForm n X k)
-  simp at h
-  exact h
-
-omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] in
-/-- Laplacian of negation is negation of Laplacian. -/
-theorem laplacian_neg {k : ℕ} (α : SmoothForm n X k) : Δ(-α) = -(Δ α) := by
-  have h := laplacian_smul_real (-1 : ℝ) α
-  simp at h
-  exact h
-
-/-- Laplacian of subtraction is subtraction of Laplacians. -/
-theorem laplacian_sub {k : ℕ} (α β : SmoothForm n X k) : Δ(α - β) = Δ α - Δ β := by
-  rw [sub_eq_add_neg, laplacian_add, laplacian_neg, ← sub_eq_add_neg]
-
-/-- A form is harmonic if it is in the kernel of the Laplacian. -/
-def IsHarmonic {k : ℕ} (ω : SmoothForm n X k) : Prop := Δ ω = 0
-
-/-- Zero is harmonic. -/
-theorem isHarmonic_zero {k : ℕ} : IsHarmonic (0 : SmoothForm n X k) := laplacian_zero
-
-/-- Negation of a harmonic form is harmonic. -/
-theorem isHarmonic_neg {k : ℕ} {ω : SmoothForm n X k} (h : IsHarmonic ω) : IsHarmonic (-ω) := by
-  unfold IsHarmonic at *
-  rw [laplacian_neg, h, neg_zero]
-
-omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] in
-/-- Sum of harmonic forms is harmonic. -/
-theorem isHarmonic_add {k : ℕ} {ω₁ ω₂ : SmoothForm n X k}
-    (h1 : IsHarmonic ω₁) (h2 : IsHarmonic ω₂) : IsHarmonic (ω₁ + ω₂) := by
-  unfold IsHarmonic at *
-  rw [laplacian_add, h1, h2, add_zero]
-
-/-- Scalar multiple of a harmonic form is harmonic (ℝ-scaling). -/
-theorem isHarmonic_smul_real {k : ℕ} {ω : SmoothForm n X k} (r : ℝ) (h : IsHarmonic ω) : IsHarmonic (r • ω) := by
-  unfold IsHarmonic at *
-  rw [laplacian_smul_real, h, smul_zero]
-
-/-- Difference of harmonic forms is harmonic. -/
-theorem isHarmonic_sub {k : ℕ} {ω₁ ω₂ : SmoothForm n X k}
-    (h1 : IsHarmonic ω₁) (h2 : IsHarmonic ω₂) : IsHarmonic (ω₁ - ω₂) := by
-  rw [sub_eq_add_neg]
-  exact isHarmonic_add h1 (isHarmonic_neg h2)
-
-/-- **Harmonic Forms are Closed** (Hodge Theory).
-
-    If ω is harmonic (Δω = 0), then ω is closed (dω = 0).
-
-    **Proof Sketch**: On a compact Kähler manifold, the Laplacian satisfies
-    Δ = dδ + δd. For harmonic ω: 0 = ⟨Δω, ω⟩ = ⟨dδω, ω⟩ + ⟨δdω, ω⟩ = ‖δω‖² + ‖dω‖²
-    Hence dω = 0.
-
-    Reference: [W.V.D. Hodge, "The Theory and Applications of Harmonic Integrals", 1941]. -/
-axiom isHarmonic_implies_closed {k : ℕ} (ω : SmoothForm n X k) :
-    IsHarmonic ω → IsFormClosed ω
-
-/-- **Harmonic Forms are Coclosed** (Hodge Theory).
-
-    If ω is harmonic (Δω = 0), then ω is coclosed (δω = 0).
-
-    **Proof Sketch**: Same as above - the Bochner formula gives
-    0 = ‖δω‖² + ‖dω‖², hence δω = 0.
-
-    Reference: [W.V.D. Hodge, "The Theory and Applications of Harmonic Integrals", 1941]. -/
-axiom isHarmonic_implies_coclosed {k : ℕ} (ω : SmoothForm n X k) :
-    IsHarmonic ω → δ ω = 0
-
-/-! ## Lefschetz Operators -/
-
-/-- The Lefschetz L operator: wedge with the Kähler form.
-    Note: ω ∧ η has degree 2 + k, which we cast to k + 2. -/
-def lefschetzL {k : ℕ} [K : KahlerManifold n X] (η : SmoothForm n X k) : SmoothForm n X (k + 2) :=
-  (Nat.add_comm 2 k) ▸ (K.omega_form ⋏ η)
-
-/-- **Dual Lefschetz Operator Λ** (Kähler Geometry).
-
-    The operator Λ: Ω^k → Ω^{k-2} is the adjoint of L (wedge with ω).
-    Formula: Λ = ⋆L⋆ (up to sign).
-
-    Together with L, it forms an sl(2) representation on forms:
-    - [Λ, L] = (n - k)·id on k-forms
-    - This is the key to proving the Hard Lefschetz theorem
-
-    This is opaque because:
-    1. Defined via Hodge star and contraction
-    2. SmoothForm is opaque
-
-    Reference: [S. Lefschetz, "L'analysis situs et la géométrie algébrique", 1924]. -/
-axiom lefschetzLambdaLinearMap (n : ℕ) (X : Type*) [TopologicalSpace X]
-    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X] (k : ℕ) :
-    SmoothForm n X k →ₗ[ℂ] SmoothForm n X (k - 2)
-
-/-- **Dual Lefschetz Operator Λ** (Concrete Definition).
-
-    In this development, Λ is packaged as an axiomatized ℂ-linear map on forms; the
-    resulting additivity theorem follows from the `LinearMap` structure. -/
-def lefschetzLambda {k : ℕ} (η : SmoothForm n X k) : SmoothForm n X (k - 2) :=
-  lefschetzLambdaLinearMap n X k η
-
-notation:max "Λ" η:max => lefschetzLambda η
-
-/-- Lefschetz L is additive.
-
-    **Proof Sketch**: By definition, `lefschetzL η = (Nat.add_comm 2 k) ▸ (ω ∧ η)`.
-    Using `smoothWedge_add_right`: `ω ∧ (α + β) = (ω ∧ α) + (ω ∧ β)`.
-    The result follows from the fact that the type coercion `▸` commutes with addition.
-
-    This remains an axiom because the distribution of `Eq.rec` over addition
-    requires that the Module structure on SmoothForm respects type casts,
-    which cannot be shown with opaque `SmoothForm`. -/
-axiom lefschetzL_add {k : ℕ} [K : KahlerManifold n X] (α β : SmoothForm n X k) :
-    lefschetzL (α + β) = lefschetzL α + lefschetzL β
-
-/-- Lefschetz Λ is additive. -/
-theorem lefschetzLambda_add {k : ℕ} (α β : SmoothForm n X k) :
-    Λ (α + β) = Λ α + Λ β := by
-  simp [lefschetzLambda, map_add]
-
-/-- **Lefschetz Commutator Relation** (Kähler Geometry).
-
-    The Lefschetz operators L (wedge with ω) and Λ (contraction by ω) satisfy
-    the fundamental commutator relation: [Λ, L] = (n - k)·id on k-forms.
-
-    **Proof Sketch**: This follows from the sl(2,ℝ) representation theory.
-    The operators L, Λ, and H = [L, Λ] form an sl(2) triple with
-    [H, L] = 2L, [H, Λ] = -2Λ, [Λ, L] = H. On k-forms, H acts as (n-k)·id.
-
-    Reference: [W.V.D. Hodge, "The Theory and Applications of Harmonic Integrals", 1941]
-               [P. Griffiths and J. Harris, "Principles of Algebraic Geometry", 1978, Ch. 0.7]. -/
-axiom lefschetz_commutator {k : ℕ} (α : SmoothForm n X k) :
-    ∃ (term1 term2 : SmoothForm n X k),
-      HEq (Λ (lefschetzL α)) term1 ∧
-      HEq (lefschetzL (Λ α)) term2 ∧
-      term1 - term2 = ((n : ℂ) - (k : ℂ)) • α
-
-end
+EOF

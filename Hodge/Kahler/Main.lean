@@ -88,6 +88,44 @@ theorem automatic_syr {p : ℕ} (γ : SmoothForm n X (2 * p))
 
 /-! ## Cone-Positive Classes are Algebraic -/
 
+/-- **Kähler Power Representation** (de Rham Theorem).
+
+    The cohomology class of the p-th power of the Kähler form is the p-th
+    cup power of the cohomology class of the Kähler form.
+
+    [ω^p] = [ω]^p
+
+    **Proof**: By induction on p:
+    - Base case (p=0): [ω^0] = [1] is the unit class.
+    - Inductive step: [ω^{p+1}] = [ω ∧ ω^p] = [ω] ∪ [ω^p].
+      By induction hypothesis, [ω^p] = [ω]^p, so [ω^{p+1}] = [ω] ∪ [ω]^p = [ω]^{p+1}. -/
+theorem omega_pow_represents_multiple (p : ℕ) :
+    ⟦kahlerPow (n := n) (X := X) p, omega_pow_IsFormClosed p⟧ =
+    (⟦K.omega_form, omega_isClosed⟧ ^ p) := by
+  induction p with
+  | zero =>
+    -- [ω^0] = [unitForm]
+    unfold kahlerPow
+    simp only [cohomologyPow_zero]
+  | succ p ih =>
+    -- [ω^{p+1}] = [ω ∧ ω^p] = [ω] ∪ [ω^p]
+    unfold kahlerPow
+    rw [cohomologyPow_succ]
+    -- Handle LHS cast
+    have h_lhs : ⟦(two_add_two_mul p) ▸ (K.omega_form ⋏ kahlerPow p), _⟧ =
+                 (two_add_two_mul p) ▸ ⟦K.omega_form ⋏ kahlerPow p, _⟧ := by
+      apply ofForm_transport
+    rw [h_lhs]
+    -- Use ofForm_wedge
+    rw [ofForm_wedge]
+    -- Now we have (two_add_two_mul p) ▸ ([ω] * [ω^p])
+    -- and RHS is (Nat.mul_succ ...) ▸ ([ω] * [ω]^p)
+    rw [ih]
+    -- Both sides are casts of the same thing
+    have h_deg : 2 + 2 * p = 2 * (p + 1) := by ring
+    subst h_deg
+    rfl
+
 /-! ## Axioms for Fundamental Class Representation -/
 
 /-- **Harvey-Lawson Fundamental Class Connection** (Harvey-Lawson, 1982).
@@ -200,7 +238,7 @@ theorem cone_positive_represents {p : ℕ}
     Wiley, 1978, Chapter 1, Section 2].
     Reference: [C. Voisin, "Hodge Theory and Complex Algebraic Geometry",
     Vol. I, Cambridge University Press, 2002, Chapter 11]. -/
-axiom omega_pow_represents_multiple {p : ℕ} (c : ℚ) (hc : c > 0) :
+axiom omega_pow_algebraic {p : ℕ} (c : ℚ) (hc : c > 0) :
     ∃ (Z : Set X), isAlgebraicSubvariety n X Z ∧
     ∃ (hZ : IsFormClosed (FundamentalClassSet n X p Z)),
       ⟦FundamentalClassSet n X p Z, hZ⟧ =
@@ -287,7 +325,7 @@ theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : Is
 
     -- γminus is a positive rational multiple of ω^p, so it has an algebraic representative
     obtain ⟨Zminus, hZminus_alg, hZminus_rep_raw⟩ :=
-      omega_pow_represents_multiple (n := n) (X := X) (p := p) sd.N sd.h_N_pos
+      omega_pow_algebraic (n := n) (X := X) (p := p) sd.N sd.h_N_pos
     obtain ⟨hZminus_closed, hZminus_rep_omega⟩ := hZminus_rep_raw
 
     -- Build the signed cycle and show it represents [γ]

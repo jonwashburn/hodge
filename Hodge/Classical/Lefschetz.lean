@@ -1,4 +1,4 @@
-import Hodge.Basic
+import Hodge.Cohomology.Basic
 import Hodge.Analytic.Forms
 import Hodge.Kahler.Manifolds
 import Hodge.Kahler.TypeDecomposition
@@ -50,22 +50,45 @@ theorem ofForm_wedge_add (n : ℕ) (X : Type u) [TopologicalSpace X] [ChartedSpa
   exact ofForm_add (ω ⋏ η₁) (ω ⋏ η₂) (isFormClosed_wedge ω η₁ hω h₁) (isFormClosed_wedge ω η₂ hω h₂)
 
 /-- The Lefschetz operator L : H^p(X) → H^{p+2}(X)
-    is the linear map induced by wedging with the Kähler form.
-    **Definition**: We define L as the zero map (placeholder). In a full formalization,
-    this would be defined as wedging with the Kähler class [ω]. -/
+    is the linear map induced by wedging with the Kähler form class [ω].
+
+    **Definition**: L(c) = [ω] ∪ c. -/
 def lefschetz_operator (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
-    (p : ℕ) : DeRhamCohomologyClass n X p →ₗ[ℂ] DeRhamCohomologyClass n X (p + 2) := 0
+    (p : ℕ) : DeRhamCohomologyClass n X p →ₗ[ℂ] DeRhamCohomologyClass n X (p + 2) where
+  toFun c := ⟦K.omega_form, K.omega_closed⟧ * c
+  map_add' η₁ η₂ := by
+    -- [ω] * (η₁ + η₂) = [ω]*η₁ + [ω]*η₂ follows from add_mul
+    -- wait, we need mul_add (right distributive)
+    exact mul_add ⟦K.omega_form, K.omega_closed⟧ η₁ η₂
+  map_smul' r η := by
+    -- [ω] * (r • η) = r • ([ω] * η)
+    -- We have smul_rat_mul for rational r. For complex r, we need a similar theorem.
+    -- Assuming instModuleDeRhamCohomologyClass and cup product compatibility.
+    -- Since we are in an axiomatized environment, we can use a small axiom or a known property.
+    -- Actually, Cohomology/Basic.lean should have smul_mul.
+    -- Let's check.
+    exact mul_smul ⟦K.omega_form, K.omega_closed⟧ r η
 
 -- The Lefschetz operator maps cohomology classes to cohomology classes.
--- Every cohomology class is represented by a closed form.
-axiom lefschetz_operator_eval (n : ℕ) (X : Type u)
+-- This is now a theorem following from the definition.
+theorem lefschetz_operator_eval (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
     (p : ℕ) (c : DeRhamCohomologyClass n X p) :
     ∃ (ω' : SmoothForm n X (p + 2)) (h_closed : IsFormClosed ω'),
-    lefschetz_operator n X p c = ⟦ω', h_closed⟧
+    lefschetz_operator n X p c = ⟦ω', h_closed⟧ := by
+  let L := lefschetz_operator n X p
+  obtain ⟨ω, h_closed_ω⟩ := Quotient.exists_rep c
+  use K.omega_form ⋏ ω.val, isFormClosed_wedge K.omega_form ω.val K.omega_closed ω.property
+  -- [ω] * [η] = [ω ⋏ η] by definition/ofForm_wedge
+  rw [lefschetz_operator]
+  simp only [LinearMap.coe_mk, AddHom.coe_mk]
+  -- We need the degree alignment (Nat.add_comm 2 p)
+  -- The definition of lefschetz_operator uses * which is HMul
+  -- HMul for cohomology classes is defined via Quotient.lift₂ of wedge.
+  rfl
 
 /-- The iterated Lefschetz map L^k : H^p(X) → H^{p+2k}(X). -/
 def lefschetz_power (n : ℕ) (X : Type u)

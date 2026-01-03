@@ -11,7 +11,7 @@ import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Geometry.Manifold.Algebra.Monoid
 import Mathlib.Geometry.Manifold.ContMDiff.Basic
 import Mathlib.Analysis.InnerProductSpace.TensorProduct
-import Hodge.Basic
+import Hodge.Cohomology.Basic
 import Hodge.Analytic.Forms
 import Hodge.Analytic.Norms
 

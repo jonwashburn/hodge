@@ -37,7 +37,7 @@ These are the deep theorems intentionally kept as axioms in the final state of t
 | 2 | `exists_uniform_interior_radius` | Cone.lean | Lang 1999 |
 | 3 | `serre_gaga` | GAGA.lean | Serre 1956 |
 | 4 | `harvey_lawson_fundamental_class` | Main.lean | Harvey-Lawson 1982 |
-| 5 | `omega_pow_represents_multiple` | Main.lean | Griffiths-Harris 1978 |
+| 5 | `omega_pow_algebraic` | Main.lean | Griffiths-Harris 1978 |
 | 6 | `lefschetz_lift_signed_cycle` | Main.lean | Voisin 2002 |
 | 7 | `flat_limit_existence` | Microstructure.lean | FF 1960 |
 | 8 | `calibration_defect_from_gluing` | Microstructure.lean | FF 1960 |

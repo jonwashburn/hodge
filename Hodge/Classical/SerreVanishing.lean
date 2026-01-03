@@ -3,7 +3,7 @@ import Mathlib.Algebra.Category.ModuleCat.Basic
 import Mathlib.Tactic.Linarith
 import Mathlib.CategoryTheory.Limits.Shapes.ZeroObjects
 import Mathlib.Geometry.Manifold.MFDeriv.Basic
-import Hodge.Basic
+import Hodge.Cohomology.Basic
 import Hodge.Classical.Bergman
 import Hodge.Analytic.SheafTheory
 

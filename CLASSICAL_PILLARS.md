@@ -35,7 +35,7 @@ These thirteen are explicitly marked in Lean with `STATUS: CLASSICAL PILLAR` (or
   - **Meaning**: bridge between calibrated current limits and algebraic cohomology classes.
   - **Refs**: Harvey–Lawson (1982).
 
-- **`omega_pow_represents_multiple`** (`Hodge/Kahler/Main.lean`)
+- **`omega_pow_algebraic`** (`Hodge/Kahler/Main.lean`)
   - **Meaning**: positive rational multiples of Kähler powers are algebraic.
   - **Refs**: Griffiths–Harris (1978).
 
