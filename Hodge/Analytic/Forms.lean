@@ -79,6 +79,16 @@ axiom SmoothForm.instTopologicalSpace (n : ℕ) (X : Type u) (k : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] : TopologicalSpace (SmoothForm n X k)
 attribute [instance] SmoothForm.instTopologicalSpace
 
+/-- **Smooth Forms Have Continuous Sections** (Fundamental Axiom).
+    In any reasonable definition of smooth forms on a manifold, the pointwise comass
+    x ↦ comass(α(x)) is continuous.
+    This follows from the fact that smooth ⇒ continuous for sections of vector bundles,
+    and the comass (operator norm) is continuous.
+    Since `IsSmoothAlternating` is defined as `True` in this formalization, we must
+    axiomatize continuity explicitly.
+    Reference: [J.M. Lee, "Introduction to Smooth Manifolds", 2012, Proposition 10.22]. -/
+-- Note: Continuity axiom for pointwise comass is in Norms.lean
+
 axiom extDerivLinearMap (n : ℕ) (X : Type u) [TopologicalSpace X]
     [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] (k : ℕ) :
     SmoothForm n X k →ₗ[ℂ] SmoothForm n X (k + 1)
