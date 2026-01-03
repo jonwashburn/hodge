@@ -163,8 +163,32 @@ instance instNormedSpaceTangentSpace (x : X) : NormedSpace ℂ (TangentSpace (�
 | Classical/HarveyLawson.lean | 1 | Pillar 5 helper |
 | Classical/SerreVanishing.lean | 1 | Serre vanishing |
 | Analytic/IntegralCurrents.lean | 1 | Polyhedral boundary |
-| Utils/BaranyGrinberg.lean | 1 | Combinatorics |
+| Utils/BaranyGrinberg.lean | 1 | Combinatorics (not imported) |
 | **TOTAL** | **70** |
+
+---
+
+### Next Steps to Continue
+
+**High priority (quick wins remaining):**
+1. **Forms.lean (8 axioms)**: `isSmoothAlternating_add`, `isSmoothAlternating_smul`, `extDerivLinearMap`, `smoothExtDeriv_*` - These require Mathlib's differential forms API.
+2. **Currents.lean (6 axioms)**: `map_smul`, `neg_zero_current`, `mass_*` - Need Current extensionality.
+3. **Norms.lean (10 axioms)**: Norm infrastructure - requires proper operator norm definitions.
+
+**Medium priority (structural axioms):**
+4. **Kahler/Manifolds.lean (5 axioms)**: Deep Kähler theory axioms
+5. **TypeDecomposition.lean (4 axioms)**: kahlerPow needs proper wedge product
+6. **Cone.lean (4 axioms)**: Includes Pillar 7
+
+**Kept as classical pillars (8 axioms):**
+1. `serre_gaga` (GAGA.lean)
+2. `federer_fleming_compactness` (FedererFleming.lean)
+3. `mass_lsc` (Calibration.lean)
+4. `spine_theorem` (Calibration.lean)
+5. `harvey_lawson_fundamental_class` (Main.lean)
+6. `hard_lefschetz_bijective` (Lefschetz.lean)
+7. `exists_uniform_interior_radius` (Cone.lean)
+8. `omega_pow_algebraic` (Main.lean)
 
 ---
 
