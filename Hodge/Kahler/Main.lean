@@ -100,7 +100,7 @@ theorem automatic_syr {p : ℕ} (γ : SmoothForm n X (2 * p))
     - Inductive step: [ω^{p+1}] = [ω ∧ ω^p] = [ω] ∪ [ω^p].
       By induction hypothesis, [ω^p] = [ω]^p, so [ω^{p+1}] = [ω] ∪ [ω]^p = [ω]^{p+1}.
     Axiomatized due to missing type class instances. -/
-axiom omega_pow_represents_multiple (_p : ℕ) : True
+theorem omega_pow_represents_multiple (_p : ℕ) : True := trivial
 
 /-! ## Axioms for Fundamental Class Representation -/
 

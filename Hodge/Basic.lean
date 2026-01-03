@@ -24,7 +24,7 @@ class ProjectiveComplexManifold (n : ℕ) (X : Type u)
     extends IsManifold (𝓒_complex n) ⊤ X, CompactSpace X where
   embedding_dim : ℕ
 
-axiom exists_not_isClosed_set (X : Type*) [TopologicalSpace X] [Nonempty X] : ∃ S : Set X, ¬ IsClosed S
+-- exists_not_isClosed_set was unused and has been removed
 
 variable {n : ℕ} {X : Type*} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
 

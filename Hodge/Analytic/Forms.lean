@@ -219,13 +219,8 @@ axiom smoothExtDeriv_add {k : ℕ} (ω₁ ω₂ : SmoothForm n X k) : smoothExtD
 axiom smoothExtDeriv_smul_real {k : ℕ} (r : ℝ) (ω : SmoothForm n X k) : smoothExtDeriv (r • ω) = r • smoothExtDeriv ω
 axiom smoothExtDeriv_continuous {k : ℕ} : Continuous (smoothExtDeriv (n := n) (X := X) (k := k))
 
--- Note: Trivial in principle since smoothWedge := 0, but HEq degree arithmetic is complex
--- Kept as axiom to avoid type-level complications
-axiom smoothExtDeriv_wedge {k l : ℕ} (α : SmoothForm n X k) (β : SmoothForm n X l) :
-    ∃ (term1 term2 : SmoothForm n X (k + l + 1)),
-      HEq (smoothExtDeriv α ⋏ β) term1 ∧
-      HEq (α ⋏ smoothExtDeriv β) term2 ∧
-      smoothExtDeriv (α ⋏ β) = term1 + ((-1 : ℂ) ^ k) • term2
+-- smoothExtDeriv_wedge (Leibniz rule for wedge) was removed as unused
+-- The HEq degree arithmetic is complex and wedge := 0 anyway
 
 def unitForm : SmoothForm n X 0 := 0
 
