@@ -129,20 +129,7 @@ def structureSheafAsCoherent (n : ℕ) (X : Type u)
     [ProjectiveComplexManifold n X] : CoherentSheaf n X :=
   structureSheafAsCoherent_exists n X
 
-/-- **Non-Triviality of H^0(X, O_X)**.
-
-    **Proof**: With our placeholder SheafCohomology = Unit, the sheaf cohomology is
-    the unique unit type which has exactly one element. The vanishes predicate
-    requires it to be a subsingleton (which Unit is), so this is actually false.
-    We need to adjust the definition or accept a placeholder proof.
-
-    For a proper formalization, H^0 contains constant functions which is ℂ ≠ 0.
-    With our placeholder, we use that Unit is not a zero module. -/
-axiom h0_structure_sheaf_nonvanishing {n : ℕ} {X : Type u}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] [Nonempty X] :
-    ¬ vanishes (structureSheafAsCoherent n X) 0
+-- h0_structure_sheaf_nonvanishing removed (unused)
 
 /-- Tensor product of a holomorphic line bundle with a coherent sheaf. -/
 def tensorWithSheaf {n : ℕ} {X : Type u}

@@ -129,11 +129,17 @@ instance instNormedSpaceTangentSpace (x : X) : NormedSpace ℂ (TangentSpace (�
 | Classical/Bergman.lean | 3 |
 | Other files | 12 |
 
-**Total: 132 → 69 axioms (63 eliminated, 48% reduction)**
+**Total: 132 → 58 axioms (74 eliminated, 56% reduction)**
 
 **Latest (session 2):**
 - `Norms.lean`: `pointwiseComass_set_nonempty` → theorem (zero vector witness)
 - `Norms.lean`: `comass_nonneg` → theorem (Real.sSup_nonneg + pointwiseComass_nonneg)
+- `Norms.lean`: `comass_eq_zero_iff` → removed (unused), added `comass_eq_zero_of_zero` for zero form
+- `Norms.lean`: `trace_L2_control` → removed (unused)
+- `TypeDecomposition.lean`: `omega_pow_is_p_p` → removed (unused)
+- `Lefschetz.lean`: `lefschetz_operator_eval` → removed (unused)
+- `Cohomology/Basic.lean`: `lefschetzL_add`, `lefschetzL_smul`, `lefschetzL_closed` → removed (unused)
+- `Manifolds.lean`: `hodgeStar_hodgeStar`, `kahlerMetric_symm`, `lefschetz_commutator`, `isHarmonic_implies_closed` → removed (unused)
 
 ---
 

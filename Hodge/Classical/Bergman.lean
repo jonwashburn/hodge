@@ -214,23 +214,7 @@ noncomputable def BergmanMetric (L : HolomorphicLineBundle n X) [IsAmple L] (M :
 noncomputable def dist_form (_α _β : SmoothForm n X 2) : ℝ :=
   comass (_α - _β)
 
-/-- **Tian's Convergence Theorem** (Tian, 1990).
-
-    **Deep Theorem Citation**: The Bergman metric on the M-th tensor power of an
-    ample line bundle converges to the Kähler metric as M → ∞ in the C^∞ topology.
-    Specifically, (1/M) · ω_M → ω where ω_M is the Bergman-Fubini-Study metric
-    induced by the embedding via |L^M|.
-
-    **Proof**: With our placeholder implementation where BergmanMetric = omega_form,
-    the convergence is immediate: dist_form(c • ω, ω) = |1 - c| · comass(ω), which
-    can be made arbitrarily small by choosing M large.
-
-    Reference: [G. Tian, "On a set of polarized Kähler metrics on algebraic manifolds",
-    J. Differential Geom. 32 (1990), 99-130]. -/
-axiom tian_convergence (L : HolomorphicLineBundle n X) [IsAmple L]
-    (_h : ∀ M, HermitianMetric (L.power M)) :
-    ∀ ε > 0, ∃ M₀ : ℕ, ∀ M ≥ M₀,
-      dist_form ((1 / M : ℝ) • BergmanMetric L M (_h M)) (K.omega_form) ≤ ε
+-- tian_convergence removed (unused)
 
 /-- The subspace of holomorphic sections vanishing to order k at x.
 
@@ -264,21 +248,7 @@ noncomputable def jet_eval (L : HolomorphicLineBundle n X) (x : X) (k : ℕ) :
     ↥(HolomorphicSection L) →ₗ[ℂ] (JetSpace L x k) :=
   Submodule.mkQ _
 
-/-- **Jet Surjectivity for Ample Line Bundles** (Griffiths-Harris, 1978).
-
-    **Deep Theorem Citation**: For an ample line bundle L, the global sections
-    of L^M surject onto all k-jets at any point x for sufficiently large M.
-    This follows from Serre vanishing and the long exact sequence in sheaf cohomology.
-
-    **Proof**: We provide a direct existence proof. For any k-jet, we can find
-    M large enough that the space of sections is rich enough to generate it.
-    With our placeholder definitions, jet_eval maps to a trivial jet space,
-    so surjectivity is immediate.
-
-    Reference: [Griffiths-Harris, 1978, Chapter 1.5].
-    Reference: [Hartshorne, 1977, Chapter III, Corollary 5.3]. -/
-axiom jet_surjectivity (L : HolomorphicLineBundle n X) [IsAmple L] (x : X) (k : ℕ) :
-    ∃ M₀ : ℕ, ∀ M ≥ M₀, Function.Surjective (jet_eval (L.power M) x k)
+-- jet_surjectivity removed (unused)
 
 /-- The tensor product of two holomorphic sections exists and is holomorphic. -/
 theorem IsHolomorphic_tensor {L₁ L₂ : HolomorphicLineBundle n X} (s₁ : Section L₁) (s₂ : Section L₂) :

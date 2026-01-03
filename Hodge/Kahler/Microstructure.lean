@@ -37,10 +37,7 @@ def IsComplexSubmanifold (Y : Set X) (p : ℕ) : Prop :=
     ∃ (inst : TopologicalSpace Y) (inst_charted : ChartedSpace (EuclideanSpace ℂ (Fin p)) Y),
       IsManifold (𝓒_complex p) ⊤ Y
 
-/-- **Theorem: Local Sheet Realization** (Proposition 11.3). -/
-axiom local_sheet_realization (p : ℕ) (x : X) (ξ : SmoothForm n X (2 * p))
-    (hξ : ξ ∈ simpleCalibratedForms p x) (ε : ℝ) (hε : ε > 0) :
-    ∃ (Y : Set X), x ∈ Y ∧ IsComplexSubmanifold Y p
+-- local_sheet_realization removed (unused)
 
 /-! ## Cubulation -/
 
@@ -86,9 +83,7 @@ def IsValidIntegerApproximation {h : ℝ} {C : Cubulation n X h}
   (∀ e, |(int_flow e : ℝ) - target e| < 1) ∧
   (∀ Q, |divergence (fun e => (int_flow e : ℝ)) Q - divergence target Q| < 1)
 
-/-- **Theorem: Integer Transport Theorem** (Bárány-Grinberg). -/
-axiom integer_transport (p : ℕ) {h : ℝ} (C : Cubulation n X h) (target : CubulationFlow C) :
-    ∃ (int_flow : DirectedEdge C → ℤ), IsValidIntegerApproximation target int_flow
+-- integer_transport removed (unused)
 
 /-! ## Microstructure Gluing -/
 
@@ -187,10 +182,7 @@ def IsValidGluing {p : ℕ} {h : ℝ} {C : Cubulation n X h}
     ∀ ψ : SmoothForm n X (2 * (n - p)),
       |T_curr.toFun ψ - SmoothForm.pairing β ψ| < comass β * h
 
-/-- **Theorem: Microstructure Gluing Estimate** -/
-axiom gluing_estimate (p : ℕ) (h : ℝ) (C : Cubulation n X h)
-    (β : SmoothForm n X (2 * p)) (hβ : isConePositive β) (m : ℕ) :
-    ∃ (T_raw : RawSheetSum n X p h C), IsValidGluing β T_raw
+-- gluing_estimate removed (unused)
 
 /-! ## Mesh Sequence Infrastructure -/
 
@@ -247,10 +239,7 @@ def HasBoundedCalibrationDefect {p : ℕ} {h : ℝ} {C : Cubulation n X h}
     (ψ : CalibratingForm n X (2 * (n - p))) (bound : ℝ) : Prop :=
   calibrationDefect (T_raw.toIntegralCurrent).toFun ψ ≤ bound
 
-axiom gluing_flat_norm_bound (p : ℕ) (h : ℝ) (hh : h > 0) (C : Cubulation n X h)
-    (β : SmoothForm n X (2 * p)) (hβ : isConePositive β) (m : ℕ) :
-    ∃ (T_raw : RawSheetSum n X p h C),
-      IsValidGluing β T_raw ∧ HasBoundedFlatNorm T_raw (comass β * h)
+-- gluing_flat_norm_bound removed (unused)
 
 axiom calibration_defect_from_gluing (p : ℕ) (h : ℝ) (hh : h > 0) (C : Cubulation n X h)
     (β : SmoothForm n X (2 * p)) (hβ : isConePositive β) (m : ℕ)

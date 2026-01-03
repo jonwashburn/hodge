@@ -24,26 +24,7 @@ noncomputable def C2 (_n _k : ℕ) : ℝ := 2
 noncomputable def C3 (_n _k : ℕ) : ℝ := 2
 noncomputable def C4 (_n _k : ℕ) : ℝ := 2
 
-/-- **The Deformation Theorem** (Federer-Fleming, 1960).
-
-    **Deep Theorem Citation**: Any integral current T can be approximated by a
-    polyhedral current P on a grid of size ε, with the decomposition:
-    T = P + ∂Q + S
-    where P is polyhedral, Q is a higher-dimensional "filling", and S is a
-    small remainder. All terms have explicit mass bounds in terms of T and ε.
-
-    **Proof**: We use the trivial decomposition P = T, Q = 0, S = 0.
-    This satisfies T = P + ∂0 + 0 = P, and all mass bounds hold with constants ≥ 1.
-
-    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents",
-    Ann. of Math. (2) 72 (1960), 458-520, Theorem 5.5]. -/
-axiom deformation_theorem (k : ℕ) (T : IntegralCurrent n X (k + 1)) (ε : ℝ) (hε : ε > 0) :
-    ∃ (P : IntegralCurrent n X (k + 1)) (Q : IntegralCurrent n X (k + 2)) (S : IntegralCurrent n X (k + 1)),
-      (T : Current n X (k + 1)) = P + Q.boundary.toFun + S ∧
-      (P : Current n X (k + 1)).mass ≤ C1 n k * ((T : Current n X (k + 1)).mass + ε * T.boundary.toFun.mass) ∧
-      (IntegralCurrent.boundary P).toFun.mass ≤ C2 n k * T.boundary.toFun.mass ∧
-      (Q : Current n X (k + 2)).mass ≤ C3 n k * ε * (T : Current n X (k + 1)).mass ∧
-      (S : Current n X (k + 1)).mass ≤ C4 n k * ε * T.boundary.toFun.mass
+-- deformation_theorem removed (unused, not in 8 pillars)
 
 /-- The hypothesis bundle for Federer-Fleming compactness. -/
 structure FFCompactnessHypothesis (n : ℕ) (X : Type*) (k : ℕ)
