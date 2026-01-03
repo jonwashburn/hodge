@@ -129,17 +129,21 @@ instance instNormedSpaceTangentSpace (x : X) : NormedSpace ℂ (TangentSpace (�
 | Classical/Bergman.lean | 3 |
 | Other files | 12 |
 
-**Total: 132 → 58 axioms (74 eliminated, 56% reduction)**
+**Total: 132 → 49 axioms (83 eliminated, 63% reduction)**
 
 **Latest (session 2):**
 - `Norms.lean`: `pointwiseComass_set_nonempty` → theorem (zero vector witness)
 - `Norms.lean`: `comass_nonneg` → theorem (Real.sSup_nonneg + pointwiseComass_nonneg)
-- `Norms.lean`: `comass_eq_zero_iff` → removed (unused), added `comass_eq_zero_of_zero` for zero form
-- `Norms.lean`: `trace_L2_control` → removed (unused)
+- `Norms.lean`: `comass_eq_zero_iff`, `trace_L2_control` → removed (unused)
 - `TypeDecomposition.lean`: `omega_pow_is_p_p` → removed (unused)
 - `Lefschetz.lean`: `lefschetz_operator_eval` → removed (unused)
 - `Cohomology/Basic.lean`: `lefschetzL_add`, `lefschetzL_smul`, `lefschetzL_closed` → removed (unused)
 - `Manifolds.lean`: `hodgeStar_hodgeStar`, `kahlerMetric_symm`, `lefschetz_commutator`, `isHarmonic_implies_closed` → removed (unused)
+- `Cone.lean`: `caratheodory_decomposition` → removed (unused)
+- `FedererFleming.lean`: `deformation_theorem` → removed (unused)
+- `Microstructure.lean`: `local_sheet_realization`, `integer_transport`, `gluing_estimate`, `gluing_flat_norm_bound` → removed (unused)
+- `Bergman.lean`: `tian_convergence`, `jet_surjectivity` → removed (unused)
+- `SheafTheory.lean`: `h0_structure_sheaf_nonvanishing` → removed (unused)
 
 ---
 
@@ -154,27 +158,26 @@ instance instNormedSpaceTangentSpace (x : X) : NormedSpace ℂ (TangentSpace (�
 
 | File | Axioms | Notes |
 |------|--------|-------|
-| Analytic/Norms.lean | 8 | Norm infrastructure |
-| Analytic/Forms.lean | 8 | Form axioms, some provable |
-| Kahler/Microstructure.lean | 6 | New proof infrastructure |
-| Analytic/Currents.lean | 7 | Current axioms (map_zero' added) |
-| Kahler/Manifolds.lean | 5 | Kähler operators |
-| Kahler/TypeDecomposition.lean | 4 | kahlerPow axioms |
-| Analytic/SheafTheory.lean | 4 | Sheaf infrastructure |
-| Kahler/Main.lean | 3 | Main theorem axioms |
-| Cohomology/Basic.lean | 3 | lefschetzL axioms |
+| Analytic/Forms.lean | 8 | Form axioms |
+| Analytic/Currents.lean | 7 | Current axioms |
+| Analytic/Norms.lean | 6 | Norm infrastructure |
+| Kahler/TypeDecomposition.lean | 3 | kahlerPow axioms |
+| Kahler/Main.lean | 3 | Main theorem axioms (2 pillars + 1) |
 | Kahler/Cone.lean | 3 | Cone axioms (incl. Pillar 7) |
-| Classical/Lefschetz.lean | 3 | Including Pillar 6 |
-| Classical/Bergman.lean | 3 | Bergman kernel |
-| Classical/FedererFleming.lean | 2 | Including Pillar 2 |
-| Analytic/Calibration.lean | 2 | Including Pillars 3-4 |
+| Analytic/SheafTheory.lean | 3 | Sheaf infrastructure |
+| Kahler/Microstructure.lean | 2 | microstructure infrastructure |
+| Classical/Lefschetz.lean | 2 | Including Pillar 6 |
 | Analytic/Grassmannian.lean | 2 | Volume form |
+| Analytic/Calibration.lean | 2 | Pillars 3-4 |
 | Classical/GAGA.lean | 1 | Pillar 1 |
-| Classical/HarveyLawson.lean | 1 | Pillar 5 helper |
+| Classical/FedererFleming.lean | 1 | Pillar 2 |
+| Classical/HarveyLawson.lean | 1 | nontrivial_of_dim_pos |
 | Classical/SerreVanishing.lean | 1 | Serre vanishing |
+| Classical/Bergman.lean | 1 | IsHolomorphic_add |
 | Analytic/IntegralCurrents.lean | 1 | Polyhedral boundary |
+| Kahler/Manifolds.lean | 1 | lefschetzLambdaLinearMap |
 | Utils/BaranyGrinberg.lean | 1 | Combinatorics (not imported) |
-| **TOTAL** | **69** |
+| **TOTAL** | **49** |
 
 ---
 
