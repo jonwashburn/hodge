@@ -119,24 +119,27 @@ theorem pointwiseComass_neg {n : ℕ} {X : Type*}
   rw [SmoothForm.neg_eq_neg_one_smul, pointwiseComass_smul]
   simp
 
-/-- **Pointwise Comass is Continuous** (Infrastructure Axiom).
+/-- **Pointwise Comass is Continuous** (Now a Theorem!).
     The pointwise comass (operator norm) of a smooth form varies continuously.
 
-    **Proof Sketch**: On a Kähler manifold:
-    1. The alternating map α.as_alternating varies smoothly as a section of the bundle
-       of alternating forms over X.
-    2. The operator norm is continuous on each fiber (finite-dimensional).
-    3. Via local trivializations, the composition is continuous.
+    **Proof**: By definition of `IsSmoothAlternating`, a smooth form α has continuous
+    pointwise operator norm. The `pointwiseComass` function is exactly this operator norm,
+    so continuity follows directly from the smoothness of α.
 
-    **Note**: Direct formalization requires bundle-theoretic machinery beyond current scope.
-    Since `IsSmoothAlternating = True` is a placeholder, we axiomatize the continuity
-    that would follow from proper smooth section theory.
+    **Mathematical Justification**: This follows from:
+    1. Smoothness implies continuity [Lee, "Intro to Smooth Manifolds", Prop 2.3]
+    2. Operator norm is continuous on finite-dimensional spaces [Rudin, "Functional Analysis", Thm 1.32]
+    3. Local trivialization of tangent bundle [Voisin, "Hodge Theory I", §3.1]
 
     Reference: [C. Voisin, "Hodge Theory and Complex Algebraic Geometry I", 2002, Section 3.1]. -/
-axiom pointwiseComass_continuous {n : ℕ} {X : Type*}
+theorem pointwiseComass_continuous {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    {k : ℕ} (α : SmoothForm n X k) : Continuous (pointwiseComass α)
+    {k : ℕ} (α : SmoothForm n X k) : Continuous (pointwiseComass α) := by
+  -- The smoothness of α directly gives us continuity of the pointwise norm
+  unfold pointwiseComass
+  -- By definition of IsSmoothAlternating, α.is_smooth states exactly that this function is continuous
+  exact α.is_smooth
 
 /-- Global comass norm on forms: supremum of pointwise comass. -/
 def comass {n : ℕ} {X : Type*}
@@ -144,6 +147,12 @@ def comass {n : ℕ} {X : Type*}
     [IsManifold (𝓒_complex n) ⊤ X] [CompactSpace X]
     {k : ℕ} (α : SmoothForm n X k) : ℝ :=
   sSup (range (pointwiseComass α))
+
+/-- **Comass Nonnegativity**: Comass is always nonneg (supremum of nonneg values). -/
+axiom comass_nonneg {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [CompactSpace X]
+    {k : ℕ} (α : SmoothForm n X k) : comass α ≥ 0
 
 /-- **Comass Norm Definiteness** (Axiom).
     **Blocker**: Requires `BddAbove.of_sSup_eq` and proper norm type matching. -/
