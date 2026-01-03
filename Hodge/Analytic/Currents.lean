@@ -41,15 +41,32 @@ theorem map_add {n k : ℕ} {X : Type*} [TopologicalSpace X] [ChartedSpace (Eucl
   simp [one_smul, one_mul] at h
   exact h
 
-/-- Currents map zero to zero. Follows from is_linear with c=0. -/
-axiom map_zero' {n k : ℕ} {X : Type*} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+/-- Currents map zero to zero. Follows from map_add with ω₁=ω₂=0. -/
+theorem map_zero' {n k : ℕ} {X : Type*} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
-    (T : Current n X k) : T.toFun 0 = 0
+    (T : Current n X k) : T.toFun 0 = 0 := by
+  -- T(0 + 0) = T(0) + T(0) from map_add
+  have h_add := map_add T 0 0
+  -- 0 + 0 = 0 in SmoothForm
+  have h_zero : (0 : SmoothForm n X k) + 0 = 0 := by ext x; simp
+  rw [h_zero] at h_add
+  -- h_add : T.toFun 0 = T.toFun 0 + T.toFun 0
+  -- From a = a + a, we get a = 0 (in ℝ)
+  linarith
 
-/-- Linearity: scalar multiplication. Derives from the is_linear field. -/
-axiom map_smul {n k : ℕ} {X : Type*} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+/-- Linearity: scalar multiplication. Derives from the is_linear field with ω₂ = 0. -/
+theorem map_smul {n k : ℕ} {X : Type*} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
-    (T : Current n X k) (r : ℝ) (ω : SmoothForm n X k) : T.toFun (r • ω) = r * T.toFun ω
+    (T : Current n X k) (r : ℝ) (ω : SmoothForm n X k) : T.toFun (r • ω) = r * T.toFun ω := by
+  -- Use is_linear with ω₁ = ω, ω₂ = 0
+  -- T(r • ω + 0) = r * T(ω) + T(0)
+  have h := T.is_linear r ω 0
+  -- r • ω + 0 = r • ω in SmoothForm
+  have h_smul_zero : r • ω + (0 : SmoothForm n X k) = r • ω := by ext x; simp
+  rw [h_smul_zero] at h
+  -- T(0) = 0 from map_zero'
+  rw [map_zero' T, add_zero] at h
+  exact h
 
 /-- The zero current evaluates to zero on all forms. -/
 def zero (n : ℕ) (X : Type*) (k : ℕ)
