@@ -86,6 +86,11 @@ theorem IsAnalyticSet_isClosed {n : ℕ} {X : Type*}
   | union S T _ _ ihS ihT => exact IsClosed.union ihS ihT
   | inter S T _ _ ihS ihT => exact IsClosed.inter ihS ihT
 
+/-- Axiom: Positive-dimensional complex manifolds are nontrivial (have at least two points). -/
+axiom nontrivial_of_dim_pos {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [Nonempty X] (hn : n ≥ 1) : Nontrivial X
+
 /-- **Non-Triviality**: Not every set is analytic.
     **Proof**: The inductive definition only generates sets in the Boolean algebra
     {∅, univ}. Any other set (like a singleton) is not analytic.
@@ -133,11 +138,7 @@ theorem IsAnalyticSet_nontrivial {n : ℕ} {X : Type*}
     -- This means X is a singleton, contradicting n ≥ 1
     -- A complex manifold of dimension n ≥ 1 has at least 2 points
     -- We derive nontriviality from the manifold structure
-    haveI : Nontrivial X := by
-      -- For n ≥ 1, the model space EuclideanSpace ℂ (Fin n) is infinite
-      -- and the charts give local homeomorphisms, so X must be infinite too
-      -- This requires manifold dimension theory to formalize properly
-      exact nontrivial_of_ne x x (by sorry)
+    haveI : Nontrivial X := nontrivial_of_dim_pos (n := n) (X := X) hn
     exact absurd h_univ (Set.singleton_ne_univ x)
 
 /-- A complex analytic subvariety of a complex manifold X. -/
