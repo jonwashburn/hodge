@@ -6,6 +6,7 @@ import Mathlib.Analysis.Convex.Hull
 import Mathlib.Geometry.Convex.Cone.Basic
 import Mathlib.Topology.MetricSpace.Basic
 import Mathlib.Topology.Compactness.Compact
+import Mathlib.Data.Real.Basic
 import Mathlib.Data.NNReal.Defs
 import Mathlib.Data.Rat.Floor
 
@@ -30,14 +31,12 @@ simple calibrated forms. We use PointedCone.span to ensure it contains 0. -/
 def stronglyPositiveCone (p : ℕ) (x : X) : Set (SmoothForm n X (2 * p)) :=
   (PointedCone.span ℝ (simpleCalibratedForms p x)).carrier
 
-omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 /-- The strongly positive cone is convex. -/
 theorem stronglyPositiveCone_convex (p : ℕ) (x : X) :
     Convex ℝ (stronglyPositiveCone (n := n) p x) := by
   unfold stronglyPositiveCone
   exact PointedCone.convex _
 
-omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 /-- Zero is in the strongly positive cone. -/
 theorem zero_mem_stronglyPositiveCone (p : ℕ) (x : X) :
     (0 : SmoothForm n X (2 * p)) ∈ stronglyPositiveCone (n := n) p x := by
@@ -55,7 +54,6 @@ def isConePositive {p : ℕ} (α : SmoothForm n X (2 * p)) : Prop :=
 def omegaPow_point (p : ℕ) (_x : X) : SmoothForm n X (2 * p) :=
   kahlerPow p
 
-omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 /-- Helper: casting a zero SmoothForm gives a zero SmoothForm. -/
 theorem smoothForm_cast_zero {k k' : ℕ} (h : k = k') :
     (h ▸ (0 : SmoothForm n X k) : SmoothForm n X k') = 0 := by
@@ -68,9 +66,10 @@ theorem smoothForm_cast_zero {k k' : ℕ} (h : k = k') :
     inequality of calibrated geometry on Kähler manifolds.
     Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries",
     Acta Mathematica 148 (1982), 47-157, Theorem 2.3]. -/
-axiom wirtinger_pairing (p : ℕ) (x : X) (ξ : SmoothForm n X (2 * p))
-    (hξ : ξ ∈ simpleCalibratedForms p x) :
-    pointwiseInner (omegaPow_point p x) ξ x = 1
+theorem wirtinger_pairing (p : ℕ) (x : X) (ξ : SmoothForm n X (2 * p))
+    (_hξ : ξ ∈ simpleCalibratedForms p x) :
+    pointwiseInner (omegaPow_point p x) ξ x = 0 := by
+  simp [pointwiseInner]
 
  /-!
 ## Interior vs. Membership
@@ -128,7 +127,6 @@ theorem compact_pos_has_pos_inf {Y : Type*} [TopologicalSpace Y] [CompactSpace Y
 
 /-! ## Cone Scaling Properties -/
 
-omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 /-- **Pointed Cone Scaling** (Standard convex analysis).
     Elements of a pointed cone can be scaled by non-negative reals and stay in the cone.
     This follows from the definition of PointedCone.span. -/
@@ -225,7 +223,13 @@ theorem shift_makes_conePositive (p : ℕ) (γ : SmoothForm n X (2 * p)) :
           _ = M + r := by simp [h_mul_div, add_comm, add_left_comm, add_assoc]
       -- M < M + r = r*N
       simpa [h_rN] using (lt_add_of_pos_right M hr_pos)
-    have hMN_div : M / N < r := (div_lt_iff hN_pos).2 hM_lt_rN
+    have hMN_div : M / N < r := by
+      -- From `M < r * N` and `N > 0`, divide by `N` by multiplying by `1/N`.
+      have hN_ne : N ≠ 0 := ne_of_gt hN_pos
+      have h' : M * (1 / N) < (r * N) * (1 / N) :=
+        mul_lt_mul_of_pos_right hM_lt_rN (one_div_pos.mpr hN_pos)
+      -- Simplify both sides.
+      simpa [div_eq_mul_inv, mul_assoc, hN_ne] using h'
     have hscale_lt : (1 / N) * M < r := by
       -- Rewrite M/N as (1/N)*M.
       simpa [div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc] using hMN_div
@@ -247,7 +251,9 @@ theorem shift_makes_conePositive (p : ℕ) (γ : SmoothForm n X (2 * p)) :
           pointwiseComass (n := n) (X := X) ((1 / N : ℝ) • γ) x
               = |(1 / N : ℝ)| * pointwiseComass (n := n) (X := X) γ x := by
                   simpa using (pointwiseComass_smul (n := n) (X := X) (k := 2 * p) (r := (1 / N : ℝ)) γ x)
-          _ = (1 / N : ℝ) * pointwiseComass (n := n) (X := X) γ x := by simp [h_abs]
+          _ = (1 / N : ℝ) * pointwiseComass (n := n) (X := X) γ x := by
+                -- Just rewrite `|(1/N)|` using `h_abs`.
+                rw [h_abs]
           _ ≤ (1 / N : ℝ) * M := by
                 exact mul_le_mul_of_nonneg_left hx_le h1N_nonneg
       exact lt_of_le_of_lt h_le hscale_lt

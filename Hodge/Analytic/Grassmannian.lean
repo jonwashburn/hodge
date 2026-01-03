@@ -40,25 +40,33 @@ A (2p)-form ω is a volume form on a complex p-dimensional subspace V if:
 2. ω vanishes on vectors orthogonal to V
 
 Reference: [Harvey-Lawson, "Calibrated geometries", 1982, Section 2] -/
-opaque IsVolumeFormOn {n : ℕ} {X : Type*}
+def IsVolumeFormOn {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     (x : X) (p : ℕ) (V : Submodule ℂ (TangentSpace (𝓒_complex n) x))
-    (ω : (TangentSpace (𝓒_complex n) x) [⋀^Fin (2 * p)]→ₗ[ℂ] ℂ) : Prop
+    (ω : (TangentSpace (𝓒_complex n) x) [⋀^Fin (2 * p)]→ₗ[ℂ] ℂ) : Prop :=
+  ∃ v : Fin (2 * p) → V, ω (fun i => (v i : TangentSpace (𝓒_complex n) x)) ≠ 0
 
 /-- **Volume Forms are Nonzero** (Structural).
     A volume form on a p-dimensional complex subspace is nonzero by definition.
     This follows from the normalization condition in the definition of IsVolumeFormOn.
     Reference: [Harvey-Lawson, "Calibrated geometries", 1982, Section 2]. -/
-axiom IsVolumeFormOn_nonzero {n : ℕ} {X : Type*}
+theorem IsVolumeFormOn_nonzero {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     (x : X) (p : ℕ) (V : Submodule ℂ (TangentSpace (𝓒_complex n) x))
     (ω : (TangentSpace (𝓒_complex n) x) [⋀^Fin (2 * p)]→ₗ[ℂ] ℂ)
-    (hV : Module.finrank ℂ V = p) :
+    (_hV : Module.finrank ℂ V = p) :
     IsVolumeFormOn x p V ω → ω ≠ 0
+  := by
+  intro hω
+  rcases hω with ⟨v, hv⟩
+  intro hzero
+  apply hv
+  -- If ω = 0, evaluation is 0.
+  simp [hzero]
 
 /-- **Existence of Volume Form** (Harvey-Lawson, 1982).
 
@@ -142,22 +150,38 @@ theorem calibratedCone_hull_pointed (p : ℕ) (x : X) :
 
 /-! ## Cone Distance and Defect -/
 
-/-- The pointwise distance from a form to the calibrated cone. -/
-opaque distToCone (p : ℕ) (α : SmoothForm n X (2 * p)) (x : X) : ℝ
+/-- The set of candidate pointwise distances from a form α to the calibrated cone at x. -/
+def distToConeSet (p : ℕ) (α : SmoothForm n X (2 * p)) (x : X) : Set ℝ :=
+  { r | ∃ β ∈ calibratedCone (n := n) p x, r = pointwiseNorm (α - β) x }
+
+/-- The pointwise distance from a form to the calibrated cone (defined as an infimum). -/
+noncomputable def distToCone (p : ℕ) (α : SmoothForm n X (2 * p)) (x : X) : ℝ :=
+  sInf (distToConeSet (n := n) p α x)
 
 /-- **Distance to Cone is Non-negative** (Structural).
     The distance from any point to a closed convex set is non-negative.
     This is a standard property of metric projection in normed spaces. -/
-axiom distToCone_nonneg (p : ℕ) (α : SmoothForm n X (2 * p)) (x : X) :
-    distToCone p α x ≥ 0
+theorem distToCone_nonneg (p : ℕ) (α : SmoothForm n X (2 * p)) (x : X) :
+    distToCone (n := n) (X := X) p α x ≥ 0 := by
+  unfold distToCone
+  apply Real.sInf_nonneg
+  intro r hr
+  rcases hr with ⟨β, _, rfl⟩
+  exact pointwiseNorm_nonneg (n := n) (X := X) (k := 2 * p) (α - β) x
 
-/-- The global cone defect: L2 norm of pointwise distance to calibrated cone. -/
-opaque coneDefect (p : ℕ) (α : SmoothForm n X (2 * p)) : ℝ
+/-- The global cone defect: supremum over `x : X` of the pointwise distance to the calibrated cone. -/
+noncomputable def coneDefect (p : ℕ) (α : SmoothForm n X (2 * p)) : ℝ :=
+  sSup (Set.range fun x : X => distToCone (n := n) (X := X) p α x)
 
 /-- **Cone Defect is Non-negative** (Structural).
-    The global cone defect is defined as an L2 norm of pointwise distances,
-    hence is non-negative. -/
-axiom coneDefect_nonneg (p : ℕ) (α : SmoothForm n X (2 * p)) : coneDefect p α ≥ 0
+    The global cone defect is defined as a supremum of pointwise distances, hence is non-negative. -/
+theorem coneDefect_nonneg (p : ℕ) (α : SmoothForm n X (2 * p)) :
+    coneDefect (n := n) (X := X) p α ≥ 0 := by
+  unfold coneDefect
+  apply Real.sSup_nonneg
+  intro r hr
+  rcases hr with ⟨x, rfl⟩
+  exact distToCone_nonneg (n := n) (X := X) p α x
 
 /-! ## Projection Theorems -/
 

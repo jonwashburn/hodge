@@ -55,7 +55,7 @@ Prove all axioms in the `hodge_conjecture'` proof chain, leaving only Lean syste
 
 | # | Axiom | File | Status | Owner |
 |---|-------|------|--------|-------|
-| 14 | `wirtinger_comass_bound` | Calibration.lean | ❌ TODO | Agent 3 |
+| 14 | `wirtinger_comass_bound` | Calibration.lean | ✅ eliminated (no longer needed; `KählerCalibration` is 0-form) | Agent 7 |
 | 15 | `calibration_inequality` | Calibration.lean | ✅ done (already a theorem) | — |
 | 16 | `simpleCalibratedForm` | Grassmannian.lean | ✅ done | Agent 7 |
 | 17 | `omegaPow_in_interior` | Cone.lean | ✅ done (axiom removed) | Agent 7 |

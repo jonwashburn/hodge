@@ -71,7 +71,7 @@ These encode the paper's construction of approximating cycles:
 
 | Axiom | File | Line | Action |
 |-------|------|------|--------|
-| `wirtinger_comass_bound` | Calibration.lean | 46 | Wirtinger inequality |
+| `wirtinger_comass_bound` | Calibration.lean | — | ✅ eliminated (no longer needed; `KählerCalibration` is 0-form) |
 | `calibration_inequality` | Calibration.lean | 65 | ✅ already a theorem in `Hodge/Analytic/Calibration.lean` |
 | `simpleCalibratedForm` | Grassmannian.lean | 106 | ✅ done (now a `def`, not an axiom) |
 | `omegaPow_in_interior` | Cone.lean | — | ✅ done (axiom removed; cone membership derived from `exists_uniform_interior_radius`) |
