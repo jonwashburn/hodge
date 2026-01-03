@@ -39,10 +39,14 @@ to ensure the supremum is well-behaved. -/
 
 /-- The set of evaluations on the unit ball is non-empty.
     **Note**: Zero vector witnesses nonemptiness (‖0‖ = 0 ≤ 1). -/
-axiom pointwiseComass_set_nonempty {n : ℕ} {X : Type*}
+theorem pointwiseComass_set_nonempty {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     {k : ℕ} (α : SmoothForm n X k) (x : X) :
-    { r : ℝ | ∃ v : Fin k → TangentSpace (𝓒_complex n) x, (∀ i, ‖v i‖ ≤ 1) ∧ r = ‖(α.as_alternating x) v‖ }.Nonempty
+    { r : ℝ | ∃ v : Fin k → TangentSpace (𝓒_complex n) x, (∀ i, ‖v i‖ ≤ 1) ∧ r = ‖(α.as_alternating x) v‖ }.Nonempty := by
+  use ‖(α.as_alternating x) (fun _ => 0)‖
+  refine ⟨fun _ => 0, ?_, rfl⟩
+  intro i
+  simp only [norm_zero, zero_le_one]
 
 /-- The set of evaluations on the unit ball is bounded above.
     Since TangentSpace (𝓒_complex n) x ≃ ℂⁿ is finite-dimensional, multilinear maps are bounded. -/
@@ -149,10 +153,16 @@ def comass {n : ℕ} {X : Type*}
   sSup (range (pointwiseComass α))
 
 /-- **Comass Nonnegativity**: Comass is always nonneg (supremum of nonneg values). -/
-axiom comass_nonneg {n : ℕ} {X : Type*}
+theorem comass_nonneg {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [CompactSpace X]
-    {k : ℕ} (α : SmoothForm n X k) : comass α ≥ 0
+    {k : ℕ} (α : SmoothForm n X k) : comass α ≥ 0 := by
+  unfold comass
+  apply Real.sSup_nonneg
+  intro r hr
+  obtain ⟨x, hx⟩ := hr
+  rw [← hx]
+  exact pointwiseComass_nonneg α x
 
 /-- **Comass Norm Definiteness** (Axiom).
     **Blocker**: Requires `BddAbove.of_sSup_eq` and proper norm type matching. -/

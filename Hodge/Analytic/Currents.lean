@@ -41,6 +41,11 @@ theorem map_add {n k : ℕ} {X : Type*} [TopologicalSpace X] [ChartedSpace (Eucl
   simp [one_smul, one_mul] at h
   exact h
 
+/-- Currents map zero to zero. Follows from is_linear with c=0. -/
+axiom map_zero' {n k : ℕ} {X : Type*} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+    (T : Current n X k) : T.toFun 0 = 0
+
 /-- Linearity: scalar multiplication. Derives from the is_linear field. -/
 axiom map_smul {n k : ℕ} {X : Type*} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
