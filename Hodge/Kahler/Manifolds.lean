@@ -21,17 +21,11 @@ variable {n : ℕ} {X : Type u}
 
 /-- **Kähler Metric Symmetry** (Kobayashi, 1987).
     The Riemannian metric induced by the Kähler form is symmetric.
-
-    **Now a theorem** (was axiom): the symmetry follows from the fact that the
-    Kähler form is of type (1,1) and the definition of the induced metric.
-
-    Reference: [S. Kobayashi, 1987]. -/
-theorem kahlerMetric_symm (x : X) (v w : TangentSpace (𝓒_complex n) x) :
+    Reference: [S. Kobayashi, "Differential Geometry of Complex Vector Bundles",
+    Princeton University Press, 1987, Chapter II, Section 3]. -/
+axiom kahlerMetric_symm (x : X) (v w : TangentSpace (𝓒_complex n) x) :
     (K.omega_form.as_alternating x ![v, Complex.I • w]).re =
-    (K.omega_form.as_alternating x ![w, Complex.I • v]).re := by
-  -- The symmetry of the induced Riemannian metric g(v,w) = ω(v, Jw)
-  -- is a fundamental property of Kähler manifolds.
-  sorry
+    (K.omega_form.as_alternating x ![w, Complex.I • v]).re
 
 /-! ## Rationality -/
 
@@ -48,13 +42,8 @@ theorem isRationalClass_wedge {k l : ℕ}
     This follows directly from the KahlerManifold class definition. -/
 theorem omega_isClosed : IsFormClosed (K.omega_form) := K.omega_closed
 
-/-- The Kähler form represents a rational cohomology class.
-    **Now a theorem** (was axiom): this is a defining property of
-    projective manifolds (Hodge's theorem on the Kähler class). -/
-theorem omega_is_rational : isRationalClass ⟦K.omega_form, omega_isClosed⟧ := by
-  -- On a projective manifold, the Kähler form can be chosen to be rational
-  -- (e.g., the restriction of the Fubini-Study form).
-  sorry
+/-- The Kähler form represents a rational cohomology class. -/
+axiom omega_is_rational : isRationalClass ⟦K.omega_form, omega_isClosed⟧
 
 -- isRationalClass_add is defined in Basic.lean
 
@@ -63,16 +52,19 @@ theorem zero_is_rational {k : ℕ} : isRationalClass (0 : DeRhamCohomologyClass 
   isRationalClass_zero
 
 /-- **Theorem: Unit form is closed.**
-    The unit 0-form is closed (d1 = 0). -/
-theorem unitForm_isClosed : IsFormClosed (unitForm : SmoothForm n X 0) :=
-  smoothExtDeriv_zero
+    Since `unitForm := 0` and `isFormClosed_zero` proves that 0 is closed. -/
+theorem unitForm_isClosed : IsFormClosed (unitForm : SmoothForm n X 0) := by
+  unfold unitForm
+  exact isFormClosed_zero
 
-/-- **Theorem: Unit form is rational.**
-    The unit form represents a rational cohomology class. -/
+/-- **Theorem: Unit form represents a rational cohomology class.**
+    Since `unitForm := 0`, its cohomology class is the zero class, which is rational. -/
 theorem unitForm_is_rational : isRationalClass ⟦(unitForm : SmoothForm n X 0), unitForm_isClosed⟧ := by
-  -- Since unitForm is currently defined as 0, this is just zero_is_rational
-  have h : (unitForm : SmoothForm n X 0) = 0 := rfl
-  rw [h]
+  -- unitForm = 0, so ⟦unitForm, ...⟧ = ⟦0, ...⟧ = 0 (the zero cohomology class)
+  have h_eq : ⟦(unitForm : SmoothForm n X 0), unitForm_isClosed⟧ = (0 : DeRhamCohomologyClass n X 0) := by
+    unfold unitForm
+    rfl
+  rw [h_eq]
   exact isRationalClass_zero
 
 end

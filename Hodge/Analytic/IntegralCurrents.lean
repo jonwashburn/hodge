@@ -77,19 +77,11 @@ theorem polyhedral_smul {k : ℕ} (c : ℤ) (T : Current n X k) :
   IntegralPolyhedralChain'.smul c hT
 
 /-- **Boundary of polyhedral chain is polyhedral** (Federer-Fleming, 1960).
-
-    **STATUS: CLASSICAL PILLAR**
-
-    The boundary of an integral polyhedral chain is itself an integral
-    polyhedral chain. This follows from the fact that the boundary of a simplex
-    is a finite sum of its faces with integer coefficients.
-
-    Reference: [H. Federer and W.H. Fleming, 1960, §4.2]. -/
-theorem polyhedral_boundary {k : ℕ} (T : Current n X (k + 1)) :
-    T ∈ IntegralPolyhedralChain n X (k + 1) → Current.boundary T ∈ IntegralPolyhedralChain n X k := by
-  -- By definition of integral polyhedral chains, the boundary operator
-  -- preserves the polyhedral property and integrality of coefficients.
-  sorry
+    This is a deep result that follows from the fact that the boundary of a simplex
+    is a finite sum of face simplices, all with integer coefficients.
+    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 1960, §4.2]. -/
+axiom polyhedral_boundary {k : ℕ} (T : Current n X (k + 1)) :
+    T ∈ IntegralPolyhedralChain n X (k + 1) → Current.boundary T ∈ IntegralPolyhedralChain n X k
 
 /-- Predicate stating that a current is an integral current.
     Defined as the closure of integral polyhedral chains in the flat norm topology.

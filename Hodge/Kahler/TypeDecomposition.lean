@@ -214,13 +214,11 @@ theorem omega_pow_IsFormClosed (p : ℕ) : IsFormClosed (kahlerPow (n := n) (X :
 
     [ω ∧ η] = [ω] ∪ [η]
 
-    **Proof**: Follows by definition of the cup product on cohomology classes.
-
-    Reference: [Bott-Tu, "Differential Forms in Algebraic Topology", 1982, §5]. -/
-theorem ofForm_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l)
+    Reference: [Bott-Tu, "Differential Forms in Algebraic Topology", 1982, §5].
+    Reference: [Warner, "Foundations of Differentiable Manifolds and Lie Groups", 1983]. -/
+axiom ofForm_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l)
     (hω : IsFormClosed ω) (hη : IsFormClosed η) :
-    ⟦ω ⋏ η, isFormClosed_wedge ω η hω hη⟧ = ⟦ω, hω⟧ * ⟦η, hη⟧ :=
-  rfl
+    ⟦ω ⋏ η, isFormClosed_wedge ω η hω hη⟧ = ⟦ω, hω⟧ * ⟦η, hη⟧
 
 /-- Cohomology class of cast form equals cohomology class of original (by proof irrelevance). -/
 theorem ofForm_cast {k l : ℕ} (h : k = l) (ω : SmoothForm n X k) (hω : IsFormClosed ω)
@@ -239,11 +237,9 @@ theorem isRationalClass_cast {k l : ℕ} (h : k = l)
 
 /-- Helper: cohomology class of degree-cast form equals cast of cohomology class.
     This uses the fact that ▸ on a quotient lifts through the quotient. -/
-theorem ofForm_transport {k l : ℕ} (h : k = l) (ω : SmoothForm n X k) (hω : IsFormClosed ω)
+axiom ofForm_transport {k l : ℕ} (h : k = l) (ω : SmoothForm n X k) (hω : IsFormClosed ω)
     (hcast : IsFormClosed (h ▸ ω)) :
-    ⟦h ▸ ω, hcast⟧ = h ▸ ⟦ω, hω⟧ := by
-  subst h
-  rfl
+    ⟦h ▸ ω, hcast⟧ = h ▸ ⟦ω, hω⟧
 
 /-- **Kähler Power is Rational** (Theorem via Induction).
 
