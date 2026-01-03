@@ -23,13 +23,6 @@ universe u
 
 variable {n : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
 
-/-- Helper axiom: The norm of zero in TangentSpace is bounded by 1.
-    This bridges the diamond problem between the axiomatized NormedAddCommGroup instance
-    and the existing Zero instance on TangentSpace. -/
-axiom tangentSpace_norm_zero_le_one {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] (x : X) :
-    ‖(0 : TangentSpace (𝓒_complex n) x)‖ ≤ 1
-
 /-- A section of differential forms is smooth if the pointwise operator norm varies continuously.
     This captures the essential content of smoothness without requiring full vector bundle machinery.
 
@@ -71,8 +64,8 @@ theorem isSmoothAlternating_zero (k : ℕ) : IsSmoothAlternating n X k (fun _ =>
     · intro hr
       refine ⟨fun _ => 0, ?_, hr⟩
       intro i
-      -- Use the helper axiom that bridges the diamond problem
-      exact tangentSpace_norm_zero_le_one x
+      -- ‖0‖ = 0 ≤ 1 in any NormedAddCommGroup
+      simp only [norm_zero, zero_le_one]
   have h_ssup_zero : ∀ x : X, sSup { r : ℝ | ∃ v : Fin k → TangentSpace (𝓒_complex n) x,
       (∀ i, ‖v i‖ ≤ 1) ∧ r = ‖(0 : (TangentSpace (𝓒_complex n) x) [⋀^Fin k]→ₗ[ℝ] ℂ) v‖ } = 0 := by
     intro x; rw [h_set_eq]; exact csSup_singleton 0
@@ -85,10 +78,22 @@ theorem isSmoothAlternating_zero (k : ℕ) : IsSmoothAlternating n X k (fun _ =>
 axiom isSmoothAlternating_add (k : ℕ) (ω η : SmoothForm n X k) :
     IsSmoothAlternating n X k (fun x => ω.as_alternating x + η.as_alternating x)
 
-/-- Axiom: The negation of a smooth form is smooth.
-    The proof follows from ‖-f‖ = ‖f‖. -/
-axiom isSmoothAlternating_neg (k : ℕ) (ω : SmoothForm n X k) :
-    IsSmoothAlternating n X k (fun x => -ω.as_alternating x)
+/-- The negation of a smooth form is smooth.
+    The proof follows from ‖-f‖ = ‖f‖, so the pointwise sSup is unchanged. -/
+theorem isSmoothAlternating_neg (k : ℕ) (ω : SmoothForm n X k) :
+    IsSmoothAlternating n X k (fun x => -ω.as_alternating x) := by
+  unfold IsSmoothAlternating
+  -- Show that { r | ∃ v, ... ∧ r = ‖(-ω x) v‖ } = { r | ∃ v, ... ∧ r = ‖(ω x) v‖ }
+  -- because ‖(-f) v‖ = ‖-(f v)‖ = ‖f v‖
+  have h_eq : ∀ x : X, { r : ℝ | ∃ v : Fin k → TangentSpace (𝓒_complex n) x,
+      (∀ i, ‖v i‖ ≤ 1) ∧ r = ‖(-ω.as_alternating x) v‖ } =
+    { r : ℝ | ∃ v : Fin k → TangentSpace (𝓒_complex n) x,
+      (∀ i, ‖v i‖ ≤ 1) ∧ r = ‖(ω.as_alternating x) v‖ } := by
+    intro x
+    ext r
+    simp only [Set.mem_setOf_eq, AlternatingMap.neg_apply, norm_neg]
+  simp_rw [h_eq]
+  exact ω.is_smooth
 
 /-- Axiom: Scalar multiplication preserves smoothness.
     The proof follows from ‖c • f‖ = |c| * ‖f‖. -/
@@ -195,8 +200,12 @@ end ClosedForm
 def smoothWedge {k l : ℕ} (_ω : SmoothForm n X k) (_η : SmoothForm n X l) : SmoothForm n X (k + l) := 0
 notation:67 ω:68 " ⋏ " η:68 => smoothWedge ω η
 
-axiom isFormClosed_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) :
-    IsFormClosed ω → IsFormClosed η → IsFormClosed (ω ⋏ η)
+-- Note: Trivial since smoothWedge := 0; needs real proof once wedge is implemented
+theorem isFormClosed_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) :
+    IsFormClosed ω → IsFormClosed η → IsFormClosed (ω ⋏ η) := by
+  intros _ _
+  unfold IsFormClosed smoothWedge
+  exact isFormClosed_zero
 
 axiom smoothExtDeriv_extDeriv {k : ℕ} (ω : SmoothForm n X k) : smoothExtDeriv (smoothExtDeriv ω) = 0
 
@@ -205,6 +214,8 @@ axiom smoothExtDeriv_add {k : ℕ} (ω₁ ω₂ : SmoothForm n X k) : smoothExtD
 axiom smoothExtDeriv_smul_real {k : ℕ} (r : ℝ) (ω : SmoothForm n X k) : smoothExtDeriv (r • ω) = r • smoothExtDeriv ω
 axiom smoothExtDeriv_continuous {k : ℕ} : Continuous (smoothExtDeriv (n := n) (X := X) (k := k))
 
+-- Note: Trivial in principle since smoothWedge := 0, but HEq degree arithmetic is complex
+-- Kept as axiom to avoid type-level complications
 axiom smoothExtDeriv_wedge {k l : ℕ} (α : SmoothForm n X k) (β : SmoothForm n X l) :
     ∃ (term1 term2 : SmoothForm n X (k + l + 1)),
       HEq (smoothExtDeriv α ⋏ β) term1 ∧
@@ -213,9 +224,15 @@ axiom smoothExtDeriv_wedge {k l : ℕ} (α : SmoothForm n X k) (β : SmoothForm 
 
 def unitForm : SmoothForm n X 0 := 0
 
-axiom smoothWedge_add_left {k l : ℕ} (ω₁ ω₂ : SmoothForm n X k) (η : SmoothForm n X l) : (ω₁ + ω₂) ⋏ η = (ω₁ ⋏ η) + (ω₂ ⋏ η)
-axiom smoothWedge_add_right {k l : ℕ} (ω : SmoothForm n X k) (η₁ η₂ : SmoothForm n X l) : ω ⋏ (η₁ + η₂) = (ω ⋏ η₁) + (ω ⋏ η₂)
-axiom smoothWedge_smul_left {k l : ℕ} (c : ℂ) (ω : SmoothForm n X k) (η : SmoothForm n X l) : (c • ω) ⋏ η = c • (ω ⋏ η)
-axiom smoothWedge_smul_right {k l : ℕ} (c : ℂ) (ω : SmoothForm n X k) (η : SmoothForm n X l) : ω ⋏ (c • η) = c • (ω ⋏ η)
-axiom smoothWedge_zero_left {k l : ℕ} (η : SmoothForm n X l) : (0 : SmoothForm n X k) ⋏ η = 0
-axiom smoothWedge_zero_right {k l : ℕ} (ω : SmoothForm n X k) : ω ⋏ (0 : SmoothForm n X l) = 0
+-- Note: The following wedge properties are trivial since smoothWedge := 0
+-- They will need real proofs once smoothWedge is properly implemented
+theorem smoothWedge_add_left {k l : ℕ} (ω₁ ω₂ : SmoothForm n X k) (η : SmoothForm n X l) : (ω₁ + ω₂) ⋏ η = (ω₁ ⋏ η) + (ω₂ ⋏ η) := by
+  simp only [smoothWedge, add_zero]
+theorem smoothWedge_add_right {k l : ℕ} (ω : SmoothForm n X k) (η₁ η₂ : SmoothForm n X l) : ω ⋏ (η₁ + η₂) = (ω ⋏ η₁) + (ω ⋏ η₂) := by
+  simp only [smoothWedge, add_zero]
+theorem smoothWedge_smul_left {k l : ℕ} (c : ℂ) (ω : SmoothForm n X k) (η : SmoothForm n X l) : (c • ω) ⋏ η = c • (ω ⋏ η) := by
+  simp only [smoothWedge, smul_zero]
+theorem smoothWedge_smul_right {k l : ℕ} (c : ℂ) (ω : SmoothForm n X k) (η : SmoothForm n X l) : ω ⋏ (c • η) = c • (ω ⋏ η) := by
+  simp only [smoothWedge, smul_zero]
+theorem smoothWedge_zero_left {k l : ℕ} (η : SmoothForm n X l) : (0 : SmoothForm n X k) ⋏ η = 0 := rfl
+theorem smoothWedge_zero_right {k l : ℕ} (ω : SmoothForm n X k) : ω ⋏ (0 : SmoothForm n X l) = 0 := rfl

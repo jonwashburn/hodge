@@ -28,13 +28,16 @@ axiom exists_not_isClosed_set (X : Type*) [TopologicalSpace X] [Nonempty X] : �
 
 variable {n : ℕ} {X : Type*} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
 
-axiom instNormTangentSpace (x : X) : Norm (TangentSpace (𝓒_complex n) x)
-attribute [instance] instNormTangentSpace
+/-- The tangent space at a point on a complex manifold modeled on `EuclideanSpace ℂ (Fin n)`
+    is definitionally equal to `EuclideanSpace ℂ (Fin n)`, which is a `NormedAddCommGroup`.
+    We use `inferInstanceAs` to transfer this instance. -/
+instance instNormedAddCommGroupTangentSpace (x : X) : NormedAddCommGroup (TangentSpace (𝓒_complex n) x) :=
+  inferInstanceAs (NormedAddCommGroup (EuclideanSpace ℂ (Fin n)))
 
-axiom instNormedAddCommGroupTangentSpace (x : X) : NormedAddCommGroup (TangentSpace (𝓒_complex n) x)
-attribute [instance] instNormedAddCommGroupTangentSpace
-
-axiom instNormedSpaceTangentSpace (x : X) : NormedSpace ℂ (TangentSpace (𝓒_complex n) x)
-attribute [instance] instNormedSpaceTangentSpace
+/-- The tangent space at a point on a complex manifold modeled on `EuclideanSpace ℂ (Fin n)`
+    is definitionally equal to `EuclideanSpace ℂ (Fin n)`, which is a `NormedSpace ℂ`.
+    We use `inferInstanceAs` to transfer this instance. -/
+instance instNormedSpaceTangentSpace (x : X) : NormedSpace ℂ (TangentSpace (𝓒_complex n) x) :=
+  inferInstanceAs (NormedSpace ℂ (EuclideanSpace ℂ (Fin n)))
 
 end
