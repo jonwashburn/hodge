@@ -22,13 +22,7 @@ variable {n : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpa
 
 variable [K : KahlerManifold n X]
 
-/-- **Kähler Metric Symmetry** (Kobayashi, 1987).
-    The Riemannian metric induced by the Kähler form is symmetric.
-    Reference: [S. Kobayashi, "Differential Geometry of Complex Vector Bundles",
-    Princeton University Press, 1987, Chapter II, Section 3]. -/
-axiom kahlerMetric_symm (x : X) (v w : TangentSpace (𝓒_complex n) x) :
-    (K.omega_form.as_alternating x ![v, Complex.I • w]).re =
-    (K.omega_form.as_alternating x ![w, Complex.I • v]).re
+-- kahlerMetric_symm removed (unused)
 
 theorem omega_isClosed : IsFormClosed (K.omega_form) := K.omega_closed
 
@@ -59,12 +53,7 @@ notation:max "Λ" η:max => lefschetzLambda η
 theorem lefschetzLambda_add {k : ℕ} (α β : SmoothForm n X k) :
     Λ (α + β) = Λ α + Λ β := map_add _ α β
 
-/-- **Lefschetz Commutator Relation** (Kähler Geometry). -/
-axiom lefschetz_commutator {k : ℕ} (α : SmoothForm n X k) :
-    ∃ (term1 term2 : SmoothForm n X k),
-      HEq (Λ (lefschetzL α)) term1 ∧
-      HEq (lefschetzL (Λ α)) term2 ∧
-      term1 - term2 = ((n : ℂ) - (k : ℂ)) • α
+-- lefschetz_commutator removed (unused, HEq complex)
 
 /-! ## Hodge Operators -/
 
@@ -81,9 +70,7 @@ theorem hodgeStar_zero {k : ℕ} : ⋆(0 : SmoothForm n X k) = 0 := rfl
 theorem hodgeStar_neg {k : ℕ} (α : SmoothForm n X k) : ⋆(-α) = -(⋆α) := by simp only [hodgeStar, neg_zero]
 theorem hodgeStar_sub {k : ℕ} (α β : SmoothForm n X k) : ⋆(α - β) = ⋆α - ⋆β := by simp only [hodgeStar, sub_self]
 
--- Note: HEq axiom kept since degree arithmetic is complex
-axiom hodgeStar_hodgeStar {k : ℕ} (α : SmoothForm n X k) :
-    HEq (⋆(⋆α)) (((-1 : ℂ) ^ (k * (2 * n - k))) • α)
+-- hodgeStar_hodgeStar removed (unused, HEq degree arithmetic complex)
 
 /-- **Adjoint Derivative / Codifferential** (Hodge Theory). -/
 def adjointDeriv {k : ℕ} (_ω : SmoothForm n X k) : SmoothForm n X (k - 1) := 0
@@ -123,10 +110,8 @@ theorem isHarmonic_smul_real {k : ℕ} {ω : SmoothForm n X k} (r : ℝ) (h : Is
 theorem isHarmonic_sub {k : ℕ} {ω₁ ω₂ : SmoothForm n X k} (h1 : IsHarmonic ω₁) (h2 : IsHarmonic ω₂) : IsHarmonic (ω₁ - ω₂) := by
   unfold IsHarmonic at *; simp only [laplacian_sub, h1, h2, sub_self]
 
--- This axiom represents real Hodge theory: harmonic implies closed
--- Cannot be derived from the stubs since Δ=0 but smoothExtDeriv may not be 0
-axiom isHarmonic_implies_closed {k : ℕ} (ω : SmoothForm n X k) :
-    IsHarmonic ω → IsFormClosed ω
+-- isHarmonic_implies_closed removed (unused)
+-- Note: Real Hodge theory says harmonic ⟹ closed, but can't derive from stubs
 
 -- Trivial since adjointDeriv = 0
 theorem isHarmonic_implies_coclosed {k : ℕ} (ω : SmoothForm n X k) :

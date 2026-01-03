@@ -61,13 +61,7 @@ axiom lefschetz_operator (n : ℕ) (X : Type u)
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     (p : ℕ) : DeRhamCohomologyClass n X p →ₗ[ℂ] DeRhamCohomologyClass n X (p + 2)
 
--- The Lefschetz operator maps cohomology classes to cohomology classes.
-axiom lefschetz_operator_eval (n : ℕ) (X : Type u)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    (p : ℕ) (c : DeRhamCohomologyClass n X p) :
-    ∃ (ω' : SmoothForm n X (p + 2)) (h_closed : IsFormClosed ω'),
-    lefschetz_operator n X p c = ⟦ω', h_closed⟧
+-- lefschetz_operator_eval removed (unused)
 
 /-- The iterated Lefschetz map L^k : H^p(X) → H^{p+2k}(X). -/
 def lefschetz_power (n : ℕ) (X : Type u)

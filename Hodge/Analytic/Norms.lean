@@ -164,13 +164,26 @@ theorem comass_nonneg {n : ℕ} {X : Type*}
   rw [← hx]
   exact pointwiseComass_nonneg α x
 
-/-- **Comass Norm Definiteness** (Axiom).
-    **Blocker**: Requires `BddAbove.of_sSup_eq` and proper norm type matching. -/
-axiom comass_eq_zero_iff {n : ℕ} {X : Type*}
+-- comass_eq_zero_iff removed (unused)
+-- Definiteness would require proper norm setup
+theorem comass_eq_zero_of_zero {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [CompactSpace X] [Nonempty X]
-    {k : ℕ} (α : SmoothForm n X k) :
-    comass α = 0 ↔ α = 0
+    {k : ℕ} : comass (0 : SmoothForm n X k) = 0 := by
+  unfold comass
+  have h_set : range (pointwiseComass (0 : SmoothForm n X k)) = {0} := by
+    ext r
+    simp only [Set.mem_range, Set.mem_singleton_iff]
+    constructor
+    · intro ⟨x, hx⟩
+      rw [← hx, pointwiseComass_zero]
+    · intro hr
+      use Classical.arbitrary X
+      rw [hr, pointwiseComass_zero]
+  rw [h_set]
+  simp only [csSup_singleton]
+
+-- Original axiom (removed): comass_eq_zero_iff : comass α = 0 ↔ α = 0
 
 /-- Instance: Norm on Smooth Forms using Comass. -/
 instance instNormSmoothForm {n : ℕ} {X : Type*}
@@ -320,12 +333,8 @@ axiom energy_minimizer {n : ℕ} {X : Type*}
       (∀ β : SmoothForm n X k, ∀ (hβ : IsFormClosed β),
         ofForm β hβ = η → energy α ≤ energy β)
 
-/-- **Trace-L2 Control** (Sobolev/Gagliardo-Nirenberg). -/
-axiom trace_L2_control {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
-    {k : ℕ} (α : SmoothForm n X k) :
-    ∃ C : ℝ, C > 0 ∧ comass α ≤ C * L2NormForm α
+-- trace_L2_control removed (unused)
+-- Would state: ∃ C > 0, comass α ≤ C * L2NormForm α
 
 /-! ## Derived Theorems -/
 

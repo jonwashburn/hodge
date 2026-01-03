@@ -53,7 +53,7 @@ axiom kahlerPow (p : ℕ) : SmoothForm n X (2 * p)
 
 axiom omega_pow_IsFormClosed (p : ℕ) : IsFormClosed (kahlerPow (n := n) (X := X) p)
 
-axiom omega_pow_is_p_p (p : ℕ) : isPPFormTD n X p (kahlerPow p)
+-- omega_pow_is_p_p removed (unused)
 
 axiom omega_pow_is_rational_TD (p : ℕ) : isRationalClass ⟦kahlerPow (n := n) (X := X) p, omega_pow_IsFormClosed p⟧
 
