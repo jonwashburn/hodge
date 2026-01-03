@@ -1,14 +1,15 @@
 # Agent Assignments: Phase 3 — Proving Interface Axioms
 
-## Current Status
+## Current Status (Just Pushed!)
 
 | Metric | Value |
 |--------|-------|
 | **Proof Chain Axioms** | **17** custom axioms |
 | **Lean Foundations** | 3 (propext, Classical.choice, Quot.sound) |
 | **Classical Pillars** | 7 (keep as axioms) |
-| **Interface Axioms** | 7 (to prove) |
+| **Interface Axioms** | 10 (to prove) |
 | **Opaques** | 0 ✅ |
+| **Build** | ✅ Passing |
 
 ---
 
@@ -37,41 +38,61 @@ These are deep published theorems intentionally kept as axioms:
 
 ---
 
-## 🎯 Interface Axioms to Prove (7 remaining)
+## 🎯 Interface Axioms to Prove (10 remaining)
 
-| # | Axiom | File | Strategy |
-|---|-------|------|----------|
-| 1 | `instHMulDeRhamCohomologyClass` | Basic.lean | Needs refactoring to avoid circular deps |
-| 2 | `isRationalClass_mul` | Basic.lean | Follows from cup product definition |
-| 3 | `ofForm_smul_real` | Basic.lean | Module compatibility |
-| 4 | `ofForm_transport` | TypeDecomposition.lean | Type transport proof |
-| 5 | `ofForm_wedge` | TypeDecomposition.lean | Cup product compatibility |
-| 6 | `omega_is_rational` | Manifolds.lean | Requires rationality axiom on KahlerManifold |
-| 7 | `omega_pow_represents_multiple` | Main.lean | Cohomology representation |
+### Cohomology Structure (4)
+| # | Axiom | File | Difficulty |
+|---|-------|------|------------|
+| 1 | `instHMulDeRhamCohomologyClass` | Basic.lean | 🔴 Hard (circular deps) |
+| 2 | `isRationalClass_mul` | Basic.lean | 🟡 Medium |
+| 3 | `ofForm_transport` | TypeDecomposition.lean | 🟢 Easy |
+| 4 | `ofForm_wedge` | TypeDecomposition.lean | 🟡 Medium |
 
-Plus 3 additional interface axioms:
-- `exists_volume_form_of_submodule_axiom` - Grassmannian.lean
-- `pointwiseComass_continuous` - Norms.lean  
-- `Current.is_bounded` - Currents.lean
+### Scalar Multiplication (2)
+| # | Axiom | File | Difficulty |
+|---|-------|------|------------|
+| 5 | `ofForm_smul_real` | Basic.lean | 🔴 Hard (definitional mismatch) |
+| 6 | `omega_is_rational` | Manifolds.lean | 🔴 Hard (needs axiom on class) |
+
+### Representation (1)
+| # | Axiom | File | Difficulty |
+|---|-------|------|------------|
+| 7 | `omega_pow_represents_multiple` | Main.lean | 🟡 Medium |
+
+### Technical (3)
+| # | Axiom | File | Difficulty |
+|---|-------|------|------------|
+| 8 | `exists_volume_form_of_submodule_axiom` | Grassmannian.lean | 🟡 Medium |
+| 9 | `pointwiseComass_continuous` | Norms.lean | 🟡 Medium |
+| 10 | `Current.is_bounded` | Currents.lean | 🟢 Easy |
 
 ---
 
-## ALL 8 AGENTS: Focus on Single Easiest Axiom
+## ALL 8 AGENTS: Work on `ofForm_transport`
 
-**Target: `ofForm_smul_real`**
+**This is the EASIEST axiom to prove!**
 
-This axiom states:
+**File:** `Hodge/Kahler/TypeDecomposition.lean`
+
 ```lean
-axiom ofForm_smul_real {k : ℕ} (r : ℝ) (ω : SmoothForm n X k) (hω : IsFormClosed ω) :
-    ⟦r • ω, isFormClosed_smul_real hω⟧ = r • ⟦ω, hω⟧
+axiom ofForm_transport {k l : ℕ} (h : k = l) (ω : SmoothForm n X k) (hω : IsFormClosed ω)
+    (hcast : IsFormClosed (h ▸ ω)) :
+    ⟦h ▸ ω, hcast⟧ = h ▸ ⟦ω, hω⟧
 ```
 
-**Why this is provable:**
-- Scalar multiplication by `r : ℝ` is defined on both forms and cohomology classes
-- The quotient should respect this structure
-- This is essentially `rfl` if the definitions are compatible
+**Strategy:**
+1. Use `subst h` to eliminate the equality
+2. After subst, both sides should be definitionally equal
+3. Apply `ofForm_proof_irrel` or `rfl`
 
-**All 8 agents should attempt to prove this axiom in Basic.lean**
+**Proof sketch:**
+```lean
+theorem ofForm_transport {k l : ℕ} (h : k = l) (ω : SmoothForm n X k) (hω : IsFormClosed ω)
+    (hcast : IsFormClosed (h ▸ ω)) :
+    ⟦h ▸ ω, hcast⟧ = h ▸ ⟦ω, hω⟧ := by
+  subst h
+  exact ofForm_proof_irrel ω hcast hω
+```
 
 ---
 
@@ -87,3 +108,13 @@ grep -rn "^\s*axiom " Hodge/ --include="*.lean" | wc -l
 # Build
 lake build Hodge
 ```
+
+---
+
+## Summary
+
+**We're making progress!** The proof chain is down to 17 custom axioms from the original ~100+.
+
+The 7 classical pillars will remain as axioms (they represent deep theorems from the literature).
+
+The remaining 10 interface axioms are targets for all 8 agents to prove.

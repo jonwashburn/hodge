@@ -235,11 +235,15 @@ theorem isRationalClass_cast {k l : ℕ} (h : k = l)
   subst h
   exact hc
 
-/-- Helper: cohomology class of degree-cast form equals cast of cohomology class.
-    This uses the fact that ▸ on a quotient lifts through the quotient. -/
-axiom ofForm_transport {k l : ℕ} (h : k = l) (ω : SmoothForm n X k) (hω : IsFormClosed ω)
+/-- **Helper: cohomology class of degree-cast form equals cast of cohomology class** (Theorem).
+    This uses the fact that ▸ on a quotient lifts through the quotient.
+    After substituting h, both sides are definitionally equal up to proof irrelevance. -/
+theorem ofForm_transport {k l : ℕ} (h : k = l) (ω : SmoothForm n X k) (hω : IsFormClosed ω)
     (hcast : IsFormClosed (h ▸ ω)) :
-    ⟦h ▸ ω, hcast⟧ = h ▸ ⟦ω, hω⟧
+    ⟦h ▸ ω, hcast⟧ = h ▸ ⟦ω, hω⟧ := by
+  subst h
+  -- Now we need: ⟦ω, hcast⟧ = ⟦ω, hω⟧
+  exact ofForm_proof_irrel ω hcast hω
 
 /-- **Kähler Power is Rational** (Theorem via Induction).
 
