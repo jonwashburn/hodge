@@ -101,8 +101,13 @@ axiom isSmoothAlternating_smul (k : ℕ) (c : ℂ) (ω : SmoothForm n X k) :
     IsSmoothAlternating n X k (fun x => c • ω.as_alternating x)
 
 /-- The difference of smooth forms is smooth (follows from add and neg). -/
-axiom isSmoothAlternating_sub (k : ℕ) (ω η : SmoothForm n X k) :
-    IsSmoothAlternating n X k (fun x => ω.as_alternating x - η.as_alternating x)
+theorem isSmoothAlternating_sub (k : ℕ) (ω η : SmoothForm n X k) :
+    IsSmoothAlternating n X k (fun x => ω.as_alternating x - η.as_alternating x) := by
+  -- sub = add neg, so use those axioms
+  have hsub : ∀ x, ω.as_alternating x - η.as_alternating x = ω.as_alternating x + (-η.as_alternating x) := by
+    intro x; rfl
+  simp_rw [hsub]
+  exact isSmoothAlternating_add k ω ⟨fun x => -η.as_alternating x, isSmoothAlternating_neg k η⟩
 
 instance (k : ℕ) : Zero (SmoothForm n X k) := ⟨⟨fun _ => 0, isSmoothAlternating_zero k⟩⟩
 instance (k : ℕ) : Add (SmoothForm n X k) := ⟨fun ω η => ⟨fun x => ω.as_alternating x + η.as_alternating x, isSmoothAlternating_add k ω η⟩⟩

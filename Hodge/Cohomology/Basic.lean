@@ -25,11 +25,48 @@ theorem cohomologous_refl {n k : ℕ} {X : Type u} [TopologicalSpace X] [Charted
   simp only [sub_self]
   cases k with | zero => rfl | succ k' => exact ⟨0, isFormClosed_zero⟩
 
-axiom cohomologous_symm {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    {ω η : ClosedForm n X k} : Cohomologous ω η → Cohomologous η ω
+theorem cohomologous_symm {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    {ω η : ClosedForm n X k} : Cohomologous ω η → Cohomologous η ω := by
+  intro h
+  unfold Cohomologous at *
+  -- h : IsExact (ω.val - η.val), goal: IsExact (η.val - ω.val)
+  -- η.val - ω.val = -(ω.val - η.val)
+  have heq : η.val - ω.val = -(ω.val - η.val) := (neg_sub ω.val η.val).symm
+  rw [heq]
+  -- Show IsExact (-α) from IsExact α
+  unfold IsExact at *
+  cases k with
+  | zero =>
+    -- h : ω.val - η.val = 0, goal: -(ω.val - η.val) = 0
+    simp [h]
+  | succ k' =>
+    -- h : ∃ β, dβ = (ω.val - η.val), goal: ∃ β, dβ = -(ω.val - η.val)
+    obtain ⟨β, hβ⟩ := h
+    use -β
+    rw [smoothExtDeriv_neg, hβ]
 
-axiom cohomologous_trans {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    {ω η θ : ClosedForm n X k} : Cohomologous ω η → Cohomologous η θ → Cohomologous ω θ
+theorem cohomologous_trans {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    {ω η θ : ClosedForm n X k} : Cohomologous ω η → Cohomologous η θ → Cohomologous ω θ := by
+  intro h1 h2
+  unfold Cohomologous at *
+  -- h1: IsExact (ω.val - η.val), h2: IsExact (η.val - θ.val)
+  -- goal: IsExact (ω.val - θ.val)
+  -- ω.val - θ.val = (ω.val - η.val) + (η.val - θ.val)
+  have heq : ω.val - θ.val = (ω.val - η.val) + (η.val - θ.val) := by
+    simp only [sub_add_sub_cancel]
+  rw [heq]
+  -- Show IsExact (α + β) from IsExact α and IsExact β
+  unfold IsExact at *
+  cases k with
+  | zero =>
+    -- h1 : ω.val - η.val = 0, h2 : η.val - θ.val = 0
+    simp [h1, h2]
+  | succ k' =>
+    -- h1 : ∃ α, dα = (ω.val - η.val), h2 : ∃ β, dβ = (η.val - θ.val)
+    obtain ⟨α, hα⟩ := h1
+    obtain ⟨β, hβ⟩ := h2
+    use α + β
+    rw [smoothExtDeriv_add, hα, hβ]
 
 instance DeRhamSetoid (n k : ℕ) (X : Type u) [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] : Setoid (ClosedForm n X k) where
   r := Cohomologous
