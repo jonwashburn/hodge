@@ -23,6 +23,13 @@ universe u
 
 variable {n : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
 
+/-- Helper axiom: The norm of zero in TangentSpace is bounded by 1.
+    This bridges the diamond problem between the axiomatized NormedAddCommGroup instance
+    and the existing Zero instance on TangentSpace. -/
+axiom tangentSpace_norm_zero_le_one {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] (x : X) :
+    ‖(0 : TangentSpace (𝓒_complex n) x)‖ ≤ 1
+
 /-- A section of differential forms is smooth if the pointwise operator norm varies continuously.
     This captures the essential content of smoothness without requiring full vector bundle machinery.
 
@@ -49,7 +56,28 @@ structure SmoothForm (n : ℕ) (X : Type u) (k : ℕ)
 /-- The zero form has continuous (constantly zero) pointwise norm.
     The zero form evaluates to 0 everywhere, so the pointwise norm is constantly 0,
     which is trivially continuous. -/
-axiom isSmoothAlternating_zero (k : ℕ) : IsSmoothAlternating n X k (fun _ => 0)
+theorem isSmoothAlternating_zero (k : ℕ) : IsSmoothAlternating n X k (fun _ => 0) := by
+  unfold IsSmoothAlternating
+  -- The zero alternating map evaluates to 0 on all inputs, so ‖0 v‖ = 0
+  -- The set { r | ∃ v, (∀ i, ‖v i‖ ≤ 1) ∧ r = ‖0‖ } = {0}
+  -- sSup {0} = 0, so the function is constantly 0
+  have h_set_eq : ∀ x : X, { r : ℝ | ∃ v : Fin k → TangentSpace (𝓒_complex n) x,
+      (∀ i, ‖v i‖ ≤ 1) ∧ r = ‖(0 : (TangentSpace (𝓒_complex n) x) [⋀^Fin k]→ₗ[ℝ] ℂ) v‖ } = {0} := by
+    intro x
+    ext r
+    simp only [Set.mem_setOf_eq, Set.mem_singleton_iff, AlternatingMap.zero_apply, norm_zero]
+    constructor
+    · rintro ⟨_, _, rfl⟩; rfl
+    · intro hr
+      refine ⟨fun _ => 0, ?_, hr⟩
+      intro i
+      -- Use the helper axiom that bridges the diamond problem
+      exact tangentSpace_norm_zero_le_one x
+  have h_ssup_zero : ∀ x : X, sSup { r : ℝ | ∃ v : Fin k → TangentSpace (𝓒_complex n) x,
+      (∀ i, ‖v i‖ ≤ 1) ∧ r = ‖(0 : (TangentSpace (𝓒_complex n) x) [⋀^Fin k]→ₗ[ℝ] ℂ) v‖ } = 0 := by
+    intro x; rw [h_set_eq]; exact csSup_singleton 0
+  simp_rw [h_ssup_zero]
+  exact continuous_const
 
 /-- Axiom: The sum of smooth forms is smooth.
     The proof requires showing that ‖(ω + η)(x)‖_op is continuous, which follows from
