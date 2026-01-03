@@ -214,9 +214,14 @@ instance instNormedSpaceTangentSpace (x : X) : NormedSpace ℂ (TangentSpace (�
 ### Next Steps to Continue
 
 **High priority (quick wins remaining):**
-1. **Forms.lean (8 axioms)**: `isSmoothAlternating_add`, `isSmoothAlternating_smul`, `extDerivLinearMap`, `smoothExtDeriv_*` - These require Mathlib's differential forms API.
-2. **Currents.lean (6 axioms)**: `map_smul`, `neg_zero_current`, `mass_*` - Need Current extensionality.
-3. **Norms.lean (10 axioms)**: Norm infrastructure - requires proper operator norm definitions.
+1. **Forms.lean (6 axioms)**: `isSmoothAlternating_add`, `isSmoothAlternating_smul`, `extDerivLinearMap`, `smoothExtDeriv_extDeriv`, `smoothExtDeriv_continuous`, `instTopologicalSpace`
+2. **Currents.lean (6 axioms)**: `map_zero'`, `map_smul`, `neg_zero_current`, `is_bounded`, `mass_add_le`, `mass_smul`
+3. **Norms.lean (6 axioms)**: `pointwiseComass_set_bddAbove`, `pointwiseComass_smul`, `comass_smul`, `instNormedAddCommGroupSmoothForm`, `instNormedSpaceRealSmoothForm`
+
+**Blockers identified:**
+- `Real.sSup_mul_of_nonneg` doesn't exist in Mathlib - prevents proving `pointwiseComass_smul`
+- SmoothForm needs `add_zero` lemma for Current proofs
+- Current structure equality needs early `@[ext]` definition
 
 **Medium priority (structural axioms):**
 4. **Kahler/Manifolds.lean (5 axioms)**: Deep Kähler theory axioms
