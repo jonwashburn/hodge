@@ -200,7 +200,25 @@ theorem mass_neg (T : Current n X k) : mass (-T) = mass T := by
   simp_rw [h_eq]
 
 /-- Mass satisfies the triangle inequality. -/
-axiom mass_add_le (S T : Current n X k) : mass (S + T) ≤ mass S + mass T
+theorem mass_add_le (S T : Current n X k) : mass (S + T) ≤ mass S + mass T := by
+  unfold mass
+  -- (S + T).toFun ω = S.toFun ω + T.toFun ω
+  have h_add : ∀ ω, (S + T).toFun ω = S.toFun ω + T.toFun ω := fun ω => by
+    show (add_curr S T).toFun ω = S.toFun ω + T.toFun ω
+    rfl
+  -- For each ω: |(S + T)(ω)| ≤ |S(ω)| + |T(ω)| ≤ mass S + mass T
+  apply csSup_le (mass_set_nonempty (S + T))
+  intro r ⟨ω, hω_comass, hr⟩
+  rw [hr, h_add]
+  calc |S.toFun ω + T.toFun ω|
+      ≤ |S.toFun ω| + |T.toFun ω| := abs_add_le _ _
+    _ ≤ sSup {r | ∃ ω, comass ω ≤ 1 ∧ r = |S.toFun ω|} +
+        sSup {r | ∃ ω, comass ω ≤ 1 ∧ r = |T.toFun ω|} := by
+        apply add_le_add
+        · apply le_csSup (mass_set_bddAbove S)
+          exact ⟨ω, hω_comass, rfl⟩
+        · apply le_csSup (mass_set_bddAbove T)
+          exact ⟨ω, hω_comass, rfl⟩
 
 /-- Mass scales with absolute value of scalar. -/
 axiom mass_smul (r : ℝ) (T : Current n X k) : mass (r • T) = |r| * mass T
