@@ -210,9 +210,9 @@ instance instNormedSpaceTangentSpace (x : X) : NormedSpace ℂ (TangentSpace (�
 | Classical/SerreVanishing.lean | 1 | Serre vanishing |
 | Classical/Bergman.lean | 1 | IsHolomorphic_add |
 | Analytic/IntegralCurrents.lean | 1 | Polyhedral boundary |
-| Kahler/Manifolds.lean | 1 | lefschetzLambdaLinearMap |
+| Kahler/Manifolds.lean | 0 | lefschetzLambdaLinearMap → definition (= 0) |
 | Utils/BaranyGrinberg.lean | 1 | Combinatorics (not imported) |
-| **TOTAL** | **41** |
+| **TOTAL** | **40** |
 
 ---
 
