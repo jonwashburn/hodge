@@ -129,8 +129,25 @@ theorem trivialModulePresheaf_isSheaf (n : ℕ) (X : Type u)
       (trivialModulePresheaf n X) := by
   -- The trivial presheaf with terminal objects (PUnit) satisfies the sheaf condition
   -- because any compatible family glues uniquely to the unique element of PUnit.
-  -- This is a standard result for constant sheaves with terminal value.
-  sorry
+  -- PUnit is a zero object in ModuleCat, hence terminal. The constant presheaf at a
+  -- terminal object is a sheaf.
+  --
+  -- First, show that trivialModulePresheaf ≅ (Functor.const _).obj (ModuleCat.of ℂ PUnit)
+  have h_iso : trivialModulePresheaf n X ≅ (Functor.const _).obj (ModuleCat.of ℂ PUnit) := by
+    refine NatIso.ofComponents (fun _ => Iso.refl _) ?_
+    intro _ _ _
+    -- Both sides are morphisms PUnit → PUnit in ModuleCat, which are unique
+    simp only [Functor.const_obj_obj, Iso.refl_hom, Category.id_comp, Category.comp_id]
+    -- The zero map and identity map are equal on PUnit (subsingleton)
+    -- Since trivialModulePresheaf.obj _ = ModuleCat.of ℂ PUnit, we need to show
+    -- the two morphisms are equal. Both are morphisms from a subsingleton module.
+    haveI : Subsingleton (ModuleCat.of ℂ PUnit) := inferInstanceAs (Subsingleton PUnit)
+    exact (ModuleCat.isZero_of_subsingleton (ModuleCat.of ℂ PUnit)).eq_of_src _ _
+  -- Use that isomorphic presheaves have the same sheaf condition
+  rw [Presheaf.isSheaf_of_iso_iff h_iso]
+  -- The constant presheaf at a terminal object is a sheaf
+  have : Subsingleton (ModuleCat.of ℂ PUnit) := inferInstanceAs (Subsingleton PUnit)
+  exact Presheaf.isSheaf_of_isTerminal _ (ModuleCat.isZero_of_subsingleton _).isTerminal
 
 /-- **The Structure Sheaf as a Coherent Sheaf** (Oka's theorem).
 
@@ -173,7 +190,19 @@ theorem trivialRingPresheaf_isSheaf (n : ℕ) (X : Type u)
       (trivialRingPresheaf n X) := by
   -- The trivial presheaf with terminal objects (PUnit) satisfies the sheaf condition
   -- because any compatible family glues uniquely to the unique element of PUnit.
-  sorry
+  -- PUnit is terminal in CommRingCat. The constant presheaf at a terminal object is a sheaf.
+  --
+  -- First, show that trivialRingPresheaf ≅ (Functor.const _).obj (CommRingCat.of PUnit)
+  have h_iso : trivialRingPresheaf n X ≅ (Functor.const _).obj (CommRingCat.of PUnit) := by
+    refine NatIso.ofComponents (fun _ => Iso.refl _) ?_
+    intro _ _ _
+    -- Both sides are morphisms PUnit → PUnit in CommRingCat, which are unique (terminal object)
+    simp only [Functor.const_obj_obj, Iso.refl_hom, Category.comp_id,
+               trivialRingPresheaf, Functor.const_obj_map]
+  -- Use that isomorphic presheaves have the same sheaf condition
+  rw [Presheaf.isSheaf_of_iso_iff h_iso]
+  -- The constant presheaf at a terminal object is a sheaf
+  exact Presheaf.isSheaf_of_isTerminal _ CommRingCat.punitIsTerminal
 
 /-- **Existence of Structure Sheaf** (Hartshorne, 1977).
 
