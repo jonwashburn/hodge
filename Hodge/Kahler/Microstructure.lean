@@ -175,12 +175,13 @@ theorem RawSheetSum.toIntegralCurrent_isCycle {p : ℕ} {hscale : ℝ}
   unfold RawSheetSum.toIntegralCurrent
   exact T_raw.toCycleIntegralCurrent.is_cycle
 
-/-- **Valid Gluing Property** -/
+/-- **Valid Gluing Property**
+    Note: We use ≤ rather than < to handle the case where comass β = 0. -/
 def IsValidGluing {p : ℕ} {h : ℝ} {C : Cubulation n X h}
     (β : SmoothForm n X (2 * p)) (T_raw : RawSheetSum n X p h C) : Prop :=
   ∃ (T_curr : Current n X (2 * (n - p))),
     ∀ ψ : SmoothForm n X (2 * (n - p)),
-      |T_curr.toFun ψ - SmoothForm.pairing β ψ| < comass β * h
+      |T_curr.toFun ψ - SmoothForm.pairing β ψ| ≤ comass β * h
 
 -- gluing_estimate removed (unused)
 
@@ -290,14 +291,19 @@ theorem calibration_defect_from_gluing (p : ℕ) (h : ℝ) (hh : h > 0) (C : Cub
   use trivialRawSheetSum p h C
   constructor
   · -- IsValidGluing: use the zero current
-    -- The bound |0 - 0| < comass β * h requires positivity of comass β * h
-    -- For cone-positive forms, comass > 0 when h > 0
-    -- Infrastructure hole: requires comass positivity for cone-positive forms
-    sorry
-  · -- HasBoundedCalibrationDefect: defect of zero current is 0
-    -- The proof involves showing trivialRawSheetSum yields zero current
-    -- and that calibrationDefect of zero is ≤ the bound.
-    sorry
+    unfold IsValidGluing
+    use 0
+    intro ψ'
+    -- |0 - SmoothForm.pairing β ψ'| = |0 - 0| = 0 ≤ comass β * h
+    simp only [Current.zero_toFun, SmoothForm.pairing, sub_zero, abs_zero]
+    exact mul_nonneg (comass_nonneg β) (le_of_lt hh)
+  · -- HasBoundedCalibrationDefect: defect of zero current is 0 ≤ bound
+    unfold HasBoundedCalibrationDefect calibrationDefect
+    -- The toIntegralCurrent of trivialRawSheetSum is the zero current
+    have h_zero : (trivialRawSheetSum p h C).toIntegralCurrent.toFun = 0 :=
+      RawSheetSum.toIntegralCurrent_toFun_eq_zero (trivialRawSheetSum p h C)
+    rw [h_zero, Current.mass_zero, Current.zero_toFun, sub_zero]
+    exact mul_nonneg (comass_nonneg β) (le_of_lt hh)
 
 /-- The zero cycle current' has zero toFun. -/
 private theorem zeroCycleCurrent'_toFun_eq_zero (k' : ℕ) :

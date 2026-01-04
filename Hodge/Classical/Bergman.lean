@@ -121,68 +121,12 @@ theorem IsHolomorphic_add (L : HolomorphicLineBundle n X) (s₁ s₂ : Section L
   have hx : x ∈ U := ⟨hx₁, hx₂⟩
   let φ : ∀ y ∈ U, L.Fiber y ≃ₗ[ℂ] ℂ := fun y hy => φ₁ y hy.1
   refine ⟨U, hx, φ, ?_⟩
-  -- φ(s₁ + s₂) = φ(s₁) + φ(s₂) by linearity of fiber maps
-  have h_linear : (fun z : ↥U => φ z z.property ((s₁ + s₂) z)) =
-                  (fun z : ↥U => φ z z.property (s₁ z) + φ z z.property (s₂ z)) := by
-    ext z; exact (φ z z.property).map_add (s₁ z) (s₂ z)
-  rw [h_linear]
-  apply MDifferentiable.add
-  -- For s₁: compose with smooth inclusion U ↪ U₁
-  · have h_le : U ≤ U₁ := inf_le_left
-    have hι : MDifferentiable (𝓒_complex n) (𝓒_complex n) (Opens.inclusion h_le) :=
-      (contMDiff_inclusion h_le).mdifferentiable one_ne_zero
-    exact hφ₁.comp hι
-  -- For s₂: φ z (s₂ z) = (transition coefficient) * φ₂ z (s₂ z)
-  -- The transition coefficient c(z) = φ₁(z)(φ₂(z)⁻¹(1)) varies with z
-  -- But both factors are MDifferentiable, so their product is MDifferentiable
-  · have h_le₂ : U ≤ U₂ := inf_le_right
-    have hι₂ : MDifferentiable (𝓒_complex n) (𝓒_complex n) (Opens.inclusion h_le₂) :=
-      (contMDiff_inclusion h_le₂).mdifferentiable one_ne_zero
-    let f₂ : ↥U₂ → ℂ := fun z => φ₂ z.val z.property (s₂ z.val)
-    have h_f₂ : MDifferentiable (𝓒_complex n) 𝓒_ℂ (f₂ ∘ Opens.inclusion h_le₂) := hφ₂.comp hι₂
-    -- The transition coefficient function: c(z) = φ₁(z)(φ₂(z)⁻¹(1))
-    -- This is MDifferentiable because the bundle transition is holomorphic
-    -- by the bundle axiom `transition_holomorphic`
-    -- For the placeholder bundle structure, we use that the transition is constant 1
-    let c_func : ↥U → ℂ := fun z =>
-      (φ₁ z.val z.property.1) ((φ₂ z.val z.property.2).symm 1)
-    -- The coefficient function is MDifferentiable
-    -- In general, this would require the bundle's transition functions to be holomorphic
-    -- For this proof, we observe that c_func = (φ₁ ∘ φ₂⁻¹)(1) is a scalar valued function
-    -- that is smooth because bundle transitions are holomorphic
-    -- The bundle axiom `transition_holomorphic` says const 1 is MDifferentiable on U ∩ V
-    -- For the coefficient function c(z) = φ₁(z)(φ₂(z)⁻¹(1)), we use:
-    have h_c_mdiff : MDifferentiable (𝓒_complex n) 𝓒_ℂ c_func := by
-      intro z
-      -- The transition function (φ₁ ∘ φ₂⁻¹) applied to 1 is smooth
-      -- This is exactly what the bundle axiom is about
-      -- We use that MDifferentiable for a constant function works here
-      -- In fact, the bundle transition at any point is just an element of ℂˣ
-      -- which doesn't depend smoothly on z in the placeholder setup
-      -- However, for MDifferentiableAt, we can use mdifferentiableAt_const
-      -- because at each point z, c_func z is a specific complex number
-      apply mdifferentiableAt_const
-    -- The full function equals c_func * (f₂ ∘ ι₂)
-    have h_func_eq : (fun z : ↥U => φ z z.property (s₂ z)) =
-                     (fun z => c_func z * (f₂ ∘ Opens.inclusion h_le₂) z) := by
-      ext z
-      simp only [Function.comp_apply, f₂, c_func, Opens.inclusion, φ]
-      conv_lhs => rw [← (φ₂ z.val z.property.2).symm_apply_apply (s₂ z)]
-      have h_lin : ∀ w : ℂ, (φ₁ z.val z.property.1) ((φ₂ z.val z.property.2).symm w) =
-                   w * (φ₁ z.val z.property.1) ((φ₂ z.val z.property.2).symm 1) := by
-        intro w
-        calc (φ₁ z.val z.property.1) ((φ₂ z.val z.property.2).symm w)
-            = (φ₁ z.val z.property.1) (w • (φ₂ z.val z.property.2).symm 1) := by
-                rw [← (φ₂ z.val z.property.2).symm.map_smul]; simp
-          _ = w • (φ₁ z.val z.property.1) ((φ₂ z.val z.property.2).symm 1) := by
-                rw [(φ₁ z.val z.property.1).map_smul]
-          _ = w * (φ₁ z.val z.property.1) ((φ₂ z.val z.property.2).symm 1) := by
-                rw [smul_eq_mul]
-      rw [h_lin]
-      ring
-    rw [h_func_eq]
-    -- Product of MDifferentiable functions is MDifferentiable
-    exact h_c_mdiff.mul h_f₂
+  -- The proof requires:
+  -- 1. φ(s₁ + s₂) = φ(s₁) + φ(s₂) by linearity
+  -- 2. Compose with smooth inclusions U ↪ U₁ and U ↪ U₂
+  -- 3. Handle transition functions φ₁ ∘ φ₂⁻¹
+  -- 4. Use MDifferentiable.add and MDifferentiable.mul
+  sorry
 
 /-- The zero section is holomorphic. -/
 theorem IsHolomorphic_zero {L : HolomorphicLineBundle n X} :

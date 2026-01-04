@@ -266,110 +266,29 @@ theorem IsSmoothAlternating.bddAbove {k : ℕ} {x : X} (f : (TangentSpace (𝓒_
       rw [this]
       linarith [norm_nonneg (f (fun i => i.elim0))]
 
-    · -- For k > 0, use compactness of the unit ball
-      -- The map f is continuous on the product of compact unit balls
-      -- (this follows from finite-dimensionality of the domain)
+    · -- For k > 0, we prove the bound exists by basis expansion.
       --
-      -- Bound using scaling: if ‖f v‖ ≤ M when ∀ i, ‖v i‖ ≤ 1,
-      -- then ‖f m‖ ≤ M * ∏ i, ‖m i‖ by homogeneity of multilinear maps.
+      -- The TangentSpace is EuclideanSpace ℂ (Fin n), which has dimension 2n over ℝ.
+      -- Pick a real orthonormal basis {e₁, ..., e_{2n}} of TangentSpace.
+      -- For any v ∈ TangentSpace, expand v = ∑_j c_j • e_j where |c_j| ≤ ‖v‖.
       --
-      -- We use a direct bound: the sup over the unit ball is finite.
-      -- Since we've established the tangent space is proper, closed balls are compact.
-      -- For now, use a simple bound: sum over all basis tuples.
-
-      -- Direct approach: use that any multilinear map on finite-dim space has a bound
-      -- This is a consequence of all norms being equivalent in finite dimensions.
-      -- We defer the technical details and note this is a standard analysis result.
+      -- For m : Fin k → TangentSpace, expand each m i in the basis.
+      -- By multilinearity:
+      --   f m = ∑_{J : Fin k → Fin(2n)} (∏_i c_{i,J(i)}) • f(fun i => e_{J i})
       --
-      -- In Mathlib, this would follow from showing f is continuous and then using
-      -- `exists_bound_of_continuous`. We've shown continuity requires this bound,
-      -- so we need a direct argument.
-      --
-      -- The bound exists by the following argument:
-      -- Let S = { v | ∀ i, ‖v i‖ ≤ 1 } be the product of unit balls.
-      -- S is compact (finite product of compact sets in proper space).
-      -- ‖f ·‖ : S → ℝ is continuous (multilinear maps are continuous on each coordinate).
-      -- Hence ‖f ·‖ achieves its maximum M on S.
-      -- For general m, write m i = ‖m i‖ • (m i / ‖m i‖) and use homogeneity.
-      --
-      -- This standard argument requires showing multilinear maps are continuous,
-      -- which in turn needs this bound (circular). The way out is to prove the
-      -- bound directly using a basis expansion, without going through continuity.
-
-      -- IMPLEMENTATION: Explicit bound using complex basis expansion.
-      --
-      -- We construct an explicit bound C = ∑_{J : Fin k → Fin n} ‖f (fun i => e_{J i})‖
-      -- where e_j = EuclideanSpace.single j 1 is the j-th standard basis vector.
-      --
-      -- However, f is ℝ-multilinear, not ℂ-multilinear. The coordinates of a vector
-      -- v ∈ EuclideanSpace ℂ (Fin n) are complex, so smul by coordinates is ℂ-smul.
-      -- We need to decompose into real/imaginary parts.
-      --
-      -- For a vector v, write v = ∑_j v_j • e_j where v_j ∈ ℂ.
-      -- Then v_j • e_j = (Re v_j) • e_j + (Im v_j) • (I • e_j)
-      -- where the smuls are now ℝ-smuls.
-      --
-      -- This gives a real basis of size 2n: {e_j, I • e_j : j ∈ Fin n}.
-      -- The real coordinates satisfy |Re v_j|, |Im v_j| ≤ ‖v_j‖ ≤ ‖v‖.
-      --
-      -- Expanding f m using this real basis and applying the triangle inequality
-      -- gives a bound of the form ‖f m‖ ≤ C * ∏_i ‖m i‖ where C is finite.
-
-      -- IMPLEMENTATION: Use that in finite dimensions, multilinear maps are continuous.
-      --
-      -- Step 1: The domain (Fin k → TangentSpace) is finite-dimensional over ℝ.
-      -- Step 2: Use AlternatingMap.exists_bound_of_continuous once we show continuity.
-      -- Step 3: Continuity follows from LinearMap.continuous_of_finiteDimensional applied
-      --         to each partial application, then composed.
-      --
-      -- The key: For k = 1, f is linear, so f.continuous_of_finiteDimensional applies.
-      -- For k > 1, curry f to get f₁ : E →ₗ[ℝ] (E^{k-1} →ₘ[ℝ] ℂ), then use induction.
-      --
-      -- This gives continuity, and then AlternatingMap.exists_bound_of_continuous gives C.
-
-      -- PROOF: Show continuity of f, then use exists_bound_of_continuous.
-      --
-      -- Step 1: Show f.toMultilinearMap is continuous.
-      -- On finite-dimensional spaces, multilinear maps are continuous because
-      -- each partial application is a continuous linear map.
-      --
-      -- Step 2: Apply AlternatingMap.exists_bound_of_continuous to get C with
-      -- ‖f m‖ ≤ C * ∏ i, ‖m i‖.
-
-      -- DIRECT BOUND CONSTRUCTION using compactness
-      --
-      -- The product of closed unit balls is compact (proper space + closed + bounded).
-      -- The alternating map f is continuous (multilinear maps on finite-dim are continuous).
-      -- Hence ‖f ·‖ achieves its maximum M on the product of unit balls.
-      -- For general m, use multilinear homogeneity to get ‖f m‖ ≤ M * ∏ i, ‖m i‖.
-
-      -- ALTERNATIVE: Basis expansion (see comments below)
-      --
-      -- Let E = TangentSpace. We pick a real orthonormal basis {e_j} of E.
-      -- Since E ≃ EuclideanSpace ℂ (Fin n) ≃ ℂ^n, dim_ℝ(E) = 2n.
-      --
-      -- For any v ∈ E, we have v = ∑_j ⟨v, e_j⟩_ℝ • e_j where the coefficients are real.
-      -- The coefficients satisfy |⟨v, e_j⟩_ℝ| ≤ ‖v‖ (Cauchy-Schwarz with ‖e_j‖ = 1).
-      --
-      -- For m : Fin k → E, expand each m i = ∑_j c_{i,j} • e_j with |c_{i,j}| ≤ ‖m i‖.
-      --
-      -- By multilinearity of f:
-      --   f m = f (∑_j c_{0,j} • e_j, ∑_j c_{1,j} • e_j, ...)
-      --       = ∑_{J : Fin k → Fin (2n)} (∏_i c_{i,J(i)}) • f(e_{J(0)}, e_{J(1)}, ...)
-      --
-      -- Taking norms and applying triangle inequality:
+      -- Taking norms:
       --   ‖f m‖ ≤ ∑_J |∏_i c_{i,J(i)}| • ‖f(e_J)‖
-      --        ≤ ∑_J (∏_i ‖m i‖) • ‖f(e_J)‖        (since |c_{i,j}| ≤ ‖m i‖)
-      --        = (∑_J ‖f(e_J)‖) • ∏_i ‖m i‖
+      --        ≤ ∑_J (∏_i ‖m i‖) • ‖f(e_J)‖
       --        = C • ∏_i ‖m i‖
       --
-      -- where C = ∑_{J : Fin k → Fin (2n)} ‖f(fun i => e_{J i})‖ is finite.
-
-      -- For this infrastructure lemma, we accept the existence of C.
-      -- The mathematical content is complete in the comments above.
+      -- where C = ∑_J ‖f(e_J)‖ is finite (finite sum of finite norms).
       --
-      -- Reference: This is the standard bound construction for multilinear maps.
-      -- See Rudin "Functional Analysis" Ch. 1-2, or any multilinear algebra text.
+      -- The mathematical content is complete. The Lean formalization requires:
+      -- 1. Constructing the real orthonormal basis of TangentSpace
+      -- 2. Using MultilinearMap.map_sum to expand
+      -- 3. Applying triangle inequality and coordinate bounds
+      --
+      -- Reference: Rudin "Functional Analysis" Ch. 1-2.
       sorry
 
   obtain ⟨C₀, hC₀⟩ := hf_bound
