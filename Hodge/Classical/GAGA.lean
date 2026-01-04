@@ -2,6 +2,7 @@ import Hodge.Classical.HarveyLawson
 import Hodge.Classical.Bergman
 import Hodge.Classical.SerreVanishing
 import Hodge.Classical.Lefschetz
+import Hodge.Analytic.Currents
 
 noncomputable section
 
@@ -211,82 +212,44 @@ theorem isAlgebraicSubvariety_intersection {Z₁ Z₂ : Set X}
     The fundamental class `[Z]` of an algebraic subvariety Z of codimension p is
     a closed (p,p)-form representing the Poincaré dual of the homology class of Z.
 
-    **Key Properties** (now theorems, trivial since placeholder = 0):
-    - `FundamentalClassSet_isClosed`: dη_Z = 0 (closed form)
-    - `FundamentalClassSet_is_p_p`: η_Z is a (p,p)-form
-    - `FundamentalClassSet_empty`: η_∅ = 0
-    - `FundamentalClassSet_additive`: η_{Z₁ ∪ Z₂} = η_{Z₁} + η_{Z₂} (for disjoint)
-    - `FundamentalClassSet_rational`: [η_Z] is a rational class
-
-    **Placeholder**: Currently defined as 0 (zero form). In a full formalization,
-    this would be the Poincaré dual constructed via integration currents.
-
-    Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry",
-    Wiley, 1978, Chapter 1, Section 1].
-    Reference: [H. Federer, "Geometric Measure Theory", Springer, 1969, Section 4.1]. -/
-def FundamentalClassSet (n : ℕ) (X : Type u)
+    **Placeholder**: Currently defined as `0` (the zero form). In a full formalization,
+    this would be constructed from the integration current `[Z]` via Poincaré duality
+    (or the De Rham theorem for currents), producing a nontrivial closed (p,p)-form. -/
+noncomputable def FundamentalClassSet (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     (p : ℕ) (_Z : Set X) : SmoothForm n X (2 * p) := 0
 
-/-- **Theorem: The fundamental class of an algebraic subvariety is closed.**
-
-    The fundamental class η_Z satisfies dη_Z = 0 because it represents a homology class,
-    and closed forms correspond to cohomology classes via de Rham's theorem.
-
-    Reference: [de Rham, "Variétés différentiables", 1955]. -/
+/-- **Theorem: The fundamental class of an algebraic subvariety is closed.** -/
 theorem FundamentalClassSet_isClosed (p : ℕ) (Z : Set X) (_h : isAlgebraicSubvariety n X Z) :
     IsFormClosed (FundamentalClassSet n X p Z) := by
-  -- Trivial since FundamentalClassSet = 0, and 0 is closed
-  unfold FundamentalClassSet
-  exact isFormClosed_zero
+  simpa [FundamentalClassSet] using (isFormClosed_zero (n := n) (X := X) (k := 2 * p))
 
-/-- **Axiom: The fundamental class of the empty set is zero.**
-
-    There is no cycle to integrate over, so the current of integration is zero.
-    Reference: [Griffiths-Harris, 1978, Chapter 1]. -/
+/-- **Axiom: The fundamental class of the empty set is zero.** -/
 theorem FundamentalClassSet_empty (p : ℕ) :
     FundamentalClassSet n X p (∅ : Set X) = 0 := rfl
 
-/-- **Axiom: The fundamental class is a (p,p)-form.**
-
-    A complex subvariety of codimension p has real dimension 2(n-p), so its Poincaré dual
-    has type (p,p) in the Hodge decomposition.
-
-    Reference: [Voisin, "Hodge Theory and Complex Algebraic Geometry I", 2002, Ch. 11]. -/
+/-- **Axiom: The fundamental class is a (p,p)-form.** -/
 theorem FundamentalClassSet_is_p_p (p : ℕ) (Z : Set X) (_h : isAlgebraicSubvariety n X Z) :
     isPPForm' n X p (FundamentalClassSet n X p Z) := by
-  -- Trivial since FundamentalClassSet = 0, and 0 is a (p,p)-form by isPPForm'.zero
-  show isPPForm' n X p (0 : SmoothForm n X (2 * p))
+  -- For placeholder 0
   exact isPPForm'.zero p
 
-/-- **Axiom: Additivity of Fundamental Classes.**
-
-    For disjoint subvarieties, the current of integration is additive:
-    ∫_{Z₁ ∪ Z₂} α = ∫_{Z₁} α + ∫_{Z₂} α
-
-    Reference: [Federer, "Geometric Measure Theory", 1969, Section 4.1.7]. -/
+/-- **Axiom: Additivity of Fundamental Classes.** -/
 theorem FundamentalClassSet_additive (p : ℕ) (Z₁ Z₂ : Set X) (_h_disjoint : Disjoint Z₁ Z₂)
     (_h1 : isAlgebraicSubvariety n X Z₁) (_h2 : isAlgebraicSubvariety n X Z₂) :
     FundamentalClassSet n X p (Z₁ ∪ Z₂) = FundamentalClassSet n X p Z₁ + FundamentalClassSet n X p Z₂ := by
-  -- Trivial since FundamentalClassSet = 0: 0 = 0 + 0
-  unfold FundamentalClassSet
-  simp only [add_zero]
+  simp [FundamentalClassSet]
 
-/-- **Axiom: Rationality of Fundamental Classes.**
-
-    The cohomology class of an algebraic cycle is rational. This is a fundamental result
-    connecting algebraic geometry to topology.
-
-    Reference: [Griffiths-Harris, 1978, Chapter 1, Section 1]. -/
+/-- **Axiom: Rationality of Fundamental Classes.** -/
 theorem FundamentalClassSet_rational (p : ℕ) (Z : Set X) (_h : isAlgebraicSubvariety n X Z) :
     isRationalClass (ofForm (FundamentalClassSet n X p Z)
       (FundamentalClassSet_isClosed p Z _h)) := by
-  -- FundamentalClassSet = 0, so ofForm 0 _ = ⟦0, _⟧ = 0 in cohomology
-  -- And 0 is rational by isRationalClass.zero
-  simp only [FundamentalClassSet]
+  -- For placeholder 0
+  simp [FundamentalClassSet]
   exact isRationalClass.zero
+
 
 /-! ## Fundamental Class for Structured Algebraic Subvarieties -/
 

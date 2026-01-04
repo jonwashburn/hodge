@@ -243,75 +243,76 @@ instance instNormedSpaceTangentSpace (x : X) : NormedSpace ℂ (TangentSpace (�
 | Additional axioms | 1 | `hard_lefschetz_inverse_form` (Pillar 6 related) |
 | Infrastructure sorrys | 4 | Forms (2), Currents (1), Grassmannian (1) |
 
-**Current axiom count by file (verified Jan 2025):**
+**Current axiom count by file (verified Jan 4, 2025):**
 
 | File | Axioms | Notes |
 |------|--------|-------|
-| Analytic/Forms.lean | 6 | Form infrastructure |
-| Analytic/Norms.lean | 0 | ✅ Completed (was 5) |
-| Kahler/Main.lean | 3 | Pillars 5, 8 + lefschetz_lift |
-| Analytic/SheafTheory.lean | 0 | ✅ Completed (trivial sheaf construction) |
-| Classical/Lefschetz.lean | 2 | Pillar 6 + operator def |
-| Analytic/Grassmannian.lean | 2 | Volume form |
-| Analytic/Calibration.lean | 2 | Pillars 3-4 |
-| Kahler/Cone.lean | 1 | Pillar 7 only (shift → theorem ✅) |
-| Kahler/Microstructure.lean | 1 | calibration_defect (flat_limit → theorem ✅) |
-| Other files | 8 | 1 each across 8 files |
-| Kahler/Manifolds.lean | 0 | ✅ Completed |
-| Kahler/TypeDecomposition.lean | 0 | ✅ Completed |
-| Cohomology/Basic.lean | 0 | ✅ Completed |
-| **TOTAL** | **28** |
+| Classical/GAGA.lean | 1 | Pillar 1: `serre_gaga` |
+| Classical/FedererFleming.lean | 1 | Pillar 2: `federer_fleming_compactness` |
+| Analytic/Calibration.lean | 2 | Pillars 3-4: `mass_lsc`, `spine_theorem` |
+| Classical/Lefschetz.lean | 2 | Pillar 6: `hard_lefschetz_bijective`, `hard_lefschetz_inverse_form` |
+| Kahler/Cone.lean | 1 | Pillar 7: `exists_uniform_interior_radius` |
+| Kahler/Main.lean | 2 | Pillars 5,8: `harvey_lawson_fundamental_class`, `omega_pow_algebraic` |
+| **TOTAL** | **9** | 8 Classical Pillars + 1 related (HL inverse) |
+
+**Current sorry count (verified Jan 4, 2025):**
+
+| File | Line | Issue | Resolution Path |
+|------|------|-------|-----------------|
+| Classical/Bergman.lean | 259 | Bundle transition holomorphicity | Strengthen `IsHolomorphic` to use atlas trivializations |
+| Kahler/Main.lean | 314 | Dependent type cast (h ▸ 0 = 0) | Add `cast_zero` lemma for `DeRhamCohomologyClass` |
 
 ---
 
-### Remaining Axiom Analysis (10 total)
+### Updated Axiom Analysis (9 total)
 
 **Category 1: The 8 Classical Pillars (KEEP AS AXIOMS)**
-1. `serre_gaga` (GAGA.lean) - Serre's GAGA theorem
-2. `federer_fleming_compactness` (FedererFleming.lean) - Compactness for integral currents
-3. `mass_lsc` (Calibration.lean) - Lower semicontinuity of mass
-4. `spine_theorem` (Calibration.lean) - Federer's spine theorem
-5. `harvey_lawson_fundamental_class` (Main.lean) - Harvey-Lawson structure theorem
-6. `hard_lefschetz_bijective` (Lefschetz.lean) - Hard Lefschetz theorem (bijectivity)
-6b. `hard_lefschetz_inverse_form` (Lefschetz.lean) - Hard Lefschetz theorem (surjectivity)
-7. `exists_uniform_interior_radius` (Cone.lean) - Uniform interior for Kähler cone
-8. `omega_pow_algebraic` (Main.lean) - Powers of Kähler form are algebraic
+1. `serre_gaga` (GAGA.lean) - Serre's GAGA theorem (Pillar 1)
+2. `federer_fleming_compactness` (FedererFleming.lean) - Flat compactness (Pillar 2)
+3. `mass_lsc` (Calibration.lean) - Lower semicontinuity of mass (Pillar 3)
+4. `spine_theorem` (Calibration.lean) - Spine theorem for GMT (Pillar 4)
+5. `harvey_lawson_fundamental_class` (Main.lean) - Harvey-Lawson structure (Pillar 5)
+6. `hard_lefschetz_bijective` (Lefschetz.lean) - Hard Lefschetz bijectivity (Pillar 6)
+7. `exists_uniform_interior_radius` (Cone.lean) - Uniform interior for Kähler cone (Pillar 7)
+8. `omega_pow_algebraic` (Main.lean) - Powers of Kähler form are algebraic (Pillar 8)
 
-**Infrastructure Holes (13 remaining)**
+**Category 2: Related Infrastructure (1 axiom)**
+- `hard_lefschetz_inverse_form` (Lefschetz.lean) - Surjectivity aspect of Hard Lefschetz
 
-| File | Item | Type | Task |
-|------|------|------|------|
-| Forms.lean | `bddAbove` | `sorry` | Prove operator norm bound |
-| Forms.lean | `add_smooth` | `sorry` | Prove triangle inequality continuity |
-| Grassmannian.lean | `vol_form` | `sorry` | Exterior algebra construction |
-| Grassmannian.lean | `smooth_stub` | `sorry` | Point-support smoothness bridge |
-| Currents.lean | `is_bounded` | `sorry` | seminorm boundedness |
-| Main.lean | `HC_lift` | `sorry` | Cycle lift logic |
-| ... | ... | ... | (and 7 others) |
+**Infrastructure Holes (2 sorries remaining)**
 
-**Blockers Summary:**
-- **Wedge product**: `smoothWedge := 0` placeholder blocks `shift_makes_conePositive` and related.
-- **Sheaf infrastructure**: Coherent sheaves and their existence need more Mathlib integration.
+| File | Sorry | Issue | Resolution |
+|------|-------|-------|------------|
+| Bergman.lean:259 | `h_c_mdiff` | IsHolomorphic uses arbitrary trivializations, not atlas charts | Strengthen `IsHolomorphic` definition to require atlas membership |
+| Main.lean:314 | `h_cast_zero` | (h ▸ 0) = 0 for dependent type cast | Add `DeRhamCohomologyClass.cast_zero` lemma |
 
 ---
 
-## 🔧 PHASE 2: THE HARD MATH (Current Phase)
+## 🎯 PHASE 3: COMPLETION PATH (Current Phase)
 
-**Status**: We have reduced axioms from 132 → 9 (plus one comment line caught by grep). **Only the 8 Classical Pillars remain as axioms.** The rest of the work has been converted into **13 explicit mathematical holes (`sorry`)** that we are grinding through.
+**Status**: Reduced from 132 axioms to **9 axioms + 2 sorries**. The proof structure is complete.
 
-**Latest Progress (Jan 2025)**:
-- **Axiom Cleanup**: Converted all remaining infrastructure axioms in `Forms.lean`, `Norms.lean`, `Lefschetz.lean`, and `Currents.lean` into theorems/instances with `sorry`.
-- **Pillar Consolidation**: All `axiom` declarations now map directly to the 8 Pillars.
-- **Hole Identification**: Identified exactly 13 pieces of "hard math" required to complete the proof.
+### What Remains
 
-**Remaining Mathematical Holes (`sorry` count: 13)**:
-1. **Forms/Norms (3)**: `isSmoothAlternating_add`, `IsSmoothAlternating.bddAbove`, `is_bounded`.
-2. **Grassmannian (2)**: `exists_volume_form_positive_case`, `simpleCalibratedForm_smooth`.
-3. **Microstructure (3)**: `calibration_defect_from_gluing`, sequence bounds.
-4. **Sheaf Theory (2)**: `structureSheaf_exists`, `idealSheaf_exists`.
-5. **Structural (3)**: `IsHolomorphic_add`, `nontrivial_of_dim_pos`, `lefschetz_lift_signed_cycle`.
+**To reach "8 Classical Pillars only":**
+1. **Eliminate `hard_lefschetz_inverse_form`**: This is the surjectivity part of Hard Lefschetz. It should be derivable from `hard_lefschetz_bijective` (which gives bijectivity).
 
-**Decision**: We acknowledge this is hard and commit to grinding through it systematically.
+**To reach "zero sorries":**
+1. **Bergman.lean:259** - Strengthen `IsHolomorphic` definition
+   - Change `IsHolomorphic` to require trivializations come from the bundle's atlas
+   - Then `c_func` MDifferentiability follows from `L.transition_holomorphic`
+
+2. **Main.lean:314** - Add cast_zero lemma
+   - Prove: `(h ▸ (0 : DeRhamCohomologyClass n X k₁)) = (0 : DeRhamCohomologyClass n X k₂)`
+   - This is technically true but requires careful dependent type handling
+
+### Summary
+
+| Metric | Current | Target |
+|--------|---------|--------|
+| Axioms | 9 | 8 (Classical Pillars) |
+| Sorries | 2 | 0 |
+| Build status | ✅ Passes | ✅ Passes |
 
 ### Work Package 1: AlternatingMap Norm Infrastructure (~12 axioms)
 

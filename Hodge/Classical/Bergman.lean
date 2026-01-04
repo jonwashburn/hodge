@@ -31,60 +31,78 @@ variable {n : ℕ} {X : Type*}
 /-- The standard model for ℂ as a complex manifold. -/
 def 𝓒_ℂ : ModelWithCorners ℂ ℂ ℂ := modelWithCornersSelf ℂ ℂ
 
+/-- A local trivialization of a bundle with fiber F over U. -/
+def LocalTrivialization {X : Type*} [TopologicalSpace X] (Fiber : X → Type*)
+    (fiber_add : ∀ x, AddCommGroup (Fiber x))
+    (fiber_module : ∀ x, Module ℂ (Fiber x))
+    (U : Opens X) :=
+  ∀ y ∈ U,
+    letI : AddCommGroup (Fiber y) := fiber_add y
+    letI : Module ℂ (Fiber y) := fiber_module y
+    Fiber y ≃ₗ[ℂ] ℂ
+
 /-- A holomorphic line bundle L over X.
 
-    **Placeholder Structure**: In our formalization, all bundles have `Fiber _ = ℂ`,
-    making all trivializations essentially the identity map. This means all transition
-    functions are constant (= 1), which is trivially MDifferentiable.
-
-    **Key Property**: The holomorphic cocycle condition is encoded in `transition_holomorphic`,
-    stating that transition functions between any local trivializations are holomorphic. -/
+    **Structure**: We now include an atlas of trivializations to properly encode the
+    holomorphic structure and cocycle condition. -/
 structure HolomorphicLineBundle (n : ℕ) (X : Type*)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] where
   Fiber : X → Type*
   fiber_add : ∀ x, AddCommGroup (Fiber x)
   fiber_module : ∀ x, Module ℂ (Fiber x)
-  has_local_trivializations : ∀ x : X, ∃ (U : Opens X) (hx : x ∈ U),
-    Nonempty (∀ y ∈ U, Fiber y ≃ₗ[ℂ] ℂ)
-  /-- Transition functions between any local trivializations are holomorphic.
-      For line bundles, this means the transition coefficient c(z) = φ₁(z)(φ₂(z)⁻¹(1))
-      is an MDifferentiable function from U₁ ∩ U₂ to ℂ.
-
-      **Placeholder**: In our simplified formalization where Fiber = ℂ and trivializations
-      are the identity, the transition function is constantly 1, hence MDifferentiable. -/
-  transition_holomorphic : ∀ (U₁ U₂ : Opens X) (φ₁ : ∀ y ∈ U₁, Fiber y ≃ₗ[ℂ] ℂ)
-    (φ₂ : ∀ y ∈ U₂, Fiber y ≃ₗ[ℂ] ℂ),
+  /-- The atlas of admissible local trivializations. -/
+  atlas : Set (Σ U : Opens X, LocalTrivialization Fiber fiber_add fiber_module U)
+  /-- The atlas covers the manifold. -/
+  is_covering : (⋃ t ∈ atlas, (t.1 : Set X)) = Set.univ
+  /-- Transition functions between any two charts in the atlas are holomorphic. -/
+  transition_holomorphic : ∀ (t₁ t₂ : atlas),
+    let ⟨U₁, φ₁⟩ := t₁.val
+    let ⟨U₂, φ₂⟩ := t₂.val
     MDifferentiable (𝓒_complex n) 𝓒_ℂ
-      (fun z : ↥(U₁ ⊓ U₂) => (φ₁ z.val z.property.1) ((φ₂ z.val z.property.2).symm 1))
+      (fun z : ↥(U₁ ⊓ U₂) =>
+        letI : AddCommGroup (Fiber z.val) := fiber_add z.val
+        letI : Module ℂ (Fiber z.val) := fiber_module z.val
+        (φ₁ z.val z.property.1) ((φ₂ z.val z.property.2).symm 1))
 
 instance (L : HolomorphicLineBundle n X) (x : X) : AddCommGroup (L.Fiber x) := L.fiber_add x
 instance (L : HolomorphicLineBundle n X) (x : X) : Module ℂ (L.Fiber x) := L.fiber_module x
 
+/-- A bundle has local trivializations everywhere (derived from atlas). -/
+theorem HolomorphicLineBundle.has_local_trivializations (L : HolomorphicLineBundle n X) (x : X) :
+    ∃ (U : Opens X) (hx : x ∈ U), Nonempty (LocalTrivialization L.Fiber L.fiber_add L.fiber_module U) := by
+  have hx_cov : x ∈ (⋃ t ∈ L.atlas, (t.1 : Set X)) := by
+    -- By the covering property, the union equals `Set.univ`.
+    simpa [L.is_covering] using (Set.mem_univ x)
+  -- Unpack membership in the union cover.
+  rcases Set.mem_iUnion.mp hx_cov with ⟨t, ht⟩
+  rcases Set.mem_iUnion.mp ht with ⟨ht_atlas, hx_in_t⟩
+  refine ⟨t.1, hx_in_t, ?_⟩
+  exact ⟨t.2⟩
+
 /-- **Holomorphic Cocycle Theorem** (Griffiths-Harris, Ch. 0.5).
 
-    For a holomorphic line bundle L, any two local trivializations φ₁ on U₁ and φ₂ on U₂
-    have holomorphic transition functions. Specifically, the transition coefficient
-    `c(z) = φ₁(z)(φ₂(z)⁻¹(1))` is MDifferentiable on U₁ ∩ U₂.
+    For a holomorphic line bundle L, any two local trivializations in the atlas
+    have holomorphic transition functions.
 
-    This is the defining property of holomorphic vector bundles. Since ℂ-linear
-    automorphisms of ℂ are multiplication by scalars, the transition function
-    `g_{12}(z) = φ₁(z) ∘ φ₂(z)⁻¹` acts as `w ↦ c(z) · w` for c(z) ∈ ℂˣ holomorphic.
-
-    **Note**: This follows directly from the `transition_holomorphic` field of
-    `HolomorphicLineBundle`, which encodes the holomorphic cocycle condition. -/
+    **Note**: This follows directly from the `transition_holomorphic` field. -/
 theorem holomorphic_bundle_transition (L : HolomorphicLineBundle n X)
-    (U₁ U₂ : Opens X) (φ₁ : ∀ y ∈ U₁, L.Fiber y ≃ₗ[ℂ] ℂ) (φ₂ : ∀ y ∈ U₂, L.Fiber y ≃ₗ[ℂ] ℂ) :
+    (t₁ t₂ : L.atlas) :
+    let ⟨U₁, φ₁⟩ := t₁.val
+    let ⟨U₂, φ₂⟩ := t₂.val
     MDifferentiable (𝓒_complex n) 𝓒_ℂ
       (fun z : ↥(U₁ ⊓ U₂) => (φ₁ z.val z.property.1) ((φ₂ z.val z.property.2).symm 1)) :=
-  L.transition_holomorphic U₁ U₂ φ₁ φ₂
+  L.transition_holomorphic t₁ t₂
 
 /-- The trivial bundle has local trivializations. -/
 theorem trivial_bundle_has_local_trivializations {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] (x : X) :
-    ∃ (U : Opens X) (hx : x ∈ U), Nonempty (∀ y ∈ U, ℂ ≃ₗ[ℂ] ℂ) :=
-  ⟨⊤, trivial, ⟨fun _ _ => LinearEquiv.refl ℂ ℂ⟩⟩
+    ∃ (U : Opens X) (hx : x ∈ U), Nonempty (LocalTrivialization (fun _ => ℂ) (fun _ => inferInstance) (fun _ => inferInstance) U) :=
+by
+  refine ⟨⊤, ?_, ?_⟩
+  · trivial
+  · exact ⟨fun _ _ => LinearEquiv.refl ℂ ℂ⟩
 
 /-- The tensor product of two holomorphic line bundles. -/
 def HolomorphicLineBundle.tensor (L₁ L₂ : HolomorphicLineBundle n X) :
@@ -92,45 +110,36 @@ def HolomorphicLineBundle.tensor (L₁ L₂ : HolomorphicLineBundle n X) :
   Fiber _ := ℂ
   fiber_add _ := inferInstance
   fiber_module _ := inferInstance
-  has_local_trivializations x := by
-    refine ⟨⊤, trivial, ⟨fun _ _ => LinearEquiv.refl ℂ ℂ⟩⟩
-  transition_holomorphic U₁ U₂ φ₁ φ₂ := by
-    -- For the tensor bundle (Fiber = ℂ), we need to show the transition
-    -- function z ↦ φ₁(z)(φ₂(z)⁻¹(1)) is MDifferentiable.
-    --
-    -- Key insight: For Fiber = ℂ, any ℂ-linear isomorphism ℂ ≃ₗ[ℂ] ℂ is
-    -- multiplication by a non-zero scalar c. So φ(v) = c·v and φ⁻¹(v) = v/c.
-    --
-    -- The transition coefficient is φ₁(z)(φ₂(z)⁻¹(1)):
-    --   = φ₁(z)(1/c₂(z)) = c₁(z) · (1/c₂(z)) = c₁(z)/c₂(z)
-    --
-    -- For the ratio to be MDifferentiable, we need c₁ and c₂ to be holomorphic.
-    -- Since ℂ-linear isomorphisms are uniquely determined by their value at 1,
-    -- we have c(z) = φ(z)(1). The "holomorphic dependence on z" is what makes
-    -- a bundle holomorphic.
-    --
-    -- For our trivial bundle construction (Fiber = ℂ, trivializations = identity),
-    -- c₁ = c₂ = 1 for all z, so the transition is constantly 1.
-    --
-    -- However, φ₁ and φ₂ are given as arbitrary inputs. We show MDifferentiability
-    -- by observing that the scalar at each point is determined by φ(1), and
-    -- the dependence on z is through these fixed LinearEquivs.
-    -- For the trivial bundle, any LinearEquiv ℂ ℂ gives a fixed scalar.
-    -- The function z ↦ (fixed scalar at z) is locally constant, hence smooth.
-    -- At each point, the value is determined by the LinearEquivs at that point.
-    -- For our trivial construction (LinearEquiv.refl), this is constantly 1.
-    -- However, proving this requires showing the function syntactically equals
-    -- a constant, which Lean cannot infer from the dependent structure.
-    -- This is an infrastructure gap in the bundle formalization.
-    sorry
+  atlas := { ⟨⊤, fun _ _ => LinearEquiv.refl ℂ ℂ⟩ }
+  is_covering := by simp
+  transition_holomorphic := by
+    intro t₁ t₂
+    -- t₁ and t₂ must be the unique element in the atlas
+    have h1 : t₁.val = ⟨⊤, fun _ _ => LinearEquiv.refl ℂ ℂ⟩ := by
+      let ⟨x, hx⟩ := t₁; simp at hx; subst hx; rfl
+    have h2 : t₂.val = ⟨⊤, fun _ _ => LinearEquiv.refl ℂ ℂ⟩ := by
+      let ⟨x, hx⟩ := t₂; simp at hx; subst hx; rfl
+    rw [h1, h2]
+    -- Transition function is z ↦ 1
+    simpa using
+      (mdifferentiable_const (c := (1 : ℂ)) (I := 𝓒_complex n) (I' := 𝓒_ℂ))
 
 /-- The M-th tensor power L^⊗M. -/
 def HolomorphicLineBundle.power (L : HolomorphicLineBundle n X) : ℕ → HolomorphicLineBundle n X
   | 0 => { Fiber := fun _ => ℂ,
            fiber_add := fun _ => inferInstance,
            fiber_module := fun _ => inferInstance,
-           has_local_trivializations := fun x => trivial_bundle_has_local_trivializations (n := n) (X := X) x,
-           transition_holomorphic := fun _ _ _ _ => by sorry }
+           atlas := { ⟨⊤, fun _ _ => LinearEquiv.refl ℂ ℂ⟩ },
+           is_covering := by simp,
+           transition_holomorphic := by
+             intro t₁ t₂
+             have h1 : t₁.val = ⟨⊤, fun _ _ => LinearEquiv.refl ℂ ℂ⟩ := by
+               let ⟨x, hx⟩ := t₁; simp at hx; subst hx; rfl
+             have h2 : t₂.val = ⟨⊤, fun _ _ => LinearEquiv.refl ℂ ℂ⟩ := by
+               let ⟨x, hx⟩ := t₂; simp at hx; subst hx; rfl
+             rw [h1, h2]
+             simpa using
+               (mdifferentiable_const (c := (1 : ℂ)) (I := 𝓒_complex n) (I' := 𝓒_ℂ)) }
   | M + 1 => L.tensor (L.power M)
 
 /-- A Hermitian metric on L. -/
@@ -239,9 +248,15 @@ theorem IsHolomorphic_add (L : HolomorphicLineBundle n X) (s₁ s₂ : Section L
     -- we have g_{12}(z)(w) = c(z) * w for c(z) ∈ ℂˣ, and c(z) is holomorphic.
     -- For this placeholder bundle infrastructure, we mark this as a structural hole.
     -- This would be eliminated by strengthening the bundle's transition_holomorphic axiom.
-    have h_c_mdiff : MDifferentiable (𝓒_complex n) 𝓒_ℂ c_func :=
-      -- Use the holomorphic cocycle axiom: transition functions are MDifferentiable
-      holomorphic_bundle_transition L U₁ U₂ φ₁ φ₂
+    have h_c_mdiff : MDifferentiable (𝓒_complex n) 𝓒_ℂ c_func := by
+      -- Placeholder: in a full development, this follows from holomorphic transition functions.
+      -- The current IsHolomorphic definition uses arbitrary trivializations, not necessarily
+      -- from the bundle's atlas. To prove this properly, we would need to either:
+      -- 1. Require the trivializations in IsHolomorphic to come from the atlas, or
+      -- 2. Prove that any two trivializations have holomorphic transitions
+      --
+      -- This is a fundamental infrastructure gap in the bundle formalization.
+      sorry
     -- Product of MDifferentiable functions is MDifferentiable
     exact h_c_mdiff.mul h_f₂_comp
 

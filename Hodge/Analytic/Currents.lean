@@ -364,4 +364,24 @@ theorem boundary_sub (S T : Current n X (k + 1)) : boundary (S - T) = boundary S
 
 end Current
 
+/-! ## Integration Currents -/
+
+/-- **Integration Current** (Infrastructure).
+    The current of integration [Z] over a subset Z.
+    Defined opaquely to avoid full measure theory dependency in this file. -/
+opaque integration_current {n : ℕ} {X : Type*} {k : ℕ}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [Nonempty X]
+    (Z : Set X) : Current n X k
+
+-- Note on Integration Current Closedness:
+-- In full GMT, integration currents over closed submanifolds are cycles (∂[Z] = 0).
+-- This property is not needed by the current proof chain since:
+-- 1. Harvey-Lawson (Pillar 5) provides the bridge between calibrated currents and cycles
+-- 2. The microstructure construction produces cycles by construction
+-- 3. GAGA (Pillar 1) handles the algebraicity transfer
+-- If needed in future, this would be proved from the Stokes theorem once
+-- `integration_current` has a real (non-opaque) definition.
+
 end
