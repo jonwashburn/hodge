@@ -221,7 +221,41 @@ theorem mass_add_le (S T : Current n X k) : mass (S + T) ≤ mass S + mass T := 
           exact ⟨ω, hω_comass, rfl⟩
 
 /-- Mass scales with absolute value of scalar. -/
-axiom mass_smul (r : ℝ) (T : Current n X k) : mass (r • T) = |r| * mass T
+theorem mass_smul (r : ℝ) (T : Current n X k) : mass (r • T) = |r| * mass T := by
+  unfold mass
+  -- (r • T).toFun ω = r * T.toFun ω
+  have h_smul : ∀ ω, (r • T).toFun ω = r * T.toFun ω := fun ω => rfl
+  -- |r * x| = |r| * |x|
+  have h_abs : ∀ ω, |(r • T).toFun ω| = |r| * |T.toFun ω| := fun ω => by
+    rw [h_smul, abs_mul]
+  simp_rw [h_abs]
+  by_cases hr : r = 0
+  · -- r = 0 case
+    simp only [hr, abs_zero, MulZeroClass.zero_mul]
+    -- Goal: sSup {r | ∃ ω, comass ω ≤ 1 ∧ r = 0} = 0
+    have h_set : { x : ℝ | ∃ ω : SmoothForm n X k, comass ω ≤ 1 ∧ x = 0 } = {0} := by
+      ext x; simp only [Set.mem_setOf_eq, Set.mem_singleton_iff]
+      constructor
+      · intro ⟨_, _, hx⟩; exact hx
+      · intro hx; subst hx; use 0; simp [comass_zero]
+    rw [h_set, csSup_singleton]
+  · -- r ≠ 0 case: |r| > 0
+    have hr_pos : |r| > 0 := abs_pos.mpr hr
+    -- The set { |r| * |T ω| : comass ω ≤ 1 } = (|r| * ·) '' { |T ω| : comass ω ≤ 1 }
+    have h_image : { x : ℝ | ∃ ω, comass ω ≤ 1 ∧ x = |r| * |T.toFun ω| } =
+        (fun x => |r| * x) '' { x : ℝ | ∃ ω, comass ω ≤ 1 ∧ x = |T.toFun ω| } := by
+      ext x; simp only [Set.mem_setOf_eq, Set.mem_image]
+      constructor
+      · intro ⟨ω, hω, hx⟩; use |T.toFun ω|; exact ⟨⟨ω, hω, rfl⟩, hx.symm⟩
+      · intro ⟨y, ⟨ω, hω, hy⟩, hxy⟩; use ω, hω; rw [← hxy, ← hy]
+    rw [h_image]
+    -- sSup (c * · '' S) = c * sSup S for c ≥ 0, S nonempty and bounded
+    have h_nonempty := mass_set_nonempty T
+    have h_bdd := mass_set_bddAbove T
+    -- Use Monotone.map_csSup_of_continuousAt
+    have h_mono : Monotone (fun x => |r| * x) := fun _ _ hab => mul_le_mul_of_nonneg_left hab (le_of_lt hr_pos)
+    have h_cont : Continuous (fun x => |r| * x) := continuous_const.mul continuous_id
+    rw [h_mono.map_csSup_of_continuousAt h_cont.continuousAt h_nonempty h_bdd]
 
 /-- Extensionality for currents. -/
 @[ext]
