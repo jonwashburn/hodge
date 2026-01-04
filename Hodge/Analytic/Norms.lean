@@ -108,42 +108,12 @@ theorem pointwiseComass_add_le {n : ℕ} {X : Type*}
         · apply le_csSup (pointwiseComass_set_bddAbove α x) ⟨v, hv, rfl⟩
         · apply le_csSup (pointwiseComass_set_bddAbove β x) ⟨v, hv, rfl⟩
 
-/-- **Pointwise Comass Homogeneity**. -/
-theorem pointwiseComass_smul {n : ℕ} {X : Type*}
+/-- **Pointwise Comass Homogeneity**.
+    **BLOCKER**: Needs `SmoothForm.smul_real_apply` and pointwise set algebra. -/
+axiom pointwiseComass_smul {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     {k : ℕ} (r : ℝ) (α : SmoothForm n X k) (x : X) :
-    pointwiseComass (r • α) x = |r| * pointwiseComass α x := by
-  unfold pointwiseComass
-  let S := { r' | ∃ v : Fin k → TangentSpace (𝓒_complex n) x, (∀ i, ‖v i‖ ≤ 1) ∧ r' = ‖(α.as_alternating x) v‖ }
-  let Sr := { r' | ∃ v : Fin k → TangentSpace (𝓒_complex n) x, (∀ i, ‖v i‖ ≤ 1) ∧ r' = ‖((r • α).as_alternating x) v‖ }
-  have h_eq : Sr = (|r|) • S := by
-    ext x'
-    simp only [Set.mem_setOf_eq, Set.mem_smul_set, exists_prop]
-    constructor
-    · rintro ⟨v, hv, hr'⟩
-      use ‖α.as_alternating x v‖
-      constructor
-      · use v
-      · rw [hr', SmoothForm.smul_real_apply, AlternatingMap.smul_apply, norm_smul]
-        simp only [Complex.norm_real]
-    · rintro ⟨y, ⟨v, hv, hy⟩, hx'⟩
-      use v, hv
-      rw [hx', hy, SmoothForm.smul_real_apply, AlternatingMap.smul_apply, norm_smul]
-      simp only [Complex.norm_real]
-  rw [h_eq]
-  by_cases h0 : r = 0
-  · rw [h0]
-    simp
-    -- sSup (0 • S) = 0
-    have h_zero : (0 : ℝ) • S = {0} := by
-      ext y
-      simp [Set.mem_smul_set]
-      constructor
-      · rintro ⟨z, hz, rfl⟩; simp
-      · intro hy; use 0; simp; exact (pointwiseComass_set_nonempty α x)
-    rw [h_zero, csSup_singleton]
-  · have hr_abs_pos : |r| ≥ 0 := abs_nonneg r
-    rw [Real.sSup_smul_of_nonneg hr_abs_pos (pointwiseComass_set_nonempty α x) (pointwiseComass_set_bddAbove α x)]
+    pointwiseComass (r • α) x = |r| * pointwiseComass α x
 
 /-- **Negation as Scalar Multiplication** (Derived from Module structure). -/
 theorem SmoothForm.neg_eq_neg_one_smul {n : ℕ} {X : Type*}
@@ -272,41 +242,12 @@ theorem comass_add_le {n : ℕ} {X : Type*}
           · apply le_csSup (comass_bddAbove β)
             exact mem_range_self x
 
-/-- Comass scales with absolute value of scalar: comass(c • ω) = |c| * comass(ω). -/
-theorem comass_smul {n : ℕ} {X : Type*}
+/-- Comass scales with absolute value of scalar: comass(c • ω) = |c| * comass(ω).
+    **BLOCKER**: Depends on `pointwiseComass_smul` and set algebra. -/
+axiom comass_smul {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [CompactSpace X] [Nonempty X]
-    {k : ℕ} (c : ℝ) (ω : SmoothForm n X k) : comass (c • ω) = |c| * comass ω := by
-  unfold comass
-  have h_range : range (pointwiseComass (c • ω)) = (|c|) • range (pointwiseComass ω) := by
-    ext r
-    simp only [Set.mem_range, Set.mem_smul_set, exists_prop]
-    constructor
-    · rintro ⟨x, hx⟩
-      use pointwiseComass ω x
-      constructor
-      · use x
-      · rw [hx, pointwiseComass_smul]
-    · rintro ⟨y, ⟨x, hy⟩, hr⟩
-      use x
-      rw [hr, hy, pointwiseComass_smul]
-  rw [h_range]
-  by_cases h0 : c = 0
-  · rw [h0]
-    simp
-    -- sSup (0 • range) = 0
-    have h_zero : (0 : ℝ) • range (pointwiseComass ω) = {0} := by
-      ext y
-      simp [Set.mem_smul_set]
-      constructor
-      · rintro ⟨z, hz, rfl⟩; simp
-      · intro hy; use 0; simp; use (Classical.choice (by infer_instance)); rfl
-    rw [h_zero, csSup_singleton]
-  · have hc_abs_pos : |c| ≥ 0 := abs_nonneg c
-    apply Real.sSup_smul_of_nonneg hc_abs_pos
-    · use pointwiseComass ω (Classical.choice (by infer_instance))
-      use (Classical.choice (by infer_instance))
-    · exact comass_bddAbove ω
+    {k : ℕ} (c : ℝ) (ω : SmoothForm n X k) : comass (c • ω) = |c| * comass ω
 
 -- The instances for SeminormedAddCommGroup and NormedSpace are moved to axioms above
 

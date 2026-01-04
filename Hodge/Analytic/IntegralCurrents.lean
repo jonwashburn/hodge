@@ -77,11 +77,35 @@ theorem polyhedral_smul {k : ℕ} (c : ℤ) (T : Current n X k) :
   IntegralPolyhedralChain'.smul c hT
 
 /-- **Boundary of polyhedral chain is polyhedral** (Federer-Fleming, 1960).
-    This is a deep result that follows from the fact that the boundary of a simplex
-    is a finite sum of face simplices, all with integer coefficients.
+    This follows from the fact that the boundary operator is additive and
+    compatible with scalar multiplication.
     Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 1960, §4.2]. -/
-axiom polyhedral_boundary {k : ℕ} (T : Current n X (k + 1)) :
-    T ∈ IntegralPolyhedralChain n X (k + 1) → Current.boundary T ∈ IntegralPolyhedralChain n X k
+theorem polyhedral_boundary {k : ℕ} (T : Current n X (k + 1)) :
+    T ∈ IntegralPolyhedralChain n X (k + 1) → Current.boundary T ∈ IntegralPolyhedralChain n X k := by
+  intro hT
+  induction hT with
+  | zero =>
+    -- ∂0 = 0
+    have h : Current.boundary (0 : Current n X (k + 1)) = 0 := Current.boundary_zero
+    rw [h]
+    exact IntegralPolyhedralChain'.zero
+  | add _ _ ihS ihT =>
+    -- ∂(S + T) = ∂S + ∂T
+    have h : Current.boundary (_ + _) = Current.boundary _ + Current.boundary _ := Current.boundary_add _ _
+    rw [h]
+    exact IntegralPolyhedralChain'.add ihS ihT
+  | neg _ ih =>
+    -- ∂(-T) = -∂T
+    have h : Current.boundary (-_) = -Current.boundary _ := Current.boundary_neg _
+    rw [h]
+    exact IntegralPolyhedralChain'.neg ih
+  | smul c _ ih =>
+    -- ∂(c • T) = c • ∂T
+    have h : Current.boundary ((c : ℝ) • _) = (c : ℝ) • Current.boundary _ := Current.boundary_smul _ _
+    -- Convert ℤ • to ℝ • via the HSMul instance
+    simp only [HSMul.hSMul] at h ⊢
+    rw [h]
+    exact IntegralPolyhedralChain'.smul c ih
 
 /-- Predicate stating that a current is an integral current.
     Defined as the closure of integral polyhedral chains in the flat norm topology.

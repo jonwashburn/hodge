@@ -52,14 +52,21 @@ theorem ofForm_wedge_add (n : ℕ) (X : Type u) [TopologicalSpace X] [ChartedSpa
 /-- The Lefschetz operator L : H^p(X) → H^{p+2}(X)
     is the linear map induced by wedging with the Kähler form class [ω].
 
-    **Definition**: L(c) = [ω] ∪ c (with appropriate degree reindexing).
-
-    Axiomatized due to technical complexity of degree coercion (2+p vs p+2)
-    in dependent type settings. The mathematical content is straightforward. -/
-axiom lefschetz_operator (n : ℕ) (X : Type u)
+    **Definition**: L(c) = c ∪ [ω].
+    By using the order (p, 2), the target degree is exactly p+2, avoiding
+    dependent type coercion issues. -/
+noncomputable def lefschetz_operator (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    (p : ℕ) : DeRhamCohomologyClass n X p →ₗ[ℂ] DeRhamCohomologyClass n X (p + 2)
+    (p : ℕ) : DeRhamCohomologyClass n X p →ₗ[ℂ] DeRhamCohomologyClass n X (p + 2) where
+  toFun c := c * ⟦KahlerManifold.omega_form, KahlerManifold.omega_closed⟧
+  map_add' c₁ c₂ := add_mul c₁ c₂ ⟦KahlerManifold.omega_form, KahlerManifold.omega_closed⟧
+  map_smul' r c := by
+    simp only [RingHom.id_apply]
+    -- (r • c) * ω = r • (c * ω)
+    exact smul_mul r c ⟦KahlerManifold.omega_form, KahlerManifold.omega_closed⟧
+
+
 
 -- lefschetz_operator_eval removed (unused)
 
