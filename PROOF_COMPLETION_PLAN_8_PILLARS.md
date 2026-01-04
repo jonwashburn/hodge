@@ -216,32 +216,44 @@ instance instNormedSpaceTangentSpace (x : X) : NormedSpace ℂ (TangentSpace (�
 
 ---
 
-### Next Steps to Continue
+### Remaining Axiom Analysis (41 total)
 
-**High priority (quick wins remaining):**
-1. **Forms.lean (6 axioms)**: `isSmoothAlternating_add`, `isSmoothAlternating_smul`, `extDerivLinearMap`, `smoothExtDeriv_extDeriv`, `smoothExtDeriv_continuous`, `instTopologicalSpace`
-2. **Currents.lean (1 axiom)**: `is_bounded`
-3. **Norms.lean (6 axioms)**: `pointwiseComass_set_bddAbove`, `pointwiseComass_smul`, `comass_smul`, `instNormedAddCommGroupSmoothForm`, `instNormedSpaceRealSmoothForm`
+**Category 1: The 8 Classical Pillars (KEEP AS AXIOMS)**
+1. `serre_gaga` (GAGA.lean) - Serre's GAGA theorem
+2. `federer_fleming_compactness` (FedererFleming.lean) - Compactness for integral currents
+3. `mass_lsc` (Calibration.lean) - Lower semicontinuity of mass
+4. `spine_theorem` (Calibration.lean) - Federer's spine theorem
+5. `harvey_lawson_fundamental_class` (Main.lean) - Harvey-Lawson structure theorem
+6. `hard_lefschetz_bijective` (Lefschetz.lean) - Hard Lefschetz theorem
+7. `exists_uniform_interior_radius` (Cone.lean) - Uniform interior for Kähler cone
+8. `omega_pow_algebraic` (Main.lean) - Powers of Kähler form are algebraic
 
-**Blockers identified:**
-- `Real.sSup_mul_of_nonneg` doesn't exist in Mathlib - prevents proving `pointwiseComass_smul`
-- SmoothForm needs `add_zero` lemma for Current proofs
-- Current structure equality needs early `@[ext]` definition
+**Category 2: Infrastructure Axioms (33 remaining, blocked by deeper work)**
 
-**Medium priority (structural axioms):**
-4. **Kahler/Manifolds.lean (5 axioms)**: Deep Kähler theory axioms
-5. **TypeDecomposition.lean (4 axioms)**: kahlerPow needs proper wedge product
-6. **Cone.lean (4 axioms)**: Includes Pillar 7
+| File | Axioms | Blocker |
+|------|--------|---------|
+| Forms.lean | 6 | Need AlternatingMap.norm typeclass |
+| Norms.lean | 6 | Need AlternatingMap.norm for bddAbove |
+| TypeDecomposition.lean | 3 | Need real wedge product |
+| SheafTheory.lean | 3 | Deep sheaf theory |
+| Cone.lean | 2 | Depends on kahlerPow |
+| Microstructure.lean | 2 | Cubulation machinery |
+| Grassmannian.lean | 2 | Volume form construction |
+| Calibration.lean | 2 | (pillars above) |
+| Lefschetz.lean | 1 | lefschetz_operator definition |
+| Main.lean | 1 | lefschetz_lift_signed_cycle |
+| Manifolds.lean | 1 | lefschetzLambdaLinearMap |
+| HarveyLawson.lean | 1 | nontrivial_of_dim_pos (metric API) |
+| SerreVanishing.lean | 1 | Serre vanishing theorem |
+| Bergman.lean | 1 | IsHolomorphic_add |
+| IntegralCurrents.lean | 1 | polyhedral_boundary |
+| Currents.lean | 1 | is_bounded |
+| BaranyGrinberg.lean | 1 | (not imported, combinatorics) |
 
-**Kept as classical pillars (8 axioms):**
-1. `serre_gaga` (GAGA.lean)
-2. `federer_fleming_compactness` (FedererFleming.lean)
-3. `mass_lsc` (Calibration.lean)
-4. `spine_theorem` (Calibration.lean)
-5. `harvey_lawson_fundamental_class` (Main.lean)
-6. `hard_lefschetz_bijective` (Lefschetz.lean)
-7. `exists_uniform_interior_radius` (Cone.lean)
-8. `omega_pow_algebraic` (Main.lean)
+**Blockers Summary:**
+- **AlternatingMap norm infrastructure**: Missing `Norm` instance for `AlternatingMap` blocks proving `pointwiseComass_set_bddAbove`, `isSmoothAlternating_add/smul`
+- **Wedge product**: `smoothWedge := 0` placeholder blocks `kahlerPow` and related
+- **Metric space API**: Complex manifold nontriviality proof needs careful API work
 
 ---
 
