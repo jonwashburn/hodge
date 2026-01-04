@@ -89,21 +89,20 @@ theorem polyhedral_boundary {k : ℕ} (T : Current n X (k + 1)) :
     have h : Current.boundary (0 : Current n X (k + 1)) = 0 := Current.boundary_zero
     rw [h]
     exact IntegralPolyhedralChain'.zero
-  | add _ _ ihS ihT =>
+  | @add S T _hS _hT ihS ihT =>
     -- ∂(S + T) = ∂S + ∂T
-    have h : Current.boundary (_ + _) = Current.boundary _ + Current.boundary _ := Current.boundary_add _ _
+    have h : Current.boundary (S + T) = Current.boundary S + Current.boundary T :=
+      Current.boundary_add S T
     rw [h]
     exact IntegralPolyhedralChain'.add ihS ihT
-  | neg _ ih =>
+  | @neg T _hT ih =>
     -- ∂(-T) = -∂T
-    have h : Current.boundary (-_) = -Current.boundary _ := Current.boundary_neg _
+    have h : Current.boundary (-T) = -Current.boundary T := Current.boundary_neg T
     rw [h]
     exact IntegralPolyhedralChain'.neg ih
-  | smul c _ ih =>
+  | @smul c T _hT ih =>
     -- ∂(c • T) = c • ∂T
-    have h : Current.boundary ((c : ℝ) • _) = (c : ℝ) • Current.boundary _ := Current.boundary_smul _ _
-    -- Convert ℤ • to ℝ • via the HSMul instance
-    simp only [HSMul.hSMul] at h ⊢
+    have h : Current.boundary (c • T) = c • Current.boundary T := Current.boundary_smul c T
     rw [h]
     exact IntegralPolyhedralChain'.smul c ih
 

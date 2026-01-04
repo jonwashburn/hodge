@@ -187,7 +187,7 @@ theorem form_is_bounded' {k : ℕ} (α : SmoothForm n X k) :
 
     Reference: [J.-P. Demailly, "Complex Analytic and Differential Geometry",
     Institut Fourier, 2012, Chapter III]. -/
-theorem shift_makes_conePositive (p : ℕ) (γ : SmoothForm n X (2 * p)) :
+theorem shift_makes_conePositive (p : ℕ) (γ : SmoothForm n X (2 * p)) [Nonempty X] :
     ∃ N : ℝ, N > 0 ∧ isConePositive (γ + N • kahlerPow p) := by
   classical
   -- Step 1: Get the uniform interior radius r > 0
@@ -195,21 +195,23 @@ theorem shift_makes_conePositive (p : ℕ) (γ : SmoothForm n X (2 * p)) :
   -- Step 2: Get the bound M > 0 for γ
   obtain ⟨M, hM_pos, hM_bound⟩ := form_is_bounded' (n := n) (X := X) γ
   -- Step 3: Choose N > M / r so that (1/N) * M < r
-  let N := M / r + 1
+  set N := M / r + 1 with hN_def
   have hN_pos : N > 0 := by
-    unfold_let N
+    rw [hN_def]
     have : M / r ≥ 0 := div_nonneg (le_of_lt hM_pos) (le_of_lt hr_pos)
     linarith
   -- Step 4: Prove that N > M / r, hence (1/N) * M < r
-  have hN_gt : N > M / r := by unfold_let N; linarith
+  have hN_gt : N > M / r := by rw [hN_def]; linarith
   have hN_inv_M_lt_r : (1 / N) * M < r := by
     have hN_ne : N ≠ 0 := ne_of_gt hN_pos
     rw [div_mul_eq_mul_div, one_mul]
-    rw [div_lt_iff hN_pos]
-    calc M < (M / r + 1) * r := by
-           rw [add_mul, div_mul_cancel₀ M (ne_of_gt hr_pos)]
-           linarith
-         _ = N * r := by unfold_let N
+    rw [div_lt_iff₀ hN_pos]
+    have h1 : M < (M / r + 1) * r := by
+      rw [_root_.add_mul, div_mul_cancel₀ M (ne_of_gt hr_pos)]
+      linarith
+    calc M < (M / r + 1) * r := h1
+         _ = N * r := by rw [hN_def]
+         _ = r * N := by ring
   -- Step 5: For each x, show that (1/N) • γ + ω^p is within r of ω^p
   -- This means: pointwiseComass ((1/N) • γ + ω^p - ω^p) x < r
   -- Which simplifies to: pointwiseComass ((1/N) • γ) x < r
@@ -219,9 +221,7 @@ theorem shift_makes_conePositive (p : ℕ) (γ : SmoothForm n X (2 * p)) :
     -- Need: pointwiseComass (N⁻¹ • γ + ω^p - ω^p) x < r
     -- Simplify: N⁻¹ • γ + ω^p - ω^p = N⁻¹ • γ
     have hsub : N⁻¹ • γ + omegaPow_point (n := n) (X := X) p x - omegaPow_point (n := n) (X := X) p x = N⁻¹ • γ := by
-      ext y v
-      simp only [SmoothForm.sub_apply, SmoothForm.add_apply]
-      ring
+      simp only [add_sub_cancel_right]
     rw [hsub]
     -- Now: pointwiseComass (N⁻¹ • γ) x < r
     -- Use pointwiseComass_smul: pointwiseComass (c • α) = |c| * pointwiseComass α
@@ -245,8 +245,6 @@ theorem shift_makes_conePositive (p : ℕ) (γ : SmoothForm n X (2 * p)) :
   -- N • (N⁻¹ • γ + kahlerPow p) = N • N⁻¹ • γ + N • kahlerPow p = γ + N • kahlerPow p
   have h_scale_eq : N • (N⁻¹ • γ + kahlerPow p) = γ + N • kahlerPow p := by
     have hN_ne : N ≠ 0 := ne_of_gt hN_pos
-    ext x v
-    simp only [SmoothForm.smul_apply, SmoothForm.add_apply]
     rw [smul_add, smul_smul, mul_inv_cancel₀ hN_ne, one_smul]
   -- Step 9: Use stronglyPositiveCone_scale
   use N, hN_pos
@@ -281,7 +279,7 @@ theorem isConePositive_add {p : ℕ} (α β : SmoothForm n X (2 * p))
     scalar multiple of ω^p, which is cone-positive by `kahlerPow_isConePositive`.
     Since the cone is closed under addition (`isConePositive_add`), the sum
     is cone-positive. -/
-theorem shift_makes_conePositive_rat (p : ℕ) (γ : SmoothForm n X (2 * p)) :
+theorem shift_makes_conePositive_rat (p : ℕ) (γ : SmoothForm n X (2 * p)) [Nonempty X] :
     ∃ N : ℚ, N > 0 ∧ isConePositive (γ + (N : ℝ) • kahlerPow p) := by
   -- Get the real N from the existing axiom
   obtain ⟨N, hN_pos, hN_cone⟩ := shift_makes_conePositive p γ

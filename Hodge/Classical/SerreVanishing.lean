@@ -45,12 +45,13 @@ theorem serre_vanishing (L : HolomorphicLineBundle n X) [IsAmple L]
   -- SheafCohomology F' q = ULift (Fin (if q = 0 then 1 else 0) → ℂ)
   -- For q > 0, this is ULift (Fin 0 → ℂ) which is a subsingleton
   unfold vanishes SheafCohomology
-  simp only [hq, ↓reduceIte, Nat.lt_irrefl, if_false]
+  have h_not_zero : ¬(q = 0) := by omega
+  simp only [h_not_zero, if_false]
   -- ULift (Fin 0 → ℂ) is a subsingleton
   constructor
   intro a b
-  ext
-  exact Fin.elim0
+  ext i
+  exact i.elim0
 
 /-- **Theorem: Jet Surjectivity Criterion**
 

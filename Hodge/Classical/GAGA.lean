@@ -60,6 +60,13 @@ theorem IsAlgebraicSet_empty (n : ℕ) (X : Type u)
     [ProjectiveComplexManifold n X] [K : KahlerManifold n X] : IsAlgebraicSet n X (∅ : Set X) :=
   IsZariskiClosed.empty
 
+/-- The empty set is an algebraic subvariety. -/
+theorem isAlgebraicSubvariety_empty (n : ℕ) (X : Type u)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
+    [ProjectiveComplexManifold n X] [K : KahlerManifold n X] : isAlgebraicSubvariety n X (∅ : Set X) :=
+  ⟨⟨∅, 0, IsAlgebraicSet_empty n X⟩, rfl⟩
+
 /-- The entire manifold is algebraic. -/
 theorem IsAlgebraicSet_univ (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]

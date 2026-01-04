@@ -175,25 +175,50 @@ theorem hard_lefschetz_isomorphism {p' : ℕ} (_h_range : p' ≤ n / 2)
     exact isRationalClass_zero
   · exact isPPForm_zero (p := p')
 
-/-- **Hard Lefschetz Inverse at the Form Level**
+/-- Helper lemma: the degree arithmetic for Hard Lefschetz.
+    When p > n/2, we have 2*(n-p) + 2*(p-(n-p)) = 2*p. -/
+theorem lefschetz_degree_eq (n p : ℕ) (hp : p > n / 2) :
+    2 * (n - p) + 2 * (p - (n - p)) = 2 * p := by
+  -- When p > n/2, we have 2p > n, so p > n - p
+  -- Therefore p - (n - p) = 2p - n (as natural numbers, since p ≥ n - p)
+  -- And 2*(n-p) + 2*(2p - n) = 2n - 2p + 4p - 2n = 2p
+  have h : p > n - p := by omega
+  omega
+
+/-- **Hard Lefschetz Inverse at the Form Level** (Pillar - Hard Lefschetz Theorem).
 
     **Deep Theorem Citation**: For forms in high degree (p > n/2), we can find a
     corresponding form in complementary degree via the inverse Lefschetz isomorphism.
 
-    **Proof**: We use the zero form as a witness. The zero form is closed, rational,
-    and is an (n-p, n-p)-form by isPPForm_zero. -/
-theorem hard_lefschetz_inverse_form {p : ℕ} (_hp : p > n / 2)
-    (_γ : SmoothForm n X (2 * p)) (_h_closed : IsFormClosed _γ) (_h_hodge : isPPForm' n X p _γ)
-    (_h_rat : isRationalClass (ofForm _γ _h_closed)) :
-    ∃ (η : SmoothForm n X (2 * (n - p))),
-      ∃ (h_η_closed : IsFormClosed η),
-      isPPForm' n X (n - p) η ∧ isRationalClass (ofForm η h_η_closed) := by
-  use 0, isFormClosed_zero
-  constructor
-  · exact isPPForm_zero (p := n - p)
-  · have h_zero : ofForm (0 : SmoothForm n X (2 * (n - p))) isFormClosed_zero =
-                  (0 : DeRhamCohomologyClass n X (2 * (n - p))) := rfl
-    rw [h_zero]
-    exact isRationalClass_zero
+    This axiom combines two aspects of Hard Lefschetz:
+    1. Existence of η with the right properties (closed, rational, (n-p,n-p))
+    2. The Lefschetz relationship [γ] = L^k([η]) where k = p - (n - p) = 2p - n
+
+    **Mathematical Content**: In Hodge theory, L^k : H^{n-k}(X) → H^{n+k}(X) is an
+    isomorphism. For γ ∈ H^{2p} with p > n/2, setting k = 2p - n > 0, we have that
+    γ is in the image of L^k, hence γ = L^k(η) for a unique η ∈ H^{2(n-p)}.
+
+    The inverse η preserves Hodge type ((n-p,n-p)) and rationality because:
+    - The Lefschetz isomorphism respects the Hodge decomposition
+    - Rational classes map to rational classes
+
+    **Why This is an Axiom**: Proving this requires:
+    1. The Kähler identities [L, Λ] = (k-n)Id on H^k(X)
+    2. The sl(2,ℂ) representation theory structure on H*(X)
+    3. Primitive decomposition theorems
+    4. The full Hodge-Lefschetz package
+
+    Reference: [C. Voisin, "Hodge Theory and Complex Algebraic Geometry I",
+    Cambridge, 2002, Theorem 6.25].
+    Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry",
+    Wiley, 1978, Chapter 0.7]. -/
+axiom hard_lefschetz_inverse_form {p : ℕ} (hp : p > n / 2)
+    (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
+    (h_hodge : isPPForm' n X p γ) (h_rat : isRationalClass (ofForm γ h_closed)) :
+    ∃ (η : SmoothForm n X (2 * (n - p))) (h_η_closed : IsFormClosed η),
+      isPPForm' n X (n - p) η ∧
+      isRationalClass (ofForm η h_η_closed) ∧
+      ofForm γ h_closed = (lefschetz_degree_eq n p hp) ▸
+        lefschetz_power n X (2 * (n - p)) (p - (n - p)) (ofForm η h_η_closed)
 
 end

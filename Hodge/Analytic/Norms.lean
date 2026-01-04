@@ -110,10 +110,35 @@ theorem pointwiseComass_add_le {n : ℕ} {X : Type*}
 
 /-- **Pointwise Comass Homogeneity**.
     **BLOCKER**: Needs `SmoothForm.smul_real_apply` and pointwise set algebra. -/
-axiom pointwiseComass_smul {n : ℕ} {X : Type*}
+theorem pointwiseComass_smul {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     {k : ℕ} (r : ℝ) (α : SmoothForm n X k) (x : X) :
     pointwiseComass (r • α) x = |r| * pointwiseComass α x
+  := by
+  unfold pointwiseComass
+  -- Compare the evaluation sets by pulling out the scalar using `norm_smul`.
+  let S : Set ℝ :=
+    { t : ℝ | ∃ v : Fin k → TangentSpace (𝓒_complex n) x, (∀ i, ‖v i‖ ≤ 1) ∧
+        t = ‖(α.as_alternating x) v‖ }
+  let Sr : Set ℝ :=
+    { t : ℝ | ∃ v : Fin k → TangentSpace (𝓒_complex n) x, (∀ i, ‖v i‖ ≤ 1) ∧
+        t = ‖((r • α).as_alternating x) v‖ }
+  have h_Sr : Sr = (|r|) • S := by
+    ext t
+    simp only [S, Sr, Set.mem_setOf_eq, Set.mem_smul_set]
+    constructor
+    · rintro ⟨v, hv, rfl⟩
+      refine ⟨‖(α.as_alternating x) v‖, ?_, ?_⟩
+      · exact ⟨v, hv, rfl⟩
+      · -- `‖(r : ℂ) • z‖ = ‖(r : ℂ)‖ * ‖z‖ = |r| * ‖z‖`
+        simp [SmoothForm.smul_real_apply, AlternatingMap.smul_apply, Complex.norm_real]
+    · rintro ⟨y, ⟨v, hv, rfl⟩, rfl⟩
+      refine ⟨v, hv, ?_⟩
+      simp [SmoothForm.smul_real_apply, AlternatingMap.smul_apply, Complex.norm_real]
+  -- Now take sups; we have nonneg scalar.
+  -- `Real.sSup_smul_of_nonneg` handles scaling of `sSup` by a nonnegative scalar.
+  simp only [S, Sr, h_Sr]
+  rw [Real.sSup_smul_of_nonneg (abs_nonneg r) S, smul_eq_mul]
 
 /-- **Negation as Scalar Multiplication** (Derived from Module structure). -/
 theorem SmoothForm.neg_eq_neg_one_smul {n : ℕ} {X : Type*}
@@ -244,10 +269,29 @@ theorem comass_add_le {n : ℕ} {X : Type*}
 
 /-- Comass scales with absolute value of scalar: comass(c • ω) = |c| * comass(ω).
     **BLOCKER**: Depends on `pointwiseComass_smul` and set algebra. -/
-axiom comass_smul {n : ℕ} {X : Type*}
+theorem comass_smul {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [CompactSpace X] [Nonempty X]
     {k : ℕ} (c : ℝ) (ω : SmoothForm n X k) : comass (c • ω) = |c| * comass ω
+  := by
+  unfold comass
+  -- Rewrite the range using the pointwise scaling lemma.
+  have h_range :
+      range (pointwiseComass (c • ω)) = (|c|) • range (pointwiseComass ω) := by
+    ext t
+    constructor
+    · rintro ⟨x, rfl⟩
+      -- `t = pointwiseComass (c • ω) x`
+      refine ⟨pointwiseComass ω x, ?_, ?_⟩
+      · exact ⟨x, rfl⟩
+      · simp [pointwiseComass_smul]
+    · rintro ⟨y, ⟨x, rfl⟩, rfl⟩
+      -- `t = |c| * pointwiseComass ω x`
+      refine ⟨x, ?_⟩
+      simp [pointwiseComass_smul]
+  rw [h_range]
+  -- Apply the general `sSup` scaling lemma.
+  rw [Real.sSup_smul_of_nonneg (abs_nonneg c) (range (pointwiseComass ω)), smul_eq_mul]
 
 -- The instances for SeminormedAddCommGroup and NormedSpace are moved to axioms above
 
