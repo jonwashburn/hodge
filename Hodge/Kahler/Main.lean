@@ -225,10 +225,29 @@ theorem omega_pow_algebraic {p : ℕ} (c : ℚ) (_hc : c > 0) :
   -- In placeholder: FundamentalClassSet = 0, so LHS = ⟦0, _⟧
   -- RHS = c • ⟦kahlerPow p, _⟧
   -- For p ≠ 1, kahlerPow = 0, so both sides are 0.
-  -- For p = 1, this requires ω to be algebraic (hyperplane section).
-  -- This is genuine mathematical content that our placeholder cannot capture.
+  -- For p = 1, kahlerPow = ω, and we need ⟦0, _⟧ = c • ⟦ω, _⟧
   simp only [FundamentalClassSet]
-  sorry
+  -- Goal: ⟦0, _⟧ = (c : ℝ) • ⟦kahlerPow p, _⟧
+  -- Use case analysis on p
+  match p with
+  | 0 =>
+    -- kahlerPow 0 = 0, so RHS = c • ⟦0, _⟧
+    -- Need: ⟦0, _⟧ = c • ⟦0, _⟧
+    simp only [kahlerPow]
+    -- c • 0 = 0 in any module, so c • ⟦0, _⟧ = ⟦0, _⟧
+    symm
+    convert smul_zero (M := ℝ) (↑c : ℝ)
+  | 1 =>
+    -- kahlerPow 1 = omega_form (with degree cast)
+    -- This is genuine mathematical content: [ω] is algebraic (hyperplane class)
+    -- but our placeholder FundamentalClassSet = 0 cannot represent it.
+    -- This case requires the full infrastructure.
+    sorry
+  | p + 2 =>
+    -- kahlerPow (p+2) = 0 (since wedge is trivial for high degrees)
+    simp only [kahlerPow]
+    symm
+    convert smul_zero (M := ℝ) (↑c : ℝ)
 
 /-- **Lefschetz Lift for Signed Cycles** (Voisin, 2002).
 
@@ -283,14 +302,21 @@ theorem lefschetz_lift_signed_cycle {p : ℕ}
              FundamentalClassSet, sub_self]
   -- Need: ⟦0, _⟧ = ⟦γ, hγ⟧
   -- Mathematical argument:
-  -- 1. From h_rep: Z_η.cycleClass (n - p) = ⟦η, hη⟧
-  -- 2. Z_η.cycleClass = ⟦0, _⟧ - ⟦0, _⟧ = 0 (since FundamentalClassSet = 0)
-  -- 3. So ⟦η, hη⟧ = 0
-  -- 4. From h_lef: ⟦γ, hγ⟧ = L^k(⟦η, hη⟧) = L^k(0) = 0
-  -- 5. Therefore ⟦0, _⟧ = ⟦γ, hγ⟧
-  -- The technical issue is the degree cast `lefschetz_degree_eq n p hp ▸ ...`
-  -- This requires showing that 0 = (cast) ▸ 0, which is true but needs careful handling.
-  -- For now, we mark this as an infrastructure gap.
+  -- 1. From h_rep and FundamentalClassSet = 0: ⟦η, hη⟧ = 0
+  -- 2. From h_lef: ⟦γ, hγ⟧ = (cast) ▸ L^k(0) = (cast) ▸ 0 = 0
+  -- 3. Therefore ⟦0, _⟧ = 0 = ⟦γ, hγ⟧
+  --
+  -- Technical issue: The cast `lefschetz_degree_eq n p hp ▸ 0` transports zero
+  -- from one cohomology degree to another. Proving this equals the zero in the
+  -- target degree requires showing that cast respects the Zero instance.
+  --
+  -- This is true but technically complex in dependent type theory.
+  -- The full proof would use:
+  -- 1. h_rep with FundamentalClassSet = 0 shows ⟦η, hη⟧ = 0
+  -- 2. LinearMap.map_zero on lefschetz_power gives L^k(0) = 0
+  -- 3. A cast_zero lemma: (h ▸ (0 : A)) = (0 : B) when h : A = B
+  --
+  -- For now, we mark this as an infrastructure gap in dependent type handling.
   sorry
 
 /-! ## The Hodge Conjecture -/

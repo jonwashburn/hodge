@@ -95,12 +95,33 @@ def HolomorphicLineBundle.tensor (L₁ L₂ : HolomorphicLineBundle n X) :
   has_local_trivializations x := by
     refine ⟨⊤, trivial, ⟨fun _ _ => LinearEquiv.refl ℂ ℂ⟩⟩
   transition_holomorphic U₁ U₂ φ₁ φ₂ := by
-    -- For the tensor bundle (Fiber = ℂ), this is the holomorphic cocycle condition.
-    -- The trivializations are ℂ-linear isomorphisms, so the transition coefficient
-    -- c(z) = φ₁(z)(φ₂(z)⁻¹(1)) is a holomorphic function.
+    -- For the tensor bundle (Fiber = ℂ), we need to show the transition
+    -- function z ↦ φ₁(z)(φ₂(z)⁻¹(1)) is MDifferentiable.
     --
-    -- This would follow from the bundle structure of L₁ and L₂, but our simplified
-    -- formalization doesn't capture the full dependence. Infrastructure gap.
+    -- Key insight: For Fiber = ℂ, any ℂ-linear isomorphism ℂ ≃ₗ[ℂ] ℂ is
+    -- multiplication by a non-zero scalar c. So φ(v) = c·v and φ⁻¹(v) = v/c.
+    --
+    -- The transition coefficient is φ₁(z)(φ₂(z)⁻¹(1)):
+    --   = φ₁(z)(1/c₂(z)) = c₁(z) · (1/c₂(z)) = c₁(z)/c₂(z)
+    --
+    -- For the ratio to be MDifferentiable, we need c₁ and c₂ to be holomorphic.
+    -- Since ℂ-linear isomorphisms are uniquely determined by their value at 1,
+    -- we have c(z) = φ(z)(1). The "holomorphic dependence on z" is what makes
+    -- a bundle holomorphic.
+    --
+    -- For our trivial bundle construction (Fiber = ℂ, trivializations = identity),
+    -- c₁ = c₂ = 1 for all z, so the transition is constantly 1.
+    --
+    -- However, φ₁ and φ₂ are given as arbitrary inputs. We show MDifferentiability
+    -- by observing that the scalar at each point is determined by φ(1), and
+    -- the dependence on z is through these fixed LinearEquivs.
+    -- For the trivial bundle, any LinearEquiv ℂ ℂ gives a fixed scalar.
+    -- The function z ↦ (fixed scalar at z) is locally constant, hence smooth.
+    -- At each point, the value is determined by the LinearEquivs at that point.
+    -- For our trivial construction (LinearEquiv.refl), this is constantly 1.
+    -- However, proving this requires showing the function syntactically equals
+    -- a constant, which Lean cannot infer from the dependent structure.
+    -- This is an infrastructure gap in the bundle formalization.
     sorry
 
 /-- The M-th tensor power L^⊗M. -/
