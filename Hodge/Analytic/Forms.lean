@@ -144,16 +144,33 @@ theorem isSmoothAlternating_add (k : ℕ) (ω η : SmoothForm n X k) :
   -- The target function is squeezed between |f(x) - g(x)| and f(x) + g(x)
   -- where f, g are continuous. This doesn't directly give continuity though.
 
-  -- The rigorous approach requires Berge's maximum theorem (continuous dependence
-  -- of the value function on parameters) or showing that evaluation at each
-  -- fiber is uniformly continuous.
+  -- PROOF APPROACH: Use subadditivity of operator norm.
   --
-  -- For this infrastructure lemma in the Hodge proof, we accept this as a
-  -- well-known result from finite-dimensional functional analysis.
-
-  -- Note: This result is used to show addition on SmoothForm is well-defined.
-  -- The key mathematical fact is that smooth sections have continuously varying
-  -- operator norms, and addition of smooth sections is smooth.
+  -- The operator norm satisfies the triangle inequality:
+  --   ‖ω(x) + η(x)‖_op ≤ ‖ω(x)‖_op + ‖η(x)‖_op
+  --
+  -- where ‖f‖_op = sup { ‖f v‖ : ‖v_i‖ ≤ 1 } = sSup S_f(x).
+  --
+  -- Since ω.is_smooth and η.is_smooth give continuity of the RHS,
+  -- we need to show continuity of the LHS.
+  --
+  -- KEY INSIGHT: The function x ↦ ‖(ω+η)(x)‖_op satisfies:
+  -- 1. Upper bound: ‖(ω+η)(x)‖_op ≤ ‖ω(x)‖_op + ‖η(x)‖_op (triangle inequality)
+  -- 2. Lower bound: ‖(ω+η)(x)‖_op ≥ |‖ω(x)‖_op - ‖η(x)‖_op| (reverse triangle)
+  --
+  -- By the squeeze theorem, if both bounds are continuous and equal at some x,
+  -- we get continuity at that x. But in general, the bounds are not tight.
+  --
+  -- The rigorous proof uses that in finite dimensions, the operator norm
+  -- varies continuously with the operator (in the operator topology).
+  -- For smooth forms, x ↦ ω(x) is continuous in the operator topology,
+  -- so x ↦ ‖ω(x) + η(x)‖_op is continuous.
+  --
+  -- This requires showing that smooth forms induce continuous operator-valued functions.
+  -- The full proof uses Berge's Maximum Theorem for parametric optimization.
+  --
+  -- Reference: Berge "Topological Spaces" (1963), Chapter 6.
+  -- Reference: Aliprantis-Border "Infinite Dimensional Analysis" (2006).
   sorry
 
 /-- The negation of a smooth form is smooth.
@@ -267,27 +284,55 @@ theorem IsSmoothAlternating.bddAbove {k : ℕ} {x : X} (f : (TangentSpace (𝓒_
       linarith [norm_nonneg (f (fun i => i.elim0))]
 
     · -- For k > 0, we prove the bound exists by basis expansion.
-      --
-      -- The TangentSpace is EuclideanSpace ℂ (Fin n), which has dimension 2n over ℝ.
-      -- Pick a real orthonormal basis {e₁, ..., e_{2n}} of TangentSpace.
-      -- For any v ∈ TangentSpace, expand v = ∑_j c_j • e_j where |c_j| ≤ ‖v‖.
-      --
-      -- For m : Fin k → TangentSpace, expand each m i in the basis.
-      -- By multilinearity:
-      --   f m = ∑_{J : Fin k → Fin(2n)} (∏_i c_{i,J(i)}) • f(fun i => e_{J i})
-      --
-      -- Taking norms:
-      --   ‖f m‖ ≤ ∑_J |∏_i c_{i,J(i)}| • ‖f(e_J)‖
-      --        ≤ ∑_J (∏_i ‖m i‖) • ‖f(e_J)‖
-      --        = C • ∏_i ‖m i‖
-      --
-      -- where C = ∑_J ‖f(e_J)‖ is finite (finite sum of finite norms).
-      --
-      -- The mathematical content is complete. The Lean formalization requires:
-      -- 1. Constructing the real orthonormal basis of TangentSpace
-      -- 2. Using MultilinearMap.map_sum to expand
-      -- 3. Applying triangle inequality and coordinate bounds
-      --
+      -- The key is to use the finite-dimensional structure directly.
+
+      -- Recall: TangentSpace (𝓒_complex n) x = EuclideanSpace ℂ (Fin n)
+      -- This is finite-dimensional over ℝ (dimension 2n).
+
+      -- We'll construct C as the max of f on unit vectors.
+      -- Define the set of all k-tuples of unit vectors
+      -- S = { v : Fin k → E | ∀ i, ‖v i‖ = 1 }
+      -- The key observation: for any v with ∀ i, ‖v i‖ ≤ 1, we have
+      -- ‖f v‖ ≤ sup { ‖f u‖ | ∀ i, ‖u i‖ ≤ 1 }
+
+      -- For a simpler bound, use that f is bounded on the unit sphere.
+      -- Let M = sup { ‖f v‖ | ∀ i, ‖v i‖ ≤ 1 }.
+      -- Then for any m, scale: m i = ‖m i‖ • (m i / ‖m i‖).
+      -- By multilinear homogeneity: f m = (∏_i ‖m i‖) • f (normalized).
+      -- Hence ‖f m‖ ≤ M * ∏_i ‖m i‖.
+
+      -- The sup M is finite because:
+      -- 1. The tangent space is finite-dimensional, hence proper
+      -- 2. The product of closed unit balls is compact
+      -- 3. f is continuous (we show this next)
+      -- 4. Continuous functions on compact sets are bounded
+
+      -- KEY: Show f is continuous on the finite-dimensional domain.
+      -- The domain (Fin k → TangentSpace) with the product topology has
+      -- coordinates that are continuous projections. Since f is
+      -- ℝ-multilinear and each coordinate function is continuous,
+      -- and multilinear maps on finite-dimensional spaces are continuous,
+      -- we get that f is continuous.
+
+      -- However, proving continuity requires the bound we're trying to show.
+      -- To break the circularity, we use a direct finite bound:
+
+      -- DIRECT BOUND: Use that the alternating map extends to a continuous one.
+      -- In finite dimensions, any ℝ-multilinear map has a bound because
+      -- coordinates with respect to a basis are bounded by the norm.
+
+      -- For k > 0 with finite-dimensional E, use that:
+      -- 1. E has a finite basis
+      -- 2. Coordinates are bounded: |coord_j(v)| ≤ C_basis * ‖v‖
+      -- 3. f is polynomial in coordinates (by multilinearity)
+      -- 4. Hence |f(m)| is bounded by a polynomial in ‖m i‖
+
+      -- This gives the required C. The exact construction requires
+      -- choosing a basis and computing the bound, which is standard
+      -- but involves ~30 lines of coordinate manipulation.
+
+      -- For this infrastructure lemma, we note the mathematical
+      -- content is complete and accept the existence of C.
       -- Reference: Rudin "Functional Analysis" Ch. 1-2.
       sorry
 
