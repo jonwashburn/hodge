@@ -103,23 +103,65 @@ def IsHolomorphic {L : HolomorphicLineBundle n X} (s : Section L) : Prop :=
     Taking the intersection of the trivializing neighborhoods and using linearity
     of the trivialization, the sum φ(s₁ + s₂) = φ(s₁) + φ(s₂) is MDifferentiable.
 
-    Reference: [Griffiths-Harris, 1978, Chapter 0.5 - Holomorphic Functions on Complex Manifolds]. -/
+    Reference: [Griffiths-Harris, 1978, Chapter 0.5 - Holomorphic Functions on Complex Manifolds].
+
+    **Note**: The full proof involves subtype inclusions and bundle transitions.
+    The mathematical content is:
+    1. Restrict to intersection of trivializing neighborhoods: U = U₁ ∩ U₂
+    2. Use linearity of fiber maps: φ(s₁ + s₂) = φ(s₁) + φ(s₂)
+    3. Compose with smooth inclusions: U ↪ U₁ and U ↪ U₂
+    4. Handle transition functions: φ₁ ∘ φ₂⁻¹ is ℂ-linear (hence MDifferentiable)
+    5. Sum of MDifferentiable functions is MDifferentiable -/
 theorem IsHolomorphic_add (L : HolomorphicLineBundle n X) (s₁ s₂ : Section L) :
     IsHolomorphic s₁ → IsHolomorphic s₂ → IsHolomorphic (s₁ + s₂) := by
   intro h₁ h₂ x
-  -- Get trivializations for both sections at x
   obtain ⟨U₁, hx₁, φ₁, hφ₁⟩ := h₁ x
   obtain ⟨U₂, hx₂, φ₂, hφ₂⟩ := h₂ x
-  -- Work on the intersection U₁ ⊓ U₂
   let U := U₁ ⊓ U₂
   have hx : x ∈ U := ⟨hx₁, hx₂⟩
-  -- Use φ₁ restricted to U (we could also use φ₂)
   let φ : ∀ y ∈ U, L.Fiber y ≃ₗ[ℂ] ℂ := fun y hy => φ₁ y hy.1
   refine ⟨U, hx, φ, ?_⟩
-  -- The proof requires showing φ(s₁ + s₂) = φ(s₁) + φ(s₂) is MDifferentiable.
-  -- This uses linearity of the trivialization and composition with inclusions.
-  sorry
-
+  -- φ(s₁ + s₂) = φ(s₁) + φ(s₂) by linearity of fiber maps
+  have h_linear : (fun z : ↥U => φ z z.property ((s₁ + s₂) z)) =
+                  (fun z : ↥U => φ z z.property (s₁ z) + φ z z.property (s₂ z)) := by
+    ext z; exact (φ z z.property).map_add (s₁ z) (s₂ z)
+  rw [h_linear]
+  apply MDifferentiable.add
+  -- For s₁: compose with smooth inclusion U ↪ U₁
+  · have h_le : U ≤ U₁ := inf_le_left
+    have hι : MDifferentiable (𝓒_complex n) (𝓒_complex n) (Opens.inclusion h_le) :=
+      (contMDiff_inclusion h_le).mdifferentiable one_ne_zero
+    exact hφ₁.comp hι
+  -- For s₂: use that φ₁(s₂) = c · φ₂(s₂) where c is the transition scalar
+  · have h_le₂ : U ≤ U₂ := inf_le_right
+    have hι₂ : MDifferentiable (𝓒_complex n) (𝓒_complex n) (Opens.inclusion h_le₂) :=
+      (contMDiff_inclusion h_le₂).mdifferentiable one_ne_zero
+    let f₂ : ↥U₂ → ℂ := fun z => φ₂ z.val z.property (s₂ z.val)
+    have h_comp : MDifferentiable (𝓒_complex n) 𝓒_ℂ (f₂ ∘ Opens.inclusion h_le₂) := hφ₂.comp hι₂
+    intro y
+    -- c = φ₁(φ₂⁻¹(1)) is the transition scalar at this point
+    let c : ℂ := (φ₁ y.val y.property.1) ((φ₂ y.val y.property.2).symm 1)
+    -- φ₁(v) = c · φ₂(v) for any v in the fiber (by ℂ-linearity of the transition)
+    have h_factor : φ y y.property (s₂ y) = c * f₂ ⟨y.val, y.property.2⟩ := by
+      simp only [φ, f₂]
+      conv_lhs => rw [← (φ₂ y.val y.property.2).symm_apply_apply (s₂ y)]
+      -- φ₁(φ₂⁻¹(w)) = w · φ₁(φ₂⁻¹(1)) for any w ∈ ℂ (since φ₁ ∘ φ₂⁻¹ is ℂ-linear)
+      have h_lin : ∀ w : ℂ, (φ₁ y.val y.property.1) ((φ₂ y.val y.property.2).symm w) =
+                   w * (φ₁ y.val y.property.1) ((φ₂ y.val y.property.2).symm 1) := by
+        intro w
+        calc (φ₁ y.val y.property.1) ((φ₂ y.val y.property.2).symm w)
+            = (φ₁ y.val y.property.1) (w • (φ₂ y.val y.property.2).symm 1) := by
+                rw [← (φ₂ y.val y.property.2).symm.map_smul]; simp
+          _ = w • (φ₁ y.val y.property.1) ((φ₂ y.val y.property.2).symm 1) := by
+                rw [(φ₁ y.val y.property.1).map_smul]
+          _ = w * (φ₁ y.val y.property.1) ((φ₂ y.val y.property.2).symm 1) := by
+                rw [smul_eq_mul]
+      rw [h_lin]
+      ring
+    rw [h_factor]
+    -- c * (MDifferentiable function) is MDifferentiable
+    have h_at : MDifferentiableAt (𝓒_complex n) 𝓒_ℂ (f₂ ∘ Opens.inclusion h_le₂) y := h_comp y
+    exact h_at.const_mul c
 
 /-- The zero section is holomorphic. -/
 theorem IsHolomorphic_zero {L : HolomorphicLineBundle n X} :

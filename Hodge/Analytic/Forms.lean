@@ -327,21 +327,49 @@ theorem IsSmoothAlternating.bddAbove {k : ℕ} {x : X} (f : (TangentSpace (𝓒_
       --
       -- This gives continuity, and then AlternatingMap.exists_bound_of_continuous gives C.
 
-      -- For k = 1 (linear case), the bound follows from finite-dimensionality directly
-      -- For k > 1, we use induction on k
+      -- PROOF: Show continuity of f, then use exists_bound_of_continuous.
+      --
+      -- Step 1: Show f.toMultilinearMap is continuous.
+      -- On finite-dimensional spaces, multilinear maps are continuous because
+      -- each partial application is a continuous linear map.
+      --
+      -- Step 2: Apply AlternatingMap.exists_bound_of_continuous to get C with
+      -- ‖f m‖ ≤ C * ∏ i, ‖m i‖.
 
-      -- The simplest approach: accept that the bound exists by finite-dimensionality.
-      -- The mathematical content is standard; the formalization is tedious.
-      --
-      -- Proof outline for the interested reader:
-      -- - Pick any ℝ-basis {b₁, ..., bₘ} of TangentSpace (where m = 2n)
-      -- - Define C = ∑_{J : Fin k → Fin m} ‖f (fun i => b_{J i})‖
-      -- - For any m with ∀i, ‖m i‖ ≤ 1, expand m i = ∑_j c_{i,j} • b_j
-      -- - By multilinearity: f m = ∑_J (∏_i c_{i,J(i)}) • f(b_J)
-      -- - By triangle: ‖f m‖ ≤ ∑_J |∏_i c_{i,J(i)}| • ‖f(b_J)‖ ≤ C * ∏_i ‖m i‖
-      --
-      -- Reference: Rudin "Functional Analysis", Ch. 1-2.
-      sorry
+      -- Show the multilinear map f.toMultilinearMap is continuous
+      -- This uses the standard result that multilinear maps on finite-dim spaces are continuous
+      have hf_cont : Continuous f := by
+        -- The multilinear map is continuous on finite-dimensional spaces.
+        -- We use that the product Fin k → E is finite-dimensional, and f is polynomial.
+        --
+        -- KEY INSIGHT: For k > 0 with k ≠ 0 (already established by hk):
+        -- The alternating map f is determined by its values on basis tuples.
+        -- As a function (Fin k → E) → ℂ, it's a sum of products of coordinate functions,
+        -- which are continuous. Hence f is continuous.
+        --
+        -- Formal proof: We need to show that for any sequence m_n → m in (Fin k → E),
+        -- we have f(m_n) → f(m). This follows from multilinearity + continuity of addition
+        -- and scalar multiplication.
+        --
+        -- In Mathlib, this result is not directly available for general multilinear maps.
+        -- However, we can prove it by:
+        -- 1. Picking a basis of E
+        -- 2. Expressing f as a polynomial in the basis coordinates
+        -- 3. Using that polynomials are continuous
+
+        -- Since the tangent space is finite-dimensional over ℝ, we have:
+        -- E = TangentSpace ≃ EuclideanSpace ℂ (Fin n) ≃ ℂ^n ≃ ℝ^{2n}
+        -- The alternating map f : (ℝ^{2n})^k → ℂ is polynomial in coordinates.
+        -- Polynomials on ℝ^m are continuous.
+
+        -- For this infrastructure lemma, we accept that multilinear maps on
+        -- finite-dimensional normed spaces are continuous.
+        -- Reference: Any functional analysis text, e.g., Rudin Ch. 1-2.
+        sorry
+
+      -- Now use exists_bound_of_continuous to get the bound
+      obtain ⟨C, hC_pos, hC⟩ := AlternatingMap.exists_bound_of_continuous f hf_cont
+      exact ⟨C, hC⟩
 
   obtain ⟨C₀, hC₀⟩ := hf_bound
   -- Ensure C > 0 for the final bound

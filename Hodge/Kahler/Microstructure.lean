@@ -245,10 +245,18 @@ def HasBoundedCalibrationDefect {p : ℕ} {h : ℝ} {C : Cubulation n X h}
     Since IsEmpty (∅ : Set X), all universal statements are vacuously true. -/
 theorem IsComplexSubmanifold_empty (p : ℕ) : IsComplexSubmanifold (∅ : Set X) p := by
   unfold IsComplexSubmanifold
-  -- The empty set vacuously satisfies all conditions for being a complex submanifold.
-  -- Since there are no points, all universal statements are vacuously true.
-  -- The construction of the charted space on an empty type requires some infrastructure.
-  sorry
+  use fun y => y.val
+  constructor
+  · intro y; rfl
+  · use instTopologicalSpaceSubtype
+    letI charted_inst : ChartedSpace (EuclideanSpace ℂ (Fin p)) (∅ : Set X) := {
+      atlas := ∅
+      chartAt := fun y => y.property.elim
+      mem_chart_source := fun y => y.property.elim
+      chart_mem_atlas := fun y => y.property.elim
+    }
+    use charted_inst
+    exact isManifold_of_contDiffOn (𝓒_complex p) ⊤ _ (fun _e _e' he _ => he.elim)
 
 /-- Construct a trivial RawSheetSum with empty sheets. -/
 noncomputable def trivialRawSheetSum (p : ℕ) (h : ℝ) (C : Cubulation n X h) :
@@ -264,10 +272,13 @@ noncomputable def trivialRawSheetSum (p : ℕ) (h : ℝ) (C : Cubulation n X h) 
     - `RawSheetSum.toIntegralCurrent` returns the zero current
     - `calibrationDefect 0 ψ = 0`
 
-    Therefore, the axiom is provable by:
+    Therefore, the theorem is provable by:
     1. Using the trivial RawSheetSum with empty sheets
     2. Using the zero current for IsValidGluing (|0 - 0| = 0 < comass β * h)
     3. HasBoundedCalibrationDefect is satisfied since defect = 0
+
+    **Note**: The detailed proof involves showing that the trivial sheet sum
+    yields zero currents and that zero currents satisfy the bounds.
 
     Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 1960]. -/
 theorem calibration_defect_from_gluing (p : ℕ) (h : ℝ) (hh : h > 0) (C : Cubulation n X h)
@@ -282,35 +293,13 @@ theorem calibration_defect_from_gluing (p : ℕ) (h : ℝ) (hh : h > 0) (C : Cub
     unfold IsValidGluing
     use 0
     intro ψ'
-    -- |0 - SmoothForm.pairing β ψ'| = |0 - 0| = 0 < comass β * h
-    -- This follows from the fact that the zero current evaluates to zero
-    -- and comass β * h > 0 when h > 0.
-    sorry
+    -- |0 - SmoothForm.pairing β ψ'| = |0 - 0| = 0 ≤ comass β * h
+    simp only [Current.zero_toFun, SmoothForm.pairing, sub_zero, abs_zero]
+    exact mul_nonneg (comass_nonneg β) (le_of_lt hh)
   · -- HasBoundedCalibrationDefect: defect of zero current is 0
-    unfold HasBoundedCalibrationDefect
-    -- calibrationDefect 0 ψ = mass(0) - 0(ψ.form) = 0 - 0 = 0
-    -- The trivialRawSheetSum produces the zero current, so defect = 0.
+    -- The proof involves showing trivialRawSheetSum yields zero current
+    -- and that calibrationDefect of zero is ≤ the bound.
     sorry
-
-/-- Helper: Casting a CycleIntegralCurrent preserves toFun being 0. -/
-private theorem cast_cycle_toFun_eq_zero {k k' : ℕ} (h_eq : k = k')
-    (c : CycleIntegralCurrent n X k) (hc : c.current.toFun = 0) :
-    (h_eq ▸ c).current.toFun = 0 := by
-  subst h_eq
-  exact hc
-
-/-- Helper: zeroCycleCurrent' has zero toFun. -/
-private theorem zeroCycleCurrent'_toFun_eq_zero (k' : ℕ) :
-    (zeroCycleCurrent' (n := n) (X := X) k').current.toFun = 0 := by
-  unfold zeroCycleCurrent'
-  rfl
-
-/-- Helper: The zero cycle current has zero toFun. -/
-private theorem zeroCycleCurrent_toFun_eq_zero (k : ℕ) (hk : k ≥ 1) :
-    (zeroCycleCurrent (n := n) (X := X) k hk).current.toFun = 0 := by
-  unfold zeroCycleCurrent
-  apply cast_cycle_toFun_eq_zero
-  exact zeroCycleCurrent'_toFun_eq_zero (k - 1)
 
 /-- The underlying current of toIntegralCurrent is the zero current.
     This is proved by unfolding the construction, which returns zeroCycleCurrent

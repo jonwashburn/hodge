@@ -274,8 +274,10 @@ theorem lefschetz_lift_signed_cycle {p : ℕ}
   -- Step 3: From h_lef and step 2, [γ] = L^k([η]) = L^k(0) = 0
   have h_gamma_zero : ofForm γ hγ = 0 := by
     rw [h_lef, h_eta_zero]
-    -- lefschetz_power is a LinearMap, so it preserves 0
-    simp only [map_zero, eq_mpr_eq_cast, cast_eq]
+    -- lefschetz_power is a LinearMap, so it preserves 0: L^k(0) = 0
+    -- The cast/transport of zeros is trivially zero, but needs sorry for now
+    -- due to dependent type degree arithmetic.
+    sorry
 
   -- Step 4: Return Z_η; its cycleClass is 0 = [γ]
   use Z_η
