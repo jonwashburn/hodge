@@ -222,9 +222,12 @@ theorem omega_pow_algebraic {p : ℕ} (c : ℚ) (_hc : c > 0) :
   -- Use the empty set as witness (FundamentalClassSet = 0 for all sets in placeholder)
   refine ⟨∅, isAlgebraicSubvariety_empty n X, ?_⟩
   refine ⟨FundamentalClassSet_isClosed p ∅ (isAlgebraicSubvariety_empty n X), ?_⟩
-  -- In placeholder: FundamentalClassSet = 0, so LHS = [0] = 0
-  -- RHS = c • [kahlerPow p] which is 0 for p ≠ 1
-  -- Full proof requires algebraicity of ω^p via complete intersections.
+  -- In placeholder: FundamentalClassSet = 0, so LHS = ⟦0, _⟧
+  -- RHS = c • ⟦kahlerPow p, _⟧
+  -- For p ≠ 1, kahlerPow = 0, so both sides are 0.
+  -- For p = 1, this requires ω to be algebraic (hyperplane section).
+  -- This is genuine mathematical content that our placeholder cannot capture.
+  simp only [FundamentalClassSet]
   sorry
 
 /-- **Lefschetz Lift for Signed Cycles** (Voisin, 2002).
@@ -279,9 +282,15 @@ theorem lefschetz_lift_signed_cycle {p : ℕ}
   simp only [SignedAlgebraicCycle.cycleClass, SignedAlgebraicCycle.fundamentalClass,
              FundamentalClassSet, sub_self]
   -- Need: ⟦0, _⟧ = ⟦γ, hγ⟧
-  -- From h_lef: ⟦γ, hγ⟧ = L^k(⟦η, hη⟧) where ⟦η, hη⟧ = 0 (from h_rep with FundamentalClassSet = 0)
-  -- So ⟦γ, hγ⟧ = L^k(0) = 0, hence ⟦0, _⟧ = ⟦γ, hγ⟧
-  -- The degree cast makes this technically complex; use sorry for infrastructure gap
+  -- Mathematical argument:
+  -- 1. From h_rep: Z_η.cycleClass (n - p) = ⟦η, hη⟧
+  -- 2. Z_η.cycleClass = ⟦0, _⟧ - ⟦0, _⟧ = 0 (since FundamentalClassSet = 0)
+  -- 3. So ⟦η, hη⟧ = 0
+  -- 4. From h_lef: ⟦γ, hγ⟧ = L^k(⟦η, hη⟧) = L^k(0) = 0
+  -- 5. Therefore ⟦0, _⟧ = ⟦γ, hγ⟧
+  -- The technical issue is the degree cast `lefschetz_degree_eq n p hp ▸ ...`
+  -- This requires showing that 0 = (cast) ▸ 0, which is true but needs careful handling.
+  -- For now, we mark this as an infrastructure gap.
   sorry
 
 /-! ## The Hodge Conjecture -/
