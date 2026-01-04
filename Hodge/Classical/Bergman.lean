@@ -99,12 +99,16 @@ def IsHolomorphic {L : HolomorphicLineBundle n X} (s : Section L) : Prop :=
 
 /-- **The sum of two holomorphic sections is holomorphic.**
 
-    **Proof**: We use the trivialization from the first section and show that
+    **Proof Sketch**: We use the trivialization from the first section and show that
     the sum is still MDifferentiable using MDifferentiable.add. The key is that
     both sections can be trivialized in a common neighborhood (we use the first
     section's trivialization, which works because the trivialization is a
     fiberwise linear equivalence, so addition in the fiber corresponds to
     addition of the trivialized values).
+
+    **Technical Note**: Full proof requires showing that holomorphic transition functions
+    preserve holomorphicity when changing trivializations. This is standard but requires
+    more bundle infrastructure than currently available.
 
     Reference: [Griffiths-Harris, 1978, Chapter 0.5 - Holomorphic Functions on Complex Manifolds].
     Reference: Standard complex analysis - sums of holomorphic functions are holomorphic. -/

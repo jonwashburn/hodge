@@ -52,10 +52,10 @@ theorem ofForm_wedge_add (n : ℕ) (X : Type u) [TopologicalSpace X] [ChartedSpa
 /-- The Lefschetz operator L : H^p(X) → H^{p+2}(X)
     is the linear map induced by wedging with the Kähler form class [ω].
 
-    **Definition**: L(c) = [ω] ∪ c.
+    **Definition**: L(c) = [ω] ∪ c (with appropriate degree reindexing).
 
-    Axiomatized because the degree arithmetic (2+p vs p+2) and typeclass
-    coherence for SMul instances makes the direct definition non-trivial. -/
+    Axiomatized due to technical complexity of degree coercion (2+p vs p+2)
+    in dependent type settings. The mathematical content is straightforward. -/
 axiom lefschetz_operator (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
