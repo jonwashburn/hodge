@@ -227,6 +227,20 @@ instance instNormedSpaceTangentSpace (x : X) : NormedSpace ℂ (TangentSpace (�
 - `smoothExtDeriv_wedge` → removed (unused, HEq complications)
 - `flat_limit_existence` → theorem (microstructure currents are all zero by construction)
 
+**Session 6 (Jan 3, 2025) - Forms.lean infrastructure:**
+- `IsSmoothAlternating.bddAbove` k=0 case → **THEOREM** ✅ (0-ary multilinear maps are constant)
+- `SmoothForm.instTopologicalSpace` → **DEFINITION** ✅ (discrete topology placeholder)
+- Remaining 2 `sorry`s in Forms.lean with detailed proof sketches:
+  - `isSmoothAlternating_add`: Requires Berge's Maximum Theorem for parametric optimization
+  - `bddAbove` k>0 case: Requires explicit basis expansion for multilinear bound
+
+**Current sorry/axiom count (verified Jan 2025 Session 6):**
+| Type | Count | Details |
+|------|-------|---------|
+| Classical pillar axioms | 8 | Keeping as external inputs |
+| Additional axioms | 1 | `hard_lefschetz_inverse_form` (Pillar 6 related) |
+| Infrastructure sorrys | 4 | Forms (2), Currents (1), Grassmannian (1) |
+
 **Current axiom count by file (verified Jan 2025):**
 
 | File | Axioms | Notes |

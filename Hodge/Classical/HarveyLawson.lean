@@ -93,15 +93,60 @@ theorem IsAnalyticSet_isClosed {n : ℕ} {X : Type*}
 theorem nontrivial_of_dim_pos {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [Nonempty X] (hn : n ≥ 1) : Nontrivial X := by
-  -- Any smooth manifold of dimension n ≥ 1 modeled on EuclideanSpace ℂ (Fin n)
-  -- is nontrivial (has at least two distinct points).
-  --
-  -- Proof sketch:
-  -- 1. EuclideanSpace ℂ (Fin n) is nontrivial for n ≥ 1 (it's ℂⁿ)
-  -- 2. Charts are local homeomorphisms to open sets in ℂⁿ
-  -- 3. Open sets in ℂⁿ containing a point contain infinitely many points
-  -- 4. Therefore the chart source contains at least 2 distinct points
-  sorry
+  -- Get a point x from Nonempty X
+  obtain ⟨x⟩ := ‹Nonempty X›
+  -- Access the chart at x
+  let chart := chartAt (EuclideanSpace ℂ (Fin n)) x
+  -- The chart source contains x
+  have hx_mem : x ∈ chart.source := mem_chart_source (EuclideanSpace ℂ (Fin n)) x
+  -- The chart target is an open set in EuclideanSpace ℂ (Fin n)
+  have h_target_open : IsOpen chart.target := chart.open_target
+  -- The point chart x is in the target
+  have h_img : chart x ∈ chart.target := chart.map_source hx_mem
+  -- Define a standard basis vector using EuclideanSpace.single
+  let idx : Fin n := ⟨0, hn⟩
+  let e₀ : EuclideanSpace ℂ (Fin n) := EuclideanSpace.single idx 1
+  -- e₀ is nonzero using EuclideanSpace.single_eq_zero_iff
+  have h_e0_ne : e₀ ≠ 0 := by
+    simp only [e₀, ne_eq, EuclideanSpace.single_eq_zero_iff]
+    exact one_ne_zero
+  -- e₀ has norm 1
+  have h_e0_norm : ‖e₀‖ = 1 := by
+    simp only [e₀, EuclideanSpace.norm_single, norm_one]
+  -- Since target is open, there's a ball around chart x contained in target
+  obtain ⟨r, hr_pos, hr_ball⟩ := Metric.isOpen_iff.mp h_target_open (chart x) h_img
+  -- Take two distinct points: chart x and chart x + (r/2) • e₀
+  let p := chart x
+  let q := p + (r / 2 : ℝ) • e₀
+  -- q is in the ball around p (hence in target)
+  have h_q_in_ball : q ∈ Metric.ball p r := by
+    simp only [Metric.mem_ball]
+    calc dist q p = ‖q - p‖ := dist_eq_norm q p
+      _ = ‖(r / 2 : ℝ) • e₀‖ := by simp only [q, add_sub_cancel_left]
+      _ = |r / 2| * ‖e₀‖ := norm_smul (r / 2 : ℝ) e₀
+      _ = r / 2 * ‖e₀‖ := by rw [abs_of_pos (by linarith : r / 2 > 0)]
+      _ = r / 2 * 1 := by rw [h_e0_norm]
+      _ = r / 2 := mul_one _
+      _ < r := by linarith
+  have h_q_in_target : q ∈ chart.target := hr_ball h_q_in_ball
+  -- p ≠ q
+  have h_pq_ne : p ≠ q := by
+    intro h_eq
+    have h_smul_zero : (r / 2 : ℝ) • e₀ = 0 := by
+      calc (r / 2 : ℝ) • e₀ = q - p := by simp only [q, add_sub_cancel_left]
+        _ = p - p := by rw [← h_eq]
+        _ = 0 := sub_self p
+    have h_smul_ne : (r / 2 : ℝ) • e₀ ≠ 0 := by
+      rw [smul_ne_zero_iff]
+      exact ⟨by linarith, h_e0_ne⟩
+    exact h_smul_ne h_smul_zero
+  -- Now pull back to get 2 distinct points in X
+  refine ⟨chart.symm p, chart.symm q, ?_⟩
+  intro h_eq
+  apply h_pq_ne
+  calc p = chart (chart.symm p) := (chart.right_inv h_img).symm
+    _ = chart (chart.symm q) := by rw [h_eq]
+    _ = q := chart.right_inv h_q_in_target
 
 /-- **Non-Triviality**: Not every set is analytic.
     **Proof**: The inductive definition only generates sets in the Boolean algebra
