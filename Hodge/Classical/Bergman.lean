@@ -116,18 +116,10 @@ theorem IsHolomorphic_add (L : HolomorphicLineBundle n X) (s₁ s₂ : Section L
   -- Use φ₁ restricted to U (we could also use φ₂)
   let φ : ∀ y ∈ U, L.Fiber y ≃ₗ[ℂ] ℂ := fun y hy => φ₁ y hy.1
   refine ⟨U, hx, φ, ?_⟩
-  -- Show that φ ∘ (s₁ + s₂) is MDifferentiable on U
-  -- The proof uses:
-  -- 1. φ(s₁ + s₂) = φ(s₁) + φ(s₂) by linearity of the bundle map
-  -- 2. φ(s₁) is MDifferentiable on U (restricting s₁ from U₁ to U ⊆ U₁)
-  -- 3. φ(s₂) can be written as φ(s₂) = c(y) * φ₂(s₂) where c is the transition function
-  -- 4. Transition functions of holomorphic line bundles are holomorphic
-  -- 5. Products and sums of MDifferentiable functions are MDifferentiable
-  --
-  -- The technical details involve showing that bundle restrictions and transitions
-  -- preserve MDifferentiability. For the current placeholder bundle structure,
-  -- this follows from the fact that all trivializations are identity-like.
+  -- The proof requires showing φ(s₁ + s₂) = φ(s₁) + φ(s₂) is MDifferentiable.
+  -- This uses linearity of the trivialization and composition with inclusions.
   sorry
+
 
 /-- The zero section is holomorphic. -/
 theorem IsHolomorphic_zero {L : HolomorphicLineBundle n X} :
