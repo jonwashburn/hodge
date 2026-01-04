@@ -33,6 +33,13 @@ namespace Current
 
 variable {k : ℕ}
 
+/-- Extensionality for currents: two currents are equal iff they agree on all forms. -/
+@[ext]
+theorem ext' {n k : ℕ} {X : Type*} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+    {S T : Current n X k} (h : ∀ ω, S.toFun ω = T.toFun ω) : S = T := by
+  cases S; cases T; simp only [Current.mk.injEq]; funext ω; exact h ω
+
 /-- Linearity properties derive from the `is_linear` field. -/
 theorem map_add {n k : ℕ} {X : Type*} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
@@ -102,8 +109,16 @@ def neg_curr (T : Current n X k) : Current n X k where
 
 instance : Neg (Current n X k) := ⟨neg_curr⟩
 
-/-- Negation of zero is zero. Trivial but requires structure equality. -/
-axiom neg_zero_current : -(0 : Current n X k) = 0
+/-- Negation of zero is zero. -/
+theorem neg_zero_current : -(0 : Current n X k) = 0 := by
+  ext ω
+  -- (-0).toFun ω = -(0.toFun ω) = -0 = 0 = 0.toFun ω
+  show -(0 : Current n X k).toFun ω = (0 : Current n X k).toFun ω
+  -- 0.toFun ω = 0 by definition
+  have h : (0 : Current n X k).toFun ω = 0 := rfl
+  rw [h]
+  -- -0 = 0
+  ring
 
 instance : Sub (Current n X k) := ⟨fun T₁ T₂ => T₁ + -T₂⟩
 
