@@ -238,13 +238,31 @@ structure HarveyLawsonConclusion (n : ℕ) (X : Type*) (k : ℕ)
 
 /-- **Harvey-Lawson Structure Theorem** (Harvey-Lawson, 1982).
 
-    **Deep Theorem Citation**: This is the main structure theorem for calibrated currents.
-    A calibrated current on a Kähler manifold is represented by integration over a
-    finite union of complex analytic subvarieties with positive integer multiplicities.
+    **STATUS: SEMANTIC STUB** - Placeholder returning empty collection with trivial predicate.
 
-    **Definition**: We provide a placeholder implementation that returns an empty collection
-    with a trivially-true representation predicate. In a full formalization, this would
-    use regularity theory for calibrated currents.
+    **Deep Theorem Citation**: This is the main structure theorem for calibrated currents.
+    A calibrated integral current calibrated by a positive (p,p)-form on a Kähler manifold
+    is represented by integration over a finite union of complex analytic subvarieties
+    with positive integer multiplicities.
+
+    **Mathematical Content**: If T is an integral current calibrated by a (p,p)-form φ, then:
+    1. T = Σᵢ mᵢ [Vᵢ] where Vᵢ are complex analytic subvarieties of codimension p
+    2. mᵢ ∈ ℕ⁺ are positive multiplicities
+    3. [Vᵢ] denotes the integration current over Vᵢ
+
+    **Implementation**: Currently returns:
+    - `varieties := ∅` (empty set of varieties)
+    - `represents := fun _ => True` (trivially satisfied predicate)
+
+    The actual mathematical content is captured by the axiom `harvey_lawson_fundamental_class`
+    (Pillar 5) in `Kahler/Main.lean`, which asserts the existence of a signed algebraic
+    cycle representing any cone-positive Hodge class.
+
+    **Path to Real Implementation**:
+    1. Define support decomposition for integral currents
+    2. Prove regularity: calibrated currents have smooth tangent planes a.e.
+    3. Use unique continuation for complex analytic sets
+    4. Apply Chow's theorem to show analyticity implies algebraicity
 
     Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries",
     Acta Math. 148 (1982), 47-157, Theorem 4.1].
@@ -255,6 +273,7 @@ def harvey_lawson_theorem {k : ℕ} (_hyp : HarveyLawsonHypothesis n X k) :
   multiplicities := fun ⟨_, h⟩ => absurd h (by simp)
   codim_correct := fun _ h => absurd h (by simp)
   represents := fun _ => True
+-- The mathematical content is in Pillar 5: harvey_lawson_fundamental_class (Kahler/Main.lean)
 
 /-- **Theorem: Harvey-Lawson conclusion represents the input current.**
     **Proof**: The representation predicate is defined to always return True. -/

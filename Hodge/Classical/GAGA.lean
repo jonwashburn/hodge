@@ -207,19 +207,36 @@ theorem isAlgebraicSubvariety_intersection {Z₁ Z₂ : Set X}
 
 /-- **The Fundamental Class Map** (Griffiths-Harris, 1978).
 
-    **STATUS: MATHEMATICAL INFRASTRUCTURE AXIOM**
+    **STATUS: SEMANTIC STUB** - Makes proof type-check but trivializes cycle classes.
 
     The fundamental class `[Z]` of an algebraic subvariety Z of codimension p is
     a closed (p,p)-form representing the Poincaré dual of the homology class of Z.
 
-    **Placeholder**: Currently defined as `0` (the zero form). In a full formalization,
-    this would be constructed from the integration current `[Z]` via Poincaré duality
-    (or the De Rham theorem for currents), producing a nontrivial closed (p,p)-form. -/
+    **Mathematical Content**: For an algebraic subvariety Z ⊂ X of codimension p:
+    1. Z defines a homology class [Z] ∈ H_{2n-2p}(X, ℤ)
+    2. Poincaré duality gives PD([Z]) ∈ H^{2p}(X, ℤ)
+    3. The de Rham isomorphism gives a closed 2p-form representing this class
+    4. On a Kähler manifold, this form is of type (p,p)
+
+    **Implementation Path**: A real implementation would:
+    1. Define integration currents over rectifiable sets (GMT)
+    2. Use Poincaré duality: H_k(X) ≅ H^{2n-k}(X)
+    3. Apply de Rham theorem to get a smooth form representative
+    4. Prove the representative is of type (p,p) using Kähler identities
+
+    **Current Placeholder**: Zero form for all inputs. This makes:
+    - All cycle classes equal to zero in cohomology
+    - `SignedAlgebraicCycle.RepresentsClass` trivially satisfiable
+    - The proof structure type-checks but doesn't carry geometric content
+
+    Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry",
+    Wiley, 1978, Chapter 1, Section 1]. -/
 noncomputable def FundamentalClassSet (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     (p : ℕ) (_Z : Set X) : SmoothForm n X (2 * p) := 0
+-- TODO: Replace with real cycle class map once integration currents are formalized
 
 /-- **Theorem: The fundamental class of an algebraic subvariety is closed.** -/
 theorem FundamentalClassSet_isClosed (p : ℕ) (Z : Set X) (_h : isAlgebraicSubvariety n X Z) :

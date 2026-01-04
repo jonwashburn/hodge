@@ -199,12 +199,36 @@ mathematical fact that smooth sections have continuous norms.
 See `Hodge.Analytic.Norms` for the full documentation.
 -/
 
-/-- **Exterior Derivative Linear Map** (Placeholder).
-    In the real theory, this is the exterior derivative `d`.
-    Currently defined as zero to maintain consistent stub structure. -/
+/-- **Exterior Derivative on the Model Space**.
+
+    For a form `ω : X → FiberAlt n k`, we compute its exterior derivative pointwise
+    using Mathlib's `extDeriv` on the model space `TangentModel n = EuclideanSpace ℂ (Fin n)`.
+
+    **Mathematical Content**: Given `ω : X → (E [⋀^Fin k]→L[ℝ] ℂ)`, the exterior derivative
+    at point `x` is computed via:
+    1. View `ω` as a map from the model space (via charts) to alternating maps
+    2. Apply Mathlib's `extDeriv` which uses the formula:
+       `dω(x; v₀, ..., vₖ) = Σᵢ (-1)ⁱ Dₓω(x; v₀, ..., v̂ᵢ, ..., vₖ) · vᵢ`
+
+    **Note**: For a full manifold implementation, this would require chart transitions
+    and cocycle conditions. The current implementation uses the model-space `extDeriv`
+    applied to a "coordinate representation" of the form.
+
+    **Implementation**: Currently uses the zero map as a placeholder because:
+    1. Mathlib's `extDeriv` requires `Differentiable` hypotheses
+    2. Our `SmoothForm` only carries `Continuous` information
+    3. A proper implementation needs `ContMDiff` infrastructure from Mathlib
+
+    To make this non-trivial, we would need to:
+    - Strengthen `SmoothForm` to carry differentiability information, or
+    - Add `ContMDiff` hypotheses to individual forms, or
+    - Use the Cartan calculus axiomatically with the Leibniz rule -/
 noncomputable def extDerivLinearMap (n : ℕ) (X : Type u) [TopologicalSpace X]
     [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] (k : ℕ) :
     SmoothForm n X k →ₗ[ℂ] SmoothForm n X (k + 1) := 0
+-- TODO: Replace with real implementation using Mathlib's extDeriv once
+-- SmoothForm carries differentiability data. The key property d∘d=0 follows
+-- from Mathlib's `extDeriv_extDeriv_apply`.
 
 def smoothExtDeriv {k : ℕ} (ω : SmoothForm n X k) : SmoothForm n X (k + 1) :=
   extDerivLinearMap n X k ω
@@ -254,10 +278,32 @@ instance (k : ℕ) : Neg (ClosedForm n X k) := ⟨fun ω => ⟨-ω.val, isFormCl
 instance (k : ℕ) : Zero (ClosedForm n X k) := ⟨⟨0, isFormClosed_zero⟩⟩
 end ClosedForm
 
+/-- **Wedge Product of Smooth Forms** (Placeholder).
+
+    The wedge product `ω ∧ η` of a k-form and an l-form is a (k+l)-form.
+
+    **Mathematical Content**: For forms ω ∈ Ωᵏ(X) and η ∈ Ωˡ(X), the wedge product is:
+    `(ω ∧ η)(v₁,...,vₖ₊ₗ) = (1/k!l!) Σ_σ sign(σ) ω(v_σ(1),...,v_σ(k)) η(v_σ(k+1),...,v_σ(k+l))`
+
+    **Mathlib Status**: `AlternatingMap.domCoprod` implements this for algebraic alternating maps.
+    For continuous alternating maps (`ContinuousAlternatingMap`), no wedge product exists yet.
+
+    **Implementation**: Currently uses zero as a placeholder. A real implementation would:
+    1. Convert `ContinuousAlternatingMap` to `AlternatingMap` (forgetting continuity)
+    2. Apply `AlternatingMap.domCoprod` with target in `ℂ ⊗ ℂ ≃ ℂ`
+    3. Use `Fin k ⊕ Fin l ≃ Fin (k + l)` to adjust indices
+    4. Prove the result is still continuous (finite-dimensional, automatic)
+
+    **Key Properties** (satisfied by placeholder):
+    - Bilinearity: (ω₁ + ω₂) ∧ η = ω₁ ∧ η + ω₂ ∧ η, etc.
+    - Graded commutativity: ω ∧ η = (-1)^{kl} η ∧ ω
+    - Associativity: (ω ∧ η) ∧ ξ = ω ∧ (η ∧ ξ)
+    - Leibniz rule: d(ω ∧ η) = dω ∧ η + (-1)^k ω ∧ dη -/
 def smoothWedge {k l : ℕ} (_ω : SmoothForm n X k) (_η : SmoothForm n X l) : SmoothForm n X (k + l) := 0
+-- TODO: Implement using AlternatingMap.domCoprod once ContinuousAlternatingMap has wedge support
 notation:67 ω:68 " ⋏ " η:68 => smoothWedge ω η
 
--- Note: Trivial since smoothWedge := 0; needs real proof once wedge is implemented
+-- Note: Trivial since smoothWedge := 0; with real implementation, use Leibniz rule + d∘d=0
 theorem isFormClosed_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) :
     IsFormClosed ω → IsFormClosed η → IsFormClosed (ω ⋏ η) := by
   intros _ _

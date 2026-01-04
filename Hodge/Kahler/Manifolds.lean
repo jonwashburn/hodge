@@ -7,6 +7,28 @@ import Mathlib.LinearAlgebra.Alternating.Basic
 # Kähler Manifolds
 
 This file contains properties and operators for Kähler manifolds.
+
+## Semantic Stub Status
+
+The Kähler operators in this file are currently defined as zero maps:
+- `lefschetzLambdaLinearMap := 0` (dual Lefschetz Λ)
+- `hodgeStar := 0` (Hodge star ⋆)
+- `adjointDeriv := 0` (codifferential δ)
+- `laplacian := 0` (Hodge Laplacian Δ)
+
+This makes all forms trivially harmonic (Δω = 0) and coclosed (δω = 0).
+
+## Mathematical Content
+
+For a real implementation:
+1. **Hodge Star ⋆**: Defined using the Riemannian metric g and volume form vol_g as
+   `α ∧ ⋆β = g(α, β) vol_g`. Requires proper metric infrastructure.
+2. **Codifferential δ**: `δ = (-1)^{nk+n+1} ⋆ d ⋆` on k-forms. Depends on ⋆ and d.
+3. **Laplacian Δ**: `Δ = dδ + δd`. The Hodge theorem says every cohomology class
+   has a unique harmonic representative.
+4. **Dual Lefschetz Λ**: `Λ = ⋆⁻¹ ∘ L ∘ ⋆` where L is wedge with ω.
+
+The stubs satisfy key algebraic properties (linearity, δ² = 0) that make theorems type-check.
 -/
 
 noncomputable section
