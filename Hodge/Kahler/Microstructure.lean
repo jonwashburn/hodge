@@ -242,6 +242,67 @@ def HasBoundedCalibrationDefect {p : ℕ} {h : ℝ} {C : Cubulation n X h}
 
 -- gluing_flat_norm_bound removed (unused)
 
+/-!
+## Zero current bound & calibration defect inequality
+
+These are the two “microstructure bookkeeping” inequalities that mirror the TeX argument
+around Proposition~\ref{prop:almost-calibration} in `Hodge-v6-w-Jon-Update-MERGED.tex`:
+
+- the defect of the zero current is zero (hence bounded by any nonnegative bound);
+- the almost-calibration estimate \(0 \le \Def_{\mathrm{cal}}(S-U) \le 2\,\Mass(U)\) when
+  \(S\) is calibrated by \(\psi\).
+-/
+
+/-- **Zero current bound**: the calibration defect of the zero current is zero. -/
+theorem calibrationDefect_zero {k : ℕ} (ψ : CalibratingForm n X k) :
+    calibrationDefect (0 : Current n X k) ψ = 0 := by
+  simp [calibrationDefect, Current.mass_zero]
+
+/-- **Zero current bound (inequality form)**: `Def_cal(0) ≤ B` for any `0 ≤ B`. -/
+theorem zero_current_bound {k : ℕ} (ψ : CalibratingForm n X k) (B : ℝ) (hB : 0 ≤ B) :
+    calibrationDefect (0 : Current n X k) ψ ≤ B := by
+  simpa [calibrationDefect_zero (n := n) (X := X) ψ] using hB
+
+/-- **Calibration defect inequality** (TeX Prop. `almost-calibration` (ii)):
+if `S` is calibrated by `ψ`, then for `T := S - U` one has `Def_cal(T) ≤ 2 * Mass(U)`. -/
+theorem calibration_defect_inequality {k : ℕ} (S U : Current n X k) (ψ : CalibratingForm n X k)
+    (hS : isCalibrated S ψ) :
+    calibrationDefect (S - U) ψ ≤ 2 * Current.mass U := by
+  -- Triangle inequality for mass: `Mass(S-U) ≤ Mass(S) + Mass(U)`.
+  have h_mass : Current.mass (S - U) ≤ Current.mass S + Current.mass U := by
+    calc
+      Current.mass (S - U) = Current.mass (S + -U) := rfl
+      _ ≤ Current.mass S + Current.mass (-U) := Current.mass_add_le S (-U)
+      _ = Current.mass S + Current.mass U := by simp [Current.mass_neg]
+  -- Evaluation identity: `(S-U)(ψ) = S(ψ) - U(ψ)`.
+  have h_eval : (S - U).toFun ψ.form = S.toFun ψ.form - U.toFun ψ.form := by
+    have : (S - U).toFun ψ.form = S.toFun ψ.form + -(U.toFun ψ.form) := rfl
+    simpa [sub_eq_add_neg] using this
+  -- Calibration inequality bounds `U(ψ)` by `Mass(U)`.
+  have hU : U.toFun ψ.form ≤ Current.mass U := calibration_inequality U ψ
+  -- Assemble as in the TeX proof.
+  unfold calibrationDefect
+  calc
+    Current.mass (S - U) - (S - U).toFun ψ.form
+        ≤ (Current.mass S + Current.mass U) - (S - U).toFun ψ.form := by
+            exact sub_le_sub_right h_mass _
+    _ = (Current.mass S + Current.mass U) - (S.toFun ψ.form - U.toFun ψ.form) := by
+            simp [h_eval]
+    _ = (Current.mass S - S.toFun ψ.form) + (Current.mass U + U.toFun ψ.form) := by ring
+    _ = Current.mass U + U.toFun ψ.form := by
+            have h0 : Current.mass S - S.toFun ψ.form = 0 := by linarith [hS]
+            simp [h0]
+    _ ≤ Current.mass U + Current.mass U := by
+            exact add_le_add_left hU _
+    _ = 2 * Current.mass U := by ring
+
+/-- Two-sided “almost-calibration” bound: `0 ≤ Def_cal(S-U) ≤ 2 Mass(U)` when `S` is calibrated. -/
+theorem calibrationDefect_bounds_sub {k : ℕ} (S U : Current n X k) (ψ : CalibratingForm n X k)
+    (hS : isCalibrated S ψ) :
+    0 ≤ calibrationDefect (S - U) ψ ∧ calibrationDefect (S - U) ψ ≤ 2 * Current.mass U := by
+  refine ⟨?_, calibration_defect_inequality (n := n) (X := X) S U ψ hS⟩
+  exact calibrationDefect_nonneg _ _
+
 /-- The empty set is a complex submanifold of any dimension (vacuously).
     Since IsEmpty (∅ : Set X), all universal statements are vacuously true. -/
 theorem IsComplexSubmanifold_empty (p : ℕ) : IsComplexSubmanifold (∅ : Set X) p := by
@@ -429,12 +490,8 @@ theorem microstructureSequence_defect_bound_axiom (p : ℕ) (γ : SmoothForm n X
     RawSheetSum.toIntegralCurrent_toFun_eq_zero (n := n) (X := X) T_raw
   -- Compute the defect of the zero current.
   have h_defect_zero : calibrationDefect T_raw.toIntegralCurrent.toFun ψ = 0 := by
-    unfold calibrationDefect
-    -- mass(0) - 0(ψ) = 0
-    rw [h_toFun_zero]
-    rw [Current.mass_zero]
-    -- evaluation of the zero current is zero
-    simp [Current.zero_toFun]
+    -- Reduce to the lemma `calibrationDefect_zero`.
+    simpa [h_toFun_zero] using (calibrationDefect_zero (n := n) (X := X) ψ)
   -- Conclude using nonnegativity of the RHS (since h > 0).
   have h_rhs_nonneg : 0 ≤ 2 * h := by nlinarith [le_of_lt hh]
   -- Rewrite the goal to the zero defect inequality.

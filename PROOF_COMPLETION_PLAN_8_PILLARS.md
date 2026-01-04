@@ -230,9 +230,11 @@ instance instNormedSpaceTangentSpace (x : X) : NormedSpace ℂ (TangentSpace (�
 **Session 6 (Jan 3, 2025) - Forms.lean infrastructure:**
 - `IsSmoothAlternating.bddAbove` k=0 case → **THEOREM** ✅ (0-ary multilinear maps are constant)
 - `SmoothForm.instTopologicalSpace` → **DEFINITION** ✅ (discrete topology placeholder)
-- Remaining 2 `sorry`s in Forms.lean with detailed proof sketches:
-  - `isSmoothAlternating_add`: Requires Berge's Maximum Theorem for parametric optimization
-  - `bddAbove` k>0 case: Requires explicit basis expansion for multilinear bound
+- **Update**: `Hodge/Analytic/Forms.lean` was refactored to use the normed space of *continuous*
+  alternating maps (`→L`) for fibers. With this setup:
+  - `isSmoothAlternating_add` is immediate from continuity (`ω.is_smooth.add η.is_smooth`)
+  - `IsSmoothAlternating.bddAbove` (including the k>0 case) follows from the built-in operator norm
+    inequality `ContinuousAlternatingMap.le_opNorm` (i.e. the standard multilinear bound)
 
 **Current sorry/axiom count (verified Jan 2025 Session 6):**
 | Type | Count | Details |

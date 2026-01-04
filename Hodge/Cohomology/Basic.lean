@@ -139,11 +139,7 @@ theorem cohomologous_smul {n k : ℕ} {X : Type u} [TopologicalSpace X] [Charted
   have h' : Cohomologous ω ω' := h
   unfold Cohomologous at h'
   -- (c • ω.val) - (c • ω'.val) = c • (ω.val - ω'.val)
-  have heq : (c • ω.val) - (c • ω'.val) = c • (ω.val - ω'.val) := by
-    ext x v
-    simp only [SmoothForm.sub_apply, SmoothForm.smul_apply, AlternatingMap.sub_apply, AlternatingMap.smul_apply]
-    -- c * a - c * b = c * (a - b)
-    rw [← smul_sub]
+  have heq : (c • ω.val) - (c • ω'.val) = c • (ω.val - ω'.val) := (smul_sub c ω.val ω'.val).symm
   rw [heq]
   unfold IsExact at *
   cases k with

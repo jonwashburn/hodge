@@ -222,27 +222,26 @@ axiom omega_pow_algebraic {p : ℕ} (c : ℚ) (hc : c > 0) :
 
 /-- **Lefschetz Lift for Signed Cycles** (Voisin, 2002).
 
-    **STATUS: THEOREM (proven from Lefschetz relationship)**
+    **STATUS: MATHEMATICAL INFRASTRUCTURE AXIOM**
 
     When p > n/2 (codimension exceeds half the dimension), the Hard Lefschetz
     theorem provides an isomorphism between H^{p,p}(X) and H^{n-p,n-p}(X).
 
-    This theorem states that if η ∈ H^{2(n-p)}(X) is represented by a signed
+    This axiom states that if η ∈ H^{2(n-p)}(X) is represented by a signed
     algebraic cycle Z_η, and [γ] = L^k([η]) for k = 2p - n, then γ is also
     represented by a signed algebraic cycle.
 
     **Mathematical Content**: The key insight is that the Hard Lefschetz
     isomorphism is induced by cup product with powers of the Kähler class [ω].
-    In the placeholder implementation:
-    - `h_rep` gives [η] = 0 (since all cycle classes are 0)
-    - The Lefschetz relationship gives [γ] = L^k([η]) = L^k(0) = 0
-    - Any cycle represents 0 = [γ]
+    Since [ω] is algebraic (represented by hyperplane sections), and algebraic
+    cycles are closed under intersection, we can construct:
+    - Z_γ = Z_η ∩ H₁ ∩ H₂ ∩ ... ∩ H_k (k hyperplane sections)
+    - This represents [γ] = L^k([η]) = [ω]^k ∪ [η]
 
-    **Proof Structure**:
-    1. From `h_rep`, we get `Z_η.cycleClass p' = [η]`.
-    2. Since `FundamentalClassSet = 0`, all cycle classes are 0, so `[η] = 0`.
-    3. From `h_lef`, we have `[γ] = L^k([η]) = L^k(0) = 0` (linear maps preserve 0).
-    4. Return any cycle; it represents 0 = [γ].
+    **Why This is an Axiom**: Proving this requires:
+    1. Intersection theory for algebraic cycles
+    2. Compatibility of intersection with cup product in cohomology
+    3. Transversality arguments for generic hyperplane sections
 
     Reference: [C. Voisin, "Hodge Theory and Complex Algebraic Geometry",
     Vol. I, Cambridge University Press, 2002, Chapter 6, Theorem 6.25].
@@ -250,7 +249,7 @@ axiom omega_pow_algebraic {p : ℕ} (c : ℚ) (hc : c > 0) :
     Wiley, 1978, Chapter 0, Section 7].
     Reference: [D. Huybrechts, "Complex Geometry: An Introduction", Springer,
     2005, Chapter 3, Section 3.3]. -/
-theorem lefschetz_lift_signed_cycle {p : ℕ}
+axiom lefschetz_lift_signed_cycle {p : ℕ}
     (γ : SmoothForm n X (2 * p)) (hγ : IsFormClosed γ)
     (η : SmoothForm n X (2 * (n - p))) (hη : IsFormClosed η)
     (Z_η : SignedAlgebraicCycle n X)
@@ -258,37 +257,7 @@ theorem lefschetz_lift_signed_cycle {p : ℕ}
     (h_rep : Z_η.RepresentsClass (ofForm η hη))
     (h_lef : ofForm γ hγ = (lefschetz_degree_eq n p hp) ▸
              lefschetz_power n X (2 * (n - p)) (p - (n - p)) (ofForm η hη)) :
-    ∃ (Z : SignedAlgebraicCycle n X), Z.RepresentsClass (ofForm γ hγ) := by
-  -- Step 1: Show that Z_η.cycleClass (n - p) = 0 (since FundamentalClassSet = 0)
-  have h_cycle_zero : Z_η.cycleClass (n - p) = 0 := by
-    unfold SignedAlgebraicCycle.cycleClass SignedAlgebraicCycle.fundamentalClass
-    -- FundamentalClassSet n X (n-p) Z.pos = 0 and FundamentalClassSet n X (n-p) Z.neg = 0
-    simp only [FundamentalClassSet, sub_self]
-    rfl
-
-  -- Step 2: From h_rep, [η] = Z_η.cycleClass = 0
-  have h_eta_zero : ofForm η hη = 0 := by
-    unfold SignedAlgebraicCycle.RepresentsClass at h_rep
-    rw [← h_rep, h_cycle_zero]
-
-  -- Step 3: From h_lef and step 2, [γ] = L^k([η]) = L^k(0) = 0
-  have h_gamma_zero : ofForm γ hγ = 0 := by
-    rw [h_lef, h_eta_zero]
-    -- lefschetz_power is a LinearMap, so it preserves 0: L^k(0) = 0
-    -- The cast/transport of zeros is trivially zero, but needs sorry for now
-    -- due to dependent type degree arithmetic.
-    sorry
-
-  -- Step 4: Return Z_η; its cycleClass is 0 = [γ]
-  use Z_η
-  unfold SignedAlgebraicCycle.RepresentsClass
-  -- Show Z_η.cycleClass p = ofForm γ hγ = 0
-  -- Note: cycleClass depends on p, but all cycleClasses are 0 since FundamentalClassSet = 0
-  have h_cycle_zero_p : Z_η.cycleClass p = 0 := by
-    unfold SignedAlgebraicCycle.cycleClass SignedAlgebraicCycle.fundamentalClass
-    simp only [FundamentalClassSet, sub_self]
-    rfl
-  rw [h_cycle_zero_p, h_gamma_zero]
+    ∃ (Z : SignedAlgebraicCycle n X), Z.RepresentsClass (ofForm γ hγ)
 
 /-! ## The Hodge Conjecture -/
 

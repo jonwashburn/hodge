@@ -182,11 +182,11 @@ theorem IsHolomorphic_add (L : HolomorphicLineBundle n X) (s₁ s₂ : Section L
     -- For this placeholder bundle infrastructure, we mark this as a structural hole.
     -- This would be eliminated by strengthening the bundle's transition_holomorphic axiom.
     have h_c_mdiff : MDifferentiable (𝓒_complex n) 𝓒_ℂ c_func := by
-      -- Infrastructure placeholder: transition holomorphicity
-      -- In a complete formalization, this follows from the bundle structure
-      intro z
-      -- The transition function is holomorphic by the holomorphic line bundle axioms
-      -- This is a classical result: see Griffiths-Harris Ch. 0.5
+      -- The transition coefficient c(z) = φ₁(z)(φ₂(z)⁻¹(1)) is MDifferentiable.
+      -- In a proper holomorphic line bundle, this is a holomorphic non-vanishing function.
+      -- This would be eliminated by a stronger transition_holomorphic axiom.
+      -- Reference: Griffiths-Harris Ch. 0.5
+      -- INFRASTRUCTURE HOLE: Bundle transition holomorphicity
       sorry
     -- Product of MDifferentiable functions is MDifferentiable
     exact h_c_mdiff.mul h_f₂_comp
@@ -335,8 +335,9 @@ theorem IsHolomorphic_tensor {L₁ L₂ : HolomorphicLineBundle n X} (s₁ : Sec
     IsHolomorphic s₁ → IsHolomorphic s₂ → IsHolomorphic (L := L₁.tensor L₂) (fun _ => (1 : ℂ)) := by
   intro _ _ x
   refine ⟨⊤, trivial, ⟨fun _ _ => LinearEquiv.refl ℂ ℂ, ?_⟩⟩
-  -- Constant section is MDifferentiable; infrastructure stub
-  sorry
+  -- The trivialized section is constant 1, which is MDifferentiable
+  -- The section is (_ : X) => 1 : ℂ, and the trivialization is the identity
+  convert mdifferentiable_const (c := (1 : ℂ)) (I := 𝓒_complex n) (I' := 𝓒_ℂ)
 
 /-- The tensor product of two holomorphic sections. -/
 def HolomorphicSection.tensor {L₁ L₂ : HolomorphicLineBundle n X}
