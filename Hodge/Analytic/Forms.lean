@@ -100,15 +100,63 @@ theorem isSmoothAlternating_neg (k : ℕ) (ω : SmoothForm n X k) :
   simp_rw [h_eq]
   exact ω.is_smooth
 
-/-- The set of evaluations on the unit ball is bounded above for any alternating map.
-    **BLOCKER**: Needs `MultilinearMap.continuous_of_finiteDimensional` or similar API. -/
-axiom IsSmoothAlternating.bddAbove {k : ℕ} {x : X} (f : (TangentSpace (𝓒_complex n) x) [⋀^Fin k]→ₗ[ℝ] ℂ) :
-    BddAbove { r : ℝ | ∃ v : Fin k → TangentSpace (𝓒_complex n) x, (∀ i, ‖v i‖ ≤ 1) ∧ r = ‖f v‖ }
+/-- The set of evaluations on the unit ball is bounded above for any alternating map. -/
+theorem IsSmoothAlternating.bddAbove {k : ℕ} {x : X} (f : (TangentSpace (𝓒_complex n) x) [⋀^Fin k]→ₗ[ℝ] ℂ) :
+    BddAbove { r : ℝ | ∃ v : Fin k → TangentSpace (𝓒_complex n) x, (∀ i, ‖v i‖ ≤ 1) ∧ r = ‖f v‖ } := by
+  -- Since the domain is finite-dimensional, f is continuous
+  have hf_cont : Continuous f := f.toMultilinearMap.continuous_of_finiteDimensional
+  obtain ⟨C, hC_pos, hC_bound⟩ := AlternatingMap.exists_bound_of_continuous f hf_cont
+  use C
+  intro r ⟨v, hv, hr⟩
+  rw [hr]
+  calc ‖f v‖ ≤ C * ∏ i, ‖v i‖ := hC_bound v
+    _ ≤ C * 1 := by
+        apply mul_le_mul_of_nonneg_left _ (le_of_lt hC_pos)
+        apply Finset.prod_le_one
+        · intro i _; exact norm_nonneg _
+        · intro i _; exact hv i
+    _ = C := mul_one C
 
 /-- Scalar multiplication preserves smoothness.
-    **BLOCKER**: Needs `IsSmoothAlternating.bddAbove` and pointwise set algebra. -/
-axiom isSmoothAlternating_smul (k : ℕ) (c : ℂ) (ω : SmoothForm n X k) :
-    IsSmoothAlternating n X k (fun x => c • ω.as_alternating x)
+    **Proof**: Follows from ‖c • f‖_op = |c| * ‖f‖_op and continuity of scalar multiplication. -/
+theorem isSmoothAlternating_smul (k : ℕ) (c : ℂ) (ω : SmoothForm n X k) :
+    IsSmoothAlternating n X k (fun x => c • ω.as_alternating x) := by
+  unfold IsSmoothAlternating
+  -- Show that ‖(c • ω) x‖_op = ‖c‖ * ‖ω x‖_op
+  have h_eq : ∀ x : X,
+    sSup { r : ℝ | ∃ v : Fin k → TangentSpace (𝓒_complex n) x, (∀ i, ‖v i‖ ≤ 1) ∧ r = ‖(c • ω.as_alternating x) v‖ } =
+    ‖c‖ * sSup { r : ℝ | ∃ v : Fin k → TangentSpace (𝓒_complex n) x, (∀ i, ‖v i‖ ≤ 1) ∧ r = ‖(ω.as_alternating x) v‖ } := by
+    intro x
+    let S := { r : ℝ | ∃ v : Fin k → TangentSpace (𝓒_complex n) x, (∀ i, ‖v i‖ ≤ 1) ∧ r = ‖(ω.as_alternating x) v‖ }
+    let Sc := { r : ℝ | ∃ v : Fin k → TangentSpace (𝓒_complex n) x, (∀ i, ‖v i‖ ≤ 1) ∧ r = ‖(c • ω.as_alternating x) v‖ }
+    have h_Sc : Sc = (‖c‖) • S := by
+      ext r
+      simp only [Set.mem_setOf_eq, Set.mem_smul_set, exists_prop]
+      constructor
+      · rintro ⟨v, hv, rfl⟩
+        use ‖ω.as_alternating x v‖
+        constructor
+        · use v, hv
+        · rw [AlternatingMap.smul_apply, norm_smul]
+      · rintro ⟨y, ⟨v, hv, rfl⟩, rfl⟩
+        use v, hv
+        rw [AlternatingMap.smul_apply, norm_smul]
+    rw [h_Sc]
+    by_cases h0 : c = 0
+    · rw [h0]; simp
+      have h_zero : (0 : ℝ) • S = {0} := by
+        ext y; simp [Set.mem_smul_set]
+        constructor
+        · rintro ⟨z, _, rfl⟩; simp
+        · intro hy; use 0; simp
+          use (fun _ => 0); simp; intro; simp
+      rw [h_zero, csSup_singleton]
+    · have hc_pos : ‖c‖ > 0 := norm_pos_iff.mpr h0
+      apply Real.sSup_smul_of_nonneg (norm_nonneg c)
+      · use 0; use (fun _ => 0); simp; intro; simp
+      · exact IsSmoothAlternating.bddAbove (ω.as_alternating x)
+  simp_rw [h_eq]
+  exact Continuous.mul continuous_const ω.is_smooth
 
 /-- The difference of smooth forms is smooth (follows from add and neg). -/
 theorem isSmoothAlternating_sub (k : ℕ) (ω η : SmoothForm n X k) :

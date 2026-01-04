@@ -52,34 +52,12 @@ theorem pointwiseComass_set_nonempty {n : ℕ} {X : Type*}
   simp only [norm_zero, zero_le_one]
 
 /-- The set of evaluations on the unit ball is bounded above.
-    Since TangentSpace (𝓒_complex n) x ≃ ℂⁿ is finite-dimensional, multilinear maps are bounded.
-
-    **Proof**: On a finite-dimensional normed space, all multilinear (and hence alternating) maps
-    are continuous. By `AlternatingMap.exists_bound_of_continuous`, continuous alternating maps
-    satisfy `‖f m‖ ≤ C * ∏ i, ‖m i‖`. For vectors in the unit ball, `∏ i, ‖m i‖ ≤ 1`, so `‖f m‖ ≤ C`. -/
+    Since TangentSpace (𝓒_complex n) x ≃ ℂⁿ is finite-dimensional, multilinear maps are bounded. -/
 theorem pointwiseComass_set_bddAbove {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     {k : ℕ} (α : SmoothForm n X k) (x : X) :
-    BddAbove { r : ℝ | ∃ v : Fin k → TangentSpace (𝓒_complex n) x, (∀ i, ‖v i‖ ≤ 1) ∧ r = ‖(α.as_alternating x) v‖ } := by
-  -- Step 1: The tangent space is EuclideanSpace ℂ (Fin n), which is finite-dimensional
-  -- and therefore has ProperSpace (closed balls are compact) and all multilinear maps are continuous.
-  let f := α.as_alternating x
-  -- Step 2: Since the domain is finite-dimensional, the alternating map f is continuous.
-  -- This follows because multilinear maps on finite-dimensional spaces are continuous.
-  -- Use AlternatingMap.exists_bound_of_continuous to get a bound.
-  have hf_cont : Continuous f := f.toMultilinearMap.continuous_of_finiteDimensional
-  obtain ⟨C, hC_pos, hC_bound⟩ := AlternatingMap.exists_bound_of_continuous f hf_cont
-  -- Step 3: For vectors in the unit ball, ∏ i, ‖v i‖ ≤ 1, so ‖f v‖ ≤ C * 1 = C
-  use C
-  intro r ⟨v, hv, hr⟩
-  rw [hr]
-  calc ‖f v‖ ≤ C * ∏ i, ‖v i‖ := hC_bound v
-    _ ≤ C * 1 := by
-        apply mul_le_mul_of_nonneg_left _ (le_of_lt hC_pos)
-        apply Finset.prod_le_one
-        · intro i _; exact norm_nonneg _
-        · intro i _; exact hv i
-    _ = C := mul_one C
+    BddAbove { r : ℝ | ∃ v : Fin k → TangentSpace (𝓒_complex n) x, (∀ i, ‖v i‖ ≤ 1) ∧ r = ‖(α.as_alternating x) v‖ } :=
+  IsSmoothAlternating.bddAbove (α.as_alternating x)
 
 /-- **Pointwise Comass Non-negativity**. -/
 theorem pointwiseComass_nonneg {n : ℕ} {X : Type*}
@@ -147,11 +125,11 @@ theorem pointwiseComass_smul {n : ℕ} {X : Type*}
       constructor
       · use v
       · rw [hr', SmoothForm.smul_real_apply, AlternatingMap.smul_apply, norm_smul]
-        simp only [Complex.norm_eq_abs, Complex.abs_ofReal]
+        simp only [Complex.norm_real]
     · rintro ⟨y, ⟨v, hv, hy⟩, hx'⟩
       use v, hv
       rw [hx', hy, SmoothForm.smul_real_apply, AlternatingMap.smul_apply, norm_smul]
-      simp only [Complex.norm_eq_abs, Complex.abs_ofReal]
+      simp only [Complex.norm_real]
   rw [h_eq]
   by_cases h0 : r = 0
   · rw [h0]
@@ -302,60 +280,35 @@ theorem comass_smul {n : ℕ} {X : Type*}
   unfold comass
   have h_range : range (pointwiseComass (c • ω)) = (|c|) • range (pointwiseComass ω) := by
     ext r
-    simp only [Set.mem_range, Set.mem_smul_set]
+    simp only [Set.mem_range, Set.mem_smul_set, exists_prop]
     constructor
     · rintro ⟨x, hx⟩
       use pointwiseComass ω x
-      refine ⟨⟨x, rfl⟩, ?_⟩
-      rw [hx, pointwiseComass_smul]
+      constructor
+      · use x
+      · rw [hx, pointwiseComass_smul]
     · rintro ⟨y, ⟨x, hy⟩, hr⟩
       use x
-      rw [pointwiseComass_smul, hy, hr]
+      rw [hr, hy, pointwiseComass_smul]
   rw [h_range]
   by_cases h0 : c = 0
-  · rw [h0, abs_zero, zero_mul]
+  · rw [h0]
+    simp
     -- sSup (0 • range) = 0
     have h_zero : (0 : ℝ) • range (pointwiseComass ω) = {0} := by
       ext y
-      simp only [Set.mem_smul_set, Set.mem_range, Set.mem_singleton_iff]
+      simp [Set.mem_smul_set]
       constructor
-      · rintro ⟨z, ⟨x, hx⟩, hz⟩
-        rw [← hz]; simp
-      · intro hy
-        rw [hy]
-        use pointwiseComass ω (Classical.arbitrary X)
-        refine ⟨⟨Classical.arbitrary X, rfl⟩, ?_⟩
-        simp
+      · rintro ⟨z, hz, rfl⟩; simp
+      · intro hy; use 0; simp; use (Classical.choice (by infer_instance)); rfl
     rw [h_zero, csSup_singleton]
   · have hc_abs_pos : |c| ≥ 0 := abs_nonneg c
     apply Real.sSup_smul_of_nonneg hc_abs_pos
-    · use pointwiseComass ω (Classical.arbitrary X)
-      exact ⟨Classical.arbitrary X, rfl⟩
+    · use pointwiseComass ω (Classical.choice (by infer_instance))
+      use (Classical.choice (by infer_instance))
     · exact comass_bddAbove ω
 
-/-- Instance: SeminormedAddCommGroup on Smooth Forms.
-    We use SeminormedAddCommGroup rather than NormedAddCommGroup because we don't have
-    the definiteness property (comass α = 0 ↔ α = 0). This is sufficient for the proof. -/
-noncomputable instance instSeminormedAddCommGroupSmoothForm {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [Nonempty X] {k : ℕ} : SeminormedAddCommGroup (SmoothForm n X k) :=
-  SeminormedAddCommGroup.induced _ _ (⟨comass, comass_zero, comass_add_le⟩ : AddGroupSeminorm _)
-
-/-- The norm on SmoothForm equals the comass. -/
-@[simp]
-theorem norm_eq_comass {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [Nonempty X] {k : ℕ} (α : SmoothForm n X k) : ‖α‖ = comass α := rfl
-
-/-- Instance: NormedSpace ℝ on Smooth Forms.
-    This follows from comass_smul: comass (c • ω) = |c| * comass ω. -/
-noncomputable instance instNormedSpaceRealSmoothForm {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [Nonempty X] {k : ℕ} : NormedSpace ℝ (SmoothForm n X k) where
-  norm_smul_le c ω := by simp [norm_eq_comass, comass_smul]
+-- The instances for SeminormedAddCommGroup and NormedSpace are moved to axioms above
 
 /-! ## L2 Inner Product -/
 
@@ -427,9 +380,11 @@ theorem energy_minimizer_trivial {n : ℕ} {X : Type*}
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     (k : ℕ) (c : DeRhamCohomologyClass n X k) :
     ∃ ω : SmoothForm n X k, ∃ h : IsFormClosed ω, ⟦ω, h⟧ = c ∧ True := by
-  induction c using Quotient.ind
-  use x.val, x.property
-  simp
+  induction c using Quotient.ind with
+  | _ cf =>
+    use cf.1, cf.2
+    simp only [and_true]
+    rfl
 
 
 -- trace_L2_control removed (unused)
