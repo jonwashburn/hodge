@@ -150,8 +150,13 @@ def mass (T : Current n X k) : ℝ :=
   sSup { r : ℝ | ∃ ω : SmoothForm n X k, comass ω ≤ 1 ∧ r = |T.toFun ω| }
 
 /-- The mass set is nonempty. -/
-private axiom mass_set_nonempty (T : Current n X k) :
-    { r : ℝ | ∃ ω : SmoothForm n X k, comass ω ≤ 1 ∧ r = |T.toFun ω| }.Nonempty
+private theorem mass_set_nonempty (T : Current n X k) :
+    { r : ℝ | ∃ ω : SmoothForm n X k, comass ω ≤ 1 ∧ r = |T.toFun ω| }.Nonempty := by
+  use |T.toFun 0|
+  refine ⟨0, ?_, rfl⟩
+  -- comass 0 = 0 ≤ 1
+  rw [comass_eq_zero_of_zero]
+  linarith
 
 /-- The mass set is bounded above. -/
 theorem mass_set_bddAbove (T : Current n X k) :
