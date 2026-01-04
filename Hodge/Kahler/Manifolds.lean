@@ -40,10 +40,13 @@ theorem unitForm_is_rational : isRationalClass ⟦(unitForm : SmoothForm n X 0),
 
 -- lefschetzL and lefschetzL_add are defined in Hodge.Cohomology.Basic
 
-/-- **Dual Lefschetz Operator Λ** (Kähler Geometry). -/
-axiom lefschetzLambdaLinearMap (n : ℕ) (X : Type u) [TopologicalSpace X]
+/-- **Dual Lefschetz Operator Λ** (Kähler Geometry).
+    In the real theory, Λ = ⋆⁻¹ ∘ L ∘ ⋆ where ⋆ is the Hodge star.
+    Since our Hodge star is currently a placeholder (= 0), we define Λ as the zero map.
+    This is consistent with the overall stub structure. -/
+noncomputable def lefschetzLambdaLinearMap (n : ℕ) (X : Type u) [TopologicalSpace X]
     [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X] (k : ℕ) :
-    SmoothForm n X k →ₗ[ℂ] SmoothForm n X (k - 2)
+    SmoothForm n X k →ₗ[ℂ] SmoothForm n X (k - 2) := 0
 
 def lefschetzLambda {k : ℕ} (η : SmoothForm n X k) : SmoothForm n X (k - 2) :=
   lefschetzLambdaLinearMap n X k η
