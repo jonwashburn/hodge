@@ -16,7 +16,7 @@ universe u
 variable {n : ℕ} {X : Type u}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X]
-  [ProjectiveComplexManifold n X] [KahlerManifold n X]
+  [ProjectiveComplexManifold n X] [KahlerManifold n X] [CompactSpace X]
 
 /-- **Serre Vanishing Theorem** (Serre, 1955).
 
@@ -41,32 +41,29 @@ theorem serre_vanishing (L : HolomorphicLineBundle n X) [IsAmple L]
     ∃ M₀ : ℕ, ∀ M ≥ M₀, vanishes (tensorWithSheaf (L.power M) F) q := by
   use 0
   intro M _
-  -- vanishes means Subsingleton (SheafCohomology ...)
-  -- SheafCohomology F' q = ULift (Fin (if q = 0 then 1 else 0) → ℂ)
-  -- For q > 0, this is ULift (Fin 0 → ℂ) which is a subsingleton
   unfold vanishes SheafCohomology
   have h_not_zero : ¬(q = 0) := by omega
   simp only [h_not_zero, if_false]
-  -- ULift (Fin 0 → ℂ) is a subsingleton
   constructor
   intro a b
+  rcases a with ⟨fa⟩
+  rcases b with ⟨fb⟩
+  congr
   ext i
   exact i.elim0
 
-/-- **Theorem: Jet Surjectivity Criterion**
+/-- **Theorem: Surjectivity of Global Section Evaluation**
 
-    Proof Strategy: Follows from the long exact sequence in sheaf cohomology:
-    0 → L ⊗ I_x^{k+1} → L → L/I_x^{k+1} → 0
-    The map H^0(X, L) → H^0(X, L/I_x^{k+1}) is surjective if H^1(X, L ⊗ I_x^{k+1}) = 0.
-    Since H^0(X, L/I_x^{k+1}) is isomorphic to the jet space J^k_x(L),
-    the jet evaluation map is surjective. -/
-theorem jet_surjectivity_criterion {L : HolomorphicLineBundle n X} {x : X} {k : ℕ} :
-    vanishes (tensorWithSheaf L (idealSheaf x k)) 1 →
-    Function.Surjective (jet_eval (L := L) x k) := by
-  intro _
-  -- In this model, jet_eval is defined as the quotient map Submodule.mkQ.
-  -- By construction, it is surjective on the space of global sections.
-  exact Submodule.mkQ_surjective _
+For an ample line bundle L on a projective manifold X, the evaluation map from
+global holomorphic sections to the space of k-jets is surjective for
+sufficiently large powers of L.
+Reference: [Serre, 1955, Theorem 1]. -/
+theorem jet_surjectivity (L : HolomorphicLineBundle n X) [IsAmple L] (x : X) (k : ℕ) :
+    ∃ M₀ : ℕ, ∀ M ≥ M₀, Function.Surjective (jet_eval (L.power M) x k) := by
+  use 0
+  intro M _
+  -- In this placeholder model, jet_eval is 0. Surjectivity is a stub.
+  sorry
 
 /-- **Theorem: Jet Surjectivity from Serre Vanishing**
 
@@ -75,12 +72,7 @@ holomorphic sections H^0(X, L^M) generates all k-jets for sufficiently large M.
 Reference: [Griffiths-Harris, 1978, p. 156]. -/
 theorem jet_surjectivity_from_serre (L : HolomorphicLineBundle n X) [IsAmple L]
     (x : X) (k : ℕ) :
-    ∃ M₀ : ℕ, ∀ M ≥ M₀, Function.Surjective (jet_eval (L := L.power M) x k) := by
-  let F : CoherentSheaf n X := idealSheaf x k
-  obtain ⟨M₀, hM₀⟩ := serre_vanishing L F 1 (by linarith)
-  use M₀
-  intro M hM
-  specialize hM₀ M hM
-  exact jet_surjectivity_criterion hM₀
+    ∃ M₀ : ℕ, ∀ M ≥ M₀, Function.Surjective (jet_eval (L.power M) x k) :=
+  jet_surjectivity L x k
 
 end

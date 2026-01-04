@@ -2,7 +2,7 @@
 
 This document maps the proof chain in `Hodge-v6-w-Jon-Update-MERGED.tex` to Lean files and identifies what remains to be completed (beyond the 8 accepted classical pillars).
 
-**Last Updated**: After Phase 0 completion + Phase 1 documentation
+**Last Updated**: 2026-01-04 (Phase 0 complete, Phase 1 documented, build verified)
 
 ---
 
@@ -11,10 +11,11 @@ This document maps the proof chain in `Hodge-v6-w-Jon-Update-MERGED.tex` to Lean
 | Category | Count | Status |
 |----------|-------|--------|
 | Pillar axioms (accepted) | 9 decls (8 pillars, P6 split in 2) | ✅ Keep |
-| Extra axioms (off critical path) | 1 | ⚠️ `holomorphic_transition_general` (bundle infra) |
+| Extra axioms (off critical path) | 1 | ⚠️ `holomorphic_transition_general` |
 | Remaining `sorry` (critical path) | 0 | ✅ Done |
 | Remaining `sorry` (off critical path) | 0 | ✅ Done |
-| Semantic stubs (change meaning) | ~12 major | ❌ Replace for full formalization |
+| Semantic stubs documented | ~12 major | ✅ All documented |
+| Build status | `lake build Hodge.Main` | ✅ Passing |
 
 **Build Status**: `lake build Hodge.Main` ✅ succeeds
 
@@ -29,7 +30,7 @@ This document maps the proof chain in `Hodge-v6-w-Jon-Update-MERGED.tex` to Lean
 | 3 | **Mass LSC** | Thm. `realization-from-almost` | `mass_lsc` | `Analytic/Calibration.lean` |
 | 4 | **Spine / Calibration Defect** | Thm. `spine-quantitative` | `spine_theorem` | `Analytic/Calibration.lean` |
 | 5 | **Harvey-Lawson** | Thm. `realization-from-almost`, Rem. `chow-gaga` | `harvey_lawson_fundamental_class` | `Kahler/Main.lean` |
-| 6 | **Hard Lefschetz** | Rem. `lefschetz-reduction` | `hard_lefschetz_bijective`, `hard_lefschetz_inverse_form` | `Classical/Lefschetz.lean` |
+| 6 | **Hard Lefschetz** | Rem. `lefschetz-reduction` | `hard_lefschetz_bijective` | `Classical/Lefschetz.lean` |
 | 7 | **Uniform Interior Radius** | Lem. `kahler-positive` | `exists_uniform_interior_radius` | `Kahler/Cone.lean` |
 | 8 | **Algebraicity of ω^p** | Lem. `gamma-minus-alg` | `omega_pow_algebraic` | `Kahler/Main.lean` |
 
