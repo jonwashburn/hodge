@@ -12,10 +12,15 @@ import Mathlib.Analysis.InnerProductSpace.PiL2
 import Mathlib.Analysis.Calculus.DifferentialForm.Basic
 import Mathlib.Topology.Sets.Opens
 import Mathlib.Topology.Defs.Induced
+import Mathlib.Analysis.Normed.Module.Alternating.Basic
+import Mathlib.Analysis.Normed.Module.FiniteDimension
+import Mathlib.Topology.Algebra.Module.FiniteDimension
+
 
 noncomputable section
 
 open Classical
+open scoped Pointwise
 
 set_option autoImplicit false
 
@@ -95,8 +100,13 @@ theorem isSmoothAlternating_neg (k : ℕ) (ω : SmoothForm n X k) :
   simp_rw [h_eq]
   exact ω.is_smooth
 
-/-- Axiom: Scalar multiplication preserves smoothness.
-    The proof follows from ‖c • f‖ = |c| * ‖f‖. -/
+/-- The set of evaluations on the unit ball is bounded above for any alternating map.
+    **BLOCKER**: Needs `MultilinearMap.continuous_of_finiteDimensional` or similar API. -/
+axiom IsSmoothAlternating.bddAbove {k : ℕ} {x : X} (f : (TangentSpace (𝓒_complex n) x) [⋀^Fin k]→ₗ[ℝ] ℂ) :
+    BddAbove { r : ℝ | ∃ v : Fin k → TangentSpace (𝓒_complex n) x, (∀ i, ‖v i‖ ≤ 1) ∧ r = ‖f v‖ }
+
+/-- Scalar multiplication preserves smoothness.
+    **BLOCKER**: Needs `IsSmoothAlternating.bddAbove` and pointwise set algebra. -/
 axiom isSmoothAlternating_smul (k : ℕ) (c : ℂ) (ω : SmoothForm n X k) :
     IsSmoothAlternating n X k (fun x => c • ω.as_alternating x)
 

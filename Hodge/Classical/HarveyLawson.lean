@@ -86,13 +86,43 @@ theorem IsAnalyticSet_isClosed {n : ℕ} {X : Type*}
   | union S T _ _ ihS ihT => exact IsClosed.union ihS ihT
   | inter S T _ _ ihS ihT => exact IsClosed.inter ihS ihT
 
-/-- Axiom: Positive-dimensional complex manifolds are nontrivial (have at least two points).
-    **Justification**: A manifold modeled on EuclideanSpace ℂ (Fin n) with n ≥ 1 has charts
-    that are local homeomorphisms to ℂⁿ. Since ℂⁿ is infinite for n ≥ 1, the manifold
-    must have more than one point. The proof requires metric space API details. -/
-axiom nontrivial_of_dim_pos {n : ℕ} {X : Type*}
+/-- Positive-dimensional complex manifolds are nontrivial (have at least two points).
+    **Proof**: A manifold modeled on EuclideanSpace ℂ (Fin n) with n ≥ 1 has charts
+    that are local homeomorphisms to ℂⁿ. Since an open set in ℂⁿ with n ≥ 1 contains
+    more than one point, the manifold must have more than one point. -/
+theorem nontrivial_of_dim_pos {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [Nonempty X] (hn : n ≥ 1) : Nontrivial X
+    [IsManifold (𝓒_complex n) ⊤ X] [Nonempty X] (hn : n ≥ 1) : Nontrivial X := by
+  -- Get a point x in X
+  obtain ⟨x⟩ := ‹Nonempty X›
+  -- Get the chart at x
+  let e := chartAt (EuclideanSpace ℂ (Fin n)) x
+  have hx_source : x ∈ e.source := mem_chart_source (EuclideanSpace ℂ (Fin n)) x
+  have hex_target : e x ∈ e.target := e.map_source hx_source
+  -- EuclideanSpace ℂ (Fin n) is nontrivial for n ≥ 1
+  haveI : Nontrivial (EuclideanSpace ℂ (Fin n)) := by
+    rw [EuclideanSpace.nontrivial_iff]
+    exact ⟨⟨0, hn⟩⟩
+  -- The target is open, nonempty, in a nontrivial T1 space, so it has ≥ 2 points
+  have h_target_nontrivial : Set.Nontrivial e.target := by
+    apply Set.nontrivial_of_nonempty_of_isOpen_of_t1Space
+    · exact ⟨e x, hex_target⟩
+    · exact e.open_target
+  obtain ⟨y, hy_target, z, hz_target, hyz⟩ := h_target_nontrivial
+  -- At least one of y, z differs from e x
+  by_cases hy_ne : y ≠ e x
+  · use e.symm y, x
+    intro h_eq
+    have : e (e.symm y) = e x := by rw [h_eq]
+    rw [e.apply_symm_apply hy_target] at this
+    exact hy_ne this
+  · push_neg at hy_ne
+    use e.symm z, x
+    intro h_eq
+    have : e (e.symm z) = e x := by rw [h_eq]
+    rw [e.apply_symm_apply hz_target] at this
+    rw [← hy_ne] at this
+    exact hyz this
 
 /-- **Non-Triviality**: Not every set is analytic.
     **Proof**: The inductive definition only generates sets in the Boolean algebra

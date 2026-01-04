@@ -160,21 +160,99 @@ theorem kahlerPow_smul_isConePositive (p : ℕ) (c : ℝ) (hc : c > 0) :
   intro x
   exact stronglyPositiveCone_scale p x (kahlerPow p) (kahlerPow_isConePositive p x) c (le_of_lt hc)
 
+/-- Any smooth form on a compact manifold has a finite supremum norm (local version for Cone.lean). -/
+theorem form_is_bounded' {k : ℕ} (α : SmoothForm n X k) :
+    ∃ M : ℝ, M > 0 ∧ ∀ x, pointwiseComass α x ≤ M := by
+  classical
+  -- Take the global comass (a supremum over X) as a uniform bound, with +1 to ensure positivity.
+  refine ⟨comass α + 1, ?_, ?_⟩
+  · have h_nonneg : (0 : ℝ) ≤ comass α := by simpa using (comass_nonneg α)
+    linarith
+  · intro x
+    have hx_le : pointwiseComass α x ≤ comass α := by
+      unfold comass
+      exact le_csSup (comass_bddAbove α) (mem_range_self x)
+    linarith
+
 /-- **Shifting by Large ω^p Makes Forms Cone Positive** (Key Lemma for Signed Decomposition).
     For any form γ with bounded pointwise comass, adding a sufficiently large
     multiple N of ω^p makes γ + N·ω^p cone-positive.
 
     The proof uses:
     1. ω^p is in the interior of the cone with uniform radius r (exists_uniform_interior_radius)
-    2. γ has bounded comass M (form_is_bounded)
+    2. γ has bounded comass M (form_is_bounded')
     3. For N > M/r, pointwiseComass(γ/N) < r, so γ/N + ω^p is within r of ω^p
     4. Hence γ/N + ω^p ∈ K_p(x) for all x
     5. Scaling by N gives γ + N·ω^p ∈ K_p(x)
 
     Reference: [J.-P. Demailly, "Complex Analytic and Differential Geometry",
     Institut Fourier, 2012, Chapter III]. -/
-axiom shift_makes_conePositive (p : ℕ) (γ : SmoothForm n X (2 * p)) :
-    ∃ N : ℝ, N > 0 ∧ isConePositive (γ + N • kahlerPow p)
+theorem shift_makes_conePositive (p : ℕ) (γ : SmoothForm n X (2 * p)) :
+    ∃ N : ℝ, N > 0 ∧ isConePositive (γ + N • kahlerPow p) := by
+  classical
+  -- Step 1: Get the uniform interior radius r > 0
+  obtain ⟨r, hr_pos, hr_interior⟩ := exists_uniform_interior_radius (n := n) (X := X) p
+  -- Step 2: Get the bound M > 0 for γ
+  obtain ⟨M, hM_pos, hM_bound⟩ := form_is_bounded' (n := n) (X := X) γ
+  -- Step 3: Choose N > M / r so that (1/N) * M < r
+  let N := M / r + 1
+  have hN_pos : N > 0 := by
+    unfold_let N
+    have : M / r ≥ 0 := div_nonneg (le_of_lt hM_pos) (le_of_lt hr_pos)
+    linarith
+  -- Step 4: Prove that N > M / r, hence (1/N) * M < r
+  have hN_gt : N > M / r := by unfold_let N; linarith
+  have hN_inv_M_lt_r : (1 / N) * M < r := by
+    have hN_ne : N ≠ 0 := ne_of_gt hN_pos
+    rw [div_mul_eq_mul_div, one_mul]
+    rw [div_lt_iff hN_pos]
+    calc M < (M / r + 1) * r := by
+           rw [add_mul, div_mul_cancel₀ M (ne_of_gt hr_pos)]
+           linarith
+         _ = N * r := by unfold_let N
+  -- Step 5: For each x, show that (1/N) • γ + ω^p is within r of ω^p
+  -- This means: pointwiseComass ((1/N) • γ + ω^p - ω^p) x < r
+  -- Which simplifies to: pointwiseComass ((1/N) • γ) x < r
+  have h_scaled_in_cone : ∀ x, (N⁻¹ • γ + omegaPow_point p x) ∈ stronglyPositiveCone p x := by
+    intro x
+    apply hr_interior x
+    -- Need: pointwiseComass (N⁻¹ • γ + ω^p - ω^p) x < r
+    -- Simplify: N⁻¹ • γ + ω^p - ω^p = N⁻¹ • γ
+    have hsub : N⁻¹ • γ + omegaPow_point (n := n) (X := X) p x - omegaPow_point (n := n) (X := X) p x = N⁻¹ • γ := by
+      ext y v
+      simp only [SmoothForm.sub_apply, SmoothForm.add_apply]
+      ring
+    rw [hsub]
+    -- Now: pointwiseComass (N⁻¹ • γ) x < r
+    -- Use pointwiseComass_smul: pointwiseComass (c • α) = |c| * pointwiseComass α
+    rw [pointwiseComass_smul]
+    -- |N⁻¹| * pointwiseComass γ x ≤ |N⁻¹| * M < r
+    have h_abs_inv : |N⁻¹| = N⁻¹ := abs_of_pos (inv_pos_of_pos hN_pos)
+    rw [h_abs_inv]
+    calc N⁻¹ * pointwiseComass γ x ≤ N⁻¹ * M := by
+           apply mul_le_mul_of_nonneg_left (hM_bound x)
+           exact le_of_lt (inv_pos_of_pos hN_pos)
+         _ = (1 / N) * M := by rw [one_div]
+         _ < r := hN_inv_M_lt_r
+  -- Step 6: Note that omegaPow_point p x = kahlerPow p (doesn't depend on x)
+  have h_omega_const : ∀ x, omegaPow_point (n := n) (X := X) p x = kahlerPow p := fun _ => rfl
+  -- Step 7: So N⁻¹ • γ + kahlerPow p is cone-positive
+  have h_inv_cone_positive : isConePositive (N⁻¹ • γ + kahlerPow p) := by
+    intro x
+    rw [← h_omega_const x]
+    exact h_scaled_in_cone x
+  -- Step 8: Scale by N to get γ + N • kahlerPow p is cone-positive
+  -- N • (N⁻¹ • γ + kahlerPow p) = N • N⁻¹ • γ + N • kahlerPow p = γ + N • kahlerPow p
+  have h_scale_eq : N • (N⁻¹ • γ + kahlerPow p) = γ + N • kahlerPow p := by
+    have hN_ne : N ≠ 0 := ne_of_gt hN_pos
+    ext x v
+    simp only [SmoothForm.smul_apply, SmoothForm.add_apply]
+    rw [smul_add, smul_smul, mul_inv_cancel₀ hN_ne, one_smul]
+  -- Step 9: Use stronglyPositiveCone_scale
+  use N, hN_pos
+  intro x
+  rw [← h_scale_eq]
+  exact stronglyPositiveCone_scale p x (N⁻¹ • γ + kahlerPow p) (h_inv_cone_positive x) N (le_of_lt hN_pos)
 
 
 /-- **Cone Addition Closure** (Standard convex analysis).

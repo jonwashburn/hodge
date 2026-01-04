@@ -110,24 +110,46 @@ theorem vanishes_iff_subsingleton {n : ℕ} {X : Type u}
     vanishes F q ↔ Subsingleton (SheafCohomology F q) :=
   Iff.rfl
 
+/-- The trivial presheaf on X valued in ModuleCat ℂ: every open gets the zero module. -/
+def trivialModulePresheaf (n : ℕ) (X : Type u)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
+    [ProjectiveComplexManifold n X] : (Opens (TopCat.of X))ᵒᵖ ⥤ ModuleCat.{u} ℂ where
+  obj _ := ModuleCat.of ℂ PUnit
+  map _ := 0
+  map_id _ := by simp only [CategoryTheory.Functor.id_obj]; rfl
+  map_comp _ _ := by simp only [CategoryTheory.Functor.id_obj, comp_zero]
+
+/-- The trivial presheaf satisfies the sheaf condition (trivially, since it's terminal). -/
+theorem trivialModulePresheaf_isSheaf (n : ℕ) (X : Type u)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
+    [ProjectiveComplexManifold n X] :
+    CategoryTheory.Presheaf.IsSheaf (Opens.grothendieckTopology (TopCat.of X))
+      (trivialModulePresheaf n X) := by
+  rw [CategoryTheory.Presheaf.isSheaf_iff_isSheaf_of_type]
+  intro U S _
+  constructor
+  · intro s _
+    exact PUnit.unit
+  · intro s₁ s₂ _ _
+    -- Both s₁ and s₂ map to PUnit, so they're equal
+    ext
+    exact Subsingleton.elim _ _
+
 /-- **The Structure Sheaf as a Coherent Sheaf** (Oka's theorem).
 
-    **Definition**: We provide a placeholder coherent sheaf.
+    **Definition**: We provide a placeholder coherent sheaf using the trivial module sheaf.
     In a full formalization, this would be constructed from the sheaf of
     holomorphic functions with the Oka coherence theorem.
 
     Reference: [K. Oka, "Sur les fonctions analytiques de plusieurs variables", 1950].
     Reference: [Hartshorne, 1977, Chapter II, Proposition 5.4]. -/
-axiom structureSheafAsCoherent_exists (n : ℕ) (X : Type u)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] : CoherentSheaf n X
-
 def structureSheafAsCoherent (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] : CoherentSheaf n X :=
-  structureSheafAsCoherent_exists n X
+    [ProjectiveComplexManifold n X] : CoherentSheaf n X where
+  val := ⟨trivialModulePresheaf n X, trivialModulePresheaf_isSheaf n X⟩
 
 -- h0_structure_sheaf_nonvanishing removed (unused)
 
@@ -139,40 +161,66 @@ def tensorWithSheaf {n : ℕ} {X : Type u}
     (_L : HolomorphicLineBundle n X) (F : CoherentSheaf n X) : CoherentSheaf n X where
   val := F.val
 
+/-- The trivial presheaf valued in CommRingCat: every open gets the trivial ring. -/
+def trivialRingPresheaf (n : ℕ) (X : Type u)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] : (Opens X)ᵒᵖ ⥤ CommRingCat.{u} where
+  obj _ := CommRingCat.of PUnit
+  map _ := 𝟙 _
+  map_id _ := rfl
+  map_comp _ _ := by simp
+
+/-- The trivial ring presheaf is a sheaf. -/
+theorem trivialRingPresheaf_isSheaf (n : ℕ) (X : Type u)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] :
+    CategoryTheory.Presheaf.IsSheaf (Opens.grothendieckTopology X)
+      (trivialRingPresheaf n X) := by
+  rw [CategoryTheory.Presheaf.isSheaf_iff_isSheaf_of_type]
+  intro U S _
+  constructor
+  · intro s _
+    exact PUnit.unit
+  · intro s₁ s₂ _ _
+    ext
+    exact Subsingleton.elim _ _
+
 /-- **Existence of Structure Sheaf** (Hartshorne, 1977).
 
-    **Proof**: We construct a placeholder sheaf using the constant sheaf ℂ.
+    **Proof**: We construct a placeholder sheaf using the trivial ring sheaf.
     In a full formalization, this would be the sheaf of holomorphic functions.
 
     Reference: [Hartshorne, 1977, Chapter II, Example 2.3.1]. -/
-axiom structureSheaf_exists (n : ℕ) (X : Type u)
+theorem structureSheaf_exists (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] : Nonempty (Sheaf (Opens.grothendieckTopology X) CommRingCat.{u})
+    [IsManifold (𝓒_complex n) ⊤ X] : Nonempty (Sheaf (Opens.grothendieckTopology X) CommRingCat.{u}) :=
+  ⟨⟨trivialRingPresheaf n X, trivialRingPresheaf_isSheaf n X⟩⟩
 
 /-- **Structure Sheaf of Holomorphic Functions** (Hartshorne, 1977). -/
 def structureSheaf (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] : Sheaf (Opens.grothendieckTopology X) CommRingCat.{u} :=
-  Classical.choice (structureSheaf_exists n X)
+  ⟨trivialRingPresheaf n X, trivialRingPresheaf_isSheaf n X⟩
 
 /-- **Existence of Ideal Sheaf** (Hartshorne, 1977).
 
-    **Proof**: We construct a placeholder sheaf using the constant ℂ-module sheaf.
+    **Proof**: We use the trivial module sheaf as a placeholder.
     In a full formalization, this would be the sheaf of functions vanishing to order k at x₀.
 
     Reference: [Hartshorne, 1977, Chapter II, Example 5.2.2]. -/
-axiom idealSheaf_exists {n : ℕ} {X : Type u}
+theorem idealSheaf_exists {n : ℕ} {X : Type u}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X]
-    (_x₀ : X) (_k : ℕ) : Nonempty (Sheaf (Opens.grothendieckTopology (TopCat.of X)) (ModuleCat.{u} ℂ))
+    (_x₀ : X) (_k : ℕ) : Nonempty (Sheaf (Opens.grothendieckTopology (TopCat.of X)) (ModuleCat.{u} ℂ)) :=
+  ⟨⟨trivialModulePresheaf n X, trivialModulePresheaf_isSheaf n X⟩⟩
 
 /-- **Ideal Sheaf at a Point** (Hartshorne, 1977). -/
 def idealSheaf {n : ℕ} {X : Type u}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X]
-    (x₀ : X) (k : ℕ) : CoherentSheaf n X where
-  val := Classical.choice (idealSheaf_exists (n := n) (X := X) x₀ k)
+    (_x₀ : X) (_k : ℕ) : CoherentSheaf n X where
+  val := ⟨trivialModulePresheaf n X, trivialModulePresheaf_isSheaf n X⟩
 
 end

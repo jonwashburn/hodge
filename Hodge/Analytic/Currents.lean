@@ -138,10 +138,51 @@ instance : HSMul ℤ (Current n X k) (Current n X k) := ⟨fun z T => (z : ℝ) 
 theorem zero_toFun (ω : SmoothForm n X k) : (0 : Current n X k).toFun ω = 0 := rfl
 
 /-- **Current Boundedness**: Every current is bounded relative to the comass.
-    This is a fundamental analytical property: a continuous linear functional on a
-    normed space is always bounded.
-    Reference: [W. Rudin, "Functional Analysis", 1991, Theorem 1.32]. -/
-axiom is_bounded (T : Current n X k) : ∃ M : ℝ, ∀ ω : SmoothForm n X k, |T.toFun ω| ≤ M * ‖ω‖
+    **Proof**: A continuous linear map between seminormed groups is bounded. -/
+theorem is_bounded (T : Current n X k) : ∃ M : ℝ, ∀ ω : SmoothForm n X k, |T.toFun ω| ≤ M * ‖ω‖ := by
+  -- Since T.toFun is a continuous linear map from a seminormed group to ℝ, it is bounded.
+  -- We use the definition of continuity at 0.
+  have h_cont := T.is_continuous.continuousAt (x := 0)
+  rw [Metric.continuousAt_iff] at h_cont
+  -- T(0) = 0
+  rw [map_zero' T, dist_zero_right] at h_cont
+  -- For ε = 1, there exists δ > 0 s.t. ‖ω - 0‖ < δ → |T(ω) - 0| < 1
+  obtain ⟨δ, hδ_pos, hδ_ball⟩ := h_cont 1 (by linarith)
+  use 2/δ
+  intro ω
+  by_cases hω : ‖ω‖ = 0
+  · -- If ‖ω‖ = 0, then T(ω) must be 0 by continuity and linearity
+    have : T.toFun ω = 0 := by
+      by_contra hne
+      let r := 2 / |T.toFun ω|
+      have h_norm : ‖r • ω‖ = |r| * ‖ω‖ := by rw [norm_smul]
+      rw [hω, mul_zero] at h_norm
+      have h_ball : r • ω ∈ Metric.ball (0 : SmoothForm n X k) δ := by
+        rw [Metric.mem_ball, dist_zero_right, h_norm]; exact hδ_pos
+      specialize hδ_ball h_ball
+      rw [map_smul T, abs_mul] at hδ_ball
+      rw [abs_of_pos (by apply div_pos; linarith; exact abs_pos.mpr hne)] at hδ_ball
+      simp at hδ_ball; linarith
+    rw [this, hω]; simp
+  · -- If ‖ω‖ > 0, use the ball bound.
+    -- Scale ω to have norm δ/2 < δ
+    let ω' := (δ / (2 * ‖ω‖)) • ω
+    have h_norm' : ‖ω'‖ = |δ / (2 * ‖ω‖)| * ‖ω‖ := by rw [norm_smul]
+    have h_scale_pos : δ / (2 * ‖ω‖) > 0 := div_pos hδ_pos (by linarith [norm_nonneg ω, hω])
+    rw [abs_of_pos h_scale_pos] at h_norm'
+    have h_ball : ω' ∈ Metric.ball (0 : SmoothForm n X k) δ := by
+      rw [Metric.mem_ball, dist_zero_right, h_norm']
+      calc δ / (2 * ‖ω‖) * ‖ω‖ = δ / 2 := by field_simp; ring
+        _ < δ := by linarith
+    specialize hδ_ball h_ball
+    rw [map_smul T, abs_mul, abs_of_pos h_scale_pos] at hδ_ball
+    calc |T.toFun ω| = (2 * ‖ω‖ / δ) * (δ / (2 * ‖ω‖) * |T.toFun ω|) := by
+          field_simp; ring
+      _ ≤ (2 * ‖ω‖ / δ) * 1 := by
+          apply mul_le_mul_of_nonneg_left (le_of_lt hδ_ball)
+          apply div_nonneg; linarith; exact le_of_lt hδ_pos
+      _ = (2 / δ) * ‖ω‖ := by ring
+
 
 /-- **Mass of a current** (Federer, 1969).
     The mass is the dual norm to the comass norm on forms:
@@ -275,6 +316,11 @@ theorem zero_add (T : Current n X k) : 0 + T = T := by
 theorem add_zero (T : Current n X k) : T + 0 = T := by
   ext ω
   show T.toFun ω + (0 : Current n X k).toFun ω = T.toFun ω
+  rw [zero_toFun]; ring
+
+theorem zero_sub (T : Current n X k) : 0 - T = -T := by
+  ext ω
+  show (0 : Current n X k).toFun ω + (-(T : Current n X k).toFun ω) = -T.toFun ω
   rw [zero_toFun]; ring
 
 /-- **Boundary operator on currents** (Federer, 1969).
