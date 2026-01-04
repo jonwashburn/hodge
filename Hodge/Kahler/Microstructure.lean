@@ -282,8 +282,12 @@ private theorem cast_cycle_toFun_eq_zero {k k' : ℕ} (h_eq : k = k')
 private theorem zeroCycleCurrent_toFun_eq_zero (k : ℕ) (hk : k ≥ 1) :
     (zeroCycleCurrent (n := n) (X := X) k hk).current.toFun = 0 := by
   unfold zeroCycleCurrent
-  apply cast_cycle_toFun_eq_zero
-  exact zeroCycleCurrent'_toFun_eq_zero (k - 1)
+  -- The cast preserves the zero function property
+  cases k with
+  | zero => omega
+  | succ k' =>
+    simp only [Nat.succ_sub_succ_eq_sub, Nat.sub_zero]
+    rfl
 
 /-- The underlying current of toIntegralCurrent is the zero current.
     This is proved by unfolding the construction, which returns zeroCycleCurrent
@@ -335,38 +339,6 @@ theorem calibration_defect_from_gluing (p : ℕ) (h : ℝ) (hh : h > 0) (C : Cub
       RawSheetSum.toIntegralCurrent_toFun_eq_zero (trivialRawSheetSum p h C)
     rw [h_zero, Current.mass_zero, Current.zero_toFun, sub_zero]
     exact mul_nonneg (comass_nonneg β) (le_of_lt hh)
-
-/-- The zero cycle current' has zero toFun. -/
-private theorem zeroCycleCurrent'_toFun_eq_zero (k' : ℕ) :
-    (zeroCycleCurrent' (n := n) (X := X) k').current.toFun = 0 := by
-  rfl
-
-/-- Casting a CycleIntegralCurrent preserves toFun being 0. -/
-private theorem cast_cycle_toFun_eq_zero {k k' : ℕ} (h_eq : k = k')
-    (c : CycleIntegralCurrent n X k') (hc : c.current.toFun = 0) :
-    (h_eq ▸ c).current.toFun = 0 := by
-  subst h_eq
-  exact hc
-
-/-- The zero cycle current has zero toFun. -/
-private theorem zeroCycleCurrent_toFun_eq_zero (k : ℕ) (hk : k ≥ 1) :
-    (zeroCycleCurrent (n := n) (X := X) k hk).current.toFun = 0 := by
-  unfold zeroCycleCurrent
-  apply cast_cycle_toFun_eq_zero
-  exact zeroCycleCurrent'_toFun_eq_zero (k - 1)
-
-/-- The underlying current of toIntegralCurrent is the zero current.
-    This is proved by unfolding the construction, which returns zeroCycleCurrent
-    or a zero integral current in all cases. -/
-theorem RawSheetSum.toIntegralCurrent_toFun_eq_zero {p : ℕ} {hscale : ℝ}
-    {C : Cubulation n X hscale} (T_raw : RawSheetSum n X p hscale C) :
-    T_raw.toIntegralCurrent.toFun = 0 := by
-  unfold RawSheetSum.toIntegralCurrent RawSheetSum.toCycleIntegralCurrent
-  by_cases h : 2 * (n - p) ≥ 1
-  · simp only [h, ↓reduceDIte]
-    exact zeroCycleCurrent_toFun_eq_zero (2 * (n - p)) h
-  · simp only [h, ↓reduceDIte]
-    rfl
 
 /-- **Mass bound for gluing construction** (Federer-Fleming, 1960).
     The integral current from gluing has mass bounded by a constant times the comass.

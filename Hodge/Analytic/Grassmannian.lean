@@ -316,20 +316,39 @@ theorem CalibratedConeAtFiber_convex (p : ℕ) (x : X) :
   exact PointedCone.convex _
 
 /-- Evaluate a SmoothForm at a point to get an element of the fiber. -/
-def SmoothForm.evalAt (α : SmoothForm n X k) (x : X) :
+def SmoothForm.evalAt {k : ℕ} (α : SmoothForm n X k) (x : X) :
     (TangentSpace (𝓒_complex n) x) [⋀^Fin k]→ₗ[ℝ] ℂ :=
   α.as_alternating x
+
+/-- Operator norm of an alternating map at a fiber.
+    Defined as the supremum of |φ(v)| over unit vectors.
+
+    This is the fiber-level analog of `pointwiseComass`. -/
+noncomputable def alternatingNormAtFiber {k : ℕ} (x : X)
+    (φ : (TangentSpace (𝓒_complex n) x) [⋀^Fin k]→ₗ[ℝ] ℂ) : ℝ :=
+  sSup { r : ℝ | ∃ v : Fin k → TangentSpace (𝓒_complex n) x,
+    (∀ i, ‖v i‖ ≤ 1) ∧ r = ‖φ v‖ }
+
+/-- Operator norm at fiber is non-negative. -/
+theorem alternatingNormAtFiber_nonneg {k : ℕ} (x : X)
+    (φ : (TangentSpace (𝓒_complex n) x) [⋀^Fin k]→ₗ[ℝ] ℂ) :
+    alternatingNormAtFiber (n := n) x φ ≥ 0 := by
+  unfold alternatingNormAtFiber
+  apply Real.sSup_nonneg
+  intro r hr
+  rcases hr with ⟨_, ⟨_, rfl⟩⟩
+  exact norm_nonneg _
 
 /-- The pointwise distance from a form to the fiber-level calibrated cone at x.
     This is the mathematically correct definition that matches the paper.
 
-    Mathematically: $d(\alpha_x, \mathcal{C}_x) = \inf_{\beta \in \mathcal{C}_x} \|\alpha_x - \beta\|$
+    Mathematically: $d(\alpha_x, \mathcal{C}_x) = \inf_{\beta \in \mathcal{C}_x} \|\alpha_x - \beta\|_{op}$
 
     Reference: [Harvey-Lawson, "Calibrated geometries", 1982, Section 3]. -/
 noncomputable def distToConeAtFiber (p : ℕ) (x : X)
     (αx : (TangentSpace (𝓒_complex n) x) [⋀^Fin (2 * p)]→ₗ[ℝ] ℂ) : ℝ :=
   sInf { r : ℝ | ∃ βx ∈ CalibratedConeAtFiber (n := n) p x,
-    r = ‖αx - βx‖ }
+    r = alternatingNormAtFiber (n := n) x (αx - βx) }
 
 /-- Distance to fiber-level cone is non-negative. -/
 theorem distToConeAtFiber_nonneg (p : ℕ) (x : X)
@@ -339,7 +358,7 @@ theorem distToConeAtFiber_nonneg (p : ℕ) (x : X)
   apply Real.sInf_nonneg
   intro r hr
   rcases hr with ⟨_, _, rfl⟩
-  exact norm_nonneg _
+  exact alternatingNormAtFiber_nonneg (n := n) x _
 
 /-- The pointwise distance from a SmoothForm to the calibrated cone at x,
     computed via the fiber-level cone. This is the preferred definition. -/
@@ -348,8 +367,9 @@ noncomputable def distToConeAtPoint (p : ℕ) (α : SmoothForm n X (2 * p)) (x :
 
 /-- Distance to cone at point is non-negative. -/
 theorem distToConeAtPoint_nonneg (p : ℕ) (α : SmoothForm n X (2 * p)) (x : X) :
-    distToConeAtPoint (n := n) p α x ≥ 0 :=
-  distToConeAtFiber_nonneg (n := n) p x (α.evalAt x)
+    distToConeAtPoint (n := n) p α x ≥ 0 := by
+  unfold distToConeAtPoint
+  exact distToConeAtFiber_nonneg (n := n) p x (α.evalAt x)
 
 /-- The global cone defect via fiber-level definition:
     supremum over x of the pointwise distance to the calibrated cone. -/
@@ -378,38 +398,28 @@ above should be preferred for cone membership and distance calculations.
     This theorem asserts that the pointwise-defined simple calibrated form
     (which is nonzero only at point x) satisfies `IsSmoothAlternating`.
 
+    **IMPORTANT: Prefer the fiber-level definitions instead.**
+    The fiber-level calibrated cone `CalibratedConeAtFiber` and distance function
+    `distToConeAtFiber` are defined above and should be preferred for:
+    - Cone membership tests
+    - Distance calculations
+    - Convexity/closure properties
+    These work directly with alternating maps at each fiber, matching the
+    mathematical definition in Harvey-Lawson and avoiding this interface issue.
+
     **Mathematical Reality:**
     A form that equals ω_x at point x and 0 elsewhere does NOT have continuous
     pointwise norm in the standard topology (the norm has a jump discontinuity at x).
     This is a fundamental limitation, not a gap in our proof.
 
-    **Why this is acceptable in this formalization:**
+    **Why this sorry exists:**
+    The `SmoothForm` type packages pointwise alternating maps with a global
+    smoothness predicate (`IsSmoothAlternating`). Point-supported forms violate
+    this predicate. This definition is kept only for legacy compatibility with
+    `calibratedCone` (the SmoothForm-level cone), which should be migrated to
+    use `CalibratedConeAtFiber` instead.
 
-    1. **Calibrated Cone Usage**: The `calibratedCone` is defined as the closure of the
-       pointed cone spanned by simple calibrated forms. The closure operation and
-       convex cone properties are purely algebraic/topological constructions on the
-       `SmoothForm` type. The actual smoothness predicate is not interrogated.
-
-    2. **Downstream Proofs**: All theorems using `calibratedCone` (e.g., membership,
-       cone properties, integration) use:
-       - Algebraic operations (addition, scalar multiplication)
-       - Cone membership via linear combinations
-       - Pointwise evaluation at specific points
-       None of these require the global continuity of the norm function.
-
-    3. **Alternative Formalizations**: A rigorous treatment would either:
-       (a) Use bump function approximations: ψ_ε(y) · ω_x where ψ_ε is a smooth
-           bump function centered at x with support shrinking to {x} as ε → 0.
-       (b) Work with currents/distributions instead of smooth forms.
-       (c) Define `CalibratedCone` using alternating maps directly, not SmoothForm.
-
-    4. **Classical References**: In Harvey-Lawson "Calibrated Geometries" (1982),
-       the calibrated cone is defined at the level of tangent spaces, not as
-       global smooth forms. Our formalization packages this into SmoothForm for
-       compatibility with the smooth form infrastructure.
-
-    For the current formalization, this `sorry` represents an interface assumption
-    that bridges the pointwise construction with the global smooth form type. -/
+    Reference: [Harvey-Lawson, "Calibrated geometries", 1982, Section 2]. -/
 theorem simpleCalibratedForm_smooth (p : ℕ) (x : X) (V : Submodule ℂ (TangentSpace (𝓒_complex n) x))
     (hV : Module.finrank ℂ V = p) :
     IsSmoothAlternating n X (2 * p) (fun y => by
