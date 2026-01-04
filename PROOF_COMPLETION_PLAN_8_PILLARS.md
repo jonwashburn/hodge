@@ -129,7 +129,7 @@ instance instNormedSpaceTangentSpace (x : X) : NormedSpace ℂ (TangentSpace (�
 | Classical/Bergman.lean | 3 |
 | Other files | 12 |
 
-**Total: 132 → 42 axioms (90 eliminated, 68% reduction)**
+**Total: 132 → 41 axioms (91 eliminated, 69% reduction)**
 
 **Latest (session 2):**
 - `Norms.lean`: `pointwiseComass_set_nonempty` → theorem (zero vector witness)
@@ -154,6 +154,7 @@ instance instNormedSpaceTangentSpace (x : X) : NormedSpace ℂ (TangentSpace (�
 - `Currents.lean`: `map_smul` → proved using `is_linear r ω 0` and `map_zero'`
 - `Currents.lean`: `neg_zero_current` → proved using new `ext'` theorem and `ring`
 - `Currents.lean`: `mass_add_le` → proved using `abs_add_le` and `le_csSup`
+- `Currents.lean`: `mass_smul` → proved using `Monotone.map_csSup_of_continuousAt`
 
 ---
 
@@ -175,7 +176,7 @@ instance instNormedSpaceTangentSpace (x : X) : NormedSpace ℂ (TangentSpace (�
 
 **Infrastructure axioms requiring major work:**
 - Forms.lean (6): `isSmoothAlternating_add/smul`, `extDerivLinearMap`, `smoothExtDeriv_extDeriv/continuous`, `instTopologicalSpace`
-- Currents.lean (2): `is_bounded`, `mass_smul`
+- Currents.lean (1): `is_bounded`
 - Norms.lean (6): `pointwiseComass_*`, `comass_smul`, `instNormedAddCommGroup/Space`
 - Others (18): TypeDecomposition (3), Microstructure (2), Grassmannian (2), SheafTheory (3), etc.
 
@@ -193,7 +194,7 @@ instance instNormedSpaceTangentSpace (x : X) : NormedSpace ℂ (TangentSpace (�
 | File | Axioms | Notes |
 |------|--------|-------|
 | Analytic/Forms.lean | 6 | Form axioms |
-| Analytic/Currents.lean | 2 | Current axioms |
+| Analytic/Currents.lean | 1 | Current axioms |
 | Analytic/Norms.lean | 6 | Norm infrastructure |
 | Kahler/TypeDecomposition.lean | 3 | kahlerPow axioms |
 | Kahler/Main.lean | 3 | Main theorem axioms (2 pillars + 1) |
@@ -211,7 +212,7 @@ instance instNormedSpaceTangentSpace (x : X) : NormedSpace ℂ (TangentSpace (�
 | Analytic/IntegralCurrents.lean | 1 | Polyhedral boundary |
 | Kahler/Manifolds.lean | 1 | lefschetzLambdaLinearMap |
 | Utils/BaranyGrinberg.lean | 1 | Combinatorics (not imported) |
-| **TOTAL** | **42** |
+| **TOTAL** | **41** |
 
 ---
 
@@ -219,7 +220,7 @@ instance instNormedSpaceTangentSpace (x : X) : NormedSpace ℂ (TangentSpace (�
 
 **High priority (quick wins remaining):**
 1. **Forms.lean (6 axioms)**: `isSmoothAlternating_add`, `isSmoothAlternating_smul`, `extDerivLinearMap`, `smoothExtDeriv_extDeriv`, `smoothExtDeriv_continuous`, `instTopologicalSpace`
-2. **Currents.lean (2 axioms)**: `is_bounded`, `mass_smul`
+2. **Currents.lean (1 axiom)**: `is_bounded`
 3. **Norms.lean (6 axioms)**: `pointwiseComass_set_bddAbove`, `pointwiseComass_smul`, `comass_smul`, `instNormedAddCommGroupSmoothForm`, `instNormedSpaceRealSmoothForm`
 
 **Blockers identified:**
