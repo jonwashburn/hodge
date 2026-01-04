@@ -86,7 +86,10 @@ theorem IsAnalyticSet_isClosed {n : ℕ} {X : Type*}
   | union S T _ _ ihS ihT => exact IsClosed.union ihS ihT
   | inter S T _ _ ihS ihT => exact IsClosed.inter ihS ihT
 
-/-- Axiom: Positive-dimensional complex manifolds are nontrivial (have at least two points). -/
+/-- Axiom: Positive-dimensional complex manifolds are nontrivial (have at least two points).
+    **Justification**: A manifold modeled on EuclideanSpace ℂ (Fin n) with n ≥ 1 has charts
+    that are local homeomorphisms to ℂⁿ. Since ℂⁿ is infinite for n ≥ 1, the manifold
+    must have more than one point. The proof requires metric space API details. -/
 axiom nontrivial_of_dim_pos {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [Nonempty X] (hn : n ≥ 1) : Nontrivial X
