@@ -81,6 +81,14 @@ notation "⟦" ω "," h "⟧" => ofForm ω h
 
 instance (k : ℕ) : Zero (DeRhamCohomologyClass n X k) := ⟨⟦0, isFormClosed_zero⟧⟩
 
+/-- Casting zero across cohomology degrees gives zero.
+    This holds because both zeros are quotients of the zero closed form,
+    and the cast preserves the quotient structure. -/
+theorem DeRhamCohomologyClass.cast_zero {k₁ k₂ : ℕ} (h : k₁ = k₂) :
+    h ▸ (0 : DeRhamCohomologyClass n X k₁) = (0 : DeRhamCohomologyClass n X k₂) := by
+  subst h
+  rfl
+
 /-! ### Well-definedness axioms -/
 
 theorem cohomologous_add {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]

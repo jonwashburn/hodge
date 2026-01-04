@@ -298,20 +298,8 @@ theorem lefschetz_lift_signed_cycle {p : ℕ}
       lefschetz_power n X (2 * (n - p)) (p - (n - p)) (ofForm η hη) = 0 := by
     rw [h_Lk_zero]
     -- Now goal is: (lefschetz_degree_eq n p hp) ▸ (0 : DeRhamCohomologyClass ...) = 0
-    -- This requires showing that casting zero across cohomology degrees gives zero.
-    --
-    -- Mathematical argument: The zero form has type SmoothForm n X k for any k,
-    -- and 0 : DeRhamCohomologyClass n X k = ⟦0, isFormClosed_zero⟧ is defined uniformly.
-    -- When we cast via Eq.rec along a proof that k₁ = k₂, the quotient element ⟦0, _⟧
-    -- in degree k₁ maps to ⟦0, _⟧ in degree k₂.
-    --
-    -- Technical gap: Lean's dependent type system doesn't automatically see that
-    -- (h ▸ 0) = 0 when both zeros are defined as Quotient.mk of the zero form.
-    -- This would require a custom cast_zero lemma for DeRhamCohomologyClass.
-    --
-    -- For now, we accept this as a technical infrastructure gap. The mathematical
-    -- content (that casting zero gives zero) is clear.
-    sorry
+    -- Use the cast_zero lemma for DeRhamCohomologyClass
+    exact DeRhamCohomologyClass.cast_zero (lefschetz_degree_eq n p hp)
   -- Step 4: ofForm γ hγ = 0
   have h_γ_zero : ofForm γ hγ = 0 := by
     rw [h_lef, h_cast_zero]
