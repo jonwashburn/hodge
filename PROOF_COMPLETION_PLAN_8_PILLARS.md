@@ -579,3 +579,23 @@ The mathematical content is now properly captured in `hard_lefschetz_inverse_for
 as part of Pillar 6, making the axiom structure cleaner.
 
 **Current state:** Main.lean has 0 non-pillar axioms (pillar axioms: `harvey_lawson_fundamental_class`, `omega_pow_algebraic`).
+
+---
+
+## Forms.lean Status
+
+**Two remaining sorrys with complete mathematical justifications:**
+
+1. **`isSmoothAlternating_add`** (line 157): Prove continuity of operator norm for sum
+   - Uses Berge's Maximum Theorem for continuous dependence of suprema
+   - The triangle inequality gives upper bound continuity
+   - Full proof requires parametric optimization theory
+
+2. **`bddAbove`** k > 0 case (line 368): Prove multilinear map bound exists
+   - Direct basis expansion argument documented in comments
+   - Pick real orthonormal basis, expand via multilinearity
+   - Apply triangle inequality to get C = ∑_J ‖f(e_J)‖
+   - Reference: Rudin "Functional Analysis" Ch. 1-2
+
+**Mathematical content:** Both results are standard in finite-dimensional functional
+analysis. The proofs are complete in comments; only Lean formalization is deferred.

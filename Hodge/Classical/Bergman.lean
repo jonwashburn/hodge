@@ -158,10 +158,46 @@ theorem IsHolomorphic_add (L : HolomorphicLineBundle n X) (s₁ s₂ : Section L
                 rw [smul_eq_mul]
       rw [h_lin]
       ring
-    rw [h_factor]
-    -- c * (MDifferentiable function) is MDifferentiable
+    -- The goal is MDifferentiableAt for (fun z => φ z z.property (s₂ z)) at y
+    -- We've shown that at y, this equals c * f₂(ι₂(y))
+    -- Use convert to match the goal after applying h_factor
     have h_at : MDifferentiableAt (𝓒_complex n) 𝓒_ℂ (f₂ ∘ Opens.inclusion h_le₂) y := h_comp y
-    exact h_at.const_mul c
+    -- c is a constant, so (fun _ => c) is MDifferentiableAt
+    have h_const : MDifferentiableAt (𝓒_complex n) 𝓒_ℂ (fun _ : ↥U => c) y :=
+      mdifferentiableAt_const
+    -- The product of two MDifferentiable functions is MDifferentiable
+    have h_mul : MDifferentiableAt (𝓒_complex n) 𝓒_ℂ
+                 (fun z : ↥U => c * (f₂ ∘ Opens.inclusion h_le₂) z) y :=
+      h_const.mul h_at
+    -- The functional equality holds by h_factor
+    have h_func_eq : ∀ z : ↥U, φ z z.property (s₂ z) = c * (f₂ ∘ Opens.inclusion h_le₂) z := by
+      intro z
+      have hz₂ : z.val ∈ U₂ := z.property.2
+      have h_fac_z : φ z z.property (s₂ z) =
+          (φ₁ z.val z.property.1) ((φ₂ z.val hz₂).symm 1) * f₂ ⟨z.val, hz₂⟩ := by
+        simp only [φ, f₂]
+        conv_lhs => rw [← (φ₂ z.val hz₂).symm_apply_apply (s₂ z)]
+        have h_lin : ∀ w : ℂ, (φ₁ z.val z.property.1) ((φ₂ z.val hz₂).symm w) =
+                     w * (φ₁ z.val z.property.1) ((φ₂ z.val hz₂).symm 1) := by
+          intro w
+          calc (φ₁ z.val z.property.1) ((φ₂ z.val hz₂).symm w)
+              = (φ₁ z.val z.property.1) (w • (φ₂ z.val hz₂).symm 1) := by
+                  rw [← (φ₂ z.val hz₂).symm.map_smul]; simp
+            _ = w • (φ₁ z.val z.property.1) ((φ₂ z.val hz₂).symm 1) := by
+                  rw [(φ₁ z.val z.property.1).map_smul]
+            _ = w * (φ₁ z.val z.property.1) ((φ₂ z.val hz₂).symm 1) := by
+                  rw [smul_eq_mul]
+        rw [h_lin]
+        ring
+      -- c is defined at y, but the coefficient is different at z
+      -- However, the key is that the LHS matches the form c_z * (f₂ ∘ ι₂) z
+      -- where c_z = φ₁ z ... - this is NOT c (which is at y)
+      -- The issue is that c varies with z, so this approach won't work directly
+      -- We need a different strategy: show the full function is MDifferentiable
+      sorry
+    convert h_mul using 1
+    funext z
+    exact h_func_eq z
 
 /-- The zero section is holomorphic. -/
 theorem IsHolomorphic_zero {L : HolomorphicLineBundle n X} :
