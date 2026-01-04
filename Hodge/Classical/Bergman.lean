@@ -179,13 +179,9 @@ theorem IsHolomorphic_add (L : HolomorphicLineBundle n X) (s₁ s₂ : Section L
     have h_c_mdiff : MDifferentiable (𝓒_complex n) 𝓒_ℂ c_func := by
       -- The transition coefficient φ₁ ∘ φ₂⁻¹ evaluated at 1 is holomorphic
       -- This is the content of the bundle's transition_holomorphic axiom
-      -- For now, we use a pointwise argument: at each z, c_func z is a specific complex number
-      -- The full axiom would give smoothness in z. We use mdifferentiableAt_const as an
-      -- approximation (valid because the placeholder bundle has trivial transitions)
-      intro z
+      -- For now, we mark this as an infrastructure hole.
       -- In a full proof, we would use L.transition_holomorphic U₁ U₂ φ₁ φ₂
-      -- For the placeholder bundle structure, use that transitions are locally constant
-      exact mdifferentiableAt_const
+      sorry
     -- Product of MDifferentiable functions is MDifferentiable
     exact h_c_mdiff.mul h_f₂_comp
 
