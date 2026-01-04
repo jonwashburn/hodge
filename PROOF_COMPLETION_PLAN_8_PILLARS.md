@@ -257,6 +257,65 @@ instance instNormedSpaceTangentSpace (x : X) : NormedSpace ℂ (TangentSpace (�
 
 ---
 
+## 🔧 PHASE 2: THE HARD MATH (Current Phase)
+
+**Status**: We have reduced axioms from 132 → 41 (69% reduction). The remaining 33 non-pillar axioms require genuine mathematical work, not just Lean API manipulation.
+
+**Decision**: We acknowledge this is hard and commit to grinding through it systematically.
+
+### Work Package 1: AlternatingMap Norm Infrastructure (~12 axioms)
+
+**Goal**: Prove that alternating maps on finite-dimensional spaces are bounded on the unit ball.
+
+**Tasks**:
+1. Define/derive `Norm` instance for `AlternatingMap` on `EuclideanSpace ℂ (Fin n)`
+2. Prove `pointwiseComass_set_bddAbove` using multilinear boundedness
+3. Prove `isSmoothAlternating_add` and `isSmoothAlternating_smul` using triangle inequality
+4. Complete `comass_smul`, `pointwiseComass_smul` proofs
+
+**Approach**: Use that `TangentSpace (𝓒_complex n) x ≃ EuclideanSpace ℂ (Fin n)` is finite-dimensional, so continuous multilinear maps are bounded.
+
+### Work Package 2: Real Wedge Product (~6 axioms)
+
+**Goal**: Replace `smoothWedge := 0` stub with actual exterior product.
+
+**Tasks**:
+1. Define wedge product using Mathlib's `exteriorPower` or `AlternatingMap.curryLeft`
+2. Prove wedge product properties (associativity, graded commutativity)
+3. Define `kahlerPow` as actual powers of the Kähler form
+4. Prove `omega_pow_IsFormClosed`, `omega_pow_is_rational_TD`
+
+**Approach**: Use `AlternatingMap.mul` or construct via tensor products and antisymmetrization.
+
+### Work Package 3: Deep Mathematical Results (~15 axioms)
+
+**Goal**: Either prove from first principles or accept as additional classical inputs.
+
+| Axiom | Difficulty | Strategy |
+|-------|------------|----------|
+| `polyhedral_boundary` | Medium | Prove from simplex combinatorics |
+| `serre_vanishing` | Hard | May need as 9th pillar |
+| `lefschetz_operator` | Medium | Define via wedge with Kähler form |
+| `IsHolomorphic_add` | Easy | Should follow from linearity |
+| `nontrivial_of_dim_pos` | Medium | Metric space API work |
+| `structureSheaf_*` | Hard | Sheaf theory infrastructure |
+| `calibration_defect_*` | Hard | GMT machinery |
+| `flat_limit_existence` | Hard | Compactness argument |
+
+### Prioritized Execution Order
+
+1. **Week 1**: AlternatingMap norm (unblocks ~12 axioms)
+2. **Week 2**: Wedge product (unblocks ~6 axioms)  
+3. **Week 3+**: Deep results (case by case)
+
+### Success Criteria
+
+- **Target**: 8 pillar axioms only
+- **Acceptable**: 8 pillars + up to 5 "infrastructure lemmas" that are clearly true but tedious
+- **Current**: 41 axioms (8 pillars + 33 infrastructure)
+
+---
+
 **Deliverables** (after Basic.lean is fixed)
 - **Use Mathlib forms**: switch to `Mathlib.Analysis.Calculus.DifferentialForm` (or the most appropriate existing Mathlib bundle-of-forms construction).
 - **Eliminate**:
