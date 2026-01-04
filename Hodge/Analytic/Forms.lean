@@ -278,29 +278,36 @@ instance (k : ℕ) : Neg (ClosedForm n X k) := ⟨fun ω => ⟨-ω.val, isFormCl
 instance (k : ℕ) : Zero (ClosedForm n X k) := ⟨⟨0, isFormClosed_zero⟩⟩
 end ClosedForm
 
-/-- **Wedge Product of Smooth Forms** (Placeholder).
+/-- **Wedge Product of Smooth Forms** (Placeholder with documented implementation path).
 
     The wedge product `ω ∧ η` of a k-form and an l-form is a (k+l)-form.
 
     **Mathematical Content**: For forms ω ∈ Ωᵏ(X) and η ∈ Ωˡ(X), the wedge product is:
     `(ω ∧ η)(v₁,...,vₖ₊ₗ) = (1/k!l!) Σ_σ sign(σ) ω(v_σ(1),...,v_σ(k)) η(v_σ(k+1),...,v_σ(k+l))`
 
-    **Mathlib Status**: `AlternatingMap.domCoprod` implements this for algebraic alternating maps.
-    For continuous alternating maps (`ContinuousAlternatingMap`), no wedge product exists yet.
+    **Implementation Path** (using Mathlib infrastructure):
+    1. Use `AlternatingMap.domCoprod` to get `E [⋀^Fin k ⊕ Fin l]→ₗ[ℝ] (ℂ ⊗[ℝ] ℂ)`
+    2. Compose with `LinearMap.mul' ℝ ℂ : ℂ ⊗[ℝ] ℂ →ₗ[ℝ] ℂ` (multiplication)
+    3. Reindex using `finSumFinEquiv : Fin k ⊕ Fin l ≃ Fin (k + l)`
+    4. Lift to `ContinuousAlternatingMap` via `AlternatingMap.mkContinuous`
+       (requires proving finite-dimensional boundedness)
+    5. Prove `fiberWedge` is continuous in both arguments (bilinear → continuous in fin-dim)
+    6. Prove all bilinearity properties from `AlternatingMap.domCoprod` bilinearity
 
-    **Implementation**: Currently uses zero as a placeholder. A real implementation would:
-    1. Convert `ContinuousAlternatingMap` to `AlternatingMap` (forgetting continuity)
-    2. Apply `AlternatingMap.domCoprod` with target in `ℂ ⊗ ℂ ≃ ℂ`
-    3. Use `Fin k ⊕ Fin l ≃ Fin (k + l)` to adjust indices
-    4. Prove the result is still continuous (finite-dimensional, automatic)
+    **Current Status**: Placeholder (returns 0). The implementation outline above is complete
+    but requires proving several infrastructure lemmas about finite-dimensional continuity
+    and bilinearity. These are standard results but require careful handling of Mathlib's
+    alternating map infrastructure.
 
-    **Key Properties** (satisfied by placeholder):
+    **Key Properties** (proven trivially from placeholder, would need real proofs):
     - Bilinearity: (ω₁ + ω₂) ∧ η = ω₁ ∧ η + ω₂ ∧ η, etc.
     - Graded commutativity: ω ∧ η = (-1)^{kl} η ∧ ω
     - Associativity: (ω ∧ η) ∧ ξ = ω ∧ (η ∧ ξ)
     - Leibniz rule: d(ω ∧ η) = dω ∧ η + (-1)^k ω ∧ dη -/
 def smoothWedge {k l : ℕ} (_ω : SmoothForm n X k) (_η : SmoothForm n X l) : SmoothForm n X (k + l) := 0
--- TODO: Implement using AlternatingMap.domCoprod once ContinuousAlternatingMap has wedge support
+-- Implementation path documented above. The algebraic formula using domCoprod is:
+-- let ab := a.domCoprod b; let ab' := (LinearMap.mul' ℝ ℂ).compAlternatingMap ab
+-- ab'.domDomCongr finSumFinEquiv
 notation:67 ω:68 " ⋏ " η:68 => smoothWedge ω η
 
 -- Note: Trivial since smoothWedge := 0; with real implementation, use Leibniz rule + d∘d=0
