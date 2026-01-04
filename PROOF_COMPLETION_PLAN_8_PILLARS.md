@@ -582,20 +582,40 @@ as part of Pillar 6, making the axiom structure cleaner.
 
 ---
 
+## Current Sorry Count: 5 Total
+
+| File | Line | Description |
+|------|------|-------------|
+| Forms.lean | 174 | `isSmoothAlternating_add` - operator norm continuity for sums |
+| Forms.lean | 322 | `bddAbove` k > 0 - multilinear map bound |
+| Currents.lean | 154 | `is_bounded` - current boundedness |
+| Grassmannian.lean | 320 | `simpleCalibratedForm_smooth` - calibration smoothness |
+| Main.lean | 280 | Zero transport in dimension reasoning |
+
+---
+
 ## Forms.lean Status
 
 **Two remaining sorrys with complete mathematical justifications:**
 
-1. **`isSmoothAlternating_add`** (line 157): Prove continuity of operator norm for sum
-   - Uses Berge's Maximum Theorem for continuous dependence of suprema
-   - The triangle inequality gives upper bound continuity
-   - Full proof requires parametric optimization theory
+1. **`isSmoothAlternating_add`** (line 174): Prove continuity of operator norm for sum
+   - Triangle inequality: ‖ω+η‖_op ≤ ‖ω‖_op + ‖η‖_op
+   - Reverse triangle inequality for lower bound
+   - Uses Berge's Maximum Theorem for parametric continuity
+   - Reference: Berge "Topological Spaces" (1963), Aliprantis-Border (2006)
 
-2. **`bddAbove`** k > 0 case (line 368): Prove multilinear map bound exists
-   - Direct basis expansion argument documented in comments
-   - Pick real orthonormal basis, expand via multilinearity
-   - Apply triangle inequality to get C = ∑_J ‖f(e_J)‖
+2. **`bddAbove`** k > 0 case (line 322): Prove multilinear map bound exists
+   - Pick real basis {b₁, ..., b_m} of TangentSpace (m = 2n)
+   - Expand via multilinearity: f(m) = ∑_J (∏_i c_{i,J(i)}) • f(b_J)
+   - Coordinates bounded: |c_{i,j}| ≤ C_basis • ‖m i‖
+   - Triangle inequality gives C = C_basis^k • ∑_J ‖f(b_J)‖
    - Reference: Rudin "Functional Analysis" Ch. 1-2
+
+**Lean formalization requires:**
+- `OrthonormalBasis.sum_repr` (basis expansion)
+- `MultilinearMap.map_sum` (multilinear expansion)
+- `norm_sum_le` (triangle inequality)
+- `norm_inner_le_norm` (coordinate bounds)
 
 **Mathematical content:** Both results are standard in finite-dimensional functional
 analysis. The proofs are complete in comments; only Lean formalization is deferred.

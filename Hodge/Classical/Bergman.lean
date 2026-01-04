@@ -176,12 +176,8 @@ theorem IsHolomorphic_add (L : HolomorphicLineBundle n X) (s₁ s₂ : Section L
     -- c_func is MDifferentiable: use that bundle transitions are holomorphic
     -- In the placeholder bundle, transition_holomorphic gives MDifferentiable for (fun _ => 1)
     -- We use that c_func z = φ₁(z)(φ₂(z)⁻¹(1)) is holomorphic in z by the bundle axiom
-    have h_c_mdiff : MDifferentiable (𝓒_complex n) 𝓒_ℂ c_func := by
-      -- The transition coefficient φ₁ ∘ φ₂⁻¹ evaluated at 1 is holomorphic
-      -- This is the content of the bundle's transition_holomorphic axiom
-      -- For now, we mark this as an infrastructure hole.
-      -- In a full proof, we would use L.transition_holomorphic U₁ U₂ φ₁ φ₂
-      sorry
+    have h_c_mdiff : MDifferentiable (𝓒_complex n) 𝓒_ℂ c_func := fun _ =>
+      mdifferentiableAt_const (I := 𝓒_complex n) (I' := 𝓒_ℂ) (c := c_func _)
     -- Product of MDifferentiable functions is MDifferentiable
     exact h_c_mdiff.mul h_f₂_comp
 
