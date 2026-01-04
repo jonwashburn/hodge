@@ -256,7 +256,11 @@ around Proposition~\ref{prop:almost-calibration} in `Hodge-v6-w-Jon-Update-MERGE
 /-- **Zero current bound**: the calibration defect of the zero current is zero. -/
 theorem calibrationDefect_zero {k : ℕ} (ψ : CalibratingForm n X k) :
     calibrationDefect (0 : Current n X k) ψ = 0 := by
-  simp [calibrationDefect, Current.mass_zero]
+  unfold calibrationDefect
+  -- The zero current has mass 0 and evaluates to 0 on all forms
+  have h1 : Current.mass (0 : Current n X k) = 0 := Current.mass_zero
+  have h2 : (0 : Current n X k).toFun ψ.form = 0 := rfl
+  simp only [h1, h2, sub_self]
 
 /-- **Zero current bound (inequality form)**: `Def_cal(0) ≤ B` for any `0 ≤ B`. -/
 theorem zero_current_bound {k : ℕ} (ψ : CalibratingForm n X k) (B : ℝ) (hB : 0 ≤ B) :
@@ -290,10 +294,12 @@ theorem calibration_defect_inequality {k : ℕ} (S U : Current n X k) (ψ : Cali
             simp [h_eval]
     _ = (Current.mass S - S.toFun ψ.form) + (Current.mass U + U.toFun ψ.form) := by ring
     _ = Current.mass U + U.toFun ψ.form := by
-            have h0 : Current.mass S - S.toFun ψ.form = 0 := by linarith [hS]
-            simp [h0]
+            -- hS : isCalibrated S ψ means Current.mass S = S.toFun ψ.form
+            unfold isCalibrated at hS
+            simp only [hS, sub_self, zero_add]
     _ ≤ Current.mass U + Current.mass U := by
-            exact add_le_add_left hU _
+            -- `add_le_add_right` adds the same term on the left: a + b ≤ a + c
+            exact add_le_add_right hU (Current.mass U)
     _ = 2 * Current.mass U := by ring
 
 /-- Two-sided “almost-calibration” bound: `0 ≤ Def_cal(S-U) ≤ 2 Mass(U)` when `S` is calibrated. -/

@@ -11,6 +11,43 @@ This document outlines a phased plan to replace vacuous definitions with real ma
 
 ---
 
+## Implementation Status (Updated)
+
+### Completed Changes
+
+1. **FundamentalClassSet is now opaque** (GAGA.lean)
+   - Changed from `def ... := 0` to `opaque` with explicit axioms
+   - Added 5 new infrastructure axioms for its properties:
+     - `FundamentalClassSet_isClosed`
+     - `FundamentalClassSet_empty`
+     - `FundamentalClassSet_is_p_p`
+     - `FundamentalClassSet_additive`
+     - `FundamentalClassSet_rational`
+
+2. **lefschetz_lift_signed_cycle is now an axiom** (Main.lean)
+   - Was a "theorem" with vacuous proof (relied on all cycle classes = 0)
+   - Now properly axiomatized as infrastructure for Lefschetz lifting
+
+3. **Build errors fixed** in:
+   - `Grassmannian.lean` - type coercions
+   - `Bergman.lean` - transition holomorphicity (1 sorry remains)
+   - `Cone.lean` - calibrated cone definitions
+   - `Microstructure.lean` - arithmetic and Current lemmas
+
+### Current Axiom Count: 15
+
+| Category | Axioms | Notes |
+|----------|--------|-------|
+| 8 Classical Pillars | 8 | Fed-Flem, Mass LSC, GAGA, Spine, Harvey-Lawson, Hard Lefschetz (2), ω^p algebraic |
+| Fundamental Class Infrastructure | 5 | Properties of the opaque FundamentalClassSet |
+| Lefschetz Lift | 1 | Cycle construction via hyperplane intersection |
+| Cone Interior | 1 | exists_uniform_interior_radius |
+
+### Remaining Sorrys: 1
+- `Bergman.lean:190` - Bundle transition holomorphicity (infrastructure placeholder)
+
+---
+
 ## Current State (Vacuous Definitions)
 
 | Definition | File:Line | Current Value | Impact |
