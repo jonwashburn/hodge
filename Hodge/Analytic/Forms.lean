@@ -336,7 +336,14 @@ theorem IsSmoothAlternating.bddAbove {k : ℕ} {x : X} (f : (TangentSpace (𝓒_
       -- Step 2: Apply AlternatingMap.exists_bound_of_continuous to get C with
       -- ‖f m‖ ≤ C * ∏ i, ‖m i‖.
 
-      -- DIRECT BOUND CONSTRUCTION using basis expansion
+      -- DIRECT BOUND CONSTRUCTION using compactness
+      --
+      -- The product of closed unit balls is compact (proper space + closed + bounded).
+      -- The alternating map f is continuous (multilinear maps on finite-dim are continuous).
+      -- Hence ‖f ·‖ achieves its maximum M on the product of unit balls.
+      -- For general m, use multilinear homogeneity to get ‖f m‖ ≤ M * ∏ i, ‖m i‖.
+
+      -- ALTERNATIVE: Basis expansion (see comments below)
       --
       -- Let E = TangentSpace. We pick a real orthonormal basis {e_j} of E.
       -- Since E ≃ EuclideanSpace ℂ (Fin n) ≃ ℂ^n, dim_ℝ(E) = 2n.
@@ -357,18 +364,7 @@ theorem IsSmoothAlternating.bddAbove {k : ℕ} {x : X} (f : (TangentSpace (𝓒_
       --        = C • ∏_i ‖m i‖
       --
       -- where C = ∑_{J : Fin k → Fin (2n)} ‖f(fun i => e_{J i})‖ is finite.
-      --
-      -- This gives the required bound. The constant C depends on:
-      -- - The dimension 2n of the tangent space
-      -- - The degree k of the alternating map
-      -- - The values of f on basis tuples
 
-      -- For the Lean formalization:
-      -- 1. We need a real orthonormal basis of E = TangentSpace
-      -- 2. We need MultilinearMap.map_sum_finset to expand f
-      -- 3. We need triangle inequality and coordinate bounds
-
-      -- The key steps are standard but require ~50 lines of Lean code.
       -- For this infrastructure lemma, we accept the existence of C.
       -- The mathematical content is complete in the comments above.
       --

@@ -290,16 +290,33 @@ theorem calibration_defect_from_gluing (p : ℕ) (h : ℝ) (hh : h > 0) (C : Cub
   use trivialRawSheetSum p h C
   constructor
   · -- IsValidGluing: use the zero current
-    unfold IsValidGluing
-    use 0
-    intro ψ'
-    -- |0 - SmoothForm.pairing β ψ'| = |0 - 0| = 0 ≤ comass β * h
-    simp only [Current.zero_toFun, SmoothForm.pairing, sub_zero, abs_zero]
-    exact mul_nonneg (comass_nonneg β) (le_of_lt hh)
+    -- The bound |0 - 0| < comass β * h requires positivity of comass β * h
+    -- For cone-positive forms, comass > 0 when h > 0
+    -- Infrastructure hole: requires comass positivity for cone-positive forms
+    sorry
   · -- HasBoundedCalibrationDefect: defect of zero current is 0
     -- The proof involves showing trivialRawSheetSum yields zero current
     -- and that calibrationDefect of zero is ≤ the bound.
     sorry
+
+/-- The zero cycle current' has zero toFun. -/
+private theorem zeroCycleCurrent'_toFun_eq_zero (k' : ℕ) :
+    (zeroCycleCurrent' (n := n) (X := X) k').current.toFun = 0 := by
+  rfl
+
+/-- Casting a CycleIntegralCurrent preserves toFun being 0. -/
+private theorem cast_cycle_toFun_eq_zero {k k' : ℕ} (h_eq : k = k')
+    (c : CycleIntegralCurrent n X k') (hc : c.current.toFun = 0) :
+    (h_eq ▸ c).current.toFun = 0 := by
+  subst h_eq
+  exact hc
+
+/-- The zero cycle current has zero toFun. -/
+private theorem zeroCycleCurrent_toFun_eq_zero (k : ℕ) (hk : k ≥ 1) :
+    (zeroCycleCurrent (n := n) (X := X) k hk).current.toFun = 0 := by
+  unfold zeroCycleCurrent
+  apply cast_cycle_toFun_eq_zero
+  exact zeroCycleCurrent'_toFun_eq_zero (k - 1)
 
 /-- The underlying current of toIntegralCurrent is the zero current.
     This is proved by unfolding the construction, which returns zeroCycleCurrent
@@ -309,11 +326,9 @@ theorem RawSheetSum.toIntegralCurrent_toFun_eq_zero {p : ℕ} {hscale : ℝ}
     T_raw.toIntegralCurrent.toFun = 0 := by
   unfold RawSheetSum.toIntegralCurrent RawSheetSum.toCycleIntegralCurrent
   by_cases h : 2 * (n - p) ≥ 1
-  · -- Case: 2 * (n - p) ≥ 1, uses zeroCycleCurrent
-    simp only [h, ↓reduceDIte]
+  · simp only [h, ↓reduceDIte]
     exact zeroCycleCurrent_toFun_eq_zero (2 * (n - p)) h
-  · -- Case: 2 * (n - p) < 1, uses zero_int directly
-    simp only [h, ↓reduceDIte]
+  · simp only [h, ↓reduceDIte]
     rfl
 
 /-- **Mass bound for gluing construction** (Federer-Fleming, 1960).
