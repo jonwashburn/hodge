@@ -335,7 +335,7 @@ theorem isFormClosed_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm 
   intros _ _
   -- `smoothExtDeriv` is the zero map in this staged development.
   unfold IsFormClosed smoothExtDeriv
-  simp [smoothExtDeriv, extDerivLinearMap]
+  simp [extDerivLinearMap]
 
 /-- Exterior derivative of an exterior derivative is zero (d² = 0).
     Trivial for the zero map. -/

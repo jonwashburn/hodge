@@ -42,7 +42,7 @@ theorem isExact_iff_eq_zero {k : ℕ} (ω : SmoothForm n X k) : IsExact ω ↔ �
         _ = 0 := this
     · intro h
       refine ⟨0, ?_⟩
-      simpa [h, smoothExtDeriv, extDerivLinearMap]
+      simp [h, smoothExtDeriv, extDerivLinearMap]
 
 theorem cohomologous_refl {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     (ω : ClosedForm n X k) : Cohomologous ω ω := by
@@ -106,6 +106,7 @@ notation "⟦" ω "," h "⟧" => ofForm ω h
 
 instance (k : ℕ) : Zero (DeRhamCohomologyClass n X k) := ⟨⟦0, isFormClosed_zero⟧⟩
 
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] in
 /-- Casting zero across cohomology degrees gives zero.
     This holds because both zeros are quotients of the zero closed form,
     and the cast preserves the quotient structure. -/
@@ -129,7 +130,7 @@ theorem cohomologous_add {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedS
   have heq : (ω₁ + ω₂).val - (ω₁' + ω₂').val = (ω₁.val - ω₁'.val) + (ω₂.val - ω₂'.val) := by
     simp only [hval_add]
     ext x v
-    simp only [SmoothForm.add_apply, SmoothForm.sub_apply, AlternatingMap.add_apply, AlternatingMap.sub_apply]
+    simp only [SmoothForm.add_apply, SmoothForm.sub_apply]
     abel
   rw [heq]
   unfold IsExact at *
@@ -152,7 +153,7 @@ theorem cohomologous_neg {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedS
   have heq : (-ω).val - (-ω').val = -(ω.val - ω'.val) := by
     simp only [hval_neg]
     ext x v
-    simp only [SmoothForm.sub_apply, SmoothForm.neg_apply, AlternatingMap.sub_apply, AlternatingMap.neg_apply]
+    simp only [SmoothForm.sub_apply, SmoothForm.neg_apply]
     -- Goal: -a - (-b) = b - a   =>   -a + b = b - a, which is true
     abel
   rw [heq]
@@ -205,10 +206,10 @@ theorem cohomologous_wedge {n k l : ℕ} {X : Type u} [TopologicalSpace X] [Char
     have h0 : ω₂.val - ω₂'.val = 0 := (isExact_iff_eq_zero (n := n) (X := X) (ω := ω₂.val - ω₂'.val)).1 h2'
     exact sub_eq_zero.mp h0
   -- hence the wedge products agree
-  have hEq : ω₁.val ⋏ ω₂.val = ω₁'.val ⋏ ω₂'.val := by simpa [hω, hη]
+  have hEq : ω₁.val ⋏ ω₂.val = ω₁'.val ⋏ ω₂'.val := by simp [hω, hη]
   -- and the difference is exact (i.e. zero)
   apply (isExact_iff_eq_zero (n := n) (X := X) (ω := (ω₁.val ⋏ ω₂.val) - (ω₁'.val ⋏ ω₂'.val))).2
-  simpa [hEq]
+  simp [hEq]
 
 /-! ### Algebraic Instances -/
 

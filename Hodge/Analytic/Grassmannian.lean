@@ -323,7 +323,8 @@ def SmoothForm.evalAt {k : ℕ} (α : SmoothForm n X k) (x : X) :
     -- `FiberAlt n k` is definitionally a `ContinuousAlternatingMap` on the model tangent space,
     -- and for `𝓒_complex n` this model is definitionally the tangent space at `x`.
     -- `simpa` bridges the definitional equality so `.toAlternatingMap` has the expected domain.
-    simpa using (α.as_alternating x).toAlternatingMap
+    -- We also need to view the ℂ-linear fiber map as an ℝ-linear alternating map on the tangent space.
+    simpa using ((α.as_alternating x).restrictScalars ℝ).toAlternatingMap
 
 /-- Operator norm of an alternating map at a fiber.
     Defined as the supremum of |φ(v)| over unit vectors.

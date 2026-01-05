@@ -49,11 +49,16 @@ Sorries: 0
 The Lean proof is closed (0 sorries) but the **foundation layer is still semantically stubbed**.
 We close this by a staged migration:
 
-- **Stage 1 (now)**: Replace the placeholder wedge `SmoothForm ⋏` with a Mathlib-backed wedge.
-  - Work bottom-up: wedge on fiber alternating maps → wedge on `SmoothForm` → update `kahlerPow`
-  - Keep `d` temporarily as-is (still 0) so closedness obligations remain trivial while wedge is migrated.
+- **Stage 1 (done)**: Replace the placeholder wedge `SmoothForm ⋏` with a Mathlib-backed wedge.
+  - Implemented on `ContinuousAlternatingMap` fibers, then lifted to `SmoothForm` and cohomology multiplication.
+  - `d` on `SmoothForm` remains temporarily stubbed (`extDerivLinearMap := 0`) to avoid destabilizing the proof while wedge migrated.
 
-- **Stage 2**: Replace the placeholder exterior derivative `extDerivLinearMap := 0` with a Mathlib-backed `d`.
+- **Stage 1.5 (done)**: Add a **model-space** de Rham calculus module backed by Mathlib `extDeriv`.
+  - New file: `Hodge/Analytic/ModelDeRham.lean`
+  - Provides `ModelForm.d` (Mathlib `extDeriv`) and a pointwise wedge using `ContinuousAlternatingMap.wedge`.
+
+- **Stage 2 (next)**: Replace the placeholder exterior derivative `extDerivLinearMap := 0` on `SmoothForm`
+  with a Mathlib-backed `d` (requires a manifold-aware form backend / chart glue).
 
 - **Stage 3**: Replace the current de Rham quotient/multiplication lemmas with a semantically correct de Rham complex/cohomology backend (local or Mathlib, depending on availability).
 
@@ -69,7 +74,7 @@ These are the axioms that `hodge_conjecture'` actually depends on:
 | 4 | `hard_lefschetz_pp_bijective` | Lefschetz.lean:60 | HL preserves (p,p) type |
 | 5 | `hard_lefschetz_rational_bijective` | Lefschetz.lean:52 | HL preserves rationality |
 | 6 | `harvey_lawson_fundamental_class` | Main.lean:144 | GMT structure theorem |
-| 7 | `mass_lsc` | Calibration.lean:129 | Mass semicontinuity |
+| 7 | `mass_lsc` | Calibration.lean:113 | Mass semicontinuity |
 | 8 | `omega_pow_algebraic` | Main.lean:219 | ω^p is algebraic |
 | 9 | `serre_gaga` | GAGA.lean:160 | GAGA principle |
 
@@ -122,6 +127,29 @@ lake build Hodge.Utils.AuditAxioms 2>&1 | grep "depends on axioms"
 
 ---
 
+## Multi-Agent Coordination
+
+When multiple agents work on this codebase simultaneously, use this strategy to avoid conflicts:
+
+### Bottom-Up Agent
+- Focus: Foundation layer (`Hodge/Analytic/*.lean`, `Hodge/Cohomology/*.lean`)
+- Direction: Start from infrastructure, work up toward higher-level theorems
+- Phases: 1 (Foundation), 2 (Currents/GMT), 3 (Cycle Class)
+
+### Top-Down Agent
+- Focus: Theorem layer (`Hodge/Kahler/*.lean`, `Hodge/Classical/*.lean`)  
+- Direction: Start from main theorems, work down toward infrastructure
+- Phases: 6 (Cleanup), 5 (Microstructure), 4 (Harvey-Lawson)
+
+### Rules
+1. Do NOT modify the same file simultaneously
+2. Check `git status` before starting work
+3. Commit frequently with descriptive messages
+4. Always verify 0 sorries, 9 axioms after changes
+5. Run `lake build Hodge` before pushing
+
+---
+
 ## Quick Reference Commands
 
 ```bash
@@ -150,5 +178,5 @@ grep -rn "^axiom " Hodge/ --include="*.lean" -A2
 
 | Date | Sorries | Axioms | Notes |
 |------|---------|--------|-------|
-| Jan 5, 2026 | 0 | 9 (9 used) | All sorries removed; unused axioms removed |
+| Jan 5, 2026 | 0 | 9 (9 used) | All sorries removed; unused axioms removed; wedge migrated; model-space `extDeriv` module added |
 | Earlier | 6 | 14 | Transport axioms converted to theorems |
