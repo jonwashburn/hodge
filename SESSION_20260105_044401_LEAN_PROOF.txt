@@ -1,6 +1,6 @@
 ================================================================================
 HODGE CONJECTURE - COMPLETE LEAN PROOF BUNDLE
-Generated: Mon Jan  5 10:12:10 CST 2026
+Generated: Mon Jan  5 04:44:01 CST 2026
 Project: /Users/jonathanwashburn/Projects/hodge
 ================================================================================
 

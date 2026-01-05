@@ -18,6 +18,7 @@ import Mathlib.Analysis.Normed.Module.FiniteDimension
 import Mathlib.Topology.Algebra.Module.FiniteDimension
 import Mathlib.Analysis.Normed.Lp.PiLp
 import Mathlib.LinearAlgebra.StdBasis
+import Hodge.Analytic.DomCoprod
 
 
 noncomputable section
@@ -40,7 +41,7 @@ abbrev TangentModel (n : ℕ) := EuclideanSpace ℂ (Fin n)
 /-- The (fiberwise) space of continuous alternating `k`-linear maps on the model tangent space.
 This is the correct object to put a norm/topology on (Mathlib: operator norm on
 `ContinuousAlternatingMap`). -/
-abbrev FiberAlt (n : ℕ) (k : ℕ) := (TangentModel n) [⋀^Fin k]→L[ℝ] ℂ
+abbrev FiberAlt (n : ℕ) (k : ℕ) := (TangentModel n) [⋀^Fin k]→L[ℂ] ℂ
 
 /-- A section of differential forms is “smooth” (for this development) if the alternating map
 varies continuously in `x`, as a map into the normed space of continuous alternating maps.

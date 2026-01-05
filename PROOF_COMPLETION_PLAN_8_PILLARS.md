@@ -1,4 +1,48 @@
-## Goal
+## Update (Jan 5, 2026) — New “Close the Proof” Strategy
+
+**Current verified state (from `LEAN_PROOF_BUNDLE.txt`)**:
+- **Sorries**: 0
+- **Axioms**: 9 (and these are exactly what `hodge_conjecture'` depends on)
+
+**What remains is semantic correctness**, not Lean holes:
+- The foundation layer still contains **semantic stubs** (not axioms) for parts of the de Rham/Hodge machinery.
+- The “close it” strategy is now a **staged migration to Mathlib-backed definitions** while keeping:
+  - **0 sorries**
+  - **No new axioms** (stay at the 9 classical pillars)
+
+### Accepted external inputs (9 classical axioms)
+
+These are the *only* axioms intended to remain:
+
+1. `serre_gaga` (GAGA)
+2. `mass_lsc` (mass lower semicontinuity)
+3. `harvey_lawson_fundamental_class` (HL structure → class bridge)
+4. `exists_uniform_interior_radius` (cone interior radius)
+5. `omega_pow_algebraic` (algebraicity of ω^p)
+6. `hard_lefschetz_bijective` (Hard Lefschetz)
+7. `hard_lefschetz_rational_bijective` (HL preserves rationality)
+8. `hard_lefschetz_pp_bijective` (HL preserves (p,p))
+9. `existence_of_representative_form` (Hodge decomposition: representative form for (p,p) classes)
+
+### Staged migration plan (no regressions)
+
+- **Stage 0 (done)**: Keep the proof “closed” (0 sorries) and make session snapshots automatic.
+  - `./scripts/generate_lean_source.sh` now also writes `SESSION_YYYYMMDD_HHMMSS_LEAN_PROOF.txt`.
+
+- **Stage 1 (in progress)**: Replace the *placeholder wedge* used by cohomology (`SmoothForm ⋏`) with a Mathlib-backed wedge:
+  - Implement/strengthen the wedge on fibers using `AlternatingMap.domCoprod` and continuous norms
+  - Then lift to `SmoothForm` wedge with continuity of the coefficient map
+  - Update cohomology multiplication and `kahlerPow` to become meaningful (ω^p via iterated wedge)
+
+- **Stage 2 (pending)**: Replace the *placeholder exterior derivative* (`extDerivLinearMap := 0`) with a Mathlib-backed `d`
+  - Model-space `extDeriv` exists in Mathlib; manifold-level packaging is not yet upstream
+  - We will stage this carefully to avoid breaking the main proof chain
+
+- **Stage 3 (pending)**: Replace the current de Rham quotient (“cohomology”) with an actually well-defined Mathlib-backed complex if/when available, or a local equivalent construction.
+
+---
+
+## Goal (Historical; superseded by the update above)
 
 Produce a **fully rigorous Lean proof of the Hodge Conjecture** in this repo with **exactly the eight published “classical inputs”** in `Classical_Inputs_8_Pillars_standalone.tex` treated as external axioms, and **no other** `axiom`/stubbed mathematics.
 

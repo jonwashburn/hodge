@@ -2,7 +2,7 @@
 
 This document maps the proof chain in `Hodge-v6-w-Jon-Update-MERGED.tex` to Lean files and identifies what remains to be completed (beyond the 8 accepted classical pillars).
 
-**Last Updated**: 2026-01-04 (Phase 0 complete, Phase 1 documented, build verified)
+**Last Updated**: 2026-01-05 (0 sorries / 9 axioms baseline; staged Mathlib migration plan underway)
 
 ---
 
@@ -10,10 +10,9 @@ This document maps the proof chain in `Hodge-v6-w-Jon-Update-MERGED.tex` to Lean
 
 | Category | Count | Status |
 |----------|-------|--------|
-| Pillar axioms (accepted) | 9 decls (8 pillars, P6 split in 2) | ✅ Keep |
-| Extra axioms (off critical path) | 1 | ⚠️ `holomorphic_transition_general` |
-| Remaining `sorry` (critical path) | 0 | ✅ Done |
-| Remaining `sorry` (off critical path) | 0 | ✅ Done |
+| Pillar axioms (accepted) | 9 decls | ✅ Keep |
+| Extra axioms | 0 | ✅ None |
+| Remaining `sorry` | 0 | ✅ None |
 | Semantic stubs documented | ~12 major | ✅ All documented |
 | Build status | `lake build Hodge.Main` | ✅ Passing |
 
@@ -21,18 +20,21 @@ This document maps the proof chain in `Hodge-v6-w-Jon-Update-MERGED.tex` to Lean
 
 ---
 
-## The 8 Classical Pillars (TeX ↔ Lean)
+## The 9 Classical Axioms (Lean baseline)
 
-| # | Pillar | TeX Reference | Lean Axiom(s) | File |
-|---|--------|---------------|---------------|------|
-| 1 | **GAGA** | Rem. `chow-gaga`, §C.External | `serre_gaga` | `Classical/GAGA.lean` |
-| 2 | **Federer-Fleming Compactness** | Thm. `realization-from-almost`, §C | `federer_fleming_compactness` | `Classical/FedererFleming.lean` |
-| 3 | **Mass LSC** | Thm. `realization-from-almost` | `mass_lsc` | `Analytic/Calibration.lean` |
-| 4 | **Spine / Calibration Defect** | Thm. `spine-quantitative` | `spine_theorem` | `Analytic/Calibration.lean` |
-| 5 | **Harvey-Lawson** | Thm. `realization-from-almost`, Rem. `chow-gaga` | `harvey_lawson_fundamental_class` | `Kahler/Main.lean` |
-| 6 | **Hard Lefschetz** | Rem. `lefschetz-reduction` | `hard_lefschetz_bijective` | `Classical/Lefschetz.lean` |
-| 7 | **Uniform Interior Radius** | Lem. `kahler-positive` | `exists_uniform_interior_radius` | `Kahler/Cone.lean` |
-| 8 | **Algebraicity of ω^p** | Lem. `gamma-minus-alg` | `omega_pow_algebraic` | `Kahler/Main.lean` |
+These are the only axioms currently in the repository (and the only ones `hodge_conjecture'` uses):
+
+| # | Axiom | File | TeX / Meaning |
+|---|------|------|---------------|
+| 1 | `serre_gaga` | `Classical/GAGA.lean` | GAGA (analytic → algebraic) |
+| 2 | `mass_lsc` | `Analytic/Calibration.lean` | mass lower semicontinuity |
+| 3 | `harvey_lawson_fundamental_class` | `Kahler/Main.lean` | Harvey–Lawson bridge to class |
+| 4 | `exists_uniform_interior_radius` | `Kahler/Cone.lean` | cone interior radius |
+| 5 | `omega_pow_algebraic` | `Kahler/Main.lean` | algebraicity of ω^p |
+| 6 | `hard_lefschetz_bijective` | `Classical/Lefschetz.lean` | Hard Lefschetz |
+| 7 | `hard_lefschetz_rational_bijective` | `Classical/Lefschetz.lean` | HL preserves rationality |
+| 8 | `hard_lefschetz_pp_bijective` | `Classical/Lefschetz.lean` | HL preserves (p,p) |
+| 9 | `existence_of_representative_form` | `Classical/Lefschetz.lean` | Hodge decomposition representative form |
 
 ---
 

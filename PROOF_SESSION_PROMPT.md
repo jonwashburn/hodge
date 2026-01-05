@@ -7,6 +7,8 @@ You are helping to complete a Lean 4 formalization of the Hodge Conjecture proof
 ### Before Making Any Changes
 
 1. **Read the full proof bundle**: `@LEAN_PROOF_BUNDLE.txt`
+2. **Create the session snapshot** (automatic): run `./scripts/generate_lean_source.sh`
+   - This regenerates `LEAN_PROOF_BUNDLE.txt` and creates `SESSION_YYYYMMDD_HHMMSS_LEAN_PROOF.txt`
 2. **Check current status**: Note the sorry count and axiom count at the top
 3. **Understand the goal**: The proof is STRUCTURALLY COMPLETE - focus on cleanup
 4. **Reference the TeX proof**: `@Hodge-v6-w-Jon-Update-MERGED.tex` for mathematical guidance
@@ -24,8 +26,9 @@ You are helping to complete a Lean 4 formalization of the Hodge Conjecture proof
    Do NOT run full `lake build`
 
 3. **Priority order for improvements**:
-   - Convert classical axioms to theorems when Mathlib support exists
-   - Improve documentation / structure without changing counts
+   - **Staged Mathlib migration**: replace semantic stubs (d/∧/cohomology) with Mathlib-backed definitions
+   - Convert classical axioms to theorems only when upstream support exists
+   - Keep the main proof compiling at all times (no regressions)
 
 4. **After each change**:
    - Build the specific file
@@ -40,6 +43,19 @@ Axioms in codebase: 9
 Axioms USED by hodge_conjecture': 9 (verified via #print axioms)
 Sorries: 0
 ```
+
+### Current “Close the Proof” Strategy (staged)
+
+The Lean proof is closed (0 sorries) but the **foundation layer is still semantically stubbed**.
+We close this by a staged migration:
+
+- **Stage 1 (now)**: Replace the placeholder wedge `SmoothForm ⋏` with a Mathlib-backed wedge.
+  - Work bottom-up: wedge on fiber alternating maps → wedge on `SmoothForm` → update `kahlerPow`
+  - Keep `d` temporarily as-is (still 0) so closedness obligations remain trivial while wedge is migrated.
+
+- **Stage 2**: Replace the placeholder exterior derivative `extDerivLinearMap := 0` with a Mathlib-backed `d`.
+
+- **Stage 3**: Replace the current de Rham quotient/multiplication lemmas with a semantically correct de Rham complex/cohomology backend (local or Mathlib, depending on availability).
 
 ### The 9 Classical Pillars (USED AXIOMS)
 
