@@ -92,8 +92,10 @@ def HolomorphicLineBundle.tensor (L₁ L₂ : HolomorphicLineBundle n X) :
   atlas := { ⟨⊤, fun _ _ => LinearEquiv.refl ℂ ℂ⟩ }
   is_covering := by simp
   transition_holomorphic := by
-    intro t₁ t₂
-    sorry
+    intro ⟨⟨U₁, φ₁⟩, h₁⟩ ⟨⟨U₂, φ₂⟩, h₂⟩
+    simp only [Set.mem_singleton_iff] at h₁ h₂
+    cases h₁; cases h₂
+    exact mdifferentiable_const
 
 /-- The M-th tensor power L^⊗M. -/
 def HolomorphicLineBundle.power (L : HolomorphicLineBundle n X) : ℕ → HolomorphicLineBundle n X
@@ -103,8 +105,10 @@ def HolomorphicLineBundle.power (L : HolomorphicLineBundle n X) : ℕ → Holomo
            atlas := { ⟨⊤, fun _ _ => LinearEquiv.refl ℂ ℂ⟩ },
            is_covering := by simp,
            transition_holomorphic := by
-             intro t₁ t₂
-             sorry }
+             intro ⟨⟨U₁, φ₁⟩, h₁⟩ ⟨⟨U₂, φ₂⟩, h₂⟩
+             simp only [Set.mem_singleton_iff] at h₁ h₂
+             cases h₁; cases h₂
+             exact mdifferentiable_const }
   | M + 1 => L.tensor (L.power M)
 
 /-- A Hermitian metric on L. -/
@@ -141,14 +145,24 @@ theorem IsHolomorphic_zero {L : HolomorphicLineBundle n X} :
     IsHolomorphic (0 : Section L) := by
   intro x
   obtain ⟨t, hx⟩ := L.has_local_trivializations x
-  exact ⟨t, hx, sorry⟩
+  refine ⟨t, hx, ?_⟩
+  have h_eq : (fun y : ↥t.val.1 => t.val.2 y y.property ((0 : Section L) y)) =
+              (fun _ => (0 : ℂ)) := by
+    ext y; exact LinearEquiv.map_zero _
+  rw [h_eq]; exact mdifferentiableAt_const
 
 /-- A scalar multiple of a holomorphic section is holomorphic. -/
 theorem IsHolomorphic_smul (L : HolomorphicLineBundle n X) (c : ℂ) (s : Section L) :
     IsHolomorphic s → IsHolomorphic (c • s) := by
   intro h x
   obtain ⟨t, hx, hφ⟩ := h x
-  exact ⟨t, hx, sorry⟩
+  refine ⟨t, hx, ?_⟩
+  have h_eq : (fun y : ↥t.val.1 => t.val.2 y y.property ((c • s) y)) =
+              (fun y : ↥t.val.1 => c * t.val.2 y y.property (s y)) := by
+    ext y
+    show t.val.2 y.val y.property (c • s y.val) = c * t.val.2 y.val y.property (s y.val)
+    rw [LinearEquiv.map_smul, smul_eq_mul]
+  rw [h_eq]; exact MDifferentiableAt.const_smul hφ c
 
 /-- The partial derivative operator ∂ on smooth forms. -/
 def partial_deriv {k : ℕ} (ω : SmoothForm n X k) : SmoothForm n X (k + 1) :=
@@ -194,11 +208,19 @@ noncomputable def jet_eval (L : HolomorphicLineBundle n X) (x : X) (k : ℕ) :
     Section L →ₗ[ℂ] (Section L) :=
   0
 
-/-- The tensor product of two holomorphic sections exists and is holomorphic. -/
+/-- The tensor product of two holomorphic sections exists and is holomorphic.
+    Note: We prove this for the constant 1 section, which is well-typed since
+    (L₁.tensor L₂).Fiber x = ℂ by definition. -/
 theorem IsHolomorphic_tensor {L₁ L₂ : HolomorphicLineBundle n X} (s₁ : Section L₁) (s₂ : Section L₂) :
-    IsHolomorphic s₁ → IsHolomorphic s₂ → IsHolomorphic (L := L₁.tensor L₂) (fun _ => (1 : ℂ)) := by
+    IsHolomorphic s₁ → IsHolomorphic s₂ →
+    IsHolomorphic (L := L₁.tensor L₂) (fun (_ : X) => (1 : ℂ)) := by
   intro _ _ x
-  obtain ⟨t, hx⟩ := (L₁.tensor L₂).has_local_trivializations x
-  exact ⟨t, hx, sorry⟩
+  have h_atlas : (⟨⊤, fun _ _ => LinearEquiv.refl ℂ ℂ⟩ :
+      Σ U : Opens X, LocalTrivialization (L₁.tensor L₂).Fiber
+        (L₁.tensor L₂).fiber_add (L₁.tensor L₂).fiber_module U) ∈
+      (L₁.tensor L₂).atlas := by
+    simp only [HolomorphicLineBundle.tensor, Set.mem_singleton_iff]
+  have hx : x ∈ (⊤ : Opens X) := trivial
+  exact ⟨⟨_, h_atlas⟩, hx, mdifferentiableAt_const⟩
 
 end
