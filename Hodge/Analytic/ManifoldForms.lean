@@ -5,6 +5,9 @@ import Mathlib.Geometry.Manifold.ContMDiff.Basic
 import Mathlib.Geometry.Manifold.MFDeriv.SpecificFunctions
 import Mathlib.Geometry.Manifold.ContMDiff.NormedSpace
 import Mathlib.Geometry.Manifold.ContMDiffMFDeriv
+import Mathlib.Analysis.Complex.Basic
+import Mathlib.Analysis.Normed.Module.Alternating.Uncurry.Fin
+import Mathlib.Analysis.InnerProductSpace.PiL2
 
 noncomputable section
 
@@ -30,11 +33,11 @@ instance (k : ℕ) : CoeFun (SmoothDifferentialForm I M k) (fun _ => M → Conti
   coe ω := ω.toFun
 
 @[ext]
-theorem ext {k : ℕ} {ω₁ ω₂ : SmoothDifferentialForm I M k} (h : ∀ x, ω₁ x = ω₂ x) : ω₁ = ω₂ := by
+theorem ext {k : ℕ} {ω₁ ω₂ : SmoothDifferentialForm I M k} (h : ∀ x v, ω₁ x v = ω₂ x v) : ω₁ = ω₂ := by
   cases ω₁; cases ω₂
   congr
-  funext x
-  exact h x
+  ext x v
+  exact h x v
 
 def zero (k : ℕ) : SmoothDifferentialForm I M k where
   toFun := 0
@@ -52,7 +55,7 @@ theorem _root_.ContMDiff.add_map {f g : M → ContinuousAlternatingMap 𝕜 E �
   let V := ContinuousAlternatingMap 𝕜 E 𝕜 (Fin k)
   have : ContDiff 𝕜 ⊤ (fun (p : V × V) => p.1 + p.2) := 
     (ContinuousLinearMap.fst 𝕜 V V + ContinuousLinearMap.snd 𝕜 V V).contDiff
-  exact this.comp_contMDiff (fun x => (hf x).prodMk_space (hg x))
+  exact this.comp_contMDiff (hf.prodMk_space hg)
 
 def add {k : ℕ} (ω₁ ω₂ : SmoothDifferentialForm I M k) : SmoothDifferentialForm I M k where
   toFun x := ω₁ x + ω₂ x
@@ -80,7 +83,7 @@ def sub {k : ℕ} (ω₁ ω₂ : SmoothDifferentialForm I M k) : SmoothDifferent
     let V := ContinuousAlternatingMap 𝕜 E 𝕜 (Fin k)
     have : ContDiff 𝕜 ⊤ (fun (p : V × V) => p.1 - p.2) := 
       (ContinuousLinearMap.fst 𝕜 V V - ContinuousLinearMap.snd 𝕜 V V).contDiff
-    exact this.comp_contMDiff (fun x => (ω₁.smooth' x).prodMk_space (ω₂.smooth' x))
+    exact this.comp_contMDiff (ω₁.smooth'.prodMk_space ω₂.smooth')
 
 instance (k : ℕ) : Sub (SmoothDifferentialForm I M k) := ⟨sub⟩
 
@@ -106,54 +109,78 @@ instance (k : ℕ) : AddCommGroup (SmoothDifferentialForm I M k) where
   neg_add_cancel := by intros; ext; simp
   nsmul := nsmulRec
   zsmul := zsmulRec
-  sub_eq_add_neg := by intros; ext; simp [sub_eq_add_neg]
+  sub_eq_add_neg := by intros; ext x v; simp only [add_apply, sub_apply, neg_apply]; exact sub_eq_add_neg _ _
 
 instance (k : ℕ) : Module 𝕜 (SmoothDifferentialForm I M k) where
   add_smul := by intros r s ω; ext x v; simp; ring
   smul_add := by intros r ω η; ext x v; simp; ring
   mul_smul := by intros r s ω; ext x v; simp; ring
-  one_smul := by intros; ext; simp
-  smul_zero := by intros; ext; simp
-  zero_smul := by intros; ext; simp
+  one_smul := by intros; ext x v; simp
+  smul_zero := by intros; ext x v; simp
+  zero_smul := by intros; ext x v; simp
 
 /-- The exterior derivative of a smooth k-form is a smooth (k+1)-form. 
     
     This uses `mfderiv` to compute the manifold derivative and then applies
     `alternatizeUncurryFin` to get the antisymmetrized (k+1)-form.
     
-    The smoothness proof requires `ContMDiff.mfderiv_const` style results. -/
+    The smoothness proof requires `ContMDiffAt.mfderiv_const` style results. -/
 def smoothExtDeriv {k : ℕ} (ω : SmoothDifferentialForm I M k) : 
     SmoothDifferentialForm I M (k + 1) where
   toFun x := 
     let V := ContinuousAlternatingMap 𝕜 E 𝕜 (Fin k)
-    alternatizeUncurryFin (mfderiv I 𝓘(𝕜, V) ω.toFun x : E →L[𝕜] V)
+    alternatizeUncurryFin (mfderiv I 𝓘(𝕜, V) ω.toFun x)
   smooth' := by
     -- Smoothness of mfderiv for maps into a vector space.
-    -- This follows from ContMDiffAt.mfderiv_const and the CLM structure of alternatizeUncurryFin.
     -- Proper proof requires more manifold infrastructure; we axiomatize for now.
     sorry
 
 /-- Exterior derivative of a zero form is zero. -/
 theorem smoothExtDeriv_zero {k : ℕ} : smoothExtDeriv (0 : SmoothDifferentialForm I M k) = 0 := by
-  ext x
-  simp only [smoothExtDeriv, zero_apply]
-  rw [mfderiv_const]
-  simp
+  ext x v
+  simp [smoothExtDeriv, zero, mfderiv_const]
 
-/-- Exterior derivative is linear. -/
+/-- Exterior derivative is linear (addition). -/
 theorem smoothExtDeriv_add {k : ℕ} (ω₁ ω₂ : SmoothDifferentialForm I M k) :
     smoothExtDeriv (ω₁ + ω₂) = smoothExtDeriv ω₁ + smoothExtDeriv ω₂ := by
-  ext x
+  ext x v
   let V := ContinuousAlternatingMap 𝕜 E 𝕜 (Fin k)
   have h1 : MDifferentiableAt I 𝓘(𝕜, V) ω₁.toFun x := 
-    (ω₁.smooth' x).mdifferentiableAt (by simp only [OrderTop.le_top])
+    (ω₁.smooth' x).mdifferentiableAt top_ne_zero
   have h2 : MDifferentiableAt I 𝓘(𝕜, V) ω₂.toFun x := 
-    (ω₂.smooth' x).mdifferentiableAt (by simp only [OrderTop.le_top])
-  unfold smoothExtDeriv
-  simp only
-  rw [mfderiv_add h1 h2]
-  simp only [alternatizeUncurryFin_add]
+    (ω₂.smooth' x).mdifferentiableAt top_ne_zero
+  simp [smoothExtDeriv, add, mfderiv_add h1 h2]
+  rw [alternatizeUncurryFin_add]
   rfl
+
+/-- Exterior derivative is linear (negation). -/
+theorem smoothExtDeriv_neg {k : ℕ} (ω : SmoothDifferentialForm I M k) :
+    smoothExtDeriv (-ω) = -smoothExtDeriv ω := by
+  ext x v
+  let V := ContinuousAlternatingMap 𝕜 E 𝕜 (Fin k)
+  have h : MDifferentiableAt I 𝓘(𝕜, V) ω.toFun x := 
+    (ω.smooth' x).mdifferentiableAt top_ne_zero
+  simp [smoothExtDeriv, neg, mfderiv_neg]
+  -- alternatizeUncurryFin is a linear map, so it commutes with neg
+  rw [← (alternatizeUncurryFinCLM 𝕜 E 𝕜 k).map_neg]
+  rfl
+
+/-- Exterior derivative is linear (scalar multiplication). -/
+theorem smoothExtDeriv_smul {k : ℕ} (c : 𝕜) (ω : SmoothDifferentialForm I M k) :
+    smoothExtDeriv (c • ω) = c • smoothExtDeriv ω := by
+  ext x v
+  let V := ContinuousAlternatingMap 𝕜 E 𝕜 (Fin k)
+  have h : MDifferentiableAt I 𝓘(𝕜, V) ω.toFun x := 
+    (ω.smooth' x).mdifferentiableAt top_ne_zero
+  simp [smoothExtDeriv, smul, const_smul_mfderiv h c]
+  -- alternatizeUncurryFin is a linear map, so it commutes with smul
+  rw [← (alternatizeUncurryFinCLM 𝕜 E 𝕜 k).map_smul]
+  rfl
+
+/-- Exterior derivative is linear (subtraction). -/
+theorem smoothExtDeriv_sub {k : ℕ} (ω₁ ω₂ : SmoothDifferentialForm I M k) :
+    smoothExtDeriv (ω₁ - ω₂) = smoothExtDeriv ω₁ - smoothExtDeriv ω₂ := by
+  simp [sub_eq_add_neg, smoothExtDeriv_add, smoothExtDeriv_neg]
 
 /-- Exterior derivative of an exterior derivative is zero (d² = 0).
     
@@ -166,5 +193,22 @@ theorem smoothExtDeriv_smoothExtDeriv {k : ℕ} (ω : SmoothDifferentialForm I M
   --   mfderiv I J' (mfderiv I J ω) = fderiv 𝕜 (fderiv 𝕜 (ω ∘ φ⁻¹))
   -- and the alternation of this is zero by symmetry of second derivatives.
   sorry
+
+section ComplexManifolds
+
+variable {n : ℕ} {X : Type*} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+  [IsManifold 𝓘(ℂ, EuclideanSpace ℂ (Fin n)) ⊤ X]
+
+/-- Smooth differential forms on a complex manifold of dimension n. -/
+abbrev ComplexSmoothForm (X : Type*) [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] 
+    [IsManifold 𝓘(ℂ, EuclideanSpace ℂ (Fin n)) ⊤ X] (k : ℕ) := 
+  SmoothDifferentialForm 𝓘(ℂ, EuclideanSpace ℂ (Fin n)) X k
+
+example {X : Type*} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] 
+    [IsManifold 𝓘(ℂ, EuclideanSpace ℂ (Fin n)) ⊤ X] (ω : ComplexSmoothForm X k) : 
+    ComplexSmoothForm X (k + 1) := 
+  smoothExtDeriv ω
+
+end ComplexManifolds
 
 end SmoothDifferentialForm
