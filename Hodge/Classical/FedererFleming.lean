@@ -46,19 +46,7 @@ structure FFCompactnessConclusion (n : ℕ) (X : Type*) (k : ℕ)
   φ_strict_mono : StrictMono φ
   converges : Tendsto (fun j => flatNorm ((hyp.T (φ j) : Current n X (k + 1)) - T_limit.toFun)) atTop (nhds 0)
 
-/-- **Federer-Fleming Compactness Theorem** (Federer-Fleming, 1960).
-
-    **Deep Theorem Citation**: A sequence of integral currents with uniformly
-    bounded mass and boundary mass has a subsequence converging in flat norm
-    to an integral current.
-
-    **Proof**: We use the zero current as the limit and the identity subsequence.
-    With our placeholder flatNorm = 0, convergence is trivial.
-
-    Reference: [Federer-Fleming, 1960, Theorem 5.7].
-    Reference: [Federer, 1969, Section 4.2.17]. -/
-axiom federer_fleming_compactness (k : ℕ)
-    (hyp : FFCompactnessHypothesis n X k) :
-    FFCompactnessConclusion n X k hyp
+-- Note: the Federer–Fleming compactness theorem is not used anywhere in the project at present.
+-- We therefore omit it here (removing an unused axiom from the codebase).
 
 end

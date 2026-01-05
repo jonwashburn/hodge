@@ -89,24 +89,8 @@ theorem isCalibrated_iff_defect_zero {k : ℕ} (T : Current n X k) (ψ : Calibra
 
 /-! ## Advanced Calibration Theorems -/
 
-/-- **Spine Theorem** (Harvey-Lawson, 1982).
-
-If a current T can be written as T = S - G where S is calibrated by ψ,
-then the calibration defect of T is bounded by twice the mass of G.
-
-**Proof Sketch**:
-- calibrationDefect(T, ψ) = mass(T) - T(ψ)
-- Since S is calibrated: mass(S) = S(ψ)
-- T = S - G implies: T(ψ) = S(ψ) - G(ψ) = mass(S) - G(ψ)
-- mass(T) ≤ mass(S) + mass(G) (triangle inequality)
-- G(ψ) ≥ -mass(G) (by calibration inequality for -G)
-- Therefore: calibrationDefect(T, ψ) ≤ mass(S) + mass(G) - (mass(S) - mass(G)) = 2·mass(G)
-
-Reference: [R. Harvey and H.B. Lawson Jr., "Calibrated geometries", 1982,
-Acta Mathematica 148, Section 4]. -/
-axiom spine_theorem {k : ℕ} (T S G : Current n X k) (ψ : CalibratingForm n X k)
-    (_h_decomp : T = S - G) (_h_calib : isCalibrated S ψ) :
-    calibrationDefect T ψ ≤ 2 * Current.mass G
+-- Note: the Harvey–Lawson “spine theorem” is not used anywhere in the project at present.
+-- We therefore omit it here (removing an unused axiom from the codebase).
 
 /-- **Lower Semicontinuity of Mass** (Federer, 1969).
 

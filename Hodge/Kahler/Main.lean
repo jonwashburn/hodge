@@ -255,7 +255,7 @@ theorem lefschetz_lift_signed_cycle {p : ℕ}
     (γ : SmoothForm n X (2 * p)) (hγ : IsFormClosed γ)
     (η : SmoothForm n X (2 * (n - p))) (hη : IsFormClosed η)
     (Z_η : SignedAlgebraicCycle n X)
-    (hp : p > n / 2)
+    (hp : 2 * p > n)
     (h_rep : Z_η.RepresentsClass (ofForm η hη))
     (h_lef : ofForm γ hγ = (lefschetz_degree_eq n p hp) ▸
              lefschetz_power n X (2 * (n - p)) (p - (n - p)) (ofForm η hη)) :
@@ -551,13 +551,17 @@ theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : Is
     have hp : p > n / 2 := by
       exact lt_of_not_ge h_range
 
+    -- Convert p > n/2 to 2*p > n (required by hard_lefschetz_inverse_form)
+    have hp' : 2 * p > n := by
+      omega
+
     -- Get η from Hard Lefschetz inverse with all properties:
     -- 1. η is closed
     -- 2. η is (n-p, n-p)-form
     -- 3. η is rational
     -- 4. [γ] = L^k([η]) (the Lefschetz relationship)
     obtain ⟨η, hη_closed, hη_hodge, hη_rat, h_lef⟩ :=
-      hard_lefschetz_inverse_form (n := n) (X := X) hp γ h_closed h_p_p h_rational
+      hard_lefschetz_inverse_form (n := n) (X := X) hp' γ h_closed h_p_p h_rational
 
     -- Apply the theorem recursively to η (note: `p' = n - p ≤ n/2`).
     obtain ⟨Z_η, hZ_η_rep⟩ :=
@@ -566,7 +570,7 @@ theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : Is
     -- Lift back to degree 2p using the Lefschetz lift theorem.
     obtain ⟨Z, hZ_rep⟩ :=
       lefschetz_lift_signed_cycle (p := p)
-        γ h_closed η hη_closed Z_η hp hZ_η_rep h_lef
+        γ h_closed η hη_closed Z_η hp' hZ_η_rep h_lef
     exact ⟨Z, hZ_rep⟩
 
 end

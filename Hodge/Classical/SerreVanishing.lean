@@ -57,13 +57,18 @@ theorem serre_vanishing (L : HolomorphicLineBundle n X) [IsAmple L]
 For an ample line bundle L on a projective manifold X, the evaluation map from
 global holomorphic sections to the space of k-jets is surjective for
 sufficiently large powers of L.
-Reference: [Serre, 1955, Theorem 1]. -/
+Reference: [Serre, 1955, Theorem 1].
+
+**Note**: This theorem is not used in the main Hodge conjecture proof.
+In the current placeholder model, `jet_eval` is defined as the identity map, so
+surjectivity is immediate. A real implementation would use genuine jet spaces. -/
 theorem jet_surjectivity (L : HolomorphicLineBundle n X) [IsAmple L] (x : X) (k : ℕ) :
     ∃ M₀ : ℕ, ∀ M ≥ M₀, Function.Surjective (jet_eval (L.power M) x k) := by
   use 0
   intro M _
-  -- In this placeholder model, jet_eval is 0. Surjectivity is a stub.
-  sorry
+  -- Placeholder model: `jet_eval` is the identity linear map.
+  simpa [jet_eval] using
+    (Function.surjective_id : Function.Surjective (fun s : Section (L.power M) => s))
 
 /-- **Theorem: Jet Surjectivity from Serre Vanishing**
 

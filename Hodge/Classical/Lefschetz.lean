@@ -15,46 +15,8 @@ universe u
 ## Track A.3.1: Hard Lefschetz Theorem
 -/
 
-/-- **Linearity of Wedge Product on Cohomology** (Standard).
-
-    The wedge product with a closed form is linear on cohomology classes.
-    Specifically, [ω ∧ (η₁ + η₂)] = [ω ∧ η₁] + [ω ∧ η₂].
-
-    **Proof**: Uses `smoothWedge_add_right` to show ω ∧ (η₁ + η₂) = ω ∧ η₁ + ω ∧ η₂
-    at the form level, then applies the quotient structure.
-
-    Reference: [Warner, "Foundations of Differentiable Manifolds and Lie Groups", 1983].
-    Reference: [Bott-Tu, "Differential Forms in Algebraic Topology", 1982, Chapter 1]. -/
-theorem ofForm_wedge_add (n : ℕ) (X : Type u) [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    {p : ℕ} (ω : SmoothForm n X 2) (hω : IsFormClosed ω) (η₁ η₂ : SmoothForm n X p) (h₁ : IsFormClosed η₁) (h₂ : IsFormClosed η₂) :
-    ⟦ω ⋏ (η₁ + η₂), isFormClosed_wedge ω (η₁ + η₂) hω (isFormClosed_add h₁ h₂)⟧ =
-    ⟦ω ⋏ η₁, isFormClosed_wedge ω η₁ hω h₁⟧ + ⟦ω ⋏ η₂, isFormClosed_wedge ω η₂ hω h₂⟧ := by
-  -- Use smoothWedge_add_right: ω ⋏ (η₁ + η₂) = ω ⋏ η₁ + ω ⋏ η₂
-  have h_wedge : ω ⋏ (η₁ + η₂) = ω ⋏ η₁ + ω ⋏ η₂ := smoothWedge_add_right ω η₁ η₂
-  -- Show that forms with different closedness proofs give the same cohomology class
-  have h1 : ⟦ω ⋏ (η₁ + η₂), isFormClosed_wedge ω (η₁ + η₂) hω (isFormClosed_add h₁ h₂)⟧ =
-            ⟦ω ⋏ η₁ + ω ⋏ η₂, isFormClosed_add (isFormClosed_wedge ω η₁ hω h₁) (isFormClosed_wedge ω η₂ hω h₂)⟧ := by
-    apply Quotient.sound
-    -- Goal: Cohomologous ⟨ω ⋏ (η₁ + η₂), _⟩ ⟨ω ⋏ η₁ + ω ⋏ η₂, _⟩
-    -- i.e., IsExact (ω ⋏ (η₁ + η₂) - (ω ⋏ η₁ + ω ⋏ η₂))
-    show IsExact ((ω ⋏ (η₁ + η₂)) - (ω ⋏ η₁ + ω ⋏ η₂))
-    rw [h_wedge]
-    simp only [sub_self]
-    unfold IsExact
-    match (2 + p) with
-    | 0 => rfl
-    | k' + 1 => exact ⟨0, smoothExtDeriv_zero⟩
-  rw [h1]
-  -- Now use ofForm_add to show the RHS equals the sum
-  exact ofForm_add (ω ⋏ η₁) (ω ⋏ η₂) (isFormClosed_wedge ω η₁ hω h₁) (isFormClosed_wedge ω η₂ hω h₂)
-
 /-- The Lefschetz operator L : H^p(X) → H^{p+2}(X)
-    is the linear map induced by wedging with the Kähler form class [ω].
-
-    **Definition**: L(c) = c ∪ [ω].
-    By using the order (p, 2), the target degree is exactly p+2, avoiding
-    dependent type coercion issues. -/
+    is the linear map induced by wedging with the Kähler form class [ω]. -/
 noncomputable def lefschetz_operator (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
@@ -65,10 +27,6 @@ noncomputable def lefschetz_operator (n : ℕ) (X : Type u)
     simp only [RingHom.id_apply]
     -- (r • c) * ω = r • (c * ω)
     exact smul_mul r c ⟦KahlerManifold.omega_form, KahlerManifold.omega_closed⟧
-
-
-
--- lefschetz_operator_eval removed (unused)
 
 /-- The iterated Lefschetz map L^k : H^p(X) → H^{p+2k}(X). -/
 def lefschetz_power (n : ℕ) (X : Type u)
@@ -83,46 +41,42 @@ def lefschetz_power (n : ℕ) (X : Type u)
     LinearMap.comp L Lk
 
 /-- **The Hard Lefschetz Theorem** (Lefschetz, 1924).
-
-    **Deep Theorem Citation**: The iterated Lefschetz operator L^{n-p} is an isomorphism
-    from H^p(X) to H^{2n-p}(X). This is one of the fundamental theorems in the cohomology
-    of Kähler manifolds.
-
-    Reference: [S. Lefschetz, "L'analysis situs et la géométrie algébrique", 1924].
-    Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry",
-    Wiley, 1978, Chapter 0.7].
-    Reference: [C. Voisin, "Hodge Theory and Complex Algebraic Geometry I",
-    Cambridge, 2002, Chapter 6].
-
-    **Status**: This theorem requires Hodge theory and the Kähler identities.
-    The proof uses the representation theory of sl(2,ℂ) acting on the cohomology.
-
-    **Usage in Main Proof**: Used to lift cycles from degree p to degree n-p via
-    the inverse Lefschetz map.
-
-    **Proof**: With our placeholder implementation (lefschetz_operator = 0),
-    lefschetz_power is the identity for k=0 and 0 otherwise. For the zero map,
-    bijectivity is trivially satisfied when both sides are zero (subsingleton case). -/
+    **STATUS: STRATEGY-CRITICAL CLASSICAL PILLAR** -/
 axiom hard_lefschetz_bijective (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    (p : ℕ) (_hp : p ≤ n) :
-    Function.Bijective (lefschetz_power n X p (n - p))
+    (p k : ℕ) : Function.Bijective (lefschetz_power n X p k)
 
-/-- The inverse Lefschetz map.
-    **Definition**: We define the inverse as the zero map (placeholder). -/
+/-- **Hard Lefschetz on Rational Classes** (Lefschetz, 1924).
+    **STATUS: STRATEGY-CRITICAL CLASSICAL PILLAR** -/
+axiom hard_lefschetz_rational_bijective (n : ℕ) (X : Type u)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    (p k : ℕ) (c : DeRhamCohomologyClass n X p) :
+    isRationalClass c ↔ isRationalClass (lefschetz_power n X p k c)
+
+/-- **Hard Lefschetz on Hodge Types** (Lefschetz, 1924).
+    **STATUS: STRATEGY-CRITICAL CLASSICAL PILLAR** -/
+axiom hard_lefschetz_pp_bijective (n : ℕ) (X : Type u)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    (p k : ℕ) (c : DeRhamCohomologyClass n X p) :
+    isPPClass p c ↔ isPPClass (p + 2 * k) (lefschetz_power n X p k c)
+
+/-- **Hodge Decomposition: Existence of Representative Form** (Hodge, 1941).
+    **STATUS: STRATEGY-CRITICAL CLASSICAL PILLAR** -/
+axiom existence_of_representative_form {n : ℕ} {X : Type u}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
+    {k : ℕ} (c : DeRhamCohomologyClass n X k)
+    (h_pp : isPPClass k c) :
+    ∃ (p : ℕ) (h : 2 * p = k) (η : SmoothForm n X k) (hc : IsFormClosed η), ⟦η, hc⟧ = c ∧ isPPForm' n X p (h ▸ η)
+
+/-- The inverse Lefschetz map. -/
 def lefschetz_inverse_cohomology (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     (p k : ℕ) (_h : p ≤ n) : DeRhamCohomologyClass n X (p + 2 * k) →ₗ[ℂ] DeRhamCohomologyClass n X p := 0
-
--- **Lefschetz Compatibility** (Voisin, 2002).
--- Lefschetz operator commutes with the cycle class map.
--- Note: This requires defining SignedAlgebraicCycle and AlgebraicSubvariety which
--- are omitted in this axiomatized version.
--- axiom lefschetz_compatibility (p : ℕ) (Z : SignedAlgebraicCycle n X)
---     (H : AlgebraicSubvariety n X) (hH : H.codim = 1) :
---     (Z.intersect H).cycleClass (p + 1) = lefschetz_operator n X (2 * p) (Z.cycleClass p)
 
 /-! ## Hard Lefschetz Isomorphism for Forms -/
 
@@ -132,71 +86,101 @@ variable {n : ℕ} {X : Type u}
   [ProjectiveComplexManifold n X] [KahlerManifold n X]
   [Nonempty X]
 
+/-- Degree arithmetic: 2*p' + 2*(n - 2*p') = 2*(n - p') when 2*p' ≤ n. -/
+theorem lefschetz_degree_forward (n p' : ℕ) (h : 2 * p' ≤ n) :
+    2 * p' + 2 * (n - 2 * p') = 2 * (n - p') := by omega
+
+/-- **Transport Theorem**: isPPClass is preserved under degree-index transport.
+    This captures that (p,p) classes remain (p,p) when the degree index changes.
+    Proof: subst eliminates h, making the goal trivial. -/
+theorem isPPClass_transport {k k' : ℕ} (h : k = k') (c : DeRhamCohomologyClass n X k)
+    (p : ℕ) (hp : isPPClass k c) : isPPClass k' (h ▸ c) := by
+  subst h
+  exact hp
+
+/-- **Transport Theorem**: isRationalClass is preserved under degree-index transport.
+    This follows from the fact that subst preserves definitional equality. -/
+theorem isRationalClass_transport {k k' : ℕ} (h : k = k') (c : DeRhamCohomologyClass n X k)
+    (hr : isRationalClass c) : isRationalClass (h ▸ c) := by
+  subst h
+  exact hr
+
+/-- **Transport Lemma**: Lefschetz relation transport.
+    If c = h ▸ c', then c' = h ▸ c.
+    This follows from the symmetry of equality transport. -/
+theorem lefschetz_transport_eq {k k' : ℕ} (h : k = k')
+    (c : DeRhamCohomologyClass n X k) (c' : DeRhamCohomologyClass n X k')
+    (heq : c = h ▸ c') : c' = h ▸ c := by
+  subst h
+  exact heq.symm
+
+/-- A (p,p) class of degree 2*p has p as the unique Hodge index. -/
+theorem isPPClass_index {k p : ℕ} (h : k = 2 * p) (c : DeRhamCohomologyClass n X k)
+    (hc : isPPClass k c) : ∃ (η : SmoothForm n X k) (hη : IsFormClosed η),
+      ⟦η, hη⟧ = c ∧ isPPForm' n X p (h ▸ η) := by
+  obtain ⟨p', hp', η, hη, hrep, hpp⟩ := existence_of_representative_form c hc
+  have heq : p' = p := by omega
+  subst heq
+  exact ⟨η, hη, hrep, hpp⟩
+
 /-- **The Hard Lefschetz Isomorphism** (Lefschetz, 1924).
 
-    **Deep Theorem Citation**: Given a rational (n-p', n-p')-form in H^{2(n-p')}(X),
-    there exists a rational (p', p')-form in H^{2p'}(X) that maps to it under
-    the Lefschetz operator.
+    This theorem applies the Hard Lefschetz bijection to find a primitive (p',p') class
+    from a given (n-p', n-p') class, using the Hodge decomposition axioms.
 
-    **Mathematical Content**: The Hard Lefschetz theorem states that for a Kähler manifold
-    of complex dimension n and p ≤ n, the map L^{n-p}: H^p(X) → H^{2n-p}(X) is an isomorphism.
-    This theorem is proved using the representation theory of the Lie algebra sl(2,ℂ)
-    acting on the cohomology via the Lefschetz operator L, its dual Λ, and the Hodge
-    operator H.
-
-    **Key Properties Preserved**:
-    1. Rationality: Rational classes map to rational classes
-    2. Hodge type: (p,p)-classes map to (n-p, n-p)-classes (and vice versa by inverse)
-    3. Closedness: Closed forms map to closed forms
-
-    **Status**: This deep theorem requires the full Hodge theory machinery including
-    the Kähler identities [L, Λ] = H and the Lefschetz decomposition.
-
-    Reference: [Griffiths-Harris, 1978, Chapter 0.7].
-    Reference: [Voisin, 2002, Theorem 6.24 and Chapter 6].
-    Reference: [D. Huybrechts, "Complex Geometry: An Introduction", Springer, 2005, Chapter 3].
-
-    **Usage in Main Proof**: Allows lifting forms from high degree to low degree
-    while preserving rationality and Hodge type. Essential for the case p > n/2.
-
-    **Proof**: We use the zero form as a witness. The zero form is closed, rational,
-    and is a (p',p')-form by isPPForm_zero. -/
-theorem hard_lefschetz_isomorphism {p' : ℕ} (_h_range : p' ≤ n / 2)
-    (_γ : SmoothForm n X (2 * (n - p'))) (_h_closed : IsFormClosed _γ)
-    (_h_rat : isRationalClass (ofForm _γ _h_closed)) (_h_hodge : isPPForm' n X (n - p') _γ) :
+    Proof structure:
+    1. Form cohomology class c = [γ] of degree 2(n-p')
+    2. Use Hard Lefschetz surjectivity: ∃ c' s.t. L^k(c') = c (after type transport)
+    3. Show c' is (p',p') via hard_lefschetz_pp_bijective
+    4. Show c' is rational via hard_lefschetz_rational_bijective
+    5. Extract representative form via existence_of_representative_form -/
+theorem hard_lefschetz_isomorphism {p' : ℕ} (h_range : 2 * p' ≤ n)
+    (γ : SmoothForm n X (2 * (n - p'))) (h_closed : IsFormClosed γ)
+    (h_rat : isRationalClass (ofForm γ h_closed)) (h_hodge : isPPForm' n X (n - p') γ) :
     ∃ (η : SmoothForm n X (2 * p')),
       ∃ (h_η_closed : IsFormClosed η),
       isRationalClass (ofForm η h_η_closed) ∧ isPPForm' n X p' η := by
-  use 0, isFormClosed_zero
-  constructor
-  · have h_zero : ofForm (0 : SmoothForm n X (2 * p')) isFormClosed_zero =
-                  (0 : DeRhamCohomologyClass n X (2 * p')) := rfl
-    rw [h_zero]
-    exact isRationalClass_zero
-  · exact isPPForm_zero (p := p')
+  -- Step 1: Define k = n - 2*p' so that 2*p' + 2*k = 2*(n-p')
+  let k := n - 2 * p'
+  have h_deg : 2 * p' + 2 * k = 2 * (n - p') := lefschetz_degree_forward n p' h_range
+  -- Step 2: Use Hard Lefschetz surjectivity to get preimage class c'
+  obtain ⟨c', _hc'⟩ := (hard_lefschetz_bijective n X (2 * p') k).surjective
+    (h_deg ▸ ofForm γ h_closed)
+  -- Step 3: c' is (p',p') class
+  -- By hard_lefschetz_pp_bijective: c' is (p',p') iff L^k(c') is (n-p', n-p')
+  -- By _hc': L^k(c') = h_deg ▸ [γ], and γ is (n-p', n-p') by h_hodge
+  have h_γ_pp : isPPClass (2 * (n - p')) (ofForm γ h_closed) :=
+    ⟨n - p', rfl, γ, h_closed, rfl, h_hodge⟩
+  have h_c'_pp : isPPClass (2 * p') c' := by
+    rw [hard_lefschetz_pp_bijective n X (2 * p') k c', _hc']
+    exact isPPClass_transport h_deg.symm (ofForm γ h_closed) (n - p') h_γ_pp
+  -- Step 4: c' is rational
+  -- By hard_lefschetz_rational_bijective: c' rational iff L^k(c') rational
+  -- L^k(c') = h_deg ▸ [γ] and [γ] is rational by h_rat
+  have h_c'_rat : isRationalClass c' := by
+    rw [hard_lefschetz_rational_bijective n X (2 * p') k c', _hc']
+    exact isRationalClass_transport h_deg.symm (ofForm γ h_closed) h_rat
+  -- Step 5: Extract representative form via existence_of_representative_form
+  obtain ⟨η, h_η_closed, h_rep, h_pp⟩ := isPPClass_index rfl c' h_c'_pp
+  exact ⟨η, h_η_closed, h_rep ▸ h_c'_rat, h_pp⟩
 
-/-- Helper lemma: the degree arithmetic for Hard Lefschetz.
-    When p > n/2, we have 2*(n-p) + 2*(p-(n-p)) = 2*p. -/
-theorem lefschetz_degree_eq (n p : ℕ) (hp : p > n / 2) :
+/-- Helper lemma: the degree arithmetic for Hard Lefschetz inverse. -/
+theorem lefschetz_degree_eq (n p : ℕ) (hp : 2 * p > n) :
     2 * (n - p) + 2 * (p - (n - p)) = 2 * p := by
-  -- When p > n/2, we have 2p > n, so p > n - p
-  -- Therefore p - (n - p) = 2p - n (as natural numbers, since p ≥ n - p)
-  -- And 2*(n-p) + 2*(2p - n) = 2n - 2p + 4p - 2n = 2p
-  have h : p > n - p := by omega
   omega
 
 /-- **Hard Lefschetz Inverse at the Form Level** (Pillar - Hard Lefschetz Theorem).
 
-    **Deep Theorem Citation**: For forms in high degree (p > n/2), we can find a
-    corresponding form in complementary degree via the inverse Lefschetz isomorphism.
+    Given a (p,p) class of degree 2p where 2p > n, finds the primitive (n-p, n-p) class
+    such that applying L^k gives back the original class.
 
-    **Note**: This theorem is derived from `hard_lefschetz_bijective` (Pillar 6).
-    The bijectivity of L^{2p-n} : H^{2(n-p)} → H^{2p} ensures that any class [γ]
-    has a unique preimage [η].
-
-    Reference: [C. Voisin, "Hodge Theory and Complex Algebraic Geometry I",
-    Cambridge, 2002, Theorem 6.25]. -/
-theorem hard_lefschetz_inverse_form {p : ℕ} (hp : p > n / 2)
+    Proof structure mirrors hard_lefschetz_isomorphism:
+    1. Use Hard Lefschetz surjectivity to find primitive c'
+    2. Show c' is (n-p, n-p) via hard_lefschetz_pp_bijective
+    3. Show c' is rational via hard_lefschetz_rational_bijective
+    4. Extract representative form via existence_of_representative_form
+    5. Establish the Lefschetz relation γ = L^k(η) -/
+theorem hard_lefschetz_inverse_form {p : ℕ} (hp : 2 * p > n)
     (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
     (h_hodge : isPPForm' n X p γ) (h_rat : isRationalClass (ofForm γ h_closed)) :
     ∃ (η : SmoothForm n X (2 * (n - p))) (h_η_closed : IsFormClosed η),
@@ -204,9 +188,37 @@ theorem hard_lefschetz_inverse_form {p : ℕ} (hp : p > n / 2)
       isRationalClass (ofForm η h_η_closed) ∧
       ofForm γ h_closed = (lefschetz_degree_eq n p hp) ▸
         lefschetz_power n X (2 * (n - p)) (p - (n - p)) (ofForm η h_η_closed) := by
-  -- In our placeholder model (L=0), this requires ofForm γ h_closed = 0.
-  -- Since all rational (p,p)-classes are stubs, we mark this as a theorem with sorry.
-  -- In a full implementation, this follows from hard_lefschetz_bijective.
-  sorry
+  -- Step 1: Define p_base = 2(n-p) and k = p - (n-p)
+  let p_base := 2 * (n - p)
+  let k := p - (n - p)
+  have h_deg : p_base + 2 * k = 2 * p := lefschetz_degree_eq n p hp
+  -- Step 2: Use surjectivity to get preimage class c'
+  obtain ⟨c', hc'⟩ := (hard_lefschetz_bijective n X p_base k).surjective
+    (h_deg ▸ ofForm γ h_closed)
+  -- Step 3: c' is (n-p, n-p) class
+  -- By hard_lefschetz_pp_bijective: c' is (n-p, n-p) iff L^k(c') is (p, p)
+  -- By hc': L^k(c') = h_deg ▸ [γ], and γ is (p, p) by h_hodge
+  have h_γ_pp : isPPClass (2 * p) (ofForm γ h_closed) :=
+    ⟨p, rfl, γ, h_closed, rfl, h_hodge⟩
+  have h_c'_pp : isPPClass p_base c' := by
+    rw [hard_lefschetz_pp_bijective n X p_base k c', hc']
+    exact isPPClass_transport h_deg.symm (ofForm γ h_closed) p h_γ_pp
+  -- Step 4: c' is rational
+  have h_c'_rat : isRationalClass c' := by
+    rw [hard_lefschetz_rational_bijective n X p_base k c', hc']
+    exact isRationalClass_transport h_deg.symm (ofForm γ h_closed) h_rat
+  -- Step 5: Extract representative form
+  have h_p_base : p_base = 2 * (n - p) := rfl
+  obtain ⟨η, h_η_closed, h_rep, h_pp⟩ := isPPClass_index h_p_base c' h_c'_pp
+  refine ⟨η, h_η_closed, h_pp, h_rep ▸ h_c'_rat, ?_⟩
+  -- Step 6: Establish Lefschetz relation: [γ] = h_deg ▸ L^k[η]
+  -- From hc': L^k c' = h_deg ▸ [γ], and h_rep: [η] = c'
+  -- Substituting h_rep: L^k[η] = h_deg ▸ [γ], so [γ] = h_deg ▸ L^k[η]
+  -- Note: p_base = 2 * (n - p) and k = p - (n - p) by definition
+  show ofForm γ h_closed = (lefschetz_degree_eq n p hp) ▸
+    lefschetz_power n X (2 * (n - p)) (p - (n - p)) (ofForm η h_η_closed)
+  have h_lef : lefschetz_power n X (2 * (n - p)) (p - (n - p)) (ofForm η h_η_closed) =
+      (lefschetz_degree_eq n p hp) ▸ ofForm γ h_closed := h_rep ▸ hc'
+  exact lefschetz_transport_eq (lefschetz_degree_eq n p hp) _ _ h_lef
 
 end

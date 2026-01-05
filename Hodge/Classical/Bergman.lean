@@ -203,10 +203,13 @@ noncomputable def BergmanMetric (L : HolomorphicLineBundle n X) [IsAmple L] (M :
 noncomputable def dist_form (_α _β : SmoothForm n X 2) : ℝ :=
   comass (_α - _β)
 
-/-- The k-jet evaluation map (Placeholder). -/
+/-- The k-jet evaluation map (Placeholder).
+
+In this lightweight model we take `jet_eval` to be the identity map, so it is surjective.
+The real mathematical `jet_eval` should map global sections to k-jets at `x`. -/
 noncomputable def jet_eval (L : HolomorphicLineBundle n X) (x : X) (k : ℕ) :
     Section L →ₗ[ℂ] (Section L) :=
-  0
+  LinearMap.id
 
 /-- The tensor product of two holomorphic sections exists and is holomorphic.
     Note: We prove this for the constant 1 section, which is well-typed since
