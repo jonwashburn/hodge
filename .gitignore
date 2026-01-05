@@ -21,3 +21,4 @@
 *.vrb
 
 
+.cursor_tmp*.lean

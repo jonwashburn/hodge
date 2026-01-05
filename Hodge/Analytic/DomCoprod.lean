@@ -200,6 +200,47 @@ theorem domDomCongr_apply {F : Type*} [NormedAddCommGroup F] [NormedSpace 𝕜 F
 
 /-! ## Scalar-valued wedge product -/
 
+/-- The (algebraic) wedge construction as a function of an *arbitrary* tensor input.
+
+We keep the tensor input explicit to avoid definitional unfolding of `domCoprod'` on pure tensors
+in later proofs (which would expand into shuffle sums). -/
+noncomputable def wedgeAlternatingTensor {k l : ℕ}
+    (t :
+      TensorProduct 𝕜 (E [⋀^Fin k]→ₗ[𝕜] 𝕜) (E [⋀^Fin l]→ₗ[𝕜] 𝕜)) :
+    E [⋀^Fin (k + l)]→ₗ[𝕜] 𝕜 :=
+by
+  classical
+  let wedge_tensor :
+      E [⋀^Fin k ⊕ Fin l]→ₗ[𝕜] (TensorProduct 𝕜 𝕜 𝕜) :=
+    AlternatingMap.domCoprod' (ιa := Fin k) (ιb := Fin l)
+      (R' := 𝕜) (Mᵢ := E) (N₁ := 𝕜) (N₂ := 𝕜) t
+  let wedge_scalar : E [⋀^Fin k ⊕ Fin l]→ₗ[𝕜] 𝕜 :=
+    (LinearMap.mul' 𝕜 𝕜).compAlternatingMap wedge_tensor
+  exact wedge_scalar.domDomCongr finSumFinEquiv
+
+@[simp]
+theorem wedgeAlternatingTensor_add {k l : ℕ}
+    (t₁ t₂ :
+      TensorProduct 𝕜 (E [⋀^Fin k]→ₗ[𝕜] 𝕜) (E [⋀^Fin l]→ₗ[𝕜] 𝕜)) :
+    wedgeAlternatingTensor (𝕜 := 𝕜) (E := E) (k := k) (l := l) (t₁ + t₂) =
+      wedgeAlternatingTensor (𝕜 := 𝕜) (E := E) (k := k) (l := l) t₁ +
+        wedgeAlternatingTensor (𝕜 := 𝕜) (E := E) (k := k) (l := l) t₂ := by
+  classical
+  -- `domCoprod'` is linear in the tensor input; the remaining steps are linear as well.
+  ext v
+  simp [wedgeAlternatingTensor, map_add]
+
+@[simp]
+theorem wedgeAlternatingTensor_smul {k l : ℕ} (c : 𝕜)
+    (t :
+      TensorProduct 𝕜 (E [⋀^Fin k]→ₗ[𝕜] 𝕜) (E [⋀^Fin l]→ₗ[𝕜] 𝕜)) :
+    wedgeAlternatingTensor (𝕜 := 𝕜) (E := E) (k := k) (l := l) (c • t) =
+      c • wedgeAlternatingTensor (𝕜 := 𝕜) (E := E) (k := k) (l := l) t := by
+  classical
+  ext v
+  simp [wedgeAlternatingTensor, map_smul, LinearMap.compAlternatingMap_smul,
+    AlternatingMap.domDomCongr_smul]
+
 /-- The underlying *algebraic* alternating map of the wedge product.
 
 This is the `AlternatingMap` obtained by `domCoprod'` (tensor-valued), composition with scalar
@@ -210,17 +251,8 @@ noncomputable def wedgeAlternating {k l : ℕ}
     E [⋀^Fin (k + l)]→ₗ[𝕜] 𝕜 :=
 by
   classical
-  -- algebraic domCoprod' (values in 𝕜 ⊗[𝕜] 𝕜)
-  let wedge_tensor :
-      E [⋀^Fin k ⊕ Fin l]→ₗ[𝕜] (TensorProduct 𝕜 𝕜 𝕜) :=
-    AlternatingMap.domCoprod'
-      (R' := 𝕜) (Mᵢ := E) (N₁ := 𝕜) (N₂ := 𝕜)
-      (ω.toAlternatingMap ⊗ₜ[𝕜] η.toAlternatingMap)
-  -- multiply scalars: 𝕜 ⊗[𝕜] 𝕜 →ₗ[𝕜] 𝕜
-  let wedge_scalar : E [⋀^Fin k ⊕ Fin l]→ₗ[𝕜] 𝕜 :=
-    (LinearMap.mul' 𝕜 𝕜).compAlternatingMap wedge_tensor
-  -- reindex Fin k ⊕ Fin l ≃ Fin (k + l)
-  exact wedge_scalar.domDomCongr finSumFinEquiv
+  exact wedgeAlternatingTensor (𝕜 := 𝕜) (E := E) (k := k) (l := l)
+    (ω.toAlternatingMap ⊗ₜ[𝕜] η.toAlternatingMap)
 
 /-- The wedge product of scalar-valued continuous alternating maps.
     Given ω : E [⋀^Fin k]→L[𝕜] 𝕜 and η : E [⋀^Fin l]→L[𝕜] 𝕜,
@@ -260,8 +292,8 @@ theorem wedge_add_left {k l : ℕ}
     wedge (𝕜 := 𝕜) (E := E) (ω₁ + ω₂) η =
       wedge (𝕜 := 𝕜) (E := E) ω₁ η + wedge (𝕜 := 𝕜) (E := E) ω₂ η := by
   ext v
-  simp [wedge_apply, wedgeAlternating, AlternatingMap.domCoprod'_apply, TensorProduct.add_tmul,
-    map_add, add_assoc, add_left_comm, add_comm]
+  -- Avoid expanding `domCoprod` into shuffle sums: the additivity happens at the tensor level.
+  simp [wedge_apply, wedgeAlternating, TensorProduct.add_tmul]
 
 theorem wedge_add_right {k l : ℕ}
     (ω : ContinuousAlternatingMap 𝕜 E 𝕜 (Fin k))
@@ -269,24 +301,53 @@ theorem wedge_add_right {k l : ℕ}
     wedge (𝕜 := 𝕜) (E := E) ω (η₁ + η₂) =
       wedge (𝕜 := 𝕜) (E := E) ω η₁ + wedge (𝕜 := 𝕜) (E := E) ω η₂ := by
   ext v
-  simp [wedge_apply, wedgeAlternating, AlternatingMap.domCoprod'_apply, TensorProduct.tmul_add,
-    map_add, add_assoc, add_left_comm, add_comm]
+  simp [wedge_apply, wedgeAlternating, TensorProduct.tmul_add]
 
 theorem wedge_smul_left {k l : ℕ} (c : 𝕜)
     (ω : ContinuousAlternatingMap 𝕜 E 𝕜 (Fin k))
     (η : ContinuousAlternatingMap 𝕜 E 𝕜 (Fin l)) :
     wedge (𝕜 := 𝕜) (E := E) (c • ω) η = c • wedge (𝕜 := 𝕜) (E := E) ω η := by
   ext v
-  simp [wedge_apply, wedgeAlternating, AlternatingMap.domCoprod'_apply, TensorProduct.smul_tmul',
-    map_smul, smul_assoc]
+  -- Avoid expanding `domCoprod'` into shuffle sums: work at the tensor level.
+  have htensor :
+      ((c • ω.toAlternatingMap) ⊗ₜ[𝕜] η.toAlternatingMap) =
+        c • (ω.toAlternatingMap ⊗ₜ[𝕜] η.toAlternatingMap) := by
+    -- scalar multiplication on tensor products acts on pure tensors by scaling the left factor
+    have : c • (ω.toAlternatingMap ⊗ₜ[𝕜] η.toAlternatingMap) =
+        (c • ω.toAlternatingMap) ⊗ₜ[𝕜] η.toAlternatingMap := by
+      simp [TensorProduct.smul_tmul']
+    simpa using this.symm
+  simp [wedge_apply, wedgeAlternating, wedgeAlternatingTensor, htensor, map_smul,
+    LinearMap.compAlternatingMap_smul, AlternatingMap.domDomCongr_smul]
 
 theorem wedge_smul_right {k l : ℕ} (c : 𝕜)
     (ω : ContinuousAlternatingMap 𝕜 E 𝕜 (Fin k))
     (η : ContinuousAlternatingMap 𝕜 E 𝕜 (Fin l)) :
     wedge (𝕜 := 𝕜) (E := E) ω (c • η) = c • wedge (𝕜 := 𝕜) (E := E) ω η := by
   ext v
-  simp [wedge_apply, wedgeAlternating, AlternatingMap.domCoprod'_apply, TensorProduct.tmul_smul,
-    map_smul, smul_assoc]
+  have htensor :
+      (ω.toAlternatingMap ⊗ₜ[𝕜] (c • η.toAlternatingMap)) =
+        c • (ω.toAlternatingMap ⊗ₜ[𝕜] η.toAlternatingMap) := by
+    -- scalar multiplication on tensor products can be moved to the left factor, hence pulled out
+    have : c • (ω.toAlternatingMap ⊗ₜ[𝕜] η.toAlternatingMap) =
+        (c • ω.toAlternatingMap) ⊗ₜ[𝕜] η.toAlternatingMap := by
+      simp [TensorProduct.smul_tmul']
+    -- move the scalar to the right factor
+    have hmove :
+        (c • ω.toAlternatingMap) ⊗ₜ[𝕜] η.toAlternatingMap =
+          ω.toAlternatingMap ⊗ₜ[𝕜] (c • η.toAlternatingMap) := by
+      -- `smul_tmul` moves the scalar between tensor factors over a commutative base ring
+      simpa using (TensorProduct.smul_tmul (R := 𝕜) (R' := 𝕜) (M := (E [⋀^Fin k]→ₗ[𝕜] 𝕜))
+        (N := (E [⋀^Fin l]→ₗ[𝕜] 𝕜)) c ω.toAlternatingMap η.toAlternatingMap)
+    -- combine
+    calc
+      ω.toAlternatingMap ⊗ₜ[𝕜] (c • η.toAlternatingMap)
+          = (c • ω.toAlternatingMap) ⊗ₜ[𝕜] η.toAlternatingMap := by
+              simpa [hmove] using hmove.symm
+      _ = c • (ω.toAlternatingMap ⊗ₜ[𝕜] η.toAlternatingMap) := by
+              simpa using this.symm
+  simp [wedge_apply, wedgeAlternating, wedgeAlternatingTensor, htensor, map_smul,
+    LinearMap.compAlternatingMap_smul, AlternatingMap.domDomCongr_smul]
 
 /-! ### Continuity in both arguments -/
 
@@ -318,7 +379,9 @@ theorem continuous_wedge {k l : ℕ} :
           ContinuousAlternatingMap 𝕜 E 𝕜 (Fin (k + l))) ≃ₗ[𝕜]
         (ContinuousAlternatingMap 𝕜 E 𝕜 (Fin l) →L[𝕜]
           ContinuousAlternatingMap 𝕜 E 𝕜 (Fin (k + l)))) :=
-    LinearMap.toContinuousLinearMap
+    LinearMap.toContinuousLinearMap (𝕜 := 𝕜)
+      (E := ContinuousAlternatingMap 𝕜 E 𝕜 (Fin l))
+      (F' := ContinuousAlternatingMap 𝕜 E 𝕜 (Fin (k + l)))
 
   let wedgeₗ' :
       (ContinuousAlternatingMap 𝕜 E 𝕜 (Fin k)) →ₗ[𝕜]
@@ -331,7 +394,10 @@ theorem continuous_wedge {k l : ℕ} :
       (ContinuousAlternatingMap 𝕜 E 𝕜 (Fin k)) →L[𝕜]
         (ContinuousAlternatingMap 𝕜 E 𝕜 (Fin l) →L[𝕜]
           ContinuousAlternatingMap 𝕜 E 𝕜 (Fin (k + l))) :=
-    LinearMap.toContinuousLinearMap wedgeₗ'
+    (LinearMap.toContinuousLinearMap (𝕜 := 𝕜)
+      (E := ContinuousAlternatingMap 𝕜 E 𝕜 (Fin k))
+      (F' := (ContinuousAlternatingMap 𝕜 E 𝕜 (Fin l) →L[𝕜]
+        ContinuousAlternatingMap 𝕜 E 𝕜 (Fin (k + l))))) wedgeₗ'
 
   -- Joint continuity of `fun (ω,η) => wedgeCLM ω η` (reduce to the multilinear evaluation lemma).
   simpa [wedgeCLM, wedgeₗ', wedgeₗ] using (by

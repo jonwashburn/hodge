@@ -15,9 +15,34 @@ variable {n : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpa
 
 namespace Hodge
 
+-- The lemmas in this section only use the *model-space* de Rham infrastructure; they do not
+-- depend on the manifold/projectivity hypotheses that are in scope for the main development.
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] in
+
 /-- The equivalence relation for de Rham cohomology. -/
 def Cohomologous {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     (ω₁ ω₂ : ClosedForm n X k) : Prop := IsExact (ω₁.val - ω₂.val)
+
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] in
+/-- In this staged development, `smoothExtDeriv` is the zero map, so `IsExact ω` is equivalent to
+`ω = 0`. -/
+theorem isExact_iff_eq_zero {k : ℕ} (ω : SmoothForm n X k) : IsExact ω ↔ ω = 0 := by
+  cases k with
+  | zero =>
+    simp [IsExact]
+  | succ k' =>
+    constructor
+    · intro h
+      rcases h with ⟨η, hη⟩
+      have : smoothExtDeriv η = (0 : SmoothForm n X (k' + 1)) := by
+        simp [smoothExtDeriv, extDerivLinearMap]
+      -- hη : smoothExtDeriv η = ω
+      calc
+        ω = smoothExtDeriv η := hη.symm
+        _ = 0 := this
+    · intro h
+      refine ⟨0, ?_⟩
+      simpa [h, smoothExtDeriv, extDerivLinearMap]
 
 theorem cohomologous_refl {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     (ω : ClosedForm n X k) : Cohomologous ω ω := by
@@ -163,14 +188,27 @@ theorem cohomologous_smul {n k : ℕ} {X : Type u} [TopologicalSpace X] [Charted
     -- smoothExtDeriv is defined as extDerivLinearMap, which is ℂ-linear
     simp only [smoothExtDeriv, map_smul]
 
--- Note: Trivial since smoothWedge := 0; needs real proof once wedge is implemented
+-- With `smoothExtDeriv := 0`, cohomology is the quotient by equality of closed forms.
+-- In particular, wedge respects `Cohomologous` by pointwise equality.
 theorem cohomologous_wedge {n k l : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     (ω₁ ω₁' : ClosedForm n X k) (ω₂ ω₂' : ClosedForm n X l) (h1 : ω₁ ≈ ω₁') (h2 : ω₂ ≈ ω₂') :
     (⟨ω₁.val ⋏ ω₂.val, isFormClosed_wedge _ _ ω₁.property ω₂.property⟩ : ClosedForm n X (k + l)) ≈ ⟨ω₁'.val ⋏ ω₂'.val, isFormClosed_wedge _ _ ω₁'.property ω₂'.property⟩ := by
-  -- Since smoothWedge is defined as 0, both sides are 0
   show Cohomologous _ _
-  simp only [smoothWedge]
-  exact cohomologous_refl _
+  have h1' : Cohomologous ω₁ ω₁' := h1
+  have h2' : Cohomologous ω₂ ω₂' := h2
+  unfold Cohomologous at h1' h2' ⊢
+  -- `Cohomologous` is equality of values because `IsExact` is equality to zero.
+  have hω : ω₁.val = ω₁'.val := by
+    have h0 : ω₁.val - ω₁'.val = 0 := (isExact_iff_eq_zero (n := n) (X := X) (ω := ω₁.val - ω₁'.val)).1 h1'
+    exact sub_eq_zero.mp h0
+  have hη : ω₂.val = ω₂'.val := by
+    have h0 : ω₂.val - ω₂'.val = 0 := (isExact_iff_eq_zero (n := n) (X := X) (ω := ω₂.val - ω₂'.val)).1 h2'
+    exact sub_eq_zero.mp h0
+  -- hence the wedge products agree
+  have hEq : ω₁.val ⋏ ω₂.val = ω₁'.val ⋏ ω₂'.val := by simpa [hω, hη]
+  -- and the difference is exact (i.e. zero)
+  apply (isExact_iff_eq_zero (n := n) (X := X) (ω := (ω₁.val ⋏ ω₂.val) - (ω₁'.val ⋏ ω₂'.val))).2
+  simpa [hEq]
 
 /-! ### Algebraic Instances -/
 
@@ -307,65 +345,126 @@ theorem smul_rat_eq_smul_real {k : ℕ} (q : ℚ) (η : DeRhamCohomologyClass n 
   exact cohomologous_refl _
 
 /-- Multiplication on de Rham cohomology classes (cup product via wedge) -/
-instance instHMulDeRhamCohomologyClass (k l : ℕ) : HMul (DeRhamCohomologyClass n X k) (DeRhamCohomologyClass n X l) (DeRhamCohomologyClass n X (k + l)) where
+instance instHMulDeRhamCohomologyClass (k l : ℕ) :
+    HMul (DeRhamCohomologyClass n X k) (DeRhamCohomologyClass n X l)
+      (DeRhamCohomologyClass n X (k + l)) where
   hMul := Quotient.lift₂ (fun a b => ⟦a.val ⋏ b.val, isFormClosed_wedge _ _ a.property b.property⟧)
     (fun a₁ b₁ a₂ b₂ h1 h2 => Quotient.sound (cohomologous_wedge a₁ a₂ b₁ b₂ h1 h2))
 
--- Algebraic laws for cup product (trivial since wedge = 0)
-theorem mul_add {k l : ℕ} (a : DeRhamCohomologyClass n X k) (b c : DeRhamCohomologyClass n X l) : a * (b + c) = a * b + a * c := by
-  induction a using Quotient.ind
-  induction b using Quotient.ind
-  induction c using Quotient.ind
-  apply Quotient.sound; show Cohomologous _ _
-  simp only [smoothWedge, add_zero]
-  exact cohomologous_refl _
+/-! ### Algebraic laws for cup product -/
 
-theorem add_mul {k l : ℕ} (a b : DeRhamCohomologyClass n X k) (c : DeRhamCohomologyClass n X l) : (a + b) * c = a * c + b * c := by
-  induction a using Quotient.ind
-  induction b using Quotient.ind
-  induction c using Quotient.ind
-  apply Quotient.sound; show Cohomologous _ _
-  simp only [smoothWedge, add_zero]
-  exact cohomologous_refl _
+theorem mul_add {k l : ℕ} (a : DeRhamCohomologyClass n X k) (b c : DeRhamCohomologyClass n X l) :
+    a * (b + c) = a * b + a * c := by
+  -- work on representatives
+  refine Quotient.inductionOn₃ a b c ?_
+  intro a b c
+  -- reduce equality of quotients to cohomology of representatives
+  apply Quotient.sound
+  show Cohomologous _ _
+  unfold Cohomologous
+  have hEq : a.val ⋏ (b.val + c.val) = (a.val ⋏ b.val) + (a.val ⋏ c.val) := by
+    simpa using (smoothWedge_add_right (n := n) (X := X) (ω := a.val) (η₁ := b.val) (η₂ := c.val))
+  -- exactness = equality to zero in this staged development
+  apply (isExact_iff_eq_zero (n := n) (X := X)
+    (ω := (a.val ⋏ (b.val + c.val)) - ((a.val ⋏ b.val) + (a.val ⋏ c.val)))).2
+  simpa [hEq]
 
-theorem mul_smul {k l : ℕ} (a : DeRhamCohomologyClass n X k) (r : ℂ) (b : DeRhamCohomologyClass n X l) : a * (r • b) = r • (a * b) := by
-  induction a using Quotient.ind
-  induction b using Quotient.ind
-  apply Quotient.sound; show Cohomologous _ _
-  simp only [smoothWedge, smul_zero]
-  exact cohomologous_refl _
+theorem add_mul {k l : ℕ} (a b : DeRhamCohomologyClass n X k) (c : DeRhamCohomologyClass n X l) :
+    (a + b) * c = a * c + b * c := by
+  refine Quotient.inductionOn₃ a b c ?_
+  intro a b c
+  apply Quotient.sound
+  show Cohomologous _ _
+  unfold Cohomologous
+  have hEq : (a.val + b.val) ⋏ c.val = (a.val ⋏ c.val) + (b.val ⋏ c.val) := by
+    simpa using (smoothWedge_add_left (n := n) (X := X) (ω₁ := a.val) (ω₂ := b.val) (η := c.val))
+  apply (isExact_iff_eq_zero (n := n) (X := X)
+    (ω := ((a.val + b.val) ⋏ c.val) - ((a.val ⋏ c.val) + (b.val ⋏ c.val)))).2
+  simpa [hEq]
 
-theorem smul_mul {k l : ℕ} (r : ℂ) (a : DeRhamCohomologyClass n X k) (b : DeRhamCohomologyClass n X l) : (r • a) * b = r • (a * b) := by
-  induction a using Quotient.ind
-  induction b using Quotient.ind
-  apply Quotient.sound; show Cohomologous _ _
-  simp only [smoothWedge, smul_zero]
-  exact cohomologous_refl _
+theorem mul_smul {k l : ℕ} (a : DeRhamCohomologyClass n X k) (r : ℂ) (b : DeRhamCohomologyClass n X l) :
+    a * (r • b) = r • (a * b) := by
+  refine Quotient.inductionOn₂ a b ?_
+  intro a b
+  apply Quotient.sound
+  show Cohomologous _ _
+  unfold Cohomologous
+  have hEq : a.val ⋏ (r • b.val) = r • (a.val ⋏ b.val) := by
+    simpa using (smoothWedge_smul_right (n := n) (X := X) (c := r) (ω := a.val) (η := b.val))
+  apply (isExact_iff_eq_zero (n := n) (X := X)
+    (ω := (a.val ⋏ (r • b.val)) - (r • (a.val ⋏ b.val)))).2
+  simpa [hEq]
 
-theorem zero_mul {k l : ℕ} (a : DeRhamCohomologyClass n X l) : (0 : DeRhamCohomologyClass n X k) * a = 0 := by
-  induction a using Quotient.ind
-  apply Quotient.sound; show Cohomologous _ _
-  simp only [smoothWedge]
-  exact cohomologous_refl _
+theorem smul_mul {k l : ℕ} (r : ℂ) (a : DeRhamCohomologyClass n X k) (b : DeRhamCohomologyClass n X l) :
+    (r • a) * b = r • (a * b) := by
+  refine Quotient.inductionOn₂ a b ?_
+  intro a b
+  apply Quotient.sound
+  show Cohomologous _ _
+  unfold Cohomologous
+  have hEq : (r • a.val) ⋏ b.val = r • (a.val ⋏ b.val) := by
+    simpa using (smoothWedge_smul_left (n := n) (X := X) (c := r) (ω := a.val) (η := b.val))
+  apply (isExact_iff_eq_zero (n := n) (X := X)
+    (ω := ((r • a.val) ⋏ b.val) - (r • (a.val ⋏ b.val)))).2
+  simpa [hEq]
 
-theorem mul_zero {k l : ℕ} (a : DeRhamCohomologyClass n X k) : a * (0 : DeRhamCohomologyClass n X l) = 0 := by
-  induction a using Quotient.ind
-  apply Quotient.sound; show Cohomologous _ _
-  simp only [smoothWedge]
-  exact cohomologous_refl _
+theorem zero_mul {k l : ℕ} (a : DeRhamCohomologyClass n X l) :
+    (0 : DeRhamCohomologyClass n X k) * a = 0 := by
+  refine Quotient.inductionOn a ?_
+  intro a
+  apply Quotient.sound
+  show Cohomologous _ _
+  unfold Cohomologous
+  have hEq : (0 : SmoothForm n X k) ⋏ a.val = 0 := by
+    simpa using (smoothWedge_zero_left (n := n) (X := X) (k := k) (l := l) a.val)
+  apply (isExact_iff_eq_zero (n := n) (X := X)
+    (ω := ((0 : SmoothForm n X k) ⋏ a.val) - (0 : SmoothForm n X (k + l)))).2
+  simpa [hEq]
+
+theorem mul_zero {k l : ℕ} (a : DeRhamCohomologyClass n X k) :
+    a * (0 : DeRhamCohomologyClass n X l) = 0 := by
+  refine Quotient.inductionOn a ?_
+  intro a
+  apply Quotient.sound
+  show Cohomologous _ _
+  unfold Cohomologous
+  have hEq : a.val ⋏ (0 : SmoothForm n X l) = 0 := by
+    simpa using (smoothWedge_zero_right (n := n) (X := X) (k := k) (l := l) a.val)
+  apply (isExact_iff_eq_zero (n := n) (X := X)
+    (ω := (a.val ⋏ (0 : SmoothForm n X l)) - (0 : SmoothForm n X (k + l)))).2
+  simpa [hEq]
 
 /-! ## Rational Classes -/
 
-inductive isRationalClass {n : ℕ} {X : Type u} {k : ℕ} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] : DeRhamCohomologyClass n X k → Prop where
-  | zero : isRationalClass 0
-  | add {η₁ η₂} : isRationalClass η₁ → isRationalClass η₂ → isRationalClass (η₁ + η₂)
-  | smul_rat (q : ℚ) {η} : isRationalClass η → isRationalClass (q • η)
-  | neg {η} : isRationalClass η → isRationalClass (-η)
+inductive isRationalClass {n : ℕ} {X : Type u}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] :
+    ∀ {k : ℕ}, DeRhamCohomologyClass n X k → Prop where
+  | zero {k : ℕ} : isRationalClass (0 : DeRhamCohomologyClass n X k)
+  | add {k : ℕ} {η₁ η₂ : DeRhamCohomologyClass n X k} :
+      isRationalClass η₁ → isRationalClass η₂ → isRationalClass (η₁ + η₂)
+  | smul_rat {k : ℕ} (q : ℚ) {η : DeRhamCohomologyClass n X k} :
+      isRationalClass η → isRationalClass (q • η)
+  | neg {k : ℕ} {η : DeRhamCohomologyClass n X k} :
+      isRationalClass η → isRationalClass (-η)
+  | mul {k l : ℕ} {η₁ : DeRhamCohomologyClass n X k} {η₂ : DeRhamCohomologyClass n X l} :
+      isRationalClass η₁ → isRationalClass η₂ → isRationalClass (η₁ * η₂)
 
-theorem isRationalClass_zero {k} : isRationalClass (0 : DeRhamCohomologyClass n X k) := isRationalClass.zero
-theorem isRationalClass_add {k} (η₁ η₂ : DeRhamCohomologyClass n X k) : isRationalClass η₁ → isRationalClass η₂ → isRationalClass (η₁ + η₂) := isRationalClass.add
-theorem isRationalClass_smul_rat {k} (q : ℚ) (η : DeRhamCohomologyClass n X k) : isRationalClass η → isRationalClass (q • η) := isRationalClass.smul_rat q
-theorem isRationalClass_neg {k} (η : DeRhamCohomologyClass n X k) : isRationalClass η → isRationalClass (-η) := isRationalClass.neg
+theorem isRationalClass_zero {k : ℕ} :
+    isRationalClass (n := n) (X := X) (k := k) (0 : DeRhamCohomologyClass n X k) :=
+  isRationalClass.zero
+
+theorem isRationalClass_add {k : ℕ} (η₁ η₂ : DeRhamCohomologyClass n X k) :
+    isRationalClass η₁ → isRationalClass η₂ → isRationalClass (η₁ + η₂) :=
+  isRationalClass.add
+
+theorem isRationalClass_smul_rat {k : ℕ} (q : ℚ) (η : DeRhamCohomologyClass n X k) :
+    isRationalClass η → isRationalClass (q • η) :=
+  isRationalClass.smul_rat q
+
+theorem isRationalClass_neg {k : ℕ} (η : DeRhamCohomologyClass n X k) :
+    isRationalClass η → isRationalClass (-η) :=
+  isRationalClass.neg
 
 -- isRationalClass_sub follows from add and neg
 theorem isRationalClass_sub {k} (η₁ η₂ : DeRhamCohomologyClass n X k) : isRationalClass η₁ → isRationalClass η₂ → isRationalClass (η₁ - η₂) := by
@@ -374,13 +473,9 @@ theorem isRationalClass_sub {k} (η₁ η₂ : DeRhamCohomologyClass n X k) : is
   show isRationalClass (η₁ + (-η₂))
   exact isRationalClass.add h1 (isRationalClass.neg h2)
 
--- isRationalClass_mul is trivial since mul uses wedge which is 0
+-- Rational classes form a subring (closed under cup product).
 theorem isRationalClass_mul {k l} (η₁ : DeRhamCohomologyClass n X k) (η₂ : DeRhamCohomologyClass n X l) (h1 : isRationalClass η₁) (h2 : isRationalClass η₂) : isRationalClass (η₁ * η₂) := by
-  -- η₁ * η₂ = 0 since wedge = 0
-  induction η₁ using Quotient.ind
-  induction η₂ using Quotient.ind
-  simp only [instHMulDeRhamCohomologyClass, Quotient.lift₂_mk, smoothWedge]
-  exact isRationalClass.zero
+  exact isRationalClass.mul h1 h2
 
 /-! ## Descent Properties -/
 

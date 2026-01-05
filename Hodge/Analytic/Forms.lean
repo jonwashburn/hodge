@@ -300,12 +300,30 @@ end ClosedForm
     and bilinearity. These are standard results but require careful handling of Mathlib's
     alternating map infrastructure.
 
-    **Key Properties** (proven trivially from placeholder, would need real proofs):
+    **Key Properties**:
     - Bilinearity: (ω₁ + ω₂) ∧ η = ω₁ ∧ η + ω₂ ∧ η, etc.
-    - Graded commutativity: ω ∧ η = (-1)^{kl} η ∧ ω
-    - Associativity: (ω ∧ η) ∧ ξ = ω ∧ (η ∧ ξ)
-    - Leibniz rule: d(ω ∧ η) = dω ∧ η + (-1)^k ω ∧ dη -/
-def smoothWedge {k l : ℕ} (_ω : SmoothForm n X k) (_η : SmoothForm n X l) : SmoothForm n X (k + l) := 0
+    - Graded commutativity and associativity are not yet needed on the critical path.
+    - Leibniz rule will be addressed when `smoothExtDeriv` is upgraded from the zero map. -/
+def smoothWedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) : SmoothForm n X (k + l) where
+  as_alternating := fun x =>
+    ContinuousAlternatingMap.wedge (𝕜 := ℂ) (E := TangentModel n) (ω.as_alternating x) (η.as_alternating x)
+  is_smooth := by
+    -- continuity of `x ↦ ω(x) ∧ η(x)` in the operator-norm topology
+    have hω : Continuous ω.as_alternating := by
+      simpa [IsSmoothAlternating] using ω.is_smooth
+    have hη : Continuous η.as_alternating := by
+      simpa [IsSmoothAlternating] using η.is_smooth
+    have hpair : Continuous fun x : X => (ω.as_alternating x, η.as_alternating x) := by
+      -- package the two continuous maps and use `ContinuousMap.prodMk`
+      let f : ContinuousMap X (FiberAlt n k) := ⟨ω.as_alternating, hω⟩
+      let g : ContinuousMap X (FiberAlt n l) := ⟨η.as_alternating, hη⟩
+      exact (ContinuousMap.prodMk f g).continuous
+    have hw :
+        Continuous fun p :
+            (FiberAlt n k × FiberAlt n l) =>
+            ContinuousAlternatingMap.wedge (𝕜 := ℂ) (E := TangentModel n) p.1 p.2 :=
+      ContinuousAlternatingMap.continuous_wedge (𝕜 := ℂ) (E := TangentModel n) (k := k) (l := l)
+    simpa [IsSmoothAlternating] using hw.comp hpair
 -- Implementation path documented above. The algebraic formula using domCoprod is:
 -- let ab := a.domCoprod b; let ab' := (LinearMap.mul' ℝ ℂ).compAlternatingMap ab
 -- ab'.domDomCongr finSumFinEquiv
@@ -315,8 +333,9 @@ notation:67 ω:68 " ⋏ " η:68 => smoothWedge ω η
 theorem isFormClosed_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) :
     IsFormClosed ω → IsFormClosed η → IsFormClosed (ω ⋏ η) := by
   intros _ _
-  unfold IsFormClosed smoothWedge
-  exact isFormClosed_zero
+  -- `smoothExtDeriv` is the zero map in this staged development.
+  unfold IsFormClosed smoothExtDeriv
+  simp [smoothExtDeriv, extDerivLinearMap]
 
 /-- Exterior derivative of an exterior derivative is zero (d² = 0).
     Trivial for the zero map. -/
@@ -344,15 +363,32 @@ theorem smoothExtDeriv_continuous {k : ℕ} : Continuous (smoothExtDeriv (n := n
 
 def unitForm : SmoothForm n X 0 := 0
 
--- Note: The following wedge properties are trivial since smoothWedge := 0
--- They will need real proofs once smoothWedge is properly implemented
 theorem smoothWedge_add_left {k l : ℕ} (ω₁ ω₂ : SmoothForm n X k) (η : SmoothForm n X l) : (ω₁ + ω₂) ⋏ η = (ω₁ ⋏ η) + (ω₂ ⋏ η) := by
-  simp only [smoothWedge, add_zero]
+  ext x v
+  simp [smoothWedge, ContinuousAlternatingMap.wedge_add_left]
 theorem smoothWedge_add_right {k l : ℕ} (ω : SmoothForm n X k) (η₁ η₂ : SmoothForm n X l) : ω ⋏ (η₁ + η₂) = (ω ⋏ η₁) + (ω ⋏ η₂) := by
-  simp only [smoothWedge, add_zero]
+  ext x v
+  simp [smoothWedge, ContinuousAlternatingMap.wedge_add_right]
 theorem smoothWedge_smul_left {k l : ℕ} (c : ℂ) (ω : SmoothForm n X k) (η : SmoothForm n X l) : (c • ω) ⋏ η = c • (ω ⋏ η) := by
-  simp only [smoothWedge, smul_zero]
+  ext x v
+  simp [smoothWedge, ContinuousAlternatingMap.wedge_smul_left]
 theorem smoothWedge_smul_right {k l : ℕ} (c : ℂ) (ω : SmoothForm n X k) (η : SmoothForm n X l) : ω ⋏ (c • η) = c • (ω ⋏ η) := by
-  simp only [smoothWedge, smul_zero]
-theorem smoothWedge_zero_left {k l : ℕ} (η : SmoothForm n X l) : (0 : SmoothForm n X k) ⋏ η = 0 := rfl
-theorem smoothWedge_zero_right {k l : ℕ} (ω : SmoothForm n X k) : ω ⋏ (0 : SmoothForm n X l) = 0 := rfl
+  ext x v
+  simp [smoothWedge, ContinuousAlternatingMap.wedge_smul_right]
+
+theorem smoothWedge_zero_left {k l : ℕ} (η : SmoothForm n X l) : (0 : SmoothForm n X k) ⋏ η = 0 := by
+  ext x v
+  -- derive from `wedge_smul_left` with `c = 0`
+  simpa [smoothWedge] using
+    congrArg (fun (f : FiberAlt n (k + l)) => f v)
+      (ContinuousAlternatingMap.wedge_smul_left
+        (𝕜 := ℂ) (E := TangentModel n) (c := (0 : ℂ))
+        (ω := (0 : FiberAlt n k)) (η := η.as_alternating x))
+
+theorem smoothWedge_zero_right {k l : ℕ} (ω : SmoothForm n X k) : ω ⋏ (0 : SmoothForm n X l) = 0 := by
+  ext x v
+  simpa [smoothWedge] using
+    congrArg (fun (f : FiberAlt n (k + l)) => f v)
+      (ContinuousAlternatingMap.wedge_smul_right
+        (𝕜 := ℂ) (E := TangentModel n) (c := (0 : ℂ))
+        (ω := ω.as_alternating x) (η := (0 : FiberAlt n l)))
