@@ -65,6 +65,11 @@ We close this by a staged migration:
     - pointwise `extDerivAt` via `mfderiv` + alternatization
     - tangent-coordinate smoothness lemmas: `mfderivInTangentCoordinates`, `extDerivInTangentCoordinates`
     - unbundled `extDeriv` (as a function `X → FiberAlt n (k+1)`) plus pointwise linearity lemmas
+    - **Stage‑3 transport helpers (added)**:
+      - `mfderivInTangentCoordinates_eq` (explicit formula on a chart neighborhood)
+      - `alternatizeUncurryFin_compContinuousLinearMap` (alternatization ↔ pullback)
+      - `extDerivInTangentCoordinatesTransported` and `extDerivInTangentCoordinatesTransported_eq`
+        (correct transported coordinate representation matching transported `extDerivAt`)
   - **Integration blocker**: Bundling `x ↦ extDerivAt ω x` back into `SmoothForm`/`ContMDiffForm` requires
     a chart-gluing argument (Stage 3/4), since `mfderiv` depends on local charts.
 

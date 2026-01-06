@@ -48,6 +48,10 @@ These are the *only* axioms intended to remain:
     - Defines an **unbundled** exterior derivative `extDeriv` as a function `X → FiberAlt n (k+1)` (bundling back into `ContMDiffForm` requires a chart-gluing proof)
     - Provides **conversion functions**: `toSmoothForm` (forget differentiability) and `ofSmoothForm` (upgrade when `ContMDiff` is known)
     - Proves pointwise linearity: `extDerivAt_add`, `extDerivAt_smul` and function-level linearity: `extDeriv_add`, `extDeriv_smul`
+    - **Stage‑3 transport helpers (added)**:
+      - `mfderivInTangentCoordinates_eq` (explicit formula on a chart neighborhood)
+      - `alternatizeUncurryFin_compContinuousLinearMap` (alternatization ↔ pullback)
+      - `extDerivInTangentCoordinatesTransported` and `extDerivInTangentCoordinatesTransported_eq` (the corrected transported coordinate expression matches transporting `extDerivAt`)
   - **Main `Forms.lean` unchanged**: Keeps `IsSmoothAlternating = Continuous` and `extDerivLinearMap = 0` to preserve baseline.
   - **Migration path**: Use `ContMDiffForm.ofSmoothForm` to upgrade a `SmoothForm` to `ContMDiffForm` when smoothness is known, then apply the real `extDeriv`.
 

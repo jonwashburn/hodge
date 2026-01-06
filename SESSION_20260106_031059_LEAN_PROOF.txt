@@ -1,6 +1,6 @@
 ================================================================================
 HODGE CONJECTURE - COMPLETE LEAN PROOF BUNDLE
-Generated: Tue Jan  6 03:20:02 CST 2026
+Generated: Tue Jan  6 03:10:58 CST 2026
 Project: /Users/jonathanwashburn/Projects/hodge
 ================================================================================
 
@@ -8649,7 +8649,7 @@ geometric measure theory that are not (yet) in Mathlib.
 -/
 
 ================================================================================
-FILE: Hodge/Analytic/ContMDiffForms.lean (435 lines)
+FILE: Hodge/Analytic/ContMDiffForms.lean (397 lines)
 ================================================================================
 import Hodge.Analytic.Forms
 import Mathlib.Geometry.Manifold.ContMDiff.NormedSpace
@@ -8820,44 +8820,6 @@ theorem alternatizeUncurryFin_compContinuousLinearMap {n : ℕ}
   simp [ContinuousAlternatingMap.alternatizeUncurryFin_apply, fin_removeNth_comp']
 
 end TransportAlternating
-
-/-!
-### Invertibility of `tangentCoordChange` on overlaps
-
-On the overlap of the domains of two extended charts, the tangent coordinate change maps
-`(tangentCoordChange I x y z)` and `(tangentCoordChange I y x z)` are inverses (as continuous linear maps).
-
-We record this explicitly, as it is frequently used when transporting forms between coordinate systems.
--/
-
-section TangentCoordChangeInv
-
-variable {𝕜 : Type*} [NontriviallyNormedField 𝕜]
-variable {E : Type*} [NormedAddCommGroup E] [NormedSpace 𝕜 E]
-variable {H : Type*} [TopologicalSpace H]
-variable {I : ModelWithCorners 𝕜 E H}
-variable {M : Type*} [TopologicalSpace M] [ChartedSpace H M] [IsManifold I 1 M]
-
-theorem tangentCoordChange_comp_eq_id {x y z : M}
-    (hz : z ∈ (extChartAt I x).source ∩ (extChartAt I y).source) :
-    (tangentCoordChange I x y z).comp (tangentCoordChange I y x z) = (1 : E →L[𝕜] E) := by
-  ext v
-  have h3 :
-      z ∈ (extChartAt I y).source ∩ (extChartAt I x).source ∩ (extChartAt I y).source := by
-    refine ⟨⟨hz.2, hz.1⟩, hz.2⟩
-  have hcomp := (tangentCoordChange_comp (w := y) (x := x) (y := y) (z := z) (v := v) (I := I) h3)
-  -- `tangentCoordChange I x y z (tangentCoordChange I y x z v) = tangentCoordChange I y y z v`
-  simpa [ContinuousLinearMap.comp_apply] using
-    (by simpa using (hcomp.trans (tangentCoordChange_self (I := I) (x := y) (z := z) (v := v) hz.2)))
-
-theorem tangentCoordChange_comp_eq_id' {x y z : M}
-    (hz : z ∈ (extChartAt I x).source ∩ (extChartAt I y).source) :
-    (tangentCoordChange I y x z).comp (tangentCoordChange I x y z) = (1 : E →L[𝕜] E) := by
-  -- symmetric statement
-  simpa [and_left_comm, and_assoc, and_comm] using
-    (tangentCoordChange_comp_eq_id (I := I) (x := y) (y := x) (z := z) ⟨hz.2, hz.1⟩)
-
-end TangentCoordChangeInv
 
 /-!
 ### Correct transported coordinate representation of `extDerivAt` (Stage 3 milestone)

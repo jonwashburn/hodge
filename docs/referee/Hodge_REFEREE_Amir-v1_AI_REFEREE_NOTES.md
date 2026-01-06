@@ -72,8 +72,8 @@ then choose rational \(N>M/r_0\) where \(M=\sup_x\|\alpha(x)\|\). Conclude
 
 ### (D) Algebraicity of \([\omega^p]\): `lem:gamma-minus-alg` (TeX ~8080)
 
-**What it does**: Uses very ample powers \(L^{\otimes m}\) and Bertini to produce a smooth complete intersection
-of codimension \(p\) with class \(c_1(L^{\otimes m})^p = m^p c_1(L)^p\).
+**What it does**: Uses very ample powers \(L^{\otimes q}\) and Bertini to produce a smooth complete intersection
+of codimension \(p\) with class \(c_1(L^{\otimes q})^p = q^p c_1(L)^p\).
 
 **Checks**:
 - Confirm the precise Bertini hypothesis needed for *iterated* generic intersections is satisfied.
@@ -102,9 +102,7 @@ This is one of the cleanest, most “standard GMT + calibration” steps.
 - Confirm the King/HL hypotheses: “positive \(d\)-closed *locally integral* \((p,p)\)-current ⇒ analytic cycle.”
 
 **Editorial risk**:
-- In the TeX source, `lem:limit_is_calibrated` appears to have an additional proof block that looks specialized
-  (fixed homology class) and may not match the lemma’s stated hypotheses. This should be cleaned before submission
-  to avoid confusion.
+- This was cleaned in the TeX during the audit (duplicate proof blocks removed); the remaining statement/proof now matches the fixed-class hypotheses used downstream.
 
 ---
 
@@ -178,6 +176,7 @@ This is the **quantitative hinge** that makes the “glue correction has vanishi
   - Confirm the precise convexity hypotheses (uniform curvature bounds scaled like \(1/h\)) are met by the chosen “rounded cubes/cells”.
   - Verify the reduction to a \(k\)-dimensional convex body \(K_t\subset\mathbb R^k\) and the use of the isoperimetric inequality
     giving \(a(t)\lesssim v(t)^{(k-1)/k}\), with constants uniform in \(t\).
+  - Audit note: the TeX proof now explicitly fixes the “nearest boundary point + normal direction” parameterization \(t=t_0-su\) and adds a one-line parallel-body/Steiner justification for the large-volume case, to remove a hidden convex-geometry step.
 
 ---
 
@@ -219,30 +218,31 @@ This is clean once the gluing mass tends to zero and the class is fixed.
 \(0\le \Def_{\mathrm{cal}}(T_\epsilon)\le 2\Mass(U_\epsilon)\to 0\).
 
 **Editorial risk**:
-- The TeX includes what looks like **two proofs** of this proposition back-to-back; that should be cleaned for submission.
+- This was cleaned in the TeX during the audit (duplicate proof block removed).
 
 ---
 
 ### Immediate editorial/hygiene issues to fix before a serious referee pass
 
-1. **Duplicate LaTeX labels**: earlier drafts contained duplicate `\label{...}` identifiers (often inside deprecated `\iffalse` blocks).
-   These should be renamed/standardized before submission so the source is unambiguous to referees and to `hyperref`.
-2. **Multiple proof blocks** for some results (notably around `lem:limit_is_calibrated` and `prop:almost-calibration`).
-   Even if logically harmless, this is a referee-readability problem.
-3. Ensure the “referee patch” blocks (`editamirblock*`) don’t accidentally leave contradictory or obsolete text visible in the final compiled PDF.
+1. **Duplicate LaTeX labels**: resolved in the current TeX (scan reports 0 duplicate `\label{...}` identifiers).
+2. **Multiple proof blocks**: resolved in the current TeX for the previously flagged items (duplicate proof blocks removed).
+3. Still worth doing before submission: ensure the “referee patch” blocks (`editamirblock*`) don’t accidentally leave contradictory or obsolete text visible in the final compiled PDF.
 
 ---
 
 ### Suggested next human referee moves (highest ROI)
 
-If you want the fastest path to “Annals-ready confidence,” I’d prioritize:
+If you want the fastest path to “Annals-ready confidence,” I’d prioritize (and note what was already audited in this pass):
 
-1. **Transport ⇒ flat norm estimate**: the quantitative heart (look for `prop:transport-flat-glue*` and its weighted variants).
-2. **Global coherence across labels**: `prop:global-coherence-all-labels` and the “simultaneous matching hinge.”
-3. **Holomorphic manufacturing**: ensure the Bergman/peak-section inputs are precisely stated with constants and domains.
+1. **Transport ⇒ flat norm estimate**: the quantitative heart (look for `prop:transport-flat-glue*` and its weighted variants).  
+   - Audited here: fixed the interior-face / “slice is a cycle” hypothesis point, and tightened the weighted-displacement bookkeeping.
+2. **Global coherence across labels**: `prop:global-coherence-all-labels` and the “simultaneous matching hinge.”  
+   - Audited here: quantifier/choice order and the definition of the integer counts \(N_{Q,v,i}\) were made explicit in the TeX (no hidden new hypotheses).
+3. **Holomorphic manufacturing**: ensure the Bergman/peak-section inputs are precisely stated with constants and domains.  
    - Update from this audit: `lem:bergman-control` had a scaling typo in the kernel-differentiation normalization; it was corrected in the TeX from \(N^{-(n+1)/2}\) to \(N^{-(n+1/2)}\) so that the produced \(1\)-jets are \(O(1)\) on \(N^{-1/2}\)-balls.
 4. **Exact-class enforcement**: read `thm:global-cohom` and `prop:cohomology-match` end-to-end and redo the rounding argument.
-5. **Parameter schedule sanity**: verify quantifier order and compatibility of all \(o(\cdot)\), \(\ll\), and “choose \(j\) large enough” steps.
+5. **Parameter schedule sanity**: verify quantifier order and compatibility of all \(o(\cdot)\), \(\ll\), and “choose \(j\) large enough” steps.  
+   - Audited here: clarified the face-map/displacement hypothesis \(\Delta_F\lesssim \varrho h^2\) at the schedule level to make the \(W_1\)/flat-norm hinge fully explicit.
 
 
 

@@ -267,6 +267,7 @@ one has $\partial R=0$ automatically.
 \begin{itemize}
 \item $m\in\mathbb{N}$: cohomology multiplier in the target class $\mathrm{PD}(m[\gamma])$ (Definition~\ref{def:syr}); it controls the total pairing $c_0=\langle \mathrm{PD}(m[\gamma]),[\psi]\rangle$.
 \item $N\gg 1$: (when invoked) the \emph{holomorphic/Bergman quantization parameter} for $L^{\otimes N}$; intrinsic analytic scale is $\sim N^{-1/2}$.
+\item \editamir{$N_{\mathrm{Car}}$: Carath\'eodory bound $N_{\mathrm{Car}}(n,p)$ on the number of calibrated directions needed to express a strongly positive form at a point (Lemma~\ref{lem:caratheodory-general}).}
 \item $h>0$: mesh size of the cubulation.
 \item $\varepsilon$: small tolerance (slope/angle or separation threshold); $\varepsilon_h$ is the direction-net resolution at mesh $h$.
 \item \editamir{$\varrho=\varrho(h)\in(0,1]$: \emph{transverse parameter radius factor}; template translation parameters are chosen in a ball of radius $\varrho\,h$ (hence per-face displacement improves to $\Delta_F\lesssim \varrho\,h^{2}$). In the borderline case $p=n/2$ we impose $\varrho=o(\varepsilon)$.}
@@ -2111,6 +2112,11 @@ Fix a direction-net scale $\varepsilon_{\mathrm{net},j}\ll h_j$ for the finite c
 Choose a transverse grid spacing $\delta_j=o(h_j)$ on each face tubular chart $\Omega_F\cong B^{2p}(0,ch_j)$ and an angle tolerance $\varepsilon_j=o(1)$ for the small-angle graph model.
 \editamirNEW{Choose also the transverse parameter radius factor $\varrho_j$ (defining the corner-exit template scale $s_j\asymp \varrho_j h_j$) such that $\varrho_j=o(\varepsilon_j)$ (required for the borderline $p=n/2$ case; see Lemma~\ref{lem:borderline-p-half}).}
 \editamirNEW{In the corner-exit templates, the relevant footprint diameter satisfies $D_Q\asymp s_j$, so the within-label translation separation needed for disjointness is at the footprint scale $\delta_{\mathrm{sep},j}\asymp \varepsilon_j\,s_j$ (cf.\ Lemma~\ref{lem:sliver-stability} and Proposition~\ref{prop:finite-template}).}
+\editamirNEW{Fix, for each interior face $F=Q\cap Q'$ in the mesh-$h_j$ cubulation, a tubular/flat face chart $\Omega_F\cong B^{2p}(0,c h_j)$ and linear face-parameter maps
+$\Phi_{Q,F},\Phi_{Q',F}:B_{C_0\varrho_j h_j}(0)\to \Omega_F$ satisfying the uniform bounds
+$\|\Phi_{Q,F}\|_{\mathrm{op}}+\|\Phi_{Q',F}\|_{\mathrm{op}}\le C_{\Phi,0}$ and $\|\Phi_{Q,F}-\Phi_{Q',F}\|_{\mathrm{op}}\le C_\Phi\,h_j$.
+Then for template atoms $y_a$ with $\|y_a\|\le C_0\varrho_j h_j$ one has the \emph{uniform} displacement estimate
+$\|\Phi_{Q,F}(y_a)-\Phi_{Q',F}(y_a)\|\le C\,\varrho_j h_j^2$, i.e.\ $\Delta_F\lesssim \varrho_j h_j^2$ (Lemmas~\ref{lem:w1-auto} and~\ref{lem:face-displacement}).}
 \item \textbf{Finally choose holomorphic scales and discrete rounding data.}
 Choose the holomorphic manufacturing scale (line bundle power) $N_j\to\infty$ large enough that the local sheet/sliver construction at tolerance $\varepsilon_j$
 is available uniformly on all $h_j$--cells (Theorem~\ref{thm:local-sheets} and the corner-exit realization package), then choose the integer activation/rounding variables
@@ -2125,16 +2131,16 @@ Set
 \qquad k:=2n-2p,
 \]
 where $C_X$ is the filling constant in Lemma~\ref{lem:FF-filling-X}.
-Using Corollary~\ref{cor:global-flat-weighted}, \editamir{for $p<n/2$} choose $j$ large enough so that
+Using Corollary~\ref{cor:global-flat-weighted}, choose $j$ large enough so that
 \[
 \delta_j:=\mathcal F(\partial T^{\mathrm{raw}}_j)\ <\ \eta(\epsilon).
 \]
+\editamir{(In the borderline case $p=n/2$, this is ensured by imposing the refined displacement schedule $\varrho_j=o(\varepsilon_j)$ so that Lemma~\ref{lem:borderline-p-half} gives $\delta_j\to 0$.)}
 Then Proposition~\ref{prop:glue-gap} produces an \emph{integral} $k$--current $U_\epsilon$ with
 $\partial U_\epsilon=\partial T^{\mathrm{raw}}_j$ and
 \[
 \Mass(U_\epsilon)\ \le\ \delta_j + C_X\,\delta_j^{\frac{k}{k-1}}\ <\ \epsilon.
 \]
-\editamir{In the borderline case $p=n/2$, the present bounds do \emph{not} imply the existence of such $j$ (see Lemma~\ref{lem:borderline-p-half}); the gluing step must therefore be supplemented by an additional middle-dimensional closure input.}
 \end{editamirblockNEW}
 \end{itemize}
 \begin{editamirblockNEW}
@@ -2277,12 +2283,13 @@ so $S_j$ satisfies the hypothesis \textnormal{(H1)} in Theorem~\ref{thm:spine-qu
 In the parameter schedule of \S\ref{sec:parameter-schedule} (with fixed $m$ and $h_j\downarrow 0$), the corner-exit vertex-template coherence package yields
 \begin{itemize}
 \item per-face transverse matching (Proposition~\ref{prop:global-coherence-all-labels}, possibly with prefix-edits),
-\item global flat-norm estimate $\mathcal F(\partial T^{\mathrm{raw}})\to 0$ for $p<n/2$ (Corollary~\ref{cor:global-flat-weighted}); in the borderline case $p=n/2$, the current bounds yield only $\mathcal F(\partial T^{\mathrm{raw}})\lesssim \varepsilon^{-1}$ and require an additional closure input (Lemma~\ref{lem:borderline-p-half}),
+\item global flat-norm estimate $\mathcal F(\partial T^{\mathrm{raw}})\to 0$ for $p<n/2$ (Corollary~\ref{cor:global-flat-weighted}); in the borderline case $p=n/2$, the same conclusion holds under the refined displacement schedule $\varrho=o(\varepsilon)$ (Lemma~\ref{lem:borderline-p-half}),
 \item filling with vanishing mass (Proposition~\ref{prop:glue-gap}).
 \end{itemize}
-The exact-class conclusion is enforced by Proposition~\ref{prop:cohomology-match} together with the per-face matching/transport mechanism (Proposition~\ref{prop:integer-transport}). \editamir{For $p=n/2$, this still requires an additional closure input to guarantee that the filling current $U_\epsilon$ in Proposition~\ref{prop:cohomology-match} can be taken with arbitrarily small mass (Lemma~\ref{lem:borderline-p-half}).}
+The exact-class conclusion is enforced by Proposition~\ref{prop:cohomology-match} together with the per-face matching/transport mechanism (Proposition~\ref{prop:integer-transport}),
 rather than relying on a decay exponent in $h$.
-Thus the hypothesis \textnormal{(H2)} in Theorem~\ref{thm:spine-quantitative} holds \editamir{for $p<n/2$ under the present estimates; the borderline case $p=n/2$ is reduced to supplying one of the additional closure inputs listed in Lemma~\ref{lem:borderline-p-half}}.
+\editamir{In the borderline case $p=n/2$, Lemma~\ref{lem:borderline-p-half} supplies $\mathcal F(\partial T^{\mathrm{raw}}_j)\to 0$ under the refined schedule $\varrho_j=o(\varepsilon_j)$, so Proposition~\ref{prop:glue-gap} still produces fillings $U_\epsilon$ of arbitrarily small mass for use in Proposition~\ref{prop:cohomology-match}.}
+Thus the hypothesis \textnormal{(H2)} in Theorem~\ref{thm:spine-quantitative} holds \editamir{for $p<n/2$ under the present estimates, and also for $p=n/2$ provided the refined displacement schedule $\varrho=o(\varepsilon)$ from Lemma~\ref{lem:borderline-p-half} is enforced.}
 \end{proposition}
 \end{editjonblock}
 
@@ -2676,11 +2683,11 @@ $K_p(x)\subset \mathcal V_x$ be the closed convex cone of \emph{strongly positiv
 For each complex $(n-p)$--plane $P\subset T_xX$ let $\xi_P\in K_p(x)$ denote the (normalized) generator of the corresponding extremal ray,
 chosen so that $\langle \xi_P,\psi_x\rangle=1$.
 
-Then there exists a number $N=N(n,p)$ (one may take $N=\dim(\mathcal V_x)+1=\binom{n}{p}^2+1$) such that for every $x\in X$ and every
-$\beta(x)\in K_p(x)$ there exist complex $(n-p)$--planes $P_{x,1},\dots,P_{x,N}\subset T_xX$ and weights
-$\theta_{x,j}\ge 0$ with $\sum_{j=1}^{N}\theta_{x,j}=1$ such that
+Then there exists a number \editamir{$N_{\mathrm{Car}}=N_{\mathrm{Car}}(n,p)$} (one may take $N_{\mathrm{Car}}=\dim(\mathcal V_x)+1=\binom{n}{p}^2+1$) such that for every $x\in X$ and every
+$\beta(x)\in K_p(x)$ there exist complex $(n-p)$--planes $P_{x,1},\dots,P_{x,N_{\mathrm{Car}}}\subset T_xX$ and weights
+$\theta_{x,j}\ge 0$ with $\sum_{j=1}^{N_{\mathrm{Car}}}\theta_{x,j}=1$ such that
 \[
-\beta(x)=t(x)\sum_{j=1}^{N}\theta_{x,j}\,\xi_{P_{x,j}},
+\beta(x)=t(x)\sum_{j=1}^{N_{\mathrm{Car}}}\theta_{x,j}\,\xi_{P_{x,j}},
 \qquad t(x):=\langle \beta(x),\psi_x\rangle.
 \]
 \end{lemma}
@@ -2695,7 +2702,7 @@ $K_p(x)$ is the closed convex cone generated by the extremal rays $\R_{\ge 0}\,\
 Intersecting with $H_x$ shows that $\widehat\beta(x)$ lies in the compact convex set
 $\mathrm{conv}\{\xi_P:\ P\in \Gr_{n-p}(T_xX)\}\subset H_x$.
 Carath\'eodory's theorem in the finite-dimensional vector space $H_x\cong\R^{D-1}$ yields a convex representation using at most $D$ points,
-hence using at most $N=D+1$ points in $\mathcal V_x$.
+hence using at most $N_{\mathrm{Car}}=D+1$ points in $\mathcal V_x$.
 \end{proof}
 
 \medskip\noindent
@@ -2712,11 +2719,11 @@ $K_p(x)\subset \mathcal V_x$ be the closed convex cone of \emph{strongly positiv
 For each complex $(n-p)$--plane $P\subset T_xX$ let $\xi_P\in K_p(x)$ denote the (normalized) generator of the corresponding extremal ray,
 chosen so that $\langle \xi_P,\psi_x\rangle=1$.
 
-Then there exists a number $N=N(n,p)$ (one may take $N=\dim_{\R}(\mathcal V_x)+1=\binom{n}{p}^2+1$) such that for every $x\in X$ and every
+Then there exists a number \editamir{$N_{\mathrm{Car}}=N_{\mathrm{Car}}(n,p)$} (one may take $N_{\mathrm{Car}}=\dim_{\R}(\mathcal V_x)+1=\binom{n}{p}^2+1$) such that for every $x\in X$ and every
 $\beta(x)\in K_p(x)$ there exist complex $(n-p)$--planes $P_{x,1},\dots,P_{x,N}\subset T_xX$ and weights
-$\theta_{x,j}\ge 0$ with $\sum_{j=1}^{N}\theta_{x,j}=1$ such that
+$\theta_{x,j}\ge 0$ with $\sum_{j=1}^{N_{\mathrm{Car}}}\theta_{x,j}=1$ such that
 \[
-\beta(x)=t(x)\sum_{j=1}^{N}\theta_{x,j}\,\xi_{P_{x,j}},
+\beta(x)=t(x)\sum_{j=1}^{N_{\mathrm{Car}}}\theta_{x,j}\,\xi_{P_{x,j}},
 \qquad t(x):=\langle \beta(x),\psi_x\rangle.
 \]
 \end{lemma}
@@ -2735,7 +2742,7 @@ Intersecting with $H_x$ shows that $\widehat\beta(x)$ lies in the compact convex
 \]
 Set $D:=\dim_{\R}(\mathcal V_x)=\binom{n}{p}^2$, so $\dim(H_x)=D-1$.
 Carath\'eodory's theorem in the affine space $H_x\cong \R^{D-1}$ yields a convex representation of $\widehat\beta(x)$
-using at most $D$ points from $\{\xi_P\}$; padding with zero weights gives a representation with at most $N=D+1$ points.
+using at most $D$ points from $\{\xi_P\}$; padding with zero weights gives a representation with at most $N_{\mathrm{Car}}=D+1$ points.
 Multiplying by $t(x)$ gives the claimed decomposition of $\beta(x)$.
 \end{proof}
 
@@ -3310,7 +3317,7 @@ complete intersections.
 
 Define the local current
 \[
-S_Q := \sum_{j=1}^{N}\sum_{a=1}^{N_{Q,j}}[Y_{Q,j}^a]\llcorner Q.
+S_Q := \sum_{j=1}^{N_{\mathrm{Car}}}\sum_{a=1}^{N_{Q,j}}[Y_{Q,j}^a]\llcorner Q.
 \]
 By construction, each $Y_{Q,j}^a$ is $\psi$-calibrated; hence $S_Q$ is a
 positive $\psi$-calibrated integral current on $Q$.  Its tangent-plane
@@ -3401,7 +3408,7 @@ t_Q:=\langle \beta(x_Q),\psi_{x_Q}\rangle,
 where $\xi_{Q,j}\in K_p(x_Q)$ are normalized extremal generators (coming from
 complex $(n-p)$-planes) satisfying $\langle \xi_{Q,j},\psi_{x_Q}\rangle=1$,
 the weights satisfy $\theta_{Q,j}\ge 0$, $\sum_j\theta_{Q,j}=1$, and
-$J(Q)\le N=N(n,p)$ uniformly bounded.
+$J(Q)\le \editamir{N_{\mathrm{Car}}=N_{\mathrm{Car}}(n,p)}$ uniformly bounded.
 
 Since $[\gamma]$ is rational, all its periods lie in $(1/M)\Z$ for some
 fixed $M$.  Choose $m\gg 1$ divisible by $M$.
@@ -3836,6 +3843,8 @@ holds with
 \[
 \tau_F\ :=\ \editamir{C_\Phi\,C_0\,\varrho\,h^2}\,N_F.
 \]
+\editamir{Moreover, the same identity pairing yields the \emph{uniform pointwise} displacement bound
+$\|\Phi_{Q,F}(y_a)-\Phi_{Q',F}(y_a)\|\le C_\Phi C_0\varrho h^2$ for all $a\le N_F$, so Corollary~\ref{cor:global-flat-weighted} may be applied with $\Delta_F:=C_\Phi C_0\varrho h^2$.}
 \end{proposition}
 
 \begin{proof}
@@ -3903,12 +3912,16 @@ Write $K_t:=(P+t)\cap Q\subset P+t\cong\R^k$, so $v(t)=\mathcal H^k(K_t)$ and $a
 
 If $v(t)\ge v_0>0$, then $K_t$ is a convex body contained in a fixed $k$--ball of radius $O(1)$, hence $a(t)\le A_0(d,k)$, and the desired bound follows
 after increasing $C_*$.
+\editamir{(For example, if $K_t\subset B_R\subset \R^k$ with $R=O(1)$, then by convexity $K_t+\rho B_1\subset B_{R+\rho}$ for all $\rho>0$.
+Differentiating the corresponding volume bound at $\rho=0$ (Steiner formula) gives a uniform surface-area bound $a(t)=\mathcal H^{k-1}(\partial K_t)\le C(k)\,R^{k-1}$.)}
 
 Assume $v(t)\le v_0$ with $v_0$ small.  The curvature pinching implies an interior/exterior rolling-ball condition with radii
 $r_{\mathrm{in}},r_{\mathrm{out}}\asymp 1$ (depending only on $c,C$) at every boundary point of $Q$.
 Let $\pi:\R^d\to P^\perp$ be orthogonal projection and set $D:=\pi(Q)\subset P^\perp$.
-Choose a nearest point $t_0\in\partial D$ and an outward normal $u\in P^\perp$ to a supporting hyperplane of $D$ at $t_0$, and write $t=t_0-s u$.
-Let $x_0\in\partial Q$ be the unique supporting point with outward normal $u$ (uniqueness by uniform convexity), so $\pi(x_0)=t_0$.
+\editamir{Choose a nearest boundary point $t_0\in\partial D$ to $t$ and set $s:=\|t_0-t\|$ and $u:=(t_0-t)/\|t_0-t\|\in P^\perp$, so $t=t_0-s u$.
+By convexity of $D$, the vector $u$ is an outward normal to a supporting hyperplane of $D$ at $t_0$.}
+\editamir{Let $x_0\in\partial Q$ be the unique supporting point of $Q$ in direction $u$ (uniqueness by uniform convexity).  Since $u\perp P$,
+the support function of $D=\pi(Q)$ in direction $u$ agrees with that of $Q$, hence $\pi(x_0)=t_0$.}
 
 Intersect the tangent balls at $x_0$ with the affine plane $P+t$.  Since $u\perp P$, these intersections are $k$-balls of radii
 $\rho_{\mathrm{in}}(s)=\sqrt{2r_{\mathrm{in}}s-s^2}$ and $\rho_{\mathrm{out}}(s)=\sqrt{2r_{\mathrm{out}}s-s^2}$, hence
@@ -4348,9 +4361,15 @@ Applying Lemma~\ref{lem:flat-C0-deform} to each slice yields a flat-norm error o
 \[
 \mathcal F\!\bigl(\Sigma^{\mathrm{act}}_y-\Sigma^{\mathrm{flat}}_y\bigr)\ \le\ C\,\varepsilon\,h\Bigl(\Mass(\Sigma^{\mathrm{flat}}_y)+\Mass(\partial\Sigma^{\mathrm{flat}}_y)\Bigr).
 \]
-Summing over the integer-weighted family of slices meeting $F$ and using that the total $(2n-2p)$--mass of pieces meeting $F$
-controls the sum of slice masses at scale $h$ gives the additional term
-$C_{\angle}\,\varepsilon\,M_F$ in the statement.
+\editamir{Summing over the integer-weighted family of slices meeting $F$ it therefore suffices to bound
+$\sum_{a}w_a\bigl(\Mass(\Sigma^{\mathrm{flat}}_{\Phi_{Q,F}y_a})+\Mass(\partial\Sigma^{\mathrm{flat}}_{\Phi_{Q,F}y_a})\bigr)$
+in terms of the total interior mass $M_F$ of pieces meeting the interface.
+In the small-angle graph regime the model slice $\Sigma^{\mathrm{flat}}$ is the boundary trace of a single-sheet piece inside a cell of diameter $\asymp h$,
+so by the uniform geometric slice estimate (e.g.\ Lemma~\ref{lem:uniformly-convex-slice-boundary} in the rounded-cell model, or the corner-simplex face-mass bound in the vertex-template model)
+one has $\Mass(\Sigma^{\mathrm{flat}}_y)\lesssim h^{-1}\,\Mass(\text{corresponding piece})$ (and $\partial\Sigma^{\mathrm{flat}}_y=0$ after edge-trimming, cf.\ Lemma~\ref{lem:face-slice-cycle-mass}).
+Summing over the finitely many pieces meeting $F$ yields
+$\sum_a w_a(\Mass(\Sigma^{\mathrm{flat}}_{\Phi_{Q,F}y_a})+\Mass(\partial\Sigma^{\mathrm{flat}}_{\Phi_{Q,F}y_a}))\lesssim h^{-1}M_F$,
+and hence the total model-error contribution is $\lesssim \varepsilon h\cdot (h^{-1}M_F)=C_{\angle}\,\varepsilon\,M_F$ as claimed.}
 \end{proof}
 
 
@@ -4675,6 +4694,7 @@ Lemma~\ref{lem:oh-face-edit-regime} isolates the only nontrivial ingredient need
 In the present paper this requirement is built into the \emph{finite corner-exit direction net} and the associated activation rule.
 By Proposition~\ref{prop:corner-exit-template-net}, all slivers in a fixed template label have identical footprint geometry; in particular, for each fixed interior face $F$ the per-piece face-slice boundary masses are \emph{uniform} within the label.
 Consequently the tail-heaviness hypothesis \textnormal{(b)} in Lemma~\ref{lem:oh-face-edit-regime} holds with $\kappa=1$ (uniformly in the refinement parameter), and item~\textnormal{(iv)} follows by combining Lemma~\ref{lem:oh-face-edit-regime} with the checkerboard face-edit estimate of Proposition~\ref{prop:checkerboard-face-oh-edit}.
+\editamir{(In the vertex-template activation route, Proposition~\ref{prop:vertex-template-face-edits} provides the same $O(h)$ face-edit conclusion without invoking checkerboarding.)}
 \end{editamirblockNEW}
 
 \smallskip
@@ -5542,7 +5562,8 @@ up to the rounding error $O(1/N)+O(\varepsilon^2)$ from Proposition~\ref{prop:ve
 \item[\textnormal{(b)}] (\textbf{Slow variation}) for each interior adjacency $Q\sim Q'$ and each shared vertex $v\in Q\cap Q'$, one has
 $|N_{Q,v,i}-N_{Q',v,i}|\lesssim h\min\{N_{Q,v,i},N_{Q',v,i}\}$ on the region where $M_{Q,i}$ is not negligible (e.g.\ via Lemma~\ref{lem:slow-variation-rounding}
 and the $0$--$1$ stability Lemma~\ref{lem:slow-variation-discrepancy});
-\item[\textnormal{(c)}] (\textbf{Cohomology periods}) after clearing denominators by choosing $m$ and applying fixed-dimension discrepancy rounding
+\item[\textnormal{(c)}] (\textbf{Cohomology periods}) after clearing denominators by the fixed cohomology multiplier $m$ (as in \S\ref{sec:parameter-schedule})
+and applying fixed-dimension discrepancy rounding
 (Lemma~\ref{lem:barany-grinberg}), one can choose the integer activations so that the \emph{raw} current has the desired periods up to an error $<\tfrac14$
 on a fixed integral cohomology basis; after applying the gluing correction with sufficiently small mass, the resulting \emph{closed} glued cycle has the
 exact integral periods and hence the exact class $\mathrm{PD}(m[\gamma])$ in rational homology (Proposition~\ref{prop:cohomology-match}).
@@ -5587,9 +5608,14 @@ are exactly those ensured by the template-net construction together with the par
 
 \smallskip\noindent
 \textbf{(3) Integer rounding with slow variation.}
-Given the per-cell mass budgets $M_{Q,i}$, the simultaneous choice of integer counts $N_{Q,v,i}$
-satisfying \textnormal{(a)} and \textnormal{(b)} is precisely the content of Lemma~\ref{lem:slow-variation-rounding}
-together with the $0$--$1$ stability Lemma~\ref{lem:slow-variation-discrepancy}, applied label-by-label.
+\editamir{Given the per-cell mass budgets $M_{Q,i}$, choose any vertex split $M_{Q,v,i}\ge 0$ with $\sum_{v\in\mathrm{Vert}(Q)}M_{Q,v,i}=M_{Q,i}$ (e.g.\ equal split).}
+\editamir{For each $(Q,v,i)$ let $\mu_{Q,v,i}>0$ denote the common per-piece mass scale in $Q$ for the $v$-anchored pieces of label $i$ (as in Proposition~\ref{prop:vertex-template-mass-matching}), and define}
+\[
+\editamir{N_{Q,v,i}\ :=\ \Bigl\lfloor \frac{M_{Q,v,i}}{\mu_{Q,v,i}}\Bigr\rceil.}
+\]
+\editamir{Then item \textnormal{(a)} is exactly Proposition~\ref{prop:vertex-template-mass-matching} applied label-by-label.}
+\editamir{Item \textnormal{(b)} follows by applying Lemma~\ref{lem:slow-variation-rounding} (and the $0$--$1$ stability Lemma~\ref{lem:slow-variation-discrepancy})
+to the Lipschitz targets $(Q,v)\mapsto M_{Q,v,i}/\mu_{Q,v,i}$ at shared vertices, on the region where $M_{Q,i}$ is not negligible.}
 
 \smallskip\noindent
 \textbf{(4) Period control and gluing.}
@@ -7147,7 +7173,7 @@ Then $T_\epsilon:=S-U_\epsilon$ is a closed integral cycle and
 \[
 \int_{T_\epsilon}\Theta_\ell\ =\ m\,I_\ell\qquad\text{for all }\ell=1,\dots,b.
 \]
-\editamir{(Here $S_Q:=\sum_{j=1}^N\sum_{a=1}^{N_{Q,j}}[Y_{Q,j}^a]\llcorner Q$ is the local integral current built from the sheet pieces, and $S_Q(\Theta_\ell):=\int_{S_Q}\Theta_\ell=\sum_{j,a}\int_{Y_{Q,j}^a\cap Q}\Theta_\ell$.)}
+\editamir{(Here $S_Q:=\sum_{j=1}^{N_{\mathrm{Car}}}\sum_{a=1}^{N_{Q,j}}[Y_{Q,j}^a]\llcorner Q$ is the local integral current built from the sheet pieces, and $S_Q(\Theta_\ell):=\int_{S_Q}\Theta_\ell=\sum_{j,a}\int_{Y_{Q,j}^a\cap Q}\Theta_\ell$.)}
 
 In particular, $[T_\epsilon]=\mathrm{PD}(m[\gamma])$ in $H_{2(n-p)}(X,\Z)/\mathrm{tors}$ (equivalently in $H_{2(n-p)}(X,\Q)$).
 \end{proposition}
@@ -7286,7 +7312,7 @@ $R$ (a $(k-1)$--current) and $Q$ (a $k$--current) in $X$ such that
 \qquad
 \Mass(R)+\Mass(Q)\ \le\ \delta+\eta.
 \]
-Since $\partial S$ is a boundary, $R$ is null-homologous and hence bounds in $X$.
+\editamir{Taking boundaries gives $\partial R=\partial^2S-\partial^2Q=0$, so $R$ is an integral cycle.  Moreover $R=\partial(S-Q)$, hence $R$ bounds in $X$ by an \emph{integral} $k$--current.}
 Applying Lemma~\ref{lem:FF-filling-X} yields an integral $k$--current $Q_R$ with $\partial Q_R=R$ and
 \[
 \Mass(Q_R)\ \le\ C_X\,\Mass(R)^{\frac{k}{k-1}}.
@@ -7332,17 +7358,18 @@ Moreover Proposition~\ref{prop:cohomology-match} gives the required period equal
 \begin{editamirblock}
 \begin{proposition}[Almost--calibration and global mass convergence for the glued cycles]\label{prop:almost-calibration}
 Let $\psi$ be a smooth closed $(2n-2p)$--form with comass $\le 1$.
-Let $S$ be an integral $(2n-2p)$--current built as a finite sum of local $\psi$--calibrated sheet pieces (so $\Mass(S)=\int_S\psi$).
+Let $(S_\epsilon)_{\epsilon>0}$ be a family of integral $(2n-2p)$--currents built as finite sums of local $\psi$--calibrated sheet pieces
+(so $\Mass(S_\epsilon)=\int_{S_\epsilon}\psi$ for each $\epsilon$).
 Let $U_\epsilon$ be integral currents such that
 \[
-\partial U_\epsilon=\partial S,
+\partial U_\epsilon=\partial S_\epsilon,
 \qquad
 \Mass(U_\epsilon)\xrightarrow[\epsilon\to 0]{}0,
 \]
 for instance the gluing corrections $U_h$ constructed in Proposition~\ref{prop:glue-gap} (with $\epsilon\sim h$).
 Define the closed integral cycles
 \[
-T_\epsilon := S-U_\epsilon,
+T_\epsilon := S_\epsilon-U_\epsilon,
 \qquad
 \partial T_\epsilon=0.
 \]
@@ -7384,7 +7411,7 @@ c_0\ \le\ \Mass(T_\epsilon)\ \le\ c_0+2\,\Mass(U_\epsilon),
 
 \begin{proof}
 By the comass bound, $|\int_{U_\epsilon}\psi|\le \Mass(U_\epsilon)$ and $\int_{T_\epsilon}\psi\le \Mass(T_\epsilon)$.
-Since each sheet piece of $S$ is $\psi$--calibrated, $\Mass(S)=\int_S\psi$.
+Since each sheet piece of $S_\epsilon$ is $\psi$--calibrated, $\Mass(S_\epsilon)=\int_{S_\epsilon}\psi$.
 
 For \textnormal{(i)}, $d\psi=0$ and the homology hypothesis give
 $\int_{T_\epsilon}\psi=\langle[T_\epsilon],[\psi]\rangle=\langle\mathrm{PD}(m[\gamma]),[\psi]\rangle=:c_0$.
@@ -7392,11 +7419,11 @@ $\int_{T_\epsilon}\psi=\langle[T_\epsilon],[\psi]\rangle=\langle\mathrm{PD}(m[\g
 For \textnormal{(ii)}, write
 \[
 \Def_{\mathrm{cal}}(T_\epsilon)
-=\Mass(T_\epsilon)-\int_{S}\psi+\int_{U_\epsilon}\psi
-\le \bigl(\Mass(S)+\Mass(U_\epsilon)\bigr)-\Mass(S)+\bigl|\int_{U_\epsilon}\psi\bigr|
+=\Mass(T_\epsilon)-\int_{S_\epsilon}\psi+\int_{U_\epsilon}\psi
+\le \bigl(\Mass(S_\epsilon)+\Mass(U_\epsilon)\bigr)-\Mass(S_\epsilon)+\bigl|\int_{U_\epsilon}\psi\bigr|
 \le 2\,\Mass(U_\epsilon),
 \]
-using $\Mass(T_\epsilon)\le \Mass(S)+\Mass(U_\epsilon)$ and $|\int_{U_\epsilon}\psi|\le \Mass(U_\epsilon)$.
+using $\Mass(T_\epsilon)\le \Mass(S_\epsilon)+\Mass(U_\epsilon)$ and $|\int_{U_\epsilon}\psi|\le \Mass(U_\epsilon)$.
 The lower bound $\Def_{\mathrm{cal}}(T_\epsilon)\ge 0$ is $\int_{T_\epsilon}\psi\le \Mass(T_\epsilon)$.
 
 Finally \textnormal{(iii)} follows from $\Mass(T_\epsilon)=\int_{T_\epsilon}\psi+\Def_{\mathrm{cal}}(T_\epsilon)=c_0+\Def_{\mathrm{cal}}(T_\epsilon)$.
@@ -7408,7 +7435,7 @@ Finally \textnormal{(iii)} follows from $\Mass(T_\epsilon)=\int_{T_\epsilon}\psi
 The filling currents $U_\epsilon$ (or $R_{\mathrm{glue}}$ in Substep~4.2) are produced by the flat-norm decomposition and the
 Federer--Fleming isoperimetric inequality.  They are \editamir{not required} to be $\psi$--calibrated, nor to have any positivity/type property.
 This causes no difficulty: the only input used later is the vanishing-mass estimate $\Mass(U_\epsilon)\to 0$.
-By Proposition~\ref{prop:almost-calibration}\textnormal{(ii)}, this forces the calibration defect of $T_\epsilon=S-U_\epsilon$ to vanish, so any subsequential
+By Proposition~\ref{prop:almost-calibration}\textnormal{(ii)}, this forces the calibration defect of $T_\epsilon=S_\epsilon-U_\epsilon$ to vanish, so any subsequential
 limit is $\psi$--calibrated (hence positive of type $(p,p)$ in the Harvey--Lawson sense).
 \end{remark}
 
@@ -7420,7 +7447,13 @@ This step establishes that the limit of the approximating cycles is
 $\psi$-calibrated and realizes the SYR property.
 
 \begin{theorem}[SYR Realization]\label{thm:syr-realization}
-\editamir{Assume the local-sheet construction of Theorem~\ref{thm:local-sheets} producing a $\psi$--calibrated sheet current $S$, and let $U_\varepsilon$ be the gluing correction current constructed in Proposition~\ref{prop:glue-gap} so that $T_\varepsilon:=S-U_\varepsilon$ is a closed integral current.  Assume Proposition~\ref{prop:cohomology-match} so that $[T_\varepsilon]=\mathrm{PD}(m[\gamma])$ in $H_{2n-2p}(X;\R)$ (hence in $H_{2n-2p}(X;\Q)$ modulo torsion), and Proposition~\ref{prop:almost-calibration} so that $0\le \Mass(T_\varepsilon)-\int_{T_\varepsilon}\psi\le 2\,\Mass(U_\varepsilon)\to 0$.}
+\begin{editamirblockNEW}
+Assume that for each $\varepsilon>0$ we have an integral $(2n-2p)$--current $S_\varepsilon$ built as a finite sum of local $\psi$--calibrated holomorphic sheet pieces (Theorem~\ref{thm:local-sheets}),
+and an integral current $U_\varepsilon$ with $\partial U_\varepsilon=\partial S_\varepsilon$ such that $\Mass(U_\varepsilon)\to 0$ as $\varepsilon\to 0$ (Proposition~\ref{prop:glue-gap}).
+Set $T_\varepsilon:=S_\varepsilon-U_\varepsilon$, so $\partial T_\varepsilon=0$ and $T_\varepsilon$ is integral.
+Assume Proposition~\ref{prop:cohomology-match} so that $[T_\varepsilon]=\mathrm{PD}(m[\gamma])$ in $H_{2n-2p}(X;\R)$ (equivalently in $H_{2n-2p}(X;\Z)/\mathrm{Tor}$),
+and Proposition~\ref{prop:almost-calibration} so that $0\le \Mass(T_\varepsilon)-\int_{T_\varepsilon}\psi\le 2\,\Mass(U_\varepsilon)\to 0$.
+\end{editamirblockNEW}
 the sequence $T_\varepsilon$ has:
 \begin{enumerate}
 \item[\textnormal{(i)}] $\Mass(T_\varepsilon)\to m\int_X\beta\wedge\psi$;
@@ -7465,13 +7498,12 @@ Thus $\Mass(T_k)\ge m\int_X\beta\wedge\psi-o(1)$ as well.  We conclude:
 This is the compactness/normalization needed for Federer--Fleming.
 
 \medskip\noindent
-\editamir{\textbf{Substep 6.2: Compactness (currents and varifolds) \cite{Allard72,Sim83}.}}
+\editamir{\textbf{Substep 6.2: Compactness (integral currents).}}
 \begin{editamirblock}
-By Federer--Fleming compactness for integral currents on the compact manifold $X$, using $\sup_k\Mass(T_k)<\infty$ and $\partial T_k=0$, after passing to a subsequence we obtain $T_k\to T$ in the flat norm. Let $V_k$ be the integral varifold associated to $T_k$. Since $\sup_k\Mass(T_k)<\infty$, the varifold measures have uniformly bounded mass, hence by weak-$\ast$ compactness of Radon measures (cf.\ \cite{Allard72,Sim83}) after passing to a further subsequence we obtain $V_k\to V$ as varifolds.
+By Federer--Fleming compactness for integral currents on the compact manifold $X$, using $\sup_k\Mass(T_k)<\infty$ and $\partial T_k=0$, after passing to a subsequence we obtain $T_k\to T$ in the flat norm.
 \end{editamirblock}
 
 \begin{itemize}
-\item $V_k\to V$ as varifolds;
 \item $T_k\to T$ as integral currents in the flat norm;
 \item \editamir{By Lemma~\ref{lem:flat_limit_of_cycles_is_cycle}, since $T_k\to T$ in the flat norm (hence weakly) and $\partial T_k=0$, we have $\partial T=0$; thus $T$ is an integral $(2n-2p)$-cycle;}
 \item \editamir{(Homology identification.) For every smooth closed $(2n-2p)$--form $\eta$ on $X$,
@@ -7829,16 +7861,16 @@ as in the global assumptions, so that $[\omega]=c_1(L)$.
 Then the class $[\omega^p]=c_1(L)^p\in H^{2p}(X,\Q)\cap H^{p,p}(X)$ lies in the $\Q$--span
 of algebraic cycle classes.  More concretely, for $m\gg 0$ there exists a smooth complete
 intersection $Z\subset X$ of codimension $p$, cut out by $p$ generic divisors in the
-linear system $|L^{\otimes m}|$, such that
+linear system $|L^{\otimes q}|$, such that
 \[
-\mathrm{PD}([Z]) \;=\; c_1(L^{\otimes m})^p \;=\; m^p\,[\omega^p].
+\mathrm{PD}([Z]) \;=\; c_1(L^{\otimes q})^p \;=\; q^p\,[\omega^p].
 \]
 In particular, any rational multiple of $[\omega^p]$ is an algebraic class.
 \end{lemma}
 
 \begin{proof}
-Choose $m\gg 0$ so that $L^{\otimes m}$ is very ample and basepoint free.
-Let $D_1,\dots,D_p\in |L^{\otimes m}|$ be generic divisors and set
+Choose $q\gg 0$ so that $L^{\otimes q}$ is very ample and basepoint free.
+Let $D_1,\dots,D_p\in |L^{\otimes q}|$ be generic divisors and set
 \[
 Z \;:=\; D_1\cap\cdots\cap D_p.
 \]
@@ -7847,7 +7879,7 @@ By Bertini's theorem, $Z$ is smooth of codimension $p$ for generic choices
 In cohomology,
 \[
 \mathrm{PD}([Z]) \;=\; c_1(\mathcal O(D_1))\smile\cdots\smile c_1(\mathcal O(D_p))
-\;=\; c_1(L^{\otimes m})^p \;=\; m^p\,c_1(L)^p \;=\; m^p\,[\omega^p],
+\;=\; c_1(L^{\otimes q})^p \;=\; q^p\,c_1(L)^p \;=\; q^p\,[\omega^p],
 \]
 as claimed.
 \end{proof}

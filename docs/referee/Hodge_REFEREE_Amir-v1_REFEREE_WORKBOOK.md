@@ -686,7 +686,8 @@ For each item below, rewrite/annotate the proof. Recommended minimum deliverable
   - [ ] Proof verified
   - [ ] Downstream use verified
 - **Proof rewrite / verification notes**:
-  - 
+  - Packaging clarity: the TeX now consistently treats the borderline case \(p=n/2\) as **closed by Lemma `lem:borderline-p-half`** (under the refined schedule \(\varrho=o(\varepsilon)\)),
+    rather than as “needing an extra closure input.” This keeps the endgame (`cor:global-flat-weighted` \(\Rightarrow\) `prop:glue-gap` \(\Rightarrow\) `prop:cohomology-match`) uniform in \(p\le n/2\).
 - **Dependencies / citations**:
   - 
 - **Questions / potential gaps**:
@@ -871,7 +872,7 @@ For each item below, rewrite/annotate the proof. Recommended minimum deliverable
   - [ ] Proof verified
   - [ ] Downstream use verified
 - **Proof rewrite / verification notes**:
-  - 
+  - Notation hygiene: renamed the Carath\'eodory bound from a bare \(N=N(n,p)\) to \(\,N_{\mathrm{Car}}(n,p)\,\) to avoid collision with the manuscript’s holomorphic/Bergman tensor-power parameter \(N\).
 - **Dependencies / citations**:
   - 
 - **Questions / potential gaps**:
@@ -884,7 +885,7 @@ For each item below, rewrite/annotate the proof. Recommended minimum deliverable
   - [ ] Proof verified
   - [ ] Downstream use verified
 - **Proof rewrite / verification notes**:
-  - 
+  - Notation hygiene: renamed the Carath\'eodory bound from a bare \(N=N(n,p)\) to \(\,N_{\mathrm{Car}}(n,p)\,\) to avoid collision with the manuscript’s holomorphic/Bergman tensor-power parameter \(N\).
 - **Dependencies / citations**:
   - 
 - **Questions / potential gaps**:
@@ -1166,6 +1167,9 @@ For each item below, rewrite/annotate the proof. Recommended minimum deliverable
   - [ ] Downstream use verified
 - **Proof rewrite / verification notes**:
   - 
+  - Displacement bookkeeping was made explicit at the point of use: the same identity pairing \(y_a\leftrightarrow y_a\) gives both
+    a \(W_1\) bound \(\tau_F\lesssim \varrho h^2 N_F\) and a \emph{uniform} per-atom displacement \(\Delta_F\lesssim \varrho h^2\),
+    so the hypotheses of both `prop:transport-flat-glue-weighted` and `cor:global-flat-weighted` are transparently satisfied.
 - **Dependencies / citations**:
   - 
 - **Questions / potential gaps**:
@@ -1178,7 +1182,7 @@ For each item below, rewrite/annotate the proof. Recommended minimum deliverable
   - [ ] Proof verified
   - [ ] Downstream use verified
 - **Proof rewrite / verification notes**:
-  - 
+  - Proof hygiene: clarified the convex-geometry choice of the normal direction \(u\) (nearest boundary point \(t_0\) in the projection \(D=\pi(Q)\), then \(u=(t_0-t)/\|t_0-t\|\) so that \(t=t_0-su\)), and added an explicit one-line justification of the uniform perimeter bound in the large-volume case (via Steiner/parallel-body estimate).
 - **Dependencies / citations**:
   - 
 - **Questions / potential gaps**:
@@ -1336,7 +1340,8 @@ For each item below, rewrite/annotate the proof. Recommended minimum deliverable
   - [ ] Proof verified
   - [ ] Downstream use verified
 - **Proof rewrite / verification notes**:
-  - 
+  - Proof hygiene: the “small-angle/model error” term is now justified explicitly by bounding the summed slice-mass contribution by \(h^{-1}M_F\)
+    (using the uniform slice-size inequality available in the rounded-cell or corner-exit regimes), giving the stated \(C_{\angle}\,\varepsilon\,M_F\) bound.
 - **Dependencies / citations**:
   - 
 - **Questions / potential gaps**:
@@ -1795,7 +1800,11 @@ For each item below, rewrite/annotate the proof. Recommended minimum deliverable
   - [ ] Proof verified
   - [ ] Downstream use verified
 - **Proof rewrite / verification notes**:
-  - 
+  - The TeX proof is explicitly a **packaging** statement; we tightened it so it no longer hides the construction of the integer counts:
+    - choose vertex splits \(M_{Q,v,i}\) of the per-cell budgets \(M_{Q,i}\),
+    - define \(N_{Q,v,i}=\lfloor M_{Q,v,i}/\mu_{Q,v,i}\rceil\) (referencing `prop:vertex-template-mass-matching`),
+    - invoke `lem:slow-variation-rounding` / `lem:slow-variation-discrepancy` for the neighbor slow-variation regime.
+  - Statement item (c) was clarified to treat \(m\) as the **fixed cohomology multiplier** from the global parameter schedule (not a new choice at this stage).
 - **Dependencies / citations**:
   - 
 - **Questions / potential gaps**:
@@ -2180,7 +2189,12 @@ For each item below, rewrite/annotate the proof. Recommended minimum deliverable
   - [ ] Proof verified
   - [ ] Downstream use verified
 - **Lean correspondence / coverage**:
-  - **Lean status**: **Not formalized**. Lean’s microstructure layer does not currently implement the rounding/count assignment across a cubulation mesh (nor Lipschitz control on targets); it only carries a proof skeleton with stubbed constructions.
+  - **Lean locus**: `Hodge/Kahler/Rounding.lean`
+  - **Lean status**: **Partially formalized**.
+    - The core nearest-integer rounding inequality used in the proof is now in Lean as
+      `Hodge.Rounding.abs_round_sub_round_le`.
+    - The full cubulation-adjacency/Lipschitz bookkeeping statement is **not yet wired** into
+      `Hodge/Kahler/Microstructure.lean` (cubulation/mesh is still stubbed).
 - **Proof rewrite / verification notes**:
   - This is a purely quantitative combinatorial estimate (rounding error + Lipschitz variation). When the microstructure layer is implemented in Lean, this lemma should map cleanly to a `Nat`-rounding bound on adjacent cubes.
 - **Dependencies / citations**:
@@ -2195,7 +2209,13 @@ For each item below, rewrite/annotate the proof. Recommended minimum deliverable
   - [ ] Proof verified
   - [ ] Downstream use verified
 - **Lean correspondence / coverage**:
-  - **Lean status**: **Not formalized** (same reason as `lem:slow-variation-rounding`; discrepancy/rounding is not yet implemented in Lean).
+  - **Lean locus**: `Hodge/Kahler/Rounding.lean`
+  - **Lean status**: **Partially formalized**.
+    - The core discrepancy-rounding inequality is now in Lean as
+      `Hodge.Rounding.abs_floor_discrepancy_le` (and its helper lemmas
+      `abs_floor_sub_floor_le`, `abs_eps_sub_eps_le_one`).
+    - The full cubulation-adjacency/Lipschitz bookkeeping statement is **not yet wired** into
+      `Hodge/Kahler/Microstructure.lean` (cubulation/mesh is still stubbed).
 - **Proof rewrite / verification notes**:
   - This lemma is the “robustness under discrepancy rounding” variant; it feeds into the later B\'ar\'any--Grinberg rounding step used for integral period locking in `prop:cohomology-match`.
 - **Dependencies / citations**:
@@ -2204,11 +2224,14 @@ For each item below, rewrite/annotate the proof. Recommended minimum deliverable
   - 
 
 ##### Lemma `lem:flatnorm-gluing-mismatch` — Flat-norm control of the gluing mismatch
-- **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 7057
+- **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 6850
 - **Referee status**:
   - [ ] Statement verified
   - [ ] Proof verified
   - [ ] Downstream use verified
+- **Lean correspondence / coverage**:
+  - **Lean status**: **Not formalized**. Lean has only stubbed flat-norm / boundary bookkeeping (no transport-to-filling argument on faces, no quantitative \(\mathcal F\) control from \(W_1\)/matching).
+  - **Closest Lean locus**: `Hodge/Analytic/FlatNorm.lean`, `Hodge/Kahler/Microstructure.lean`.
 - **Proof rewrite / verification notes**:
   - 
 - **Dependencies / citations**:
@@ -2217,11 +2240,13 @@ For each item below, rewrite/annotate the proof. Recommended minimum deliverable
   - 
 
 ##### Remark `rem:lean-bottleneck-flatnorm` — Referee note: this is the quantitative bottleneck
-- **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 7080
+- **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 6874
 - **Referee status**:
   - [ ] Statement verified
   - [ ] Proof verified
   - [ ] Downstream use verified
+- **Lean correspondence / coverage**:
+  - **Lean status**: **Not formalized** (tracked as a known bottleneck: it is where the TeX proof needs real quantitative GMT/flat-norm control; Lean currently bypasses this via stubs).
 - **Proof rewrite / verification notes**:
   - 
 - **Dependencies / citations**:
@@ -2230,11 +2255,13 @@ For each item below, rewrite/annotate the proof. Recommended minimum deliverable
   - 
 
 ##### Lemma `lem:FF-filling-X` — Federer--Fleming filling on $X$ for bounding cycles
-- **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 7090
+- **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 6885
 - **Referee status**:
   - [ ] Statement verified
   - [ ] Proof verified
   - [ ] Downstream use verified
+- **Lean correspondence / coverage**:
+  - **Lean status**: **Not formalized** (Lean does not implement a real filling inequality for integral currents on \(X\); the microstructure/currents layer is stubbed).
 - **Proof rewrite / verification notes**:
   - 
 - **Dependencies / citations**:
@@ -2243,11 +2270,13 @@ For each item below, rewrite/annotate the proof. Recommended minimum deliverable
   - 
 
 ##### Proposition `prop:glue-gap` — Microstructure/gluing estimate
-- **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 7133
+- **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 6929
 - **Referee status**:
   - [ ] Statement verified
   - [ ] Proof verified
   - [ ] Downstream use verified
+- **Lean correspondence / coverage**:
+  - **Lean status**: **Stubbed** (Lean’s `microstructureSequence` is a placeholder; no real construction of \(U_\varepsilon\) with \(\Mass(U_\varepsilon)\to 0\) from flat-norm control).
 - **Proof rewrite / verification notes**:
   - 
 - **Dependencies / citations**:
@@ -2263,7 +2292,7 @@ The TeX results in this block (glue scaling, B\'ar\'any--Grinberg rounding, inte
 - **Status in Lean**: the microstructure construction and cohomology-locking constraints are stubbed (the Lean proof closes, but does not implement discrepancy rounding / period matching).
 
 ##### Remark `rem:glue-scaling` — Choosing the glue scale to make the correction negligible
-- **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 7173
+- **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 6969
 - **Referee status**:
   - [ ] Statement verified
   - [ ] Proof verified
@@ -2276,7 +2305,7 @@ The TeX results in this block (glue scaling, B\'ar\'any--Grinberg rounding, inte
   - 
 
 ##### Lemma `lem:barany-grinberg` — Fixed-dimension discrepancy rounding (B\'ar\'any--Grinberg)
-- **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 7219
+- **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 7015
 - **Referee status**:
   - [ ] Statement verified
   - [ ] Proof verified
@@ -2302,7 +2331,7 @@ The TeX results in this block (glue scaling, B\'ar\'any--Grinberg rounding, inte
   - 
 
 ##### Lemma `lem:integral-periods` — Integral periods of integral cycles
-- **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 7322
+- **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 7118
 - **Referee status**:
   - [ ] Statement verified
   - [ ] Proof verified
@@ -2315,7 +2344,7 @@ The TeX results in this block (glue scaling, B\'ar\'any--Grinberg rounding, inte
   - 
 
 ##### Lemma `lem:lattice-discreteness` — Lattice discreteness
-- **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 7342
+- **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 7138
 - **Referee status**:
   - [ ] Statement verified
   - [ ] Proof verified
@@ -2328,7 +2357,7 @@ The TeX results in this block (glue scaling, B\'ar\'any--Grinberg rounding, inte
   - 
 
 ##### Proposition `prop:cohomology-match` — Integral cohomology constraints
-- **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 7354
+- **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 7150
 - **Referee status**:
   - [ ] Statement verified
   - [ ] Proof verified
@@ -2352,6 +2381,10 @@ The TeX results in this block (glue scaling, B\'ar\'any--Grinberg rounding, inte
   - [ ] Downstream use verified
 - **Proof rewrite / verification notes**:
   - 
+  - Notation hygiene: updated the statement/proof to use \(S_\epsilon\) (not a fixed \(S\)) so the \(\epsilon\to 0\) limit is unambiguous: \(T_\epsilon:=S_\epsilon-U_\epsilon\) with \(\Mass(U_\epsilon)\to 0\).
+  - Step 5 (“boundary correction with vanishing mass”) now explicitly records that in the flat-norm decomposition
+    \(\partial S=R+\partial Q\), one has \(\partial R=0\) and \(R=\partial(S-Q)\), so \(R\) bounds in \(X\) by an **integral** current,
+    making the invocation of `lem:FF-filling-X` completely formal.
 - **Dependencies / citations**:
   - 
 - **Questions / potential gaps**:
@@ -2392,6 +2425,10 @@ The TeX results in this block (glue scaling, B\'ar\'any--Grinberg rounding, inte
   - [ ] Downstream use verified
 - **Proof rewrite / verification notes**:
   - 
+  - Notation + minimality cleanup:
+    - the theorem statement now explicitly treats \((S_\varepsilon,U_\varepsilon,T_\varepsilon)\) as a \emph{family indexed by} \(\varepsilon\downarrow 0\) (rather than a single fixed \(S\)),
+      matching the microstructure construction;
+    - the proof now uses only Federer–Fleming compactness for integral currents (varifold language removed as it was not used).
 - **Dependencies / citations**:
   - 
 - **Questions / potential gaps**:
@@ -2521,7 +2558,7 @@ The TeX results in this block (glue scaling, B\'ar\'any--Grinberg rounding, inte
   - [ ] Proof verified
   - [ ] Downstream use verified
 - **Proof rewrite / verification notes**:
-  - 
+  - Notation hygiene: the line-bundle tensor power in the complete-intersection construction was renamed from \(m\) to \(q\) to avoid collision with the global cohomology multiplier \(m\) used throughout the SYR/microstructure closure chain.
 - **Dependencies / citations**:
   - 
 - **Questions / potential gaps**:

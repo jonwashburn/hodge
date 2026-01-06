@@ -94,6 +94,51 @@ This hypothesis was made explicit in item~(b) and the proof was adjusted accordi
 In the weighted-scaling discussion, the symbol \(m\) was being used in two different senses (cohomology multiplier \(m\) in \(\mathrm{PD}(m[\gamma])\) and tensor power in Bergman-scale holomorphic manufacturing). This led to misleading phrases such as “\(h\downarrow 0\) (equivalently \(m\to\infty\))” and a dimensional typo involving \(\sqrt m\,h\).
 The manuscript now separates these roles explicitly (using a distinct holomorphic scale parameter \(N\) where both appear simultaneously), corrects the Bergman-scale relation to \(h\sim c\,N^{-1/2}\), and removes the misleading “\(h\downarrow 0\iff m\to\infty\)” equivalence in the fixed-\(m\) SYR regime.
 
+\subsection*{Additional notation hygiene: Carath\'eodory bound and \(\omega^p\) lemma}
+Two further low-level notation collisions were removed:
+\begin{itemize}
+\item The Carath\'eodory bound (formerly denoted \(N(n,p)\) in the local decomposition/quantization step) was renamed to \(N_{\mathrm{Car}}=N_{\mathrm{Car}}(n,p)\) to avoid collision with the holomorphic tensor power \(N\).
+\item In Lemma \texttt{lem:gamma-minus-alg} (\(\omega^p\) is algebraic), the line-bundle tensor power used to produce a complete intersection was renamed from \(m\) to \(q\) to avoid collision with the global cohomology multiplier \(m\) used throughout the SYR/microstructure closure chain.
+\end{itemize}
+
+\subsection*{Packaging clarity: global coherence and template displacement}
+Two small “reader-facing” clarifications were added to reduce hidden-quantifier concerns in the gluing hinge:
+\begin{itemize}
+\item In Proposition \texttt{prop:global-coherence-all-labels}, the proof now explicitly defines the integer counts \(N_{Q,v,i}=\lfloor M_{Q,v,i}/\mu_{Q,v,i}\rceil\) (vertex-split budgets and per-piece mass scales) and clarifies that \(m\) in the period-locking step is the \emph{fixed} cohomology multiplier from the global parameter schedule.
+\item In Lemma \texttt{lem:template-displacement}, the proof now explicitly bounds the summed slice-mass contribution by \(h^{-1}M_F\) (available in either the rounded-cell or corner-exit regimes), justifying the stated \(C_{\angle}\,\varepsilon\,M_F\) term from the small-angle/model-error estimate.
+\end{itemize}
+
+\subsection*{Uniformly convex slice-boundary inequality: proof hygiene}
+In Lemma \texttt{lem:uniformly-convex-slice-boundary}, we added two short referee-facing clarifications:
+\begin{itemize}
+\item an explicit bound for the large-volume case \(v(t)\ge v_0\), using a parallel-body/Steiner argument to bound \(\mathcal H^{k-1}(\partial K_t)\) uniformly when the slice \(K_t\) lies in a fixed-radius ball;
+\item an explicit choice of the normal direction \(u\) for the small-volume case, taking \(t_0\) as a nearest boundary point in the projection \(D=\pi(Q)\) and setting \(u=(t_0-t)/\|t_0-t\|\), so that the parameterization \(t=t_0-su\) is fully justified.
+\end{itemize}
+
+\subsection*{Borderline case \(p=n/2\): consistent endgame packaging}
+The TeX now treats the middle-dimensional case \(p=n/2\) consistently across the parameter schedule and the H2-package summary:
+\begin{itemize}
+\item Lemma \texttt{lem:borderline-p-half} is used as the explicit closure mechanism in the borderline regime, showing
+\(\mathcal F(\partial T^{\mathrm{raw}})\to 0\) under the refined displacement schedule \(\varrho=o(\varepsilon)\) (together with the footprint-scale packing bound).
+\item Consequently, the same implication
+\(\mathcal F(\partial T^{\mathrm{raw}}_j)\to 0 \Rightarrow \Mass(U_\epsilon)\to 0\) via Proposition \texttt{prop:glue-gap}
+feeds into the exact-class rounding step \texttt{prop:cohomology-match} without any “extra closure input” placeholder.
+\end{itemize}
+
+\subsection*{Step 5 (period locking): making the “\(R\) bounds integrally” point explicit}
+In the Step~5 boundary-correction subsection (used inside Proposition \texttt{prop:cohomology-match}), the TeX now explicitly notes that
+in an integral flat-norm decomposition \(\partial S=R+\partial Q\) one has \(\partial R=0\) and \(R=\partial(S-Q)\).
+This makes it completely formal that \(R\) bounds in \(X\) by an \emph{integral} current, so Lemma \texttt{lem:FF-filling-X}
+applies without any hidden homological step.
+
+\subsection*{Final closure chain: indexing and compactness minimality}
+Two final referee-facing hygiene improvements were made in the SYR endgame:
+\begin{itemize}
+\item In Proposition \texttt{prop:almost-calibration} and Theorem \texttt{thm:syr-realization}, the sheet current is now written as \(S_\epsilon\) (rather than a fixed \(S\)),
+so the family \(T_\epsilon:=S_\epsilon-U_\epsilon\) is unambiguous as \(\epsilon\downarrow 0\).
+\item In Theorem \texttt{thm:syr-realization}, the compactness step is now phrased purely in the Federer--Fleming framework for integral currents; varifold language was removed since it was not used in the argument.
+\end{itemize}
+
 \subsection*{Classical SYR under LICD: gluing corrected to use flat norm (not boundary mass)}
 In the auxiliary theorem \texttt{thm:classical-syr-licd}, the original Step~3 asserted a global estimate of the form
 \(\Mass(\partial \sum_Q S_Q)\lesssim C\varepsilon\) at mesh scale \(\varepsilon\).

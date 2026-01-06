@@ -54,9 +54,9 @@ still needs to audit.
 
 - **Location**: Lemma `lem:gamma-minus-alg`.
 - **Mechanism**:
-  - Choose \(m\gg 0\) with \(L^{\otimes m}\) very ample.
-  - Take \(p\) generic divisors \(D_1,\dots,D_p\in |L^{\otimes m}|\); set \(Z=D_1\cap\cdots\cap D_p\).
-  - Then \(\mathrm{PD}([Z])=c_1(L^{\otimes m})^p=m^p[\omega^p]\), so \([\omega^p]\) is a \(\mathbb Q\)-linear combination of cycle classes.
+  - Choose \(q\gg 0\) with \(L^{\otimes q}\) very ample.
+  - Take \(p\) generic divisors \(D_1,\dots,D_p\in |L^{\otimes q}|\); set \(Z=D_1\cap\cdots\cap D_p\).
+  - Then \(\mathrm{PD}([Z])=c_1(L^{\otimes q})^p=q^p[\omega^p]\), so \([\omega^p]\) is a \(\mathbb Q\)-linear combination of cycle classes.
 
 ---
 
@@ -95,11 +95,9 @@ still needs to audit.
   - Apply Theorem `thm:syr` \(\Rightarrow\) holomorphic chain; projective \(\Rightarrow\) algebraic via Remark `rem:chow-gaga`.
 
 - **High-risk (math) still to audit**:
-  - The quantitative “transport \(\Rightarrow\) flat norm” machinery and its summations (`prop:transport-flat-glue*` etc.), which the TeX itself flags as the bottleneck (see Remark `rem:lean-bottleneck-flatnorm`).
-  - Primary local statements to re-derive: Proposition `prop:transport-flat-glue`, Proposition `prop:transport-flat-glue-weighted`,
-    and the geometric inequality Lemma `lem:uniformly-convex-slice-boundary` (used to control slice boundary mass in the sliver regime).
-  - Note for `prop:transport-flat-glue`: the proof’s Step 1 is cleanest on an **interior face patch after edge-trimming**, where each face slice is a **cycle**
-    (this is packaged later as Lemma `lem:face-slice-cycle-mass`). The TeX now states this explicitly in hypothesis (b).
+  - The quantitative “transport \(\Rightarrow\) flat norm” hinge was audited at the **interface level**: the TeX now makes the interior-face/cycle hypothesis explicit,
+    clarifies the displacement control \(\Delta_F\lesssim \varrho h^2\) used in the template/vertex-template regimes, and eliminates a few bookkeeping ambiguities.
+    A human referee should still re-derive the constants in `prop:transport-flat-glue*` and `lem:uniformly-convex-slice-boundary` end-to-end.
 
 #### G.1 Transport \(\Rightarrow\) flat norm (the quantitative hinge)
 

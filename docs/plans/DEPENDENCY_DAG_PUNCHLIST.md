@@ -168,6 +168,14 @@ These stubs make the proof type-check but don't carry the mathematical meaning o
 `x ↦ extDerivAt ω x` as a `SmoothForm` (continuous) or `ContMDiffForm` (smooth). This requires a chart-gluing
 argument for the manifold exterior derivative (Stage 3).
 
+**Stage 3 progress (Jan 6, 2026)**: `Hodge/Analytic/ContMDiffForms.lean` now includes concrete “transport in
+tangent coordinates” infrastructure needed for chart-gluing:
+- `mfderivInTangentCoordinates_eq`: explicit formula on the chart neighborhood of `x₀`
+- `alternatizeUncurryFin_compContinuousLinearMap`: alternatization ↔ pullback compatibility
+- `extDerivInTangentCoordinatesTransported` and `extDerivInTangentCoordinatesTransported_eq`: the corrected
+  transported coordinate representation of `dω` agrees with transporting `extDerivAt` on the neighborhood
+  of `x₀`
+
 ### Tier 2: Kähler/Hodge Operators
 
 | Stub | Current | Correct | Depends On | Documentation |
