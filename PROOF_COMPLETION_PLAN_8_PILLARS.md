@@ -52,6 +52,8 @@ These are the *only* axioms intended to remain:
       - `mfderivInTangentCoordinates_eq` (explicit formula on a chart neighborhood)
       - `alternatizeUncurryFin_compContinuousLinearMap` (alternatization ↔ pullback)
       - `extDerivInTangentCoordinatesTransported` and `extDerivInTangentCoordinatesTransported_eq` (the corrected transported coordinate expression matches transporting `extDerivAt`)
+    - **Chart-level helper (added)**:
+      - `Hodge/Analytic/ChartExtDeriv.lean`: defines `omegaInChart` and `extDerivInChartWithin` and proves `ContDiffOn` on the chart target.
   - **Main `Forms.lean` unchanged**: Keeps `IsSmoothAlternating = Continuous` and `extDerivLinearMap = 0` to preserve baseline.
   - **Migration path**: Use `ContMDiffForm.ofSmoothForm` to upgrade a `SmoothForm` to `ContMDiffForm` when smoothness is known, then apply the real `extDeriv`.
 

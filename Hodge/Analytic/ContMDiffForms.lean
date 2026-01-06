@@ -43,6 +43,20 @@ namespace ContMDiffForm
 
 variable {k : ℕ}
 
+/-!
+### Convenience: `Boundaryless` instance for the complex model
+
+Mathlib provides `Boundaryless` for the trivial model `𝓘(ℂ, TangentModel n)`. The model
+`𝓒_complex n` is definitional equal to this, but typeclass search does not always unfold it.
+We register the instance explicitly so lemmas that require `[I.Boundaryless]` can be used
+without manual `change` steps.
+-/
+
+instance instBoundaryless_Ccomplex : (𝓒_complex n).Boundaryless := by
+  -- `𝓒_complex n` is defeq to `𝓘(ℂ, TangentModel n)`
+  change (𝓘(ℂ, TangentModel n)).Boundaryless
+  infer_instance
+
 /-- The pointwise exterior derivative of a `C^∞` form, as a fiber element. -/
 noncomputable def extDerivAt (ω : ContMDiffForm n X k) (x : X) : FiberAlt n (k + 1) :=
   ContinuousAlternatingMap.alternatizeUncurryFin

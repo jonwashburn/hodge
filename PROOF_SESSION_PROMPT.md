@@ -70,6 +70,9 @@ We close this by a staged migration:
       - `alternatizeUncurryFin_compContinuousLinearMap` (alternatization ↔ pullback)
       - `extDerivInTangentCoordinatesTransported` and `extDerivInTangentCoordinatesTransported_eq`
         (correct transported coordinate representation matching transported `extDerivAt`)
+    - **Stage‑3 chart-level helpers (added)**:
+      - `Hodge/Analytic/ChartExtDeriv.lean`: `omegaInChart` + `ContDiffOn` on chart target, and
+        `extDerivInChartWithin` (model-space `extDerivWithin`) + `ContDiffOn` on chart target.
   - **Integration blocker**: Bundling `x ↦ extDerivAt ω x` back into `SmoothForm`/`ContMDiffForm` requires
     a chart-gluing argument (Stage 3/4), since `mfderiv` depends on local charts.
 
@@ -191,7 +194,7 @@ grep -rn "^axiom " Hodge/ --include="*.lean" -A2
 
 | Date | Sorries | Axioms | Notes |
 |------|---------|--------|-------|
-| Jan 6, 2026 | 0 | 9 (9 used) | `ContMDiffForms.lean` has 0 sorries (pointwise linearity proved); `extDeriv` kept unbundled; conversion functions added; linter cleanups |
+| Jan 6, 2026 | 0 | 9 (9 used) | `ContMDiffForms.lean` has 0 sorries (pointwise linearity proved); `extDeriv` kept unbundled; conversion functions added; chart-level `extDerivWithin` helper added (`ChartExtDeriv.lean`); linter cleanups |
 | Jan 5, 2026 (late) | 0 | 9 (9 used) | Stage 2 groundwork complete in `ContMDiffForms.lean`; `Forms.lean` stable with Continuous baseline |
 | Jan 5, 2026 | 0 | 9 (9 used) | All sorries removed; unused axioms removed; wedge migrated; model-space `extDeriv` module added |
 | Earlier | 6 | 14 | Transport axioms converted to theorems |

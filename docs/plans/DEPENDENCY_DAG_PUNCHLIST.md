@@ -175,6 +175,9 @@ tangent coordinates” infrastructure needed for chart-gluing:
 - `extDerivInTangentCoordinatesTransported` and `extDerivInTangentCoordinatesTransported_eq`: the corrected
   transported coordinate representation of `dω` agrees with transporting `extDerivAt` on the neighborhood
   of `x₀`
+- **Chart-level helper (Jan 6, 2026)**: `Hodge/Analytic/ChartExtDeriv.lean` defines the coefficient map
+  `omegaInChart` in a fixed chart and proves `ContDiffOn` for it and its model-space exterior derivative
+  `extDerivInChartWithin` on the chart target.
 
 ### Tier 2: Kähler/Hodge Operators
 

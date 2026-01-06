@@ -170,8 +170,8 @@
 \newcommand{\editamirNEW}[1]{\textcolor{blue}{#1}}
 \newenvironment{editamirblockNEW}{\begingroup\color{blue}}{\endgroup}
 
-% AI assistant layer (RED; Jan 2026 — distinct from prior blue edits)
-\definecolor{editaiColor}{rgb}{0.80,0.00,0.00}
+% AI assistant layer (teal; Jan 2026)
+\definecolor{editaiColor}{rgb}{0.00,0.45,0.45}
 \newcommand{\editai}[1]{\textcolor{editaiColor}{#1}}
 \newenvironment{editaiblock}{\begingroup\color{editaiColor}}{\endgroup}
 
@@ -213,14 +213,14 @@ For a cone--positive class with representative $\beta$, the main construction pr
 in the fixed class $\mathrm{PD}(m[\gamma^+])$ whose \emph{calibration defects} satisfy
 $\Mass(T_k)-\langle T_k,\psi\rangle\to 0$, and hence whose masses converge to the cohomological lower bound
 $\Mass(T_k)\to m\int_X \beta\wedge\psi$.
-\editai{By Proposition~\ref{prop:almost-calibration}, the constructed cycles have uniformly bounded mass and $\psi$--defect $\to 0$. Hence, by Federer--Fleming compactness for integral currents on a compact manifold (e.g.\ \cite{Fed69}) and varifold compactness (e.g.\ \cite{Allard72,Sim83}), after passing to a subsequence we obtain a flat/varifold limit $T$ which is $\psi$--calibrated. The identification of such a $T$ as a positive holomorphic chain is Theorem~\ref{thm:syr-realization}; algebraicity on projective $X$ then follows by Remark~\ref{rem:chow-gaga}.}
+\editamir{By Proposition~\ref{prop:almost-calibration}, the constructed cycles have uniformly bounded mass and $\psi$--defect $\to 0$. Hence, by Federer--Fleming compactness for integral currents on a compact manifold (e.g.\ \cite{Fed69}) and varifold compactness (e.g.\ \cite{Allard72,Sim83}), after passing to a subsequence we obtain a flat/varifold limit $T$ which is $\psi$--calibrated. The identification of such a $T$ as a positive holomorphic chain is Theorem~\ref{thm:syr-realization}; algebraicity on projective $X$ then follows by Remark~\ref{rem:chow-gaga}.}
 Combining with the signed decomposition yields algebraicity of $\gamma$ (after reducing to $p\le n/2$ by Hard Lefschetz).
 
 We also record an auxiliary calibration--coercivity observation in the special CPM--bridge regime where the harmonic representative is cone-valued; this is not used in the main realization/SYR chain.
 \end{editconeblock}
 \end{abstract}
 
-\begin{editaiblock}
+\begin{editamirblock}
 \section*{Parameter and notation dictionary (referee layer)}
 \noindent\textbf{Purpose.} The manuscript uses several global parameters repeatedly.  This short dictionary
 records the intended meaning when a symbol is used without an immediate local definition.  If a later
@@ -249,7 +249,7 @@ Equivalently $J_x^k(L^N)\cong \mathcal{O}_X(L^{\otimes N})_x/\mathfrak{m}_x^{k+1
 \item $\mathrm{PD}(\gamma)$: Poincar\'e dual homology class.
 \item $\mathcal{F}(\cdot)$: Federer--Fleming flat norm on integral currents (Definition~\ref{def:flat-norm}); $\partial$ denotes boundary of a current.
 \end{itemize}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 \begin{definition}[Flat norm on integral currents]\label{def:flat-norm}
 Fix an integer $\ell\ge 0$.
 For an integral $\ell$--current $T$ on $X$, the \emph{flat norm} is
@@ -260,18 +260,18 @@ R\ \text{integral $\ell$--current},\ Q\ \text{integral $(\ell+1)$--current}\Bigr
 In particular, if $T$ is an integral $\ell$--cycle, then in any decomposition $T=R+\partial Q$ with $R,Q$ integral
 one has $\partial R=0$ automatically.
 \end{definition}
-\end{editaiblock}
+\end{editamirblockNEW}
 
 
 \noindent\textbf{Scale parameters (used in the gluing/template constructions).}
 \begin{itemize}
 \item $m\in\mathbb{N}$: cohomology multiplier in the target class $\mathrm{PD}(m[\gamma])$ (Definition~\ref{def:syr}); it controls the total pairing $c_0=\langle \mathrm{PD}(m[\gamma]),[\psi]\rangle$.
 \item $N\gg 1$: (when invoked) the \emph{holomorphic/Bergman quantization parameter} for $L^{\otimes N}$; intrinsic analytic scale is $\sim N^{-1/2}$.
-\item \editai{$N_{\mathrm{Car}}$: Carath\'eodory bound $N_{\mathrm{Car}}(n,p)$ on the number of calibrated directions needed to express a strongly positive form at a point (Lemma~\ref{lem:caratheodory-general}).}
+\item \editamir{$N_{\mathrm{Car}}$: Carath\'eodory bound $N_{\mathrm{Car}}(n,p)$ on the number of calibrated directions needed to express a strongly positive form at a point (Lemma~\ref{lem:caratheodory-general}).}
 \item $h>0$: mesh size of the cubulation.
 \item $\varepsilon$: small tolerance (slope/angle or separation threshold); $\varepsilon_h$ is the direction-net resolution at mesh $h$.
-\item \editai{$\varrho=\varrho(h)\in(0,1]$: \emph{transverse parameter radius factor}; template translation parameters are chosen in a ball of radius $\varrho\,h$ (hence per-face displacement improves to $\Delta_F\lesssim \varrho\,h^{2}$). In the borderline case $p=n/2$ we impose $\varrho=o(\varepsilon)$.}
-\item \editai{$\delta$: transverse grid spacing / separation scale used to keep different sheets/templates disjoint; in the refined schedule we take $\delta\asymp \varrho\,\varepsilon\,h$ so that $B_{\,\varrho h}(0)$ still contains $\asymp \varepsilon^{-2p}$ available lattice sites.}
+\item \editamir{$\varrho=\varrho(h)\in(0,1]$: \emph{transverse parameter radius factor}; template translation parameters are chosen in a ball of radius $\varrho\,h$ (hence per-face displacement improves to $\Delta_F\lesssim \varrho\,h^{2}$). In the borderline case $p=n/2$ we impose $\varrho=o(\varepsilon)$.}
+\item \editamir{$\delta$: transverse grid spacing / separation scale used to keep different sheets/templates disjoint; in the refined schedule we take $\delta\asymp \varrho\,\varepsilon\,h$ so that $B_{\,\varrho h}(0)$ still contains $\asymp \varepsilon^{-2p}$ available lattice sites.}
 \item $s$: corner-exit translation scale (size of perturbation used to exit through specified faces).
 \end{itemize}
 
@@ -288,7 +288,7 @@ one has $\partial R=0$ automatically.
 \Def_{\mathrm{cal}}(T):=\Mass(T)-\langle T,\psi\rangle,
 \]
 so ``almost-calibrated'' means $\Def_{\mathrm{cal}}(T)$ is small compared to the relevant scaling.
-\end{editaiblock}
+\end{editamirblock}
 
 
 
@@ -741,7 +741,7 @@ V_{j}\in \Gp(x)
 Every element of $\mathcal{C}_{x}$ is a nonnegative linear combination of
 calibrated simple $(p,p)$--forms, and the cone is closed under limits.
 
-\begin{editaiblock}
+\begin{editamirblock}
 \begin{lemma}[Closure of the calibrated cone]\label{lem:calibrated-cone-closed}
 For each $x\in X$, the cone $\mathcal{C}_{x}\subset \Lambda^{2p}T_x^*X$ is closed.
 In particular, for every $\alpha_x$ the infimum in $\dist(\alpha_x,\mathcal{C}_x)$ is attained.
@@ -775,7 +775,7 @@ By continuity of $V\mapsto \phi_V$ we obtain
 so $\mathcal{C}_x$ is closed.  Since $\mathcal{C}_x$ is a closed convex subset of a finite-dimensional inner-product space,
 nearest-point projection exists and the distance infimum is attained.
 \end{proof}
-\end{editaiblock}
+\end{editamirblock}
 
 We write
 \[
@@ -824,7 +824,7 @@ The main cone--based proof uses the calibrated cone $\mathcal{C}_{x}$
 directly and does not rely on the factor $K$, but the net viewpoint is
 included for completeness.\fi
 
-\begin{editaiblock}\editamir{
+\begin{editamirblockNEW}\editamir{
 \noindent\textbf{Finite calibrated frame (net viewpoint, corrected).}
 Fix $\varepsilon=\tfrac{1}{10}$ and let $\{V_{1},\ldots,V_{N}\}\subset \Gp(x)$ be an $\varepsilon$--net.
 Set
@@ -849,7 +849,7 @@ so the $\varepsilon$--net yields a quantitative \emph{discretization} of the sup
 $V\mapsto \langle \alpha_{x},\phi_{V}\rangle_{+}$ used in \eqref{eq:ray-defect-formula}.
 No equivalence between $\distcone(\alpha_{x})=\dist(\alpha_{x},\mathcal{C}_{x})$ and the distance to a finite-dimensional
 linear span is asserted or needed anywhere in the proof.}
-\end{editaiblock}
+\end{editamirblockNEW}
 
 % ----------------------------------------------------------
 % Ray distance vs. convex calibrated cone
@@ -948,7 +948,7 @@ to discretize the support functional in \eqref{eq:ray-defect-formula}, as explai
 	\end{equation}
 \end{lemma}\fi
 
-\begin{editaiblock}
+\begin{editamirblockNEW}
 \begin{lemma}[Explicit minimization along a calibrated ray]
 \label{lem:radial-min}
 Fix $x\in X$ and write $\mathcal{C}_{x}:=\mathrm{cone}\{\phi_{V}:V\in\Gp(x)\}\subset \Lambda^{2p}T_x^*X$.
@@ -992,7 +992,7 @@ Imposing $\lambda\ge 0$ yields $\lambda^{*}=\langle \alpha_{x},\phi_{V}\rangle_{
 Taking the infimum over $V\in\Gp(x)$ gives \eqref{eq:ray-defect-formula}.
 The final inequality follows from $\bigcup_{V\in\Gp(x)}\R_{\ge 0}\phi_{V}\subset\mathcal{C}_{x}$.
 \end{proof}
-\end{editaiblock}
+\end{editamirblockNEW}
 
 % ----------------------------------------------------------
 % Trace L^2 control (used later with Hermitian model)
@@ -1131,7 +1131,7 @@ The final inequality follows from $\bigcup_{V\in\Gp(x)}\R_{\ge 0}\phi_{V}\subset
 	\end{enumerate}
 \end{proposition}\fi
 
-\begin{editaiblock}
+\begin{editamirblockNEW}
 \begin{proposition}[Well-posedness and basic properties]
 \label{prop:dist-cal-properties}
 Fix $x\in X$ and consider the calibrated cone
@@ -1171,7 +1171,7 @@ Items (1)--(2) are standard facts for closed convex sets in finite-dimensional H
 Item (3) follows because in unitary coordinates the cone depends only on $(n,p)$, and $\dist(\cdot,\mathcal{C})$
 is continuous (indeed, $1$--Lipschitz) in its argument.  Item (4) is immediate from the definition of distance.
 \end{proof}
-\end{editaiblock}
+\end{editamirblockNEW}
 
 % ----------------------------------------------------------
 % Optional: Kähler-angle parametrization (for intuition)
@@ -1315,7 +1315,7 @@ We define the energy of $\alpha$ by
 E(\alpha) := \|d\eta\|^{2}_{L^{2}}.
 \]
 
-\begin{editaiblock}
+\begin{editamirblock}
 \subsection*{Energy identity and type decomposition}
 We recall a standard Hodge--theoretic fact: on a compact K\"ahler manifold, the space of harmonic forms decomposes into harmonic \((r,s)\) types, and the harmonic representative of a cohomology class in \(H^{r,s}(X)\) is of type \((r,s)\) (see, e.g., Wells \cite[Ch.~5]{Wells}).
 In particular, since \( [\alpha]\in H^{p,p}(X)\), the harmonic representative \(\gamma_{\harm}\) of \([\alpha]\) has pure type \((p,p)\).
@@ -1373,9 +1373,9 @@ Elliptic control on the Coulomb slice gives a uniform bound (depending only on \
 
 \smallskip
 \noindent\emph{Remark.} If \([\alpha]\) has a nonzero harmonic off--type component, then no estimate of the form \eqref{eq:primitive-control} can hold with right--hand side \(\|d\eta\|_{L^2}\), since harmonic components are invisible to the Coulomb energy.
-\end{editaiblock}
+\end{editamirblock}
 
-\begin{editaiblock}
+\begin{editamirblock}
 \begin{lemma}[Elliptic estimate on the Coulomb slice]\label{lem:elliptic-coulomb}
 Let $\eta$ be a smooth $(2p-1)$--form on a compact K\"ahler manifold with $d^*\eta=0$ and $\eta\perp \ker d$.
 Then there exists a constant $C=C(X,\omega,p)$ such that
@@ -1394,9 +1394,9 @@ One convenient formulation is
 valid on any compact Riemannian manifold; imposing $d^*\eta=0$ gives the stated bound.
 See, for example, Wells, \emph{Differential Analysis on Complex Manifolds}, Chapter~5, or any standard Hodge theory reference.
 \end{proof}
-\end{editaiblock}
+\end{editamirblock}
 
-\begin{editaiblock}
+\begin{editamirblock}
 \begin{lemma}[Coulomb decomposition and energy identity]\label{lem:coulomb}
 Let \([\alpha]\in H^{2p}(X,\RR)\cap H^{p,p}(X)\) and let \(\alpha\) be a smooth closed real \(2p\)–form representing \([\alpha]\).
 Write \(\alpha=\gamma_{\harm}+d\eta\) for its Coulomb decomposition with \(d^*\eta=0\) and \(\eta\perp\ker d\).
@@ -1448,7 +1448,7 @@ Finally, \((\alpha^{(p,p)}-\gamma_{\harm})_{\prim}\) is the \(L^{2}\)-orthogonal
 \(\|(\alpha^{(p,p)}-\gamma_{\harm})_{\prim}\|_{L^{2}}\le \|(d\eta)^{(p,p)}\|_{L^{2}}\le \|d\eta\|_{L^{2}}\),
 and the same elliptic estimate completes the proof.
 \end{proof}
-\end{editaiblock}
+\end{editamirblock}
 
 
 
@@ -1486,13 +1486,13 @@ G_{p}(x) \cong G_{\C}(p,n)
 \]
 with its standard Fubini--Study metric.
 
-\begin{editaiblock}
+\begin{editamirblock}
 \noindent\textbf{Referee clarification (fiber model and metric).}
 For the arguments below we only use that each fiber $G_{p}(x)$ is a \emph{fixed} compact homogeneous manifold
 (isomorphic to $G_{\C}(p,n)$) and that $d_{\mathrm{FS}}$ denotes any fixed $U(n)$--invariant Riemannian distance on that model.
 Different normalizations of the invariant metric are bi--Lipschitz equivalent with constants depending only on $(n,p)$,
 so all covering/packing constants in Lemma~\ref{lem:covering-number} may be taken uniform in $x$.
-\end{editaiblock}
+\end{editamirblock}
 
 In particular, $G_{p}(x)$ is
 compact, smooth, homogeneous, and has real dimension
@@ -1505,12 +1505,12 @@ d := \dim_{\R} G_{p}(x)
 
 Fix $\varepsilon = \tfrac{1}{10}$.  
 
-\begin{editaiblock}
+\begin{editamirblock}
 \noindent\textbf{Referee note (choice of the net).}
 The maximal $\varepsilon$--separated set $\{\xi(x)_{\ell}\}_{\ell}$ is chosen \emph{independently for each} $x\in X$.
 Only the uniform cardinality bound \eqref{eq:grass-cover} is used later; no global smooth/measurable dependence of the selection on $x$
 is required in the main proof chain.
-\end{editaiblock}
+\end{editamirblock}
 
 
 On each fiber $G_{p}(x)$ (with the Fubini--Study geodesic distance
@@ -1748,7 +1748,7 @@ model for $(p,p)$--forms and a rank--one approximation inequality.
 		\mu(\alpha_x) = \frac{1}{d}\operatorname{tr}(H_\alpha).
 		\]
 	\end{enumerate}
-\begin{editaiblock}
+\begin{editamirblock}
 \begin{proof}
 Fix unitary coordinates at $x$ and let $\mathcal H:=\Lambda^{p,0}T_x^*X$ with the induced Hermitian inner product.
 Given a real $(p,p)$--form $\beta\in\Lambda^{p,p}T_x^*X$, define $H_\beta\in\Herm(\mathcal H)$ by
@@ -1779,10 +1779,10 @@ Finally, under $\mathcal I$ the K\"ahler form $\omega^p/p!$ corresponds to the i
 corresponds to the scalar matrix component $(\operatorname{tr}H_\beta/d)\,I_{\mathcal H}$.
 Thus subtracting $(\operatorname{tr}H_\beta/d)\,I_{\mathcal H}$ corresponds to the primitive (traceless) projection of $\beta$.
 \end{proof}
-\end{editaiblock}
+\end{editamirblock}
 \end{lemma}
 
-\begin{editaiblock}
+\begin{editamirblock}
 \begin{remark}[Calibrated cone in the Hermitian model; not the full PSD cone for $1<p<n-1$]\label{rem:cone-not-full-psd}
 Let $\mathcal H=\Lambda^{p,0}T_x^*X$ and let $\mathcal I:\Lambda^{p,p}T_x^*X\to\Herm(\mathcal H)$ be the isometry of Lemma~\ref{lem:hermitian-model}.
 Let $\mathsf{Dec}\subset \mathcal H$ denote the set of \emph{decomposable} $p$--vectors.
@@ -1800,7 +1800,7 @@ $\mathrm{cone}\{v\otimes v^*: v\in\mathsf{Dec}\}$:
 indeed, if $w\otimes w^*=\sum_j v_j\otimes v_j^*$ with $v_j\in\mathsf{Dec}$, then each summand has range contained in $\mathrm{span}\{w\}$ (because the left-hand side has rank one),
 so every $v_j$ is collinear with $w$, forcing $w$ to be decomposable.  Thus the calibrated cone is a strict subcone of the PSD cone when $1<p<n-1$.
 \end{remark}
-\end{editaiblock}
+\end{editamirblock}
 
 \begin{lemma}[Rank--one approximation controls the traceless part]\label{lem:rankone}
 	There exists a finite constant $C_{\mathrm{rank}}(d)>0$, depending only on
@@ -1834,7 +1834,7 @@ so every $v_j$ is collinear with $w$, forcing $w$ to be decomposable.  Thus the 
 \end{proof}
 
 \begin{proposition}[PSD surrogate for the $(p,p)$ projection]\label{prop:pp-projection}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 There exists a constant $C_{0}=C_{0}(n,p)>0$ such that for every $x\in X$ and every
 $\alpha_{x}\in \Lambda^{2p}T_x^*X$, writing $\gamma_{\harm,x}\in \Lambda^{p,p}T_x^*X$
 for the fixed reference $(p,p)$--form at $x$, one has
@@ -1848,11 +1848,11 @@ C_{0}\,\bigl\|(\alpha_{x}^{(p,p)}-\gamma_{\harm,x})_{\prim}\bigr\|^{2},
 where $\xi_{v}(x):=\mathcal I_x^{-1}(v\otimes v^{*})\in \Lambda^{p,p}T_x^*X$ is the rank--one
 \emph{positive} ray produced by the Hermitian model $\mathcal I_x$ from
 Lemma~\ref{lem:hermitian-model}.
-\end{editaiblock}
+\end{editamirblockNEW}
 \end{proposition}
 
 \begin{proof}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 Let $\beta:=\alpha_{x}^{(p,p)}-\gamma_{\harm,x}$ and set $H:=\mathcal I_x(\beta)\in \Herm(\mathcal H_x)$.
 Decompose $H=\frac{\tr H}{d}\,\Id + H_{0}$ with $\tr(H_{0})=0$.
 By Lemma~\ref{lem:hermitian-model} the map $\mathcal I_x$ is an isometry, and the primitive part
@@ -1865,11 +1865,11 @@ Lemma~\ref{lem:rankone} provides a unit vector $v\in\mathcal H_x$ and $\lambda\g
 C_{0}\,\|H_{0}\|_{\mathrm{HS}}.
 \]
 Applying $\mathcal I_x^{-1}$ yields \eqref{eq:pp-projection}.
-\end{editaiblock}
+\end{editamirblockNEW}
 \end{proof}
 
 \begin{corollary}[Pointwise rank--one PSD surrogate]\label{cor:Dpsd-pointwise}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 Define the rank--one PSD surrogate distance
 \[
 D_{\mathrm{PSD}}(\alpha_{x})
@@ -1892,11 +1892,11 @@ C_{0}\,\|(\alpha_{x}^{(p,p)}-\gamma_{\harm,x})_{\prim}\|^{2}.
 This controls distance to the \emph{full} set of rank--one PSD rays (all $v\in \mathcal H_x$),
 and therefore does \emph{not} by itself upper--bound the calibrated net distance $D_{\mathrm{net}}$,
 which only ranges over decomposable (calibrated) rays and then discretizes them.
-\end{editaiblock}
+\end{editamirblockNEW}
 \end{corollary}
 
 \begin{proof}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 For any rank--one ray $\lambda\xi_v(x)\in\Lambda^{p,p}T_x^*X$ we have, by orthogonality of Hodge types,
 \[
 \|\alpha_x-\lambda\xi_v(x)\|^2
@@ -1907,7 +1907,7 @@ For any rank--one ray $\lambda\xi_v(x)\in\Lambda^{p,p}T_x^*X$ we have, by orthog
 \]
 Taking the infimum over $(v,\lambda)$ and applying Proposition~\ref{prop:pp-projection} yields
 \eqref{eq:Dpsd-pointwise}.
-\end{editaiblock}
+\end{editamirblockNEW}
 \end{proof}
 
 \paragraph{Fixing a constant.}
@@ -2029,7 +2029,7 @@ A:=\mathrm{PD}(m[\gamma])\in H_k(X,\Z),
 c_0:=\langle A,[\psi]\rangle
 =m\int_X \beta\wedge\psi.
 \]
-\editai{Fix any sequence of mesh scales $h_j\to 0$. For each $j$, apply the constructions assembled in the H1/H2 packages (Propositions~\ref{prop:h1-package} and \ref{prop:transport-flat-glue-weighted}) together with global coherence (Proposition~\ref{prop:global-coherence-all-labels}) to obtain, at scale $h_j$:}
+\editamir{Fix any sequence of mesh scales $h_j\to 0$. For each $j$, apply the constructions assembled in the H1/H2 packages (Propositions~\ref{prop:h1-package} and \ref{prop:transport-flat-glue-weighted}) together with global coherence (Proposition~\ref{prop:global-coherence-all-labels}) to obtain, at scale $h_j$:}
 \begin{enumerate}
 \item[\textnormal{(H1)}] a \emph{calibrated sheet--sum} integral current $S_j=\sum_Q S_{Q,j}$ built from holomorphic pieces in cells $Q$ (hence $\Mass(S_j)=\langle S_j,\psi\rangle$) and satisfying the single quantitative budget condition
 \[
@@ -2110,9 +2110,9 @@ $m\int_X\beta\wedge\Theta_\ell\in\Z$ (cf.\ Substep~4.3 and Proposition~\ref{prop
 \item \textbf{Then choose small local accuracy parameters as functions of $h_j$.}
 Fix a direction-net scale $\varepsilon_{\mathrm{net},j}\ll h_j$ for the finite calibrated dictionary in Proposition~\ref{prop:global-coherence-all-labels}.
 Choose a transverse grid spacing $\delta_j=o(h_j)$ on each face tubular chart $\Omega_F\cong B^{2p}(0,ch_j)$ and an angle tolerance $\varepsilon_j=o(1)$ for the small-angle graph model.
-\editai{Choose also the transverse parameter radius factor $\varrho_j$ (defining the corner-exit template scale $s_j\asymp \varrho_j h_j$) such that $\varrho_j=o(\varepsilon_j)$ (required for the borderline $p=n/2$ case; see Lemma~\ref{lem:borderline-p-half}).}
-\editai{In the corner-exit templates, the relevant footprint diameter satisfies $D_Q\asymp s_j$, so the within-label translation separation needed for disjointness is at the footprint scale $\delta_{\mathrm{sep},j}\asymp \varepsilon_j\,s_j$ (cf.\ Lemma~\ref{lem:sliver-stability} and Proposition~\ref{prop:finite-template}).}
-\editai{Fix, for each interior face $F=Q\cap Q'$ in the mesh-$h_j$ cubulation, a tubular/flat face chart $\Omega_F\cong B^{2p}(0,c h_j)$ and linear face-parameter maps
+\editamirNEW{Choose also the transverse parameter radius factor $\varrho_j$ (defining the corner-exit template scale $s_j\asymp \varrho_j h_j$) such that $\varrho_j=o(\varepsilon_j)$ (required for the borderline $p=n/2$ case; see Lemma~\ref{lem:borderline-p-half}).}
+\editamirNEW{In the corner-exit templates, the relevant footprint diameter satisfies $D_Q\asymp s_j$, so the within-label translation separation needed for disjointness is at the footprint scale $\delta_{\mathrm{sep},j}\asymp \varepsilon_j\,s_j$ (cf.\ Lemma~\ref{lem:sliver-stability} and Proposition~\ref{prop:finite-template}).}
+\editamirNEW{Fix, for each interior face $F=Q\cap Q'$ in the mesh-$h_j$ cubulation, a tubular/flat face chart $\Omega_F\cong B^{2p}(0,c h_j)$ and linear face-parameter maps
 $\Phi_{Q,F},\Phi_{Q',F}:B_{C_0\varrho_j h_j}(0)\to \Omega_F$ satisfying the uniform bounds
 $\|\Phi_{Q,F}\|_{\mathrm{op}}+\|\Phi_{Q',F}\|_{\mathrm{op}}\le C_{\Phi,0}$ and $\|\Phi_{Q,F}-\Phi_{Q',F}\|_{\mathrm{op}}\le C_\Phi\,h_j$.
 Then for template atoms $y_a$ with $\|y_a\|\le C_0\varrho_j h_j$ one has the \emph{uniform} displacement estimate
@@ -2123,7 +2123,7 @@ is available uniformly on all $h_j$--cells (Theorem~\ref{thm:local-sheets} and t
 (counts, prefixes) to meet the local budgets and global period constraints (Proposition~\ref{prop:global-coherence-all-labels} and Proposition~\ref{prop:cohomology-match}).
 
 \item \textbf{Glue-scale closure (absolute).}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 After fixing $m$ and choosing the mesh and local parameters as above, we now fix an arbitrary tolerance $\epsilon>0$.
 Set
 \[
@@ -2135,15 +2135,15 @@ Using Corollary~\ref{cor:global-flat-weighted}, choose $j$ large enough so that
 \[
 \delta_j:=\mathcal F(\partial T^{\mathrm{raw}}_j)\ <\ \eta(\epsilon).
 \]
-\editai{(In the borderline case $p=n/2$, this is ensured by imposing the refined displacement schedule $\varrho_j=o(\varepsilon_j)$ so that Lemma~\ref{lem:borderline-p-half} gives $\delta_j\to 0$.)}
+\editamir{(In the borderline case $p=n/2$, this is ensured by imposing the refined displacement schedule $\varrho_j=o(\varepsilon_j)$ so that Lemma~\ref{lem:borderline-p-half} gives $\delta_j\to 0$.)}
 Then Proposition~\ref{prop:glue-gap} produces an \emph{integral} $k$--current $U_\epsilon$ with
 $\partial U_\epsilon=\partial T^{\mathrm{raw}}_j$ and
 \[
 \Mass(U_\epsilon)\ \le\ \delta_j + C_X\,\delta_j^{\frac{k}{k-1}}\ <\ \epsilon.
 \]
-\end{editaiblock}
+\end{editamirblockNEW}
 \end{itemize}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 Under this schedule (with $m$ fixed), the central quantitative goal is that the \emph{raw boundary mismatch}
 \[
 \delta_j:=\mathcal F\!\left(\partial T^{\mathrm{raw}}_j\right)
@@ -2155,9 +2155,9 @@ Once $\delta_j$ is small, Proposition~\ref{prop:glue-gap} gives an \emph{integra
 $\partial U_\epsilon=\partial T^{\mathrm{raw}}_j$ and $\Mass(U_\epsilon)<\epsilon$, as used in
 Proposition~\ref{prop:cohomology-match}.  Finally, Proposition~\ref{prop:almost-calibration} converts the vanishing glue-mass
 into vanishing calibration defect.
-\end{editaiblock}
+\end{editamirblockNEW}
 
-\begin{editaiblock}
+\begin{editamirblockNEW}
 \begin{lemma}[Borderline ($p=n/2$): closure via a refined displacement schedule]\label{lem:borderline-p-half}
 Assume $p=n/2$ (equivalently $k=2n-2p=n$).
 Under the hypotheses of Corollary~\ref{cor:global-flat-weighted} with the \emph{refined} displacement control
@@ -2214,16 +2214,16 @@ as claimed.
 
 
 
-\begin{editaiblock}
-\editai{\noindent\textbf{Referee cleanup.} The proof above is the consolidated argument for Lemma~\ref{lem:borderline-p-half}. The duplicate proof block kept from an earlier patch is disabled to avoid ambiguity.}
-\end{editaiblock}
+\begin{editamirblockNEW}
+\editamir{\noindent\textbf{Referee cleanup.} The proof above is the consolidated argument for Lemma~\ref{lem:borderline-p-half}. The duplicate proof block kept from an earlier patch is disabled to avoid ambiguity.}
+\end{editamirblockNEW}
 \iffalse
 
 \begin{proof}
 In the middle-dimensional case $k=n$, Corollary~\ref{cor:global-flat-weighted} gives
 \[
 \mathcal F(\partial T^{\mathrm{raw}})
-\ \editai{\lesssim\ \varrho\,h^2} \sum_Q \sum_{a\in\mathcal S(Q)} m_{Q,a}^{\frac{n-1}{n}}.
+\ \editamir{\lesssim\ \varrho\,h^2} \sum_Q \sum_{a\in\mathcal S(Q)} m_{Q,a}^{\frac{n-1}{n}}.
 \]
 For each fixed cell $Q$, H\"older yields
 \[
@@ -2244,7 +2244,7 @@ This tends to $0$ as $h\downarrow 0$ under the schedule $\varrho=o(\varepsilon)$
 \end{proof}
 \fi
 
-\end{editaiblock}
+\end{editamirblockNEW}
 
 
 \subsection*{H1/H2 packaged at the point of use (for Theorem~\ref{thm:spine-quantitative})}
@@ -2252,9 +2252,9 @@ This tends to $0$ as $h\downarrow 0$ under the schedule $\varrho=o(\varepsilon)$
 \begin{proposition}[H1 package: local holomorphic multi-sheet manufacturing]\label{prop:h1-package}
 In the parameter schedule of \S\ref{sec:parameter-schedule}, for each mesh cell $Q$ and each direction family prescribed by the local Carath\'eodory data of $\beta$ on $Q$,
 Theorem~\ref{thm:local-sheets} and the projective holomorphic manufacturing machinery supply the required calibrated sheet--sum $S_Q$ satisfying $\Mass(S_Q)=\langle S_Q,\psi\rangle$
-with quantitative \editai{within-direction} disjointness, slope, and budget control.  Thus the hypothesis \textnormal{(H1)} in Theorem~\ref{thm:spine-quantitative} holds in this manuscript.
+with quantitative \editamir{within-direction} disjointness, slope, and budget control.  Thus the hypothesis \textnormal{(H1)} in Theorem~\ref{thm:spine-quantitative} holds in this manuscript.
 
-\begin{editaiblock}
+\begin{editamirblock}
 \noindent\textbf{Referee tightening (make \textnormal{(H1)} verifiable from cited inputs).}
 Fix an index $j$ and the mesh scale $h_j$.
 For each cell $Q$, let $\{(P_{Q,a},m_{Q,a})\}_{a\in\mathcal S(Q,j)}$ denote the local Carath\'eodory data for the cone field $\beta$ on $Q$
@@ -2276,7 +2276,7 @@ Summing over $Q$ and using that the Carath\'eodory weights encode the $\psi$--pa
 \Mass(S_j)=\langle S_j,\psi\rangle\ \le\ c_0+o(1),
 \]
 so $S_j$ satisfies the hypothesis \textnormal{(H1)} in Theorem~\ref{thm:spine-quantitative}.
-\end{editaiblock}
+\end{editamirblock}
 \end{proposition}
 
 \begin{proposition}[H2 package: global face coherence and gluing (corner-exit route)]\label{prop:h2-package}
@@ -2288,8 +2288,8 @@ In the parameter schedule of \S\ref{sec:parameter-schedule} (with fixed $m$ and 
 \end{itemize}
 The exact-class conclusion is enforced by Proposition~\ref{prop:cohomology-match} together with the per-face matching/transport mechanism (Proposition~\ref{prop:integer-transport}),
 rather than relying on a decay exponent in $h$.
-\editai{In the borderline case $p=n/2$, Lemma~\ref{lem:borderline-p-half} supplies $\mathcal F(\partial T^{\mathrm{raw}}_j)\to 0$ under the refined schedule $\varrho_j=o(\varepsilon_j)$, so Proposition~\ref{prop:glue-gap} still produces fillings $U_\epsilon$ of arbitrarily small mass for use in Proposition~\ref{prop:cohomology-match}.}
-Thus the hypothesis \textnormal{(H2)} in Theorem~\ref{thm:spine-quantitative} holds \editai{for $p<n/2$ under the present estimates, and also for $p=n/2$ provided the refined displacement schedule $\varrho=o(\varepsilon)$ from Lemma~\ref{lem:borderline-p-half} is enforced.}
+\editamir{In the borderline case $p=n/2$, Lemma~\ref{lem:borderline-p-half} supplies $\mathcal F(\partial T^{\mathrm{raw}}_j)\to 0$ under the refined schedule $\varrho_j=o(\varepsilon_j)$, so Proposition~\ref{prop:glue-gap} still produces fillings $U_\epsilon$ of arbitrarily small mass for use in Proposition~\ref{prop:cohomology-match}.}
+Thus the hypothesis \textnormal{(H2)} in Theorem~\ref{thm:spine-quantitative} holds \editamir{for $p<n/2$ under the present estimates, and also for $p=n/2$ provided the refined displacement schedule $\varrho=o(\varepsilon)$ from Lemma~\ref{lem:borderline-p-half} is enforced.}
 \end{proposition}
 \end{editjonblock}
 
@@ -2308,13 +2308,13 @@ Define the cohomological lower bound
 c_0 := \int_X m\,\gamma\wedge \psi \;=\; \langle A,[\psi]\rangle .
 \]
 \editamir{Let} a sequence of integral $(2n-2p)$--cycles $\{T_k\}_{k\ge 1}$ with
-$\partial T_k=0$ and \editai{$[T_k]=A$ in $H_{2n-2p}(X;\Z)/\mathrm{Tor}$} such that the calibration defect tends to zero:
+$\partial T_k=0$ and \editamir{$[T_k]=A$ in $H_{2n-2p}(X;\Z)/\mathrm{Tor}$} such that the calibration defect tends to zero:
 \[
 \Def_{\mathrm{cal}}(T_k)\ :=\ \Mass(T_k)-\langle T_k,\psi\rangle \ \longrightarrow\ 0.
 \]
 (Equivalently, since $\psi$ is closed and the homology class is fixed in $H_{2n-2p}(X;\Z)/\mathrm{Tor}$, one has $\langle T_k,\psi\rangle=c_0$ for all $k$ and thus
 $\Def_{\mathrm{cal}}(T_k)\to 0$ iff $\Mass(T_k)\to c_0$.)
-Then there exists an integral $(2n-2p)$--cycle $T$ with $\partial T=0$ and \editai{$[T]=A$ in $H_{2n-2p}(X;\Z)/\mathrm{Tor}$} such that
+Then there exists an integral $(2n-2p)$--cycle $T$ with $\partial T=0$ and \editamir{$[T]=A$ in $H_{2n-2p}(X;\Z)/\mathrm{Tor}$} such that
 \[
 \Mass(T)=\langle T,\psi\rangle=c_0.
 \]
@@ -2328,9 +2328,9 @@ If $X$ is projective, each $V_j$ is algebraic (Remark~\ref{rem:chow-gaga}), and 
 algebraic cohomology class.
 \end{theorem}
 
-\begin{editaiblock}
+\begin{editamirblock}
 \begin{proof}
-Since \editai{$[T_k]=A$ in $H_{2n-2p}(X;\Z)/\mathrm{Tor}$} is fixed and $\psi$ is closed, the pairing is constant:
+Since \editamir{$[T_k]=A$ in $H_{2n-2p}(X;\Z)/\mathrm{Tor}$} is fixed and $\psi$ is closed, the pairing is constant:
 \(
 \langle T_k,\psi\rangle=\langle A,[\psi]\rangle=c_0
 \)
@@ -2366,10 +2366,10 @@ T=\sum_j m_j[V_j],
 with $m_j\in\Z_{>0}$ and $V_j$ irreducible analytic subvarieties of codimension $p$.
 If $X$ is projective, each $V_j$ is algebraic by Chow/GAGA (Remark~\ref{rem:chow-gaga}).
 \end{proof}
-\end{editaiblock}
+\end{editamirblock}
 
 
-\begin{editaiblock}
+\begin{editamirblock}
 \begin{lemma}[Flat limits of cycles are cycles]\label{lem:flat_limit_of_cycles_is_cycle}
 Let $T_k$ be integral currents of dimension $m$ on $X$ with $\partial T_k=0$ and
 $\sup_k\Mass(T_k)<\infty$.  Assume $T_k\to T$ in the flat norm.  Then $T$ is an
@@ -2383,12 +2383,12 @@ Moreover, the class of integral currents is closed under flat limits under the
 uniform mass and boundary-mass bounds (Federer--Fleming compactness/closure; see
 \cite[\S\S 4.1--4.2]{Fed69}).  Therefore $T$ is integral and, by the first part, a cycle.
 \end{proof}
-\end{editaiblock}
+\end{editamirblock}
 
 \begin{lemma}[Almost--calibrated limits are calibrated]\label{lem:limit_is_calibrated}
 Let $\psi$ be a smooth closed form with comass $\le 1$.
 Let $T_k$ be integral currents with $\sup_k\Mass(T_k)<\infty$ and $T_k\rightharpoonup T$ weakly.
-If the calibration deficits \editai{$\Def_{\mathrm{cal}}(T_k):=\Mass(T_k)-\langle T_k,\psi\rangle$} satisfy $\Def_{\mathrm{cal}}(T_k)\to 0$,
+If the calibration deficits \editamir{$\Def_{\mathrm{cal}}(T_k):=\Mass(T_k)-\langle T_k,\psi\rangle$} satisfy $\Def_{\mathrm{cal}}(T_k)\to 0$,
 then $T$ is $\psi$--calibrated, i.e. $\Mass(T)=\langle T,\psi\rangle$.
 \end{lemma}
 
@@ -2397,7 +2397,7 @@ Weak convergence gives $\langle T_k,\psi\rangle\to \langle T,\psi\rangle$.
 Lower semicontinuity of mass under weak convergence (see e.g. \cite[Ch.~XIV]{LangGmT} or \cite{Sim83}) yields
 $\Mass(T)\le \liminf_k \Mass(T_k)=\liminf_k\bigl(\langle T_k,\psi\rangle+\Def_{\mathrm{cal}}(T_k)\bigr)
 =\langle T,\psi\rangle$.
-\editai{On the other hand, $\mathrm{comass}(\psi)\le 1$ implies $|\langle T,\psi\rangle|\le \Mass(T)$ and hence $\langle T,\psi\rangle\le \Mass(T)$ (see e.g. \cite[Lemma~3.5]{HL82}).}
+\editamir{On the other hand, $\mathrm{comass}(\psi)\le 1$ implies $|\langle T,\psi\rangle|\le \Mass(T)$ and hence $\langle T,\psi\rangle\le \Mass(T)$ (see e.g. \cite[Lemma~3.5]{HL82}).}
 Thus $\Mass(T)=\langle T,\psi\rangle$, so $T$ is $\psi$--calibrated.
 \end{proof}
 
@@ -2467,13 +2467,13 @@ In particular, the constant sequence $T_k:=[D]$ is an almost-calibrated realizin
 We say a cone--valued smooth closed $(p,p)$--form $\beta$ (representing the rational Hodge class $[\gamma]$)
 is \emph{SYR--realizable} if there exists a sequence of integral $(2n-2p)$--cycles $T_k$ such that
 \begin{enumerate}
-\item $\partial T_k=0$ and \editai{$[T_k]=\mathrm{PD}(m[\gamma])$ in $H_{2n-2p}(X;\Z)/\mathrm{Tor}$ (equivalently in $H_{2n-2p}(X;\Q)$)} for some fixed integer $m\ge 1$ (independent of $k$), and
+\item $\partial T_k=0$ and \editamir{$[T_k]=\mathrm{PD}(m[\gamma])$ in $H_{2n-2p}(X;\Z)/\mathrm{Tor}$ (equivalently in $H_{2n-2p}(X;\Q)$)} for some fixed integer $m\ge 1$ (independent of $k$), and
 \item the \emph{calibration defect} satisfies
 \[
 \Def_{\mathrm{cal}}(T_k)\ :=\ \Mass(T_k)-\langle T_k,\psi\rangle\ \longrightarrow\ 0.
 \]
 \end{enumerate}
-Equivalently, since $\psi$ is closed and \editai{$[T_k]=\mathrm{PD}(m[\gamma])$ in $H_{2n-2p}(X;\Z)/\mathrm{Tor}$}, one has the exact pairing identity
+Equivalently, since $\psi$ is closed and \editamir{$[T_k]=\mathrm{PD}(m[\gamma])$ in $H_{2n-2p}(X;\Z)/\mathrm{Tor}$}, one has the exact pairing identity
 \[
 \langle T_k,\psi\rangle=\bigl\langle [T_k],[\psi]\bigr\rangle
 =\bigl\langle \mathrm{PD}(m[\gamma]),[\psi]\bigr\rangle
@@ -2483,37 +2483,37 @@ Equivalently, since $\psi$ is closed and \editai{$[T_k]=\mathrm{PD}(m[\gamma])$ 
 and therefore SYR is equivalent to $\Mass(T_k)\to c_0$.
 
 \end{definition}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 \noindent\textbf{Notation warning.} The symbol $m$ is used in two distinct roles:
 (i) the cohomology multiplier in $\mathrm{PD}(m[\gamma])$ in Definition~\ref{def:syr}; and
 (ii) the large tensor power $L^{\otimes N}$ in the Bergman/holomorphic inputs (e.g.\ the $N^{-1/2}$ scale).
-\editai{Throughout the referee-layer patches we reserve $m$ for the cohomology multiplier and use $N$ for the holomorphic tensor power, so the Bergman scale is always $N^{-1/2}$.}
-\end{editaiblock}
+\editamir{Throughout the referee-layer patches we reserve $m$ for the cohomology multiplier and use $N$ for the holomorphic tensor power, so the Bergman scale is always $N^{-1/2}$.}
+\end{editamirblockNEW}
 
 
 \begin{theorem}[Calibrated realization under SYR]\label{thm:syr}
 Assume $\beta$ is SYR--realizable in the sense of Definition~\ref{def:syr}, and let $\psi=\omega^{n-p}/(n-p)!$.
-Then there exists an integral $(2n-2p)$--cycle $T$ with $\partial T=0$ and \editai{$[T]=\mathrm{PD}(m[\gamma])$ in $H_{2n-2p}(X;\Z)/\mathrm{Tor}$} such that
+Then there exists an integral $(2n-2p)$--cycle $T$ with $\partial T=0$ and \editamir{$[T]=\mathrm{PD}(m[\gamma])$ in $H_{2n-2p}(X;\Z)/\mathrm{Tor}$} such that
 \[
 \Mass(T)=\langle T,\psi\rangle=\bigl\langle \mathrm{PD}(m[\gamma]),[\psi]\bigr\rangle.
 \]
-\editai{In particular, $T$ is $\psi$--calibrated.  For the K\"ahler calibration $\psi=\omega^{n-p}/(n-p)!$, calibrated integral currents are $d$--closed and positive of bidimension $(p,p)$ (see \cite{HL82}).  By King's theorem on positive closed locally integral currents \cite{King71}, $T$ is a holomorphic chain}
+\editamir{In particular, $T$ is $\psi$--calibrated.  For the K\"ahler calibration $\psi=\omega^{n-p}/(n-p)!$, calibrated integral currents are $d$--closed and positive of bidimension $(p,p)$ (see \cite{HL82}).  By King's theorem on positive closed locally integral currents \cite{King71}, $T$ is a holomorphic chain}
 \[
 T=\sum_j m_j[V_j],
 \qquad m_j\in\mathbb{N},
 \]
-\editai{where $V_j\subset X$ are irreducible complex analytic subvarieties of codimension $p$.  If, moreover, $X$ is projective, then each $V_j$ is algebraic by Chow/GAGA (Remark~\ref{rem:chow-gaga}), so $[\gamma]\in H^{2p}(X;\Q)$ is an algebraic class.}
+\editamir{where $V_j\subset X$ are irreducible complex analytic subvarieties of codimension $p$.  If, moreover, $X$ is projective, then each $V_j$ is algebraic by Chow/GAGA (Remark~\ref{rem:chow-gaga}), so $[\gamma]\in H^{2p}(X;\Q)$ is an algebraic class.}
 \end{theorem}
 
 
-\begin{editaiblock}
-\editai{\noindent\textbf{Referee clarification (holomorphic-chain conclusion).}
+\begin{editamirblockNEW}
+\editamir{\noindent\textbf{Referee clarification (holomorphic-chain conclusion).}
 Once Theorem~\ref{thm:realization-from-almost} produces an \emph{integral} cycle $T$ with
 $\Mass(T)=\langle T,\psi\rangle$ for $\psi=\omega^{n-p}/(n-p)!$, the current $T$ is $\psi$--calibrated.
 By Wirtinger/Harvey--Lawson calibrated-geometry results \cite{HL82}, a $\psi$--calibrated integral current is strongly positive and
 $d$--closed of the correct Hodge type. King’s theorem then yields the holomorphic-chain representation
 $T=\sum_j m_j[V_j]$ \cite{King71}. (Projective $\Rightarrow$ algebraic is handled separately via Chow/GAGA.)}
-\end{editaiblock}
+\end{editamirblockNEW}
 \begin{proof}
 Let $\{T_k\}$ be the SYR sequence.
 By Definition~\ref{def:syr}, $\Def_{\mathrm{cal}}(T_k)\to 0$ and the homology classes $[T_k]=\mathrm{PD}(m[\gamma])$ are fixed.
@@ -2523,7 +2523,7 @@ Since $\psi$ is closed, the pairing $\langle T_k,\psi\rangle$ depends only on th
 \qquad\text{for all }k.
 \]
 Hence $\Mass(T_k)=\Def_{\mathrm{cal}}(T_k)+\langle T_k,\psi\rangle\to c_0$.
-Applying Theorem~\ref{thm:realization-from-almost} to the fixed--class sequence $\{T_k\}$ yields an integral cycle $T$ with \editai{$[T]=\mathrm{PD}(m[\gamma])$ in $H_{2n-2p}(X;\Z)/\mathrm{Tor}$}
+Applying Theorem~\ref{thm:realization-from-almost} to the fixed--class sequence $\{T_k\}$ yields an integral cycle $T$ with \editamir{$[T]=\mathrm{PD}(m[\gamma])$ in $H_{2n-2p}(X;\Z)/\mathrm{Tor}$}
 in the same class with $\Mass(T)=\langle T,\psi\rangle=c_0$ and the holomorphic--chain representation
 \(T=\sum_j m_j[V_j]\).
 When $X$ is projective, algebraicity of analytic subvarieties follows by Remark~\ref{rem:chow-gaga}.
@@ -2601,7 +2601,7 @@ decompositions, isoperimetric fillings, and varifold compactness).
 	\emph{Step 3: Closure by a small-mass filling (flat-norm viewpoint).}
 	Set $S^{\mathrm{raw}}_\varepsilon:=\sum_Q S_Q$.
 	Its boundary $\partial S^{\mathrm{raw}}_\varepsilon$ is supported on the union of cell interfaces.
-	\editai{While $\Mass(\partial S^{\mathrm{raw}}_\varepsilon)$ may be large, the robust quantity for gluing is the \emph{flat norm} $\mathcal F(\partial S^{\mathrm{raw}}_\varepsilon)$.
+	\editamir{While $\Mass(\partial S^{\mathrm{raw}}_\varepsilon)$ may be large, the robust quantity for gluing is the \emph{flat norm} $\mathcal F(\partial S^{\mathrm{raw}}_\varepsilon)$.
 	By the dual characterization of $\mathcal F$ and Stokes, for any test form $\eta$ with $\|\eta\|_{\mathrm{comass}}\le 1$ and $\|d\eta\|_{\mathrm{comass}}\le 1$ one has
 	$\partial S^{\mathrm{raw}}_\varepsilon(\eta)=S^{\mathrm{raw}}_\varepsilon(d\eta)$.
 	The cellwise $C^0$ approximation of $\beta$ together with bounded geometry implies $S^{\mathrm{raw}}_\varepsilon(d\eta)=\int_X (m\beta)\wedge d\eta + o_\varepsilon(1)=o_\varepsilon(1)$ (since $d\beta=0$), hence $\mathcal F(\partial S^{\mathrm{raw}}_\varepsilon)\to 0$.}
@@ -2621,7 +2621,7 @@ decompositions, isoperimetric fillings, and varifold compactness).
 	\]
 	Using a finite cover $\{U_\alpha\}$ and partition of unity yields a global sequence of closed integral cycles (still denoted $T_\varepsilon$)
 	with $\Mass(T_\varepsilon)=m\int_X\beta\wedge\psi + o_\varepsilon(1)$ and $\Def_{\mathrm{cal}}(T_\varepsilon)\to 0$.
-	\editai{To enforce the exact homology class $\mathrm{PD}(m[\gamma])$ (modulo torsion), one may refine the mesh so that the period contributions of individual plaques are uniformly tiny and then apply the same fixed-dimensional rounding / lattice-discreteness argument used later in Proposition~\ref{prop:cohomology-match}.}
+	\editamir{To enforce the exact homology class $\mathrm{PD}(m[\gamma])$ (modulo torsion), one may refine the mesh so that the period contributions of individual plaques are uniformly tiny and then apply the same fixed-dimensional rounding / lattice-discreteness argument used later in Proposition~\ref{prop:cohomology-match}.}
 	Thus $\beta$ is SYR--realizable in the sense of Definition~\ref{def:syr}.
 \end{proof}
 
@@ -2672,7 +2672,7 @@ combination of at most $D+1$ such generators, where $D=\dim(\mathcal{V}_x)=\bino
 is independent of $x$.
 
 
-\begin{editaiblock}
+\begin{editamirblockNEW}
 \iffalse
 % ======= Old (truncated) version kept for traceability; superseded in Step 85 =======
 
@@ -2683,7 +2683,7 @@ $K_p(x)\subset \mathcal V_x$ be the closed convex cone of \emph{strongly positiv
 For each complex $(n-p)$--plane $P\subset T_xX$ let $\xi_P\in K_p(x)$ denote the (normalized) generator of the corresponding extremal ray,
 chosen so that $\langle \xi_P,\psi_x\rangle=1$.
 
-Then there exists a number \editai{$N_{\mathrm{Car}}=N_{\mathrm{Car}}(n,p)$} (one may take $N_{\mathrm{Car}}=\dim(\mathcal V_x)+1=\binom{n}{p}^2+1$) such that for every $x\in X$ and every
+Then there exists a number \editamir{$N_{\mathrm{Car}}=N_{\mathrm{Car}}(n,p)$} (one may take $N_{\mathrm{Car}}=\dim(\mathcal V_x)+1=\binom{n}{p}^2+1$) such that for every $x\in X$ and every
 $\beta(x)\in K_p(x)$ there exist complex $(n-p)$--planes $P_{x,1},\dots,P_{x,N_{\mathrm{Car}}}\subset T_xX$ and weights
 $\theta_{x,j}\ge 0$ with $\sum_{j=1}^{N_{\mathrm{Car}}}\theta_{x,j}=1$ such that
 \[
@@ -2719,7 +2719,7 @@ $K_p(x)\subset \mathcal V_x$ be the closed convex cone of \emph{strongly positiv
 For each complex $(n-p)$--plane $P\subset T_xX$ let $\xi_P\in K_p(x)$ denote the (normalized) generator of the corresponding extremal ray,
 chosen so that $\langle \xi_P,\psi_x\rangle=1$.
 
-Then there exists a number \editai{$N_{\mathrm{Car}}=N_{\mathrm{Car}}(n,p)$} (one may take $N_{\mathrm{Car}}=\dim_{\R}(\mathcal V_x)+1=\binom{n}{p}^2+1$) such that for every $x\in X$ and every
+Then there exists a number \editamir{$N_{\mathrm{Car}}=N_{\mathrm{Car}}(n,p)$} (one may take $N_{\mathrm{Car}}=\dim_{\R}(\mathcal V_x)+1=\binom{n}{p}^2+1$) such that for every $x\in X$ and every
 $\beta(x)\in K_p(x)$ there exist complex $(n-p)$--planes $P_{x,1},\dots,P_{x,N}\subset T_xX$ and weights
 $\theta_{x,j}\ge 0$ with $\sum_{j=1}^{N_{\mathrm{Car}}}\theta_{x,j}=1$ such that
 \[
@@ -2750,7 +2750,7 @@ Multiplying by $t(x)$ gives the claimed decomposition of $\beta(x)$.
 \textbf{Remark (what is actually used later).}
 In the global construction we only require such decompositions at the finitely many cube base points $x_Q$
 (Substep~4.1), so no global measurable selection or continuity-in-$x$ statement is needed for the subsequent arguments.
-\end{editaiblock}
+\end{editamirblockNEW}
 
 \begin{editblock}
 \begin{lemma}[Lipschitz weights from a strongly convex simplex fit]\label{lem:lipschitz-qp-weights}
@@ -2821,9 +2821,9 @@ and reduces “stable direction labeling’’ to the quantitative choice of $\v
 Fix an ample line bundle $L\to X$ with a Hermitian metric whose curvature
 form equals $\omega$.  For $N\in\N$ large, consider the complete linear
 system $|L^{\otimes N}|$.
-\editai{(Parameter convention: throughout the holomorphic/Bergman manufacturing block, $N$ denotes the tensor power of $L$ controlling the Bergman scale $N^{-1/2}$; the cohomology multiplier remains $m$ as in Definition~\ref{def:syr}.)}
+\editamir{(Parameter convention: throughout the holomorphic/Bergman manufacturing block, $N$ denotes the tensor power of $L$ controlling the Bergman scale $N^{-1/2}$; the cohomology multiplier remains $m$ as in Definition~\ref{def:syr}.)}
 
-\begin{editaiblock}
+\begin{editamirblock}
 \begin{lemma}[Jet surjectivity for ample powers (pointwise and for finite sets)]\label{lem:jet-surjectivity}
 Let $X$ be a smooth complex projective manifold and $L\to X$ an ample line bundle.
 Fix an integer $k\ge 1$.
@@ -2869,12 +2869,12 @@ H^0(X,L^N)\twoheadrightarrow H^0\!\left(X,L^N\otimes \mathcal{O}_X/\mathcal{I}_Z
 \]
 as claimed.
 \end{proof}
-\end{editaiblock}
+\end{editamirblock}
 
 
 \begin{lemma}[Uniform $C^1$ control on $N^{-1/2}$-balls via Bergman kernels]
 \label{lem:bergman-control}
-\begin{editaiblock}
+\begin{editamirblock}
 Fix $\varepsilon>0$.  There exists \editamir{$N_1(\varepsilon)$} such that for all
 $N\ge \editamir{N_1(\varepsilon)}$, each $x\in X$, and each collection of $p$
 complex covectors $\lambda_1,\ldots,\lambda_p\in T_x^{*(1,0)}X$, there exist
@@ -2882,20 +2882,20 @@ sections $s_1,\ldots,s_p\in H^0(X,L^{\editamir{N}})$ with the following properti
 in normal holomorphic coordinates centered at $x$:
 \begin{enumerate}
 \item[\textnormal{(i)}] $s_i(x)=0$ and $ds_i(x)=\lambda_i$ for each $i$;
-\item[\textnormal{(ii)}] on the geodesic ball $B_{c\,\editai{N^{-1/2}}}(x)$
+\item[\textnormal{(ii)}] on the geodesic ball $B_{c\,\editamir{N^{-1/2}}}(x)$
 (for a universal constant $c>0$ depending only on $(X,\omega)$),
 the gradients satisfy
 \[
 \|ds_i(y)-\lambda_i\|\le \varepsilon\,\max_{1\le j\le p}\|\lambda_j\|
-\quad\text{for all } y\in B_{c\,\editai{N^{-1/2}}}(x).
+\quad\text{for all } y\in B_{c\,\editamir{N^{-1/2}}}(x).
 \]
 \end{enumerate}
 
-\end{editaiblock}
+\end{editamirblock}
 \end{lemma}
 
 \begin{proof}
-\begin{editaiblock}
+\begin{editamirblock}
 \editamir{
 \noindent\textbf{Analytic input (Bergman kernel at the $N^{-1/2}$ scale).}
 We invoke a \emph{near off-diagonal} Bergman kernel expansion with \emph{derivative control up to order $2$}
@@ -2970,11 +2970,11 @@ Using the derivative control above and $\|A_N^{-1}\|=O(1)$ for $N$ large, we obt
 \|ds_i(Z)-\lambda_i\|\le \varepsilon\max_{1\le j\le p}\|\lambda_j\|
 \qquad\text{for all }|Z|\le \sigma.
 \]
-Returning to the original variables gives the desired estimate on $B_{c\,\editai{N^{-1/2}}}(x)$ with $c:=\sigma$.
+Returning to the original variables gives the desired estimate on $B_{c\,\editamir{N^{-1/2}}}(x)$ with $c:=\sigma$.
 
 Finally, undo the normalization by multiplying the constructed sections by $M$, which yields the general case.
 
-\end{editaiblock}
+\end{editamirblock}
 \end{proof}
 
 
@@ -3011,7 +3011,7 @@ Differentiating $S(u,g(u))=0$ gives $Dg=-(\partial_w S)^{-1}\partial_u S$, so th
 $\|Dg\|\le C\,\varepsilon$ for a constant $C$ depending only on $(n,p)$ and the conditioning of $\{\lambda_i\}$.
 \end{proof}
 
-\begin{editaiblock}
+\begin{editamirblockNEW}
 \noindent\textbf{Referee addendum (explicit slope constant and usable domain).}
 In applications, we take $U=B_r(0)\subset\C^n$ and apply the above argument on a \emph{concentric subball}
 $U_{1/2}:=B_{r/2}(0)$, so that the implicit-function graph is defined on the full base $\Pi\cap U_{1/2}$.
@@ -3023,7 +3023,7 @@ $\|(\partial_wS)^{-1}\|\le 2\kappa$ on $U$, hence the graph map satisfies the un
 \qquad C_{\mathrm{graph}}:=2\kappa,
 \]
 and $Y\cap U_{1/2}$ is a single $C^1$ graph over $\Pi\cap U_{1/2}$.
-\end{editaiblock}
+\end{editamirblockNEW}
 
 \end{editblock}
 
@@ -3047,15 +3047,15 @@ Moreover, $Y$ is $\psi$-calibrated (being a complex submanifold).
 
 
 
-\begin{editaiblock}
-\editai{\noindent\textbf{Referee correction (removing an unnecessary Bertini/global-smoothness dependency).}
+\begin{editamirblockNEW}
+\editamir{\noindent\textbf{Referee correction (removing an unnecessary Bertini/global-smoothness dependency).}
 Downstream we only use that the defining sections are \emph{transverse on the Bergman ball}
 $B_{c\,N^{-1/2}}(x)$, which yields a \emph{single-sheet $C^1$ graph} there.
 No later step requires $Y$ to be globally smooth on all of $X$.
 Accordingly, the conclusion may be read as producing an \emph{algebraic complete-intersection cycle}
 (possibly with singularities away from $B_{c\,N^{-1/2}}(x)$), whose associated integration current is
 $\psi$--calibrated in the sense of Wirtinger/Harvey--Lawson \cite{HL82}.}
-\end{editaiblock}
+\end{editamirblockNEW}
 
 \begin{proof}
 Choose covectors $\lambda_1,\ldots,\lambda_p\in T_x^*X$ whose common
@@ -3071,13 +3071,13 @@ that $Y$ is smooth and $\{ds_1(y),\ldots,ds_p(y)\}$ are linearly
 independent on the ball.
 \fi
 
-\begin{editaiblock}
-\editai{\noindent\textbf{Referee note.} The above generic-perturbation/Bertini sentence is not needed here.
+\begin{editamirblockNEW}
+\editamir{\noindent\textbf{Referee note.} The above generic-perturbation/Bertini sentence is not needed here.
 We keep the sections $s_i$ produced by Lemma~\ref{lem:bergman-control}: by construction they satisfy
 $\{ds_1(y),\ldots,ds_p(y)\}$ linearly independent on $B_{c\,N^{-1/2}}(x)$, hence $Y$ is smooth on that ball.
 Possible singularities of the global complete intersection away from the ball do not affect the local graph estimate
 and do not enter later arguments, which work at the level of integral currents/algebraic cycles.}
-\end{editaiblock}
+\end{editamirblockNEW}
 
 
 The complex normal space to $Y$ at $y$ is spanned by
@@ -3087,10 +3087,10 @@ Hence $T_yY$ is $\varepsilon$-close to $\Pi$ for all $y$ in the ball.
 
 Since $Y$ is a complex submanifold of a K\"ahler manifold, it is
 automatically calibrated by $\psi=\omega^{n-p}/(n-p)!$.
-\begin{editaiblock}
+\begin{editamirblockNEW}
 \editamir{More generally, even if $Y$ is only an analytic/algebraic complete intersection with singularities away from the ball,
 the associated integration current $[Y]$ is $\psi$--calibrated (Wirtinger), hence strongly positive and closed; see \cite{HL82,King71}.}
-\end{editaiblock}
+\end{editamirblockNEW}
 
 \end{proof}
 
@@ -3119,7 +3119,7 @@ $\{\Pi_{\alpha,1},\ldots,\Pi_{\alpha,N_\alpha}\}$ in the compact fiber
 $G_{n-p}(T_{x_\alpha}X)$.  Apply Proposition~\ref{prop:tangent-approx-full}
 to realize each net direction by a calibrated complete intersection
 $Y_{\alpha,j}$ through $x_\alpha$ with tangent plane $\varepsilon/2$-close
-to $\Pi_{\alpha,j}$ on a ball of radius $c\,N^{-1/2}$. \editai{(Since there are only finitely many directions in the net, we may take a single $N$ large enough so that all of the resulting local graph estimates hold on the same Bergman radius $c\,N^{-1/2}$.)}
+to $\Pi_{\alpha,j}$ on a ball of radius $c\,N^{-1/2}$. \editamir{(Since there are only finitely many directions in the net, we may take a single $N$ large enough so that all of the resulting local graph estimates hold on the same Bergman radius $c\,N^{-1/2}$.)}
 
 By the $C^1$ control in Proposition~\ref{prop:tangent-approx-full}, for $N$ large enough the tangent planes of each $Y_{\alpha,j}$
 remain $\varepsilon$-close to $T_{x_\alpha}Y_{\alpha,j}$ throughout $B_{c\,N^{-1/2}}(x_\alpha)$.
@@ -3135,7 +3135,7 @@ with prescribed tangent directions and mass fractions.
 
 \begin{theorem}[Local multi-sheet construction]\label{thm:local-sheets}
 Let $Q\subset X$ be a small coordinate cube.  Let
-$\Pi_1,\ldots,\Pi_J\in \Gr_{n-p}(TQ)$ be constant $(n-p)$-planes \editai{(assumed complex/$\psi$-calibrated in the intended application)}, and let
+$\Pi_1,\ldots,\Pi_J\in \Gr_{n-p}(TQ)$ be constant $(n-p)$-planes \editamir{(assumed complex/$\psi$-calibrated in the intended application)}, and let
 $\theta_1,\ldots,\theta_J\in\Q_{>0}$ with $\sum_j\theta_j=1$.
 For every $\varepsilon,\delta>0$, there exist smooth $\psi$-calibrated
 complete intersections $\{Y_j^a\}_{j,a}$ in $X$ such that:
@@ -3167,7 +3167,7 @@ are controlled by the uniform $C^1$-closeness of the metric.
 
 \medskip\noindent
 \textbf{Substep 3.2: Fix calibrated target planes (no minimization needed).}
-\begin{editaiblock}
+\begin{editamirblock}
 In the closure-chain application, each target direction $\Pi_j$ comes from the calibrated cone decomposition
 (hence is already a complex $(n-p)$-plane, i.e. $\psi$-calibrated).  We therefore set
 \[
@@ -3175,8 +3175,8 @@ In the closure-chain application, each target direction $\Pi_j$ comes from the c
 \]
 and no ``projection to the nearest calibrated plane'' is required.
 \par\smallskip
-\editai{Referee note: claiming pairwise disjointness for sheets built from \emph{different} directions is generally false (e.g. for $p=1$, non-parallel complex hypersurfaces intersect locally).  Disjointness is only enforced within each fixed-direction family $\{Y_j^a\}_a$.}
-\end{editaiblock}
+\editamir{Referee note: claiming pairwise disjointness for sheets built from \emph{different} directions is generally false (e.g. for $p=1$, non-parallel complex hypersurfaces intersect locally).  Disjointness is only enforced within each fixed-direction family $\{Y_j^a\}_a$.}
+\end{editamirblock}
 
 \medskip\noindent
 \textbf{Substep 3.3: Choose sheet counts via Diophantine rounding.}
@@ -3216,16 +3216,16 @@ Fix such an $M$ and set $N_j:=N_j(M)$.
 In $\Phi(Q)\subset\C^n$, for each $j$, let $N_j^\perp$ be the complex
 $p$-dimensional normal space (the complex orthogonal complement of
 $\widetilde\Pi_j$), so that $\C^n=\widetilde\Pi_j\oplus N_j^\perp$.
-\begin{editaiblock}
+\begin{editamirblock}
 Pick distinct translation vectors
 $t_{j,1},\ldots,t_{j,N_j}\in N_j^\perp$ in a small ball $B(0,\rho)$
 with $\rho\ll\mathrm{diam}(Q)$, such that for each fixed $j$ the affine spaces
 $\widetilde\Pi_j+t_{j,a}$ are pairwise disjoint on $\Phi(Q)$ as $a$ varies.
 This is possible since $N_j^\perp$ has real dimension $2p\ge 2$ and we choose only finitely many points.
 \editamir{No disjointness is asserted between different directions $j\neq j'$.}
-\end{editaiblock}
+\end{editamirblock}
 
-\begin{editaiblock}
+\begin{editamirblockNEW}
 \noindent\textbf{Referee tightening (quantitative separation for persistence).}
 To make the later holomorphic perturbation \emph{provably} preserve disjointness on $Q$, we choose the
 translations with a margin tied to the eventual $C^1$--graph scale.
@@ -3242,7 +3242,7 @@ Then the resulting realized sheets $Y_j^a$ in Substep~3.5 satisfy
 $\dist\bigl(Y_j^a\cap Q,\ \widetilde\Pi_j+t_{j,a}\bigr)\le 2\,\eta_N\,h$ (by Lemma~\ref{lem:global-graph-contraction}
 as used in Proposition~\ref{prop:cell-scale-linear-model-graph}),
 so the tubular neighborhoods around distinct planes are disjoint and hence the sheets remain disjoint on $Q$.
-\end{editaiblock}
+\end{editamirblockNEW}
 
 
 
@@ -3259,7 +3259,7 @@ These satisfy: (i) $\psi_0$-calibration (complex $(n-p)$-planes);
 
 \medskip\noindent
 \textbf{Substep 3.5: Upgrade to algebraic complete intersections.}
-\begin{editaiblock}
+\begin{editamirblock}
 This step uses the polarized/projective hypothesis: fix an ample line bundle $L$ with
 $\omega=c_1(L)$ and work with large tensor powers $L^{\otimes N}$.
 After shrinking $Q$ (or refining the cube partition), assume $Q$ is contained in a
@@ -3279,9 +3279,9 @@ over $\widetilde\Pi_j+t_{j,a}$.  Since the perturbation is $C^1$--small on $Q$, 
 pairwise disjointness, and the mass fraction estimates from Substeps 3.1--3.4 persist.
 (For quantitative transversality/persistence estimates in the large $N$ regime, compare
 \cite{Donaldson01}.)
-\end{editaiblock}
+\end{editamirblock}
 
-\begin{editaiblock}
+\begin{editamirblockNEW}
 \noindent\textbf{Referee tightening (replace informal Bergman appeal by an internal lemma chain).}
 The existence of algebraic complete intersections that are $C^1$--close to the flat model planes on $Q$
 is provided quantitatively by Proposition~\ref{prop:cell-scale-linear-model-graph},
@@ -3301,7 +3301,7 @@ Mass persistence then follows from Lemma~\ref{lem:sliver-stability}\textnormal{(
 \]
 so by choosing $N$ large enough that $\eta_N^2\ll \delta$ and taking $M$ large enough in Substep~3.3,
 property \textnormal{(ii)} holds as stated.
-\end{editaiblock}
+\end{editamirblockNEW}
 
 
 \end{proof}
@@ -3340,7 +3340,7 @@ For any $\delta>0$ there exist integers $N_{Q,1},\ldots,N_{Q,N}$ such that the t
 
 \begin{proof}
 Let $k:=2n-2p$.
-\editai{Choose a corner-exit scale $s=s(Q,\delta)\ll \mathrm{side}(Q)$ and, for each direction label $(Q,j)$, use the corner-exit translation template mechanism
+\editamir{Choose a corner-exit scale $s=s(Q,\delta)\ll \mathrm{side}(Q)$ and, for each direction label $(Q,j)$, use the corner-exit translation template mechanism
 (Lemmas~\ref{lem:complex-corner-exit-template} and~\ref{lem:corner-exit-mass-scale}, and the finite-net packaging in Proposition~\ref{prop:corner-exit-template-net})
 to arrange that all sheets in a fixed family $(Q,j)$ have identical corner-exit footprints inside $Q$.  In particular, their $\psi$--masses in $Q$ agree up to the common
 small-slope distortion factor, so we may denote by $A_{Q,j}>0$ the common $\psi$--mass of a single $(Q,j)$-sheet in $Q$, with scaling $A_{Q,j}\asymp s^{k}$.}
@@ -3362,7 +3362,7 @@ $\Mass([Y_{Q,j}^a]\llcorner Q)=\int_Q\psi\llcorner[Y_{Q,j}^a]$, hence
 \[
 \Mass(S_Q)=\sum_j N_{Q,j}A_{Q,j}.
 \]
-\editai{By shrinking the corner-exit scale $s$ (hence shrinking all $A_{Q,j}\asymp s^k$ uniformly) one increases the available total sheet count
+\editamir{By shrinking the corner-exit scale $s$ (hence shrinking all $A_{Q,j}\asymp s^k$ uniformly) one increases the available total sheet count
 without changing the cube budget $M_Q=m\int_Q\beta\wedge\psi$.  This provides the discretization resolution needed to
 arrange the simultaneous constraints on (i) mass fractions (barycenter) and (ii) total mass, yielding $|\sum_j N_{Q,j}A_{Q,j}-M_Q|\le \delta M_Q$.}
 \end{proof}
@@ -3408,13 +3408,13 @@ t_Q:=\langle \beta(x_Q),\psi_{x_Q}\rangle,
 where $\xi_{Q,j}\in K_p(x_Q)$ are normalized extremal generators (coming from
 complex $(n-p)$-planes) satisfying $\langle \xi_{Q,j},\psi_{x_Q}\rangle=1$,
 the weights satisfy $\theta_{Q,j}\ge 0$, $\sum_j\theta_{Q,j}=1$, and
-$J(Q)\le \editai{N_{\mathrm{Car}}=N_{\mathrm{Car}}(n,p)}$ uniformly bounded.
+$J(Q)\le \editamir{N_{\mathrm{Car}}=N_{\mathrm{Car}}(n,p)}$ uniformly bounded.
 
 Since $[\gamma]$ is rational, all its periods lie in $(1/M)\Z$ for some
 fixed $M$.  Choose $m\gg 1$ divisible by $M$.
 
 Let $P_{Q,j}\subset T_{x_Q}X$ be the complex $(n-p)$-plane corresponding to $\xi_{Q,j}$.
-\editai{Fix also a corner-exit footprint scale $s=s(h,\delta)\ll h:=\mathrm{side}(Q)$ and write $k:=2n-2p=2(n-p)$.  Using the corner-exit translation templates
+\editamir{Fix also a corner-exit footprint scale $s=s(h,\delta)\ll h:=\mathrm{side}(Q)$ and write $k:=2n-2p=2(n-p)$.  Using the corner-exit translation templates
 (Lemmas~\ref{lem:corner-exit-template-open} and~\ref{lem:corner-exit-mass-scale}, packaged uniformly over a finite direction net in Proposition~\ref{prop:corner-exit-template-net}),
 we may choose, for each direction $(Q,j)$, a family of local $\psi$--calibrated sheet pieces in $Q$ whose corner-exit footprints are uniformly fat $k$--simplices of scale $s$ and are \emph{identical} across the family.  In particular, their $\psi$--masses in $Q$ are equal up to the common small-slope distortion factor.  Denote this common value by $A_{Q,j}>0$; by Lemma~\ref{lem:corner-exit-mass-scale} one has the mass scale $A_{Q,j}\asymp s^{k}$ (with constants depending only on $(n,p)$ and the net conditioning constants).}
 The target $\psi$--mass in $Q$ is
@@ -3430,7 +3430,7 @@ Choose integers $N_{Q,j}\ge 0$ so that simultaneously
 \qquad\text{and}\qquad
 \Bigl|\sum_j N_{Q,j}A_{Q,j}-M_Q\Bigr|\le \delta\,M_Q.
 \]
-\editai{Such choices exist by rounding once the corner-exit scale $s$ is chosen so that $M_Q/A_{Q,j}\gg 1$ uniformly (equivalently, there are many equal-mass pieces available per cube).  Since $A_{Q,j}\asymp s^{k}$ can be made arbitrarily small by shrinking $s$ (with $m$ fixed), this discretization resolution can be achieved without taking $m\to\infty$.}
+\editamir{Such choices exist by rounding once the corner-exit scale $s$ is chosen so that $M_Q/A_{Q,j}\gg 1$ uniformly (equivalently, there are many equal-mass pieces available per cube).  Since $A_{Q,j}\asymp s^{k}$ can be made arbitrarily small by shrinking $s$ (with $m$ fixed), this discretization resolution can be achieved without taking $m\to\infty$.}
 
 Apply Theorem~\ref{thm:local-sheets} to realize each direction $(Q,j)$ by a family
 of $\psi$--calibrated sheets $Y_{Q,j}^a\subset Q$ ($a=1,\ldots,N_{Q,j}$) with
@@ -3486,7 +3486,7 @@ $F\times B^{2p}(0,ch)$ in normal coordinates, the restriction of $\partial S_Q$ 
 slice currents $\Sigma_y$ parameterized by a discrete transverse measure $\mu_{Q\to F}$ on $B^{2p}(0,ch)$ (integer weights), and similarly for $Q'$.
 We assume (after the standard edge-trimming/localization away from the $(2n\!-\!2)$--skeleton of the mesh) that each such face slice is a cycle on the interior face,
 i.e.\ $\partial\Sigma_y=0$ as a current on $F$ for all parameters $y$ that occur.
-\editai{(This is enforced in the vertex-template/corner-exit regime by the face-edit localization
+\editamir{(This is enforced in the vertex-template/corner-exit regime by the face-edit localization
 Proposition~\ref{prop:vertex-template-face-edits}; see Lemma~\ref{lem:face-slice-cycle-mass}.)}
 \item[\textnormal{(c)}] (\textbf{$W_1$ face matching}) The two induced transverse measures have the same total mass and satisfy
 \[
@@ -3558,7 +3558,7 @@ B_F(\eta)
 =\int f_\eta\,d\mu_{Q\to F}-\int f_\eta\,d\mu_{Q'\to F}.
 \]
 Since $\mu_{Q\to F}$ and $\mu_{Q'\to F}$ have the same total mass (hypothesis \textnormal{(c)}), adding a constant to $f_\eta$ does not change $B_F(\eta)$.
-Therefore, by Kantorovich--Rubinstein duality for $W_1$, \editai{(e.g.\ \cite{Villani03})}
+Therefore, by Kantorovich--Rubinstein duality for $W_1$, \editamir{(e.g.\ \cite{Villani03})}
 \[
 |B_F(\eta)|
 \le \mathrm{Lip}(f_\eta)\,W_1(\mu_{Q\to F},\mu_{Q'\to F})
@@ -3643,11 +3643,11 @@ thereby verifying hypothesis~\textnormal{(c)} in Theorem~\ref{thm:sliver-mass-ma
 \end{remark}
 
 \begin{lemma}[Automatic $W_1$-matching from smooth dependence of face maps]\label{lem:w1-auto}
-\editai{Let $\mu$ be a finite Borel measure on $\R^{2p}$ supported in a ball of radius $O(\varrho h)$ and with total mass $\mu(\R^{2p})=N$.}
+\editamir{Let $\mu$ be a finite Borel measure on $\R^{2p}$ supported in a ball of radius $O(\varrho h)$ and with total mass $\mu(\R^{2p})=N$.}
 Let $\Phi,\Phi':\R^{2p}\to\R^{2p}$ be linear maps with $\|\Phi-\Phi'\|_{\mathrm{op}}\le C\,h$.
 Then
 \[
-\editai{W_1(\Phi_\#\mu,\Phi'_\#\mu)\ \le\ C\,h\int_{\R^{2p}}\|y\|\,d\mu(y)\ \le\ C'\,\varrho\,h^2\,N.}
+\editamir{W_1(\Phi_\#\mu,\Phi'_\#\mu)\ \le\ C\,h\int_{\R^{2p}}\|y\|\,d\mu(y)\ \le\ C'\,\varrho\,h^2\,N.}
 \]
 \end{lemma}
 
@@ -3668,22 +3668,22 @@ Estimating $\|\Phi y-\Phi' y\|\le \|\Phi-\Phi'\|_{\mathrm{op}}\|y\|$ gives
 W_1(\Phi_\#\mu,\Phi'_\#\mu)
 \le \|\Phi-\Phi'\|_{\mathrm{op}}\int_{\R^{2p}}\|y\|\,d\mu(y).
 \]
-\editai{If $\operatorname{supp}\mu\subset B(0,C_0 \varrho h)$, then $\int\|y\|\,d\mu\le C_0 \varrho h\,\mu(\R^{2p})=C_0 \varrho h\,N$.}
+\editamir{If $\operatorname{supp}\mu\subset B(0,C_0 \varrho h)$, then $\int\|y\|\,d\mu\le C_0 \varrho h\,\mu(\R^{2p})=C_0 \varrho h\,N$.}
 Absorbing constants yields the stated bound.
 \end{proof}
 
 
 \begin{editblock}
 \begin{lemma}[Pointwise displacement bound under nearby face maps]\label{lem:face-displacement}
-Let $y_1,\dots,y_N\in\R^{2p}$ satisfy $\|y_a\|\le \editai{C_0\,\varrho\,h}$ and let $\Phi,\Phi':\R^{2p}\to\R^{2p}$ be linear maps with
+Let $y_1,\dots,y_N\in\R^{2p}$ satisfy $\|y_a\|\le \editamir{C_0\,\varrho\,h}$ and let $\Phi,\Phi':\R^{2p}\to\R^{2p}$ be linear maps with
 $\|\Phi-\Phi'\|_{\mathrm{op}}\le C_1\,h$.
 Define two multisets $u_a:=\Phi y_a$ and $u'_a:=\Phi' y_a$.
 Then the index-wise matching satisfies
 \[
-\|u_a-u'_a\|\ \le\ \editai{C_0C_1\,\varrho\,h^2}\qquad\text{for all }a.
+\|u_a-u'_a\|\ \le\ \editamir{C_0C_1\,\varrho\,h^2}\qquad\text{for all }a.
 \]
 In particular, when adjacent cells use the \emph{same} translation template $\{y_a\}$ and their face parameterizations differ by $O(h)$ in operator norm,
-the hypothesis of Corollary~\ref{cor:global-flat-weighted} holds with $\editai{\Delta_F=O(\varrho\,h^2)}$.
+the hypothesis of Corollary~\ref{cor:global-flat-weighted} holds with $\editamir{\Delta_F=O(\varrho\,h^2)}$.
 \end{lemma}
 
 \begin{proof}
@@ -3698,7 +3698,7 @@ the hypothesis of Corollary~\ref{cor:global-flat-weighted} holds with $\editai{\
 \end{editblock}
 
 \begin{lemma}[Template stability under small multiset edits]\label{lem:w1-template-edit}
-\editai{Let $\Omega\subset\R^{2p}$ be a bounded domain of diameter $\mathrm{diam}(\Omega)\le C\,\varrho h$.}
+\editamir{Let $\Omega\subset\R^{2p}$ be a bounded domain of diameter $\mathrm{diam}(\Omega)\le C\,\varrho h$.}
 Let $\mu=\sum_{a=1}^{N}\delta_{y_a}$ and $\mu'=\sum_{b=1}^{N}\delta_{y'_b}$ be two integer-weighted discrete measures on $\Omega$
 with the \emph{same total mass} $N$.
 Assume there is a matching of atoms such that $\|y_a-y'_a\|\le \Delta$ for all $a$ (after relabeling).
@@ -3708,7 +3708,7 @@ W_1(\mu,\mu')\ \le\ \Delta\,N.
 \]
 More generally, if $\mu'$ is obtained from $\mu$ by deleting $r$ atoms and inserting $r$ atoms (so total mass stays $N$), then
 \[
-\editai{W_1(\mu,\mu')\ \le\ r\cdot \mathrm{diam}(\Omega)\ \le\ C\,r\,\varrho\,h.}
+\editamir{W_1(\mu,\mu')\ \le\ r\cdot \mathrm{diam}(\Omega)\ \le\ C\,r\,\varrho\,h.}
 \]
 \end{lemma}
 
@@ -3723,16 +3723,16 @@ $N_{Q,j}^\perp$ (e.g.\ a scaled lattice/low-discrepancy set of diameter $O(h)$),
 induced transverse measures are related by applying two nearby face-slice maps (coming from nearby plane directions and nearby normal-coordinate identifications).
 Since $\beta$ is smooth, these maps differ by $O(h)$ in operator norm, so Lemma~\ref{lem:w1-auto} yields
 \[
-\editai{W_1(\mu_{Q\to F},\mu_{Q'\to F})\ \lesssim\ \varrho\,h^2\,N_F,}
+\editamir{W_1(\mu_{Q\to F},\mu_{Q'\to F})\ \lesssim\ \varrho\,h^2\,N_F,}
 \]
 where $N_F$ is the number of sheets contributing to that face.
 Inserting this into Proposition~\ref{prop:transport-flat-glue} yields a global bound of the form
 \[
-\editai{\mathcal F(\partial T^{\mathrm{raw}})\ \lesssim\ m\,\varrho\,h \;+\; O(\varepsilon\,m),}
+\editamir{\mathcal F(\partial T^{\mathrm{raw}})\ \lesssim\ m\,\varrho\,h \;+\; O(\varepsilon\,m),}
 \]
-\begin{editaiblock}
+\begin{editamirblockNEW}
 so choosing a refinement schedule $h=h_j\downarrow 0$ and $\varepsilon=\varepsilon_j\downarrow 0$ forces the right-hand side to $0$ for fixed $m$, hence the gluing correction $U_{h_j}$ becomes negligible in the mass equality.
-\end{editaiblock}
+\end{editamirblockNEW}
 The remaining task is then to implement this “fixed template” choice while still meeting the cohomological constraints (Substep 4.3).
 \smallskip
 \editblue{In the \emph{sliver} regime, the count $N_F$ is not controlled by total mass; see Remark~\ref{rem:sliver-vs-template} and
@@ -3807,15 +3807,15 @@ Taking the infimum over $\sigma$ in the definition of $\mathcal F$ proves the cl
 \end{editblock}
 
 \begin{editjonblock}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 \begin{proposition}[Integer transverse matching from the master prefix template (constructed here)]
 \label{prop:integer-transport}
 Let $F=Q\cap Q'$ be an interior $(2n-1)$-face of the cubulation at mesh $h$.
 Fix a transverse grid scale $\delta_{\perp}\in(0,h)$ and choose an integer $N_*\ge 0$ together with an ordered list of grid atoms
-$\mathbf y=(y_a)_{a=1}^{N_*}$ with $y_a\in \editai{B_{C_0\varrho h}(0)}\cap \delta_{\perp}\mathbb Z^{2p}$.
+$\mathbf y=(y_a)_{a=1}^{N_*}$ with $y_a\in \editamir{B_{C_0\varrho h}(0)}\cap \delta_{\perp}\mathbb Z^{2p}$.
 For $1\le N\le N_*$ write $\nu^{(N)}:=\sum_{a=1}^N\delta_{y_a}$ (cf.\ Proposition~\ref{prop:prefix-template-coherence}).
 
-Let $\Phi_{Q,F},\Phi_{Q',F}:\editai{B_{C_0\varrho h}(0)}\to \Omega_F$ be the face maps from
+Let $\Phi_{Q,F},\Phi_{Q',F}:\editamir{B_{C_0\varrho h}(0)}\to \Omega_F$ be the face maps from
 Lemma~\ref{lem:template-displacement-edits} (in particular
 $\|\Phi_{Q,F}-\Phi_{Q',F}\|_{\mathrm{op}}\le C_\Phi h$ and
 $\|\Phi_{Q,F}\|_{\mathrm{op}}+\|\Phi_{Q',F}\|_{\mathrm{op}}\le C_{\Phi,0}$).
@@ -3836,14 +3836,14 @@ $\delta_{\perp}$-grid images in $\Omega_F$, and satisfy
 Moreover their $W_1$-distance is controlled by the template displacement:
 \[
 W_1(\mu_{Q\to F},\mu_{Q'\to F})
-\ \le\ \editai{C_\Phi\,C_0\,\varrho\,h^2}\,N_F.
+\ \le\ \editamir{C_\Phi\,C_0\,\varrho\,h^2}\,N_F.
 \]
 In particular, hypothesis \textnormal{(c)} in Proposition~\ref{prop:transport-flat-glue-weighted}
 holds with
 \[
-\tau_F\ :=\ \editai{C_\Phi\,C_0\,\varrho\,h^2}\,N_F.
+\tau_F\ :=\ \editamir{C_\Phi\,C_0\,\varrho\,h^2}\,N_F.
 \]
-\editai{Moreover, the same identity pairing yields the \emph{uniform pointwise} displacement bound
+\editamir{Moreover, the same identity pairing yields the \emph{uniform pointwise} displacement bound
 $\|\Phi_{Q,F}(y_a)-\Phi_{Q',F}(y_a)\|\le C_\Phi C_0\varrho h^2$ for all $a\le N_F$, so Corollary~\ref{cor:global-flat-weighted} may be applied with $\Delta_F:=C_\Phi C_0\varrho h^2$.}
 \end{proposition}
 
@@ -3858,15 +3858,15 @@ W_1(\mu_{Q\to F},\mu_{Q'\to F})
 \ \le\ \int_{\Omega_F\times\Omega_F}|u-v|\,d\pi(u,v)
 \ =\ \sum_{a=1}^{N_F}\big|\Phi_{Q,F}(y_a)-\Phi_{Q',F}(y_a)\big|.
 \]
-Using Lemma~\ref{lem:template-displacement-edits} and $\editai{|y_a|\le C_0\varrho h}$ we get
+Using Lemma~\ref{lem:template-displacement-edits} and $\editamir{|y_a|\le C_0\varrho h}$ we get
 \[
 \big|\Phi_{Q,F}(y_a)-\Phi_{Q',F}(y_a)\big|
 \ \le\ \|\Phi_{Q,F}-\Phi_{Q',F}\|_{\mathrm{op}}\,|y_a|
-\ \le\ \editai{C_\Phi h\cdot C_0\varrho h\ =\ C_\Phi C_0 \varrho h^2}.
+\ \le\ \editamir{C_\Phi h\cdot C_0\varrho h\ =\ C_\Phi C_0 \varrho h^2}.
 \]
 Summing over $a=1,\dots,N_F$ yields the claimed bound.
 \end{proof}
-\end{editaiblock}
+\end{editamirblockNEW}
 \end{editjonblock}
 
 \begin{editblock}
@@ -3918,7 +3918,7 @@ Differentiating the corresponding volume bound at $\rho=0$ (Steiner formula) giv
 Assume $v(t)\le v_0$ with $v_0$ small.  The curvature pinching implies an interior/exterior rolling-ball condition with radii
 $r_{\mathrm{in}},r_{\mathrm{out}}\asymp 1$ (depending only on $c,C$) at every boundary point of $Q$.
 Let $\pi:\R^d\to P^\perp$ be orthogonal projection and set $D:=\pi(Q)\subset P^\perp$.
-\editai{Choose a nearest boundary point $t_0\in\partial D$ to $t$ and set $s:=\|t_0-t\|$ and $u:=(t_0-t)/\|t_0-t\|\in P^\perp$, so $t=t_0-s u$.
+\editamir{Choose a nearest boundary point $t_0\in\partial D$ to $t$ and set $s:=\|t_0-t\|$ and $u:=(t_0-t)/\|t_0-t\|\in P^\perp$, so $t=t_0-s u$.
 By convexity of $D$, the vector $u$ is an outward normal to a supporting hyperplane of $D$ at $t_0$.}
 \editamir{Let $x_0\in\partial Q$ be the unique supporting point of $Q$ in direction $u$ (uniqueness by uniform convexity).  Since $u\perp P$,
 the support function of $D=\pi(Q)$ in direction $u$ agrees with that of $Q$, hence $\pi(x_0)=t_0$.}
@@ -4026,7 +4026,7 @@ Taking these $R,Q$ in the definition of $\mathcal F$ gives the claim.
 \begin{editblock}
 
 \begin{lemma}[{\color{blue}Interface face-slices are cycles with controlled mass}]\label{lem:face-slice-cycle-mass}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 Work on an interior interface face $F=Q\cap Q'$ in the flat/tubular chart, and assume the holomorphic sliver pieces
 $Y^{Q,a}\cap Q$ satisfy the single-sheet small-slope graph control of Proposition~\ref{prop:cell-scale-linear-model-graph}
 (and hence Lemma~\ref{lem:sliver-stability}) on a neighborhood of $Q$.
@@ -4040,7 +4040,7 @@ Then, after the standard edge-trimming/prefix-edit localization of Proposition~\
 \item[\textnormal{(i)}] $\partial\Sigma_F(u_a)=0$ as a current on $F$ (i.e.\ the face slice is a cycle on the interior face).
 \item[\textnormal{(ii)}] There exists a constant $C=C(X,n,p)>0$ such that
 \[
-\Mass(\Sigma_F(u_a))\ \le\ \editai{C\,m_{Q,a}^{\frac{k-1}{k}}},
+\Mass(\Sigma_F(u_a))\ \le\ \editamir{C\,m_{Q,a}^{\frac{k-1}{k}}},
 \qquad
 m_{Q,a}:=\Mass([Y^{Q,a}]\llcorner Q).
 \]
@@ -4078,12 +4078,12 @@ Combining these estimates yields
 as claimed.
 \end{proof}
 
-\end{editaiblock}
+\end{editamirblockNEW}
 \end{lemma}
 
 
 \begin{corollary}[Global flat-norm bound from weighted face control (sliver-compatible)]\label{cor:global-flat-weighted}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 Assume the hypotheses of Proposition~\ref{prop:transport-flat-glue-weighted} on each interior interface face $F$ between adjacent mesh cells,
 and let $T^{\mathrm{raw}}$ be the global raw current obtained by summing the cell-wise template currents.
 For each such face $F$, denote by $B_F$ the boundary mismatch current supported near $F$.
@@ -4100,19 +4100,19 @@ Consequently,
 \]
 
 In the vertex-template holomorphic-sliver regime, Lemma~\ref{lem:face-slice-cycle-mass} supplies
-$\partial\Sigma_F(u_a)=0$ and $\Mass(\Sigma_F(u_a))\le \editai{C\, m_{Q,a}^{\frac{k-1}{k}}}$ (with $k:=2n-2p$)
+$\partial\Sigma_F(u_a)=0$ and $\Mass(\Sigma_F(u_a))\le \editamir{C\, m_{Q,a}^{\frac{k-1}{k}}}$ (with $k:=2n-2p$)
 for every slice meeting a cell $Q$.
-Assuming in addition the schedule/face parameterization control of Lemma~\ref{lem:face-displacement} (so that $\editai{\Delta_F=O(\varrho\,h^2)}$ on all interior faces),
+Assuming in addition the schedule/face parameterization control of Lemma~\ref{lem:face-displacement} (so that $\editamir{\Delta_F=O(\varrho\,h^2)}$ on all interior faces),
 we obtain
 \[
-\mathcal F(\partial T^{\mathrm{raw}})\ \le\ \editai{C\,\varrho\, h^2} \sum_Q \sum_{a\in \mathcal S(Q)} m_{Q,a}^{\frac{k-1}{k}},
+\mathcal F(\partial T^{\mathrm{raw}})\ \le\ \editamir{C\,\varrho\, h^2} \sum_Q \sum_{a\in \mathcal S(Q)} m_{Q,a}^{\frac{k-1}{k}},
 \]
 for a constant $C$ depending only on $X$ (and the fixed geometric data), not on $h$ or the multiplicities.
-\end{editaiblock}
+\end{editamirblockNEW}
 \end{corollary}
 
 \begin{proof}
-\editai{Apply Proposition~\ref{prop:transport-flat-glue-weighted} facewise, then sum over interfaces and use the triangle inequality for $\mathcal F$.}
+\editamir{Apply Proposition~\ref{prop:transport-flat-glue-weighted} facewise, then sum over interfaces and use the triangle inequality for $\mathcal F$.}
 
 Since $T^{\mathrm{raw}}=\sum_Q S_Q$, we have
 \[
@@ -4141,17 +4141,17 @@ $\|u_a-u'_{\sigma(a)}\|\le \Delta_F$ give the per-face estimate
 \]
 so summing over $F$ yields the first bound.
 
-Under the additional assumptions $\editai{\Delta_F\le C\,\varrho\,h^2}$ and
+Under the additional assumptions $\editamir{\Delta_F\le C\,\varrho\,h^2}$ and
 $\Mass(\Sigma_F(u_a))+\Mass(\partial\Sigma_F(u_a))\lesssim m_a^{\frac{k-1}{k}}$ (with $k=2n-2p$),
 we obtain
 \[
-\mathcal F(B_F)\ \editai{\lesssim\ \varrho\,h^2}\sum_{a\in\mathcal S(F)} m_{F,a}^{\frac{k-1}{k}}.
+\mathcal F(B_F)\ \editamir{\lesssim\ \varrho\,h^2}\sum_{a\in\mathcal S(F)} m_{F,a}^{\frac{k-1}{k}}.
 \]
 Finally, each piece $Y^{Q,a}\llcorner Q$ meets only $O(1)$ interfaces of its cell, so reorganizing the sum over faces into a sum over
 cells and their pieces gives
 \[
 \mathcal F\!\left(\partial T^{\mathrm{raw}}\right)
-\ \editai{\lesssim\ \varrho\,h^2}\sum_Q\ \sum_{a\in\mathcal S(Q)} m_{Q,a}^{\frac{k-1}{k}},
+\ \editamir{\lesssim\ \varrho\,h^2}\sum_Q\ \sum_{a\in\mathcal S(Q)} m_{Q,a}^{\frac{k-1}{k}},
 \]
 as claimed.
 \end{proof}
@@ -4161,12 +4161,12 @@ as claimed.
 \begin{remark}[Consistency with the constant-mass-per-sheet template regime]
 If every piece in a cell has comparable mass $m_{Q,a}\asymp h^{k}$ (the naive “one sheet type’’ model), then
 $m_{Q,a}^{(k-1)/k}\asymp h^{k-1}$ and $\sum_a m_{Q,a}^{(k-1)/k}\asymp N_Q h^{k-1}\asymp M_Q/h$, where $M_Q=\sum_a m_{Q,a}$ is the total mass in $Q$.
-The corollary then yields $\mathcal F(\partial T^{\mathrm{raw}})\lesssim \editai{\varrho\,h^2}\sum_Q(M_Q/h)=\editai{\varrho\,h}\,\sum_Q M_Q\editai{\asymp m\,\varrho\,h}$,
+The corollary then yields $\mathcal F(\partial T^{\mathrm{raw}})\lesssim \editamir{\varrho\,h^2}\sum_Q(M_Q/h)=\editamir{\varrho\,h}\,\sum_Q M_Q\editamir{\asymp m\,\varrho\,h}$,
 recovering the unweighted “template’’ scaling from Remark~\ref{rem:w1-auto}.
 \end{remark}
 
 \begin{remark}[Scaling consequence: weighted gluing + packing]\label{rem:weighted-scaling}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 \noindent\textbf{Parameter synchronization for holomorphic corner--exit.}
 In the holomorphic realization steps (Propositions~\ref{prop:finite-template} and \ref{prop:holomorphic-corner-exit-L1}), the symbols
 $N,h,\varepsilon$ must be synchronized as follows (here $N$ denotes the tensor power of $L$ in the Bergman/holomorphic inputs, while $m$ denotes the fixed cohomology multiplier in $\mathrm{PD}(m[\gamma])$):
@@ -4182,13 +4182,13 @@ s\ \le\ \frac{c_0}{C(n,p)}\cdot \frac{h}{(1+A_*(h))\,\Lambda(h)}
 \]
 whenever Proposition~\ref{prop:holomorphic-corner-exit-L1} is invoked uniformly over labels;
 \item take the translation separation in Proposition~\ref{prop:finite-template} at the footprint scale:
-\editai{if $D_Q:=\max_a\mathrm{diam}((P+t_a)\cap Q)$, then require $\delta:=10\,\varepsilon\,D_Q$ (in the corner-exit regime $D_Q\asymp s\asymp \varrho h$).}
+\editamir{if $D_Q:=\max_a\mathrm{diam}((P+t_a)\cap Q)$, then require $\delta:=10\,\varepsilon\,D_Q$ (in the corner-exit regime $D_Q\asymp s\asymp \varrho h$).}
 \end{itemize}
-\editai{Note: read this scaling remark only after the global coherence construction is established (Proposition~\ref{prop:global-coherence-all-labels}), to avoid any circular use of the conclusion.}
-\end{editaiblock}
+\editamir{Note: read this scaling remark only after the global coherence construction is established (Proposition~\ref{prop:global-coherence-all-labels}), to avoid any circular use of the conclusion.}
+\end{editamirblockNEW}
 
 Assume we are in the regime where adjacent cells use the same translation template and their face parameterizations differ by $O(h)$,
-so Lemma~\ref{lem:face-displacement} gives \editai{$\Delta_F\lesssim \varrho\,h^2$}.
+so Lemma~\ref{lem:face-displacement} gives \editamir{$\Delta_F\lesssim \varrho\,h^2$}.
 Assume further that in each cell, each family of disjoint $C^1$ sliver graphs over a fixed direction has slope $\le \varepsilon$ and satisfies the separation
 needed for disjointness; then Lemma~\ref{lem:sliver-packing} yields $N_Q\lesssim \varepsilon^{-2p}$ pieces per family.
 Writing $M_Q:=\sum_{a\in\mathcal S(Q)} m_{Q,a}$, the concavity/H\"older bound gives
@@ -4216,7 +4216,7 @@ By Remark~\ref{rem:lefschetz-reduction}, it suffices for the unconditional Hodge
 \begin{remark}[On vanishing per-piece masses (no hidden lower bound)]\label{rem:no-vanishing-piece-mass}
 The weighted flat-norm estimate of Corollary~\ref{cor:global-flat-weighted}
 \[
-\mathcal F(\partial T^{\mathrm{raw}})\ \editai{\lesssim\ \varrho\,h^2}\sum_Q\sum_{a\in\mathcal S(Q)} m_{Q,a}^{\frac{k-1}{k}}
+\mathcal F(\partial T^{\mathrm{raw}})\ \editamir{\lesssim\ \varrho\,h^2}\sum_Q\sum_{a\in\mathcal S(Q)} m_{Q,a}^{\frac{k-1}{k}}
 \]
 holds \emph{without} any hypothesis that the individual piece masses $m_{Q,a}$ are bounded below by a fixed multiple of $h^{k}$.
 This is crucial in the sliver regime, where one may intentionally split a cell budget $M_Q$ into many tiny pieces in order to obtain large
@@ -4250,11 +4250,11 @@ on the cell boundary scales like
 \mathrm{Bdry}(Q)\ \asymp\ N_Q\Bigl(\frac{M_Q}{N_Q}\Bigr)^{\frac{k-1}{k}}
 \ =\ M_Q^{\frac{k-1}{k}}\,N_Q^{\frac1k}.
 \]
-If, across a shared interface, the corresponding face slices are displaced by $\|v\|=O(h^2)$ (as in the template/face-map variation \editai{estimate (cf.\ Lemma~\ref{lem:template-displacement})}),
+If, across a shared interface, the corresponding face slices are displaced by $\|v\|=O(h^2)$ (as in the template/face-map variation \editamir{estimate (cf.\ Lemma~\ref{lem:template-displacement})}),
 then Lemma~\ref{lem:flat-translate} gives a per-piece flat mismatch $\lesssim \|v\|\times$(boundary mass).  A crude summation therefore yields a
 \editamir{per-face mismatch of order} $h^n\,\varepsilon_{\mathcal T}$, and summing over the $\sim h^{-n}$ faces yields a
 \[
-\mathcal F(B_F)\ \editai{\lesssim\ \varrho\,h^2}\,\mathrm{Bdry}(Q)\ \editai{\asymp\ \varrho\,h^2}\,M_Q^{\frac{k-1}{k}}\,N_Q^{\frac1k}.
+\mathcal F(B_F)\ \editamir{\lesssim\ \varrho\,h^2}\,\mathrm{Bdry}(Q)\ \editamir{\asymp\ \varrho\,h^2}\,M_Q^{\frac{k-1}{k}}\,N_Q^{\frac1k}.
 \]
 Summing over $\asymp h^{-2n}$ faces gives the global \editamir{scaling} bound
 \[
@@ -4314,12 +4314,12 @@ Combining gives the claim.
 \begin{lemma}[Template displacement $\Rightarrow$ per-face flat-norm mismatch]\label{lem:template-displacement}
 Work in the setting of Proposition~\ref{prop:transport-flat-glue}\textnormal{(a)}--\textnormal{(b)} on an interior interface $F=Q\cap Q'$ at mesh $h$.
 \editamir{In the global-coherence regime (Proposition~\ref{prop:global-coherence-all-labels}), the boundary slices on $F$ are parameterized by the \emph{same} integer-weighted discrete measure}
-\editai{$\nu=\sum_{a=1}^{N_F} w_a\,\delta_{y_a}$ supported in a ball of radius $C_0\,\varrho h\subset\R^{2p}$ via linear face maps}
+\editamir{$\nu=\sum_{a=1}^{N_F} w_a\,\delta_{y_a}$ supported in a ball of radius $C_0\,\varrho h\subset\R^{2p}$ via linear face maps}
 $\mu_{Q\to F}=(\Phi_{Q,F})_\#\nu$ and $\mu_{Q'\to F}=(\Phi_{Q',F})_\#\nu$.
 Assume $\|\Phi_{Q,F}\|_{\mathrm{op}}+\|\Phi_{Q',F}\|_{\mathrm{op}}\le C_{\Phi,0}$ and $\|\Phi_{Q,F}-\Phi_{Q',F}\|_{\mathrm{op}}\le C_\Phi h$.
 Then, after pairing atoms by the identity pairing $y_a\leftrightarrow y_a$, the mismatch current $B_F$ satisfies
 \[
-\mathcal F(B_F)\ \le\ \editai{C\,\varrho\,h^2}\,\Biggl(\sum_{a=1}^{N_F} w_a\Bigl(\Mass(\Sigma_{\Phi_{Q,F}y_a})+\Mass(\partial\Sigma_{\Phi_{Q,F}y_a})\Bigr)
+\mathcal F(B_F)\ \le\ \editamir{C\,\varrho\,h^2}\,\Biggl(\sum_{a=1}^{N_F} w_a\Bigl(\Mass(\Sigma_{\Phi_{Q,F}y_a})+\Mass(\partial\Sigma_{\Phi_{Q,F}y_a})\Bigr)
 \;+\sum_{a=1}^{N_F} w_a\Bigl(\Mass(\Sigma_{\Phi_{Q',F}y_a})+\Mass(\partial\Sigma_{\Phi_{Q',F}y_a})\Bigr)\Biggr)\ +\ C_{\angle}\,\varepsilon\,M_F,
 \]
 where $M_F$ denotes the total $(2n-2p)$-mass of pieces meeting the interface (so $M_F\lesssim M_Q+M_{Q'}$) and
@@ -4341,16 +4341,16 @@ and hence
 B_F=\sum_{a=1}^{N_F} w_a\bigl(\Sigma_{\Phi_{Q,F}y_a}-\Sigma_{\Phi_{Q',F}y_a}\bigr).
 \]
 For each atom $y_a$ define the translation vector $v_a:=(\Phi_{Q,F}-\Phi_{Q',F})y_a$.
-\editai{Since $\|y_a\|\le C_0\varrho h$ and $\|\Phi_{Q,F}-\Phi_{Q',F}\|_{\mathrm{op}}\le C_\Phi h$, we have $\|v_a\|\le C\,\varrho\,h^2$.}
+\editamir{Since $\|y_a\|\le C_0\varrho h$ and $\|\Phi_{Q,F}-\Phi_{Q',F}\|_{\mathrm{op}}\le C_\Phi h$, we have $\|v_a\|\le C\,\varrho\,h^2$.}
 Lemma~\ref{lem:flat-translate} then gives
 \[
 \mathcal F\!\bigl(\Sigma_{\Phi_{Q,F}y_a}-\Sigma_{\Phi_{Q',F}y_a}\bigr)
 \le \|v_a\|\Bigl(\Mass(\Sigma_{\Phi_{Q,F}y_a})+\Mass(\partial\Sigma_{\Phi_{Q,F}y_a})\Bigr)
-\le \editai{C\,\varrho\,h^2}\Bigl(\Mass(\Sigma_{\Phi_{Q,F}y_a})+\Mass(\partial\Sigma_{\Phi_{Q,F}y_a})\Bigr).
+\le \editamir{C\,\varrho\,h^2}\Bigl(\Mass(\Sigma_{\Phi_{Q,F}y_a})+\Mass(\partial\Sigma_{\Phi_{Q,F}y_a})\Bigr).
 \]
 By subadditivity of $\mathcal F$ and summing over $a$ (with weights $w_a$),
 \[
-\mathcal F(B_F)\le \editai{C\,\varrho\,h^2}\sum_{a=1}^{N_F} w_a\,\Bigl(\Mass(\Sigma_{\Phi_{Q,F}y_a})+\Mass(\partial\Sigma_{\Phi_{Q,F}y_a})\Bigr).
+\mathcal F(B_F)\le \editamir{C\,\varrho\,h^2}\sum_{a=1}^{N_F} w_a\,\Bigl(\Mass(\Sigma_{\Phi_{Q,F}y_a})+\Mass(\partial\Sigma_{\Phi_{Q,F}y_a})\Bigr).
 \]
 The same bound holds with $Q$ and $Q'$ swapped; combining yields the symmetric form stated.
 
@@ -4361,7 +4361,7 @@ Applying Lemma~\ref{lem:flat-C0-deform} to each slice yields a flat-norm error o
 \[
 \mathcal F\!\bigl(\Sigma^{\mathrm{act}}_y-\Sigma^{\mathrm{flat}}_y\bigr)\ \le\ C\,\varepsilon\,h\Bigl(\Mass(\Sigma^{\mathrm{flat}}_y)+\Mass(\partial\Sigma^{\mathrm{flat}}_y)\Bigr).
 \]
-\editai{Summing over the integer-weighted family of slices meeting $F$ it therefore suffices to bound
+\editamir{Summing over the integer-weighted family of slices meeting $F$ it therefore suffices to bound
 $\sum_{a}w_a\bigl(\Mass(\Sigma^{\mathrm{flat}}_{\Phi_{Q,F}y_a})+\Mass(\partial\Sigma^{\mathrm{flat}}_{\Phi_{Q,F}y_a})\bigr)$
 in terms of the total interior mass $M_F$ of pieces meeting the interface.
 In the small-angle graph regime the model slice $\Sigma^{\mathrm{flat}}$ is the boundary trace of a single-sheet piece inside a cell of diameter $\asymp h$,
@@ -4381,7 +4381,7 @@ Assume the two sides admit template representations
 \qquad
 \mu_{Q'\to F}=(\Phi_{Q',F})_\#\nu',
 \]
-where $\nu$ and $\nu'$ are integer-weighted discrete measures supported in $\editai{B_{C_0\varrho h}(0)}\subset\R^{2p}$ and the face maps satisfy
+where $\nu$ and $\nu'$ are integer-weighted discrete measures supported in $\editamir{B_{C_0\varrho h}(0)}\subset\R^{2p}$ and the face maps satisfy
 $\|\Phi_{Q,F}\|_{\mathrm{op}}+\|\Phi_{Q',F}\|_{\mathrm{op}}\le C_{\Phi,0}$ and $\|\Phi_{Q,F}-\Phi_{Q',F}\|_{\mathrm{op}}\le C_\Phi h$.
 Write $\nu=\nu^{\wedge}+\nu^{+}$ and $\nu'=\nu^{\wedge}+\nu^{-}$, where $\nu^{\wedge}$ is any common submeasure (matched part) and
 $\nu^{\pm}$ are the unmatched remainders (insertions/deletions).
@@ -4389,7 +4389,7 @@ Let $B_F^{\wedge}$ be the mismatch current coming from the matched part $\nu^{\w
 coming from the unmatched part (so $B_F=B_F^{\wedge}+B_F^{\mathrm{un}}$).
 Then
 \[
-\mathcal F(B_F^{\wedge})\ \le\ \editai{C\,\varrho\,h^2}\Bigl(\Mass(\partial S_Q\llcorner F)+\Mass(\partial S_{Q'}\llcorner F)\Bigr)\ +\ C_{\angle}\,\varepsilon\,M_F,
+\mathcal F(B_F^{\wedge})\ \le\ \editamir{C\,\varrho\,h^2}\Bigl(\Mass(\partial S_Q\llcorner F)+\Mass(\partial S_{Q'}\llcorner F)\Bigr)\ +\ C_{\angle}\,\varepsilon\,M_F,
 \]
 and, moreover,
 \[
@@ -4450,8 +4450,8 @@ Thus such bounded corrections create only an $O(h)$ \emph{fraction} of insertion
 \end{remark}
 
 \begin{remark}[Nested prefix-template scheme]\label{rem:nested-template-scheme}
-Fix, for each direction label, an \emph{ordered} master template of transverse atoms $(y_a)_{a\ge 1}\subset \editai{B_{C_0\varrho h}(0)}\subset\R^{2p}$.
-For example, Lemma~\ref{lem:sphere-quantize-nested} produces a nested ordered sequence on a sphere (uniform density), and scaling embeds it into $\editai{B_{C_0\varrho h}(0)}$.
+Fix, for each direction label, an \emph{ordered} master template of transverse atoms $(y_a)_{a\ge 1}\subset \editamir{B_{C_0\varrho h}(0)}\subset\R^{2p}$.
+For example, Lemma~\ref{lem:sphere-quantize-nested} produces a nested ordered sequence on a sphere (uniform density), and scaling embeds it into $\editamir{B_{C_0\varrho h}(0)}$.
 For each cell $Q$ choose an integer count $N_Q$ and take the cell template to be the prefix
 \(
 \nu^{(N_Q)}:=\sum_{a=1}^{N_Q}\delta_{y_a}.
@@ -4464,7 +4464,7 @@ then upgrades this to an $O(h^2)$ flat-norm contribution, matching the displacem
 
 \begin{proposition}[Prefix templates $\Rightarrow$ interface coherence up to $O(h)$ edits]\label{prop:prefix-template-coherence}
 Work in the setting of Lemma~\ref{lem:template-displacement-edits} on an interior interface $F=Q\cap Q'$ at mesh $h$.
-Fix an ordered template of transverse atoms $(y_a)_{a\ge 1}\subset \editai{B_{C_0\varrho h}(0)}\subset\R^{2p}$ and define prefixes
+Fix an ordered template of transverse atoms $(y_a)_{a\ge 1}\subset \editamir{B_{C_0\varrho h}(0)}\subset\R^{2p}$ and define prefixes
 \[
 \nu^{(N)}\ :=\ \sum_{a=1}^{N}\delta_{y_a}.
 \]
@@ -4501,7 +4501,7 @@ Then Lemma~\ref{lem:template-edits-oh} (using $\theta_F\lesssim h$) upgrades the
 
 \begin{theorem}[Global prefix-template activation / mass matching (template bookkeeping)]\label{thm:sliver-mass-matching-on-template}
 Fix a mesh-$h$ decomposition by smooth uniformly convex cells (rounded cubes) and fix a direction label $j$ with paired calibrated reference planes across neighbors.
-Fix an \emph{ordered} master template of transverse atoms $(y_a)_{a\ge 1}\subset \editai{B_{C_0\varrho h}(0)}\subset\R^{2p}$.
+Fix an \emph{ordered} master template of transverse atoms $(y_a)_{a\ge 1}\subset \editamir{B_{C_0\varrho h}(0)}\subset\R^{2p}$.
 For each cell $Q$, let $N_Q\in\Z_{\ge 0}$ be the desired integer count for family $j$ (derived from the Lipschitz target weights) and let
 $M_Q\ge 0$ be the corresponding target mass budget for that family (obtained from the smooth form $m\beta$).
 Assume:
@@ -4520,7 +4520,7 @@ $O(h)$--fraction hypothesis of Proposition~\ref{prop:prefix-template-coherence}.
 Then the resulting raw current built from these pieces satisfies the per-face flat-norm mismatch bound of Proposition~\ref{prop:prefix-template-coherence}.
 Consequently one obtains the global estimate
 \[
-\mathcal F(\partial T^{\mathrm{raw}})\ \editai{\lesssim\ \varrho\,h^2}\sum_Q\sum_{a\in\mathcal S(Q)} m_{Q,a}^{\frac{k-1}{k}}\ +\ O(\varepsilon\,m),
+\mathcal F(\partial T^{\mathrm{raw}})\ \editamir{\lesssim\ \varrho\,h^2}\sum_Q\sum_{a\in\mathcal S(Q)} m_{Q,a}^{\frac{k-1}{k}}\ +\ O(\varepsilon\,m),
 \qquad k:=2n-2p,
 \]
 where $m_{Q,a}:=\Mass([Y^{Q,a}]\llcorner Q)$ and $\varepsilon$ is the small-angle parameter.
@@ -4688,14 +4688,14 @@ By (c), $r\le C h N_{\min}$, hence the right-hand side is $\le (\kappa C)h \sum_
 \end{proof}
 
 \begin{remark}[Item \textnormal{(iv)}: tail-heaviness and how it is enforced]\label{rem:iv-what-remains}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 Lemma~\ref{lem:oh-face-edit-regime} isolates the only nontrivial ingredient needed for the $O(h)$ face-edit estimate in item~\textnormal{(iv)} of Theorem~\ref{thm:sliver-mass-matching-on-template}: when passing from a prefix template to a longer template, the added ``tail'' pieces must not contribute a disproportionate amount of face-slice boundary mass on any interior face $F$.
 
 In the present paper this requirement is built into the \emph{finite corner-exit direction net} and the associated activation rule.
 By Proposition~\ref{prop:corner-exit-template-net}, all slivers in a fixed template label have identical footprint geometry; in particular, for each fixed interior face $F$ the per-piece face-slice boundary masses are \emph{uniform} within the label.
 Consequently the tail-heaviness hypothesis \textnormal{(b)} in Lemma~\ref{lem:oh-face-edit-regime} holds with $\kappa=1$ (uniformly in the refinement parameter), and item~\textnormal{(iv)} follows by combining Lemma~\ref{lem:oh-face-edit-regime} with the checkerboard face-edit estimate of Proposition~\ref{prop:checkerboard-face-oh-edit}.
-\editai{(In the vertex-template activation route, Proposition~\ref{prop:vertex-template-face-edits} provides the same $O(h)$ face-edit conclusion without invoking checkerboarding.)}
-\end{editaiblock}
+\editamir{(In the vertex-template activation route, Proposition~\ref{prop:vertex-template-face-edits} provides the same $O(h)$ face-edit conclusion without invoking checkerboarding.)}
+\end{editamirblockNEW}
 
 \smallskip
 For intuition, in the dense-sheet translation-invariant model the same uniformity is automatic because each sheet is a translate of a fixed slice current; the net construction above is the robust replacement used in the sliver regime.
@@ -4703,7 +4703,7 @@ For intuition, in the dense-sheet translation-invariant model the same uniformit
 \end{editblock}
 
 \begin{remark}[Parameter tension and the chosen regime]\label{rem:param-tension}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 There is a genuine tension between (a) taking many pieces per cube (to average fluctuations in counting) and (b) keeping the face mismatch small enough that the flat gluing error tends to zero as the mesh is refined.
 The present paper resolves this tension by working in the \emph{sliver / corner-exit regime} and by using \emph{weighted} matching rather than raw counting:
 
@@ -4713,7 +4713,7 @@ The present paper resolves this tension by working in the \emph{sliver / corner-
 \end{itemize}
 
 In this way, the proof does not rely on a dense-sheet cancellation principle; the smallness of the gluing error is obtained directly from the weighted transport bounds together with the finite-net uniformity.
-\end{editaiblock}
+\end{editamirblockNEW}
 \end{remark}
 
 \begin{editblock}
@@ -4883,8 +4883,8 @@ Disjointness of the pieces $[P+t_a]\llcorner Q$ is immediate because the affine 
 \begin{corollary}[Holomorphic upgrade on a ball cell]\label{cor:holomorphic-flat-sliver-local}
 In the setting of Proposition~\ref{prop:flat-sliver-local}, assume $Q$ lies in a holomorphic chart and that $P$ is a calibrated complex
 $(n-p)$-plane in those coordinates with normal covectors $\lambda_1,\dots,\lambda_p$.
-Fix $\varepsilon>0$ and choose a holomorphic tensor power \editai{$N_{\mathrm{hol}}\ge N_1(\varepsilon)$} (Lemma~\ref{lem:bergman-control}) with
-$\mathrm{diam}(Q)\le c\,\editai{N_{\mathrm{hol}}^{-1/2}}$.
+Fix $\varepsilon>0$ and choose a holomorphic tensor power \editamir{$N_{\mathrm{hol}}\ge N_1(\varepsilon)$} (Lemma~\ref{lem:bergman-control}) with
+$\mathrm{diam}(Q)\le c\,\editamir{N_{\mathrm{hol}}^{-1/2}}$.
 Then, after possibly reducing $N$ by a dimensional constant (absorbed into $C(p)$), the translations $t_a$ may be chosen so that
 \[
 \|t_a-t_b\|\ \ge\ 10\,\varepsilon\,\mathrm{diam}(Q)\qquad (a\neq b),
@@ -4907,7 +4907,7 @@ we may replace the family by a subfamily (renaming and keeping the same notation
 \)
 for all $a\neq b$.
 
-With \editai{$N_{\mathrm{hol}}\ge N_1(\varepsilon)$} and $\mathrm{diam}(Q)\le c\,\editai{N_{\mathrm{hol}}^{-1/2}}$, the Bergman-scale $C^1$ control and the holomorphic finite-template
+With \editamir{$N_{\mathrm{hol}}\ge N_1(\varepsilon)$} and $\mathrm{diam}(Q)\le c\,\editamir{N_{\mathrm{hol}}^{-1/2}}$, the Bergman-scale $C^1$ control and the holomorphic finite-template
 construction apply at each translation parameter $t_a$, producing $\psi$-calibrated holomorphic complete intersections
 $Y^1,\dots,Y^N$ whose restrictions to $Q$ are disjoint $C^1$ graphs over $P+t_a$ with slope $O(\varepsilon)$.
 In particular their masses satisfy
@@ -5001,7 +5001,7 @@ pure prefix-count difference at the shared vertices.
 \end{remark}
 
 \begin{definition}[Global vertex template (flat cubical model)]\label{def:vertex-template}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 Fix a cubical grid in $\R^{2n}$ with mesh $h$ and vertex set $\Lambda:=(h\Z)^{2n}$, and fix a calibrated $(2n-2p)$--plane $P$.
 For each vertex $v\in\Lambda$, fix an infinite ordered family of affine planes
 \[
@@ -5032,7 +5032,7 @@ are independent of $a$ (or, more generally, satisfy
 $c\,b_{v,1}(F;Q)\le b_{v,a}(F;Q)\le C\,b_{v,1}(F;Q)$ for all $a$ with constants $c,C$ independent of $h,v,Q$).
 \end{enumerate}
 We refer to $(P_{v,a})_{a\ge 1}$ as a \emph{global vertex template} for direction $P$.
-\end{editaiblock}
+\end{editamirblockNEW}
 \end{definition}
 
 
@@ -5153,7 +5153,7 @@ $c_j=a_j+i b_j$ ($1\le j\le n-p$) satisfying the quantitative nondegeneracy boun
 \]
 Define the conditioning ratio $\Lambda:=\alpha^*/\alpha_*$.
 
-\begin{editaiblock}
+\begin{editamirblockNEW}
 \noindent\textbf{Referee note (tracking the conditioning constants).}
 The parameters $\alpha_*,\alpha^*,A_*$ (hence $\Lambda=\alpha^*/\alpha_*$) are \emph{inputs} describing a quantitative transversality of the chosen
 ``slanted'' coordinate row of $A$ for the specific plane $P$.
@@ -5166,7 +5166,7 @@ A_*(h):=\max_{P_i\in\mathcal N_h}A_*(P_i),\qquad
 \]
 so these constants may depend on $(h,\varepsilon_h)$ as the net is refined.
 Unless a uniform-in-$h$ lower bound on $\alpha_*(h)$ is proved, the later scaling schedule must keep the dependence on $(1+A_*(h))\Lambda(h)$ explicit.
-\end{editaiblock}
+\end{editamirblockNEW}
 
 \smallskip\noindent
 Then there exists a choice of a \emph{vertex} $v$ of $Q$ (equivalently, a choice of which incident coordinate faces of $Q$ provide the “orthant’’ constraints)
@@ -5240,7 +5240,7 @@ Since $\mathcal N_h$ is finite and all required coefficients are nonzero, one ha
 \]
 hence $\Lambda:=\alpha^*/\alpha_*$ is finite.
 Apply Lemma~\ref{lem:corner-exit-template-open} with these uniform constants to obtain uniform corner-exit templates for every $P_i$.
-\begin{editaiblock}
+\begin{editamirblockNEW}
 \noindent\textbf{Net constants $\alpha_*(h),A_*(h),\Lambda(h)$.}
 For each fixed $h$ we choose the net $\mathcal N_h\subset\mathcal U$ inside the open ``nondegenerate'' set $\mathcal U$ (defined below) so that the
 row-coefficient nonvanishing required by Lemma~\ref{lem:corner-exit-template-open} holds for every $P_i\in\mathcal N_h$.
@@ -5263,7 +5263,7 @@ corner-exit scale condition from Lemma~\ref{lem:corner-exit-template-open},
 s\ \le\ \frac{c_0}{C(n,p)}\cdot \frac{h}{(1+A_*(h))\,\Lambda(h)},
 \]
 whenever Proposition~\ref{prop:holomorphic-corner-exit-L1} is applied uniformly over all labels.
-\end{editaiblock}
+\end{editamirblockNEW}
 
 \end{proof}
 
@@ -5332,7 +5332,7 @@ gives the stated inequality for $E$.
 
 
 \begin{proposition}[Vertex-template prefix lengths match local mass budgets (L2, cube model)]\label{prop:vertex-template-mass-matching}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 Work in the setting of Definition~\ref{def:vertex-template} for a fixed cube $Q$, and \editamir{suppose that} the vertex templates have equal (or uniformly comparable) slice masses as in
 Definition~\ref{def:vertex-template}\textnormal{(iii)}.  Assume further that the geometric templates are realized in $Q$ by holomorphic pieces with small-slope graph control,
 so that Lemma~\ref{lem:sliver-stability}\textnormal{(i)} applies uniformly on $Q$.
@@ -5359,12 +5359,12 @@ Then the realized total mass satisfies
 \]
 In particular, whenever $M_{Q,v}\gg \mu_{Q,v}$ (equivalently $N_{Q,v}\to\infty$), the relative error per vertex is
 \(O(1/N_{Q,v})+O(\varepsilon^2)\).
-\end{editaiblock}
+\end{editamirblockNEW}
 \end{proposition}
 
 
 \begin{proof}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 Fix a vertex $v$.  By nearest-integer rounding,
 \[
 \Bigl|N_{Q,v}\,\mu_{Q,v}-M_{Q,v}\Bigr|\ \le\ \frac12\,\mu_{Q,v}.
@@ -5397,7 +5397,7 @@ Summing over the finitely many vertices $v\in\mathrm{Vert}(Q)$ and using $\sum_v
 \]
 Finally, if $M_{Q,v}\gg \mu_{Q,v}$ then $M_{Q,v}\simeq N_{Q,v}\mu_{Q,v}$ and dividing the per-vertex estimate by $M_{Q,v}$ gives the relative error
 \(O(1/N_{Q,v})+O(\varepsilon^2)\).
-\end{editaiblock}
+\end{editamirblockNEW}
 \end{proof}
 
 
@@ -5435,7 +5435,7 @@ where $B_F^{\mathrm{un}}$ is the unpaired (tail) part of the mismatch on $F$.
 
 
 \begin{proof}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 Fix an interior interface face $F=Q\cap Q'$.
 By the corner localization property in Definition~\ref{def:vertex-template}\textnormal{(i)}, any piece anchored at a vertex
 $v\notin\mathrm{Vert}(F)$ is supported in $B(v,c_0h)$, which does not intersect $F$.
@@ -5460,13 +5460,13 @@ Therefore Lemma~\ref{lem:oh-face-edit-regime} yields
 Summing this bound over the finitely many vertices $v\in\mathrm{Vert}(F)$ and absorbing the fixed vertex-count into the constant
 gives $\Mass(B_F^{\mathrm{un}})\le \theta_F\bigl(\Mass(\partial S_Q\llcorner F)+\Mass(\partial S_{Q'}\llcorner F)\bigr)$ with
 $\theta_F\lesssim h$, as claimed.
-\end{editaiblock}
+\end{editamirblockNEW}
 \end{proof}
 
 
 
 \begin{corollary}[Corner-exit vertex templates verify the activation hypotheses (iii)–(iv)]\label{cor:corner-exit-iii-iv}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 Fix one direction label $j$ and work on a mesh-$h$ cubulation in the cube model of Definition~\ref{def:vertex-template}.
 \editamir{Suppose that} for this label the following are implemented:
 \begin{enumerate}
@@ -5490,10 +5490,10 @@ Theorem~\ref{thm:sliver-mass-matching-on-template} hold (after absorbing constan
 Moreover, if one prefers to express the activation via a single ordered per-cube prefix (rather than per-vertex prefixes),
 one may implement the block-uniform coded interleaving of Definitions~\ref{def:block-uniform-codes}--\ref{def:checkerboard-anchoring}
 and then use Proposition~\ref{prop:checkerboard-face-oh-edit} for the face-edit estimate.
-\end{editaiblock}
+\end{editamirblockNEW}
 \end{corollary}
 \begin{proof}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 \emph{Hypothesis \textnormal{(iii)}.}
 For each cube $Q$, consider the disjoint family of holomorphic pieces
 \[
@@ -5518,12 +5518,12 @@ Theorem~\ref{thm:sliver-mass-matching-on-template}.
 
 With \textnormal{(iii)}--\textnormal{(iv)} verified for label $j$, Theorem~\ref{thm:sliver-mass-matching-on-template}
 applies to this direction family.
-\end{editaiblock}
+\end{editamirblockNEW}
 \end{proof}
 
 
 \begin{remark}[{\color{blue}Referee map: downstream invocations of Proposition~\ref{prop:holomorphic-corner-exit-L1}}]\label{rem:L1-downstream-map}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 For later proof-spine checks, Proposition~\ref{prop:holomorphic-corner-exit-L1} is used downstream only through the following interfaces:
 \begin{enumerate}
 \item Corollary~\ref{cor:corner-exit-iii-iv}: it supplies the holomorphic corner-exit slivers (with (G1-iff)/(G2) and the $L^1$ boundary-face mass control) needed to certify activation hypothesis \textnormal{(iii)} for the vertex-template program.
@@ -5533,7 +5533,7 @@ Earlier forward references to Proposition~\ref{prop:holomorphic-corner-exit-L1} 
 are parameter-synchronization notes rather than additional proof dependencies.
 Constants in the $L^1$ bounds may depend on $(k,\Lambda,\varepsilon)$ as recorded in Proposition~\ref{prop:holomorphic-corner-exit-L1};
 uniformity across labels is enforced by the finite direction net and the schedule in Remark~\ref{rem:weighted-scaling}.
-\end{editaiblock}
+\end{editamirblockNEW}
 \end{remark}
 
 
@@ -5573,8 +5573,8 @@ and summing the resulting per-label flat-norm mismatch bounds yields $\mathcal F
 Remark~\ref{rem:weighted-scaling}.
 \end{proposition}
 
-\begin{editaiblock}
-\editai{\noindent\textbf{Referee closure of the “simultaneous matching” hinge.}
+\begin{editamirblockNEW}
+\editamir{\noindent\textbf{Referee closure of the “simultaneous matching” hinge.}
 For each interior face $F=Q\cap Q'$, Proposition~\ref{prop:global-coherence-all-labels} furnishes a \emph{common prefix length} $N_F$
 (and hence equal integer masses on both sides after the prefix-edit/balancing step).
 Fix, at this mesh scale, a transverse grid $\delta_\perp$ and choose a master grid-atom list $(y_a)_{a=1}^{N_*}$ with $N_*\ge \max_F N_F$.
@@ -5582,11 +5582,11 @@ With each resulting $N_F$, Proposition~\ref{prop:integer-transport} \emph{constr
 $\mu_{Q\to F}$ and $\mu_{Q'\to F}$ and gives the quantitative $W_1$ bound needed in the transport/glue estimate.
 Because the construction is facewise and uses the globally coherent master template, the hypothesis (c) in
 Proposition~\ref{prop:transport-flat-glue-weighted} is discharged \emph{simultaneously for all interior faces}.}
-\end{editaiblock}
+\end{editamirblockNEW}
 
 
 \begin{proof}
-\begin{editaiblock}
+\begin{editamirblock}
 \noindent\textbf{Dependency packaging (no new axioms).}
 This statement is a \emph{packaging} of previously proved components; the role of this proof is to
 make the dependency chain explicit and eliminate any hidden “assume-as-needed” steps.
@@ -5608,13 +5608,13 @@ are exactly those ensured by the template-net construction together with the par
 
 \smallskip\noindent
 \textbf{(3) Integer rounding with slow variation.}
-\editai{Given the per-cell mass budgets $M_{Q,i}$, choose any vertex split $M_{Q,v,i}\ge 0$ with $\sum_{v\in\mathrm{Vert}(Q)}M_{Q,v,i}=M_{Q,i}$ (e.g.\ equal split).}
-\editai{For each $(Q,v,i)$ let $\mu_{Q,v,i}>0$ denote the common per-piece mass scale in $Q$ for the $v$-anchored pieces of label $i$ (as in Proposition~\ref{prop:vertex-template-mass-matching}), and define}
+\editamir{Given the per-cell mass budgets $M_{Q,i}$, choose any vertex split $M_{Q,v,i}\ge 0$ with $\sum_{v\in\mathrm{Vert}(Q)}M_{Q,v,i}=M_{Q,i}$ (e.g.\ equal split).}
+\editamir{For each $(Q,v,i)$ let $\mu_{Q,v,i}>0$ denote the common per-piece mass scale in $Q$ for the $v$-anchored pieces of label $i$ (as in Proposition~\ref{prop:vertex-template-mass-matching}), and define}
 \[
-\editai{N_{Q,v,i}\ :=\ \Bigl\lfloor \frac{M_{Q,v,i}}{\mu_{Q,v,i}}\Bigr\rceil.}
+\editamir{N_{Q,v,i}\ :=\ \Bigl\lfloor \frac{M_{Q,v,i}}{\mu_{Q,v,i}}\Bigr\rceil.}
 \]
 \editamir{Then item \textnormal{(a)} is exactly Proposition~\ref{prop:vertex-template-mass-matching} applied label-by-label.}
-\editai{Item \textnormal{(b)} follows by applying Lemma~\ref{lem:slow-variation-rounding} (and the $0$--$1$ stability Lemma~\ref{lem:slow-variation-discrepancy})
+\editamir{Item \textnormal{(b)} follows by applying Lemma~\ref{lem:slow-variation-rounding} (and the $0$--$1$ stability Lemma~\ref{lem:slow-variation-discrepancy})
 to the Lipschitz targets $(Q,v)\mapsto M_{Q,v,i}/\mu_{Q,v,i}$ at shared vertices, on the region where $M_{Q,i}$ is not negligible.}
 
 \smallskip\noindent
@@ -5631,13 +5631,13 @@ Finally, the verification that the sliver/template activation hypotheses \textno
 is exactly Corollary~\ref{cor:corner-exit-iii-iv}, once the local corner-exit realizability from (2) is in place.
 Summing the per-label flat-norm mismatch bounds is then a direct application of Corollary~\ref{cor:global-flat-weighted},
 yielding $\mathcal F(\partial T^{\mathrm{raw}})=o(m)$ in the parameter regime of Remark~\ref{rem:weighted-scaling}.
-\end{editaiblock}
+\end{editamirblock}
 \end{proof}
 
 
-\begin{editaiblock}
+\begin{editamirblock}
 \begin{corollary}[Flat boundary of the raw current in the weighted scaling regime]\label{cor:raw-boundary-flat-small}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 Assume the hypotheses of Proposition~\ref{prop:global-coherence-all-labels} and work in the parameter regime of
 Remark~\ref{rem:weighted-scaling} (in particular, $h\sim c\,N^{-1/2}$ for the holomorphic scale $N\to\infty$ and the corner-exit/graph parameters are synchronized as there).
 Then the associated raw current $T^{\mathrm{raw}}$ satisfies
@@ -5650,15 +5650,15 @@ Equivalently, for every $\eta>0$ there exists $h_0>0$ such that for all sufficie
 \[
 \mathcal F(\partial T^{\mathrm{raw}})\le \eta\,m.
 \]
-\end{editaiblock}
-\begin{editaiblock}
+\end{editamirblockNEW}
+\begin{editamirblockNEW}
 In particular, for fixed cohomology multiplier $m$, any bound of the form $\mathcal{F}(\partial T^{\mathrm{raw}})=o(m)$ yields $\mathcal{F}(\partial T^{\mathrm{raw}})\to 0$ as $h\downarrow 0$.
-\end{editaiblock}
+\end{editamirblockNEW}
 
 \end{corollary}
 
 \begin{proof}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 By Proposition~\ref{prop:global-coherence-all-labels}, each interior interface mismatch $B_F$ fits the weighted translation model
 of Corollary~\ref{cor:global-flat-weighted} with a uniform displacement control $\Delta_F\lesssim h^2$.
 Moreover, the face-level $O(h)$ edit regime required there is ensured by the local face-edit estimates
@@ -5666,7 +5666,7 @@ Moreover, the face-level $O(h)$ edit regime required there is ensured by the loc
 so Corollary~\ref{cor:global-flat-weighted} gives
 \[
 \mathcal F\!\left(\partial T^{\mathrm{raw}}\right)
-\ \editai{\lesssim\ \varrho\,h^2}\sum_Q\ \sum_{a\in\mathcal S(Q)} m_{Q,a}^{\frac{k-1}{k}},
+\ \editamir{\lesssim\ \varrho\,h^2}\sum_Q\ \sum_{a\in\mathcal S(Q)} m_{Q,a}^{\frac{k-1}{k}},
 \qquad k:=2n-2p.
 \]
 Remark~\ref{rem:weighted-scaling} identifies the local packing bound in each cell (coming from the holomorphic corner-exit realization)
@@ -5677,16 +5677,16 @@ and converts the right-hand side into the global scaling estimate
 \]
 Choosing a refinement schedule $h\downarrow 0$ with $\varepsilon=\varepsilon(h)\downarrow 0$ slowly enough (as in Remark~\ref{rem:weighted-scaling})
 gives $\mathcal F(\partial T^{\mathrm{raw}})/m\to 0$, i.e.\ $\mathcal F(\partial T^{\mathrm{raw}})=o(m)$.
-\end{editaiblock}
+\end{editamirblockNEW}
 \end{proof}
 
-\end{editaiblock}
+\end{editamirblock}
 
 
-\begin{editaiblock}
+\begin{editamirblockNEW}
 \noindent\textbf{Referee cleanup.} The proof block that followed here was a duplicate of the packaged dependency check above.
 It has been removed to prevent two competing “proofs” from coexisting in the manuscript.
-\end{editaiblock}
+\end{editamirblockNEW}
 
 \begin{remark}[Making the ``prefix-balanced face population'' explicit]
 The previous proposition treats each vertex template separately.
@@ -5731,7 +5731,7 @@ and for all $N,N'\ge 1$,
 |A_S(N)-A_S(N')|\ \le\ \frac{|S|}{2^d}\,|N-N'| + 2^{d+1}.
 \]
 \end{lemma}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 \begin{proof}
 Write $N=q\,2^d+r$ with $q\in\Z_{\ge 0}$ and $0\le r<2^d$.  By Definition~\ref{def:block-uniform-codes}, each complete block of
 length $2^d$ contains each code in $\mathcal V$ exactly once, so each complete block contributes exactly $|S|$ hits.  Hence
@@ -5759,7 +5759,7 @@ and use the previous estimate for each bracketed term to get
 \ \le\ \frac{|S|}{2^d}|N-N'| + 2^{d+1}.
 \]
 \end{proof}
-\end{editaiblock}
+\end{editamirblockNEW}
 
 \begin{lemma}[Two-sided face population is automatic under checkerboarding]\label{lem:two-sided-face-pop}
 Fix a coordinate direction $\ell\in\{1,\dots,d\}$ and an interior interface face $F:=Q_g\cap Q_{g+e_\ell}$.
@@ -5770,7 +5770,7 @@ Then $S_{g,\ell}^+=S_{g+e_\ell,\ell}^-$ and hence, for every $N$,
 \{a\le N:\ v_g(u_a)\in F\}\ =\ \{a\le N:\ v_{g+e_\ell}(u_a)\in F\}.
 \]
 \end{lemma}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 \begin{proof}
 By Definition~\ref{def:checkerboard-anchoring}, the anchored vertex $v_g(u)$ lies on the \emph{positive} $\ell$-face of $Q_g$
 if and only if the $\ell$-th coordinate of $g+(u\oplus\pi(g))$ equals $g_\ell+1$, i.e.
@@ -5786,9 +5786,9 @@ But $(u\oplus\pi(g+e_\ell))_\ell=0$ is exactly the condition that $v_{g+e_\ell}(
 of $Q_{g+e_\ell}$, which is the same hyperplane $F=Q_g\cap Q_{g+e_\ell}$.  Therefore $S_{g,\ell}^+=S_{g+e_\ell,\ell}^-$.
 The equality of the index-sets for every $N$ follows immediately from the definition of $A_S(N)$.
 \end{proof}
-\end{editaiblock}
+\end{editamirblockNEW}
 
-\begin{editaiblock}
+\begin{editamirblockNEW}
 \begin{proposition}[Checkerboard corner assignment implies a face-level $O(h)$ edit regime]\label{prop:checkerboard-face-oh-edit}
 Fix $d\ge 2$ and a cubical grid $(Q_g)$ of mesh $h>0$.
 Assume the ordered sliver activation in each cube $Q_g$ uses the block-uniform code sequence $(u_a)_{a\ge 1}$
@@ -5869,7 +5869,7 @@ Combining the previous two displays yields
 with $C$ depending only on $(d,c_0,C_0)$ (absorbing fixed powers of $2$ into the constant), as claimed.
 The final $O(h)$ specialization follows immediately under $|N-N'|\le \theta N_{\min}$ with $\theta\lesssim h$ and $N_{\min}\gtrsim h^{-1}$.
 \end{proof}
-\end{editaiblock}
+\end{editamirblockNEW}
 
 
 \begin{remark}[Rounded cubes]\label{rem:smooth-cells}
@@ -5915,9 +5915,9 @@ If in addition $\sup_{(u,w)\in U}\|\partial_u F(u,w)\|\le \eta$, then $g$ is Lip
 \[
 \|Dg\|\ \le\ \frac{\|A^{-1}\|\,\eta}{1-\|A^{-1}\|\,\eta}\ \le\ 2\,\|A^{-1}\|\,\eta.
 \]
-\begin{editaiblock}
-\editai{In particular, since $F$ is $C^1$ and $\partial_wF(u,g(u))$ is invertible for all $u\in U_u$, the implicit function theorem implies $g\in C^1(U_u)$; hence the displayed bound holds for every $u\in U_u$.}
-\end{editaiblock}
+\begin{editamirblockNEW}
+\editamir{In particular, since $F$ is $C^1$ and $\partial_wF(u,g(u))$ is invertible for all $u\in U_u$, the implicit function theorem implies $g\in C^1(U_u)$; hence the displayed bound holds for every $u\in U_u$.}
+\end{editamirblockNEW}
 
 \end{lemma}
 \begin{proof}
@@ -5976,7 +5976,7 @@ With the corner-exit Euclidean templates and the small-slope stability package i
 difficulty becomes sharply focused.
 
 \smallskip\noindent
-\begin{editaiblock}
+\begin{editamirblockNEW}
 \textbf{Blocker A (cell-scale single-sheet control --- \emph{resolved}).}
 This checkpoint is now achieved by Proposition~\ref{prop:cell-scale-linear-model-graph}, which builds holomorphic complete intersections
 whose local defining map $F(u,w)$ is a small perturbation of the invertible linear model in the $w$-variables and hence yields a \emph{unique}
@@ -5990,7 +5990,7 @@ Lemma~\ref{lem:sliver-stability} gives $\Mass([Y]\llcorner Q)=(1+O(\varepsilon^2
 and Proposition~\ref{prop:holomorphic-corner-exit-g1g2} (hence Proposition~\ref{prop:holomorphic-corner-exit-L1}) controls the boundary-face contributions.
 Therefore there are no ``heavy tails'' at cell scale, and the remaining mass-budget matching (L2) reduces to the discrete prefix-length bookkeeping
 (with $O(1/N)+O(\varepsilon^2)$ rounding error) in the template-matching stage.
-\end{editaiblock}
+\end{editamirblockNEW}
 \smallskip\noindent
 \textbf{How to apply Lemma~\ref{lem:global-graph-contraction} to holomorphic complete intersections.}
 In a holomorphic chart, write the local coefficients of the defining sections as a map
@@ -6025,7 +6025,7 @@ $B_{R/\sqrt N}(0)\subset B_{\rho/8}(0)$:
 \qquad \varepsilon_N\xrightarrow[N\to\infty]{}0,
 \]
 with constants uniform over the finitely many charts in a fixed atlas on $X$.
-\editai{Moreover, the construction in the proof yields the quantitative bound $\varepsilon_N\le C_R\,e^{-c N}$ for some $c>0$ (uniform over $\ell$ with $|a|+|b|\le 1$ and over charts in a fixed finite atlas). In particular, $\varepsilon_N=o(N^{-1/2})$.}
+\editamirNEW{Moreover, the construction in the proof yields the quantitative bound $\varepsilon_N\le C_R\,e^{-c N}$ for some $c>0$ (uniform over $\ell$ with $|a|+|b|\le 1$ and over charts in a fixed finite atlas). In particular, $\varepsilon_N=o(N^{-1/2})$.}
 \end{lemma}
 
 \begin{proof}
@@ -6043,13 +6043,13 @@ $f_{\ell,N}=\ell-\text{(holomorphic error)}$ on $B_{R/\sqrt N}$ with the stated 
 \end{proof}
 
 
-\begin{proposition}[\editai{Cell-scale linear-model complete intersections are single-sheet graphs}]\label{prop:cell-scale-linear-model-graph}
+\begin{proposition}[\editamir{Cell-scale linear-model complete intersections are single-sheet graphs}]\label{prop:cell-scale-linear-model-graph}
 \iffalse
 Fix a holomorphic chart identifying a neighborhood of a cell $Q$ with a domain in $\C^{n}=\C^{n-p}\times\C^{p}$ with coordinates $z=(u,w)$,
 and assume $Q\subset B_{R/\sqrt N}(0)$ for some fixed $R$.
 \fi
-\editai{Fix a holomorphic chart identifying a neighborhood of a cell $Q$ with a domain in $\C^{n}=\C^{n-p}\times\C^{p}$ with coordinates $z=(u,w)$, and assume $Q\subset B_{R/\sqrt N}(0)$ for some fixed $R$. Assume moreover that the cell diameter satisfies $h\asymp N^{-1/2}$.}
-Let $t\in\C^p$ satisfy $|t|\le c\,h$ (with \editai{$h\asymp N^{-1/2}$}).
+\editamir{Fix a holomorphic chart identifying a neighborhood of a cell $Q$ with a domain in $\C^{n}=\C^{n-p}\times\C^{p}$ with coordinates $z=(u,w)$, and assume $Q\subset B_{R/\sqrt N}(0)$ for some fixed $R$. Assume moreover that the cell diameter satisfies $h\asymp N^{-1/2}$.}
+Let $t\in\C^p$ satisfy $|t|\le c\,h$ (with \editamir{$h\asymp N^{-1/2}$}).
 Then for all sufficiently large $N$ there exist sections $\sigma_1,\dots,\sigma_p\in H^0(X,L^N)$ such that, writing
 $\sigma_j=F_j\,e^{\otimes N}$ in a local frame on $B_{R/\sqrt N}(0)$ and setting $F=(F_1,\dots,F_p)$, one has
 \[
@@ -6064,7 +6064,7 @@ $\{w=t\}$ on all of $Q$, with slope $O(\eta_N)$ (hence as small as desired).
 \end{proposition}
 
 \begin{proof}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 Apply Lemma~\ref{lem:bergman-affine-approx-hormander} to the affine-linear holomorphic functions
 $\ell_0\equiv 1$ and $\ell_j(z)=w_j$ ($1\le j\le p$).  Thus for each $j=0,1,\dots,p$ we obtain a holomorphic section
 $s_j\in H^0(X,L^N)$ with local coefficient $f_j$ on $B_{R/\sqrt N}$ such that
@@ -6118,7 +6118,7 @@ Y_t\cap Q=\{(u,w)\in Q:\sigma_1=\cdots=\sigma_p=0\}
 is a single $C^1$ graph over the affine plane $\{w=t\}$ on all of $Q$,
 and the slope estimate follows from Lemma~\ref{lem:global-graph-contraction}:
 $\|Dg\|_{L^\infty}\le 2\eta_N$.
-\end{editaiblock}
+\end{editamirblockNEW}
 \end{proof}
 
 
@@ -6141,7 +6141,7 @@ If $E\subset B(0,c_0h)$ with $c_0<1$, then $E$ cannot intersect any set at dista
 \end{proof}
 
 \begin{lemma}[{\color{blue}Fat corner simplices force ``if'' on the designated exit faces}]\label{lem:corner-simplex-hits-designated-faces}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 Fix $d\ge 2$ and $1\le k<d$.  Let $Q=[0,h]^d$ and let $v$ be a vertex.
 Assume $E\subset Q$ is a $k$--simplex satisfying:
 \begin{enumerate}
@@ -6162,11 +6162,11 @@ Then for any codimension--$1$ face $F$ of $Q$,
 F\in\{F_0,\dots,F_k\}.
 \]
 Moreover, if $F$ is not incident to $v$, then $E\cap F=\emptyset$.
-\end{editaiblock}
+\end{editamirblockNEW}
 \end{lemma}
 
 \begin{proof}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 For each $i$, since $E\cap F_i$ is a facet of the $k$--simplex $E$, it contains a relatively open subset of the $(k-1)$--dimensional affine hyperplane $F_i$. Hence $\mathcal H^{k-1}(E\cap F_i)>0$.
 
 Let $F$ be a codimension--$1$ face of $Q$ \emph{not} incident to $v$.  Using \eqref{C3cornerlocal} with $c_0<1$, Lemma~\ref{lem:ball-excludes-faces} implies $E\cap F=\emptyset$.
@@ -6178,7 +6178,7 @@ E\cap F \subset E\cap\partial Q \subset \bigcup_{i=0}^k F_i,
 so $E\cap F\subset\bigcup_{i=0}^k (E\cap F\cap F_i)$.  For each $i$, since $F\neq F_i$ the intersection $F\cap F_i$ is contained in a codimension--$2$ face of $Q$, and $E\cap F_i$ has nonempty relative interior in $F_i$; therefore $E\cap F\cap F_i$ is contained in a proper boundary piece of the facet $E\cap F_i$ and has Hausdorff dimension at most $k-2$.  In particular $\mathcal H^{k-1}(E\cap F\cap F_i)=0$ for all $i$, hence $\mathcal H^{k-1}(E\cap F)=0$.
 
 This proves the claimed ``if and only if'' statement.
-\end{editaiblock}
+\end{editamirblockNEW}
 \end{proof}
 
 
@@ -6200,7 +6200,7 @@ c_\star\, v_E^{(k-1)/k}\ \le\ a_i\ \le\ C_\star\, v_E^{(k-1)/k}.
 \end{lemma}
 
 \begin{proof}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 Because $A$ is affine on $\Pi$, both the $k$--Jacobian and the $(k-1)$--Jacobian of $A$ are constant on $\Pi$ and are controlled by the operator--norm bounds:
 \[
 \Lambda^{-k}\ \lesssim_k\ J_k(A)\ \lesssim_k\ \Lambda^{k},
@@ -6229,7 +6229,7 @@ Combining with the previous comparability under $A$ yields
 a_i\ \simeq_{k,\Lambda}\ v_E^{(k-1)/k},
 \]
 uniformly in $i$, proving the claim.
-\end{editaiblock}
+\end{editamirblockNEW}
 \end{proof}
 
 
@@ -6257,7 +6257,7 @@ so $\sqrt{\det(I+(DG)^T DG)}=1+O(\varepsilon^2)$ uniformly.  Apply with $m=k$ an
 
 \iffalse
 \begin{proposition}[{\color{blue}Corner--exit footprint geometry is preserved under small--slope holomorphic graphs}]\label{prop:holomorphic-corner-exit-g1g2-old1}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 Fix $d\ge 2$ and $1\le k<d$.  Let $Q=[0,h]^d$ and let $v$ be a vertex.
 Let $P$ be an affine $k$--plane and set $E:=P\cap Q$.
 Assume:
@@ -6292,13 +6292,13 @@ F\in\{F_0,\dots,F_k\}.
 \]
 with distortion factor $\simeq_{k,\Lambda,\varepsilon}$ tending to $1$ as $\varepsilon\to 0$ (in fact $1+O_{k}(\varepsilon^2)$).
 \end{enumerate}
-\end{editaiblock}
+\end{editamirblockNEW}
 \end{proposition}
 \fi
 
 \iffalse
 \begin{proposition}[{\color{blue}Corner--exit footprint geometry for small--slope graphs}]\label{prop:holomorphic-corner-exit-g1g2-old2}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 Fix $d\ge 2$ and $1\le k<d$.  Let $Q=[0,h]^d\subset\R^d$ and let $v$ be a vertex of $Q$.
 Let $P\subset\R^d$ be an affine $k$--plane and set $E:=P\cap Q$.
 
@@ -6356,12 +6356,12 @@ For each $i=0,\dots,k$, the intersection $Y\pitchfork F_i$ is a smooth oriented 
 \simeq_{k,\Lambda}\ v_E^{(k-1)/k}.
 \]
 \end{enumerate}
-\end{editaiblock}
+\end{editamirblockNEW}
 \end{proposition}
 \fi
 
 \begin{proposition}[{\color{blue}Corner--exit footprint geometry for small--slope graphs}]\label{prop:holomorphic-corner-exit-g1g2}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 Fix $d\ge 2$ and $1\le k<d$.  Let $Q=[0,h]^d\subset\R^d$ and let $v$ be a vertex of $Q$.
 Let $P\subset\R^d$ be an affine $k$--plane and set $E:=P\cap Q$.
 Write $v_E:=\mathcal H^k(E)$.
@@ -6415,11 +6415,11 @@ For each $i=0,\dots,k$, the intersection $Y\pitchfork F_i$ is a smooth oriented 
 \simeq_{k,\Lambda}\ v_E^{(k-1)/k}.
 \]
 \end{enumerate}
-\end{editaiblock}
+\end{editamirblockNEW}
 \end{proposition}
 
 \begin{proof}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 For \eqref{G1iff}, let $F$ be a codimension--$1$ face of $Q$ not in $\{F_0,\dots,F_k\}$.
 By definition of $\delta$, we have $\dist(E,F)\ge \delta$.
 If $y\in Y\cap F$, then $y=\Phi(x)$ for some $x\in E$, and hence
@@ -6442,17 +6442,17 @@ Because $\Phi$ is a $C^1$ graph map with slope $\le \varepsilon$, the area formu
 \mathcal H^{k-1}(Y\cap F_i)=\bigl(1+O_k(\varepsilon^2)\bigr)\,\mathcal H^{k-1}(E\cap F_i),
 \]
 and the final comparison follows from the fatness estimate in \eqref{H2cornerfat}.
-\end{editaiblock}
+\end{editamirblockNEW}
 \end{proof}
 
-\begin{editaiblock}
-\editai{\noindent\textbf{Referee cleanup.} The additional proof blocks that followed here were earlier draft variants of the same argument.
+\begin{editamirblockNEW}
+\editamirNEW{\noindent\textbf{Referee cleanup.} The additional proof blocks that followed here were earlier draft variants of the same argument.
 They have been removed to prevent multiple competing proofs from coexisting in the compiled manuscript.}
-\end{editaiblock}
+\end{editamirblockNEW}
 
 
 \begin{corollary}[{\color{blue}Corner--exit faces persist uniformly across a finite template family}]\label{cor:holomorphic-corner-exit-inherits}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 Fix $d\ge 2$ and $1\le k<d$.  Let $Q=[0,h]^d$ and let $v$ be a vertex.
 Let $\{P_a\}_{a=1}^N$ be a finite family of affine $k$--planes and set $E_a:=P_a\cap Q$.
 \editamir{Suppose that} for each $a$:
@@ -6463,7 +6463,7 @@ $E_a$ is a $k$--simplex satisfying the footprint hypotheses \eqref{H1corner} of 
 \item[\textup{(T2)}]\label{T2}
 $E_a$ is $\Lambda$--fat with the same fatness parameter $\Lambda$.
 \end{enumerate}
-\editai{Assume moreover that $\varepsilon>0$ is chosen small enough (depending only on $k$ and $\Lambda$) so that Proposition~\ref{prop:holomorphic-corner-exit-g1g2} applies to every pair $(E_a,Y^{(a)})$.}
+\editamir{Assume moreover that $\varepsilon>0$ is chosen small enough (depending only on $k$ and $\Lambda$) so that Proposition~\ref{prop:holomorphic-corner-exit-g1g2} applies to every pair $(E_a,Y^{(a)})$.}
 
 Define the uniform gap
 \[
@@ -6475,29 +6475,29 @@ $\sup_{x\in E_a}|\Phi_a(x)-x|<\delta_\star/2$.
 
 Then for every $a$ the conclusions \eqref{G1iff}--\eqref{G2mass} of Proposition~\ref{prop:holomorphic-corner-exit-g1g2} hold for $(E_a,Y^{(a)})$,
 with constants depending only on $(k,\Lambda)$ and on the graph--slope bound (equivalently on $\varepsilon$).
-\end{editaiblock}
+\end{editamirblockNEW}
 \end{corollary}
 
 \begin{proof}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 Apply Proposition~\ref{prop:holomorphic-corner-exit-g1g2} to each pair $(E_a,Y^{(a)})$.
 The only additional point is that the smallness requirement on the graph (encoded there by the gap parameter $\delta$) can be chosen uniformly in $a$,
 because the family is finite and $\delta_\star>0$ by definition.
-\editai{This is legitimate because the smallness threshold in Proposition~\ref{prop:holomorphic-corner-exit-g1g2} depends only on $(k,\Lambda)$ (and the slope bound), not on $a$.}
-\end{editaiblock}
+\editamir{This is legitimate because the smallness threshold in Proposition~\ref{prop:holomorphic-corner-exit-g1g2} depends only on $(k,\Lambda)$ (and the slope bound), not on $a$.}
+\end{editamirblockNEW}
 \end{proof}
 
 
 \begin{remark}[Recognition Science interpretation (updated)]\label{rem:rs-interpretation}
-\begin{editaiblock}
-\editai{\noindent\textbf{Non-logical commentary.} This remark is optional exposition only and is \emph{not used} anywhere in the proof chain.
+\begin{editamirblockNEW}
+\editamir{\noindent\textbf{Non-logical commentary.} This remark is optional exposition only and is \emph{not used} anywhere in the proof chain.
 All logical dependencies for Theorem~\ref{thm:main-hodge} are contained in the stated results and the published “Classical Inputs” ledger.}
-\end{editaiblock}
+\end{editamirblockNEW}
 
 \iffalse From the Recognition Science perspective (see \texttt{Source-Super.txt} and \texttt{recognition-geometry-dec-6.tex}), \fi
 the microstructure/gluing step is a ``ledger closure'' requirement: local recognition events (slivers) must be manufactured so that
 their interface mismatch is negligible.  In this language a mesh cell $Q$ plays the role of a \emph{resolution cell} (a region on which the ``event alphabet''
-is stable), and the natural analytic resolution scale in K\"ahler quantization is the Bergman scale \editai{$N^{-1/2}$}.
+is stable), and the natural analytic resolution scale in K\"ahler quantization is the Bergman scale \editamir{$N^{-1/2}$}.
 Thus the correct classical checkpoint is a \emph{finite-resolution stability statement} on a ball containing $Q$:
 construct holomorphic equations that are uniformly $C^1$-close to a fixed linear model on a Bergman ball (via Bergman kernel/peak-section control,
 e.g.\ Lemma~\ref{lem:bergman-control} or the cutoff+$\bar\partial$ route in Lemma~\ref{lem:bergman-affine-approx-hormander}), and then conclude that the zero set
@@ -6538,7 +6538,7 @@ Assume further that for each $i\in\{1,2\}$ there exists an \emph{anchor point} $
 
 
 \begin{proof}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 \textnormal{(i)} Write $k:=2n-2p$ and parametrize $Y\cap Q$ as the graph of $u:P\cap Q\to P^\perp$ with $\|Du\|_{C^0}\le\varepsilon$.
 By the area formula for graphs,
 \[
@@ -6562,8 +6562,8 @@ $\editamir{\dist(y,P+t_i)\le \varepsilon D_i}$, i.e.
 \[
 Y_i\cap Q\ \subset\ \editamir{\mathcal N_{\varepsilon D_i}}(P+t_i)\cap Q.
 \]
-\editai{If $\|t_1-t_2\|\ge 10\,\varepsilon\,\max\{D_1,D_2\}$, then the tubular neighborhoods $\mathcal N_{\varepsilon D_1}(P+t_1)$ and $\mathcal N_{\varepsilon D_2}(P+t_2)$ are disjoint, hence so are $Y_1\cap Q$ and $Y_2\cap Q$.}
-\end{editaiblock}
+\editamir{If $\|t_1-t_2\|\ge 10\,\varepsilon\,\max\{D_1,D_2\}$, then the tubular neighborhoods $\mathcal N_{\varepsilon D_1}(P+t_1)$ and $\mathcal N_{\varepsilon D_2}(P+t_2)$ are disjoint, hence so are $Y_1\cap Q$ and $Y_2\cap Q$.}
+\end{editamirblockNEW}
 \end{proof}
 
 
@@ -6595,7 +6595,7 @@ hence $N\lesssim \varepsilon^{-2p}$ as claimed.
 
 \begin{editblock}
 \begin{proposition}[Realizing a finite translation template locally]\label{prop:finite-template}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 \noindent\textbf{Role in the closure chain.}
 Proposition~\ref{prop:finite-template} is the \emph{analytic local holomorphic-realization} input.
 It depends only on:
@@ -6605,22 +6605,22 @@ and (iii) stability/disjointness of small-slope slivers under plane separation (
 It does \emph{not} assume any of the corner-exit net constants $\alpha_*(h),A_*(h),\Lambda(h)$; those enter only through
 how one chooses the translations $t_a$ and the separation scale $\delta=10\,\varepsilon\,\mathrm{diam}(Q)$ in later applications
 (e.g. Proposition~\ref{prop:holomorphic-corner-exit-L1} using Proposition~\ref{prop:corner-exit-template-net}).
-\end{editaiblock}
+\end{editamirblockNEW}
 Fix a holomorphic chart identifying a neighborhood of a cell $Q$ with a domain in $\C^n$, and fix a calibrated complex $(n-p)$-plane
 $P\subset\C^n$ with normal covectors $\lambda_1,\dots,\lambda_p$ (so $\bigcap_i\ker\lambda_i=P$).
 Let $t_1,\dots,t_N\in P^\perp\cong\R^{2p}$ be translation vectors such that the affine planes $(P+t_a)$ are pairwise disjoint on $Q$ and
 \editamir{let $D_Q:=\max_{1\le a\le N}\mathrm{diam}\bigl((P+t_a)\cap Q\bigr)\le \mathrm{diam}(Q)$, and assume the translations are separated by
 $\|t_a-t_b\|\ge 10\,C_{\mathrm{graph}}\,\varepsilon\,D_Q$.}
-Fix $\varepsilon>0$ and choose a holomorphic tensor power \editai{$N_{\mathrm{hol}}\ge N_1(\varepsilon)$} as in Lemma~\ref{lem:bergman-control},
+Fix $\varepsilon>0$ and choose a holomorphic tensor power \editamir{$N_{\mathrm{hol}}\ge N_1(\varepsilon)$} as in Lemma~\ref{lem:bergman-control},
 with $N_{\mathrm{hol}}$ large enough that
 \[
-\mathrm{diam}(Q)\ \le\ c\,\editai{N_{\mathrm{hol}}^{-1/2}},
+\mathrm{diam}(Q)\ \le\ c\,\editamir{N_{\mathrm{hol}}^{-1/2}},
 \]
-where $c>0$ is the universal constant in Lemma~\ref{lem:bergman-control}.\editai{ By increasing $N_{\mathrm{hol}}$ if necessary, we may assume in fact $\mathrm{diam}(Q)\le (c/2)\,N_{\mathrm{hol}}^{-1/2}$; then $Q\subset B_{(c/2)\,N_{\mathrm{hol}}^{-1/2}}(x)$ for every $x\in Q$.}
+where $c>0$ is the universal constant in Lemma~\ref{lem:bergman-control}.\editamir{ By increasing $N_{\mathrm{hol}}$ if necessary, we may assume in fact $\mathrm{diam}(Q)\le (c/2)\,N_{\mathrm{hol}}^{-1/2}$; then $Q\subset B_{(c/2)\,N_{\mathrm{hol}}^{-1/2}}(x)$ for every $x\in Q$.}
 For each $a$, pick any point $x_a\in (P+t_a)\cap Q$.
 Then there exist $\psi$-calibrated holomorphic complete intersections $Y^1,\dots,Y^N\subset X$ such that, on $Q$:
 \begin{enumerate}
-\item[\textnormal{(i)}] $Y^a$ is a $C^1$ graph over $P+t_a$ with slope \editai{$\le C_{\mathrm{graph}}\varepsilon$} (hence $\angle(T_yY^a,P)\le C\varepsilon$);
+\item[\textnormal{(i)}] $Y^a$ is a $C^1$ graph over $P+t_a$ with slope \editamir{$\le C_{\mathrm{graph}}\varepsilon$} (hence $\angle(T_yY^a,P)\le C\varepsilon$);
 \item[\textnormal{(ii)}] the pieces $Y^a\cap Q$ are pairwise disjoint;
 \item[\textnormal{(iii)}] $\Mass([Y^a]\llcorner Q)=(1+O(\varepsilon^2))\,\Mass([P+t_a]\llcorner Q)$.
 \end{enumerate}
@@ -6628,19 +6628,19 @@ Then there exist $\psi$-calibrated holomorphic complete intersections $Y^1,\dots
 
 \begin{proof}
 For each $a$, apply Lemma~\ref{lem:bergman-control} at $x_a$ with covectors $\lambda_i$ to obtain sections
-$s_{a,1},\dots,s_{a,p}\in H^0(X,L^{N_{\mathrm{hol}}})$ whose first-order jets at $x_a$ realize the covectors $\lambda_i$. \editai{This applies on $Q$ since $Q\subset B_{(c/2)\,N_{\mathrm{hol}}^{-1/2}}(x_a)\subset B_{c\,N_{\mathrm{hol}}^{-1/2}}(x_a)$ (because $x_a\in Q$ and we ensured $\mathrm{diam}(Q)\le (c/2)\,N_{\mathrm{hol}}^{-1/2}$).}
+$s_{a,1},\dots,s_{a,p}\in H^0(X,L^{N_{\mathrm{hol}}})$ whose first-order jets at $x_a$ realize the covectors $\lambda_i$. \editamir{This applies on $Q$ since $Q\subset B_{(c/2)\,N_{\mathrm{hol}}^{-1/2}}(x_a)\subset B_{c\,N_{\mathrm{hol}}^{-1/2}}(x_a)$ (because $x_a\in Q$ and we ensured $\mathrm{diam}(Q)\le (c/2)\,N_{\mathrm{hol}}^{-1/2}$).}
 Let $Y^a:=\{s_{a,1}=\cdots=s_{a,p}=0\}$.
-\editai{Let $C_{\mathrm{graph}}$ be the slope constant from Lemma~\ref{lem:graph-from-grad}.} Then Lemma~\ref{lem:graph-from-grad} gives (i) with slope $\le C_{\mathrm{graph}}\varepsilon$, and Lemma~\ref{lem:sliver-stability}(i) gives (iii) with the same slope parameter. \editai{Applying Lemma~\ref{lem:sliver-stability}(ii) with $\varepsilon$ replaced by $C_{\mathrm{graph}}\varepsilon$ and using the separation assumption $\|t_a-t_b\|\ge 10\,C_{\mathrm{graph}}\varepsilon\,D_Q$ yields (ii).}
+\editamir{Let $C_{\mathrm{graph}}$ be the slope constant from Lemma~\ref{lem:graph-from-grad}.} Then Lemma~\ref{lem:graph-from-grad} gives (i) with slope $\le C_{\mathrm{graph}}\varepsilon$, and Lemma~\ref{lem:sliver-stability}(i) gives (iii) with the same slope parameter. \editamir{Applying Lemma~\ref{lem:sliver-stability}(ii) with $\varepsilon$ replaced by $C_{\mathrm{graph}}\varepsilon$ and using the separation assumption $\|t_a-t_b\|\ge 10\,C_{\mathrm{graph}}\varepsilon\,D_Q$ yields (ii).}
 \end{proof}
 \end{editblock}
 
 \begin{editblock}
 \iffalse
 \begin{proposition}[{\color{blue}Corner--exit: $L^1$ interface mass control on boundary faces}]\label{prop:holomorphic-corner-exit-L1-old}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 Work in the setting of Proposition~\ref{prop:finite-template}, and fix a cube $Q=[0,h]^d$ (with a chosen vertex $v$) inside a holomorphic coordinate chart.
 Let $\{P_a\}_{a=1}^N$ be the associated finite family of affine $k$--planes from the corner--exit template construction, and write $E_a:=P_a\cap Q$.
-\editai{Suppose that} each $E_a$ is a $\Lambda$--fat corner--exit simplex in the sense of Proposition~\ref{prop:holomorphic-corner-exit-g1g2} (so it comes with designated exit faces
+\editamir{Suppose that} each $E_a$ is a $\Lambda$--fat corner--exit simplex in the sense of Proposition~\ref{prop:holomorphic-corner-exit-g1g2} (so it comes with designated exit faces
 $F_0^{(a)},\dots,F_k^{(a)}$ incident to $v$ and meets no other codimension--$1$ faces).  Set $v_{E_a}:=\mathcal H^k(E_a)$.
 
 Let $Y^{(a)}$ be the holomorphic complete intersections produced by Proposition~\ref{prop:finite-template} on $Q$ using anchor points $x_a\in E_a$, so that:
@@ -6670,11 +6670,11 @@ In particular, summing over $a$,
 \sum_{a=1}^N \Mass\bigl(\partial([Y^{(a)}]\llcorner Q)\bigr)
 \ \lesssim_{k,\Lambda,\varepsilon}\ \sum_{a=1}^N v_{E_a}^{(k-1)/k}.
 \]
-\end{editaiblock}
+\end{editamirblockNEW}
 \end{proposition}
 
 \begin{proof}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 Items \eqref{L1a}--\eqref{L1b} are exactly the output of Proposition~\ref{prop:finite-template} on the cube $Q$.
 (The $C^0$ bound in \eqref{L1a} follows because $x_a\in Y^{(a)}$ by Lemma~\ref{lem:bergman-control}(i), so in graph coordinates
 $\Phi_a(x)=x+u_a(x)$ with $u_a(x_a)=0$ and $\|Du_a\|_{C^0}\lesssim\varepsilon$, hence $\sup_{E_a}|u_a|\lesssim \varepsilon\,\mathrm{diam}(E_a)\lesssim \varepsilon h$.)
@@ -6691,17 +6691,17 @@ By \eqref{G1iff}, only the designated faces $F_i^{(a)}$ contribute; therefore
 \le \sum_{i=0}^k \Mass\bigl(\partial([Y^{(a)}]\llcorner Q)\llcorner F_i^{(a)}\bigr)
 \lesssim_{k,\Lambda,\varepsilon} v_{E_a}^{(k-1)/k},
 \]
-and summing over $a$ gives the stated $L^1$ bound.\end{editaiblock}
+and summing over $a$ gives the stated $L^1$ bound.\end{editamirblockNEW}
 \end{proof}
 \fi
 
 \begin{proposition}[{\color{blue}Corner--exit: $L^1$ interface mass control on boundary faces}]\label{prop:holomorphic-corner-exit-L1}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 Work in a holomorphic coordinate chart identifying a neighborhood of a cell $Q=[0,h]^d\subset\R^d$, with a chosen vertex $v$.
 Fix $1\le k<d$ and let $\{P_a\}_{a=1}^N$ be a finite family of affine $k$--planes.
 Set $E_a:=P_a\cap Q$ and $v_{E_a}:=\mathcal H^k(E_a)$.
 
-\editai{Suppose that} each $E_a$ is a $\Lambda$--fat corner--exit simplex footprint in the sense of
+\editamir{Suppose that} each $E_a$ is a $\Lambda$--fat corner--exit simplex footprint in the sense of
 Proposition~\ref{prop:holomorphic-corner-exit-g1g2}, with designated exit faces
 $F_0^{(a)},\dots,F_k^{(a)}$ incident to $v$.
 
@@ -6731,11 +6731,11 @@ In particular,
 \sum_{a=1}^N \Mass\bigl(\partial([Y^{(a)}]\llcorner Q)\bigr)
 \ \lesssim_{k,\Lambda,\varepsilon}\ \sum_{a=1}^N v_{E_a}^{(k-1)/k}.
 \]
-\end{editaiblock}
+\end{editamirblockNEW}
 \end{proposition}
 
 \begin{proof}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 The geometric graph and disjointness conclusions (existence of $\Phi_a$ and the bound $\sup_{E_a}|\Phi_a-\mathrm{Id}|\lesssim \varepsilon h$)
 are the output of Proposition~\ref{prop:finite-template}.
 Since the family $\{E_a\}_{a=1}^N$ is finite, the uniform gap $\delta_\star$ is positive, and for $\varepsilon$ small the displacement bound
@@ -6757,7 +6757,7 @@ and $\partial Q$ is the disjoint union of its codimension--$1$ faces.  Using \eq
 \ \lesssim_{k,\Lambda,\varepsilon}\ v_{E_a}^{(k-1)/k},
 \]
 hence the stated bound for $\Mass(\partial([Y^{(a)}]\llcorner Q))$, and summing over $a$ yields the final estimate.
-\end{editaiblock}
+\end{editamirblockNEW}
 \end{proof}
 
 
@@ -6768,7 +6768,7 @@ so that across any shared face the mismatch reduces to a pure prefix-count diffe
 \smallskip\noindent
 This is achieved by choosing the anchor points $x_a$ in Proposition~\ref{prop:finite-template} (hence the Bergman balls on which the $C^1$ control holds)
 to be \emph{vertex-centered}: take $x_a\in (P+t_a)\cap B(v,c_0h)$ (for instance $x_a=v+t_a$ in a coordinate model).
-If the mesh satisfies $h\lesssim \editai{N_{\mathrm{hol}}^{-1/2}}$ with a small enough constant, then the Bergman ball $B_{c\,\editai{N_{\mathrm{hol}}^{-1/2}}}(x_a)$ contains the entire
+If the mesh satisfies $h\lesssim \editamir{N_{\mathrm{hol}}^{-1/2}}$ with a small enough constant, then the Bergman ball $B_{c\,\editamir{N_{\mathrm{hol}}^{-1/2}}}(x_a)$ contains the entire
 vertex star $\mathrm{Star}(v)$ (the union of the finitely many cubes meeting at $v$), so the resulting holomorphic complete intersection $Y^a$
 is a single-sheet graph over the same affine translate $P+t_a$ \emph{on every cube in $\mathrm{Star}(v)$ simultaneously}.
 Thus the vertex template is realized by a single global holomorphic object $Y^a$, and restricting to each cube produces coherent
@@ -6810,8 +6810,8 @@ which yields the stated form.
 \end{proof}
 
 \begin{remark}[Interpretation of the “many pieces” hypothesis in fixed-$m$ regimes]
-\editai{The relative slow-variation form $|N_Q-N_{Q'}|\le C\,h\,N_Q$ is automatic once $N_Q\gtrsim h^{-1}$, i.e.\ once the additive rounding error is negligible compared to the local count.}
-\editai{In the sliver/corner-exit regime at fixed cohomology multiplier $m$, this lower bound is achieved by shrinking the per-piece mass scale $A\asymp s^{k}$ (with $s\ll h$), so that $N_Q\sim M_Q/A$ is large even though the total budget $M_Q\asymp m\,h^{2n}$ is $O(m)$.}
+\editamir{The relative slow-variation form $|N_Q-N_{Q'}|\le C\,h\,N_Q$ is automatic once $N_Q\gtrsim h^{-1}$, i.e.\ once the additive rounding error is negligible compared to the local count.}
+\editamir{In the sliver/corner-exit regime at fixed cohomology multiplier $m$, this lower bound is achieved by shrinking the per-piece mass scale $A\asymp s^{k}$ (with $s\ll h$), so that $N_Q\sim M_Q/A$ is large even though the total budget $M_Q\asymp m\,h^{2n}$ is $O(m)$.}
 \end{remark}
 \begin{editblock}
 \begin{lemma}[Slow variation persists under $0$--$1$ discrepancy rounding]\label{lem:slow-variation-discrepancy}
@@ -6857,7 +6857,7 @@ T^{\mathrm{raw}}(d\eta)\approx \int_X (m\beta)\wedge d\eta,
 \]
 with an error controlled by $(\delta+\varepsilon+\mathrm{mesh})\cdot m$ (for fixed cohomology multiplier $m$).
 Since $\beta$ is closed and $X$ has no boundary, $\int_X (m\beta)\wedge d\eta=\pm\int_X d(m\beta\wedge \eta)=0$.
-\begin{editaiblock}
+\begin{editamirblock}
 \begin{lemma}[Flat-norm control of the gluing mismatch]\label{lem:flatnorm-gluing-mismatch}
 In Substep~4.2, for the raw current $T^{\mathrm{raw}}$ built from the cube-local sheets, one has
 \[
@@ -6889,10 +6889,10 @@ All subsequent uses of this estimate (Proposition~\ref{prop:glue-gap} and Propos
 require only flat-norm calculus and standard filling/isoperimetric inequalities.
 \editai{(AI note: when auditing Proposition~\ref{prop:transport-flat-glue}, the key places to re-derive are the Lipschitz bound for $f_\eta$ via the homotopy formula (including the boundary-slice term), the precise Kantorovich--Rubinstein duality hypotheses on the face parameter domain, and the summability of the small-angle/model-error term under the global parameter schedule.)}
 \end{remark}
-\end{editaiblock}
+\end{editamirblock}
 
-\begin{editaiblock}
-\begin{editaiblock}
+\begin{editamirblock}
+\begin{editamirblockNEW}
 \begin{lemma}[Federer--Fleming filling on $X$ for bounding cycles]\label{lem:FF-filling-X}
 Let $X$ be a fixed compact smooth Riemannian manifold and fix an integer $k\ge 2$.
 There exists a constant $C_X>0$ (depending only on $(X,k)$) with the following property:
@@ -6931,11 +6931,11 @@ Moreover,
 since $\iota$ is an isometric embedding and hence $\Mass(\iota_\# R)=\Mass(R)$.
 Absorb the constants into $C_X$.
 \end{proof}
-\end{editaiblock}
+\end{editamirblockNEW}
 
 
 
-\begin{editaiblock}
+\begin{editamirblockNEW}
 
 \begin{proposition}[Microstructure/gluing estimate]\label{prop:glue-gap}
 Let $T^{\mathrm{raw}}\in \mathcal I_k(X)$ be the (generally non-closed) integral $k$--current built from the microstructure pieces on a mesh of size $h$.
@@ -6974,9 +6974,9 @@ Then $\partial R_{\mathrm{glue}}=-(\partial Q+\partial Q_0)=-(R-R_0+R_0)=-R$, an
 \]
 Letting $\eta\downarrow 0$ yields the claimed bound.
 \end{proof}
-\end{editaiblock}
+\end{editamirblockNEW}
 
-\begin{editaiblock}
+\begin{editamirblockNEW}
 \begin{remark}[Choosing the glue scale to make the correction negligible]\label{rem:glue-scaling}
 Let $k=2n-2p$ and set $\delta:=\mathcal F(\partial T^{\mathrm{raw}})$.
 Proposition~\ref{prop:glue-gap} yields
@@ -6987,9 +6987,9 @@ Hence $\Mass(R_{\mathrm{glue}})=o(m)$ whenever $\delta=o\!\left(m^{\frac{k-1}{k}
 In the regime where Lemma~\ref{lem:flatnorm-gluing-mismatch} gives $\delta\le \varepsilon_{\mathrm{glue}}(m,\delta,\varepsilon,\mathrm{mesh})\cdot m$,
 it is enough to choose parameters so that $\varepsilon_{\mathrm{glue}}(m,\delta,\varepsilon,\mathrm{mesh})=o\!\left(m^{-1/k}\right)$.
 \end{remark}
-\end{editaiblock}
+\end{editamirblockNEW}
 
-\end{editaiblock}
+\end{editamirblock}
 
 
 
@@ -7125,7 +7125,7 @@ with $\eta_Q\to 0$ as $\varepsilon,\delta\to 0$.  Summing over all cubes yields
 \]
 
 \begin{editjonblock}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 \begin{lemma}[Integral periods of integral cycles]\label{lem:integral-periods}
 Let $X$ be a compact manifold and let $T$ be a closed integral $k$--cycle (equivalently, an integral $k$--current with $\partial T=0$).
 Let $\eta$ be a smooth closed $k$--form whose de~Rham cohomology class lies in the image of
@@ -7143,9 +7143,9 @@ so $\langle [\eta],[T]\rangle\in\Z$.
 Under the de~Rham isomorphism, this pairing is represented by integration of a smooth closed form representative, hence
 $\langle [\eta],[T]\rangle=\int_{T}\eta$.
 \end{proof}
-\end{editaiblock}
+\end{editamirblockNEW}
 
-\begin{editaiblock}
+\begin{editamirblockNEW}
 \begin{lemma}[Lattice discreteness]\label{lem:lattice-discreteness}
 Let $z\in\Z$ and $r\in\R$ satisfy $|z-r|<\tfrac12$.  Then $z$ is the unique integer within distance $\tfrac12$ of $r$.
 In particular, if $c\in\Z$ and $|z-c|<\tfrac12$, then $z=c$.
@@ -7155,7 +7155,7 @@ Consequently, if $\int_T\eta\in\Z$ and $c\in\Z$ satisfy $|\int_T\eta-c|<\tfrac12
 \begin{proof}
 If $z\neq c$ are integers then $|z-c|\ge 1$.  Thus no real number can lie within distance $\tfrac12$ of two distinct integers.
 \end{proof}
-\end{editaiblock}
+\end{editamirblockNEW}
 \end{editjonblock}
 
 \begin{proposition}[Integral cohomology constraints]\label{prop:cohomology-match}
@@ -7173,7 +7173,7 @@ Then $T_\epsilon:=S-U_\epsilon$ is a closed integral cycle and
 \[
 \int_{T_\epsilon}\Theta_\ell\ =\ m\,I_\ell\qquad\text{for all }\ell=1,\dots,b.
 \]
-\editai{(Here $S_Q:=\sum_{j=1}^{N_{\mathrm{Car}}}\sum_{a=1}^{N_{Q,j}}[Y_{Q,j}^a]\llcorner Q$ is the local integral current built from the sheet pieces, and $S_Q(\Theta_\ell):=\int_{S_Q}\Theta_\ell=\sum_{j,a}\int_{Y_{Q,j}^a\cap Q}\Theta_\ell$.)}
+\editamir{(Here $S_Q:=\sum_{j=1}^{N_{\mathrm{Car}}}\sum_{a=1}^{N_{Q,j}}[Y_{Q,j}^a]\llcorner Q$ is the local integral current built from the sheet pieces, and $S_Q(\Theta_\ell):=\int_{S_Q}\Theta_\ell=\sum_{j,a}\int_{Y_{Q,j}^a\cap Q}\Theta_\ell$.)}
 
 In particular, $[T_\epsilon]=\mathrm{PD}(m[\gamma])$ in $H_{2(n-p)}(X,\Z)/\mathrm{tors}$ (equivalently in $H_{2(n-p)}(X,\Q)$).
 \end{proposition}
@@ -7185,7 +7185,7 @@ We make the fixed-dimension rounding in Substep~4.3 explicit.
 
 \smallskip\noindent
 \textbf{Step 1: Real targets and base--marginal decomposition.}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 Fix a fine cube decomposition $\{Q\}$ (mesh $h$) and the associated families of sheet pieces
 $\{Y_{Q,j}^a\}_{a\ge 1}$ produced in the preceding prefix--template construction.
 For each pair $(Q,j)$ let $n_{Q,j}\in\R_{\ge 0}$ denote the \emph{real} target sheet count coming from the local bookkeeping.
@@ -7213,11 +7213,11 @@ S^{\mathrm{frac}}:=S^{0}+\sum_{Q,j}a_{Q,j}\,Z_{Q,j}.
 \]
 Thus the rounding problem is to choose $\varepsilon_{Q,j}\in\{0,1\}$ so that the period error
 $\int_{S(\varepsilon)}\Theta_\ell-\int_{S^{\mathrm{frac}}}\Theta_\ell$ is uniformly small for all $\ell$.
-\end{editaiblock}
+\end{editamirblockNEW}
 
 \smallskip\noindent
 \textbf{Step 2: Set up the rounding vectors.}
-\begin{editaiblock}
+\begin{editamirblockNEW}
 For each $(Q,j)$ define the \emph{marginal contribution vector}
 \[
 v_{Q,j}:=\Bigl(\int_{Z_{Q,j}}\Theta_1,\ \dots,\ \int_{Z_{Q,j}}\Theta_b\Bigr)\in\R^b.
@@ -7233,7 +7233,7 @@ Choosing the mesh $h$ small (depending on $\max_\ell\|\Theta_\ell\|_{C^0}$ and $
 \[
 \|v_{Q,j}\|_{\ell^\infty}\le \frac{1}{8b}\qquad\text{for all }(Q,j).
 \]
-\end{editaiblock}
+\end{editamirblockNEW}
 
 \smallskip\noindent
 \textbf{Step 3: Apply B\'ar\'any--Grinberg.}
@@ -7247,7 +7247,7 @@ Undoing the normalization gives
 \[
 \Bigl\|\sum_{Q,j}(\varepsilon_{Q,j}-a_{Q,j})\,v_{Q,j}\Bigr\|_{\ell^\infty}\le \frac18.
 \]
-\begin{editaiblock}
+\begin{editamirblockNEW}
 Equivalently, for each $\ell=1,\dots,b$,
 \[
 \Bigl|\int_{S(\varepsilon)}\Theta_\ell-\int_{S^{\mathrm{frac}}}\Theta_\ell\Bigr|
@@ -7268,10 +7268,10 @@ Combining the two inequalities yields
 \qquad (\ell=1,\dots,b).
 \]
 Set $S:=S(\varepsilon)=\sum_Q S_Q$.
-\end{editaiblock}
+\end{editamirblockNEW}
 
 \smallskip\noindent
-\begin{editaiblock}
+\begin{editamirblockNEW}
 \textbf{Step 4: Lock the periods via a small boundary correction.}
 Choose an integral $(2n-2p)$--current $U_\epsilon$ with $\partial U_\epsilon=\partial S$ and
 \[
@@ -7291,7 +7291,7 @@ For each $\ell$ we have
 so the previous estimate implies $\bigl|\int_{T_\epsilon}\Theta_\ell-mI_\ell\bigr|<\frac12$.
 By Lemma~\ref{lem:lattice-discreteness} it follows that $\int_{T_\epsilon}\Theta_\ell=mI_\ell$ for all $\ell$.
 This identifies the Poincar\'e dual class of $T_\epsilon$ with $m\gamma$ (modulo torsion), as claimed.
-\end{editaiblock}
+\end{editamirblockNEW}
 \end{proof}
 
 
@@ -7303,7 +7303,7 @@ has a boundary supported on the inter-cube faces.
 By the microstructure/gluing estimate established in Proposition~\ref{prop:glue-gap}
 (i.e.\ a quantitative bound forcing $\mathcal F(\partial S)\to 0$ as the local errors $\delta,\varepsilon\to 0$ and the mesh size $\to 0$).
 
-\begin{editaiblock}
+\begin{editamirblockNEW}
 Write $k:=2n-2p$ and $\delta:=\mathcal F(\partial S)$.
 By Definition~\ref{def:flat-norm}, for any $\eta>0$ there exist \emph{integral} currents
 $R$ (a $(k-1)$--current) and $Q$ (a $k$--current) in $X$ such that
@@ -7312,7 +7312,7 @@ $R$ (a $(k-1)$--current) and $Q$ (a $k$--current) in $X$ such that
 \qquad
 \Mass(R)+\Mass(Q)\ \le\ \delta+\eta.
 \]
-\editai{Taking boundaries gives $\partial R=\partial^2S-\partial^2Q=0$, so $R$ is an integral cycle.  Moreover $R=\partial(S-Q)$, hence $R$ bounds in $X$ by an \emph{integral} $k$--current.}
+\editamir{Taking boundaries gives $\partial R=\partial^2S-\partial^2Q=0$, so $R$ is an integral cycle.  Moreover $R=\partial(S-Q)$, hence $R$ bounds in $X$ by an \emph{integral} $k$--current.}
 Applying Lemma~\ref{lem:FF-filling-X} yields an integral $k$--current $Q_R$ with $\partial Q_R=R$ and
 \[
 \Mass(Q_R)\ \le\ C_X\,\Mass(R)^{\frac{k}{k-1}}.
@@ -7333,19 +7333,19 @@ Lemma~\ref{lem:borderline-p-half}), the bound
 \Mass(U_\epsilon)\ <\ \min\Bigl\{\epsilon,\ \frac{1}{4\,\max_\ell\|\Theta_\ell\|_{C^0}}\Bigr\}
 \]
 required in Proposition~\ref{prop:cohomology-match} holds.
-\end{editaiblock}
+\end{editamirblockNEW}
 
-\begin{editaiblock}
+\begin{editamirblockNEW}
 \[
 \Mass(T_\epsilon)
 \le \Mass(S) + \Mass(U_\epsilon)
 \to m\int_X \beta\wedge \psi,
 \]
-\end{editaiblock}
+\end{editamirblockNEW}
 since $\Mass(U_\epsilon)\to 0$.
 
 
-\begin{editaiblock}
+\begin{editamirblock}
 \noindent\textbf{Referee bridge (Step 21 $\rightarrow$ Step 22 $\rightarrow$ Proposition~\ref{prop:almost-calibration}).}
 Let $T^{\mathrm{raw}}=T^{\mathrm{raw}}_h$ be the raw mesh current.
 By Proposition~\ref{prop:glue-gap} there is a correction $R_{\mathrm{glue}}=R_{\mathrm{glue}}(h)$ with
@@ -7353,7 +7353,7 @@ $\partial R_{\mathrm{glue}}=-\partial T^{\mathrm{raw}}$ and $\Mass(R_{\mathrm{gl
 Set $U_h:=-R_{\mathrm{glue}}$ and $T_h:=T^{\mathrm{raw}}-U_h=T^{\mathrm{raw}}+R_{\mathrm{glue}}$; then $\partial T_h=0$ and $\Mass(U_h)\to 0$.
 Moreover Proposition~\ref{prop:cohomology-match} gives the required period equalities, hence $[T_h]=\mathrm{PD}(m[\gamma])$
 (mod torsion), so the hypotheses of Proposition~\ref{prop:almost-calibration} are met with $\epsilon=h$.
-\end{editaiblock}
+\end{editamirblock}
 
 \begin{editaiblock}
 \begin{proposition}[Almost--calibration and global mass convergence for the glued cycles]\label{prop:almost-calibration}
@@ -7433,7 +7433,7 @@ Finally \textnormal{(iii)} follows from $\Mass(T_\epsilon)=\int_{T_\epsilon}\psi
 
 \begin{remark}[The correction current need not be positive]\label{rem:correction-not-positive}
 The filling currents $U_\epsilon$ (or $R_{\mathrm{glue}}$ in Substep~4.2) are produced by the flat-norm decomposition and the
-Federer--Fleming isoperimetric inequality.  They are \editai{not required} to be $\psi$--calibrated, nor to have any positivity/type property.
+Federer--Fleming isoperimetric inequality.  They are \editamir{not required} to be $\psi$--calibrated, nor to have any positivity/type property.
 This causes no difficulty: the only input used later is the vanishing-mass estimate $\Mass(U_\epsilon)\to 0$.
 \editai{By Proposition~\ref{prop:almost-calibration}\textnormal{(ii)}, this forces the calibration defect of $T_\epsilon=S_\epsilon-U_\epsilon$ to vanish, so any subsequential}
 limit is $\psi$--calibrated (hence positive of type $(p,p)$ in the Harvey--Lawson sense).
@@ -7458,7 +7458,7 @@ the sequence $T_\varepsilon$ has:
 \begin{enumerate}
 \item[\textnormal{(i)}] $\Mass(T_\varepsilon)\to m\int_X\beta\wedge\psi$;
 \item[\textnormal{(ii)}] A subsequential limit $T$ that is $\psi$-calibrated
-and represents $\mathrm{PD}(m[\gamma])$\editai{ in $H_{2n-2p}(X;\R)$ (equivalently in $H_{2n-2p}(X;\Z)/\mathrm{Tor}$).}
+and represents $\mathrm{PD}(m[\gamma])$\editamir{ in $H_{2n-2p}(X;\R)$ (equivalently in $H_{2n-2p}(X;\Z)/\mathrm{Tor}$).}
 \end{enumerate}
 In particular, $\beta$ is SYR-realizable in the sense of Definition~\ref{def:syr}.
 \end{theorem}
@@ -7468,16 +7468,16 @@ The proof proceeds in four substeps.
 
 \medskip\noindent
 \textbf{Substep 6.1: Uniform mass bound and homology class.}
-\editai{Set $T_k:=T_{1/k}$ and write $U_{1/k}$ for the gluing correction from Proposition~\ref{prop:glue-gap}.  By Proposition~\ref{prop:almost-calibration} we have}
-\begin{editaiblock}
+\editamir{Set $T_k:=T_{1/k}$ and write $U_{1/k}$ for the gluing correction from Proposition~\ref{prop:glue-gap}.  By Proposition~\ref{prop:almost-calibration} we have}
+\begin{editamirblock}
 \[
 \Mass(T_k)\le \int_{T_k}\psi + 2\,\Mass(U_{1/k})
 = \langle[T_k],[\psi]\rangle + 2\,\Mass(U_{1/k})
 = m\int_X\beta\wedge\psi + 2\,\Mass(U_{1/k}),
 \]
-\end{editaiblock}
-\editai{and $\Mass(U_{1/k})\to 0$ as $k\to\infty$.}
-\editai{By construction, $T_k$ is obtained from the raw current $T^{\mathrm{raw}}_{1/k}$ by the gluing correction from Proposition~\ref{prop:glue-gap}:
+\end{editamirblock}
+\editamir{and $\Mass(U_{1/k})\to 0$ as $k\to\infty$.}
+\editamir{By construction, $T_k$ is obtained from the raw current $T^{\mathrm{raw}}_{1/k}$ by the gluing correction from Proposition~\ref{prop:glue-gap}:
 write $R_{\mathrm{glue}}=R_{\mathrm{glue}}(1/k)$ and set $U_{1/k}:=-R_{\mathrm{glue}}$, so $T_k=T^{\mathrm{raw}}_{1/k}-U_{1/k}=T^{\mathrm{raw}}_{1/k}+R_{\mathrm{glue}}$ and $\partial T_k=0$.
 Proposition~\ref{prop:cohomology-match} gives the period equalities against the chosen integral basis $\{\Theta_\ell\}$, hence $[T_k]=\mathrm{PD}(m[\gamma])$ (mod torsion).}
 (Equivalently, Proposition~\ref{prop:almost-calibration} isolates this global mass control in the sharper ``almost--calibration'' form
@@ -7505,7 +7505,7 @@ By Federer--Fleming compactness for integral currents on the compact manifold $X
 
 \begin{itemize}
 \item $T_k\to T$ as integral currents in the flat norm;
-\item \editai{By Lemma~\ref{lem:flat_limit_of_cycles_is_cycle}, since $T_k\to T$ in the flat norm (hence weakly) and $\partial T_k=0$, we have $\partial T=0$; thus $T$ is an integral $(2n-2p)$-cycle;}
+\item \editamir{By Lemma~\ref{lem:flat_limit_of_cycles_is_cycle}, since $T_k\to T$ in the flat norm (hence weakly) and $\partial T_k=0$, we have $\partial T=0$; thus $T$ is an integral $(2n-2p)$-cycle;}
 \item \editamir{(Homology identification.) For every smooth closed $(2n-2p)$--form $\eta$ on $X$,
 \[
 \langle T,\eta\rangle=\lim_{k\to\infty}\langle T_k,\eta\rangle
@@ -7520,7 +7520,7 @@ Lower semicontinuity gives
 
 \medskip\noindent
 \textbf{Substep 6.3 (optional): tangent-plane viewpoint (not used below).}
-\editai{One can interpret $\Def_{\mathrm{cal}}(T_k)$ as measuring, in an averaged sense, how far the approximate tangent planes of $T_k$ are from the calibrated Grassmannian determined by $\psi$.  This can be formalized using standard tangent-measure/varifold language, but it is not used in the argument below.}
+\editamir{One can interpret $\Def_{\mathrm{cal}}(T_k)$ as measuring, in an averaged sense, how far the approximate tangent planes of $T_k$ are from the calibrated Grassmannian determined by $\psi$.  This can be formalized using standard tangent-measure/varifold language, but it is not used in the argument below.}
 \iffalse
 For each $k$, the tangent planes of $T_k$ around $x$ induce a probability
 measure $\nu_x^{(k)}$ on $\Gr_{n-p}(T_xX)$, where $\mu_k$ denotes the mass measure of $T_k$.
@@ -7564,8 +7564,8 @@ By weak convergence $T_k\rightharpoonup T$ and closedness of $\psi$, we have
 \[
 \langle T,\psi\rangle=\lim_{k\to\infty}\langle T_k,\psi\rangle=m\int_X\beta\wedge\psi.
 \]
-\editai{By Proposition~\ref{prop:almost-calibration}, the calibration defect satisfies $\Def_{\mathrm{cal}}(T_k)=\Mass(T_k)-\int_{T_k}\psi\le 2\,\Mass(U_{1/k})\to 0$, hence $\Mass(T_k)\to m\int_X\beta\wedge\psi$.}
-Combining with \eqref{eq:mass-lsc} and the calibration inequality $\langle T,\psi\rangle\le \Mass(T)$ yields $\Mass(T)=\langle T,\psi\rangle$, so $T$ is $\psi$-calibrated.\editai{ (This is exactly Lemma~\ref{lem:limit_is_calibrated} in this setting.)}
+\editamir{By Proposition~\ref{prop:almost-calibration}, the calibration defect satisfies $\Def_{\mathrm{cal}}(T_k)=\Mass(T_k)-\int_{T_k}\psi\le 2\,\Mass(U_{1/k})\to 0$, hence $\Mass(T_k)\to m\int_X\beta\wedge\psi$.}
+Combining with \eqref{eq:mass-lsc} and the calibration inequality $\langle T,\psi\rangle\le \Mass(T)$ yields $\Mass(T)=\langle T,\psi\rangle$, so $T$ is $\psi$-calibrated.\editamir{ (This is exactly Lemma~\ref{lem:limit_is_calibrated} in this setting.)}
 In particular, $\Mass(T)=m\int_X\beta\wedge\psi$ and $[T]=\mathrm{PD}(m[\gamma])$.
 
 \textbf{Conclusion:} We have established:
@@ -7578,7 +7578,7 @@ with $[T]=\mathrm{PD}(m[\gamma])$.
 Thus $\beta$ is SYR-realizable in the sense of Definition~\ref{def:syr}.
 \end{proof}
 
-\begin{editaiblock}
+\begin{editamirblock}
 \begin{corollary}[SYR limit is a holomorphic (hence algebraic) cycle]\label{cor:syr-limit-holomorphic-chain}
 Under the hypotheses of Theorem~\ref{thm:syr-realization}, any subsequential flat limit $T$ is a $\psi$--calibrated integral $(2n-2p)$--cycle representing $\mathrm{PD}(m[\gamma])$ in real homology. In particular, $T$ is a positive holomorphic $(n-p)$--cycle (a holomorphic chain).
 If $X$ is projective, then by Chow/GAGA this holomorphic cycle is algebraic, so $\gamma$ is represented by an algebraic cycle with rational coefficients.
@@ -7588,7 +7588,7 @@ If $X$ is projective, then by Chow/GAGA this holomorphic cycle is algebraic, so 
 Everything up to ``$\psi$--calibrated integral cycle'' is proved in Theorem~\ref{thm:syr-realization}.  To pass from $\psi$--calibrated to holomorphic,
 apply Theorem~\ref{thm:realization-from-almost} (which invokes King~\cite[Thm.~5.2.1]{King71}, with supporting calibrated-geometry background in Harvey--Lawson~\cite{HL82}).  The projective algebraicity statement is Chow/GAGA (e.g.\ Serre~\cite{Serre56}).
 \end{proof}
-\end{editaiblock}
+\end{editamirblock}
 
 % ------------------------------------------------------------
 \subsection*{Addressing potential objections to the SYR construction}
@@ -7722,13 +7722,13 @@ dimension $n$, and let $1\le p\le \frac{n}{2}$.
 Let $\beta$ be a smooth closed cone--valued $(p,p)$--form representing a rational Hodge class $[\gamma]\in H^{p,p}(X;\Q)$.
 Then $\beta$ is SYR--realizable in the sense of Definition~\ref{def:syr}; equivalently,
 there exist integral $(2n-2p)$--cycles $T_k$ with $\partial T_k=0$ and
-\editai{$[T_k]=\mathrm{PD}(m[\gamma])$ in $H_{2n-2p}(X;\Z)/\mathrm{Tor}$ (equivalently in $H_{2n-2p}(X;\Q)$)} for some fixed $m\in\N$ independent of $k$, such that
+\editamir{$[T_k]=\mathrm{PD}(m[\gamma])$ in $H_{2n-2p}(X;\Z)/\mathrm{Tor}$ (equivalently in $H_{2n-2p}(X;\Q)$)} for some fixed $m\in\N$ independent of $k$, such that
 \[
 \Def_{\mathrm{cal}}(T_k)=\Mass(T_k)-\langle T_k,\psi\rangle\ \longrightarrow\ 0.
 \]
 Consequently, $[\gamma]$ is algebraic.
 \end{theorem}
-\begin{editaiblock}
+\begin{editamirblock}
 \begin{proof}
 Fix a mesh parameter $\epsilon>0$.
 The construction in Proposition~\ref{prop:global-coherence-all-labels} (built from Theorem~\ref{thm:local-sheets} and Proposition~\ref{prop:finite-template}) produces a ``raw'' integral current $S_\epsilon$
@@ -7751,7 +7751,7 @@ T_\epsilon:=S_\epsilon-U_\epsilon.
 The cohomological bookkeeping (Theorem~\ref{thm:global-cohom}, together with Proposition~\ref{prop:cohomology-match})
 implies that for some fixed $m\in\N$ independent of $\epsilon$,
 \(
-\editai{[T_\epsilon]=\mathrm{PD}(m[\gamma])\in H_{2n-2p}(X;\Z)/\mathrm{Tor}\quad\text{(equivalently in }H_{2n-2p}(X;\Q)\text{)}.}
+\editamir{[T_\epsilon]=\mathrm{PD}(m[\gamma])\in H_{2n-2p}(X;\Z)/\mathrm{Tor}\quad\text{(equivalently in }H_{2n-2p}(X;\Q)\text{)}.}
 \)
 Finally, Proposition~\ref{prop:almost-calibration} yields the quantitative almost--calibration estimate
 \[
@@ -7762,7 +7762,7 @@ Definition~\ref{def:syr}.
 Applying Theorem~\ref{thm:syr} concludes that $[\gamma]$ is represented by a holomorphic chain and, since $X$ is projective (Remark~\ref{rem:chow-gaga}),
 is algebraic.
 \end{proof}
-\end{editaiblock}
+\end{editamirblock}
 
 
 
@@ -7795,7 +7795,7 @@ B\bigl(\omega^p(x),\,r_0\bigr)\ \subset\ K_p(x),
 where $B(\cdot,r_0)$ denotes the ball in $\Lambda^{p,p}T_x^*X$ for the pointwise metric induced by $\omega$.
 \end{lemma}
 
-\begin{editaiblock}
+\begin{editamirblock}
 \begin{proof}
 Fix $x\in X$ and choose a unitary frame for $(T^{1,0}_xX,\omega_x)$.
 In these coordinates, $\omega_x=\frac{i}{2}\sum_{j=1}^n dz^j\wedge d\bar z^j$, hence
@@ -7815,7 +7815,7 @@ r_0:=\min_{x\in X} r(x)>0,
 and then $B(\omega^p(x),r_0)\subset K_p(x)$ for all $x$.  For background on positivity cones see Harvey--Lawson~\cite{HL82}
 or Demailly~\cite{Demailly12}.
 \end{proof}
-\end{editaiblock}
+\end{editamirblock}
 
 \begin{lemma}[Signed Decomposition]\label{lem:signed-decomp}
 Let $\gamma \in H^{2p}(X,\Q) \cap H^{p,p}(X)$ be any rational Hodge class.
@@ -7829,7 +7829,7 @@ and $\gamma^-$ can be taken to be a positive rational multiple of $[\omega^p]$.
 
 \begin{proof}
 Let $\alpha$ be any smooth closed $(p,p)$--form representing $\gamma$.
-\begin{editaiblock}
+\begin{editamirblock}
 Let $r_0>0$ be the uniform interior radius from Lemma~\ref{lem:kahler-positive}.
 Set
 \[
@@ -7842,7 +7842,7 @@ Then for every $x\in X$ we have $\|\alpha(x)/N\|<r_0$, hence
 \omega^p(x) + \frac{1}{N}\alpha(x)\ \in\ B\bigl(\omega^p(x),r_0\bigr)\ \subset\ K_p(x).
 \]
 Since $K_p(x)$ is a cone, multiplying by $N$ yields $\alpha(x)+N\,\omega^p(x)\in K_p(x)$ for all $x$.
-\end{editaiblock}
+\end{editamirblock}
 
 Define $\gamma^+ := \gamma + N \cdot [\omega^p]$ and
 $\gamma^- := N \cdot [\omega^p]$.
@@ -7854,7 +7854,7 @@ and both are rational Hodge classes since $[\omega^p] = c_1(L)^p$ is
 rational for the ample bundle $L$.
 \end{proof}
 
-\begin{editaiblock}
+\begin{editamirblock}
 \begin{lemma}[$\omega^p$ is algebraic]\label{lem:gamma-minus-alg}
 Let $X$ be a smooth complex projective manifold and fix an ample line bundle $L\to X$
 as in the global assumptions, so that $[\omega]=c_1(L)$.
@@ -7883,7 +7883,7 @@ In cohomology,
 \]
 as claimed.
 \end{proof}
-\end{editaiblock}
+\end{editamirblock}
 
 \begin{theorem}[Cone--positive classes are algebraic]\label{thm:effective-algebraic}
 Let $\gamma^+ \in H^{2p}(X,\Q) \cap H^{p,p}(X)$ be a cone--positive rational
@@ -7893,15 +7893,15 @@ is algebraic.
 \end{theorem}
 
 \begin{proof}
-\begin{editaiblock}
+\begin{editamirblock}
 Let $\beta$ be a smooth closed cone--valued $(p,p)$--form representing the class $\gamma^+$ (this is the meaning of cone--positivity in the manuscript).
 By Theorem~\ref{thm:automatic-syr}, $\beta$ is SYR--realizable in the sense of Definition~\ref{def:syr}; in particular there exists $m\in\N$ and integral cycles $T_k$ with
-\editai{$[T_k]=\mathrm{PD}(m[\gamma^+])$ in $H_{2n-2p}(X;\Z)/\mathrm{Tor}$ (equivalently in $H_{2n-2p}(X;\Q)$)} and $\Def_{\mathrm{cal}}(T_k)\to 0$.
+\editamir{$[T_k]=\mathrm{PD}(m[\gamma^+])$ in $H_{2n-2p}(X;\Z)/\mathrm{Tor}$ (equivalently in $H_{2n-2p}(X;\Q)$)} and $\Def_{\mathrm{cal}}(T_k)\to 0$.
 Applying Theorem~\ref{thm:syr} to this SYR data produces a $\psi$--calibrated integral cycle
 \(T=\sum_j m_j[V_j]\)
-with \editai{$[T]=\mathrm{PD}(m[\gamma^+])$ in $H_{2n-2p}(X;\Z)/\mathrm{Tor}$ (equivalently in $H_{2n-2p}(X;\Q)$)}, hence an analytic cycle representative of $m[\gamma^+]$.
+with \editamir{$[T]=\mathrm{PD}(m[\gamma^+])$ in $H_{2n-2p}(X;\Z)/\mathrm{Tor}$ (equivalently in $H_{2n-2p}(X;\Q)$)}, hence an analytic cycle representative of $m[\gamma^+]$.
 Since $X$ is projective, each $V_j$ is algebraic by Remark~\ref{rem:chow-gaga}, so $m[\gamma^+]$ is algebraic and therefore $\gamma^+$ is algebraic.
-\end{editaiblock}
+\end{editamirblock}
 
 \end{proof}
 
@@ -7909,7 +7909,7 @@ Since $X$ is projective, each $V_j$ is algebraic by Remark~\ref{rem:chow-gaga}, 
 
 \begin{remark}[Chow/GAGA for analytic subvarieties]\label{rem:chow-gaga}
 If $X$ is projective, any complex analytic subvariety of $X$ is algebraic.
-\editai{This is a standard consequence of Chow's theorem (for projective space) together with Serre's GAGA.
+\editamir{This is a standard consequence of Chow's theorem (for projective space) together with Serre's GAGA.
 See, for example, \cite{Hartshorne77,GH78,Serre56}.}
 \end{remark}
 
@@ -7932,7 +7932,7 @@ class $\gamma \in H^{2p}(X,\Q) \cap H^{p,p}(X)$ is algebraic.
 \end{theorem}
 
 \begin{proof}
-\begin{editaiblock}
+\begin{editamirblock}
 By Remark~\ref{rem:lefschetz-reduction} it suffices to treat the range $p\le n/2$.
 Let $\gamma\in H^{2p}(X,\Q)\cap H^{p,p}(X)$.
 Apply Lemma~\ref{lem:signed-decomp} to write
@@ -7942,7 +7942,7 @@ By Lemma~\ref{lem:gamma-minus-alg}, the class $[\omega^{p}]$ (hence $\gamma^{-}$
 By Theorem~\ref{thm:effective-algebraic}, the cone--positive class $\gamma^{+}$ is algebraic.
 Since algebraic classes form a $\Q$--vector subspace of $H^{2p}(X,\Q)$, the difference
 $\gamma=\gamma^{+}-\gamma^{-}$ is algebraic.
-\end{editaiblock}
+\end{editamirblock}
 \end{proof}
 
 
@@ -7957,7 +7957,7 @@ By Lemma~\ref{lem:signed-decomp}, write $\gamma = \gamma^+ - \gamma^-$
 where $\gamma^+$ and $\gamma^- = N[\omega^p]$ are both cone--positive rational
 Hodge classes.
 
-\editai{By Lemma~\ref{lem:gamma-minus-alg}, $\gamma^-$ is algebraic: it is represented (in $H^{2p}(X,\Q)$) by a rational multiple of a complete intersection $Z^-\subset X$.}
+\editamir{By Lemma~\ref{lem:gamma-minus-alg}, $\gamma^-$ is algebraic: it is represented (in $H^{2p}(X,\Q)$) by a rational multiple of a complete intersection $Z^-\subset X$.}
 
 By Theorem~\ref{thm:effective-algebraic}, $\gamma^+$ is algebraic:
 it is represented by an algebraic cycle $Z^+$ obtained from the
@@ -7980,11 +7980,11 @@ cycles tensored with $\Q$.  Hence $\gamma$ is algebraic.
 \end{corollary}
 
 \begin{proof}
-\begin{editaiblock}
+\begin{editamirblock}
 Let $\alpha\in H^{2p}(X;\Q)\cap H^{p,p}(X)$.  This is exactly the hypothesis of Theorem~\ref{thm:main-hodge}, which shows that
 $\alpha$ is an \emph{algebraic class}.  Equivalently, there exists an algebraic cycle (with rational coefficients) whose cohomology
 class equals $\alpha$.  Hence $\alpha$ is represented by an algebraic cycle.
-\end{editaiblock}
+\end{editamirblock}
 \end{proof}
 
 \begin{remark}[Why signed decomposition is the key]
@@ -8098,7 +8098,7 @@ Calibrated-limit closure (Theorem~\ref{thm:realization-from-almost}) + Harvey--L
 \end{editjonblock}
 
 
-\begin{editaiblock}
+\begin{editamirblock}
 %=========================================================
 \section*{Classical Inputs (Published Theorems Used as External Pillars)}
 \label{sec:classical-inputs}
@@ -8137,7 +8137,7 @@ At the endgame we appeal to standard identifications between certain \emph{posit
 
 \item \textbf{H\"ormander $L^2$ $\bar\partial$-methods and Bergman kernel asymptotics.}
 The local holomorphic realization steps use $L^2$-existence/estimate inputs for $\bar\partial$ (in the positive line bundle setting)
-and near/off-diagonal Bergman kernel expansions with controlled derivatives at the \editai{$N^{-1/2}$} scale.%
+and near/off-diagonal Bergman kernel expansions with controlled derivatives at the \editamir{$N^{-1/2}$} scale.%
 \cite{Demailly12,Tian90,Zelditch98,Catlin99,MaMarinescu07,MaMarinescu13OffDiag,Donaldson01}
 
 \item \textbf{Hodge theory, Hard Lefschetz, and projective algebraicity tools.}
@@ -8157,7 +8157,7 @@ we rely on the Kantorovich--Rubinstein dual characterization and standard stabil
 \medskip
 \noindent\textbf{Referee note.} The phrase ``unconditional'' in this manuscript is to be read as:
 \emph{unconditional modulo the published pillars listed above}, with hypotheses checked locally at each invocation site.
-\end{editaiblock}
+\end{editamirblock}
 
 
 \begin{thebibliography}{99}
