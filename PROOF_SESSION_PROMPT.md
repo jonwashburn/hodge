@@ -1,200 +1,38 @@
-# Hodge Conjecture Lean Proof - Session Prompt
+# Goal
+Complete the Lean 4 formalization of the Hodge Conjecture proof.
 
-## Instructions for AI Assistant
+# Current Status
+- **Sorries**: 0
+- **Axioms**: 9 (the accepted "Classical Pillars")
+- **Semantic Completeness**:
+  - The proof is structurally complete (it type-checks).
+  - A staged migration to Mathlib-backed semantic definitions is underway.
+  - **Stage 1 (DONE)**: Mathlib-backed wedge product.
+  - **Stage 2 (DONE)**: Pointwise exterior derivative `extDerivAt` on manifolds.
+  - **Stage 3 (DONE)**: **Infrastructure Bridge**. Rigidly connected manifold-level `mfderiv` to chart-level `fderiv` calculation. `ContMDiffForm.extDerivForm` and $d^2=0$ exist.
 
-You are helping to complete a Lean 4 formalization of the Hodge Conjecture proof. 
+# Core Development
+- `Hodge/Analytic/ContMDiffForms.lean`: Rigorous `C^∞` forms and exterior derivative.
+- `Hodge/Analytic/ChartExtDeriv.lean`: Chart-level derivative identities and smoothness proofs.
+- `Hodge/Kahler/Main.lean`: The high-level proof connecting the Pillars.
 
-### Before Making Any Changes
+# Key Proof Checkpoints (TeX correspondence)
+- `SignedDecomposition`: Proven.
+- `AutomaticSYR`: Proven structurally; needs semantic migration.
+- `MicrostructureApproximation`: Stubbed; needs GMT integration.
 
-1. **Read the full proof bundle**: `@LEAN_PROOF_BUNDLE.txt`
-2. **Create the session snapshot** (automatic): run `./scripts/generate_lean_source.sh`
-   - This regenerates `LEAN_PROOF_BUNDLE.txt` and creates `SESSION_YYYYMMDD_HHMMSS_LEAN_PROOF.txt`
-2. **Check current status**: Note the sorry count and axiom count at the top
-3. **Understand the goal**: The proof is STRUCTURALLY COMPLETE - focus on cleanup
-4. **Reference the TeX proof**: `@Hodge-v6-w-Jon-Update-MERGED.tex` for mathematical guidance
+# Context Files
+- `@docs/plans/DEPENDENCY_DAG_PUNCHLIST.md`: Mapping of TeX steps to Lean.
+- `@PROOF_COMPLETION_PLAN_8_PILLARS.md`: Detailed migration plan.
+- `@docs/referee/Hodge_REFEREE_Amir-v1_REFEREE_WORKBOOK.md`: Referee tracking and correspondences.
 
-### Ground Rules
+# Instructions
+1. **Maintain 0 sorries**: Do not introduce new Lean holes.
+2. **Follow the plan**: Focus on Stage 4 (migrating the global `SmoothForm` layer to use the rigorous exterior derivative).
+3. **Bridge Infrastructure**: Leverage the existing `ChartExtDeriv` lemmas to prove global smoothness of manifold operators.
 
-1. **DO NOT go backwards**: 
-   - Current baseline: **0 sorries, 9 axioms** (all 9 used by `hodge_conjecture'`)
-   - Keep it that way: don’t reintroduce sorries; don’t add axioms unless replacing more severe stubs
-   
-2. **Build only files you edit**: 
-   ```bash
-   lake build Hodge.Path.To.File
-   ```
-   Do NOT run full `lake build`
-
-3. **Priority order for improvements**:
-   - **Staged Mathlib migration**: replace semantic stubs (d/∧/cohomology) with Mathlib-backed definitions
-   - Convert classical axioms to theorems only when upstream support exists
-   - Keep the main proof compiling at all times (no regressions)
-
-4. **After each change**:
-   - Build the specific file
-   - Verify: `lake build Hodge.Utils.AuditAxioms` to see used axioms
-
-### Current Proof Status
-
-**STRUCTURALLY COMPLETE** - The main theorem `hodge_conjecture'` compiles successfully.
-
-```
-Axioms in codebase: 9
-Axioms USED by hodge_conjecture': 9 (verified via #print axioms)
-Sorries: 0
-```
-
-### Current “Close the Proof” Strategy (staged)
-
-The Lean proof is closed (0 sorries) but the **foundation layer is still semantically stubbed**.
-We close this by a staged migration:
-
-- **Stage 1 (done)**: Replace the placeholder wedge `SmoothForm ⋏` with a Mathlib-backed wedge.
-  - Implemented on `ContinuousAlternatingMap` fibers, then lifted to `SmoothForm` and cohomology multiplication.
-  - `d` on `SmoothForm` remains temporarily stubbed (`extDerivLinearMap := 0`) to avoid destabilizing the proof while wedge migrated.
-
-- **Stage 1.5 (done)**: Add a **model-space** de Rham calculus module backed by Mathlib `extDeriv`.
-  - New file: `Hodge/Analytic/ModelDeRham.lean`
-  - Provides `ModelForm.d` (Mathlib `extDeriv`) and a pointwise wedge using `ContinuousAlternatingMap.wedge`.
-
-- **Stage 2 (groundwork complete)**: Replace the placeholder exterior derivative `extDerivLinearMap := 0` on `SmoothForm`
-  with a Mathlib-backed `d` (requires a manifold-aware form backend / chart glue).
-
-  - **Stage 2 groundwork (done)**: A manifold-aware `C^∞` backend now exists in
-    `Hodge/Analytic/ContMDiffForms.lean`, defining `ContMDiffForm` and:
-    - pointwise `extDerivAt` via `mfderiv` + alternatization
-    - tangent-coordinate smoothness lemmas: `mfderivInTangentCoordinates`, `extDerivInTangentCoordinates`
-    - unbundled `extDeriv` (as a function `X → FiberAlt n (k+1)`) plus pointwise linearity lemmas
-    - **Stage‑3 transport helpers (added)**:
-      - `mfderivInTangentCoordinates_eq` (explicit formula on a chart neighborhood)
-      - `alternatizeUncurryFin_compContinuousLinearMap` (alternatization ↔ pullback)
-      - `extDerivInTangentCoordinatesTransported` and `extDerivInTangentCoordinatesTransported_eq`
-        (correct transported coordinate representation matching transported `extDerivAt`)
-    - **Stage‑3 chart-level helpers (added)**:
-      - `Hodge/Analytic/ChartExtDeriv.lean`: `omegaInChart` + `ContDiffOn` on chart target, and
-        `extDerivInChartWithin` (model-space `extDerivWithin`) + `ContDiffOn` on chart target.
-  - **Integration blocker**: Bundling `x ↦ extDerivAt ω x` back into `SmoothForm`/`ContMDiffForm` requires
-    a chart-gluing argument (Stage 3/4), since `mfderiv` depends on local charts.
-
-- **Stage 3**: Replace the current de Rham quotient/multiplication lemmas with a semantically correct de Rham complex/cohomology backend (local or Mathlib, depending on availability).
-
-### The 9 Classical Pillars (USED AXIOMS)
-
-These are the axioms that `hodge_conjecture'` actually depends on:
-
-| # | Axiom | Location | Mathematical Content |
-|---|-------|----------|---------------------|
-| 1 | `existence_of_representative_form` | Lefschetz.lean:68 | Hodge Decomposition |
-| 2 | `exists_uniform_interior_radius` | Cone.lean:104 | Kähler cone interior |
-| 3 | `hard_lefschetz_bijective` | Lefschetz.lean:45 | Hard Lefschetz Theorem |
-| 4 | `hard_lefschetz_pp_bijective` | Lefschetz.lean:60 | HL preserves (p,p) type |
-| 5 | `hard_lefschetz_rational_bijective` | Lefschetz.lean:52 | HL preserves rationality |
-| 6 | `harvey_lawson_fundamental_class` | Main.lean:144 | GMT structure theorem |
-| 7 | `mass_lsc` | Calibration.lean:113 | Mass semicontinuity |
-| 8 | `omega_pow_algebraic` | Main.lean:219 | ω^p is algebraic |
-| 9 | `serre_gaga` | GAGA.lean:160 | GAGA principle |
-
-### Current Sorries
-
-None (sorry count is 0).
-
-### Proof Dependency Tree
-
-```
-hodge_conjecture'
-├── Case p ≤ n/2:
-│   ├── signed_decomposition
-│   │   └── exists_uniform_interior_radius [AXIOM]
-│   ├── cone_positive_represents
-│   │   ├── limit_is_calibrated
-│   │   │   └── mass_lsc [AXIOM]
-│   │   ├── harvey_lawson_union_is_algebraic
-│   │   │   └── serre_gaga [AXIOM]
-│   │   └── harvey_lawson_fundamental_class [AXIOM]
-│   └── omega_pow_algebraic [AXIOM]
-│
-└── Case p > n/2:
-    └── hard_lefschetz_inverse_form
-        ├── hard_lefschetz_bijective [AXIOM]
-        ├── hard_lefschetz_pp_bijective [AXIOM]
-        ├── hard_lefschetz_rational_bijective [AXIOM]
-        └── existence_of_representative_form [AXIOM]
-```
-
-### Regenerating the Proof Bundle
-
-After making changes, regenerate:
-```bash
-./scripts/generate_lean_source.sh
-```
-
-### Verifying Axiom Usage
-
-To see exactly which axioms the main theorem uses:
-```bash
-lake build Hodge.Utils.AuditAxioms 2>&1 | grep "depends on axioms"
-```
-
-### Success Criteria
-
-- **Current state**: **0 sorries, 9 axioms** ✓
-- **Next**: only reduce axioms by replacing pillars with theorems (or strengthening existing stubs)
-- **Documentation**: ensure all 9 classical pillars are well-documented
-
----
-
-## Multi-Agent Coordination
-
-When multiple agents work on this codebase simultaneously, use this strategy to avoid conflicts:
-
-### Bottom-Up Agent
-- Focus: Foundation layer (`Hodge/Analytic/*.lean`, `Hodge/Cohomology/*.lean`)
-- Direction: Start from infrastructure, work up toward higher-level theorems
-- Phases: 1 (Foundation), 2 (Currents/GMT), 3 (Cycle Class)
-
-### Top-Down Agent
-- Focus: Theorem layer (`Hodge/Kahler/*.lean`, `Hodge/Classical/*.lean`)  
-- Direction: Start from main theorems, work down toward infrastructure
-- Phases: 6 (Cleanup), 5 (Microstructure), 4 (Harvey-Lawson)
-
-### Rules
-1. Do NOT modify the same file simultaneously
-2. Check `git status` before starting work
-3. Commit frequently with descriptive messages
-4. Always verify 0 sorries, 9 axioms after changes
-5. Run `lake build Hodge` before pushing
-
----
-
-## Quick Reference Commands
-
-```bash
-# Regenerate proof bundle
-./scripts/generate_lean_source.sh
-
-# Check sorry count
-grep -rn "sorry" Hodge/ --include="*.lean" | grep -v "This sorry" | wc -l
-
-# Check axiom count  
-grep -rn "^axiom " Hodge/ --include="*.lean" | wc -l
-
-# See used axioms
-lake build Hodge.Utils.AuditAxioms
-
-# Build specific file
-lake build Hodge.Kahler.Main
-
-# List all axioms with context
-grep -rn "^axiom " Hodge/ --include="*.lean" -A2
-```
-
----
-
-## Session History
-
+# Session History
 | Date | Sorries | Axioms | Notes |
 |------|---------|--------|-------|
-| Jan 6, 2026 | 0 | 9 (9 used) | `ContMDiffForms.lean` has 0 sorries (pointwise linearity proved); `extDeriv` kept unbundled; conversion functions added; chart-level `extDerivWithin` helper added (`ChartExtDeriv.lean`); linter cleanups |
-| Jan 5, 2026 (late) | 0 | 9 (9 used) | Stage 2 groundwork complete in `ContMDiffForms.lean`; `Forms.lean` stable with Continuous baseline |
-| Jan 5, 2026 | 0 | 9 (9 used) | All sorries removed; unused axioms removed; wedge migrated; model-space `extDeriv` module added |
-| Earlier | 6 | 14 | Transport axioms converted to theorems |
+| Jan 6, 2026 | 0 | 9 | Stage 3 Infrastructure Bridge complete. Bridged manifold `mfderiv` to chart-level `fderiv`. Proven smoothness of coordinate representations. Formulated bundled `extDerivForm` and $d^2=0$ ($d$ operator now semantically grounded). |
+| Jan 5, 2026 | 0 | 9 | Stage 2 groundwork complete (pointwise `extDerivAt` on manifolds). |

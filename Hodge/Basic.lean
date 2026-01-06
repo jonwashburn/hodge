@@ -8,13 +8,28 @@ import Mathlib.Analysis.Calculus.DifferentialForm.Basic
 import Mathlib.Topology.Sets.Opens
 import Mathlib.Topology.Defs.Induced
 
+import Mathlib.Analysis.Normed.Module.Alternating.Basic
+
+
 noncomputable section
 
 open Classical
+open scoped Manifold
 
 set_option autoImplicit false
 
 universe u
+
+/-- We work with the model tangent space `E = ℂⁿ` (Mathlib's `EuclideanSpace ℂ (Fin n)`).
+
+In Mathlib, `TangentSpace (𝓒_complex n) x` is a type synonym for this `E`, so this is the
+correct (and non-dependent) fiber to use for continuity of sections. -/
+abbrev TangentModel (n : ℕ) := EuclideanSpace ℂ (Fin n)
+
+/-- The (fiberwise) space of continuous alternating `k`-linear maps on the model tangent space.
+This is the correct object to put a norm/topology on (Mathlib: operator norm on
+`ContinuousAlternatingMap`). -/
+abbrev FiberAlt (n : ℕ) (k : ℕ) := (TangentModel n) [⋀^Fin k]→L[ℂ] ℂ
 
 def 𝓒_complex (n : ℕ) : ModelWithCorners ℂ (EuclideanSpace ℂ (Fin n)) (EuclideanSpace ℂ (Fin n)) :=
   modelWithCornersSelf ℂ (EuclideanSpace ℂ (Fin n))

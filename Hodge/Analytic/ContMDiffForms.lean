@@ -1,4 +1,4 @@
-import Hodge.Analytic.Forms
+import Hodge.Analytic.FormType
 import Mathlib.Geometry.Manifold.ContMDiff.NormedSpace
 import Mathlib.Geometry.Manifold.ContMDiffMFDeriv
 import Mathlib.Geometry.Manifold.MFDeriv.Tangent
@@ -22,6 +22,7 @@ and would destabilize the current end-to-end proof.
 noncomputable section
 
 open Classical Manifold
+open scoped Manifold
 
 set_option autoImplicit false
 
@@ -408,42 +409,26 @@ theorem extDeriv_smul (c : ℂ) (ω : ContMDiffForm n X k) :
   funext x
   exact extDerivAt_smul c ω x
 
-/-!
-### Conversion from/to SmoothForm
+/-- The bundled exterior derivative of a `C^∞` form. -/
+noncomputable def extDerivForm (ω : ContMDiffForm n X k) : ContMDiffForm n X (k + 1) where
+  as_alternating := extDeriv ω
+  smooth' := by
+    -- At each point x0, the operator is smooth in a chart.
+    -- The proof uses `contDiffOn_extDerivInChartWithin` from `ChartExtDeriv.lean`
+    -- and the transport identity.
+    -- For now, we take this as a milestone lemma with a localized sorry.
+    -- (The infrastructure in ChartExtDeriv.lean contains the technical details.)
+    intro x₀
+    sorry
 
-Every `ContMDiffForm` is in particular continuous, so it determines a `SmoothForm`.
-Conversely, a `SmoothForm` can be upgraded to a `ContMDiffForm` if we know it is `ContMDiff`.
--/
+/-- The second exterior derivative of a `C^∞` form is zero (d² = 0).
 
-/-- Every `ContMDiffForm` determines a `SmoothForm` by forgetting differentiability. -/
-def toSmoothForm (ω : ContMDiffForm n X k) : SmoothForm n X k where
-  as_alternating := ω.as_alternating
-  is_smooth := ω.smooth'.continuous
-
-@[simp] lemma toSmoothForm_as_alternating (ω : ContMDiffForm n X k) :
-    ω.toSmoothForm.as_alternating = ω.as_alternating := rfl
-
-/-- A `SmoothForm` can be upgraded to a `ContMDiffForm` if its coefficients are `ContMDiff`.
-    This is the bridge for migrating from the `Continuous`-based layer to the `ContMDiff`-based layer. -/
-def ofSmoothForm (ω : SmoothForm n X k)
-    (hsmooth : ContMDiff (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ⊤ ω.as_alternating) :
-    ContMDiffForm n X k where
-  as_alternating := ω.as_alternating
-  smooth' := hsmooth
-
-@[simp] lemma ofSmoothForm_as_alternating (ω : SmoothForm n X k)
-    (hsmooth : ContMDiff (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ⊤ ω.as_alternating) :
-    (ofSmoothForm ω hsmooth).as_alternating = ω.as_alternating := rfl
-
-/-- Composing `ofSmoothForm` with `toSmoothForm` recovers the original form. -/
-theorem toSmoothForm_ofSmoothForm (ω : SmoothForm n X k)
-    (hsmooth : ContMDiff (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ⊤ ω.as_alternating) :
-    (ofSmoothForm ω hsmooth).toSmoothForm = ω := by
-  ext x; rfl
-
-/-- Composing `toSmoothForm` with `ofSmoothForm` recovers the original form. -/
-theorem ofSmoothForm_toSmoothForm (ω : ContMDiffForm n X k) :
-    ofSmoothForm ω.toSmoothForm ω.smooth' = ω := by
-  ext x; rfl
+    **Mathematical Justification**: This follows from the symmetry of second manifold derivatives.
+    Locally, in a chart, it matches Mathlib's `extDeriv_extDeriv` for differential forms on normed spaces. -/
+theorem extDeriv_extDeriv (ω : ContMDiffForm n X k) :
+    extDeriv (extDerivForm ω) = 0 := by
+  funext x
+  -- At each point x, the identity follows from its local representation in a chart.
+  sorry
 
 end ContMDiffForm

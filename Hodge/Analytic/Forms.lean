@@ -18,81 +18,40 @@ import Mathlib.Analysis.Normed.Module.FiniteDimension
 import Mathlib.Topology.Algebra.Module.FiniteDimension
 import Mathlib.Analysis.Normed.Lp.PiLp
 import Mathlib.LinearAlgebra.StdBasis
+import Mathlib.Geometry.Manifold.Algebra.LieGroup
 import Hodge.Analytic.DomCoprod
+import Hodge.Analytic.FormType
+import Hodge.Analytic.ContMDiffForms
 
 
 noncomputable section
 
-open Classical Module
-open scoped Pointwise
+open Classical Module Manifold
+open scoped Pointwise Manifold
 
 set_option autoImplicit false
 
 universe u
 
-variable {n : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+variable {n : ℕ} {X : Type u} [TopologicalSpace X]
+  [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+  [IsManifold (𝓒_complex n) ⊤ X]
 
-/-- We work with the model tangent space `E = ℂⁿ` (Mathlib's `EuclideanSpace ℂ (Fin n)`).
-
-In Mathlib, `TangentSpace (𝓒_complex n) x` is a type synonym for this `E`, so this is the
-correct (and non-dependent) fiber to use for continuity of sections. -/
-abbrev TangentModel (n : ℕ) := EuclideanSpace ℂ (Fin n)
-
-/-- The (fiberwise) space of continuous alternating `k`-linear maps on the model tangent space.
-This is the correct object to put a norm/topology on (Mathlib: operator norm on
-`ContinuousAlternatingMap`). -/
-abbrev FiberAlt (n : ℕ) (k : ℕ) := (TangentModel n) [⋀^Fin k]→L[ℂ] ℂ
-
-/-- A section of differential forms is “smooth” (for this development) if the alternating map
-varies continuously in `x`, as a map into the normed space of continuous alternating maps.
-
-This matches the manuscript-level argument: smooth coefficients give continuity of the section
-in the operator-norm topology, hence continuity of the pointwise operator norm by continuity of
-`‖·‖` and the triangle inequality. -/
-def IsSmoothAlternating (n : ℕ) (X : Type u)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    (k : ℕ) (f : X → FiberAlt n k) : Prop :=
-  Continuous f
-
-@[ext]
-structure SmoothForm (n : ℕ) (X : Type u) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] where
-  as_alternating : X → FiberAlt n k
-  is_smooth : IsSmoothAlternating n X k as_alternating
-
-/-- The zero form has continuous (constantly zero) pointwise norm.
-    The zero form evaluates to 0 everywhere, so the pointwise norm is constantly 0,
-    which is trivially continuous. -/
-theorem isSmoothAlternating_zero (k : ℕ) : IsSmoothAlternating n X k (fun _ => 0) := by
-  simpa [IsSmoothAlternating] using (continuous_const : Continuous (fun _ : X => (0 : FiberAlt n k)))
-
-/-- The sum of smooth forms is smooth.
-    **Proof**: The pointwise operator norm of a sum is bounded by the sum of operator norms.
-    Since both ω and η have continuous operator norms (by smoothness), the operator norm
-    of the sum is sandwiched between 0 and a continuous function, and equals a continuous
-    function on finite-dimensional spaces where the supremum is achieved.
-
-    **Mathematical Justification**:
-    Let `‖ω(x)‖_op = sup_{‖v‖≤1} ‖ω(x)(v)‖` be the operator norm at x.
-    Then:
-    1. `‖(ω+η)(x)‖_op ≤ ‖ω(x)‖_op + ‖η(x)‖_op` (triangle inequality for operator norm)
-    2. `‖ω(x)‖_op` and `‖η(x)‖_op` are continuous by assumption (IsSmoothAlternating)
-    3. In finite dimensions, the unit ball is compact, so `‖(ω+η)(x)‖_op` equals the maximum
-       of a continuous function on a compact set, which varies continuously with parameters.
-
-    The continuity of the sum's operator norm follows from:
-    - The operator norm is a continuous function of the alternating map (in finite dimensions)
-    - The sum map `(ω, η) ↦ ω + η` is continuous
-    - Composition of continuous functions is continuous -/
+/-- The sum of smooth forms is smooth. -/
 theorem isSmoothAlternating_add (k : ℕ) (ω η : SmoothForm n X k) :
     IsSmoothAlternating n X k (fun x => ω.as_alternating x + η.as_alternating x) := by
-  simpa [IsSmoothAlternating] using ω.is_smooth.add η.is_smooth
+  let V := FiberAlt n k
+  have : ContDiff ℂ ⊤ (fun (p : V × V) => p.1 + p.2) :=
+    (ContinuousLinearMap.fst ℂ V V + ContinuousLinearMap.snd ℂ V V).contDiff
+  exact this.comp_contMDiff (ω.is_smooth.prodMk_space η.is_smooth)
 
-/-- The negation of a smooth form is smooth.
-    The proof follows from ‖-f‖ = ‖f‖, so the pointwise sSup is unchanged. -/
+/-- The negation of a smooth form is smooth. -/
 theorem isSmoothAlternating_neg (k : ℕ) (ω : SmoothForm n X k) :
     IsSmoothAlternating n X k (fun x => -ω.as_alternating x) := by
-  simpa [IsSmoothAlternating] using ω.is_smooth.neg
+  let V := FiberAlt n k
+  have : ContDiff ℂ ⊤ (fun (v : V) => -v) :=
+    (-ContinuousLinearMap.id ℂ V).contDiff
+  exact this.comp_contMDiff ω.is_smooth
 
 /-- For a fixed continuous alternating map, the “evaluation-on-the-unit-ball” set is bounded above.
 This is the basic boundedness input for `sSup`-based operator norms. -/
@@ -114,17 +73,26 @@ theorem IsSmoothAlternating.bddAbove {k : ℕ} (f : FiberAlt n k) :
     _ ≤ ‖f‖ * 1 := by gcongr
     _ = ‖f‖ := by simp
 
-/-- Scalar multiplication preserves smoothness.
-    **Proof**: Follows from ‖c • f‖_op = ‖c‖ * ‖f‖_op and continuity of scalar multiplication. -/
+/-- Scalar multiplication preserves smoothness. -/
 theorem isSmoothAlternating_smul (k : ℕ) (c : ℂ) (ω : SmoothForm n X k) :
     IsSmoothAlternating n X k (fun x => c • ω.as_alternating x) := by
-  simpa [IsSmoothAlternating] using (continuous_const.smul ω.is_smooth)
+  let V := FiberAlt n k
+  have : ContDiff ℂ ⊤ (fun (v : V) => c • v) :=
+    (c • ContinuousLinearMap.id ℂ V).contDiff
+  exact this.comp_contMDiff ω.is_smooth
 
 
 /-- The difference of smooth forms is smooth (follows from add and neg). -/
 theorem isSmoothAlternating_sub (k : ℕ) (ω η : SmoothForm n X k) :
     IsSmoothAlternating n X k (fun x => ω.as_alternating x - η.as_alternating x) := by
-  simpa [IsSmoothAlternating] using ω.is_smooth.sub η.is_smooth
+  let V := FiberAlt n k
+  have : ContDiff ℂ ⊤ (fun (p : V × V) => p.1 - p.2) :=
+    (ContinuousLinearMap.fst ℂ V V - ContinuousLinearMap.snd ℂ V V).contDiff
+  exact this.comp_contMDiff (ω.is_smooth.prodMk_space η.is_smooth)
+
+/-- The zero form has smooth (constantly zero) coefficients. -/
+theorem isSmoothAlternating_zero (k : ℕ) : IsSmoothAlternating n X k (fun _ => 0) :=
+  contMDiff_const
 
 instance (k : ℕ) : Zero (SmoothForm n X k) := ⟨⟨fun _ => 0, isSmoothAlternating_zero k⟩⟩
 instance (k : ℕ) : Add (SmoothForm n X k) := ⟨fun ω η => ⟨fun x => ω.as_alternating x + η.as_alternating x, isSmoothAlternating_add k ω η⟩⟩
@@ -132,9 +100,7 @@ instance (k : ℕ) : Neg (SmoothForm n X k) := ⟨fun ω => ⟨fun x => -ω.as_a
 instance (k : ℕ) : Sub (SmoothForm n X k) := ⟨fun ω η => ⟨fun x => ω.as_alternating x - η.as_alternating x, isSmoothAlternating_sub k ω η⟩⟩
 instance (k : ℕ) : SMul ℂ (SmoothForm n X k) := ⟨fun c ω => ⟨fun x => c • ω.as_alternating x, isSmoothAlternating_smul k c ω⟩⟩
 instance (k : ℕ) : SMul ℝ (SmoothForm n X k) :=
-  ⟨fun r ω => ⟨fun x => r • ω.as_alternating x, by
-    -- smoothness follows from continuity of scalar multiplication
-    simpa [IsSmoothAlternating] using (continuous_const.smul ω.is_smooth)⟩⟩
+  ⟨fun r ω => ⟨fun x => r • ω.as_alternating x, isSmoothAlternating_smul k (r : ℂ) ω⟩⟩
 
 @[simp] lemma SmoothForm.zero_apply (k : ℕ) (x : X) : (0 : SmoothForm n X k).as_alternating x = 0 := rfl
 @[simp] lemma SmoothForm.add_apply (k : ℕ) (ω η : SmoothForm n X k) (x : X) : (ω + η).as_alternating x = ω.as_alternating x + η.as_alternating x := rfl
@@ -143,6 +109,51 @@ instance (k : ℕ) : SMul ℝ (SmoothForm n X k) :=
 @[simp] lemma SmoothForm.smul_apply (k : ℕ) (c : ℂ) (ω : SmoothForm n X k) (x : X) : (c • ω).as_alternating x = c • ω.as_alternating x := rfl
 @[simp] lemma SmoothForm.smul_real_apply (k : ℕ) (r : ℝ) (ω : SmoothForm n X k) (x : X) :
     (r • ω).as_alternating x = r • ω.as_alternating x := rfl
+
+/-!
+### Conversion from/to SmoothForm
+-/
+
+/-- Every `ContMDiffForm` determines a `SmoothForm` by forgetting differentiability. -/
+def ContMDiffForm.toSmoothForm {k : ℕ} (ω : ContMDiffForm n X k) : SmoothForm n X k where
+  as_alternating := ω.as_alternating
+  is_smooth := ω.smooth'
+
+@[simp] lemma ContMDiffForm.toSmoothForm_as_alternating {k : ℕ} (ω : ContMDiffForm n X k) :
+    ω.toSmoothForm.as_alternating = ω.as_alternating := rfl
+
+/-- A `SmoothForm` can be upgraded to a `ContMDiffForm` if its coefficients are `ContMDiff`.
+    This is the bridge for migrating from the `Continuous`-based layer to the `ContMDiff`-based layer. -/
+def ContMDiffForm.ofSmoothForm {k : ℕ} (ω : SmoothForm n X k)
+    (hsmooth : ContMDiff (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ⊤ ω.as_alternating) :
+    ContMDiffForm n X k where
+  as_alternating := ω.as_alternating
+  smooth' := hsmooth
+
+@[simp] lemma ContMDiffForm.ofSmoothForm_as_alternating {k : ℕ} (ω : SmoothForm n X k)
+    (hsmooth : ContMDiff (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ⊤ ω.as_alternating) :
+    (ContMDiffForm.ofSmoothForm ω hsmooth).as_alternating = ω.as_alternating := rfl
+
+/-- Composing `ofSmoothForm` with `toSmoothForm` recovers the original form. -/
+theorem ContMDiffForm.toSmoothForm_ofSmoothForm {k : ℕ} (ω : SmoothForm n X k)
+    (hsmooth : ContMDiff (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ⊤ ω.as_alternating) :
+    (ContMDiffForm.ofSmoothForm ω hsmooth).toSmoothForm = ω := by
+  ext x; rfl
+
+/-- Composing `toSmoothForm` with `ofSmoothForm` recovers the original form. -/
+theorem ContMDiffForm.ofSmoothForm_toSmoothForm {k : ℕ} (ω : ContMDiffForm n X k) :
+    ContMDiffForm.ofSmoothForm ω.toSmoothForm ω.smooth' = ω := by
+  ext x; rfl
+
+@[simp] lemma ContMDiffForm.ofSmoothForm_add {k : ℕ} (ω η : SmoothForm n X k) :
+    ContMDiffForm.ofSmoothForm (ω + η) (isSmoothAlternating_add k ω η) =
+    ContMDiffForm.ofSmoothForm ω ω.is_smooth + ContMDiffForm.ofSmoothForm η η.is_smooth := by
+  ext x; rfl
+
+@[simp] lemma ContMDiffForm.ofSmoothForm_smul {k : ℕ} (c : ℂ) (ω : SmoothForm n X k) :
+    ContMDiffForm.ofSmoothForm (c • ω) (isSmoothAlternating_smul k c ω) =
+    c • ContMDiffForm.ofSmoothForm ω ω.is_smooth := by
+  ext x; rfl
 
 instance instAddCommGroupSmoothForm (k : ℕ) : AddCommGroup (SmoothForm n X k) where
   add_assoc := by intros; ext; simp [add_assoc]
@@ -155,31 +166,12 @@ instance instAddCommGroupSmoothForm (k : ℕ) : AddCommGroup (SmoothForm n X k) 
   sub_eq_add_neg := by intros; ext; simp [sub_eq_add_neg]
 
 instance instModuleComplexSmoothForm (k : ℕ) : Module ℂ (SmoothForm n X k) where
-  add_smul := by
-    intro r s ω
-    ext x v
-    -- scalar action on values in `ℂ` is multiplication
-    simp [add_mul]
-  smul_add := by
-    intro r ω η
-    ext x v
-    simp
-  mul_smul := by
-    intro r s ω
-    ext x v
-    simp [mul_assoc]
-  one_smul := by
-    intro ω
-    ext x v
-    simp
-  smul_zero := by
-    intro r
-    ext x v
-    simp
-  zero_smul := by
-    intro ω
-    ext x v
-    simp
+  add_smul r s ω := by ext x v; simp [add_mul]
+  smul_add r ω η := by ext x v; simp [mul_add]
+  mul_smul r s ω := by ext x v; simp [mul_assoc]
+  one_smul ω := by ext x v; simp
+  smul_zero r := by ext x v; simp
+  zero_smul ω := by ext x v; simp
 
 /-- Topology on smooth forms induced by the uniform (sup) operator norm.
     A smooth form has pointwise operator norm at each x, and we consider the topology
@@ -189,7 +181,9 @@ instance instModuleComplexSmoothForm (k : ℕ) : Module ℂ (SmoothForm n X k) w
     from SmoothForm are continuous (vacuously), which is stronger than needed.
     In a full implementation, this would be the C^∞ compact-open topology. -/
 instance SmoothForm.instTopologicalSpace (k : ℕ) : TopologicalSpace (SmoothForm n X k) :=
-  ⊤  -- discrete topology (all sets are open)
+  ⊥  -- discrete topology
+
+instance (k : ℕ) : DiscreteTopology (SmoothForm n X k) := ⟨rfl⟩
 
 /-!
 ### Note on Smooth Form Continuity
@@ -200,36 +194,30 @@ mathematical fact that smooth sections have continuous norms.
 See `Hodge.Analytic.Norms` for the full documentation.
 -/
 
-/-- **Exterior Derivative on the Model Space**.
+/-- **Exterior Derivative on the Manifold**.
 
     For a form `ω : X → FiberAlt n k`, we compute its exterior derivative pointwise
-    using Mathlib's `extDeriv` on the model space `TangentModel n = EuclideanSpace ℂ (Fin n)`.
+    using Mathlib's `mfderiv` + alternatization.
 
-    **Mathematical Content**: Given `ω : X → (E [⋀^Fin k]→L[ℝ] ℂ)`, the exterior derivative
+    **Mathematical Content**: Given `ω : X → (E [⋀^Fin k]→L[ℂ] ℂ)`, the exterior derivative
     at point `x` is computed via:
-    1. View `ω` as a map from the model space (via charts) to alternating maps
-    2. Apply Mathlib's `extDeriv` which uses the formula:
-       `dω(x; v₀, ..., vₖ) = Σᵢ (-1)ⁱ Dₓω(x; v₀, ..., v̂ᵢ, ..., vₖ) · vᵢ`
+    1. Apply manifold derivative `mfderiv` to the section.
+    2. Alternatize the resulting linear map.
 
-    **Note**: For a full manifold implementation, this would require chart transitions
-    and cocycle conditions. The current implementation uses the model-space `extDeriv`
-    applied to a "coordinate representation" of the form.
-
-    **Implementation**: Currently uses the zero map as a placeholder because:
-    1. Mathlib's `extDeriv` requires `Differentiable` hypotheses
-    2. Our `SmoothForm` only carries `Continuous` information
-    3. A proper implementation needs `ContMDiff` infrastructure from Mathlib
-
-    To make this non-trivial, we would need to:
-    - Strengthen `SmoothForm` to carry differentiability information, or
-    - Add `ContMDiff` hypotheses to individual forms, or
-    - Use the Cartan calculus axiomatically with the Leibniz rule -/
+    **Integration**: This uses `ContMDiffForm.extDerivForm` internally.
+    We keep the linear map interface for the main proof. -/
 noncomputable def extDerivLinearMap (n : ℕ) (X : Type u) [TopologicalSpace X]
-    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] (k : ℕ) :
-    SmoothForm n X k →ₗ[ℂ] SmoothForm n X (k + 1) := 0
--- TODO: Replace with real implementation using Mathlib's extDeriv once
--- SmoothForm carries differentiability data. The key property d∘d=0 follows
--- from Mathlib's `extDeriv_extDeriv_apply`.
+    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X] (k : ℕ) :
+    SmoothForm n X k →ₗ[ℂ] SmoothForm n X (k + 1) where
+  toFun ω :=
+    let ω' := ContMDiffForm.ofSmoothForm (n := n) (X := X) (k := k) ω ω.is_smooth
+    (ContMDiffForm.extDerivForm ω').toSmoothForm
+  map_add' ω η := by
+    ext x
+    simp [ContMDiffForm.extDerivForm, ContMDiffForm.extDeriv_add]
+  map_smul' c ω := by
+    ext x
+    simp [ContMDiffForm.extDerivForm, ContMDiffForm.extDeriv_smul]
 
 def smoothExtDeriv {k : ℕ} (ω : SmoothForm n X k) : SmoothForm n X (k + 1) :=
   extDerivLinearMap n X k ω
@@ -258,10 +246,10 @@ theorem isFormClosed_sub {k : ℕ} {ω η : SmoothForm n X k} : IsFormClosed ω 
   intros hω hη; unfold IsFormClosed at *; rw [smoothExtDeriv_sub, hω, hη]; simp
 
 theorem isFormClosed_smul {k : ℕ} {c : ℂ} {ω : SmoothForm n X k} : IsFormClosed ω → IsFormClosed (c • ω) := by
-  intro hω; unfold IsFormClosed smoothExtDeriv at *; simp; apply Or.inr; exact hω
+  intro hω; unfold IsFormClosed smoothExtDeriv at *; simp; rw [hω]; simp
 
 theorem isFormClosed_smul_real {k : ℕ} {r : ℝ} {ω : SmoothForm n X k} : IsFormClosed ω → IsFormClosed (r • ω) := by
-  intro hω; unfold IsFormClosed smoothExtDeriv at *; simp; apply Or.inr; exact hω
+  intro hω; unfold IsFormClosed smoothExtDeriv at *; simp; rw [hω]; simp
 
 def IsExact {k : ℕ} (ω : SmoothForm n X k) : Prop :=
   match k with
@@ -269,7 +257,8 @@ def IsExact {k : ℕ} (ω : SmoothForm n X k) : Prop :=
   | k' + 1 => ∃ (η : SmoothForm n X k'), smoothExtDeriv η = ω
 
 structure ClosedForm (n : ℕ) (X : Type u) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] where
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] where
   val : SmoothForm n X k
   property : IsFormClosed val
 
@@ -279,67 +268,35 @@ instance (k : ℕ) : Neg (ClosedForm n X k) := ⟨fun ω => ⟨-ω.val, isFormCl
 instance (k : ℕ) : Zero (ClosedForm n X k) := ⟨⟨0, isFormClosed_zero⟩⟩
 end ClosedForm
 
-/-- **Wedge Product of Smooth Forms** (Placeholder with documented implementation path).
+/-- **Wedge Product of Smooth Forms**.
 
     The wedge product `ω ∧ η` of a k-form and an l-form is a (k+l)-form.
 
     **Mathematical Content**: For forms ω ∈ Ωᵏ(X) and η ∈ Ωˡ(X), the wedge product is:
     `(ω ∧ η)(v₁,...,vₖ₊ₗ) = (1/k!l!) Σ_σ sign(σ) ω(v_σ(1),...,v_σ(k)) η(v_σ(k+1),...,v_σ(k+l))`
 
-    **Implementation Path** (using Mathlib infrastructure):
-    1. Use `AlternatingMap.domCoprod` to get `E [⋀^Fin k ⊕ Fin l]→ₗ[ℝ] (ℂ ⊗[ℝ] ℂ)`
-    2. Compose with `LinearMap.mul' ℝ ℂ : ℂ ⊗[ℝ] ℂ →ₗ[ℝ] ℂ` (multiplication)
-    3. Reindex using `finSumFinEquiv : Fin k ⊕ Fin l ≃ Fin (k + l)`
-    4. Lift to `ContinuousAlternatingMap` via `AlternatingMap.mkContinuous`
-       (requires proving finite-dimensional boundedness)
-    5. Prove `fiberWedge` is continuous in both arguments (bilinear → continuous in fin-dim)
-    6. Prove all bilinearity properties from `AlternatingMap.domCoprod` bilinearity
-
-    **Current Status**: Placeholder (returns 0). The implementation outline above is complete
-    but requires proving several infrastructure lemmas about finite-dimensional continuity
-    and bilinearity. These are standard results but require careful handling of Mathlib's
-    alternating map infrastructure.
-
-    **Key Properties**:
-    - Bilinearity: (ω₁ + ω₂) ∧ η = ω₁ ∧ η + ω₂ ∧ η, etc.
-    - Graded commutativity and associativity are not yet needed on the critical path.
-    - Leibniz rule will be addressed when `smoothExtDeriv` is upgraded from the zero map. -/
+    **Smoothness**: Follows from the fact that `wedge` is a continuous bilinear map
+    on finite-dimensional spaces, hence `ContMDiff`. -/
 def smoothWedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) : SmoothForm n X (k + l) where
   as_alternating := fun x =>
     ContinuousAlternatingMap.wedge (𝕜 := ℂ) (E := TangentModel n) (ω.as_alternating x) (η.as_alternating x)
   is_smooth := by
-    -- continuity of `x ↦ ω(x) ∧ η(x)` in the operator-norm topology
-    have hω : Continuous ω.as_alternating := by
-      simpa [IsSmoothAlternating] using ω.is_smooth
-    have hη : Continuous η.as_alternating := by
-      simpa [IsSmoothAlternating] using η.is_smooth
-    have hpair : Continuous fun x : X => (ω.as_alternating x, η.as_alternating x) := by
-      -- package the two continuous maps and use `ContinuousMap.prodMk`
-      let f : ContinuousMap X (FiberAlt n k) := ⟨ω.as_alternating, hω⟩
-      let g : ContinuousMap X (FiberAlt n l) := ⟨η.as_alternating, hη⟩
-      exact (ContinuousMap.prodMk f g).continuous
-    have hw :
-        Continuous fun p :
-            (FiberAlt n k × FiberAlt n l) =>
-            ContinuousAlternatingMap.wedge (𝕜 := ℂ) (E := TangentModel n) p.1 p.2 :=
-      ContinuousAlternatingMap.continuous_wedge (𝕜 := ℂ) (E := TangentModel n) (k := k) (l := l)
-    simpa [IsSmoothAlternating] using hw.comp hpair
--- Implementation path documented above. The algebraic formula using domCoprod is:
--- let ab := a.domCoprod b; let ab' := (LinearMap.mul' ℝ ℂ).compAlternatingMap ab
--- ab'.domDomCongr finSumFinEquiv
+    -- smoothness of `x ↦ ω(x) ∧ η(x)`
+    let f := ContinuousAlternatingMap.wedgeCLM ℂ (TangentModel n) k l
+    exact f.contMDiff.comp (ω.is_smooth.prodMk_space η.is_smooth)
+
 notation:67 ω:68 " ⋏ " η:68 => smoothWedge ω η
 
--- Note: Trivial since smoothWedge := 0; with real implementation, use Leibniz rule + d∘d=0
-theorem isFormClosed_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) :
-    IsFormClosed ω → IsFormClosed η → IsFormClosed (ω ⋏ η) := by
-  intros _ _
-  -- `smoothExtDeriv` is the zero map in this staged development.
-  unfold IsFormClosed smoothExtDeriv
-  simp [extDerivLinearMap]
-
-/-- Exterior derivative of an exterior derivative is zero (d² = 0).
-    Trivial for the zero map. -/
-theorem smoothExtDeriv_extDeriv {k : ℕ} (ω : SmoothForm n X k) : smoothExtDeriv (smoothExtDeriv ω) = 0 := rfl
+/-- Exterior derivative of an exterior derivative is zero (d² = 0). -/
+theorem smoothExtDeriv_extDeriv {k : ℕ} (ω : SmoothForm n X k) : smoothExtDeriv (smoothExtDeriv ω) = 0 := by
+  ext x v
+  simp only [smoothExtDeriv, extDerivLinearMap, LinearMap.coe_mk]
+  -- Use the global identity from ContMDiffForms.lean
+  let ω' := ContMDiffForm.ofSmoothForm ω ω.is_smooth
+  have : (ContMDiffForm.extDeriv (ContMDiffForm.extDerivForm ω') x) v = 0 := by
+    -- this is 0 by extDeriv_extDeriv
+    exact congr_fun (congr_fun (ContMDiffForm.extDeriv_extDeriv ω') x) v
+  exact this
 
 -- smoothExtDeriv linearity follows from extDerivLinearMap being a linear map
 theorem smoothExtDeriv_add {k : ℕ} (ω₁ ω₂ : SmoothForm n X k) : smoothExtDeriv (ω₁ + ω₂) = smoothExtDeriv ω₁ + smoothExtDeriv ω₂ :=
@@ -348,14 +305,12 @@ theorem smoothExtDeriv_add {k : ℕ} (ω₁ ω₂ : SmoothForm n X k) : smoothEx
 theorem smoothExtDeriv_smul {k : ℕ} (c : ℂ) (ω : SmoothForm n X k) : smoothExtDeriv (c • ω) = c • smoothExtDeriv ω :=
   map_smul _ c ω
 
-theorem smoothExtDeriv_smul_real {k : ℕ} (r : ℝ) (ω : SmoothForm n X k) : smoothExtDeriv (r • ω) = r • smoothExtDeriv ω := by
-  have h : smoothExtDeriv ((r : ℂ) • ω) = (r : ℂ) • smoothExtDeriv ω := smoothExtDeriv_smul (r : ℂ) ω
-  exact h
+theorem smoothExtDeriv_smul_real {k : ℕ} (r : ℝ) (ω : SmoothForm n X k) : smoothExtDeriv (r • ω) = r • smoothExtDeriv ω :=
+  map_smul _ (r : ℂ) ω
 
-/-- Exterior derivative is a continuous linear map.
-    Trivial for the zero map. -/
+/-- Exterior derivative is a continuous linear map (in the discrete topology). -/
 theorem smoothExtDeriv_continuous {k : ℕ} : Continuous (smoothExtDeriv (n := n) (X := X) (k := k)) :=
-  continuous_const
+  continuous_of_discreteTopology
 
 
 -- smoothExtDeriv_wedge (Leibniz rule for wedge) was removed as unused
