@@ -191,6 +191,7 @@ def domDomCongr {F : Type*} [NormedAddCommGroup F] [NormedSpace 𝕜 F]
   toAlternatingMap := f.toAlternatingMap.domDomCongr e
   cont := f.cont.comp (continuous_pi fun i => continuous_apply (e i))
 
+omit [FiniteDimensional 𝕜 E] [CompleteSpace 𝕜] in
 @[simp]
 theorem domDomCongr_apply {F : Type*} [NormedAddCommGroup F] [NormedSpace 𝕜 F]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -218,6 +219,7 @@ by
     (LinearMap.mul' 𝕜 𝕜).compAlternatingMap wedge_tensor
   exact wedge_scalar.domDomCongr finSumFinEquiv
 
+omit [FiniteDimensional 𝕜 E] [CompleteSpace 𝕜] in
 @[simp]
 theorem wedgeAlternatingTensor_add {k l : ℕ}
     (t₁ t₂ :
@@ -230,6 +232,7 @@ theorem wedgeAlternatingTensor_add {k l : ℕ}
   ext v
   simp [wedgeAlternatingTensor, map_add]
 
+omit [FiniteDimensional 𝕜 E] [CompleteSpace 𝕜] in
 @[simp]
 theorem wedgeAlternatingTensor_smul {k l : ℕ} (c : 𝕜)
     (t :
@@ -337,15 +340,15 @@ theorem wedge_smul_right {k l : ℕ} (c : 𝕜)
         (c • ω.toAlternatingMap) ⊗ₜ[𝕜] η.toAlternatingMap =
           ω.toAlternatingMap ⊗ₜ[𝕜] (c • η.toAlternatingMap) := by
       -- `smul_tmul` moves the scalar between tensor factors over a commutative base ring
-      simpa using (TensorProduct.smul_tmul (R := 𝕜) (R' := 𝕜) (M := (E [⋀^Fin k]→ₗ[𝕜] 𝕜))
-        (N := (E [⋀^Fin l]→ₗ[𝕜] 𝕜)) c ω.toAlternatingMap η.toAlternatingMap)
+      simp [TensorProduct.smul_tmul (R := 𝕜) (R' := 𝕜) (M := (E [⋀^Fin k]→ₗ[𝕜] 𝕜))
+        (N := (E [⋀^Fin l]→ₗ[𝕜] 𝕜)) c ω.toAlternatingMap η.toAlternatingMap]
     -- combine
     calc
       ω.toAlternatingMap ⊗ₜ[𝕜] (c • η.toAlternatingMap)
           = (c • ω.toAlternatingMap) ⊗ₜ[𝕜] η.toAlternatingMap := by
-              simpa [hmove] using hmove.symm
+              simp [hmove]
       _ = c • (ω.toAlternatingMap ⊗ₜ[𝕜] η.toAlternatingMap) := by
-              simpa using this.symm
+              simp [this.symm]
   simp [wedge_apply, wedgeAlternating, wedgeAlternatingTensor, htensor, map_smul,
     LinearMap.compAlternatingMap_smul, AlternatingMap.domDomCongr_smul]
 
@@ -365,13 +368,13 @@ theorem continuous_wedge {k l : ℕ} :
     LinearMap.mk₂ 𝕜
       (fun ω η => wedge (𝕜 := 𝕜) (E := E) ω η)
       (fun ω₁ ω₂ η => by
-        simpa [wedge_add_left (𝕜 := 𝕜) (E := E) ω₁ ω₂ η] )
+        simp [wedge_add_left (𝕜 := 𝕜) (E := E) ω₁ ω₂ η] )
       (fun c ω η => by
-        simpa [wedge_smul_left (𝕜 := 𝕜) (E := E) c ω η])
+        simp [wedge_smul_left (𝕜 := 𝕜) (E := E) c ω η])
       (fun ω η₁ η₂ => by
-        simpa [wedge_add_right (𝕜 := 𝕜) (E := E) ω η₁ η₂])
+        simp [wedge_add_right (𝕜 := 𝕜) (E := E) ω η₁ η₂])
       (fun c ω η => by
-        simpa [wedge_smul_right (𝕜 := 𝕜) (E := E) c ω η])
+        simp [wedge_smul_right (𝕜 := 𝕜) (E := E) c ω η])
 
   -- Upgrade the inner linear maps in `η` to continuous linear maps (finite-dimensional domain).
   let eη :

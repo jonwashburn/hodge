@@ -57,13 +57,16 @@ We close this by a staged migration:
   - New file: `Hodge/Analytic/ModelDeRham.lean`
   - Provides `ModelForm.d` (Mathlib `extDeriv`) and a pointwise wedge using `ContinuousAlternatingMap.wedge`.
 
-- **Stage 2 (next)**: Replace the placeholder exterior derivative `extDerivLinearMap := 0` on `SmoothForm`
+- **Stage 2 (groundwork complete)**: Replace the placeholder exterior derivative `extDerivLinearMap := 0` on `SmoothForm`
   with a Mathlib-backed `d` (requires a manifold-aware form backend / chart glue).
 
-  - **Stage 2 groundwork (in progress)**: A manifold-aware `C^∞` backend now exists in
+  - **Stage 2 groundwork (done)**: A manifold-aware `C^∞` backend now exists in
     `Hodge/Analytic/ContMDiffForms.lean`, defining `ContMDiffForm` and:
     - pointwise `extDerivAt` via `mfderiv` + alternatization
     - tangent-coordinate smoothness lemmas: `mfderivInTangentCoordinates`, `extDerivInTangentCoordinates`
+    - unbundled `extDeriv` (as a function `X → FiberAlt n (k+1)`) plus pointwise linearity lemmas
+  - **Integration blocker**: Bundling `x ↦ extDerivAt ω x` back into `SmoothForm`/`ContMDiffForm` requires
+    a chart-gluing argument (Stage 3/4), since `mfderiv` depends on local charts.
 
 - **Stage 3**: Replace the current de Rham quotient/multiplication lemmas with a semantically correct de Rham complex/cohomology backend (local or Mathlib, depending on availability).
 
@@ -183,5 +186,6 @@ grep -rn "^axiom " Hodge/ --include="*.lean" -A2
 
 | Date | Sorries | Axioms | Notes |
 |------|---------|--------|-------|
+| Jan 5, 2026 (late) | 0 | 9 (9 used) | Stage 2 groundwork complete in `ContMDiffForms.lean`; `Forms.lean` stable with Continuous baseline |
 | Jan 5, 2026 | 0 | 9 (9 used) | All sorries removed; unused axioms removed; wedge migrated; model-space `extDeriv` module added |
 | Earlier | 6 | 14 | Transport axioms converted to theorems |

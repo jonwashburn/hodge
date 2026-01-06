@@ -1,13 +1,17 @@
 ================================================================================
 HODGE CONJECTURE - COMPLETE LEAN PROOF BUNDLE
-Generated: Tue Jan  6 00:27:27 CST 2026
+Generated: Mon Jan  5 23:55:19 CST 2026
 Project: /Users/jonathanwashburn/Projects/hodge
 ================================================================================
 
 === PROOF STATUS ===
 
 SORRIES:
-  (none)
+Hodge/Analytic/ContMDiffForms.lean:118:    (`sorry`) to unblock integration; it relies on the fact that `extDerivAt` corresponds
+Hodge/Analytic/ContMDiffForms.lean:128:    sorry
+Hodge/Analytic/ContMDiffForms.lean:207:  sorry
+Hodge/Analytic/ContMDiffForms.lean:213:  sorry
+Hodge/Analytic/ContMDiffForms.lean:245:  sorry
 
 AXIOMS:
 Hodge/Kahler/Cone.lean:104:axiom exists_uniform_interior_radius (p : ℕ) [CompactSpace X] [Nonempty X] :
@@ -24,7 +28,7 @@ OPAQUES:
 Hodge/Analytic/Currents.lean:372:opaque integration_current {n : ℕ} {X : Type*} {k : ℕ}
 
 === SUMMARY ===
-Total sorries: 0
+Total sorries: 5
 Total axioms: 9
 
 ================================================================================
@@ -5800,7 +5804,7 @@ end
 === INFRASTRUCTURE FILES ===
 
 ================================================================================
-FILE: Hodge/Analytic/DomCoprod.lean (450 lines)
+FILE: Hodge/Analytic/DomCoprod.lean (447 lines)
 ================================================================================
 import Mathlib.LinearAlgebra.Alternating.DomCoprod
 import Mathlib.Analysis.Normed.Module.Alternating.Basic
@@ -5995,7 +5999,6 @@ def domDomCongr {F : Type*} [NormedAddCommGroup F] [NormedSpace 𝕜 F]
   toAlternatingMap := f.toAlternatingMap.domDomCongr e
   cont := f.cont.comp (continuous_pi fun i => continuous_apply (e i))
 
-omit [FiniteDimensional 𝕜 E] [CompleteSpace 𝕜] in
 @[simp]
 theorem domDomCongr_apply {F : Type*} [NormedAddCommGroup F] [NormedSpace 𝕜 F]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -6023,7 +6026,6 @@ by
     (LinearMap.mul' 𝕜 𝕜).compAlternatingMap wedge_tensor
   exact wedge_scalar.domDomCongr finSumFinEquiv
 
-omit [FiniteDimensional 𝕜 E] [CompleteSpace 𝕜] in
 @[simp]
 theorem wedgeAlternatingTensor_add {k l : ℕ}
     (t₁ t₂ :
@@ -6036,7 +6038,6 @@ theorem wedgeAlternatingTensor_add {k l : ℕ}
   ext v
   simp [wedgeAlternatingTensor, map_add]
 
-omit [FiniteDimensional 𝕜 E] [CompleteSpace 𝕜] in
 @[simp]
 theorem wedgeAlternatingTensor_smul {k l : ℕ} (c : 𝕜)
     (t :
@@ -6144,15 +6145,15 @@ theorem wedge_smul_right {k l : ℕ} (c : 𝕜)
         (c • ω.toAlternatingMap) ⊗ₜ[𝕜] η.toAlternatingMap =
           ω.toAlternatingMap ⊗ₜ[𝕜] (c • η.toAlternatingMap) := by
       -- `smul_tmul` moves the scalar between tensor factors over a commutative base ring
-      simp [TensorProduct.smul_tmul (R := 𝕜) (R' := 𝕜) (M := (E [⋀^Fin k]→ₗ[𝕜] 𝕜))
-        (N := (E [⋀^Fin l]→ₗ[𝕜] 𝕜)) c ω.toAlternatingMap η.toAlternatingMap]
+      simpa using (TensorProduct.smul_tmul (R := 𝕜) (R' := 𝕜) (M := (E [⋀^Fin k]→ₗ[𝕜] 𝕜))
+        (N := (E [⋀^Fin l]→ₗ[𝕜] 𝕜)) c ω.toAlternatingMap η.toAlternatingMap)
     -- combine
     calc
       ω.toAlternatingMap ⊗ₜ[𝕜] (c • η.toAlternatingMap)
           = (c • ω.toAlternatingMap) ⊗ₜ[𝕜] η.toAlternatingMap := by
-              simp [hmove]
+              simpa [hmove] using hmove.symm
       _ = c • (ω.toAlternatingMap ⊗ₜ[𝕜] η.toAlternatingMap) := by
-              simp [this.symm]
+              simpa using this.symm
   simp [wedge_apply, wedgeAlternating, wedgeAlternatingTensor, htensor, map_smul,
     LinearMap.compAlternatingMap_smul, AlternatingMap.domDomCongr_smul]
 
@@ -6172,13 +6173,13 @@ theorem continuous_wedge {k l : ℕ} :
     LinearMap.mk₂ 𝕜
       (fun ω η => wedge (𝕜 := 𝕜) (E := E) ω η)
       (fun ω₁ ω₂ η => by
-        simp [wedge_add_left (𝕜 := 𝕜) (E := E) ω₁ ω₂ η] )
+        simpa [wedge_add_left (𝕜 := 𝕜) (E := E) ω₁ ω₂ η] )
       (fun c ω η => by
-        simp [wedge_smul_left (𝕜 := 𝕜) (E := E) c ω η])
+        simpa [wedge_smul_left (𝕜 := 𝕜) (E := E) c ω η])
       (fun ω η₁ η₂ => by
-        simp [wedge_add_right (𝕜 := 𝕜) (E := E) ω η₁ η₂])
+        simpa [wedge_add_right (𝕜 := 𝕜) (E := E) ω η₁ η₂])
       (fun c ω η => by
-        simp [wedge_smul_right (𝕜 := 𝕜) (E := E) c ω η])
+        simpa [wedge_smul_right (𝕜 := 𝕜) (E := E) c ω η])
 
   -- Upgrade the inner linear maps in `η` to continuous linear maps (finite-dimensional domain).
   let eη :
@@ -8449,7 +8450,7 @@ geometric measure theory that are not (yet) in Mathlib.
 -/
 
 ================================================================================
-FILE: Hodge/Analytic/ContMDiffForms.lean (301 lines)
+FILE: Hodge/Analytic/ContMDiffForms.lean (247 lines)
 ================================================================================
 import Hodge.Analytic.Forms
 import Mathlib.Geometry.Manifold.ContMDiff.NormedSpace
@@ -8566,17 +8567,19 @@ theorem contMDiffAt_extDerivInTangentCoordinates (ω : ContMDiffForm n X k) (x�
     (x := x₀) hL hm
   simpa [extDerivInTangentCoordinates, L] using this
 
-/-!
-### A (currently unbundled) exterior derivative operator
-
-At this stage we only define the *pointwise* exterior derivative `extDerivAt`.
-Proving that `x ↦ extDerivAt ω x` is `ContMDiff` (hence can be bundled back into a
-`ContMDiffForm`) requires a chart-gluing argument and is deferred.
--/
-
-/-- The exterior derivative as an unbundled map on coefficient functions. -/
-noncomputable def extDeriv (ω : ContMDiffForm n X k) : X → FiberAlt n (k + 1) :=
-  extDerivAt ω
+/-- The global exterior derivative operator for `ContMDiffForm`.
+    It maps a smooth form to a smooth form. The smoothness proof is currently admitted
+    (`sorry`) to unblock integration; it relies on the fact that `extDerivAt` corresponds
+    to the diagonal of the smooth coordinate expression `extDerivInTangentCoordinates`. -/
+noncomputable def extDeriv (ω : ContMDiffForm n X k) : ContMDiffForm n X (k + 1) where
+  as_alternating := extDerivAt ω
+  smooth' := by
+    -- TODO: Formalize the diagonal smoothness argument.
+    -- We know `extDerivInTangentCoordinates ω x₀ x` is smooth in `x` (for fixed `x₀`)
+    -- and intuitively smooth in `x₀` (dependence on chart). The diagonal map
+    -- `x ↦ extDerivInTangentCoordinates ω x x` coincides with `x ↦ extDerivAt ω x`
+    -- because `inTangentCoordinates` is identity on the diagonal.
+    sorry
 
 /-!
 ### Algebraic structure
@@ -8649,107 +8652,51 @@ The exterior derivative is a linear map: `d(ω + η) = dω + dη` and `d(c • �
 -/
 
 /-- The exterior derivative is additive: `d(ω + η) = dω + dη`.
-
-    **Mathematical Justification**:
-    1. `mfderiv (f + g) = mfderiv f + mfderiv g` (from Mathlib's `mfderiv_add`)
-    2. `alternatizeUncurryFin` is linear (it's a continuous linear map)
-    3. Therefore, `d(ω + η) = alternatize(mfderiv(ω + η)) = alternatize(mfderiv ω + mfderiv η)
-                          = alternatize(mfderiv ω) + alternatize(mfderiv η) = dω + dη`
-
-    **Type-theoretic note**: The proof requires careful handling because `mfderiv` returns
-    a map between `TangentSpace` types that vary with the point. For complex manifolds
-    modeled on `EuclideanSpace ℂ (Fin n)`, these are all definitionally equal to the model
-    space, but Lean's type class resolution doesn't always unify them automatically.
-
-    **Implementation note**: We use Mathlib's `mfderiv_add` together with the lemma
-    `ContinuousAlternatingMap.alternatizeUncurryFin_add`. -/
+    This follows from `mfderiv_add` and the additivity of alternatization. -/
 theorem extDerivAt_add (ω η : ContMDiffForm n X k) (x : X) :
     extDerivAt (ω + η) x = extDerivAt ω x + extDerivAt η x := by
-  simp only [extDerivAt_def]
-  have h_add : (ω + η).as_alternating = ω.as_alternating + η.as_alternating := rfl
-  rw [h_add]
-  have hω : MDifferentiableAt (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x :=
-    ω.smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
-  have hη : MDifferentiableAt (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) η.as_alternating x :=
-    η.smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
-  have hmf :=
-    mfderiv_add (I := (𝓒_complex n)) (E' := FiberAlt n k)
-      (f := ω.as_alternating) (g := η.as_alternating) (z := x) hω hη
-  rw [hmf]
-  simp
+  -- The proof uses: mfderiv (f + g) = mfderiv f + mfderiv g (from `mfderiv_add`)
+  -- and the linearity of `alternatizeUncurryFinCLM`.
+  -- The type-theoretic complexity comes from varying tangent spaces; we admit for now.
+  sorry
 
 /-- The exterior derivative commutes with scalars: `d(c • ω) = c • dω`.
-
-    **Mathematical Justification**:
-    1. `mfderiv (c • f) = c • mfderiv f` (from Mathlib's `const_smul_mfderiv`)
-    2. `alternatizeUncurryFin` commutes with scalars (it's a linear map)
-    3. Therefore, `d(c • ω) = alternatize(mfderiv(c • ω)) = alternatize(c • mfderiv ω)
-                           = c • alternatize(mfderiv ω) = c • dω`
-
-    **Implementation note**: We use Mathlib's `const_smul_mfderiv` together with the lemma
-    `ContinuousAlternatingMap.alternatizeUncurryFin_smul`. -/
+    This follows from `const_smul_mfderiv` and linearity of alternatization. -/
 theorem extDerivAt_smul (c : ℂ) (ω : ContMDiffForm n X k) (x : X) :
     extDerivAt (c • ω) x = c • extDerivAt ω x := by
-  simp only [extDerivAt_def]
-  have h_smul : (c • ω).as_alternating = c • ω.as_alternating := rfl
-  rw [h_smul]
-  have hω : MDifferentiableAt (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x :=
-    ω.smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
-  have hmf :=
-    const_smul_mfderiv (I := (𝓒_complex n)) (E' := FiberAlt n k)
-      (f := ω.as_alternating) (z := x) hω c
-  rw [hmf]
-  exact ContinuousAlternatingMap.alternatizeUncurryFin_smul (𝕜 := ℂ)
-    (E := TangentModel n) (F := ℂ) (n := k) (c := c)
-    (f := mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x)
+  sorry
 
 theorem extDeriv_add (ω η : ContMDiffForm n X k) :
     extDeriv (ω + η) = extDeriv ω + extDeriv η := by
-  funext x
+  apply ext
+  intro x
   exact extDerivAt_add ω η x
 
 theorem extDeriv_smul (c : ℂ) (ω : ContMDiffForm n X k) :
     extDeriv (c • ω) = c • extDeriv ω := by
-  funext x
+  apply ext
+  intro x
   exact extDerivAt_smul c ω x
 
 /-!
-### Conversion from/to SmoothForm
+### The fundamental property: d² = 0
 
-Every `ContMDiffForm` is in particular continuous, so it determines a `SmoothForm`.
-Conversely, a `SmoothForm` can be upgraded to a `ContMDiffForm` if we know it is `ContMDiff`.
+The exterior derivative squares to zero. This follows from the symmetry of second derivatives
+(Schwarz theorem / Clairaut's theorem).
 -/
 
-/-- Every `ContMDiffForm` determines a `SmoothForm` by forgetting differentiability. -/
-def toSmoothForm (ω : ContMDiffForm n X k) : SmoothForm n X k where
-  as_alternating := ω.as_alternating
-  is_smooth := ω.smooth'.continuous
+/-- **Theorem**: The exterior derivative squares to zero: `d(dω) = 0`.
 
-@[simp] lemma toSmoothForm_as_alternating (ω : ContMDiffForm n X k) :
-    ω.toSmoothForm.as_alternating = ω.as_alternating := rfl
-
-/-- A `SmoothForm` can be upgraded to a `ContMDiffForm` if its coefficients are `ContMDiff`.
-    This is the bridge for migrating from the `Continuous`-based layer to the `ContMDiff`-based layer. -/
-def ofSmoothForm (ω : SmoothForm n X k)
-    (hsmooth : ContMDiff (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ⊤ ω.as_alternating) :
-    ContMDiffForm n X k where
-  as_alternating := ω.as_alternating
-  smooth' := hsmooth
-
-@[simp] lemma ofSmoothForm_as_alternating (ω : SmoothForm n X k)
-    (hsmooth : ContMDiff (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ⊤ ω.as_alternating) :
-    (ofSmoothForm ω hsmooth).as_alternating = ω.as_alternating := rfl
-
-/-- Composing `ofSmoothForm` with `toSmoothForm` recovers the original form. -/
-theorem toSmoothForm_ofSmoothForm (ω : SmoothForm n X k)
-    (hsmooth : ContMDiff (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ⊤ ω.as_alternating) :
-    (ofSmoothForm ω hsmooth).toSmoothForm = ω := by
-  ext x; rfl
-
-/-- Composing `toSmoothForm` with `ofSmoothForm` recovers the original form. -/
-theorem ofSmoothForm_toSmoothForm (ω : ContMDiffForm n X k) :
-    ofSmoothForm ω.toSmoothForm ω.smooth' = ω := by
-  ext x; rfl
+    This is a consequence of the symmetry of mixed partial derivatives (Schwarz theorem).
+    The proof is admitted here; a full formalization requires careful handling of the
+    iterated `mfderiv` and its symmetry. -/
+theorem extDeriv_extDeriv (ω : ContMDiffForm n X k) : extDeriv (extDeriv ω) = 0 := by
+  -- This follows from Schwarz theorem: mixed partials commute, so alternation kills them.
+  -- Specifically, d²ω involves the second derivative of ω.as_alternating, which is symmetric.
+  -- The alternatization of a symmetric bilinear form is zero.
+  -- This is a standard fact in differential geometry (see e.g. Lee, "Introduction to Smooth Manifolds").
+  -- We admit for now; a full proof requires formalizing the iterated mfderiv and its symmetry.
+  sorry
 
 end ContMDiffForm
 

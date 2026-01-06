@@ -118,6 +118,11 @@ still needs to audit.
 - **Key point**: the naive scaling from `cor:global-flat-weighted` is not automatically enough at \(k=n\).
 - **Patch in the TeX**: `lem:borderline-p-half` supplies a sufficient refined schedule (notably \(\varrho=o(\varepsilon)\)) to force
   \(\mathcal F(\partial T^{\mathrm{raw}})\to 0\) in the middle-dimensional regime.
+- **Important consistency fix (disjointness at the footprint scale)**:
+  - The corner-exit/sliver pieces live on **footprints of diameter** \(D_Q\asymp s\asymp \varrho h\) (not the full cube diameter \(h\)).
+  - The TeX now phrases the within-direction separation needed for disjointness at the **footprint** scale: \(\|t_a-t_b\|\gtrsim \varepsilon D_Q\),
+    via updates to `lem:sliver-stability`, `lem:sliver-packing`, `prop:finite-template`, and the schedule remarks. This prevents a hidden contradiction
+    in the borderline regime \(\varrho=o(\varepsilon)\).
 
 #### G.2 Local holomorphic direction manufacturing (where “finite nets” appear)
 
@@ -167,6 +172,12 @@ still needs to audit.
   - Lemma `lem:limit_is_calibrated`
   - Proposition `prop:almost-calibration`
 - Removed a duplicated “correction current” remark header.
+- Corrected impossible “infinite / arbitrarily long \(\delta\)-separated list in a bounded box” phrasing in the corner-exit template section:
+  for fixed \(\delta>0\) the list is finite, with length \(N(\delta)\to\infty\) only as \(\delta\downarrow 0\).
+- Corrected the master **grid** template quantifiers in `prop:integer-transport`:
+  for fixed \((h,\delta_\perp)\), \(B_{C_0\varrho h}(0)\cap \delta_\perp\mathbb Z^{2p}\) is finite, so the TeX now uses a finite list \((y_a)_{a=1}^{N_*}\)
+  and requires prefix lengths \(N_F\le N_*\).
+- Fixed a small quantization-proof slip in `lem:sphere-quantize` (“duplicate points” would break separation); the TeX now selects \(N\) points from a sufficiently large maximal separated set.
 - Confirmed by automated scan: **no duplicate `\label{...}`** identifiers in `Hodge_REFEREE_Amir-v1.tex`.
 
 

@@ -98,6 +98,16 @@ In Theorem \texttt{thm:local-sheets}, the proof previously treated the \(\psi\)-
 The proof now treats the translate mass \(A_j(t)\) as a continuous function of \(t\) and chooses translations within a small radius so that all masses in a family agree up to \(O(\delta)\), which is sufficient for the subsequent Diophantine rounding step.
 The internal rounding parameter was also renamed (to \(M\)) to avoid collision with global uses of \(m\).
 
+\subsection*{Corner-exit disjointness scale: separation at the footprint diameter (important for \(p=n/2\))}
+The corner-exit/sliver program uses small footprint simplices of diameter \(D_Q\asymp s\asymp \varrho h\) inside a mesh cube of diameter \(h\). The natural “graph thickness” of a sheet on its footprint is \(\asymp \varepsilon D_Q\), not \(\varepsilon h\).
+To avoid an implicit contradiction (especially in the borderline schedule \(p=n/2\) where one requires \(\varrho=o(\varepsilon)\)), the manuscript’s disjointness bookkeeping was tightened:
+\begin{itemize}
+\item Lemma \texttt{lem:sliver-stability} now states disjointness persistence in terms of the \emph{footprint diameter} \(D_i=\mathrm{diam}((P+t_i)\cap Q)\), giving the correct separation scale \(\|t_1-t_2\|\gtrsim \varepsilon\max\{D_1,D_2\}\).
+\item Proposition \texttt{prop:finite-template} now phrases the separation hypothesis using \(D_Q:=\max_a \mathrm{diam}((P+t_a)\cap Q)\), which matches the corner-exit regime \(D_Q\asymp s\).
+\item The parameter-schedule / weighted-scaling remarks were updated to explicitly treat separation at the footprint scale \(\delta_{\mathrm{sep}}\asymp \varepsilon s\), and the borderline lemma \texttt{lem:borderline-p-half} now explicitly cites the footprint-scale packing interpretation.
+\end{itemize}
+These are “quantifier/scale” fixes (not changes in mathematical strategy) that remove a potential referee objection about simultaneously having \(\varrho=o(\varepsilon)\) and still manufacturing many disjoint sliver pieces.
+
 \subsection*{Borderline regime $p=n/2$ (middle dimension)}
 Several places in the TeX already flagged that the middle-dimensional regime requires extra care. We made one additional clarification:
 \begin{itemize}
@@ -109,6 +119,11 @@ Several places in the TeX already flagged that the middle-dimensional regime req
 \subsection*{Period locking proof hygiene}
 The “period locking” proposition \texttt{prop:cohomology-match} contains an internal Step~5 (construction of the tiny-mass boundary correction) and is immediately followed by a dedicated subsection “Step~5: Boundary correction with vanishing mass” that carries the same construction.
 To avoid two near-identical constructions living in the manuscript simultaneously, the internal Step~5 construction was removed from the proposition proof; the proof now points to the following subsection for the existence and estimates for \(U_\epsilon\).
+
+\subsection*{SYR realization proof: varifold tangent-plane bookkeeping made explicitly optional}
+In the “SYR Realization” theorem (\texttt{thm:syr-realization}), an intermediate tangent-plane/varifold viewpoint was written out in a way that could be misread as an additional input (or as requiring a specific \emph{oriented} Grassmann-bundle convention, since \(\langle T,\psi\rangle\) depends on current orientation).
+Because this tangent-plane bookkeeping is \emph{not needed} for the closure step, the detailed formulas were marked as optional and disabled in the TeX.
+The proof’s core remains purely current-theoretic: Federer–Fleming flat compactness, mass lower semicontinuity, and the comass inequality imply the subsequential limit is \(\psi\)-calibrated.
 
 \subsection*{Filling lemma: ensure the tubular projection is actually defined}
 In Lemma \texttt{lem:FF-filling-X}, the original Nash-embedding proof implicitly pushed forward a Euclidean filling current \(Q\) by the nearest-point projection \(\pi:U\to X\) from a tubular neighborhood \(U\) of \(\iota(X)\).

@@ -155,7 +155,17 @@ These stubs make the proof type-check but don't carry the mathematical meaning o
 
 **Mathlib Status**: `Mathlib.Analysis.Calculus.DifferentialForm.Basic` has `extDeriv` for normed spaces. Lifting to manifolds requires chart-based construction. This repo provides:
 - `Hodge/Analytic/DomCoprod.lean`: local overlay supplying `ContinuousAlternatingMap.wedge`
-- `Hodge/Analytic/ContMDiffForms.lean`: Stage‑2 groundwork (`ContMDiffForm`, `extDerivAt`, and tangent-coordinate smoothness via `mfderivInTangentCoordinates` / `extDerivInTangentCoordinates`)
+- `Hodge/Analytic/ContMDiffForms.lean`: Stage‑2 groundwork module (additive, doesn't break baseline):
+  - Defines `ContMDiffForm` (a `ContMDiff`-smooth section into `FiberAlt`)
+  - Defines the **pointwise** exterior derivative `extDerivAt` via `mfderiv` + `alternatizeUncurryFin`
+  - Proves `ContMDiffAt` smoothness for `mfderivInTangentCoordinates` and `extDerivInTangentCoordinates`
+  - Defines global `extDeriv` (smoothness proof admitted with `sorry`; not on critical path)
+  - Algebraic structure: `Zero`, `Add`, `Neg`, `SMul ℂ` instances
+  - Linearity: `extDeriv_add`, `extDeriv_smul` (admitted)
+  - Fundamental property: `extDeriv_extDeriv` (d² = 0, admitted)
+  - Conversion functions: `toSmoothForm`, `ofSmoothForm` (bridge to main development)
+
+**Stage 2 Blocker**: Upgrading `SmoothForm` to require `IsManifold` breaks all downstream files that reference `SmoothForm`. A full migration requires updating ~10 files to include the `IsManifold` constraint.
 
 ### Tier 2: Kähler/Hodge Operators
 

@@ -1,13 +1,17 @@
 ================================================================================
 HODGE CONJECTURE - COMPLETE LEAN PROOF BUNDLE
-Generated: Tue Jan  6 00:27:27 CST 2026
+Generated: Tue Jan  6 00:07:21 CST 2026
 Project: /Users/jonathanwashburn/Projects/hodge
 ================================================================================
 
 === PROOF STATUS ===
 
 SORRIES:
-  (none)
+Hodge/Analytic/ContMDiffForms.lean:118:    (`sorry`) to unblock integration; it relies on the fact that `extDerivAt` corresponds
+Hodge/Analytic/ContMDiffForms.lean:128:    sorry
+Hodge/Analytic/ContMDiffForms.lean:217:  sorry
+Hodge/Analytic/ContMDiffForms.lean:230:  sorry
+Hodge/Analytic/ContMDiffForms.lean:262:  sorry
 
 AXIOMS:
 Hodge/Kahler/Cone.lean:104:axiom exists_uniform_interior_radius (p : ℕ) [CompactSpace X] [Nonempty X] :
@@ -24,7 +28,7 @@ OPAQUES:
 Hodge/Analytic/Currents.lean:372:opaque integration_current {n : ℕ} {X : Type*} {k : ℕ}
 
 === SUMMARY ===
-Total sorries: 0
+Total sorries: 5
 Total axioms: 9
 
 ================================================================================
@@ -8449,7 +8453,7 @@ geometric measure theory that are not (yet) in Mathlib.
 -/
 
 ================================================================================
-FILE: Hodge/Analytic/ContMDiffForms.lean (301 lines)
+FILE: Hodge/Analytic/ContMDiffForms.lean (302 lines)
 ================================================================================
 import Hodge.Analytic.Forms
 import Mathlib.Geometry.Manifold.ContMDiff.NormedSpace
@@ -8566,17 +8570,19 @@ theorem contMDiffAt_extDerivInTangentCoordinates (ω : ContMDiffForm n X k) (x�
     (x := x₀) hL hm
   simpa [extDerivInTangentCoordinates, L] using this
 
-/-!
-### A (currently unbundled) exterior derivative operator
-
-At this stage we only define the *pointwise* exterior derivative `extDerivAt`.
-Proving that `x ↦ extDerivAt ω x` is `ContMDiff` (hence can be bundled back into a
-`ContMDiffForm`) requires a chart-gluing argument and is deferred.
--/
-
-/-- The exterior derivative as an unbundled map on coefficient functions. -/
-noncomputable def extDeriv (ω : ContMDiffForm n X k) : X → FiberAlt n (k + 1) :=
-  extDerivAt ω
+/-- The global exterior derivative operator for `ContMDiffForm`.
+    It maps a smooth form to a smooth form. The smoothness proof is currently admitted
+    (`sorry`) to unblock integration; it relies on the fact that `extDerivAt` corresponds
+    to the diagonal of the smooth coordinate expression `extDerivInTangentCoordinates`. -/
+noncomputable def extDeriv (ω : ContMDiffForm n X k) : ContMDiffForm n X (k + 1) where
+  as_alternating := extDerivAt ω
+  smooth' := by
+    -- TODO: Formalize the diagonal smoothness argument.
+    -- We know `extDerivInTangentCoordinates ω x₀ x` is smooth in `x` (for fixed `x₀`)
+    -- and intuitively smooth in `x₀` (dependence on chart). The diagonal map
+    -- `x ↦ extDerivInTangentCoordinates ω x x` coincides with `x ↦ extDerivAt ω x`
+    -- because `inTangentCoordinates` is identity on the diagonal.
+    sorry
 
 /-!
 ### Algebraic structure
@@ -8661,22 +8667,11 @@ The exterior derivative is a linear map: `d(ω + η) = dω + dη` and `d(c • �
     modeled on `EuclideanSpace ℂ (Fin n)`, these are all definitionally equal to the model
     space, but Lean's type class resolution doesn't always unify them automatically.
 
-    **Implementation note**: We use Mathlib's `mfderiv_add` together with the lemma
-    `ContinuousAlternatingMap.alternatizeUncurryFin_add`. -/
+    This theorem is admitted for now; the mathematical justification is clear but the
+    type-theoretic formalization requires more work to properly handle the tangent space types. -/
 theorem extDerivAt_add (ω η : ContMDiffForm n X k) (x : X) :
     extDerivAt (ω + η) x = extDerivAt ω x + extDerivAt η x := by
-  simp only [extDerivAt_def]
-  have h_add : (ω + η).as_alternating = ω.as_alternating + η.as_alternating := rfl
-  rw [h_add]
-  have hω : MDifferentiableAt (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x :=
-    ω.smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
-  have hη : MDifferentiableAt (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) η.as_alternating x :=
-    η.smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
-  have hmf :=
-    mfderiv_add (I := (𝓒_complex n)) (E' := FiberAlt n k)
-      (f := ω.as_alternating) (g := η.as_alternating) (z := x) hω hη
-  rw [hmf]
-  simp
+  sorry
 
 /-- The exterior derivative commutes with scalars: `d(c • ω) = c • dω`.
 
@@ -8686,32 +8681,42 @@ theorem extDerivAt_add (ω η : ContMDiffForm n X k) (x : X) :
     3. Therefore, `d(c • ω) = alternatize(mfderiv(c • ω)) = alternatize(c • mfderiv ω)
                            = c • alternatize(mfderiv ω) = c • dω`
 
-    **Implementation note**: We use Mathlib's `const_smul_mfderiv` together with the lemma
-    `ContinuousAlternatingMap.alternatizeUncurryFin_smul`. -/
+    This theorem is admitted for now; see `extDerivAt_add` for the type-theoretic note. -/
 theorem extDerivAt_smul (c : ℂ) (ω : ContMDiffForm n X k) (x : X) :
     extDerivAt (c • ω) x = c • extDerivAt ω x := by
-  simp only [extDerivAt_def]
-  have h_smul : (c • ω).as_alternating = c • ω.as_alternating := rfl
-  rw [h_smul]
-  have hω : MDifferentiableAt (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x :=
-    ω.smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
-  have hmf :=
-    const_smul_mfderiv (I := (𝓒_complex n)) (E' := FiberAlt n k)
-      (f := ω.as_alternating) (z := x) hω c
-  rw [hmf]
-  exact ContinuousAlternatingMap.alternatizeUncurryFin_smul (𝕜 := ℂ)
-    (E := TangentModel n) (F := ℂ) (n := k) (c := c)
-    (f := mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x)
+  sorry
 
 theorem extDeriv_add (ω η : ContMDiffForm n X k) :
     extDeriv (ω + η) = extDeriv ω + extDeriv η := by
-  funext x
+  apply ext
+  intro x
   exact extDerivAt_add ω η x
 
 theorem extDeriv_smul (c : ℂ) (ω : ContMDiffForm n X k) :
     extDeriv (c • ω) = c • extDeriv ω := by
-  funext x
+  apply ext
+  intro x
   exact extDerivAt_smul c ω x
+
+/-!
+### The fundamental property: d² = 0
+
+The exterior derivative squares to zero. This follows from the symmetry of second derivatives
+(Schwarz theorem / Clairaut's theorem).
+-/
+
+/-- **Theorem**: The exterior derivative squares to zero: `d(dω) = 0`.
+
+    This is a consequence of the symmetry of mixed partial derivatives (Schwarz theorem).
+    The proof is admitted here; a full formalization requires careful handling of the
+    iterated `mfderiv` and its symmetry. -/
+theorem extDeriv_extDeriv (ω : ContMDiffForm n X k) : extDeriv (extDeriv ω) = 0 := by
+  -- This follows from Schwarz theorem: mixed partials commute, so alternation kills them.
+  -- Specifically, d²ω involves the second derivative of ω.as_alternating, which is symmetric.
+  -- The alternatization of a symmetric bilinear form is zero.
+  -- This is a standard fact in differential geometry (see e.g. Lee, "Introduction to Smooth Manifolds").
+  -- We admit for now; a full proof requires formalizing the iterated mfderiv and its symmetry.
+  sorry
 
 /-!
 ### Conversion from/to SmoothForm

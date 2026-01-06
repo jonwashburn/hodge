@@ -38,14 +38,19 @@ These are the *only* axioms intended to remain:
   - `Hodge/Analytic/ModelDeRham.lean`: model-space forms + `ModelForm.d := extDeriv` + pointwise wedge
   - `Hodge/Cohomology/ModelDeRham.lean`: model-space **C∞** forms + `d²=0` + additive cohomology quotient
 
-  - **Stage 2 (in progress)**: Replace the *placeholder exterior derivative* (`extDerivLinearMap := 0`) with a Mathlib-backed `d`
-    - **Current blocker**: the main proof uses `SmoothForm n X k` on manifolds, which only carries continuity (`Continuous`) not differentiability.
-    - **Milestone (completed)**: a manifold-aware “C^∞ form” backend exists in `Hodge/Analytic/ContMDiffForms.lean`
-      - Defines `ContMDiffForm` (a `ContMDiff` coefficient map into `FiberAlt`)
-      - Defines the **pointwise** exterior derivative `extDerivAt` via `mfderiv` + alternatization
-      - Proves `ContMDiffAt` smoothness in tangent coordinates (`mfderivInTangentCoordinates`)
-      - Defines the **global** exterior derivative `extDeriv` (with a `sorry` for global smoothness, to unblock integration)
-    - **Next milestone**: integrate this `extDeriv` into `SmoothForm` (requires Stage 3 type migration) or update the codebase to use `ContMDiffForm` where needed.
+- **Stage 2 (groundwork complete)**:
+  - **Goal**: Replace the *placeholder exterior derivative* (`extDerivLinearMap := 0`) with a Mathlib-backed `d`
+  - **Current status**: The `SmoothForm` type uses `Continuous` coefficients (not `ContMDiff`), which is insufficient for `mfderiv`. The upgrade to `ContMDiff` breaks all downstream files that use `SmoothForm`.
+  - **Solution**: A separate **additive module** `Hodge/Analytic/ContMDiffForms.lean` provides the `ContMDiff`-based infrastructure:
+    - Defines `ContMDiffForm` (a `ContMDiff` coefficient map into `FiberAlt`)
+    - Defines the **pointwise** exterior derivative `extDerivAt` via `mfderiv` + alternatization
+    - Proves `ContMDiffAt` smoothness in tangent coordinates (`mfderivInTangentCoordinates`, `extDerivInTangentCoordinates`)
+    - Defines an **unbundled** exterior derivative `extDeriv` as a function `X → FiberAlt n (k+1)` (bundling back into `ContMDiffForm` requires a chart-gluing proof)
+    - Provides **conversion functions**: `toSmoothForm` (forget differentiability) and `ofSmoothForm` (upgrade when `ContMDiff` is known)
+    - Proves pointwise linearity: `extDerivAt_add`, `extDerivAt_smul` and function-level linearity: `extDeriv_add`, `extDeriv_smul`
+  - **Main `Forms.lean` unchanged**: Keeps `IsSmoothAlternating = Continuous` and `extDerivLinearMap = 0` to preserve baseline.
+  - **Migration path**: Use `ContMDiffForm.ofSmoothForm` to upgrade a `SmoothForm` to `ContMDiffForm` when smoothness is known, then apply the real `extDeriv`.
+
 
 - **Stage 3 (pending)**: Replace the current de Rham quotient (“cohomology”) with an actually well-defined Mathlib-backed complex if/when available, or a local equivalent construction.
 

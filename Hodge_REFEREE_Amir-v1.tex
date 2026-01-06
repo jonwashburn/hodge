@@ -167,8 +167,8 @@
 \newenvironment{editamirblock}{\begingroup\color{blue}}{\endgroup}
 
 % === Referee layer (blue; cumulative across steps) ===
-\newcommand{\editamirNEW}[1]{\textcolor{red}{#1}}
-\newenvironment{editamirblockNEW}{\begingroup\color{red}}{\endgroup}
+\newcommand{\editamirNEW}[1]{\textcolor{blue}{#1}}
+\newenvironment{editamirblockNEW}{\begingroup\color{blue}}{\endgroup}
 
 % AI assistant layer (teal; Jan 2026)
 \definecolor{editaiColor}{rgb}{0.00,0.45,0.45}
@@ -2112,7 +2112,7 @@ Choose a transverse grid spacing $\delta_j=o(h_j)$ on each face tubular chart $\
 \editamirNEW{Choose also the transverse parameter radius factor $\varrho_j$ (defining the corner-exit template scale $s_j\asymp \varrho_j h_j$) such that $\varrho_j=o(\varepsilon_j)$ (required for the borderline $p=n/2$ case; see Lemma~\ref{lem:borderline-p-half}).}
 \editamirNEW{In the corner-exit templates, the relevant footprint diameter satisfies $D_Q\asymp s_j$, so the within-label translation separation needed for disjointness is at the footprint scale $\delta_{\mathrm{sep},j}\asymp \varepsilon_j\,s_j$ (cf.\ Lemma~\ref{lem:sliver-stability} and Proposition~\ref{prop:finite-template}).}
 \item \textbf{Finally choose holomorphic scales and discrete rounding data.}
-Choose the holomorphic manufacturing scale (line bundle power) $M_j\to\infty$ large enough that the local sheet/sliver construction at tolerance $\varepsilon_j$
+Choose the holomorphic manufacturing scale (line bundle power) $N_j\to\infty$ large enough that the local sheet/sliver construction at tolerance $\varepsilon_j$
 is available uniformly on all $h_j$--cells (Theorem~\ref{thm:local-sheets} and the corner-exit realization package), then choose the integer activation/rounding variables
 (counts, prefixes) to meet the local budgets and global period constraints (Proposition~\ref{prop:global-coherence-all-labels} and Proposition~\ref{prop:cohomology-match}).
 
@@ -2591,14 +2591,20 @@ decompositions, isoperimetric fillings, and varifold compactness).
 	$\langle\xi_{Q,j},\psi\rangle=1$ pointwise, hence $\Mass(S_Q)=M_Q\int_Q \sum_j
 	\theta_{Q,j}\,d\vol + o_\varepsilon(1)$.
 	
-	\emph{Step 3: Closure by isoperimetric filling.} The sum $\sum_Q S_Q$ has small
-	boundary concentrated on cell interfaces with $\Mass(\partial \sum_Q S_Q)\lesssim
-	C\,\varepsilon$ (uniform density and bounded geometry). By the isoperimetric
-	inequality on compact Riemannian manifolds and the Federer–Fleming Deformation
-	Theorem, there exists a correction current $R_\varepsilon$ with
-	$\partial R_\varepsilon = -\partial \sum_Q S_Q$ and $\Mass(R_\varepsilon)\to 0$ as
-	$\varepsilon\to 0$. Then $T_\varepsilon:=\sum_Q S_Q+R_\varepsilon$ is closed,
-	rectifiable, and calibrated almost everywhere.
+	\emph{Step 3: Closure by a small-mass filling (flat-norm viewpoint).}
+	Set $S^{\mathrm{raw}}_\varepsilon:=\sum_Q S_Q$.
+	Its boundary $\partial S^{\mathrm{raw}}_\varepsilon$ is supported on the union of cell interfaces.
+	\editamir{While $\Mass(\partial S^{\mathrm{raw}}_\varepsilon)$ may be large, the robust quantity for gluing is the \emph{flat norm} $\mathcal F(\partial S^{\mathrm{raw}}_\varepsilon)$.
+	By the dual characterization of $\mathcal F$ and Stokes, for any test form $\eta$ with $\|\eta\|_{\mathrm{comass}}\le 1$ and $\|d\eta\|_{\mathrm{comass}}\le 1$ one has
+	$\partial S^{\mathrm{raw}}_\varepsilon(\eta)=S^{\mathrm{raw}}_\varepsilon(d\eta)$.
+	The cellwise $C^0$ approximation of $\beta$ together with bounded geometry implies $S^{\mathrm{raw}}_\varepsilon(d\eta)=\int_X (m\beta)\wedge d\eta + o_\varepsilon(1)=o_\varepsilon(1)$ (since $d\beta=0$), hence $\mathcal F(\partial S^{\mathrm{raw}}_\varepsilon)\to 0$.}
+	By a Federer--Fleming isoperimetric/filling inequality for integral currents on compact manifolds, there exists an integral current $R_\varepsilon$ with
+	$\partial R_\varepsilon = -\partial S^{\mathrm{raw}}_\varepsilon$ and $\Mass(R_\varepsilon)\to 0$.
+	Define the closed integral cycle $T_\varepsilon:=S^{\mathrm{raw}}_\varepsilon+R_\varepsilon$.
+	Since $S^{\mathrm{raw}}_\varepsilon$ is a sum of $\psi$--calibrated pieces, $\int_{S^{\mathrm{raw}}_\varepsilon}\psi=\Mass(S^{\mathrm{raw}}_\varepsilon)$, and therefore
+	\[
+	0\le \Def_{\mathrm{cal}}(T_\varepsilon)\le 2\,\Mass(R_\varepsilon)\xrightarrow[\varepsilon\to 0]{}0.
+	\]
 	
 	\emph{Step 4: Homology adjustment and mass control.} Pairing with $\psi$ shows
 	\[
@@ -2606,13 +2612,10 @@ decompositions, isoperimetric fillings, and varifold compactness).
 	= \sum_Q \int_Q \sum_j \theta_{Q,j}\,d\vol + o_\varepsilon(1)
 	= \int_{U_\alpha}\beta\wedge\psi + o_\varepsilon(1).
 	\]
-	Using a finite cover $\{U_\alpha\}$ and partition of unity yields a global cycle
-	with $\Mass(T_\varepsilon)=m\int_X\beta\wedge\psi + o_\varepsilon(1)$. Adjusting
-	by a null–homologous small–mass cycle (via Deformation Theorem \cite{FF60,Fed69}) yields an integral
-	cycle in class $\mathrm{PD}(m[\gamma])$ with the same mass asymptotics. Varifold
-	compactness then provides a convergent subsequence.  The mass asymptotics imply
-	$\Def_{\mathrm{cal}}(T_\varepsilon)\to 0$, hence $\beta$ is SYR--realizable in the
-	sense of Definition~\ref{def:syr}.
+	Using a finite cover $\{U_\alpha\}$ and partition of unity yields a global sequence of closed integral cycles (still denoted $T_\varepsilon$)
+	with $\Mass(T_\varepsilon)=m\int_X\beta\wedge\psi + o_\varepsilon(1)$ and $\Def_{\mathrm{cal}}(T_\varepsilon)\to 0$.
+	\editamir{To enforce the exact homology class $\mathrm{PD}(m[\gamma])$ (modulo torsion), one may refine the mesh so that the period contributions of individual plaques are uniformly tiny and then apply the same fixed-dimensional rounding / lattice-discreteness argument used later in Proposition~\ref{prop:cohomology-match}.}
+	Thus $\beta$ is SYR--realizable in the sense of Definition~\ref{def:syr}.
 \end{proof}
 
 \begin{corollary}[Closure of the program under LICD]\label{cor:closure-licd}
@@ -3144,7 +3147,7 @@ The proof proceeds in four substeps.
 
 \medskip\noindent
 \textbf{Substep 3.1: Local setup and flattening.}
-\editamir{For $Q$ small enough (equivalently, for mesh $h$ small enough), there is a holomorphic chart}
+\editamir{Write $h:=\mathrm{diam}(Q)$. For $Q$ small enough (equivalently, for $h$ small enough), there is a holomorphic chart}
 $\Phi:U\to B(0,2)\subset\C^n$ with $Q\subset U$,
 $\Phi(Q)\subset [-1,1]^{2n}\subset\C^n$, and the K\"ahler form $\omega$
 and calibration $\psi=\omega^{n-p}/(n-p)!$ are $C^1$-close to the flat
@@ -3169,7 +3172,7 @@ and no ``projection to the nearest calibrated plane'' is required.
 
 \medskip\noindent
 \textbf{Substep 3.3: Choose sheet counts via Diophantine rounding.}
-For fixed $j$, the $\psi$--mass of a flat model translate in $Q$ is
+\editamir{Write $k:=2n-2p$.} For fixed $j$, the $\psi$--mass of a flat model translate in $Q$ is
 \[
 A_j(t)\ :=\ \Mass\bigl([\widetilde\Pi_j+t]\llcorner Q\bigr),\qquad t\in N_j^\perp.
 \]
@@ -3218,17 +3221,17 @@ This is possible since $N_j^\perp$ has real dimension $2p\ge 2$ and we choose on
 \noindent\textbf{Referee tightening (quantitative separation for persistence).}
 To make the later holomorphic perturbation \emph{provably} preserve disjointness on $Q$, we choose the
 translations with a margin tied to the eventual $C^1$--graph scale.
-Fix $k\gg 1$ (to be chosen in Substep~3.5) and let $\eta_k\to 0$ be the graph parameter produced by
-Proposition~\ref{prop:cell-scale-linear-model-graph} for $L^k$ on Bergman balls of radius $\asymp k^{-1/2}$.
+Fix $N\gg 1$ (to be chosen in Substep~3.5) and let $\eta_N\to 0$ be the graph parameter produced by
+Proposition~\ref{prop:cell-scale-linear-model-graph} for $L^{\otimes N}$ on Bergman balls of radius $\asymp N^{-1/2}$.
 Choose the translation vectors so that, for each fixed $j$,
 \[
 |t_{j,a}|\le c\,h
 \qquad\text{and}\qquad
-\|t_{j,a}-t_{j,a'}\|\ge 20\,\eta_k\,h\quad(a\neq a'),
+\|t_{j,a}-t_{j,a'}\|\ge 20\,\eta_N\,h\quad(a\neq a'),
 \]
 where $c>0$ is the constant in Proposition~\ref{prop:cell-scale-linear-model-graph}.
 Then the resulting realized sheets $Y_j^a$ in Substep~3.5 satisfy
-$\dist\bigl(Y_j^a\cap Q,\ \widetilde\Pi_j+t_{j,a}\bigr)\le 2\,\eta_k\,h$ (by Lemma~\ref{lem:global-graph-contraction}
+$\dist\bigl(Y_j^a\cap Q,\ \widetilde\Pi_j+t_{j,a}\bigr)\le 2\,\eta_N\,h$ (by Lemma~\ref{lem:global-graph-contraction}
 as used in Proposition~\ref{prop:cell-scale-linear-model-graph}),
 so the tubular neighborhoods around distinct planes are disjoint and hence the sheets remain disjoint on $Q$.
 \end{editamirblockNEW}
@@ -3250,15 +3253,15 @@ These satisfy: (i) $\psi_0$-calibration (complex $(n-p)$-planes);
 \textbf{Substep 3.5: Upgrade to algebraic complete intersections.}
 \begin{editamirblock}
 This step uses the polarized/projective hypothesis: fix an ample line bundle $L$ with
-$\omega=c_1(L)$ and work with large tensor powers $L^k$.
+$\omega=c_1(L)$ and work with large tensor powers $L^{\otimes N}$.
 After shrinking $Q$ (or refining the cube partition), assume $Q$ is contained in a
-Bergman ball of radius $O(k^{-1/2})$ for $L^k$.
+Bergman ball of radius $O(N^{-1/2})$ for $L^{\otimes N}$.
 
 Using holomorphic peak sections and Bergman kernel asymptotics (Tian--Catlin--Zelditch;
 see \cite{Tian90,Catlin99,Zelditch98,MaMarinescu07}), one can construct global holomorphic
-sections $s^{(1)}_{j,a},\ldots,s^{(p)}_{j,a}\in H^0(X,L^k)$ whose restrictions to $Q$,
-after trivializing $L^k$ on $Q$, are $C^2$--close to the affine linear functions cutting out
-the model planes $\widetilde Y_j^a$.  For $k\gg 1$, the holomorphic implicit function theorem
+sections $s^{(1)}_{j,a},\ldots,s^{(p)}_{j,a}\in H^0(X,L^{\otimes N})$ whose restrictions to $Q$,
+after trivializing $L^{\otimes N}$ on $Q$, are $C^2$--close to the affine linear functions cutting out
+the model planes $\widetilde Y_j^a$.  For $N\gg 1$, the holomorphic implicit function theorem
 then gives that
 \[
 Y_j^a:=\{s^{(1)}_{j,a}=0\}\cap\cdots\cap\{s^{(p)}_{j,a}=0\}
@@ -3266,7 +3269,7 @@ Y_j^a:=\{s^{(1)}_{j,a}=0\}\cap\cdots\cap\{s^{(p)}_{j,a}=0\}
 is a smooth complex $(n-p)$--dimensional complete intersection and, on $Q$, is a single $C^1$ graph
 over $\widetilde\Pi_j+t_{j,a}$.  Since the perturbation is $C^1$--small on $Q$, the calibration,
 pairwise disjointness, and the mass fraction estimates from Substeps 3.1--3.4 persist.
-(For quantitative transversality/persistence estimates in the large $k$ regime, compare
+(For quantitative transversality/persistence estimates in the large $N$ regime, compare
 \cite{Donaldson01}.)
 \end{editamirblock}
 
@@ -3278,17 +3281,17 @@ which itself is proved from Lemma~\ref{lem:bergman-affine-approx-hormander}
 (via Lemma~\ref{lem:global-graph-contraction}).
 Concretely, after a unitary linear change of coordinates sending $\widetilde\Pi_j$ to $\{w=0\}$,
 for each translation $t_{j,a}$ with $|t_{j,a}|\le c\,h$ the proposition yields sections
-$\sigma^{(1)}_{j,a},\dots,\sigma^{(p)}_{j,a}\in H^0(X,L^k)$ such that
+$\sigma^{(1)}_{j,a},\dots,\sigma^{(p)}_{j,a}\in H^0(X,L^{\otimes N})$ such that
 \[
 Y_j^a:=\{\sigma^{(1)}_{j,a}=0\}\cap\cdots\cap\{\sigma^{(p)}_{j,a}=0\}
 \]
 is a smooth complex $(n-p)$--fold near $Q$ and $Y_j^a\cap Q$ is a single $C^1$ graph over
-$\widetilde\Pi_j+t_{j,a}$ with slope $\le 2\eta_k$.
+$\widetilde\Pi_j+t_{j,a}$ with slope $\le 2\eta_N$.
 Mass persistence then follows from Lemma~\ref{lem:sliver-stability}\textnormal{(i)}:
 \[
-\Mass([Y_j^a]\llcorner Q)=\bigl(1+O(\eta_k^2)\bigr)\Mass([\widetilde\Pi_j+t_{j,a}]\llcorner Q),
+\Mass([Y_j^a]\llcorner Q)=\bigl(1+O(\eta_N^2)\bigr)\Mass([\widetilde\Pi_j+t_{j,a}]\llcorner Q),
 \]
-so by choosing $k$ large enough that $\eta_k^2\ll \delta$ and taking $M$ large enough in Substep~3.3,
+so by choosing $N$ large enough that $\eta_N^2\ll \delta$ and taking $M$ large enough in Substep~3.3,
 property \textnormal{(ii)} holds as stated.
 \end{editamirblockNEW}
 
@@ -6549,12 +6552,13 @@ $\|t_a-t_b\|\ge 10\,\varepsilon\,r$ for $a\neq b$, then the same conclusion hold
 \end{lemma}
 
 \begin{proof}
-\editamir{For the first claim, since $(P+t_a)\cap Q\neq\emptyset$ and $\mathrm{diam}(Q)=h$, after translating the transverse coordinates we may assume the set
-$\{t_a\}$ lies in a transverse ball $B_{C h}(0)\subset P^\perp$ for a dimensional constant $C$.}
-\editamir{The balls $B(t_a,5\varepsilon h)\subset P^\perp$ are pairwise disjoint and contained in $B_{(C+5\varepsilon)h}(0)$.}
+\editamir{For the first claim, since $(P+t_a)\cap Q\neq\emptyset$ and $\mathrm{diam}(Q)=h$, pick $a_0$ and points $x_a\in (P+t_a)\cap Q$.
+Projecting $x_a-x_{a_0}$ orthogonally to $P^\perp$ gives $t_a-t_{a_0}$, hence $|t_a-t_{a_0}|\le |x_a-x_{a_0}|\le h$.
+After translating the transverse coordinates by $-t_{a_0}$, we may assume $\{t_a\}\subset B_h(0)\subset P^\perp$.}
+\editamir{The balls $B(t_a,5\varepsilon h)\subset P^\perp$ are pairwise disjoint and contained in $B_{(1+5\varepsilon)h}(0)$.}
 \editamir{Comparing Euclidean volumes in $\R^{2p}$ gives}
 \[
-N\,(5\varepsilon h)^{2p}\ \lesssim\ (Ch)^{2p},
+N\,(5\varepsilon h)^{2p}\ \lesssim\ h^{2p},
 \]
 hence $N\lesssim \varepsilon^{-2p}$ as claimed.
 \editamir{The “ball of radius $r$” variant is identical with $h$ replaced by $r$.}
@@ -7399,7 +7403,7 @@ Finally \textnormal{(iii)} follows from $\Mass(T_\epsilon)=\int_{T_\epsilon}\psi
 
 \begin{remark}[The correction current need not be positive]\label{rem:correction-not-positive}
 The filling currents $U_\epsilon$ (or $R_{\mathrm{glue}}$ in Substep~4.2) are produced by the flat-norm decomposition and the
-Federer--Fleming isoperimetric inequality.  They are \emph{not} \editamir{not required} to be $\psi$--calibrated, nor to have any positivity/type property.
+Federer--Fleming isoperimetric inequality.  They are \editamir{not required} to be $\psi$--calibrated, nor to have any positivity/type property.
 This causes no difficulty: the only input used later is the vanishing-mass estimate $\Mass(U_\epsilon)\to 0$.
 By Proposition~\ref{prop:almost-calibration}\textnormal{(ii)}, this forces the calibration defect of $T_\epsilon=S-U_\epsilon$ to vanish, so any subsequential
 limit is $\psi$--calibrated (hence positive of type $(p,p)$ in the Harvey--Lawson sense).
@@ -7407,7 +7411,7 @@ limit is $\psi$--calibrated (hence positive of type $(p,p)$ in the Harvey--Lawso
 
 
 % ------------------------------------------------------------
-\subsection*{Step 6: SYR realization via varifold compactness (Theorem D)}
+\subsection*{Step 6: SYR realization via compactness (Theorem D)}
 
 This step establishes that the limit of the approximating cycles is
 $\psi$-calibrated and realizes the SYR property.
@@ -7480,7 +7484,9 @@ Lower semicontinuity gives
 \end{equation}
 
 \medskip\noindent
-\textbf{Substep 6.3: Calibration of the limit (no Young-measure bookkeeping needed).}
+\textbf{Substep 6.3 (optional): tangent-plane viewpoint (not used below).}
+\editamir{One can interpret $\Def_{\mathrm{cal}}(T_k)$ as measuring, in an averaged sense, how far the approximate tangent planes of $T_k$ are from the calibrated Grassmannian determined by $\psi$.  This can be formalized using standard tangent-measure/varifold language, but it is not used in the argument below.}
+\iffalse
 For each $k$, the tangent planes of $T_k$ around $x$ induce a probability
 measure $\nu_x^{(k)}$ on $\Gr_{n-p}(T_xX)$, where $\mu_k$ denotes the mass measure of $T_k$.
 
@@ -7511,6 +7517,7 @@ it follows that
 \medskip\noindent
 \emph{Remark (optional barycenter bookkeeping).}
 The microstructure construction can be organized to track local plane-mixtures at the mesh scale via Young-measure language, but this bookkeeping is not needed for the calibrated-limit closure and is not used in the Hodge argument.  In particular, we do \emph{not} require any pointwise barycenter identity for the calibrated limit current.
+\fi
 
 \medskip\noindent
 \textbf{Substep 6.4: Calibration of the limit.}
@@ -7991,8 +7998,8 @@ Calibrated-limit closure (Theorem~\ref{thm:realization-from-almost}) + Harvey--L
 \small
 \textbf{Choose once:} $m\ge 1$ so that $m[\gamma]\in H^{2p}(X,\Z)$ and all integral periods $m\int_X\beta\wedge\Theta_\ell\in\Z$ (Substep~4.3 / Proposition~\ref{prop:cohomology-match}).\par
 \textbf{Choose a mesh sequence:} $h_j\downarrow 0$ with rounded cubulation by coordinate cubes $Q$ (size $h_j$).\par
-\textbf{Choose local accuracy scales:} $\varepsilon_{\mathrm{net},j}\ll h_j$ (direction dictionary), $\delta_j=o(h_j)$ (transverse grid), $\varepsilon_j=o(1)$ (small-angle tolerance).\par
-\textbf{Choose holomorphic scale:} $M_j\to\infty$ large enough for the local holomorphic manufacturing at tolerance $\varepsilon_j$.\par
+\textbf{Choose local accuracy scales:} $\varepsilon_{\mathrm{net},j}\ll h_j$ (direction dictionary), $\delta_j=o(h_j)$ (transverse grid), $\varepsilon_j=o(1)$ (small-angle tolerance), and a transverse radius factor $\varrho_j\in(0,1]$ (template parameters live in $B_{\varrho_j h_j}$; in the borderline case $p=n/2$ impose $\varrho_j=o(\varepsilon_j)$).\par
+\textbf{Choose holomorphic scale:} $N_j\to\infty$ large enough for the local holomorphic manufacturing at tolerance $\varepsilon_j$.\par
 \textbf{Choose discrete data at each $j$:} integer activations/prefix lengths satisfying (i) local budgets, (ii) slow variation / face-edit control, and (iii) global period constraints.\par
 \textbf{Target inequalities:} $\mathcal F(\partial T^{\mathrm{raw}}_j)\to 0$ $\Rightarrow$ $\Mass(R_{\mathrm{glue},j})\to 0$ (Proposition~\ref{prop:glue-gap}) $\Rightarrow$ $\Def_{\mathrm{cal}}(T_j)\to 0$ (Proposition~\ref{prop:almost-calibration}).}}
 \end{center}
