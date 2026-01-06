@@ -240,7 +240,7 @@ If you want the fastest path to “Annals-ready confidence,” I’d prioritize:
 1. **Transport ⇒ flat norm estimate**: the quantitative heart (look for `prop:transport-flat-glue*` and its weighted variants).
 2. **Global coherence across labels**: `prop:global-coherence-all-labels` and the “simultaneous matching hinge.”
 3. **Holomorphic manufacturing**: ensure the Bergman/peak-section inputs are precisely stated with constants and domains.
-   - Update from this audit: `lem:bergman-control` had a scaling typo in the kernel-differentiation normalization; it was corrected in the TeX from \(m^{-(n+1)/2}\) to \(m^{-(n+1/2)}\) so that the produced \(1\)-jets are \(O(1)\) on \(m^{-1/2}\)-balls.
+   - Update from this audit: `lem:bergman-control` had a scaling typo in the kernel-differentiation normalization; it was corrected in the TeX from \(N^{-(n+1)/2}\) to \(N^{-(n+1/2)}\) so that the produced \(1\)-jets are \(O(1)\) on \(N^{-1/2}\)-balls.
 4. **Exact-class enforcement**: read `thm:global-cohom` and `prop:cohomology-match` end-to-end and redo the rounding argument.
 5. **Parameter schedule sanity**: verify quantifier order and compatibility of all \(o(\cdot)\), \(\ll\), and “choose \(j\) large enough” steps.
 

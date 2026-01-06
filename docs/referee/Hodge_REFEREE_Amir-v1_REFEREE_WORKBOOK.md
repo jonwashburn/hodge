@@ -929,7 +929,7 @@ For each item below, rewrite/annotate the proof. Recommended minimum deliverable
 - **Questions / potential gaps**:
   - 
 
-##### Lemma `lem:bergman-control` — Uniform $C^1$ control on $m^{-1/2}$-balls via Bergman kernels
+##### Lemma `lem:bergman-control` — Uniform $C^1$ control on $N^{-1/2}$-balls via Bergman kernels
 - **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 3063
 - **Referee status**:
   - [ ] Statement verified
@@ -939,8 +939,8 @@ For each item below, rewrite/annotate the proof. Recommended minimum deliverable
   - **Lean file**: `Hodge/Classical/Bergman.lean`
   - **Status**: **Not formalized** (Lean uses placeholders: e.g. `log_KM := 0`, and `∂,∂̄` are defined from `smoothExtDeriv`, which is still stubbed as `0` on `SmoothForm`).
 - **Proof rewrite / verification notes**:
-  - **Scaling/normalization fix applied**: in the kernel-differentiation construction of the basis sections \(s_{a,m}\), the normalization factor must be \(m^{-(n+1/2)}\) (not \(m^{-(n+1)/2}\)) so that the resulting \(1\)-jets \(ds_{a,m}(0)\) are \(O(1)\) (and uniformly invertible) on Bergman balls of radius \(\asymp m^{-1/2}\).
-  - The proof now uses the stable estimate \(\sup_{|Z|\le\sigma}\|ds_{a,m}(Z)-ds_{a,m}(0)\|\le \varepsilon\), rather than comparing directly to a fixed coordinate covector \(dz^a\).
+  - **Scaling/normalization fix applied**: in the kernel-differentiation construction of the basis sections \(s_{a,N}\), the normalization factor must be \(N^{-(n+1/2)}\) (not \(N^{-(n+1)/2}\)) so that the resulting \(1\)-jets \(ds_{a,N}(0)\) are \(O(1)\) (and uniformly invertible) on Bergman balls of radius \(\asymp N^{-1/2}\).
+  - The proof now uses the stable estimate \(\sup_{|Z|\le\sigma}\|ds_{a,N}(Z)-ds_{a,N}(0)\|\le \varepsilon\), rather than comparing directly to a fixed coordinate covector \(dz^a\).
 - **Dependencies / citations**:
   - 
 - **Questions / potential gaps**:
@@ -985,7 +985,7 @@ For each item below, rewrite/annotate the proof. Recommended minimum deliverable
 - **Lean correspondence / coverage**:
   - **Lean status**: **Not formalized** (this is part of the “H1 local sheet manufacturing” chain; Lean only has a proof skeleton above this layer).
 - **Proof rewrite / verification notes**:
-  - 
+  - **Referee correction to track**: In the proof of the predecessor construction (around TeX lines ~3044–3073), the manuscript now explicitly avoids any global Bertini/generic-perturbation argument. Downstream, verify that later uses only need **local transversality / graph control on the Bergman ball** (and do not require global smoothness of the complete intersection away from the ball).
 - **Dependencies / citations**:
   - 
 - **Questions / potential gaps**:
@@ -2158,39 +2158,46 @@ For each item below, rewrite/annotate the proof. Recommended minimum deliverable
   - 
 
 ##### Remark `rem:vertex-star-coherence` — Vertex-star coherence (how to make the same template live across adjacent cubes)
-- **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 6965
+- **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 6738
 - **Referee status**:
   - [ ] Statement verified
   - [ ] Proof verified
   - [ ] Downstream use verified
+- **Lean correspondence / coverage**:
+  - **Lean locus**: `Hodge/Kahler/Microstructure.lean` (cubulation + global bookkeeping stubs)
+  - **Lean status**: **Not formalized**. Lean does not implement “vertex-star coherence” (shared holomorphic template across adjacent cubes); the current cubulation infrastructure is a placeholder (it can be a single cube), and holomorphic slivers/templates are not constructed.
 - **Proof rewrite / verification notes**:
-  - 
+  - This remark depends on the Bergman-ball local graph control chain (H1: local sheets + corner-exit) to make one holomorphic object \(Y^a\) serve all cubes in a vertex star. Lean’s `Classical/Bergman.lean` is a placeholder layer and is not used on the critical path.
 - **Dependencies / citations**:
   - 
 - **Questions / potential gaps**:
   - 
 
 ##### Lemma `lem:slow-variation-rounding` — Slow variation under rounding of Lipschitz targets
-- **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 6980
+- **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 6753
 - **Referee status**:
   - [ ] Statement verified
   - [ ] Proof verified
   - [ ] Downstream use verified
+- **Lean correspondence / coverage**:
+  - **Lean status**: **Not formalized**. Lean’s microstructure layer does not currently implement the rounding/count assignment across a cubulation mesh (nor Lipschitz control on targets); it only carries a proof skeleton with stubbed constructions.
 - **Proof rewrite / verification notes**:
-  - 
+  - This is a purely quantitative combinatorial estimate (rounding error + Lipschitz variation). When the microstructure layer is implemented in Lean, this lemma should map cleanly to a `Nat`-rounding bound on adjacent cubes.
 - **Dependencies / citations**:
   - 
 - **Questions / potential gaps**:
   - 
 
 ##### Lemma `lem:slow-variation-discrepancy` — Slow variation persists under $0$--$1$ discrepancy rounding
-- **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 7013
+- **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 6791
 - **Referee status**:
   - [ ] Statement verified
   - [ ] Proof verified
   - [ ] Downstream use verified
+- **Lean correspondence / coverage**:
+  - **Lean status**: **Not formalized** (same reason as `lem:slow-variation-rounding`; discrepancy/rounding is not yet implemented in Lean).
 - **Proof rewrite / verification notes**:
-  - 
+  - This lemma is the “robustness under discrepancy rounding” variant; it feeds into the later B\'ar\'any--Grinberg rounding step used for integral period locking in `prop:cohomology-match`.
 - **Dependencies / citations**:
   - 
 - **Questions / potential gaps**:

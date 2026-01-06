@@ -68,6 +68,53 @@ noncomputable def mfderivInTangentCoordinates (ω : ContMDiffForm n X k) (x₀ x
   inTangentCoordinates (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) (fun y => y) (fun y => ω.as_alternating y)
     (fun y => mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating y) x₀ x
 
+@[simp] lemma mfderivInTangentCoordinates_self (ω : ContMDiffForm n X k) (x : X) :
+    mfderivInTangentCoordinates (n := n) (X := X) (k := k) ω x x =
+      mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x := by
+  classical
+  -- Unfold `inTangentCoordinates` at `(x₀,x)=(x,x)` and simplify the coordinate changes.
+  have hx : (fun y : X => y) x ∈ (chartAt (EuclideanSpace ℂ (Fin n)) ((fun y : X => y) x)).source := by
+    simpa using (mem_chart_source (EuclideanSpace ℂ (Fin n)) x)
+  have hy :
+      (fun y : X => ω.as_alternating y) x ∈
+        (chartAt (FiberAlt n k) ((fun y : X => ω.as_alternating y) x)).source := by
+    simpa using (mem_chart_source (FiberAlt n k) (ω.as_alternating x))
+  -- `inTangentCoordinates_eq` expresses the coordinate changes explicitly.
+  have h :=
+    (inTangentCoordinates_eq (I := (𝓒_complex n)) (I' := 𝓘(ℂ, FiberAlt n k))
+        (f := fun y : X => y) (g := fun y : X => ω.as_alternating y)
+        (ϕ := fun y : X =>
+          mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating y)
+        (x₀ := x) (x := x) hx hy)
+  -- The coordinate changes on the diagonal are identities, so the expression reduces to `mfderiv`.
+  have h_src :
+      (tangentBundleCore (𝓒_complex n) X).coordChange (achart (EuclideanSpace ℂ (Fin n)) x)
+          (achart (EuclideanSpace ℂ (Fin n)) x) x =
+        ContinuousLinearMap.id ℂ (TangentModel n) := by
+    ext v
+    have hx' :
+        x ∈ (tangentBundleCore (𝓒_complex n) X).baseSet (achart (EuclideanSpace ℂ (Fin n)) x) := by
+      simpa [tangentBundleCore_baseSet, coe_achart] using
+        (mem_achart_source (EuclideanSpace ℂ (Fin n)) x)
+    simpa using (tangentBundleCore (𝓒_complex n) X).coordChange_self
+      (achart (EuclideanSpace ℂ (Fin n)) x) x hx' v
+  have h_tgt :
+      (tangentBundleCore 𝓘(ℂ, FiberAlt n k) (FiberAlt n k)).coordChange
+          (achart (FiberAlt n k) (ω.as_alternating x)) (achart (FiberAlt n k) (ω.as_alternating x))
+          (ω.as_alternating x) =
+        ContinuousLinearMap.id ℂ (FiberAlt n k) := by
+    ext v
+    have hy' :
+        ω.as_alternating x ∈
+          (tangentBundleCore 𝓘(ℂ, FiberAlt n k) (FiberAlt n k)).baseSet
+            (achart (FiberAlt n k) (ω.as_alternating x)) := by
+      simpa [tangentBundleCore_baseSet, coe_achart] using
+        (mem_achart_source (FiberAlt n k) (ω.as_alternating x))
+    simpa using (tangentBundleCore 𝓘(ℂ, FiberAlt n k) (FiberAlt n k)).coordChange_self
+      (achart (FiberAlt n k) (ω.as_alternating x)) (ω.as_alternating x) hy' v
+  -- Finish by rewriting the coordinate changes as identities.
+  simpa [mfderivInTangentCoordinates, inTangentCoordinates, h_src, h_tgt] using h
+
 /-- Smoothness of the tangent-coordinate expression of the derivative.
     This follows from `ContMDiffAt.mfderiv_const` (since the fiber bundle for values is trivial). -/
 theorem contMDiffAt_mfderivInTangentCoordinates (ω : ContMDiffForm n X k) (x₀ : X) :
@@ -91,6 +138,10 @@ noncomputable def extDerivInTangentCoordinates (ω : ContMDiffForm n X k) (x₀ 
     ContinuousAlternatingMap.alternatizeUncurryFin
       (𝕜 := ℂ) (E := TangentModel n) (F := ℂ) (n := k)
       (mfderivInTangentCoordinates (n := n) (X := X) (k := k) ω x₀ x)
+
+@[simp] lemma extDerivInTangentCoordinates_self (ω : ContMDiffForm n X k) (x : X) :
+    extDerivInTangentCoordinates (n := n) (X := X) (k := k) ω x x = extDerivAt (n := n) (X := X) (k := k) ω x := by
+  simp [extDerivInTangentCoordinates, extDerivAt_def, mfderivInTangentCoordinates_self]
 
 theorem contMDiffAt_extDerivInTangentCoordinates (ω : ContMDiffForm n X k) (x₀ : X) :
     ContMDiffAt (𝓒_complex n) 𝓘(ℂ, FiberAlt n (k + 1)) ⊤

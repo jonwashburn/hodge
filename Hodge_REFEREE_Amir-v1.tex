@@ -6020,7 +6020,7 @@ $f_{\ell,N}=\ell-\text{(holomorphic error)}$ on $B_{R/\sqrt N}$ with the stated 
 \begin{proposition}[\editamir{Cell-scale linear-model complete intersections are single-sheet graphs}]\label{prop:cell-scale-linear-model-graph}
 \iffalse
 Fix a holomorphic chart identifying a neighborhood of a cell $Q$ with a domain in $\C^{n}=\C^{n-p}\times\C^{p}$ with coordinates $z=(u,w)$,
-and assume $Q\subset B_{R/\sqrt m}(0)$ for some fixed $R$.
+and assume $Q\subset B_{R/\sqrt N}(0)$ for some fixed $R$.
 \fi
 \editamir{Fix a holomorphic chart identifying a neighborhood of a cell $Q$ with a domain in $\C^{n}=\C^{n-p}\times\C^{p}$ with coordinates $z=(u,w)$, and assume $Q\subset B_{R/\sqrt N}(0)$ for some fixed $R$. Assume moreover that the cell diameter satisfies $h\asymp N^{-1/2}$.}
 Let $t\in\C^p$ satisfy $|t|\le c\,h$ (with \editamir{$h\asymp N^{-1/2}$}).
@@ -6471,7 +6471,7 @@ All logical dependencies for Theorem~\ref{thm:main-hodge} are contained in the s
 \iffalse From the Recognition Science perspective (see \texttt{Source-Super.txt} and \texttt{recognition-geometry-dec-6.tex}), \fi
 the microstructure/gluing step is a ``ledger closure'' requirement: local recognition events (slivers) must be manufactured so that
 their interface mismatch is negligible.  In this language a mesh cell $Q$ plays the role of a \emph{resolution cell} (a region on which the ``event alphabet''
-is stable), and the natural analytic resolution scale in K\"ahler quantization is the Bergman scale $m^{-1/2}$.
+is stable), and the natural analytic resolution scale in K\"ahler quantization is the Bergman scale \editamir{$N^{-1/2}$}.
 Thus the correct classical checkpoint is a \emph{finite-resolution stability statement} on a ball containing $Q$:
 construct holomorphic equations that are uniformly $C^1$-close to a fixed linear model on a Bergman ball (via Bergman kernel/peak-section control,
 e.g.\ Lemma~\ref{lem:bergman-control} or the cutoff+$\bar\partial$ route in Lemma~\ref{lem:bergman-affine-approx-hormander}), and then conclude that the zero set
@@ -6585,11 +6585,12 @@ $P\subset\C^n$ with normal covectors $\lambda_1,\dots,\lambda_p$ (so $\bigcap_i\
 Let $t_1,\dots,t_N\in P^\perp\cong\R^{2p}$ be translation vectors such that the affine planes $(P+t_a)$ are pairwise disjoint on $Q$ and
 \editamir{let $D_Q:=\max_{1\le a\le N}\mathrm{diam}\bigl((P+t_a)\cap Q\bigr)\le \mathrm{diam}(Q)$, and assume the translations are separated by
 $\|t_a-t_b\|\ge 10\,C_{\mathrm{graph}}\,\varepsilon\,D_Q$.}
-Fix $\varepsilon>0$ and choose $m\ge m_1(\varepsilon)$ as in Lemma~\ref{lem:bergman-control}, with $m$ large enough that
+Fix $\varepsilon>0$ and choose a holomorphic tensor power \editamir{$N_{\mathrm{hol}}\ge N_1(\varepsilon)$} as in Lemma~\ref{lem:bergman-control},
+with $N_{\mathrm{hol}}$ large enough that
 \[
-\mathrm{diam}(Q)\ \le\ c\,m^{-1/2},
+\mathrm{diam}(Q)\ \le\ c\,\editamir{N_{\mathrm{hol}}^{-1/2}},
 \]
-where $c>0$ is the universal constant in Lemma~\ref{lem:bergman-control}.\editamir{ By increasing $m$ if necessary, we may assume in fact $\mathrm{diam}(Q)\le (c/2)\,m^{-1/2}$; then $Q\subset B_{(c/2)\,m^{-1/2}}(x)$ for every $x\in Q$.}
+where $c>0$ is the universal constant in Lemma~\ref{lem:bergman-control}.\editamir{ By increasing $N_{\mathrm{hol}}$ if necessary, we may assume in fact $\mathrm{diam}(Q)\le (c/2)\,N_{\mathrm{hol}}^{-1/2}$; then $Q\subset B_{(c/2)\,N_{\mathrm{hol}}^{-1/2}}(x)$ for every $x\in Q$.}
 For each $a$, pick any point $x_a\in (P+t_a)\cap Q$.
 Then there exist $\psi$-calibrated holomorphic complete intersections $Y^1,\dots,Y^N\subset X$ such that, on $Q$:
 \begin{enumerate}
@@ -6601,7 +6602,7 @@ Then there exist $\psi$-calibrated holomorphic complete intersections $Y^1,\dots
 
 \begin{proof}
 For each $a$, apply Lemma~\ref{lem:bergman-control} at $x_a$ with covectors $\lambda_i$ to obtain sections
-$s_{a,1},\dots,s_{a,p}\in H^0(X,L^m)$ whose first-order jets at $x_a$ realize the covectors $\lambda_i$. \editamir{This applies on $Q$ since $Q\subset B_{(c/2)\,m^{-1/2}}(x_a)\subset B_{c\,m^{-1/2}}(x_a)$ (because $x_a\in Q$ and we ensured $\mathrm{diam}(Q)\le (c/2)\,m^{-1/2}$).}
+$s_{a,1},\dots,s_{a,p}\in H^0(X,L^{N_{\mathrm{hol}}})$ whose first-order jets at $x_a$ realize the covectors $\lambda_i$. \editamir{This applies on $Q$ since $Q\subset B_{(c/2)\,N_{\mathrm{hol}}^{-1/2}}(x_a)\subset B_{c\,N_{\mathrm{hol}}^{-1/2}}(x_a)$ (because $x_a\in Q$ and we ensured $\mathrm{diam}(Q)\le (c/2)\,N_{\mathrm{hol}}^{-1/2}$).}
 Let $Y^a:=\{s_{a,1}=\cdots=s_{a,p}=0\}$.
 \editamir{Let $C_{\mathrm{graph}}$ be the slope constant from Lemma~\ref{lem:graph-from-grad}.} Then Lemma~\ref{lem:graph-from-grad} gives (i) with slope $\le C_{\mathrm{graph}}\varepsilon$, and Lemma~\ref{lem:sliver-stability}(i) gives (iii) with the same slope parameter. \editamir{Applying Lemma~\ref{lem:sliver-stability}(ii) with $\varepsilon$ replaced by $C_{\mathrm{graph}}\varepsilon$ and using the separation assumption $\|t_a-t_b\|\ge 10\,C_{\mathrm{graph}}\varepsilon\,D_Q$ yields (ii).}
 \end{proof}
@@ -6741,7 +6742,7 @@ so that across any shared face the mismatch reduces to a pure prefix-count diffe
 \smallskip\noindent
 This is achieved by choosing the anchor points $x_a$ in Proposition~\ref{prop:finite-template} (hence the Bergman balls on which the $C^1$ control holds)
 to be \emph{vertex-centered}: take $x_a\in (P+t_a)\cap B(v,c_0h)$ (for instance $x_a=v+t_a$ in a coordinate model).
-If the mesh satisfies $h\lesssim m^{-1/2}$ with a small enough constant, then the Bergman ball $B_{c\,m^{-1/2}}(x_a)$ contains the entire
+If the mesh satisfies $h\lesssim \editamir{N_{\mathrm{hol}}^{-1/2}}$ with a small enough constant, then the Bergman ball $B_{c\,\editamir{N_{\mathrm{hol}}^{-1/2}}}(x_a)$ contains the entire
 vertex star $\mathrm{Star}(v)$ (the union of the finitely many cubes meeting at $v$), so the resulting holomorphic complete intersection $Y^a$
 is a single-sheet graph over the same affine translate $P+t_a$ \emph{on every cube in $\mathrm{Star}(v)$ simultaneously}.
 Thus the vertex template is realized by a single global holomorphic object $Y^a$, and restricting to each cube produces coherent
@@ -8104,7 +8105,7 @@ At the endgame we appeal to standard identifications between certain \emph{posit
 
 \item \textbf{H\"ormander $L^2$ $\bar\partial$-methods and Bergman kernel asymptotics.}
 The local holomorphic realization steps use $L^2$-existence/estimate inputs for $\bar\partial$ (in the positive line bundle setting)
-and near/off-diagonal Bergman kernel expansions with controlled derivatives at the $m^{-1/2}$ scale.%
+and near/off-diagonal Bergman kernel expansions with controlled derivatives at the \editamir{$N^{-1/2}$} scale.%
 \cite{Demailly12,Tian90,Zelditch98,Catlin99,MaMarinescu07,MaMarinescu13OffDiag,Donaldson01}
 
 \item \textbf{Hodge theory, Hard Lefschetz, and projective algebraicity tools.}
