@@ -89,6 +89,47 @@ Additionally, the extra duplicated proof blocks previously flagged around \textt
 In Proposition \texttt{prop:transport-flat-glue}, the Step~1 Lipschitz bound implicitly requires working on an \emph{interior} face patch after the standard edge-trimming/localization (so that each face slice is a cycle, i.e.\ has zero boundary as a current on the interior face).
 This hypothesis was made explicit in item~(b) and the proof was adjusted accordingly (dropping the spurious boundary-slice term in the homotopy/Lipschitz estimate).
 
+\subsection*{Notation cleanup: cohomology multiplier \(m\) vs.\ Bergman/holomorphic power}
+In the weighted-scaling discussion, the symbol \(m\) was being used in two different senses (cohomology multiplier \(m\) in \(\mathrm{PD}(m[\gamma])\) and tensor power in Bergman-scale holomorphic manufacturing). This led to misleading phrases such as “\(h\downarrow 0\) (equivalently \(m\to\infty\))” and a dimensional typo involving \(\sqrt m\,h\).
+The manuscript now separates these roles explicitly (using a distinct holomorphic scale parameter \(N\) where both appear simultaneously), corrects the Bergman-scale relation to \(h\sim c\,N^{-1/2}\), and removes the misleading “\(h\downarrow 0\iff m\to\infty\)” equivalence in the fixed-\(m\) SYR regime.
+
+\subsection*{Local multi-sheet construction: translate-mass dependence made explicit}
+In Theorem \texttt{thm:local-sheets}, the proof previously treated the \(\psi\)-mass of a flat model translate \((\widetilde\Pi_j+t)\cap Q\) as independent of \(t\), which is false for generic cube geometry.
+The proof now treats the translate mass \(A_j(t)\) as a continuous function of \(t\) and chooses translations within a small radius so that all masses in a family agree up to \(O(\delta)\), which is sufficient for the subsequent Diophantine rounding step.
+The internal rounding parameter was also renamed (to \(M\)) to avoid collision with global uses of \(m\).
+
+\subsection*{Borderline regime $p=n/2$ (middle dimension)}
+Several places in the TeX already flagged that the middle-dimensional regime requires extra care. We made one additional clarification:
+\begin{itemize}
+\item Corollary \texttt{cor:raw-boundary-flat-small} now explicitly notes that in the borderline case \(p=n/2\), the conclusion
+\(\mathcal F(\partial T^{\mathrm{raw}})=o(m)\) is to be read under the refined displacement schedule of Lemma \texttt{lem:borderline-p-half}
+(e.g.\ \(\varrho=o(\varepsilon)\)).
+\end{itemize}
+
+\subsection*{Period locking proof hygiene}
+The “period locking” proposition \texttt{prop:cohomology-match} contains an internal Step~5 (construction of the tiny-mass boundary correction) and is immediately followed by a dedicated subsection “Step~5: Boundary correction with vanishing mass” that carries the same construction.
+To avoid two near-identical constructions living in the manuscript simultaneously, the internal Step~5 construction was removed from the proposition proof; the proof now points to the following subsection for the existence and estimates for \(U_\epsilon\).
+
+\subsection*{Filling lemma: ensure the tubular projection is actually defined}
+In Lemma \texttt{lem:FF-filling-X}, the original Nash-embedding proof implicitly pushed forward a Euclidean filling current \(Q\) by the nearest-point projection \(\pi:U\to X\) from a tubular neighborhood \(U\) of \(\iota(X)\).
+This requires \(Q\) to be supported in \(U\), which is not automatic for an arbitrary Euclidean filling.
+The proof now explicitly invokes a \emph{relative} filling inequality in the fixed tubular neighborhood \(U\) (a standard GMT fact for integral currents in domains), so that \(Q\subset U\) and \(\pi_\#Q\) is well-defined.
+
+\subsection*{Holomorphic corner-exit footprint geometry: duplicate proofs removed}
+The corner-exit geometry proposition \texttt{prop:holomorphic-corner-exit-g1g2} had accumulated multiple back-to-back proof environments (draft variants of the same argument).
+These were removed, leaving a single concise proof so that the compiled manuscript presents one unambiguous argument.
+
+\subsection*{Corner-exit direction-net packaging: missing uniform constant added}
+In the finite direction-net packaging proposition \texttt{prop:corner-exit-template-net}, the proof introduced per-direction constants
+\(\alpha_*(i),\alpha^*(i),A_*(i)\) but only explicitly took a minimum/maximum for \(\alpha_*\) and \(A_*\) before applying the open-template lemma.
+This was tightened to also define \(\alpha^*:=\max_i\alpha^*(i)\) (hence a finite \(\Lambda=\alpha^*/\alpha_*\)) before invoking Lemma \texttt{lem:corner-exit-template-open}.
+This is a small but important bookkeeping correction for referee readability.
+
+\subsection*{Template packing language: “arbitrarily long \(\delta\)-separated lists”}
+Several template statements used shorthand like “an ordered \(\delta\)-separated list \((t_a)_{a\ge 1}\)” inside a bounded parameter box (or “arbitrarily long \(\delta\)-separated list for any \(\delta>0\)”). Literally, a bounded set cannot contain an infinite \(\delta\)-separated family for fixed \(\delta>0\).
+These statements were corrected to the accurate formulation: for each fixed \(\delta>0\) one gets a \emph{finite} \(\delta\)-separated list of length \(N(\delta)\), and \(N(\delta)\to\infty\) as \(\delta\downarrow 0\) (with the footprint scale fixed).
+This does not change any downstream argument (where \(\delta_{\perp}\) is chosen as part of the mesh schedule), but removes a potential referee objection.
+
 \subsection*{Convention note: “algebraic class”}
 A short remark was added near the main theorem stating the manuscript’s convention: an \emph{algebraic class} in \(H^{2p}(X,\mathbb Q)\) means a class in the \(\mathbb Q\)-span of cycle classes (equivalently, the image of the cycle class map with \(\mathbb Q\)-coefficients), hence a \(\mathbb Q\)-vector subspace.
 

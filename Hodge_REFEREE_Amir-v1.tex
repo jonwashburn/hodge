@@ -167,8 +167,8 @@
 \newenvironment{editamirblock}{\begingroup\color{blue}}{\endgroup}
 
 % === Referee layer (blue; cumulative across steps) ===
-\newcommand{\editamirNEW}[1]{\textcolor{blue}{#1}}
-\newenvironment{editamirblockNEW}{\begingroup\color{blue}}{\endgroup}
+\newcommand{\editamirNEW}[1]{\textcolor{red}{#1}}
+\newenvironment{editamirblockNEW}{\begingroup\color{red}}{\endgroup}
 
 % AI assistant layer (teal; Jan 2026)
 \definecolor{editaiColor}{rgb}{0.00,0.45,0.45}
@@ -2109,6 +2109,7 @@ $m\int_X\beta\wedge\Theta_\ell\in\Z$ (cf.\ Substep~4.3 and Proposition~\ref{prop
 \item \textbf{Then choose small local accuracy parameters as functions of $h_j$.}
 Fix a direction-net scale $\varepsilon_{\mathrm{net},j}\ll h_j$ for the finite calibrated dictionary in Proposition~\ref{prop:global-coherence-all-labels}.
 Choose a transverse grid spacing $\delta_j=o(h_j)$ on each face tubular chart $\Omega_F\cong B^{2p}(0,ch_j)$ and an angle tolerance $\varepsilon_j=o(1)$ for the small-angle graph model.
+\editamirNEW{Choose also the transverse parameter radius factor $\varrho_j$ (defining the corner-exit template scale $s_j\asymp \varrho_j h_j$) such that $\varrho_j=o(\varepsilon_j)$ (required for the borderline $p=n/2$ case; see Lemma~\ref{lem:borderline-p-half}).}
 \item \textbf{Finally choose holomorphic scales and discrete rounding data.}
 Choose the holomorphic manufacturing scale (line bundle power) $M_j\to\infty$ large enough that the local sheet/sliver construction at tolerance $\varepsilon_j$
 is available uniformly on all $h_j$--cells (Theorem~\ref{thm:local-sheets} and the corner-exit realization package), then choose the integer activation/rounding variables
@@ -4215,13 +4216,13 @@ in Lemma~\ref{lem:oh-face-edit-regime}.
 \begin{editblock}
 \begin{remark}[Model scaling at the Bergman cell size]\label{rem:sliver-bergman-scaling}
 This remark records a simplified scaling calculation explaining why a “sliver’’ mechanism could, in principle, coexist with the intrinsic
-holomorphic control scale $h\sim m^{-1/2}$.
+holomorphic control scale $h\sim N^{-1/2}$ at tensor power $L^{\otimes N}$.
 
 \smallskip\noindent
-Assume cells have diameter $h\asymp m^{-1/2}$ (as suggested by Lemma~\ref{lem:bergman-control}) so that uniform $C^1$ graph control holds on each cell.
-Then the number of cells is $\asymp h^{-2n}\asymp m^{n}$, and the target mass per cell is
+Assume cells have diameter $h\asymp N^{-1/2}$ (as suggested by Lemma~\ref{lem:bergman-control}) so that uniform $C^1$ graph control holds on each cell.
+Then the number of cells is $\asymp h^{-2n}\asymp N^{n}$, and the target mass per cell is
 \[
-M_Q\ \sim\ m\int_Q \beta\wedge\psi\ \asymp\ m\,h^{2n}\ \asymp\ m^{1-n}.
+M_Q\ \sim\ m\int_Q \beta\wedge\psi\ \asymp\ m\,h^{2n}\ \asymp\ m\,N^{-n}.
 \]
 In a smooth convex flat model (e.g.\ a ball cell), if $M_Q$ is split into $N_Q$ \emph{equal} sliver pieces of mass $M_Q/N_Q$, then the
 $(2n-2p-1)$--dimensional boundary size of a single piece scales like $(M_Q/N_Q)^{\frac{k-1}{k}}$ (with $k:=2n-2p$), hence the total boundary size
@@ -4239,9 +4240,10 @@ then Lemma~\ref{lem:flat-translate} gives a per-piece flat mismatch $\lesssim \|
 Summing over $\asymp h^{-2n}$ faces gives the global \editamir{scaling} bound
 \[
 \mathcal F(\partial T^{\mathrm{raw}})\ \lesssim\ h^{-2n}\cdot h^2\cdot M_Q^{\frac{k-1}{k}}\,N_Q^{\frac1k}
-\ \asymp\ m^{\frac{n-1}{k}}\,N_Q^{\frac1k}.
+\ \asymp\ \varrho\,m^{\frac{k-1}{k}}\,N^{-\frac{k-n}{k}}\,N_Q^{\frac1k}.
 \]
-Since $(n-1)/k<1$ for $k=2n-2p\ge 2$, this is automatically sublinear in $m$ provided $N_Q$ grows at most polynomially in $m$ with exponent $<k-(n-1)$.
+In particular, for $p<n/2$ (so $k>n$) the factor $N^{-(k-n)/k}\to 0$ as $N\to\infty$, and one expects
+$\mathcal F(\partial T^{\mathrm{raw}})=o(m)$ for fixed $m$ provided $N_Q=o(N^{k-n})$ (e.g.\ polynomial growth in $N$ with exponent $<k-n$).
 Making any version of this calculation rigorous inside the cubical/face framework requires precisely the weighted bookkeeping estimate flagged in
 Remark~\ref{rem:sliver-vs-template}.
 \end{remark}
@@ -4497,7 +4499,7 @@ Consequently one obtains the global estimate
 \qquad k:=2n-2p,
 \]
 where $m_{Q,a}:=\Mass([Y^{Q,a}]\llcorner Q)$ and $\varepsilon$ is the small-angle parameter.
-In particular, under the parameter regime of Remark~\ref{rem:weighted-scaling} (e.g.\ Bergman scale $h\sim m^{-1/2}$, polynomial piece count per cell, and $p\le n/2$),
+In particular, under the parameter regime of Remark~\ref{rem:weighted-scaling} (e.g.\ Bergman scale $h\sim N^{-1/2}$ at holomorphic power $N\to\infty$, polynomial piece count per cell, and $p\le n/2$),
 one has $\mathcal F(\partial T^{\mathrm{raw}})=o(m)$.
 \end{theorem}
 
@@ -4555,17 +4557,17 @@ Thus the “global activation gate’’ is unconditional in the corner-exit rou
 \begin{proposition}[Flat-ball model: prefix activation is feasible]\label{prop:prefix-activation-flat-ball}
 In the Euclidean ball-cell model of Proposition~\ref{prop:flat-sliver-local}, fix a radius $r\in(0,h)$ so that each affine piece
 $[P+t]\llcorner B_h(0)$ with $t\in S^{2p-1}(r)$ has the same mass $\mu(r)$.
-Fix an ordered $\delta$--separated template $(t_a)_{a\ge 1}\subset S^{2p-1}(r)$ and define prefixes
+Fix $\delta>0$ and an ordered $\delta$--separated list $(t_a)_{a=1}^{N}\subset S^{2p-1}(r)$ (so $N$ is finite), and for each $1\le N'\le N$ define the prefix
 \(
-\nu^{(N)}:=\sum_{a=1}^N \delta_{t_a}.
+\nu^{(N')}:=\sum_{a=1}^{N'} \delta_{t_a}.
 \)
-Then for any target mass $M\ge 0$, choosing $N=\lfloor M/\mu(r)\rceil$ gives
+Then for any target mass $M\ge 0$, choosing $N':=\lfloor M/\mu(r)\rceil$ (and taking $N$ large enough that $N'\le N$) gives
 \[
-\Bigl|\sum_{a=1}^N \Mass([P+t_a]\llcorner B_h(0))\ -\ M\Bigr|\ \le\ \mu(r),
+\Bigl|\sum_{a=1}^{N'} \Mass([P+t_a]\llcorner B_h(0))\ -\ M\Bigr|\ \le\ \mu(r),
 \qquad
-\frac{\mu(r)}{M}\ =\ O\!\left(\frac1N\right)\ \text{ when }M\gg \mu(r).
+\frac{\mu(r)}{M}\ =\ O\!\left(\frac1{N'}\right)\ \text{ when }M\gg \mu(r).
 \]
-Moreover, if two neighboring cells choose counts $N$ and $N'$ with $|N-N'|\le \theta\,\min\{N,N'\}$, then the induced prefix edit is a $\theta$--fraction
+Moreover, if two neighboring cells choose counts $N_1$ and $N_2$ with $|N_1-N_2|\le \theta\,\min\{N_1,N_2\}$, then the induced prefix edit is a $\theta$--fraction
 of the pieces (hence of the face-boundary mass, since all pieces have comparable slice boundary by the ball scaling law).
 \end{proposition}
 
@@ -5036,7 +5038,8 @@ and $E(t)$ meets no other codimension-$1$ faces of $Q$.
 and $\mathcal H^k(E(t))$ is independent of $t$ in the above parameter box (hence equal across indices).
 \end{enumerate}
 In particular, this admissible parameter box has real dimension $2p-1$, so for any separation scale $\delta>0$ one can choose an ordered $\delta$--separated
-list $(t_a)_{a\ge 1}$ inside it with identical footprints $P_{t_a}\cap Q$.
+list $(t_a)_{a=1}^{N}$ inside it with identical footprints $P_{t_a}\cap Q$, where $N$ may be taken as large as allowed by packing (equivalently, $N\to\infty$
+as $\delta\downarrow 0$ with $s$ fixed).
 \end{lemma}
 \begin{proof}
 Write $u_j=x_j+i y_j$ with $x_j=\Re u_j$ and $y_j=\Im u_j$.
@@ -5069,7 +5072,8 @@ i.e.\ by $\sum_j(x_j+y_j)\le s$ together with nonnegativity of the $k=2(n-p)$ co
 This is the standard $k$--simplex in $\R^{k}$ (embedded linearly as a graph in $\R^{2n}$), proving (i) and (ii).
 Uniform fatness follows because this simplex is affine-equivalent to the standard simplex with distortion depending only on the fixed linear map $A$,
 and the slice mass $\mathcal H^k(E(t))\asymp s^k$ is independent of $t$ since the defining inequalities do not depend on $t$ inside the admissible box.
-Finally, packing a $\delta$--separated family inside a $(2p-1)$--dimensional box is elementary.
+Finally, packing a $\delta$--separated family inside a $(2p-1)$--dimensional box gives a quantitative bound $N\gtrsim (s/\delta)^{2p-1}$; in particular, by
+taking $\delta$ small one can make the ordered list as long as needed.
 \end{proof}
 
 
@@ -5149,7 +5153,8 @@ $(n,p,\Lambda)$.
 \smallskip\noindent
 Moreover, one may choose $t$ from a $(2p\!-\!1)$--dimensional parameter box (fixing $\Re t_r=\pm s$ and varying the remaining real components with margin $\asymp s$),
 so that the resulting footprints are \emph{identical} (hence have equal slice mass) throughout that box.  In particular, for any separation scale $\delta>0$ one can
-extract an ordered $\delta$--separated list of translations producing identical corner-exit simplex footprints.
+extract an ordered $\delta$--separated list $(t_a)_{a=1}^{N}$ of translations producing identical corner-exit simplex footprints, with $N\to\infty$ as $\delta\downarrow 0$
+(for fixed $s$).
 \end{lemma}
 
 \begin{proof}
@@ -5187,7 +5192,8 @@ In any fixed holomorphic coordinate chart, there exists a finite set of calibrat
 \]
 which is an $\varepsilon_h$--net in $G_\C(n-p,n)$ and has the following property:
 for each $P_i\in\mathcal N_h$ there is a corner-exit translation template family in the cube $Q=[0,h]^{2n}$ (allowing choice of vertex and exit-face set)
-whose footprints are uniformly fat corner-exit simplices, and which supplies an arbitrarily long $\delta$--separated ordered list of translations (for any $\delta>0$)
+whose footprints are uniformly fat corner-exit simplices, and which supplies, for each $\delta>0$, a $\delta$--separated ordered list of translations of length $N(\delta)$
+(with $N(\delta)\to\infty$ as $\delta\downarrow 0$)
 with identical footprint geometry (hence uniform per-piece slice mass within each label).
 Moreover, because $\mathcal N_h$ is finite, the fatness/locality constants may be chosen \emph{uniformly} over all directions in $\mathcal N_h$.
 \end{proposition}
@@ -5200,7 +5206,11 @@ Start with any $\varepsilon_h/2$--net and perturb each point by $<\varepsilon_h/
 
 \smallskip\noindent
 For each $P_i\in\mathcal N_h$, choose a witnessing splitting and slanted coordinate, and let $\alpha_*(i),\alpha^*(i),A_*(i)$ be the resulting quantitative constants.
-Since $\mathcal N_h$ is finite and all required coefficients are nonzero, one has $\alpha_*:=\min_i\alpha_*(i)>0$ and $A_*:=\max_iA_*(i)<\infty$.
+Since $\mathcal N_h$ is finite and all required coefficients are nonzero, one has
+\[
+\alpha_*:=\min_i\alpha_*(i)>0,\qquad \alpha^*:=\max_i\alpha^*(i)<\infty,\qquad A_*:=\max_iA_*(i)<\infty,
+\]
+hence $\Lambda:=\alpha^*/\alpha_*$ is finite.
 Apply Lemma~\ref{lem:corner-exit-template-open} with these uniform constants to obtain uniform corner-exit templates for every $P_i$.
 \begin{editamirblockNEW}
 \noindent\textbf{Net constants $\alpha_*(h),A_*(h),\Lambda(h)$.}
@@ -5508,7 +5518,7 @@ Fix a small scale $\varepsilon_h\ll h$ and choose, in each chart, an $\varepsilo
 $\{P_1,\dots,P_M\}\subset G_\C(n-p,n)$ together with uniform corner-exit translation templates as in Proposition~\ref{prop:corner-exit-template-net}.
 
 \smallskip\noindent
-\editamir{Choose} \\emph{globally labeled} Lipschitz weights $w_i(x)$ against this dictionary (e.g.\ by the strongly convex simplex fit of
+\editamir{Choose \emph{globally labeled}} Lipschitz weights $w_i(x)$ against this dictionary (e.g.\ by the strongly convex simplex fit of
 Lemma~\ref{lem:lipschitz-qp-weights} applied to $\widehat\beta(x)$ in local trivializations), and define per-cell target mass budgets
 $M_{Q,i}\ge 0$ accordingly, with $\sum_i M_{Q,i}=M_Q$ and Lipschitz variation across neighbors.
 For each label $i$, realize the corresponding corner-exit template holomorphically on each vertex star by applying
@@ -5599,6 +5609,8 @@ Then the associated raw current $T^{\mathrm{raw}}$ satisfies
 \[
 \mathcal F(\partial T^{\mathrm{raw}})=o(m)\qquad\text{as }h\downarrow 0.
 \]
+In the borderline case $p=n/2$, this conclusion is understood under the additional refined displacement schedule of
+Lemma~\ref{lem:borderline-p-half} (e.g.\ $\varrho=o(\varepsilon)$).
 Equivalently, for every $\eta>0$ there exists $h_0>0$ such that for all sufficiently small mesh sizes $h<h_0$,
 \[
 \mathcal F(\partial T^{\mathrm{raw}})\le \eta\,m.
@@ -5677,7 +5689,7 @@ A_S(N):=\#\{1\le a\le N:\ u_a\in S\}.
 \)
 Then for all $N\ge 1$,
 \[
-\Bigl|A_S(N) - \frac{|S|}{2^d}\,N\Bigr|\ \le\ 2^d,
+\Bigl|A_S(N) - \frac{|S|}{2^d}\,N\Bigr|\ \le\ 2^{d+1},
 \]
 and for all $N,N'\ge 1$,
 \[
@@ -6398,84 +6410,10 @@ and the final comparison follows from the fatness estimate in \eqref{H2cornerfat
 \end{editamirblockNEW}
 \end{proof}
 
-
-\begin{proof}
 \begin{editamirblockNEW}
-\textbf{Step 1: no new faces.}
-If $F$ is a codimension--$1$ face of $Q$ with $E\cap F=\emptyset$, then $\dist(E,F)\ge\delta$ by definition of $\delta$.
-Since $\sup_{x\in E}|\Phi(x)-x|<\delta/2$, we have $\dist(\Phi(E),F)\ge\delta/2$, hence $Y\cap F=(\Phi(E))\cap F=\emptyset$.
-\iffalse
-\begin{editamirblock}
-\editamir{This proves the ``$\Rightarrow$'' direction in \textup{(G1)}.  The ``$\Leftarrow$'' direction follows because each facet map is a homeomorphism on its interior (by small-slope graph control), hence the image meets a codimension-one face if and only if the preimage meets that face.}
-\end{editamirblock}
-\iffalse
-This proves the ``$\Rightarrow$'' direction in \eqref{G1faces}.  The ``$\Leftarrow$'' direction follows because each facet
-\fi
-\fi
-\begin{editamirblock}
-\editamir{This proves the ``$\Rightarrow$'' direction in \textup{(G1)}. The ``$\Leftarrow$'' direction follows because each facet}
-\end{editamirblock}
-$E\cap F_i$ is nonempty, hence $\Phi(E)$ intersects $F_i$ for $\varepsilon$ small (by continuity) and $Y=\Phi(E)$ on $Q$.
-
-\textbf{Step 2: transverse intersections with $F_i$.}
-Fix $i\in\{0,\dots,k\}$.  Since $E\cap F_i$ is a facet of the simplex $E$, it contains a relatively open subset of the
-$(k-1)$--dimensional affine plane $P\cap F_i$.  Because $\Phi$ is $C^1$--close to the identity on $E$,
-the tangent planes $T_yY$ are $\varepsilon$--close to $P$ uniformly, so $Y$ meets $F_i$ transversely for $\varepsilon$ sufficiently small.
-In particular, $Y\cap F_i$ is a smooth oriented $(k-1)$--submanifold and
-\[
-\Mass\bigl(\partial([Y]\llcorner Q)\llcorner F_i\bigr)=\mathcal H^{k-1}(Y\cap F_i).
-\]
-
-\textbf{Step 3: area distortion on the facets.}
-On $E\cap F_i$, the restriction $\Phi|_{E\cap F_i}$ is a $C^1$ embedding whose differential is $O(\varepsilon)$--close to the identity
-on the $(k-1)$--plane $P\cap F_i$.  By the area formula for graphs (as in Lemma~\ref{lem:sliver-stability}),
-\[
-\mathcal H^{k-1}(Y\cap F_i)=\bigl(1+O_k(\varepsilon^2)\bigr)\,\mathcal H^{k-1}(E\cap F_i).
-\]
-Combining with \eqref{H2cornerfat} gives \eqref{G2mass}.
+\editamirNEW{\noindent\textbf{Referee cleanup.} The additional proof blocks that followed here were earlier draft variants of the same argument.
+They have been removed to prevent multiple competing proofs from coexisting in the compiled manuscript.}
 \end{editamirblockNEW}
-\end{proof}
-
-
-\begin{proof}
-\begin{editamirblockNEW}
-\emph{Step 1: localization away from non--incident faces.}
-By \eqref{H1corner} we have $E\subset B(v,c_0h)$ with $c_0<1$.  Choosing $\varepsilon_0(c_0)>0$ small enough, the $C^1$--graph assumption implies
-$Y\cap Q=\Phi(E)\subset B(v,(c_0+\tfrac12)h)$.  Hence Lemma~\ref{lem:ball-excludes-faces} shows that $Y$ cannot meet any codimension--$1$ face of $Q$ not incident to $v$.
-
-\emph{Step 2: the designated faces are hit with positive $(k-1)$--measure.}
-Fix $i\in\{0,\dots,k\}$.  Since $E\cap F_i$ is a facet of the simplex $E$, it has nonempty relative interior in $F_i$ and therefore $\mathcal H^{k-1}(E\cap F_i)>0$.
-Because $\Phi$ is a homeomorphism $E\to Y\cap Q$ and $\partial E=\bigcup_{j=0}^k (E\cap F_j)$ (all facets lie on $\partial Q$ by \eqref{H1corner}),
-we have $\partial(Y\cap Q)=\Phi(\partial E)\subset\partial Q$.
-On the relative interior of the facet $E\cap F_i$ there is a positive distance to every other codimension--$1$ face of $Q$; for $\varepsilon$ sufficiently small,
-continuity forces $\Phi(\mathrm{relint}(E\cap F_i))\subset F_i$.  In particular $\mathcal H^{k-1}(Y\cap F_i)>0$.
-
-\emph{Step 3: no other incident faces carry positive $(k-1)$--measure.}
-Let $F$ be a codimension--$1$ face of $Q$ incident to $v$ but $F\notin\{F_0,\dots,F_k\}$.  By \eqref{H1corner}, $E\cap F=\emptyset$.
-Since $E$ is compact and disjoint from $F$, there is a positive gap $\dist(E,F)\ge \delta>0$.  Under the standing assumption $\sup_{x\in E}|\Phi(x)-x|<\delta/2$,
-we get $\dist(\Phi(E),F)\ge \delta/2$, hence $Y\cap F=\emptyset$ and $\mathcal H^{k-1}(Y\cap F)=0$.
-Together with Steps 1--2 this proves \eqref{G1iff}.
-
-\emph{Step 4: boundary current and mass on each designated face.}
-Fix $i$.  For $\varepsilon$ small, the $C^1$--graph condition implies that $Y$ is $C^1$--close to $P$ on $Q$, and since $P$ meets $F_i$ transversely along the facet $E\cap F_i$,
-the perturbed submanifold $Y$ also meets $F_i$ transversely; hence $Y\cap F_i$ is a smooth oriented $(k-1)$--submanifold.
-In this situation, the restriction of the boundary current to the face is the integration current over the slice:
-\[
-\partial([Y]\llcorner Q)\llcorner F_i = [Y\cap F_i],
-\]
-so $\Mass(\partial([Y]\llcorner Q)\llcorner F_i)=\mathcal H^{k-1}(Y\cap F_i)$.
-
-\emph{Step 5: compare $\mathcal H^{k-1}(Y\cap F_i)$ to $\mathcal H^{k-1}(E\cap F_i)$.}
-On each facet $E\cap F_i$ the map $\Phi$ restricts to a $C^1$ map into $F_i$ whose differential differs from the identity by $O(\varepsilon)$; in particular
-$Y\cap F_i=\Phi(E\cap F_i)$ is a small--slope $(k-1)$--graph over $E\cap F_i$ inside $F_i$.
-Applying Lemma~\ref{lem:small-graph-distortion} with $m=k-1$ gives
-\[
-\mathcal H^{k-1}(Y\cap F_i)=\mathcal H^{k-1}(\Phi(E\cap F_i))
-=(1+O_k(\varepsilon^2))\,\mathcal H^{k-1}(E\cap F_i).
-\]
-Finally Lemma~\ref{lem:corner-simplex-face-mass} yields $\mathcal H^{k-1}(E\cap F_i)\simeq_{k,\Lambda} v_E^{(k-1)/k}$, completing \eqref{G2mass}.
-\end{editamirblockNEW}
-\end{proof}
 
 
 \begin{corollary}[{\color{blue}Corner--exit faces persist uniformly across a finite template family}]\label{cor:holomorphic-corner-exit-inherits}
@@ -6872,7 +6810,7 @@ The local sheet construction is designed so that, uniformly for these test forms
 \[
 T^{\mathrm{raw}}(d\eta)\approx \int_X (m\beta)\wedge d\eta,
 \]
-with an error controlled by $(\delta+\varepsilon+\mathrm{mesh}+1/m)\cdot m$.
+with an error controlled by $(\delta+\varepsilon+\mathrm{mesh})\cdot m$ (for fixed cohomology multiplier $m$).
 Since $\beta$ is closed and $X$ has no boundary, $\int_X (m\beta)\wedge d\eta=\pm\int_X d(m\beta\wedge \eta)=0$.
 \begin{editamirblock}
 \begin{lemma}[Flat-norm control of the gluing mismatch]\label{lem:flatnorm-gluing-mismatch}
@@ -6880,7 +6818,8 @@ In Substep~4.2, for the raw current $T^{\mathrm{raw}}$ built from the cube-local
 \[
 \mathcal F\!\left(\partial T^{\mathrm{raw}}\right)\ \le\ \varepsilon_{\mathrm{glue}}(m,\delta,\varepsilon,\mathrm{mesh})\cdot m,
 \qquad
-\varepsilon_{\mathrm{glue}}\xrightarrow[\delta,\varepsilon\to 0,\ \mathrm{mesh}\to 0,\ m\to\infty]{}0.
+\varepsilon_{\mathrm{glue}}\xrightarrow[\delta,\varepsilon\to 0,\ \mathrm{mesh}\to 0]{}0
+\qquad\text{for fixed $m$ (chosen once to clear denominators of $[\gamma]$).}
 \]
 \end{lemma}
 
@@ -6927,9 +6866,10 @@ Choose an (isometric) Nash embedding $\iota:X\hookrightarrow \R^N$ for some $N$.
 Let $U$ be a tubular neighborhood of $\iota(X)$ and let $\pi:U\to X$ be the nearest--point projection.
 Then $\pi$ is Lipschitz with $\Lip(\pi)$ depending only on $X$.
 
-Since $R$ bounds in $X$, the pushforward $\iota_\# R$ bounds in $\R^N$.
-By the Euclidean isoperimetric (filling) inequality for integral currents (Federer--Fleming \cite{FF60}; see also Federer \cite{Fed69}),
-there exists an integral $k$--current $Q$ in $\R^N$ with $\partial Q=\iota_\# R$ and
+Since $R$ bounds in $X$, the pushforward $\iota_\# R$ bounds in $\R^N$ and is supported in the embedded submanifold $\iota(X)\subset U$.
+By the \emph{relative} Euclidean isoperimetric (filling) inequality for integral currents in a fixed open set
+(applied in the tubular neighborhood $U$; see Federer--Fleming \cite{FF60} and Federer \cite[\S4.2]{Fed69}),
+there exists an integral $k$--current $Q$ supported in $U$ with $\partial Q=\iota_\# R$ and
 \[
 \Mass(Q)\ \le\ C_{N,k}\,\Mass(\iota_\# R)^{\frac{k}{k-1}}.
 \]
@@ -7297,26 +7237,7 @@ so that $|\int_{U_\epsilon}\Theta_\ell|<\frac14$ for all $\ell$.
 and Corollary~\ref{cor:global-flat-weighted}.)
 
 \smallskip\noindent
-\textbf{Step 5: Construct the tiny-mass boundary correction $U_\epsilon$.}
-Let $S$ be the raw microstructure current produced in Steps~1--3 and set $R:=\partial S$.
-Define $\delta:=\mathcal F(R)$ using Definition~\ref{def:flat-norm}.
-By Corollary~\ref{cor:global-flat-weighted} (together with the parameter schedule in \S\ref{sec:parameter-schedule}),
-we have $\delta=\delta(h)\to 0$ as the mesh size $h\downarrow 0$.
-Fix
-\[
-M_\Theta:=\max_\ell \|\Theta_\ell\|_{C^0}.
-\]
-Choose the mesh sufficiently fine so that
-\[
-\delta + C_X\,\delta^{\frac{k}{k-1}}
-< \min\Bigl\{\epsilon,\ \frac{1}{4\,M_\Theta}\Bigr\}.
-\]
-Apply Proposition~\ref{prop:glue-gap} (with $T^{\mathrm{raw}}=S$) to obtain an integral $k$--current $R_{\mathrm{glue}}$ with
-\[
-\partial R_{\mathrm{glue}}=-R,\qquad \Mass(R_{\mathrm{glue}})\le \delta + C_X\,\delta^{\frac{k}{k-1}}.
-\]
-Set $U_\epsilon:=-R_{\mathrm{glue}}$. Then $\partial U_\epsilon=R=\partial S$ and $\Mass(U_\epsilon)$ satisfies the bound required for Step~4.
-
+\textbf{Step 5: (See the next subsection.)}
 Then $T_\epsilon:=S-U_\epsilon$ is a closed integral cycle, hence by Lemma~\ref{lem:integral-periods} each $\int_{T_\epsilon}\Theta_\ell\in\Z$.
 For each $\ell$ we have
 \[

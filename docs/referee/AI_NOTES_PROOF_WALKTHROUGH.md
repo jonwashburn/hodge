@@ -113,6 +113,12 @@ still needs to audit.
   - The matching bound is written directly in terms of the equal-weight matching cost \(\tau_F=\inf_\sigma\sum_a\|u_a-u'_{\sigma(a)}\|\) times a per-slice weight \(\Mass(\Sigma(u_a))+\Mass(\partial\Sigma(u_a))\).
   - In the holomorphic corner-exit regime the slices are cycles and satisfy \(\Mass(\Sigma_F(u_a))\lesssim m_{Q,a}^{(k-1)/k}\) by Lemma `lem:face-slice-cycle-mass`, which is what makes the global summation in `cor:global-flat-weighted` workable.
 
+#### G.1(bis) Borderline case \(p=n/2\)
+
+- **Key point**: the naive scaling from `cor:global-flat-weighted` is not automatically enough at \(k=n\).
+- **Patch in the TeX**: `lem:borderline-p-half` supplies a sufficient refined schedule (notably \(\varrho=o(\varepsilon)\)) to force
+  \(\mathcal F(\partial T^{\mathrm{raw}})\to 0\) in the middle-dimensional regime.
+
 #### G.2 Local holomorphic direction manufacturing (where “finite nets” appear)
 
 - **Projective tangential approximation**: Proposition `prop:tangent-approx-full` (built from Bergman/peak-section control, via `lem:bergman-control`).

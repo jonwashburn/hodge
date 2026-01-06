@@ -51,6 +51,10 @@ As of the latest automated scan, **no duplicate `\label{...}` identifiers** were
 - [x] **Duplicate proof blocks**: removed stray back-to-back proof environments (notably after `lem:radial-min` and in the calibrated-cone preliminaries, plus the earlier duplicates around `lem:limit_is_calibrated` and `prop:almost-calibration`).
 - [x] **Terminology**: added TeX remark `rem:algebraic-class-convention` clarifying what “algebraic class” means (\(\mathbb Q\)-span of cycle classes).
 - [x] **Transport/gluing interface clarity**: made explicit in TeX Proposition `prop:transport-flat-glue` that (after edge trimming) the face slices are cycles on the interior face, so the Step 1 homotopy/Lipschitz estimate drops the boundary-slice term (aligned with Lemma `lem:face-slice-cycle-mass`).
+- [x] **Parameter/notation collisions**: separated the cohomology multiplier \(m\) (fixed in SYR) from the Bergman/holomorphic tensor-power parameter (denoted \(N\) when both appear together), and removed misleading “\(h\downarrow 0\iff m\to\infty\)” phrasing in fixed-\(m\) statements.
+- [x] **Period-locking proof hygiene**: removed a duplicated internal “Step 5” construction inside `prop:cohomology-match` (the boundary correction is now handled once, in the following dedicated subsection).
+- [x] **Filling lemma correctness**: in `lem:FF-filling-X`, made explicit that the Euclidean filling used is supported in the tubular neighborhood where the nearest-point projection is defined (relative filling in the tubular domain).
+- [x] **Combinatorics/typos**: fixed a constant mismatch in `lem:prefix-discrepancy` and a stray TeX typo in `prop:global-coherence-all-labels` (`\\emph{...}` → `\emph{...}`).
 - **See also**:
   - `docs/referee/AI_NOTES_PROOF_WALKTHROUGH.md`
   - `docs/referee/REFEREE_PATCH_REPORT.tex`
@@ -1385,7 +1389,8 @@ For each item below, rewrite/annotate the proof. Recommended minimum deliverable
   - [ ] Proof verified
   - [ ] Downstream use verified
 - **Proof rewrite / verification notes**:
-  - 
+  - **Hygiene fix applied**: the TeX previously wrote an “ordered \(\delta\)-separated template \((t_a)_{a\ge 1}\)” on a compact sphere, which cannot exist for fixed \(\delta>0\).
+    It now correctly uses a finite \(\delta\)-separated list \((t_a)_{a=1}^N\), and notes that one can make \(N\) large by taking \(\delta\) smaller.
 - **Dependencies / citations**:
   - 
 - **Questions / potential gaps**:
@@ -1606,7 +1611,7 @@ For each item below, rewrite/annotate the proof. Recommended minimum deliverable
   - [ ] Proof verified
   - [ ] Downstream use verified
 - **Proof rewrite / verification notes**:
-  - 
+  - **Hygiene fix applied**: the TeX now states the correct packing fact: for fixed separation \(\delta>0\) one gets a *finite* \(\delta\)-separated list of translations inside the bounded admissible parameter box, with length \(N(\delta)\to\infty\) as \(\delta\downarrow 0\) (with the footprint scale fixed).
 - **Dependencies / citations**:
   - 
 - **Questions / potential gaps**:
@@ -1632,20 +1637,23 @@ For each item below, rewrite/annotate the proof. Recommended minimum deliverable
   - [ ] Proof verified
   - [ ] Downstream use verified
 - **Proof rewrite / verification notes**:
-  - 
+  - Same packing-language hygiene fix as in `lem:complex-corner-exit-template`: for fixed \(\delta>0\), only finitely many \(\delta\)-separated translations fit in the bounded template box; length grows as \(\delta\downarrow 0\).
 - **Dependencies / citations**:
   - 
 - **Questions / potential gaps**:
   - 
 
 ##### Proposition `prop:corner-exit-template-net` — Robust corner-exit templates for a finite direction net
-- **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 5357
+- **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 5184
 - **Referee status**:
   - [ ] Statement verified
   - [ ] Proof verified
   - [ ] Downstream use verified
 - **Proof rewrite / verification notes**:
-  - 
+  - Verified that the net is taken inside the dense “nondegenerate” open set \(\mathcal U\), so each net direction admits a corner-exit template via Lemma `lem:corner-exit-template-open`.
+  - **Small bookkeeping fix applied in TeX**: the proof now explicitly defines the uniform upper bound \(\alpha^*:=\max_i\alpha^*(i)\) (hence a finite \(\Lambda=\alpha^*/\alpha_*\)) before invoking `lem:corner-exit-template-open`.
+  - **Packing-language fix applied in TeX**: the statement no longer claims an “arbitrarily long \(\delta\)-separated list for any fixed \(\delta>0\)”; it now states the correct form “length \(N(\delta)\to\infty\) as \(\delta\downarrow 0\)”.
+  - The proof correctly notes that no uniform-in-\(h\) lower bound for \(\alpha_*(h)\) is claimed; instead the later schedule keeps dependence on \((1+A_*(h))\Lambda(h)\) explicit and enforces the corner-exit scale restriction.
 - **Dependencies / citations**:
   - 
 - **Questions / potential gaps**:
@@ -1963,40 +1971,40 @@ For each item below, rewrite/annotate the proof. Recommended minimum deliverable
 - **Questions / potential gaps**:
   - 
 
-##### Proposition `prop:holomorphic-corner-exit-g1g2` — {\color{blue}Corner--exit footprint geometry is preserved under small--slope holomorphic graphs}
-- **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 6391
+##### Proposition `prop:holomorphic-corner-exit-g1g2-old1` — {\color{blue}Corner--exit footprint geometry is preserved under small--slope holomorphic graphs}
+- **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 6216
 - **Referee status**:
   - [ ] Statement verified
   - [ ] Proof verified
   - [ ] Downstream use verified
 - **Proof rewrite / verification notes**:
+  - This is an older/draft variant kept for traceability; the main live statement used downstream is `prop:holomorphic-corner-exit-g1g2`.
+- **Dependencies / citations**:
   - 
+- **Questions / potential gaps**:
+  - 
+
+##### Proposition `prop:holomorphic-corner-exit-g1g2-old2` — {\color{blue}Corner--exit footprint geometry for small--slope graphs}
+- **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 6257
+- **Referee status**:
+  - [ ] Statement verified
+  - [ ] Proof verified
+  - [ ] Downstream use verified
+- **Proof rewrite / verification notes**:
+  - This is an older/draft variant kept for traceability; the main live statement used downstream is `prop:holomorphic-corner-exit-g1g2`.
 - **Dependencies / citations**:
   - 
 - **Questions / potential gaps**:
   - 
 
 ##### Proposition `prop:holomorphic-corner-exit-g1g2` — {\color{blue}Corner--exit footprint geometry for small--slope graphs}
-- **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 6432
+- **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 6320
 - **Referee status**:
   - [ ] Statement verified
   - [ ] Proof verified
   - [ ] Downstream use verified
 - **Proof rewrite / verification notes**:
-  - 
-- **Dependencies / citations**:
-  - 
-- **Questions / potential gaps**:
-  - 
-
-##### Proposition `prop:holomorphic-corner-exit-g1g2` — {\color{blue}Corner--exit footprint geometry for small--slope graphs}
-- **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 6495
-- **Referee status**:
-  - [ ] Statement verified
-  - [ ] Proof verified
-  - [ ] Downstream use verified
-- **Proof rewrite / verification notes**:
-  - 
+  - **Hygiene fix applied**: the TeX had multiple back-to-back proof environments here (draft variants). It has been cleaned to a single proof plus a short “referee cleanup” note.
 - **Dependencies / citations**:
   - 
 - **Questions / potential gaps**:
@@ -2256,7 +2264,11 @@ For each item below, rewrite/annotate the proof. Recommended minimum deliverable
   - [ ] Proof verified
   - [ ] Downstream use verified
 - **Proof rewrite / verification notes**:
-  - 
+  - The internal “Step 5” construction of the tiny-mass boundary correction inside the proposition proof was **removed** (it duplicated the immediately-following subsection “Step 5: Boundary correction with vanishing mass”). The proposition now cleanly points to that subsection for existence/estimates of \(U_\epsilon\).
+  - The intended \(\tfrac14+\tfrac14<\tfrac12\) budget is explicit:
+    - mesh refinement makes each marginal vector \(v_{Q,j}=(\int_{Z_{Q,j}}\Theta_\ell)_\ell\) uniformly tiny so B\'ar\'any--Grinberg gives a \(\le 1/8\) rounding error in each period;
+    - the filling \(U_\epsilon\) is chosen so \(\Mass(U_\epsilon)\cdot\max_\ell\|\Theta_\ell\|_{C^0}<1/4\), hence \(|\int_{U_\epsilon}\Theta_\ell|<1/4\) for all \(\ell\);
+    - integrality + “within \(1/2\)” locks the periods exactly.
 - **Dependencies / citations**:
   - 
 - **Questions / potential gaps**:

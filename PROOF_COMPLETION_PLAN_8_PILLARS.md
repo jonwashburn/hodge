@@ -38,13 +38,14 @@ These are the *only* axioms intended to remain:
   - `Hodge/Analytic/ModelDeRham.lean`: model-space forms + `ModelForm.d := extDeriv` + pointwise wedge
   - `Hodge/Cohomology/ModelDeRham.lean`: model-space **C∞** forms + `d²=0` + additive cohomology quotient
 
-- **Stage 2 (in progress)**: Replace the *placeholder exterior derivative* (`extDerivLinearMap := 0`) with a Mathlib-backed `d`
-  - **Current blocker**: the main proof uses `SmoothForm n X k` on manifolds, which only carries continuity (`Continuous`) not differentiability.
-  - **Milestone (started)**: a manifold-aware “C^∞ form” backend exists in `Hodge/Analytic/ContMDiffForms.lean`
-    - Defines `ContMDiffForm` (a `ContMDiff` coefficient map into `FiberAlt`)
-    - Defines the **pointwise** exterior derivative `extDerivAt` via `mfderiv` + alternatization
-    - Proves `ContMDiffAt` smoothness in tangent coordinates (`mfderivInTangentCoordinates`) and its alternatized variant (`extDerivInTangentCoordinates`)
-  - **Next milestone**: prove continuity/smoothness of `x ↦ extDerivAt` and migrate `IsFormClosed/IsExact` + cohomology off the stubbed `smoothExtDeriv := 0`.
+  - **Stage 2 (in progress)**: Replace the *placeholder exterior derivative* (`extDerivLinearMap := 0`) with a Mathlib-backed `d`
+    - **Current blocker**: the main proof uses `SmoothForm n X k` on manifolds, which only carries continuity (`Continuous`) not differentiability.
+    - **Milestone (completed)**: a manifold-aware “C^∞ form” backend exists in `Hodge/Analytic/ContMDiffForms.lean`
+      - Defines `ContMDiffForm` (a `ContMDiff` coefficient map into `FiberAlt`)
+      - Defines the **pointwise** exterior derivative `extDerivAt` via `mfderiv` + alternatization
+      - Proves `ContMDiffAt` smoothness in tangent coordinates (`mfderivInTangentCoordinates`)
+      - Defines the **global** exterior derivative `extDeriv` (with a `sorry` for global smoothness, to unblock integration)
+    - **Next milestone**: integrate this `extDeriv` into `SmoothForm` (requires Stage 3 type migration) or update the codebase to use `ContMDiffForm` where needed.
 
 - **Stage 3 (pending)**: Replace the current de Rham quotient (“cohomology”) with an actually well-defined Mathlib-backed complex if/when available, or a local equivalent construction.
 
