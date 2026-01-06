@@ -417,7 +417,7 @@ theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : Is
             have : ⟦FundamentalClassSet n X p Zplus, FundamentalClassSet_isClosed (n := n) (X := X) p Zplus hZplus_alg⟧
                 = ⟦sd.γplus, sd.h_plus_closed⟧ := by
               exact hw_plus.trans hZplus_rep
-            simpa [this]
+            simp [this]
       _ = ⟦sd.γplus, sd.h_plus_closed⟧ - ⟦sd.γminus, sd.h_minus_closed⟧ := by
             -- rewrite the - part using ω^p representation and γminus = N·ω^p
             -- First turn the ω^p representation into a γminus representation.
@@ -536,7 +536,7 @@ theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : Is
                 _ = ⟦sd.γplus - sd.γminus, hdiff_closed⟧ := by
                       -- rewrite the form using `sd.h_eq`
                       -- (proof is now definitional after rewriting)
-                      simpa [sd.h_eq] using (rfl : ⟦γ, h_closed'⟧ = ⟦γ, h_closed'⟧)
+                      simp [sd.h_eq]
             -- Now `hsub'` gives the desired relation.
             -- `hsub' : ⟦γplus-γminus⟧ = ⟦γplus⟧ - ⟦γminus⟧`
             -- so we can rewrite.

@@ -238,9 +238,9 @@ statement explicitly redefines a symbol, that local definition takes precedence.
 
 \noindent\textbf{Holomorphic sections / jets.}
 \begin{itemize}
-\item $H^0(X,L^m)$: the complex vector space of global holomorphic sections of $L^{\otimes m}$.
-\item $J_x^k(L^m)$: the $k$--jet space at $x$, i.e. germs of holomorphic sections of $L^{\otimes m}$ modulo those vanishing to order $k+1$ at $x$.
-Equivalently $J_x^k(L^m)\cong \mathcal{O}_X(L^{\otimes m})_x/\mathfrak{m}_x^{k+1}$.
+\item $H^0(X,L^N)$: the complex vector space of global holomorphic sections of $L^{\otimes N}$.
+\item $J_x^k(L^N)$: the $k$--jet space at $x$, i.e. germs of holomorphic sections of $L^{\otimes N}$ modulo those vanishing to order $k+1$ at $x$.
+Equivalently $J_x^k(L^N)\cong \mathcal{O}_X(L^{\otimes N})_x/\mathfrak{m}_x^{k+1}$.
 \end{itemize}
 
 \noindent\textbf{Cohomology / cycles.}
@@ -2479,8 +2479,8 @@ and therefore SYR is equivalent to $\Mass(T_k)\to c_0$.
 \begin{editamirblockNEW}
 \noindent\textbf{Notation warning.} The symbol $m$ is used in two distinct roles:
 (i) the cohomology multiplier in $\mathrm{PD}(m[\gamma])$ in Definition~\ref{def:syr}; and
-(ii) the large tensor power $L^{\otimes m}$ in the Bergman/holomorphic inputs (e.g.\ the $m^{-1/2}$ scale).
-When both parameters appear in the same discussion, we will temporarily denote the tensor-power parameter by $N$ to avoid collision.
+(ii) the large tensor power $L^{\otimes N}$ in the Bergman/holomorphic inputs (e.g.\ the $N^{-1/2}$ scale).
+\editamir{Throughout the referee-layer patches we reserve $m$ for the cohomology multiplier and use $N$ for the holomorphic tensor power, so the Bergman scale is always $N^{-1/2}$.}
 \end{editamirblockNEW}
 
 
@@ -2630,7 +2630,7 @@ Assume the cone-valued representative $\beta$ satisfies LICD.
 By the theorem ``Classical SYR under LICD'', there exists an integer $m\ge 1$ and a sequence of integral $(2n-2p)$-cycles $T_k$
 with $\partial T_k=0$, $[T_k]=\mathrm{PD}(m[\gamma])$, and
 \[
-\Mass(T_k)\downarrow \bigl\langle \mathrm{PD}(m[\gamma]),[\psi]\bigr\rangle
+\Mass(T_k)\to \bigl\langle \mathrm{PD}(m[\gamma]),[\psi]\bigr\rangle
 = m\int_X \beta\wedge\psi.
 \]
 Applying the theorem ``Realization from almost--calibrated sequences'' yields, after passing to a subsequence, a weak limit $T$
@@ -2812,9 +2812,9 @@ and reduces “stable direction labeling’’ to the quantitative choice of $\v
 \subsection*{Step 2: Projective tangential approximation with $C^1$ control}
 
 Fix an ample line bundle $L\to X$ with a Hermitian metric whose curvature
-form equals $\omega$.  For $m\in\N$ large, consider the complete linear
-system $|L^m|$.
-(Parameter convention: in this ``projective/Bergman'' step, $m$ denotes the tensor power of $L$ controlling the Bergman scale $m^{-1/2}$.  This is independent of the homology-multiple used earlier in $A=\mathrm{PD}(m[\gamma])$; when both appear simultaneously, the meaning will be indicated explicitly.)
+form equals $\omega$.  For $N\in\N$ large, consider the complete linear
+system $|L^{\otimes N}|$.
+\editamir{(Parameter convention: throughout the holomorphic/Bergman manufacturing block, $N$ denotes the tensor power of $L$ controlling the Bergman scale $N^{-1/2}$; the cohomology multiplier remains $m$ as in Definition~\ref{def:syr}.)}
 
 \begin{editamirblock}
 \begin{lemma}[Jet surjectivity for ample powers (pointwise and for finite sets)]\label{lem:jet-surjectivity}
@@ -2822,20 +2822,20 @@ Let $X$ be a smooth complex projective manifold and $L\to X$ an ample line bundl
 Fix an integer $k\ge 1$.
 
 \smallskip
-\noindent\textup{(i)} For each point $x\in X$ there exists an integer $m_0(k,x)$ such that for all $m\ge m_0(k,x)$
+\noindent\textup{(i)} For each point $x\in X$ there exists an integer $N_0(k,x)$ such that for all $N\ge N_0(k,x)$
 the natural evaluation map on $k$-jets
 \[
-H^0(X,L^m)\longrightarrow J^k_x(L^m)
+H^0(X,L^N)\longrightarrow J^k_x(L^N)
 \]
-\editamir{Here $J^k_x(L^m):=\mathcal O_X(L^m)_x/\mathfrak m_x^{k+1}\mathcal O_X(L^m)_x$ denotes the $k$-jet space at $x$.}
+\editamir{Here $J^k_x(L^N):=\mathcal O_X(L^N)_x/\mathfrak m_x^{k+1}\mathcal O_X(L^N)_x$ denotes the $k$-jet space at $x$.}
 
 is surjective.
 
 \smallskip
-\noindent\textup{(ii)} More generally, for any \emph{finite} set $S\subset X$ there exists $m_0(k,S)$ such that for all $m\ge m_0(k,S)$
+\noindent\textup{(ii)} More generally, for any \emph{finite} set $S\subset X$ there exists $N_0(k,S)$ such that for all $N\ge N_0(k,S)$
 the joint evaluation map
 \[
-H^0(X,L^m)\longrightarrow \bigoplus_{x\in S} J^k_x(L^m)
+H^0(X,L^N)\longrightarrow \bigoplus_{x\in S} J^k_x(L^N)
 \]
 is surjective.  In particular (taking $k=1$), prescribed values and first derivatives can be realized simultaneously at finitely many points.
 \end{lemma}
@@ -2843,44 +2843,44 @@ is surjective.  In particular (taking $k=1$), prescribed values and first deriva
 \begin{proof}
 For \textup{(i)}, let $\mathfrak{m}_x\subset \mathcal{O}_X$ be the maximal ideal at $x$ and consider the exact sequence
 \[
-0\to L^m\otimes \mathfrak{m}_x^{k+1}\to L^m \to
-L^m\otimes \mathcal{O}_X/\mathfrak{m}_x^{k+1}\to 0.
+0\to L^N\otimes \mathfrak{m}_x^{k+1}\to L^N \to
+L^N\otimes \mathcal{O}_X/\mathfrak{m}_x^{k+1}\to 0.
 \]
 Since $\mathfrak{m}_x^{k+1}$ is coherent and $L$ is ample, Serre vanishing gives
-$H^1(X,L^m\otimes \mathfrak{m}_x^{k+1})=0$ for all $m\ge m_0(k,x)$ (see \cite[III, Thm.~5.2]{Hartshorne77}).
+$H^1(X,L^N\otimes \mathfrak{m}_x^{k+1})=0$ for all $N\ge N_0(k,x)$ (see \cite[III, Thm.~5.2]{Hartshorne77}).
 Taking global sections yields the desired surjection
 \[
-H^0(X,L^m)\twoheadrightarrow H^0\!\left(X,L^m\otimes \mathcal{O}_X/\mathfrak{m}_x^{k+1}\right)\cong J^k_x(L^m).
+H^0(X,L^N)\twoheadrightarrow H^0\!\left(X,L^N\otimes \mathcal{O}_X/\mathfrak{m}_x^{k+1}\right)\cong J^k_x(L^N).
 \]
 
 For \textup{(ii)}, apply the same argument to the finite ``fat point'' subscheme
 $Z:=\sum_{x\in S}(k{+}1)\,x$ with ideal sheaf $\mathcal{I}_Z:=\bigcap_{x\in S}\mathfrak{m}_x^{k+1}$.
-Serre vanishing gives $H^1(X,L^m\otimes \mathcal{I}_Z)=0$ for all $m\ge m_0(k,S)$, hence
+Serre vanishing gives $H^1(X,L^N\otimes \mathcal{I}_Z)=0$ for all $N\ge N_0(k,S)$, hence
 \[
-H^0(X,L^m)\twoheadrightarrow H^0\!\left(X,L^m\otimes \mathcal{O}_X/\mathcal{I}_Z\right)\cong
-\bigoplus_{x\in S} J^k_x(L^m),
+H^0(X,L^N)\twoheadrightarrow H^0\!\left(X,L^N\otimes \mathcal{O}_X/\mathcal{I}_Z\right)\cong
+\bigoplus_{x\in S} J^k_x(L^N),
 \]
 as claimed.
 \end{proof}
 \end{editamirblock}
 
 
-\begin{lemma}[Uniform $C^1$ control on $m^{-1/2}$-balls via Bergman kernels]
+\begin{lemma}[Uniform $C^1$ control on $N^{-1/2}$-balls via Bergman kernels]
 \label{lem:bergman-control}
 \begin{editamirblock}
-Fix $\varepsilon>0$.  There exists $m_1(\varepsilon)$ such that for all
-$m\ge m_1(\varepsilon)$, each $x\in X$, and each collection of $p$
+Fix $\varepsilon>0$.  There exists \editamir{$N_1(\varepsilon)$} such that for all
+$N\ge \editamir{N_1(\varepsilon)}$, each $x\in X$, and each collection of $p$
 complex covectors $\lambda_1,\ldots,\lambda_p\in T_x^{*(1,0)}X$, there exist
-sections $s_1,\ldots,s_p\in H^0(X,L^m)$ with the following properties
+sections $s_1,\ldots,s_p\in H^0(X,L^{\editamir{N}})$ with the following properties
 in normal holomorphic coordinates centered at $x$:
 \begin{enumerate}
 \item[\textnormal{(i)}] $s_i(x)=0$ and $ds_i(x)=\lambda_i$ for each $i$;
-\item[\textnormal{(ii)}] on the geodesic ball $B_{c\,m^{-1/2}}(x)$
+\item[\textnormal{(ii)}] on the geodesic ball $B_{c\,\editamir{N^{-1/2}}}(x)$
 (for a universal constant $c>0$ depending only on $(X,\omega)$),
 the gradients satisfy
 \[
 \|ds_i(y)-\lambda_i\|\le \varepsilon\,\max_{1\le j\le p}\|\lambda_j\|
-\quad\text{for all } y\in B_{c\,m^{-1/2}}(x).
+\quad\text{for all } y\in B_{c\,\editamir{N^{-1/2}}}(x).
 \]
 \end{enumerate}
 
@@ -2890,16 +2890,16 @@ the gradients satisfy
 \begin{proof}
 \begin{editamirblock}
 \editamir{
-\noindent\textbf{Analytic input (Bergman kernel at the $m^{-1/2}$ scale).}
+\noindent\textbf{Analytic input (Bergman kernel at the $N^{-1/2}$ scale).}
 We invoke a \emph{near off-diagonal} Bergman kernel expansion with \emph{derivative control up to order $2$}
-on rescaled balls of radius $\asymp m^{-1/2}$ for the positive Hermitian line bundle $(L,h)$ with curvature $\omega$.
+on rescaled balls of radius $\asymp N^{-1/2}$ for the positive Hermitian line bundle $(L,h)$ with curvature $\omega$.
 Concretely, we need that in normal coordinates and local unitary frames,
 the rescaled kernel admits a $C^2$ asymptotic expansion on $\{|Z|,|Z'|\le \sigma\}$ (fixed $\sigma>0$),
-so that first derivatives of the kernel (hence gradients of the induced peak sections) vary by $O(m^{-1/2})$.
+so that first derivatives of the kernel (hence gradients of the induced peak sections) vary by $O(N^{-1/2})$.
 This is a standard consequence of the off-diagonal expansion in \cite{MaMarinescu13OffDiag} (see also the classical
 diagonal expansions \cite{Tian90,Catlin99,Zelditch98} and the systematic treatment \cite{MaMarinescu07}).
 In the present paper, $X$ is compact K\"ahler and $(L,h)$ is positive, so the hypotheses of the cited off-diagonal expansion apply.
-We therefore take the $C^2$ near off-diagonal Bergman kernel expansion on the $m^{-1/2}$ scale as a published analytic input
+We therefore take the $C^2$ near off-diagonal Bergman kernel expansion on the $N^{-1/2}$ scale as a published analytic input
 (e.g.\ \cite{MaMarinescu13OffDiag,MaMarinescu07}).}
 
 Set $M:=\max_{1\le j\le p}\|\lambda_j\|$.  If $M=0$, take $s_i\equiv 0$ for all $i$, so assume $M>0$ and replace $\lambda_i$ by $\lambda_i/M$.
@@ -2907,11 +2907,11 @@ Thus we may assume $M=1$.
 
 Fix $x\in X$.  Choose $K$--coordinates and a local holomorphic frame for $(L,h)$ centered at $x$
 (as in \cite[\S4.1]{MaMarinescu07}), so that all estimates below are uniform in $x$.
-Let $P_m(\cdot,\cdot)$ denote the Bergman kernel of $H^0(X,L^m)$ for the $L^2$ inner product induced by $(h^m,\omega)$, written in these coordinates and this frame.
+Let $P_N(\cdot,\cdot)$ denote the Bergman kernel of $H^0(X,L^N)$ for the $L^2$ inner product induced by $(h^N,\omega)$, written in these coordinates and this frame.
 The \emph{near off-diagonal Bergman kernel expansion} on the Bergman scale
 (e.g. \cite[Thm.~1]{MaMarinescu13OffDiag}; see also \cite{MaMarinescu13OffDiag,Tian90,Catlin99,Zelditch98,MaMarinescu07})
 implies the following: there exists a universal $\sigma>0$ such that, in rescaled variables
-$Z=\sqrt m\,z$ and $Z'=\sqrt m\,z'$, we have
+$Z=\sqrt N\,z$ and $Z'=\sqrt N\,z'$, we have
 
 \medskip\noindent\textbf{Normalization check (matching the literature).}
 We work with the \emph{prequantum convention}
@@ -2925,44 +2925,45 @@ $P_{\mathrm{BF}}(Z,Z')=\exp\!\big(\pi Z\cdot\overline{Z'}-\tfrac{\pi}{2}(|Z|^2+|
 rescaling of the normal coordinates $Z\mapsto cZ$.)
 \medskip
 \[
-m^{-n}\,P_m\!\left(\tfrac Z{\sqrt m},\tfrac{Z'}{\sqrt m}\right)
+N^{-n}\,P_N\!\left(\tfrac Z{\sqrt N},\tfrac{Z'}{\sqrt N}\right)
 =
-P_{\mathrm{BF}}(Z,Z') + O(m^{-1/2})
+P_{\mathrm{BF}}(Z,Z') + O(N^{-1/2})
 \quad\text{in }C^{2}(\{|Z|,|Z'|\le \sigma\}),
 \]
 where $P_{\mathrm{BF}}(Z,Z')=\exp\!\big(\pi Z\cdot\overline{Z'}-\tfrac{\pi}{2}(|Z|^2+|Z'|^2)\big)$ is the Bargmann--Fock kernel on $\C^n$.
 
-Using the reproducing-kernel representation, differentiate the kernel in the \emph{second} variable at $Z'=0$ to obtain holomorphic sections.
+Using the reproducing-kernel representation, differentiate the kernel in the \emph{second} variable at $Z'=0$ to obtain holomorphic sections
+\editamir{(for each fixed $Z'$, the map $Z\mapsto P_N(\tfrac Z{\sqrt N},\tfrac{Z'}{\sqrt N})$ represents a holomorphic section in the first variable, so taking a derivative in $Z'$ and evaluating at $Z'=0$ preserves holomorphicity in $Z$).}
 More precisely, for $a=1,\dots,n$ define
 \[
-s_{a,m}(z)\ :=\ m^{-(n+1)/2}\,\partial_{\overline{Z'_a}}
-\Big(P_m(\tfrac Z{\sqrt m},\tfrac{Z'}{\sqrt m})\Big)\Big|_{Z'=0},
+s_{a,N}(z)\ :=\ N^{-(n+1/2)}\,\partial_{\overline{Z'_a}}
+\Big(P_N(\tfrac Z{\sqrt N},\tfrac{Z'}{\sqrt N})\Big)\Big|_{Z'=0},
 \]
-viewed as a local holomorphic function via the chosen frame.
+viewed as a local representative via the chosen frame.
 Since $P_{\mathrm{BF}}(Z,Z')$ is linear in $\overline{Z'}$ to first order, the $C^2$--control above implies:
 \begin{enumerate}
-\item $s_{a,m}(0)=0$ for all $a$;
-\item the $1$--jets satisfy $ds_{a,m}(0)=dz^a+o(1)$ as $m\to\infty$;
-\item moreover, $\sup_{|Z|\le \sigma}\|ds_{a,m}(Z)-ds_{a,m}(0)\|=o(1)$ as $m\to\infty$.
+\item $s_{a,N}(0)=0$ for all $a$;
+\item the $1$--jets satisfy $ds_{a,N}(0)=\editamir{\pi\,}dz^a+o(1)$ as $N\to\infty$;
+\item moreover, $\sup_{|Z|\le \sigma}\|ds_{a,N}(Z)-ds_{a,N}(0)\|=o(1)$ as $N\to\infty$.
 \end{enumerate}
-In particular, for $m\ge m_1(\varepsilon)$ the matrix $A_m:=(ds_{a,m}(0))_{a=1}^n$ is invertible and
+In particular, for $N\ge \editamir{N_1(\varepsilon)}$ the matrix $A_N:=(ds_{a,N}(0))_{a=1}^n$ is invertible and
 \[
-\sup_{|Z|\le \sigma}\|ds_{a,m}(Z)-dz^a\|\le \varepsilon
+\sup_{|Z|\le \sigma}\|ds_{a,N}(Z)-ds_{a,N}(0)\|\le \varepsilon
 \qquad\text{for all }a=1,\dots,n.
 \]
 
 Now write each $\lambda_i=\sum_{a=1}^n \lambda_i^a\,dz^a$ in these coordinates and set
 \[
-s_i \ :=\ \sum_{a=1}^n b_{i,a}\,s_{a,m},
-\qquad\text{where } b_i:=A_m^{-1}(\lambda_i).
+s_i \ :=\ \sum_{a=1}^n b_{i,a}\,s_{a,N},
+\qquad\text{where } b_i:=A_N^{-1}(\lambda_i).
 \]
 Then $s_i(0)=0$ and $ds_i(0)=\lambda_i$ \emph{exactly} by construction.
-Using the derivative control above and $\|A_m^{-1}\|=O(1)$ for $m$ large, we obtain
+Using the derivative control above and $\|A_N^{-1}\|=O(1)$ for $N$ large, we obtain
 \[
 \|ds_i(Z)-\lambda_i\|\le \varepsilon\max_{1\le j\le p}\|\lambda_j\|
 \qquad\text{for all }|Z|\le \sigma.
 \]
-Returning to the original variables gives the desired estimate on $B_{c\,m^{-1/2}}(x)$ with $c:=\sigma$.
+Returning to the original variables gives the desired estimate on $B_{c\,\editamir{N^{-1/2}}}(x)$ with $c:=\sigma$.
 
 Finally, undo the normalization by multiplying the constructed sections by $M$, which yields the general case.
 
@@ -3023,16 +3024,16 @@ and $Y\cap U_{1/2}$ is a single $C^1$ graph over $\Pi\cap U_{1/2}$.
 
 \label{prop:tangent-approx-full}
 Let $x\in X$ and let $\Pi\subset T_xX$ be a complex $(n-p)$-plane.
-For every $\varepsilon>0$ there exist $m\gg 0$ and a smooth complete
+For every $\varepsilon>0$ there exist $N\gg 0$ and a smooth complete
 intersection
 \[
 Y = \{s_1=0\}\cap \cdots \cap \{s_p=0\}\subset X,
-\qquad s_i\in H^0(X,L^m),
+\qquad s_i\in H^0(X,L^N),
 \]
 such that $x\in Y$, $Y$ is smooth in a neighborhood of $x$, and
 \[
 \angle\bigl(T_yY,\Pi\bigr)<\varepsilon
-\quad\text{for all } y\in B_{c\,m^{-1/2}}(x).
+\quad\text{for all } y\in B_{c\,N^{-1/2}}(x).
 \]
 Moreover, $Y$ is $\psi$-calibrated (being a complex submanifold).
 \end{proposition}
@@ -3042,10 +3043,10 @@ Moreover, $Y$ is $\psi$-calibrated (being a complex submanifold).
 \begin{editamirblockNEW}
 \editamir{\noindent\textbf{Referee correction (removing an unnecessary Bertini/global-smoothness dependency).}
 Downstream we only use that the defining sections are \emph{transverse on the Bergman ball}
-$B_{c\,m^{-1/2}}(x)$, which yields a \emph{single-sheet $C^1$ graph} there.
+$B_{c\,N^{-1/2}}(x)$, which yields a \emph{single-sheet $C^1$ graph} there.
 No later step requires $Y$ to be globally smooth on all of $X$.
 Accordingly, the conclusion may be read as producing an \emph{algebraic complete-intersection cycle}
-(possibly with singularities away from $B_{c\,m^{-1/2}}(x)$), whose associated integration current is
+(possibly with singularities away from $B_{c\,N^{-1/2}}(x)$), whose associated integration current is
 $\psi$--calibrated in the sense of Wirtinger/Harvey--Lawson \cite{HL82}.}
 \end{editamirblockNEW}
 
@@ -3053,10 +3054,10 @@ $\psi$--calibrated in the sense of Wirtinger/Harvey--Lawson \cite{HL82}.}
 Choose covectors $\lambda_1,\ldots,\lambda_p\in T_x^*X$ whose common
 kernel equals $\Pi$.  By Lemma~\ref{lem:bergman-control}, pick
 $s_1,\ldots,s_p$ with $s_i(x)=0$, $ds_i(x)=\lambda_i$, and
-$\|ds_i(y)-\lambda_i\|<\varepsilon/p$ on $B_{c\,m^{-1/2}}(x)$.
+$\|ds_i(y)-\lambda_i\|<\varepsilon/p$ on $B_{c\,N^{-1/2}}(x)$.
 
 \iffalse
-For $m\gg 0$ and after a small generic perturbation inside the
+For $N\gg 0$ and after a small generic perturbation inside the
 finite-dimensional linear system (which does not change jets at $x$
 nor the $C^1$ estimates on the small ball), Bertini's theorem ensures
 that $Y$ is smooth and $\{ds_1(y),\ldots,ds_p(y)\}$ are linearly
@@ -3066,7 +3067,7 @@ independent on the ball.
 \begin{editamirblockNEW}
 \editamir{\noindent\textbf{Referee note.} The above generic-perturbation/Bertini sentence is not needed here.
 We keep the sections $s_i$ produced by Lemma~\ref{lem:bergman-control}: by construction they satisfy
-$\{ds_1(y),\ldots,ds_p(y)\}$ linearly independent on $B_{c\,m^{-1/2}}(x)$, hence $Y$ is smooth on that ball.
+$\{ds_1(y),\ldots,ds_p(y)\}$ linearly independent on $B_{c\,N^{-1/2}}(x)$, hence $Y$ is smooth on that ball.
 Possible singularities of the global complete intersection away from the ball do not affect the local graph estimate
 and do not enter later arguments, which work at the level of integral currents/algebraic cycles.}
 \end{editamirblockNEW}
@@ -3091,14 +3092,14 @@ the associated integration current $[Y]$ is $\psi$--calibrated (Wirtinger), henc
 For every compact $K\subset X$ and $\varepsilon>0$ there exist finitely
 many points $x_1,\dots,x_A\in K$ and, for each $\alpha$, finitely many
 $\psi$-calibrated $(n-p)$-submanifolds $Y_{\alpha,1},\ldots,Y_{\alpha,N_\alpha}$
-(each a smooth complete intersection in $|L^m|$ for some large $m$) such that:
+(each a smooth complete intersection in $|L^N|$ for some large $N$) such that:
 \begin{enumerate}
 \item[\textnormal{(i)}] $K\subset \bigcup_{\alpha=1}^A B(x_\alpha,\varepsilon)$;
 \item[\textnormal{(ii)}] for each fixed $\alpha$ and each calibrated plane $\Pi\subset T_{x_\alpha}X$
 there exists $j\in\{1,\dots,N_\alpha\}$ with
 $\mathrm{dist}\!\bigl(T_{x_\alpha}Y_{\alpha,j},\Pi\bigr)<\varepsilon$.
 \end{enumerate}
-Moreover, each $Y_{\alpha,j}$ can be chosen so that on the Bergman ball $B_{c\,m^{-1/2}}(x_\alpha)$
+Moreover, each $Y_{\alpha,j}$ can be chosen so that on the Bergman ball $B_{c\,N^{-1/2}}(x_\alpha)$
 its tangent planes remain $\varepsilon$-close to $T_{x_\alpha}Y_{\alpha,j}$ (as in Proposition~\ref{prop:tangent-approx-full}).
 \end{proposition}
 
@@ -3111,10 +3112,10 @@ $\{\Pi_{\alpha,1},\ldots,\Pi_{\alpha,N_\alpha}\}$ in the compact fiber
 $G_{n-p}(T_{x_\alpha}X)$.  Apply Proposition~\ref{prop:tangent-approx-full}
 to realize each net direction by a calibrated complete intersection
 $Y_{\alpha,j}$ through $x_\alpha$ with tangent plane $\varepsilon/2$-close
-to $\Pi_{\alpha,j}$ on a ball of radius $c\,m^{-1/2}$.
+to $\Pi_{\alpha,j}$ on a ball of radius $c\,N^{-1/2}$. \editamir{(Since there are only finitely many directions in the net, we may take a single $N$ large enough so that all of the resulting local graph estimates hold on the same Bergman radius $c\,N^{-1/2}$.)}
 
-By the $C^1$ control in Proposition~\ref{prop:tangent-approx-full}, for $m$ large enough the tangent planes of each $Y_{\alpha,j}$
-remain $\varepsilon$-close to $T_{x_\alpha}Y_{\alpha,j}$ throughout $B_{c\,m^{-1/2}}(x_\alpha)$.
+By the $C^1$ control in Proposition~\ref{prop:tangent-approx-full}, for $N$ large enough the tangent planes of each $Y_{\alpha,j}$
+remain $\varepsilon$-close to $T_{x_\alpha}Y_{\alpha,j}$ throughout $B_{c\,N^{-1/2}}(x_\alpha)$.
 Thus, at each fixed center $x_\alpha$, the finite family $\{Y_{\alpha,j}\}_j$ realizes an $\varepsilon$-net of calibrated directions in $T_{x_\alpha}X$,
 and the centers $\{x_\alpha\}$ cover $K$ at scale $\varepsilon$.
 \end{proof}
@@ -4862,7 +4863,8 @@ Disjointness of the pieces $[P+t_a]\llcorner Q$ is immediate because the affine 
 \begin{corollary}[Holomorphic upgrade on a ball cell]\label{cor:holomorphic-flat-sliver-local}
 In the setting of Proposition~\ref{prop:flat-sliver-local}, assume $Q$ lies in a holomorphic chart and that $P$ is a calibrated complex
 $(n-p)$-plane in those coordinates with normal covectors $\lambda_1,\dots,\lambda_p$.
-Fix $\varepsilon>0$ and choose $m\ge m_1(\varepsilon)$ (Lemma~\ref{lem:bergman-control}) with $\mathrm{diam}(Q)\le c\,m^{-1/2}$.
+Fix $\varepsilon>0$ and choose a holomorphic tensor power \editamir{$N_{\mathrm{hol}}\ge N_1(\varepsilon)$} (Lemma~\ref{lem:bergman-control}) with
+$\mathrm{diam}(Q)\le c\,\editamir{N_{\mathrm{hol}}^{-1/2}}$.
 Then, after possibly reducing $N$ by a dimensional constant (absorbed into $C(p)$), the translations $t_a$ may be chosen so that
 \[
 \|t_a-t_b\|\ \ge\ 10\,\varepsilon\,\mathrm{diam}(Q)\qquad (a\neq b),
@@ -4885,7 +4887,7 @@ we may replace the family by a subfamily (renaming and keeping the same notation
 \)
 for all $a\neq b$.
 
-With $m\ge m_1(\varepsilon)$ and $\mathrm{diam}(Q)\le c\,m^{-1/2}$, the Bergman-scale $C^1$ control and the holomorphic finite-template
+With \editamir{$N_{\mathrm{hol}}\ge N_1(\varepsilon)$} and $\mathrm{diam}(Q)\le c\,\editamir{N_{\mathrm{hol}}^{-1/2}}$, the Bergman-scale $C^1$ control and the holomorphic finite-template
 construction apply at each translation parameter $t_a$, producing $\psi$-calibrated holomorphic complete intersections
 $Y^1,\dots,Y^N$ whose restrictions to $Q$ are disjoint $C^1$ graphs over $P+t_a$ with slope $O(\varepsilon)$.
 In particular their masses satisfy
@@ -5989,29 +5991,29 @@ Bergman-scale balls, and
 Fix a holomorphic chart $\varphi:U\to B_{\rho}(0)\subset\C^n$ and a local holomorphic frame $e$ of $L$ over $U$ with
 $|e|_h^2=e^{-\phi}$ and $i\partial\bar\partial\phi=\omega$ on $U$.
 Fix $R>0$ and let $\ell(z)=a\cdot z+b$ be an affine-linear holomorphic function on $\C^n$ with $|a|+|b|\le 1$.
-Then for all sufficiently large $m$ there exists a global section $s_{\ell,m}\in H^0(X,L^m)$ such that, writing
-$s_{\ell,m}=f_{\ell,m}\,e^{\otimes m}$ on $B_{\rho/8}(0)$, one has on the Bergman-scale ball
-$B_{R/\sqrt m}(0)\subset B_{\rho/8}(0)$:
+Then for all sufficiently large $N$ there exists a global section $s_{\ell,N}\in H^0(X,L^N)$ such that, writing
+$s_{\ell,N}=f_{\ell,N}\,e^{\otimes N}$ on $B_{\rho/8}(0)$, one has on the Bergman-scale ball
+$B_{R/\sqrt N}(0)\subset B_{\rho/8}(0)$:
 \[
-\sup_{|z|\le R/\sqrt m}\Bigl(|f_{\ell,m}(z)-\ell(z)|+\sqrt m\,|\nabla(f_{\ell,m}-\ell)(z)|\Bigr)\ \le\ \varepsilon_m,
-\qquad \varepsilon_m\xrightarrow[m\to\infty]{}0,
+\sup_{|z|\le R/\sqrt N}\Bigl(|f_{\ell,N}(z)-\ell(z)|+\sqrt N\,|\nabla(f_{\ell,N}-\ell)(z)|\Bigr)\ \le\ \varepsilon_N,
+\qquad \varepsilon_N\xrightarrow[N\to\infty]{}0,
 \]
 with constants uniform over the finitely many charts in a fixed atlas on $X$.
-\editamirNEW{Moreover, the construction in the proof yields the quantitative bound $\varepsilon_m\le C_R\,e^{-c m}$ for some $c>0$ (uniform over $\ell$ with $|a|+|b|\le 1$ and over charts in a fixed finite atlas). In particular, $\varepsilon_m=o(m^{-1/2})$.}
+\editamirNEW{Moreover, the construction in the proof yields the quantitative bound $\varepsilon_N\le C_R\,e^{-c N}$ for some $c>0$ (uniform over $\ell$ with $|a|+|b|\le 1$ and over charts in a fixed finite atlas). In particular, $\varepsilon_N=o(N^{-1/2})$.}
 \end{lemma}
 
 \begin{proof}
 Choose a cutoff $\chi$ supported in $B_{\rho/2}(0)$ with $\chi\equiv 1$ on $B_{\rho/4}(0)$ and set
-$\tilde s:=\chi\,\ell\,e^{\otimes m}$ (extended by $0$ outside $U$).
-Then $\bar\partial\tilde s=(\bar\partial\chi)\,\ell\,e^{\otimes m}$ is supported in the annulus
+$\tilde s:=\chi\,\ell\,e^{\otimes N}$ (extended by $0$ outside $U$).
+Then $\bar\partial\tilde s=(\bar\partial\chi)\,\ell\,e^{\otimes N}$ is supported in the annulus
 $\{\rho/4\le |z|\le \rho/2\}$ \editamir{where, after scaling the local frame by a constant (equivalently adding a constant to $\phi$), we may assume $\inf_{\rho/4\le |z|\le \rho/2}\phi\ge c_0>0$.}
-Solve $\bar\partial u=\bar\partial\tilde s$ using H\"ormander $L^2$ estimates \editamirNEW{(see \cite{Demailly12,MaMarinescu07})} for the positive bundle $(L^m,h^m)$; the weight $e^{-m\phi}$
-forces $\|u\|_{L^2(h^m)}\le C\,e^{-c m}$.
+Solve $\bar\partial u=\bar\partial\tilde s$ using H\"ormander $L^2$ estimates \editamirNEW{(see \cite{Demailly12,MaMarinescu07})} for the positive bundle $(L^N,h^N)$; the weight $e^{-N\phi}$
+forces $\|u\|_{L^2(h^N)}\le C\,e^{-c N}$.
 On the inner ball $B_{\rho/4}(0)$ one has $\bar\partial u=0$, so $u$ is holomorphic there.
-Standard local $L^2\to C^1$ estimates for holomorphic sections on Bergman balls (mean-value inequality plus Cauchy estimates at scale $m^{-1/2}$)
-give $\|u\|_{C^1(B_{R/\sqrt m})}\le C_R\,e^{-c m}$.
-Setting $s_{\ell,m}:=\tilde s-u$ yields $s_{\ell,m}$ holomorphic and
-$f_{\ell,m}=\ell-\text{(holomorphic error)}$ on $B_{R/\sqrt m}$ with the stated bound.
+Standard local $L^2\to C^1$ estimates for holomorphic sections on Bergman balls (mean-value inequality plus Cauchy estimates at scale $N^{-1/2}$)
+give $\|u\|_{C^1(B_{R/\sqrt N})}\le C_R\,e^{-c N}$.
+Setting $s_{\ell,N}:=\tilde s-u$ yields $s_{\ell,N}$ holomorphic and
+$f_{\ell,N}=\ell-\text{(holomorphic error)}$ on $B_{R/\sqrt N}$ with the stated bound.
 \end{proof}
 
 
@@ -6020,54 +6022,54 @@ $f_{\ell,m}=\ell-\text{(holomorphic error)}$ on $B_{R/\sqrt m}$ with the stated 
 Fix a holomorphic chart identifying a neighborhood of a cell $Q$ with a domain in $\C^{n}=\C^{n-p}\times\C^{p}$ with coordinates $z=(u,w)$,
 and assume $Q\subset B_{R/\sqrt m}(0)$ for some fixed $R$.
 \fi
-\editamir{Fix a holomorphic chart identifying a neighborhood of a cell $Q$ with a domain in $\C^{n}=\C^{n-p}\times\C^{p}$ with coordinates $z=(u,w)$, and assume $Q\subset B_{R/\sqrt m}(0)$ for some fixed $R$. Assume moreover that the cell diameter satisfies $h\asymp m^{-1/2}$.}
-Let $t\in\C^p$ satisfy $|t|\le c\,h$ (with \editamir{$h\asymp m^{-1/2}$}).
-Then for all sufficiently large $m$ there exist sections $\sigma_1,\dots,\sigma_p\in H^0(X,L^m)$ such that, writing
-$\sigma_j=F_j\,e^{\otimes m}$ in a local frame on $B_{R/\sqrt m}(0)$ and setting $F=(F_1,\dots,F_p)$, one has
+\editamir{Fix a holomorphic chart identifying a neighborhood of a cell $Q$ with a domain in $\C^{n}=\C^{n-p}\times\C^{p}$ with coordinates $z=(u,w)$, and assume $Q\subset B_{R/\sqrt N}(0)$ for some fixed $R$. Assume moreover that the cell diameter satisfies $h\asymp N^{-1/2}$.}
+Let $t\in\C^p$ satisfy $|t|\le c\,h$ (with \editamir{$h\asymp N^{-1/2}$}).
+Then for all sufficiently large $N$ there exist sections $\sigma_1,\dots,\sigma_p\in H^0(X,L^N)$ such that, writing
+$\sigma_j=F_j\,e^{\otimes N}$ in a local frame on $B_{R/\sqrt N}(0)$ and setting $F=(F_1,\dots,F_p)$, one has
 \[
-\|\partial_w F-I\|_{L^\infty(B_{R/\sqrt m})}\ +\ \|\partial_u F\|_{L^\infty(B_{R/\sqrt m})}\ \le\ \eta_m,
+\|\partial_w F-I\|_{L^\infty(B_{R/\sqrt N})}\ +\ \|\partial_u F\|_{L^\infty(B_{R/\sqrt N})}\ \le\ \eta_N,
 \qquad
-\sup_{u:\ (u,t)\in B_{R/\sqrt m}} |F(u,t)|\ \le\ \eta_m\,h,
+\sup_{u:\ (u,t)\in B_{R/\sqrt N}} |F(u,t)|\ \le\ \eta_N\,h,
 \]
-with $\eta_m\to 0$.
-Consequently, for $m$ large enough, the common zero set
+with $\eta_N\to 0$.
+Consequently, for $N$ large enough, the common zero set
 $Y_t:=\{\sigma_1=\cdots=\sigma_p=0\}$ satisfies that $Y_t\cap Q$ is a \emph{single} $C^1$ graph over the affine complex plane
-$\{w=t\}$ on all of $Q$, with slope $O(\eta_m)$ (hence as small as desired).
+$\{w=t\}$ on all of $Q$, with slope $O(\eta_N)$ (hence as small as desired).
 \end{proposition}
 
 \begin{proof}
 \begin{editamirblockNEW}
 Apply Lemma~\ref{lem:bergman-affine-approx-hormander} to the affine-linear holomorphic functions
 $\ell_0\equiv 1$ and $\ell_j(z)=w_j$ ($1\le j\le p$).  Thus for each $j=0,1,\dots,p$ we obtain a holomorphic section
-$s_j\in H^0(X,L^m)$ with local coefficient $f_j$ on $B_{R/\sqrt m}$ such that
+$s_j\in H^0(X,L^N)$ with local coefficient $f_j$ on $B_{R/\sqrt N}$ such that
 \[
-\sup_{B_{R/\sqrt m}}\Bigl(|f_0-1|+\sqrt m\,|\nabla(f_0-1)|\Bigr)\le \varepsilon_m,
+\sup_{B_{R/\sqrt N}}\Bigl(|f_0-1|+\sqrt N\,|\nabla(f_0-1)|\Bigr)\le \varepsilon_N,
 \qquad
-\sup_{B_{R/\sqrt m}}\Bigl(|f_j-w_j|+\sqrt m\,|\nabla(f_j-w_j)|\Bigr)\le \varepsilon_m\ (1\le j\le p),
+\sup_{B_{R/\sqrt N}}\Bigl(|f_j-w_j|+\sqrt N\,|\nabla(f_j-w_j)|\Bigr)\le \varepsilon_N\ (1\le j\le p),
 \]
-for some $\varepsilon_m\to 0$ (as in Lemma~\ref{lem:bergman-affine-approx-hormander}).
+for some $\varepsilon_N\to 0$ (as in Lemma~\ref{lem:bergman-affine-approx-hormander}).
 
 For $t=(t_1,\dots,t_p)$ define $\sigma_j:=s_j-t_j s_0$ and write
-$\sigma_j=F_j\cdot e^{\otimes m}$ in the chosen local frame, so
+$\sigma_j=F_j\cdot e^{\otimes N}$ in the chosen local frame, so
 \[
 F_j(u,w)=f_j(u,w)-t_j f_0(u,w).
 \]
 Since $\nabla(w_j)=e_j$ and $\nabla(1)=0$ in the Euclidean chart, the above estimates imply
 \[
-\|\partial_w F-I\|_{L^\infty(B_{R/\sqrt m})}+\|\partial_u F\|_{L^\infty(B_{R/\sqrt m})}
-\ \le\ C\,\frac{\varepsilon_m}{\sqrt m},
+\|\partial_w F-I\|_{L^\infty(B_{R/\sqrt N})}+\|\partial_u F\|_{L^\infty(B_{R/\sqrt N})}
+\ \le\ C\,\frac{\varepsilon_N}{\sqrt N},
 \]
 and at $w=t$ we have
 \[
 F_j(u,t)=(f_j-w_j)(u,t)-t_j(f_0-1)(u,t),
 \qquad\text{hence}\qquad
-\sup_{u:(u,t)\in B_{R/\sqrt m}}|F(u,t)|\le C\,\varepsilon_m .
+\sup_{u:(u,t)\in B_{R/\sqrt N}}|F(u,t)|\le C\,\varepsilon_N .
 \]
-Set $\eta_m:=C\,\varepsilon_m/h$, where $h=\mathrm{diam}(Q)\asymp m^{-1/2}$ and (by Lemma~\ref{lem:bergman-affine-approx-hormander}) $\varepsilon_m=o(m^{-1/2})$; hence $\eta_m\to 0$. Moreover, for $m$ large one has $C\,\varepsilon_m/\sqrt m\le \eta_m$, so
+Set $\eta_N:=C\,\varepsilon_N/h$, where $h=\mathrm{diam}(Q)\asymp N^{-1/2}$ and (by Lemma~\ref{lem:bergman-affine-approx-hormander}) $\varepsilon_N=o(N^{-1/2})$; hence $\eta_N\to 0$. Moreover, for $N$ large one has $C\,\varepsilon_N/\sqrt N\le \eta_N$, so
 \[
-\|\partial_w F-I\|_{L^\infty}+\|\partial_u F\|_{L^\infty}\le \eta_m,
+\|\partial_w F-I\|_{L^\infty}+\|\partial_u F\|_{L^\infty}\le \eta_N,
 \qquad
-\sup_{u:(u,t)\in B_{R/\sqrt m}}|F(u,t)|\le \eta_m\,h .
+\sup_{u:(u,t)\in B_{R/\sqrt N}}|F(u,t)|\le \eta_N\,h .
 \]
 
 Introduce the translated variable $\widetilde w:=w-t$ and the translated map
@@ -6075,11 +6077,11 @@ Introduce the translated variable $\widetilde w:=w-t$ and the translated map
 \widetilde F(u,\widetilde w):=F(u,\widetilde w+t).
 \]
 Then $\partial_{\widetilde w}\widetilde F=\partial_w F$ and $\partial_u\widetilde F=\partial_u F$, and
-$\sup_{u}|\widetilde F(u,0)|=\sup_{u}|F(u,t)|\le \eta_m h$.
+$\sup_{u}|\widetilde F(u,0)|=\sup_{u}|F(u,t)|\le \eta_N h$.
 
-Choose $r\simeq h$ and a product set $U_u\times U_{\widetilde w}\subset B_{R/\sqrt m}$
+Choose $r\simeq h$ and a product set $U_u\times U_{\widetilde w}\subset B_{R/\sqrt N}$
 with $Q\subset U_u\times (t+U_{\widetilde w})$ and $U_{\widetilde w}\subset B_{\widetilde w}(0,r)$.
-For $m$ large we have $\eta_m\ll 1$ and $\eta_m h\le r/2$, so Lemma~\ref{lem:global-graph-contraction}
+For $N$ large we have $\eta_N\ll 1$ and $\eta_N h\le r/2$, so Lemma~\ref{lem:global-graph-contraction}
 applies to $\widetilde F$ on $U_u\times U_{\widetilde w}$ with $A=I$.
 It produces a unique $C^1$ graph $\widetilde w=g(u)$ solving $\widetilde F(u,\widetilde w)=0$ on $U_u$,
 hence $w=t+g(u)$ solves $F(u,w)=0$.
@@ -6089,7 +6091,7 @@ Y_t\cap Q=\{(u,w)\in Q:\sigma_1=\cdots=\sigma_p=0\}
 \]
 is a single $C^1$ graph over the affine plane $\{w=t\}$ on all of $Q$,
 and the slope estimate follows from Lemma~\ref{lem:global-graph-contraction}:
-$\|Dg\|_{L^\infty}\le 2\eta_m$.
+$\|Dg\|_{L^\infty}\le 2\eta_N$.
 \end{editamirblockNEW}
 \end{proof}
 

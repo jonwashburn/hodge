@@ -186,6 +186,7 @@ grep -rn "^axiom " Hodge/ --include="*.lean" -A2
 
 | Date | Sorries | Axioms | Notes |
 |------|---------|--------|-------|
+| Jan 6, 2026 | 0 | 9 (9 used) | `ContMDiffForms.lean` has 0 sorries (pointwise linearity proved); `extDeriv` kept unbundled; conversion functions added; linter cleanups |
 | Jan 5, 2026 (late) | 0 | 9 (9 used) | Stage 2 groundwork complete in `ContMDiffForms.lean`; `Forms.lean` stable with Continuous baseline |
 | Jan 5, 2026 | 0 | 9 (9 used) | All sorries removed; unused axioms removed; wedge migrated; model-space `extDeriv` module added |
 | Earlier | 6 | 14 | Transport axioms converted to theorems |

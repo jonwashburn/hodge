@@ -54,8 +54,10 @@ theorem omega_is_rational : isRationalClass ⟦K.omega_form, omega_isClosed⟧ :
 theorem omega_is_pp : isPPForm' n X 1 K.omega_form :=
   K.omega_is_pp
 
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 theorem unitForm_isClosed : IsFormClosed (unitForm : SmoothForm n X 0) := isFormClosed_zero
 
+omit K in
 theorem unitForm_is_rational : isRationalClass ⟦(unitForm : SmoothForm n X 0), unitForm_isClosed⟧ := isRationalClass_zero
 
 /-! ## Kähler Operators -/
@@ -75,6 +77,7 @@ def lefschetzLambda {k : ℕ} (η : SmoothForm n X k) : SmoothForm n X (k - 2) :
 
 notation:max "Λ" η:max => lefschetzLambda η
 
+omit [ProjectiveComplexManifold n X] K in
 theorem lefschetzLambda_add {k : ℕ} (α β : SmoothForm n X k) :
     Λ (α + β) = Λ α + Λ β := map_add _ α β
 
@@ -89,10 +92,15 @@ noncomputable def hodgeStar {k : ℕ} (_ω : SmoothForm n X k) : SmoothForm n X 
 notation:max "⋆" ω:max => hodgeStar ω
 
 -- Note: Trivial since hodgeStar := 0; needs real proofs once properly implemented
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 theorem hodgeStar_add {k : ℕ} (α β : SmoothForm n X k) : ⋆(α + β) = ⋆α + ⋆β := by simp only [hodgeStar, add_zero]
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 theorem hodgeStar_smul_real {k : ℕ} (r : ℝ) (α : SmoothForm n X k) : ⋆(r • α) = r • (⋆α) := by simp only [hodgeStar, smul_zero]
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 theorem hodgeStar_zero {k : ℕ} : ⋆(0 : SmoothForm n X k) = 0 := rfl
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 theorem hodgeStar_neg {k : ℕ} (α : SmoothForm n X k) : ⋆(-α) = -(⋆α) := by simp only [hodgeStar, neg_zero]
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 theorem hodgeStar_sub {k : ℕ} (α β : SmoothForm n X k) : ⋆(α - β) = ⋆α - ⋆β := by simp only [hodgeStar, sub_self]
 
 -- hodgeStar_hodgeStar removed (unused, HEq degree arithmetic complex)
@@ -102,11 +110,17 @@ def adjointDeriv {k : ℕ} (_ω : SmoothForm n X k) : SmoothForm n X (k - 1) := 
 notation:max "δ" ω:max => adjointDeriv ω
 
 -- Note: Trivial since adjointDeriv := 0; needs real proofs once properly implemented
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 theorem adjointDeriv_add {k : ℕ} (α β : SmoothForm n X k) : δ (α + β) = δ α + δ β := by simp only [adjointDeriv, add_zero]
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 theorem adjointDeriv_smul_real {k : ℕ} (r : ℝ) (α : SmoothForm n X k) : δ (r • α) = r • (δ α) := by simp only [adjointDeriv, smul_zero]
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 theorem adjointDeriv_zero {k : ℕ} : δ(0 : SmoothForm n X k) = 0 := rfl
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 theorem adjointDeriv_neg {k : ℕ} (α : SmoothForm n X k) : δ(-α) = -(δ α) := by simp only [adjointDeriv, neg_zero]
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 theorem adjointDeriv_sub {k : ℕ} (α β : SmoothForm n X k) : δ(α - β) = δ α - δ β := by simp only [adjointDeriv, sub_self]
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 theorem adjointDeriv_squared {k : ℕ} (α : SmoothForm n X k) : δ (δ α) = 0 := rfl
 
 /-! ## Hodge Laplacian -/
@@ -115,23 +129,33 @@ noncomputable def laplacian {k : ℕ} (_ω : SmoothForm n X k) : SmoothForm n X 
 notation:max "Δ" ω:max => laplacian ω
 
 -- Note: Trivial since laplacian := 0; needs real proofs once properly implemented
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 theorem laplacian_add {k : ℕ} (α β : SmoothForm n X k) : Δ (α + β) = Δ α + Δ β := by simp only [laplacian, add_zero]
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 theorem laplacian_smul_real {k : ℕ} (r : ℝ) (α : SmoothForm n X k) : Δ (r • α) = r • (Δ α) := by simp only [laplacian, smul_zero]
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 theorem laplacian_zero {k : ℕ} : Δ(0 : SmoothForm n X k) = 0 := rfl
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 theorem laplacian_neg {k : ℕ} (α : SmoothForm n X k) : Δ(-α) = -(Δ α) := by simp only [laplacian, neg_zero]
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 theorem laplacian_sub {k : ℕ} (α β : SmoothForm n X k) : Δ(α - β) = Δ α - Δ β := by simp only [laplacian, sub_self]
 
 def IsHarmonic {k : ℕ} (ω : SmoothForm n X k) : Prop := Δ ω = 0
 
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 theorem isHarmonic_zero {k : ℕ} : IsHarmonic (0 : SmoothForm n X k) := rfl
 
 -- IsHarmonic properties follow from laplacian = 0 (all forms are harmonic since Δ = 0)
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 theorem isHarmonic_neg {k : ℕ} {ω : SmoothForm n X k} (h : IsHarmonic ω) : IsHarmonic (-ω) := by
   unfold IsHarmonic at *; simp only [laplacian_neg, h, neg_zero]
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 theorem isHarmonic_add {k : ℕ} {ω₁ ω₂ : SmoothForm n X k} (h1 : IsHarmonic ω₁) (h2 : IsHarmonic ω₂) : IsHarmonic (ω₁ + ω₂) := by
   unfold IsHarmonic at *; simp only [laplacian_add, h1, h2, add_zero]
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 theorem isHarmonic_smul_real {k : ℕ} {ω : SmoothForm n X k} (r : ℝ) (h : IsHarmonic ω) : IsHarmonic (r • ω) := by
   unfold IsHarmonic at *; simp only [laplacian_smul_real, h, smul_zero]
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 theorem isHarmonic_sub {k : ℕ} {ω₁ ω₂ : SmoothForm n X k} (h1 : IsHarmonic ω₁) (h2 : IsHarmonic ω₂) : IsHarmonic (ω₁ - ω₂) := by
   unfold IsHarmonic at *; simp only [laplacian_sub, h1, h2, sub_self]
 
@@ -139,6 +163,7 @@ theorem isHarmonic_sub {k : ℕ} {ω₁ ω₂ : SmoothForm n X k} (h1 : IsHarmon
 -- Note: Real Hodge theory says harmonic ⟹ closed, but can't derive from stubs
 
 -- Trivial since adjointDeriv = 0
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 theorem isHarmonic_implies_coclosed {k : ℕ} (ω : SmoothForm n X k) :
     IsHarmonic ω → δ ω = 0 := by
   intro _; rfl

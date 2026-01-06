@@ -1,6 +1,6 @@
 ================================================================================
 HODGE CONJECTURE - COMPLETE LEAN PROOF BUNDLE
-Generated: Tue Jan  6 01:16:02 CST 2026
+Generated: Tue Jan  6 00:34:39 CST 2026
 Project: /Users/jonathanwashburn/Projects/hodge
 ================================================================================
 
@@ -2913,7 +2913,7 @@ theorem omega_is_pp : isPPForm' n X 1 K.omega_form :=
 omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 theorem unitForm_isClosed : IsFormClosed (unitForm : SmoothForm n X 0) := isFormClosed_zero
 
-omit K in
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in
 theorem unitForm_is_rational : isRationalClass ⟦(unitForm : SmoothForm n X 0), unitForm_isClosed⟧ := isRationalClass_zero
 
 /-! ## Kähler Operators -/
@@ -4602,7 +4602,7 @@ theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : Is
             have : ⟦FundamentalClassSet n X p Zplus, FundamentalClassSet_isClosed (n := n) (X := X) p Zplus hZplus_alg⟧
                 = ⟦sd.γplus, sd.h_plus_closed⟧ := by
               exact hw_plus.trans hZplus_rep
-            simp [this]
+            simpa [this]
       _ = ⟦sd.γplus, sd.h_plus_closed⟧ - ⟦sd.γminus, sd.h_minus_closed⟧ := by
             -- rewrite the - part using ω^p representation and γminus = N·ω^p
             -- First turn the ω^p representation into a γminus representation.
@@ -4721,7 +4721,7 @@ theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : Is
                 _ = ⟦sd.γplus - sd.γminus, hdiff_closed⟧ := by
                       -- rewrite the form using `sd.h_eq`
                       -- (proof is now definitional after rewriting)
-                      simp [sd.h_eq]
+                      simpa [sd.h_eq] using (rfl : ⟦γ, h_closed'⟧ = ⟦γ, h_closed'⟧)
             -- Now `hsub'` gives the desired relation.
             -- `hsub' : ⟦γplus-γminus⟧ = ⟦γplus⟧ - ⟦γminus⟧`
             -- so we can rewrite.

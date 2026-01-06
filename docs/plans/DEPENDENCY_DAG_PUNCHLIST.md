@@ -159,13 +159,14 @@ These stubs make the proof type-check but don't carry the mathematical meaning o
   - Defines `ContMDiffForm` (a `ContMDiff`-smooth section into `FiberAlt`)
   - Defines the **pointwise** exterior derivative `extDerivAt` via `mfderiv` + `alternatizeUncurryFin`
   - Proves `ContMDiffAt` smoothness for `mfderivInTangentCoordinates` and `extDerivInTangentCoordinates`
-  - Defines global `extDeriv` (smoothness proof admitted with `sorry`; not on critical path)
+  - Defines an **unbundled** `extDeriv` (as a function `X → FiberAlt n (k+1)`)
   - Algebraic structure: `Zero`, `Add`, `Neg`, `SMul ℂ` instances
-  - Linearity: `extDeriv_add`, `extDeriv_smul` (admitted)
-  - Fundamental property: `extDeriv_extDeriv` (d² = 0, admitted)
+  - Linearity: `extDerivAt_add`, `extDerivAt_smul` and function-level `extDeriv_add`, `extDeriv_smul`
   - Conversion functions: `toSmoothForm`, `ofSmoothForm` (bridge to main development)
 
-**Stage 2 Blocker**: Upgrading `SmoothForm` to require `IsManifold` breaks all downstream files that reference `SmoothForm`. A full migration requires updating ~10 files to include the `IsManifold` constraint.
+**Stage 2 Blocker**: To replace `extDerivLinearMap := 0` in the main `SmoothForm` layer, we need to *bundle*
+`x ↦ extDerivAt ω x` as a `SmoothForm` (continuous) or `ContMDiffForm` (smooth). This requires a chart-gluing
+argument for the manifold exterior derivative (Stage 3).
 
 ### Tier 2: Kähler/Hodge Operators
 

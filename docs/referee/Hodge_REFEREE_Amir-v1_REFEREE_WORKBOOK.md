@@ -858,7 +858,7 @@ For each item below, rewrite/annotate the proof. Recommended minimum deliverable
   - [ ] Proof verified
   - [ ] Downstream use verified
 - **Proof rewrite / verification notes**:
-  - 
+  - Minor hygiene: the proof originally wrote \(\Mass(T_k)\downarrow c_0\); this was corrected to \(\Mass(T_k)\to c_0\) since the auxiliary LICD theorem provides convergence of defect/mass, not a monotone construction.
 - **Dependencies / citations**:
   - 
 - **Questions / potential gaps**:
@@ -935,8 +935,12 @@ For each item below, rewrite/annotate the proof. Recommended minimum deliverable
   - [ ] Statement verified
   - [ ] Proof verified
   - [ ] Downstream use verified
+- **Lean correspondence / coverage**:
+  - **Lean file**: `Hodge/Classical/Bergman.lean`
+  - **Status**: **Not formalized** (Lean uses placeholders: e.g. `log_KM := 0`, and `∂,∂̄` are defined from `smoothExtDeriv`, which is still stubbed as `0` on `SmoothForm`).
 - **Proof rewrite / verification notes**:
-  - 
+  - **Scaling/normalization fix applied**: in the kernel-differentiation construction of the basis sections \(s_{a,m}\), the normalization factor must be \(m^{-(n+1/2)}\) (not \(m^{-(n+1)/2}\)) so that the resulting \(1\)-jets \(ds_{a,m}(0)\) are \(O(1)\) (and uniformly invertible) on Bergman balls of radius \(\asymp m^{-1/2}\).
+  - The proof now uses the stable estimate \(\sup_{|Z|\le\sigma}\|ds_{a,m}(Z)-ds_{a,m}(0)\|\le \varepsilon\), rather than comparing directly to a fixed coordinate covector \(dz^a\).
 - **Dependencies / citations**:
   - 
 - **Questions / potential gaps**:
@@ -948,6 +952,8 @@ For each item below, rewrite/annotate the proof. Recommended minimum deliverable
   - [ ] Statement verified
   - [ ] Proof verified
   - [ ] Downstream use verified
+- **Lean correspondence / coverage**:
+  - **Lean status**: **Not formalized** (this is a complex-analytic implicit-function / quantitative graph lemma; no Lean analogue currently).
 - **Proof rewrite / verification notes**:
   - 
 - **Dependencies / citations**:
@@ -961,6 +967,8 @@ For each item below, rewrite/annotate the proof. Recommended minimum deliverable
   - [ ] Statement verified
   - [ ] Proof verified
   - [ ] Downstream use verified
+- **Lean correspondence / coverage**:
+  - **Lean status**: **Not formalized** (depends on Bergman control + projective approximation; Lean’s `Bergman.lean` is currently a placeholder layer).
 - **Proof rewrite / verification notes**:
   - 
 - **Dependencies / citations**:
@@ -974,6 +982,8 @@ For each item below, rewrite/annotate the proof. Recommended minimum deliverable
   - [ ] Statement verified
   - [ ] Proof verified
   - [ ] Downstream use verified
+- **Lean correspondence / coverage**:
+  - **Lean status**: **Not formalized** (this is part of the “H1 local sheet manufacturing” chain; Lean only has a proof skeleton above this layer).
 - **Proof rewrite / verification notes**:
   - 
 - **Dependencies / citations**:
@@ -987,6 +997,9 @@ For each item below, rewrite/annotate the proof. Recommended minimum deliverable
   - [ ] Statement verified
   - [ ] Proof verified
   - [ ] Downstream use verified
+- **Lean correspondence / coverage**:
+  - **Lean locus**: `Hodge/Kahler/Microstructure.lean` (bookkeeping) and `Hodge/Kahler/Main.lean` (`microstructure_*` theorems)
+  - **Status**: **Stubbed** in Lean (microstructure sequences/cubulations/sheets are placeholders; Lean does not construct holomorphic sheets from Bergman data).
 - **Proof rewrite / verification notes**:
   - 
 - **Dependencies / citations**:
@@ -2234,6 +2247,13 @@ For each item below, rewrite/annotate the proof. Recommended minimum deliverable
   - 
 - **Questions / potential gaps**:
   - 
+
+#### Lean coverage note (for this block)
+
+The TeX results in this block (glue scaling, B\'ar\'any--Grinberg rounding, integral periods, lattice discreteness, and the integral cohomology matching proposition) are **not currently formalized** in the Lean skeleton.
+
+- **Closest Lean locus**: `Hodge/Kahler/Microstructure.lean` (bookkeeping inequalities) and `Hodge/Kahler/Main.lean` (the `microstructure_*` theorems).
+- **Status in Lean**: the microstructure construction and cohomology-locking constraints are stubbed (the Lean proof closes, but does not implement discrepancy rounding / period matching).
 
 ##### Remark `rem:glue-scaling` — Choosing the glue scale to make the correction negligible
 - **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 7173

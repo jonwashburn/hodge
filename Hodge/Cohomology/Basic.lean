@@ -240,7 +240,7 @@ instance instSMulRealDeRhamCohomologyClass (k : ℕ) : SMul ℝ (DeRhamCohomolog
       -- r • a ≈ r • b follows from c • a ≈ c • b with c = (r : ℂ)
       have hc : (⟨(r : ℂ) • a.val, isFormClosed_smul a.property⟩ : ClosedForm n X k) ≈
                 ⟨(r : ℂ) • b.val, isFormClosed_smul b.property⟩ := cohomologous_smul (r : ℂ) a b h
-      convert hc using 1 <;> rfl)
+      convert hc using 1)
 
 /-- AddCommGroup structure on de Rham cohomology classes -/
 instance instAddCommGroupDeRhamCohomologyClass (k : ℕ) : AddCommGroup (DeRhamCohomologyClass n X k) where
@@ -334,7 +334,8 @@ instance instModuleComplexDeRhamCohomologyClass (k : ℕ) : Module ℂ (DeRhamCo
 instance instSMulRationalDeRhamCohomologyClass (k : ℕ) : SMul ℚ (DeRhamCohomologyClass n X k) where
   smul q a := (q : ℂ) • a
 
-/-- Compatibility: rational scalar multiplication equals real scalar multiplication. -/
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] in
+-- Compatibility: rational scalar multiplication equals real scalar multiplication.
 theorem smul_rat_eq_smul_real {k : ℕ} (q : ℚ) (η : DeRhamCohomologyClass n X k) :
     q • η = (q : ℝ) • η := by
   induction η using Quotient.ind
@@ -354,6 +355,7 @@ instance instHMulDeRhamCohomologyClass (k l : ℕ) :
 
 /-! ### Algebraic laws for cup product -/
 
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] in
 theorem mul_add {k l : ℕ} (a : DeRhamCohomologyClass n X k) (b c : DeRhamCohomologyClass n X l) :
     a * (b + c) = a * b + a * c := by
   -- work on representatives
@@ -368,8 +370,9 @@ theorem mul_add {k l : ℕ} (a : DeRhamCohomologyClass n X k) (b c : DeRhamCohom
   -- exactness = equality to zero in this staged development
   apply (isExact_iff_eq_zero (n := n) (X := X)
     (ω := (a.val ⋏ (b.val + c.val)) - ((a.val ⋏ b.val) + (a.val ⋏ c.val)))).2
-  simpa [hEq]
+  simp [hEq]
 
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] in
 theorem add_mul {k l : ℕ} (a b : DeRhamCohomologyClass n X k) (c : DeRhamCohomologyClass n X l) :
     (a + b) * c = a * c + b * c := by
   refine Quotient.inductionOn₃ a b c ?_
@@ -381,8 +384,9 @@ theorem add_mul {k l : ℕ} (a b : DeRhamCohomologyClass n X k) (c : DeRhamCohom
     simpa using (smoothWedge_add_left (n := n) (X := X) (ω₁ := a.val) (ω₂ := b.val) (η := c.val))
   apply (isExact_iff_eq_zero (n := n) (X := X)
     (ω := ((a.val + b.val) ⋏ c.val) - ((a.val ⋏ c.val) + (b.val ⋏ c.val)))).2
-  simpa [hEq]
+  simp [hEq]
 
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] in
 theorem mul_smul {k l : ℕ} (a : DeRhamCohomologyClass n X k) (r : ℂ) (b : DeRhamCohomologyClass n X l) :
     a * (r • b) = r • (a * b) := by
   refine Quotient.inductionOn₂ a b ?_
@@ -394,8 +398,9 @@ theorem mul_smul {k l : ℕ} (a : DeRhamCohomologyClass n X k) (r : ℂ) (b : De
     simpa using (smoothWedge_smul_right (n := n) (X := X) (c := r) (ω := a.val) (η := b.val))
   apply (isExact_iff_eq_zero (n := n) (X := X)
     (ω := (a.val ⋏ (r • b.val)) - (r • (a.val ⋏ b.val)))).2
-  simpa [hEq]
+  simp [hEq]
 
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] in
 theorem smul_mul {k l : ℕ} (r : ℂ) (a : DeRhamCohomologyClass n X k) (b : DeRhamCohomologyClass n X l) :
     (r • a) * b = r • (a * b) := by
   refine Quotient.inductionOn₂ a b ?_
@@ -407,8 +412,9 @@ theorem smul_mul {k l : ℕ} (r : ℂ) (a : DeRhamCohomologyClass n X k) (b : De
     simpa using (smoothWedge_smul_left (n := n) (X := X) (c := r) (ω := a.val) (η := b.val))
   apply (isExact_iff_eq_zero (n := n) (X := X)
     (ω := ((r • a.val) ⋏ b.val) - (r • (a.val ⋏ b.val)))).2
-  simpa [hEq]
+  simp [hEq]
 
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] in
 theorem zero_mul {k l : ℕ} (a : DeRhamCohomologyClass n X l) :
     (0 : DeRhamCohomologyClass n X k) * a = 0 := by
   refine Quotient.inductionOn a ?_
@@ -420,8 +426,9 @@ theorem zero_mul {k l : ℕ} (a : DeRhamCohomologyClass n X l) :
     simpa using (smoothWedge_zero_left (n := n) (X := X) (k := k) (l := l) a.val)
   apply (isExact_iff_eq_zero (n := n) (X := X)
     (ω := ((0 : SmoothForm n X k) ⋏ a.val) - (0 : SmoothForm n X (k + l)))).2
-  simpa [hEq]
+  simp [hEq]
 
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] in
 theorem mul_zero {k l : ℕ} (a : DeRhamCohomologyClass n X k) :
     a * (0 : DeRhamCohomologyClass n X l) = 0 := by
   refine Quotient.inductionOn a ?_
@@ -433,7 +440,7 @@ theorem mul_zero {k l : ℕ} (a : DeRhamCohomologyClass n X k) :
     simpa using (smoothWedge_zero_right (n := n) (X := X) (k := k) (l := l) a.val)
   apply (isExact_iff_eq_zero (n := n) (X := X)
     (ω := (a.val ⋏ (0 : SmoothForm n X l)) - (0 : SmoothForm n X (k + l)))).2
-  simpa [hEq]
+  simp [hEq]
 
 /-! ## Rational Classes -/
 
@@ -481,18 +488,22 @@ theorem isRationalClass_mul {k l} (η₁ : DeRhamCohomologyClass n X k) (η₂ :
 /-! ## Descent Properties -/
 
 -- ofForm_add follows directly from the Quotient.lift₂ definition
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] in
 theorem ofForm_add {k : ℕ} (ω η : SmoothForm n X k) (hω : IsFormClosed ω) (hη : IsFormClosed η) : ⟦ω + η, isFormClosed_add hω hη⟧ = ⟦ω, hω⟧ + ⟦η, hη⟧ := rfl
 
 -- ofForm_smul follows directly from the Quotient.lift definition
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] in
 theorem ofForm_smul {k : ℕ} (c : ℂ) (ω : SmoothForm n X k) (hω : IsFormClosed ω) : ⟦c • ω, isFormClosed_smul hω⟧ = c • ⟦ω, hω⟧ := rfl
 
 -- ofForm_smul_real follows directly from the Quotient.lift definition
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] in
 theorem ofForm_smul_real {k : ℕ} (r : ℝ) (ω : SmoothForm n X k) (hω : IsFormClosed ω) : ⟦r • ω, isFormClosed_smul_real hω⟧ = r • ⟦ω, hω⟧ := rfl
 
 omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] in
 theorem ofForm_proof_irrel {k : ℕ} (ω : SmoothForm n X k) (h₁ h₂ : IsFormClosed ω) : ⟦ω, h₁⟧ = ⟦ω, h₂⟧ := by apply Quotient.sound; apply cohomologous_refl
 
 -- ofForm_sub follows from ofForm_add and ofForm_neg
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] in
 theorem ofForm_sub {k : ℕ} (ω η : SmoothForm n X k) (hω : IsFormClosed ω) (hη : IsFormClosed η) : ⟦ω - η, isFormClosed_sub hω hη⟧ = ⟦ω, hω⟧ - ⟦η, hη⟧ := by
   show ⟦ω - η, _⟧ = ⟦ω, hω⟧ + (-⟦η, hη⟧)
   -- Need to show ⟦ω - η, _⟧ = ⟦ω, hω⟧ + ⟦-η, _⟧
@@ -502,6 +513,7 @@ theorem ofForm_sub {k : ℕ} (ω η : SmoothForm n X k) (hω : IsFormClosed ω) 
   exact cohomologous_refl _
 
 -- ofForm_wedge follows directly from the Quotient.lift₂ definition
+omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] in
 theorem ofForm_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) (hω : IsFormClosed ω) (hη : IsFormClosed η) : ⟦ω ⋏ η, isFormClosed_wedge ω η hω hη⟧ = ⟦ω, hω⟧ * ⟦η, hη⟧ := rfl
 
 /-! ## (p,p) Forms -/

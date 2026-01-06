@@ -27,6 +27,7 @@ This note summarizes two \emph{critical} referee blockers previously identified 
 \item the impossible coverage statement in Proposition \texttt{prop:dense-holo};
 \item the per-cube mass matching step in Theorem \texttt{thm:global-cohom} (and its local precursor \texttt{lem:local-bary}), including the quantifier/scaling issue around fixed \(m\).
 \item \textbf{hygiene/readability fixes} prompted by the AI referee notes: removal of stray duplicate proof blocks and addition of a brief convention note for “algebraic class”.
+\item \textbf{analytic/auxiliary fixes}: (i) the LICD ``classical SYR'' gluing step was corrected to use flat-norm smallness (not a false global boundary-mass bound); (ii) a scaling typo was corrected in the Bergman-kernel jet-control lemma used in the holomorphic manufacturing package.
 \end{itemize}
 This report is \emph{not} a proof audit of the full manuscript; it is a surgical “what changed and why” memo.
 
@@ -92,6 +93,23 @@ This hypothesis was made explicit in item~(b) and the proof was adjusted accordi
 \subsection*{Notation cleanup: cohomology multiplier \(m\) vs.\ Bergman/holomorphic power}
 In the weighted-scaling discussion, the symbol \(m\) was being used in two different senses (cohomology multiplier \(m\) in \(\mathrm{PD}(m[\gamma])\) and tensor power in Bergman-scale holomorphic manufacturing). This led to misleading phrases such as “\(h\downarrow 0\) (equivalently \(m\to\infty\))” and a dimensional typo involving \(\sqrt m\,h\).
 The manuscript now separates these roles explicitly (using a distinct holomorphic scale parameter \(N\) where both appear simultaneously), corrects the Bergman-scale relation to \(h\sim c\,N^{-1/2}\), and removes the misleading “\(h\downarrow 0\iff m\to\infty\)” equivalence in the fixed-\(m\) SYR regime.
+
+\subsection*{Classical SYR under LICD: gluing corrected to use flat norm (not boundary mass)}
+In the auxiliary theorem \texttt{thm:classical-syr-licd}, the original Step~3 asserted a global estimate of the form
+\(\Mass(\partial \sum_Q S_Q)\lesssim C\varepsilon\) at mesh scale \(\varepsilon\).
+As a global mass statement this is not robust (and is generally false in mesh-refinement regimes).
+The TeX now correctly phrases the closure step in the \emph{flat norm}:
+\(\mathcal F(\partial S^{\mathrm{raw}}_\varepsilon)\to 0\) by duality plus Stokes (using that \(d\beta=0\)),
+then applies a standard filling/isoperimetric inequality to produce a filling current \(R_\varepsilon\) with \(\Mass(R_\varepsilon)\to 0\).
+This yields a closed cycle \(T_\varepsilon=S^{\mathrm{raw}}_\varepsilon+R_\varepsilon\) with quantitative almost-calibration
+\(0\le \Def_{\mathrm{cal}}(T_\varepsilon)\le 2\,\Mass(R_\varepsilon)\to 0\).
+
+\subsection*{Bergman kernel jet-control lemma: scaling typo corrected}
+In Lemma \texttt{lem:bergman-control}, the proof constructs basis sections by differentiating the Bergman kernel and rescaling.
+For the resulting \(1\)-jets \(ds_{a,m}(0)\) to be \(O(1)\) (hence uniformly invertible) on Bergman balls of radius \(\asymp m^{-1/2}\),
+the normalization factor must be \(m^{-(n+1/2)}\) (not \(m^{-(n+1)/2}\)).
+This scaling was corrected in the TeX, and the downstream derivative comparison in the proof was rewritten in the stable form
+\(\sup_{|Z|\le\sigma}\|ds_{a,m}(Z)-ds_{a,m}(0)\|\le \varepsilon\).
 
 \subsection*{Local multi-sheet construction: translate-mass dependence made explicit}
 In Theorem \texttt{thm:local-sheets}, the proof previously treated the \(\psi\)-mass of a flat model translate \((\widetilde\Pi_j+t)\cap Q\) as independent of \(t\), which is false for generic cube geometry.

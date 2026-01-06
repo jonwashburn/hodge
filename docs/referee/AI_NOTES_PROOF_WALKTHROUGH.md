@@ -127,6 +127,7 @@ still needs to audit.
 #### G.2 Local holomorphic direction manufacturing (where “finite nets” appear)
 
 - **Projective tangential approximation**: Proposition `prop:tangent-approx-full` (built from Bergman/peak-section control, via `lem:bergman-control`).
+  - **Audit fix**: `lem:bergman-control` had a scaling typo in the Bergman-kernel differentiation normalization; the TeX now uses \(m^{-(n+1/2)}\) (not \(m^{-(n+1)/2}\)) so the constructed \(1\)-jets are \(O(1)\) on \(m^{-1/2}\)-balls.
 - **Finite nets at sample points**: Proposition `prop:dense-holo` should be read as a **finite net of calibrated directions at finitely many centers** covering a compact \(K\) at scale \(\varepsilon\), *not* as a finite family of submanifolds containing every point of \(K\) (which is impossible). The TeX statement now matches the proof’s construction (centers + direction nets at each center).
 
 ---
