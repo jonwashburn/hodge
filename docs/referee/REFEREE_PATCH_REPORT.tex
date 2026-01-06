@@ -130,6 +130,10 @@ Several template statements used shorthand like “an ordered \(\delta\)-separat
 These statements were corrected to the accurate formulation: for each fixed \(\delta>0\) one gets a \emph{finite} \(\delta\)-separated list of length \(N(\delta)\), and \(N(\delta)\to\infty\) as \(\delta\downarrow 0\) (with the footprint scale fixed).
 This does not change any downstream argument (where \(\delta_{\perp}\) is chosen as part of the mesh schedule), but removes a potential referee objection.
 
+\subsection*{Grid master-template quantifiers (finite prefixes on a finite lattice set)}
+In Proposition \texttt{prop:integer-transport}, the master transverse atoms were written as an “ordered template \((y_a)_{a\ge 1}\subset B_{C_0\varrho h}(0)\cap \delta_\perp\mathbb Z^{2p}\)”. For fixed \(h\) and fixed \(\delta_\perp>0\), the grid intersection is a \emph{finite} set, so the intended meaning is: pick \emph{as many grid atoms as needed} for the finite prefixes used at that mesh scale.
+The TeX now states this correctly by choosing a finite ordered list \((y_a)_{a=1}^{N_*}\) of grid atoms and requiring the working prefix length \(N_F\le N_*\).
+
 \subsection*{Convention note: “algebraic class”}
 A short remark was added near the main theorem stating the manuscript’s convention: an \emph{algebraic class} in \(H^{2p}(X,\mathbb Q)\) means a class in the \(\mathbb Q\)-span of cycle classes (equivalently, the image of the cycle class map with \(\mathbb Q\)-coefficients), hence a \(\mathbb Q\)-vector subspace.
 

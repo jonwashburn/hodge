@@ -2110,6 +2110,7 @@ $m\int_X\beta\wedge\Theta_\ell\in\Z$ (cf.\ Substep~4.3 and Proposition~\ref{prop
 Fix a direction-net scale $\varepsilon_{\mathrm{net},j}\ll h_j$ for the finite calibrated dictionary in Proposition~\ref{prop:global-coherence-all-labels}.
 Choose a transverse grid spacing $\delta_j=o(h_j)$ on each face tubular chart $\Omega_F\cong B^{2p}(0,ch_j)$ and an angle tolerance $\varepsilon_j=o(1)$ for the small-angle graph model.
 \editamirNEW{Choose also the transverse parameter radius factor $\varrho_j$ (defining the corner-exit template scale $s_j\asymp \varrho_j h_j$) such that $\varrho_j=o(\varepsilon_j)$ (required for the borderline $p=n/2$ case; see Lemma~\ref{lem:borderline-p-half}).}
+\editamirNEW{In the corner-exit templates, the relevant footprint diameter satisfies $D_Q\asymp s_j$, so the within-label translation separation needed for disjointness is at the footprint scale $\delta_{\mathrm{sep},j}\asymp \varepsilon_j\,s_j$ (cf.\ Lemma~\ref{lem:sliver-stability} and Proposition~\ref{prop:finite-template}).}
 \item \textbf{Finally choose holomorphic scales and discrete rounding data.}
 Choose the holomorphic manufacturing scale (line bundle power) $M_j\to\infty$ large enough that the local sheet/sliver construction at tolerance $\varepsilon_j$
 is available uniformly on all $h_j$--cells (Theorem~\ref{thm:local-sheets} and the corner-exit realization package), then choose the integer activation/rounding variables
@@ -2158,7 +2159,7 @@ Under the hypotheses of Corollary~\ref{cor:global-flat-weighted} with the \emph{
 \Delta_F\ \lesssim\ \varrho\,h^{2}
 \qquad\text{(as in Lemma~\ref{lem:w1-auto}, Lemma~\ref{lem:template-displacement}, and Lemma~\ref{lem:w1-template-edit}),}
 \]
-and the packing bound $|\mathcal S(Q)|\lesssim \varepsilon^{-2p}=\varepsilon^{-n}$ (Lemma~\ref{lem:sliver-packing}),
+and the footprint-scale packing bound $|\mathcal S(Q)|\lesssim \varepsilon^{-2p}=\varepsilon^{-n}$ (Lemma~\ref{lem:sliver-packing}, applied with transverse radius $r\asymp \varrho h$ and separation $\gtrsim \varepsilon r$),
 one has the quantitative estimate
 \[
 \mathcal F(\partial T^{\mathrm{raw}})\ \le\ C\,\frac{\varrho}{\varepsilon}\,\Mass(T^{\mathrm{raw}})^{\frac{n-1}{n}},
@@ -3799,16 +3800,16 @@ Taking the infimum over $\sigma$ in the definition of $\mathcal F$ proves the cl
 \begin{proposition}[Integer transverse matching from the master prefix template (constructed here)]
 \label{prop:integer-transport}
 Let $F=Q\cap Q'$ be an interior $(2n-1)$-face of the cubulation at mesh $h$.
-Fix a transverse grid scale $\delta_{\perp}\in(0,h)$ and an ordered master template
-$\mathbf y=(y_a)_{a\ge1}\subset \editamir{B_{C_0\varrho h}(0)}\cap \delta_{\perp}\mathbb Z^{2p}$.
-For $N\in\mathbb N$ write $\nu^{(N)}:=\sum_{a=1}^N\delta_{y_a}$ (cf.\ Proposition~\ref{prop:prefix-template-coherence}).
+Fix a transverse grid scale $\delta_{\perp}\in(0,h)$ and choose an integer $N_*\ge 0$ together with an ordered list of grid atoms
+$\mathbf y=(y_a)_{a=1}^{N_*}$ with $y_a\in \editamir{B_{C_0\varrho h}(0)}\cap \delta_{\perp}\mathbb Z^{2p}$.
+For $1\le N\le N_*$ write $\nu^{(N)}:=\sum_{a=1}^N\delta_{y_a}$ (cf.\ Proposition~\ref{prop:prefix-template-coherence}).
 
 Let $\Phi_{Q,F},\Phi_{Q',F}:\editamir{B_{C_0\varrho h}(0)}\to \Omega_F$ be the face maps from
 Lemma~\ref{lem:template-displacement-edits} (in particular
 $\|\Phi_{Q,F}-\Phi_{Q',F}\|_{\mathrm{op}}\le C_\Phi h$ and
 $\|\Phi_{Q,F}\|_{\mathrm{op}}+\|\Phi_{Q',F}\|_{\mathrm{op}}\le C_{\Phi,0}$).
 
-Define the (balanced) transverse measures on $F$ by choosing an integer $N_F\ge0$
+Define the (balanced) transverse measures on $F$ by choosing an integer $N_F$ with $0\le N_F\le N_*$
 (the common prefix length after the face-balancing/prefix-edit step of
 Proposition~\ref{prop:global-coherence-all-labels}) and setting
 \[
@@ -4163,13 +4164,14 @@ corner-exit scale restriction
 s\ \le\ \frac{c_0}{C(n,p)}\cdot \frac{h}{(1+A_*(h))\,\Lambda(h)}
 \]
 whenever Proposition~\ref{prop:holomorphic-corner-exit-L1} is invoked uniformly over labels;
-\item take the translation separation in Proposition~\ref{prop:finite-template} with $\delta:=10\,\varepsilon\,\mathrm{diam}(Q)$.
+\item take the translation separation in Proposition~\ref{prop:finite-template} at the footprint scale:
+\editamir{if $D_Q:=\max_a\mathrm{diam}((P+t_a)\cap Q)$, then require $\delta:=10\,\varepsilon\,D_Q$ (in the corner-exit regime $D_Q\asymp s\asymp \varrho h$).}
 \end{itemize}
 \editamir{Note: read this scaling remark only after the global coherence construction is established (Proposition~\ref{prop:global-coherence-all-labels}), to avoid any circular use of the conclusion.}
 \end{editamirblockNEW}
 
 Assume we are in the regime where adjacent cells use the same translation template and their face parameterizations differ by $O(h)$,
-so Lemma~\ref{lem:face-displacement} gives $\Delta_F\lesssim h^2$.
+so Lemma~\ref{lem:face-displacement} gives \editamir{$\Delta_F\lesssim \varrho\,h^2$}.
 Assume further that in each cell, each family of disjoint $C^1$ sliver graphs over a fixed direction has slope $\le \varepsilon$ and satisfies the separation
 needed for disjointness; then Lemma~\ref{lem:sliver-packing} yields $N_Q\lesssim \varepsilon^{-2p}$ pieces per family.
 Writing $M_Q:=\sum_{a\in\mathcal S(Q)} m_{Q,a}$, the concavity/H\"older bound gives
@@ -4772,7 +4774,8 @@ One concrete route is to start from a maximal $\delta$--separated set $\{t_a\}\s
 \(
 \delta\asymp r\,N^{-1/(d-1)},
 \)
-which has cardinality $\asymp N$ by packing, and then trim/duplicate finitely many points to obtain exactly $N$ points while preserving separation at the stated scale.
+which has cardinality $\asymp N$ by packing.  By choosing the implicit constant in $\delta\asymp r\,N^{-1/(d-1)}$ small enough, we may assume this maximal set has
+cardinality at least $N$, and then select any $N$ of its points (preserving $\delta$--separation).
 Let $\{C_a\}$ be the associated Voronoi cells; then $\mathrm{diam}(C_a)\lesssim \delta$.
 
 Define the cell-averaged atomic measure $\widetilde\mu:=\sum_a \bigl(\int_{C_a}\rho\,d\sigma\bigr)\delta_{t_a}$.
@@ -5548,7 +5551,8 @@ Remark~\ref{rem:weighted-scaling}.
 \editamir{\noindent\textbf{Referee closure of the “simultaneous matching” hinge.}
 For each interior face $F=Q\cap Q'$, Proposition~\ref{prop:global-coherence-all-labels} furnishes a \emph{common prefix length} $N_F$
 (and hence equal integer masses on both sides after the prefix-edit/balancing step).
-With this $N_F$, Proposition~\ref{prop:integer-transport} \emph{constructs} the integer-weighted measures
+Fix, at this mesh scale, a transverse grid $\delta_\perp$ and choose a master grid-atom list $(y_a)_{a=1}^{N_*}$ with $N_*\ge \max_F N_F$.
+With each resulting $N_F$, Proposition~\ref{prop:integer-transport} \emph{constructs} the integer-weighted measures
 $\mu_{Q\to F}$ and $\mu_{Q'\to F}$ and gives the quantitative $W_1$ bound needed in the transport/glue estimate.
 Because the construction is facewise and uses the globally coherent master template, the hypothesis (c) in
 Proposition~\ref{prop:transport-flat-glue-weighted} is discharged \emph{simultaneously for all interior faces}.}
@@ -6496,7 +6500,7 @@ Let $t_1,t_2\in P^\perp$ and suppose $Y_1,Y_2$ are $C^1$ graphs of slope $\le \v
 $P+t_1$ and $P+t_2$ on $(P+t_i)\cap Q$, realized as $Y_i\cap Q=\{x+u_i(x):x\in (P+t_i)\cap Q\}$ with $\|Du_i\|_{C^0}\le\varepsilon$.
 Assume further that for each $i\in\{1,2\}$ there exists an \emph{anchor point} $x_i\in (P+t_i)\cap Q$ with $x_i\in Y_i$
 (equivalently $u_i(x_i)=0$).
-If $\|t_1-t_2\|\ge 10\,\varepsilon\,h$, then $Y_1\cap Q$ and $Y_2\cap Q$ are disjoint.
+\editamir{Let $D_i:=\mathrm{diam}\bigl((P+t_i)\cap Q\bigr)\le h$. If $\|t_1-t_2\|\ge 10\,\varepsilon\,\max\{D_1,D_2\}$, then $Y_1\cap Q$ and $Y_2\cap Q$ are disjoint.}
 \end{enumerate}
 \end{editamirblockNEW}
 \end{lemma}
@@ -6519,16 +6523,15 @@ hence $\Mass([Y]\llcorner Q)=\bigl(1+O(\varepsilon^2)\bigr)\Mass([P]\llcorner Q)
 \textnormal{(ii)} Fix $i\in\{1,2\}$ and let $x_i\in (P+t_i)\cap Q$ be an anchor with $u_i(x_i)=0$.
 For any $x\in (P+t_i)\cap Q$,
 \[
-|u_i(x)|\ =\ |u_i(x)-u_i(x_i)|\ \le\ \|Du_i\|_{C^0}\,|x-x_i|\ \le\ \varepsilon\,h,
+|u_i(x)|\ =\ |u_i(x)-u_i(x_i)|\ \le\ \|Du_i\|_{C^0}\,|x-x_i|\ \le\ \varepsilon\,D_i\ \le\ \varepsilon\,h,
 \]
-since $\mathrm{diam}(Q)=h$.
+\editamir{since $|x-x_i|\le \mathrm{diam}((P+t_i)\cap Q)=D_i\le h$.}
 Therefore every point $y=x+u_i(x)\in Y_i\cap Q$ satisfies
-$\dist(y,P+t_i)\le \varepsilon h$, i.e.
+$\editamir{\dist(y,P+t_i)\le \varepsilon D_i}$, i.e.
 \[
-Y_i\cap Q\ \subset\ \mathcal N_{\varepsilon h}(P+t_i)\cap Q.
+Y_i\cap Q\ \subset\ \editamir{\mathcal N_{\varepsilon D_i}}(P+t_i)\cap Q.
 \]
-If $\|t_1-t_2\|\ge 10\,\varepsilon\,h$, then the tubular neighborhoods
-$\mathcal N_{\varepsilon h}(P+t_1)$ and $\mathcal N_{\varepsilon h}(P+t_2)$ are disjoint, hence so are $Y_1\cap Q$ and $Y_2\cap Q$.
+\editamir{If $\|t_1-t_2\|\ge 10\,\varepsilon\,\max\{D_1,D_2\}$, then the tubular neighborhoods $\mathcal N_{\varepsilon D_1}(P+t_1)$ and $\mathcal N_{\varepsilon D_2}(P+t_2)$ are disjoint, hence so are $Y_1\cap Q$ and $Y_2\cap Q$.}
 \end{editamirblockNEW}
 \end{proof}
 
@@ -6541,17 +6544,20 @@ Assume we have affine translates $P+t_1,\dots,P+t_N$ such that each $(P+t_a)\cap
 \qquad (a\neq b).
 \]
 Then $N\le C(n,p)\,\varepsilon^{-2p}$.
+\editamir{More generally, if the translation parameters lie in a transverse ball $B_r(0)\subset P^\perp$ and satisfy
+$\|t_a-t_b\|\ge 10\,\varepsilon\,r$ for $a\neq b$, then the same conclusion holds.}
 \end{lemma}
 
 \begin{proof}
-Since $(P+t_a)\cap Q\neq\emptyset$ and $\mathrm{diam}(Q)=h$, the translation parameters $t_a$ all lie in a transverse ball $B_{Ch}(0)\subset P^\perp$
-for a dimensional constant $C$ (depending only on the choice of identification of $P^\perp$ with $\R^{2p}$).
-The balls $B(t_a,5\varepsilon h)\subset P^\perp$ are pairwise disjoint and contained in $B_{(C+5\varepsilon)h}(0)$.
-Comparing Euclidean volumes in $\R^{2p}$ gives
+\editamir{For the first claim, since $(P+t_a)\cap Q\neq\emptyset$ and $\mathrm{diam}(Q)=h$, after translating the transverse coordinates we may assume the set
+$\{t_a\}$ lies in a transverse ball $B_{C h}(0)\subset P^\perp$ for a dimensional constant $C$.}
+\editamir{The balls $B(t_a,5\varepsilon h)\subset P^\perp$ are pairwise disjoint and contained in $B_{(C+5\varepsilon)h}(0)$.}
+\editamir{Comparing Euclidean volumes in $\R^{2p}$ gives}
 \[
 N\,(5\varepsilon h)^{2p}\ \lesssim\ (Ch)^{2p},
 \]
 hence $N\lesssim \varepsilon^{-2p}$ as claimed.
+\editamir{The “ball of radius $r$” variant is identical with $h$ replaced by $r$.}
 \end{proof}
 \end{editblock}
 
@@ -6571,7 +6577,8 @@ how one chooses the translations $t_a$ and the separation scale $\delta=10\,\var
 Fix a holomorphic chart identifying a neighborhood of a cell $Q$ with a domain in $\C^n$, and fix a calibrated complex $(n-p)$-plane
 $P\subset\C^n$ with normal covectors $\lambda_1,\dots,\lambda_p$ (so $\bigcap_i\ker\lambda_i=P$).
 Let $t_1,\dots,t_N\in P^\perp\cong\R^{2p}$ be translation vectors such that the affine planes $(P+t_a)$ are pairwise disjoint on $Q$ and
-separated by $\editamir{\|t_a-t_b\|\ge 10\,C_{\mathrm{graph}}\,\varepsilon\,\mathrm{diam}(Q)}$.
+\editamir{let $D_Q:=\max_{1\le a\le N}\mathrm{diam}\bigl((P+t_a)\cap Q\bigr)\le \mathrm{diam}(Q)$, and assume the translations are separated by
+$\|t_a-t_b\|\ge 10\,C_{\mathrm{graph}}\,\varepsilon\,D_Q$.}
 Fix $\varepsilon>0$ and choose $m\ge m_1(\varepsilon)$ as in Lemma~\ref{lem:bergman-control}, with $m$ large enough that
 \[
 \mathrm{diam}(Q)\ \le\ c\,m^{-1/2},
@@ -6590,7 +6597,7 @@ Then there exist $\psi$-calibrated holomorphic complete intersections $Y^1,\dots
 For each $a$, apply Lemma~\ref{lem:bergman-control} at $x_a$ with covectors $\lambda_i$ to obtain sections
 $s_{a,1},\dots,s_{a,p}\in H^0(X,L^m)$ whose first-order jets at $x_a$ realize the covectors $\lambda_i$. \editamir{This applies on $Q$ since $Q\subset B_{(c/2)\,m^{-1/2}}(x_a)\subset B_{c\,m^{-1/2}}(x_a)$ (because $x_a\in Q$ and we ensured $\mathrm{diam}(Q)\le (c/2)\,m^{-1/2}$).}
 Let $Y^a:=\{s_{a,1}=\cdots=s_{a,p}=0\}$.
-\editamir{Let $C_{\mathrm{graph}}$ be the slope constant from Lemma~\ref{lem:graph-from-grad}.} Then Lemma~\ref{lem:graph-from-grad} gives (i) with slope $\le C_{\mathrm{graph}}\varepsilon$, and Lemma~\ref{lem:sliver-stability}(i) gives (iii) with the same slope parameter. \editamir{Applying Lemma~\ref{lem:sliver-stability}(ii) with $\varepsilon$ replaced by $C_{\mathrm{graph}}\varepsilon$ and using the separation assumption $\|t_a-t_b\|\ge 10\,C_{\mathrm{graph}}\varepsilon\,\mathrm{diam}(Q)$ yields (ii).}
+\editamir{Let $C_{\mathrm{graph}}$ be the slope constant from Lemma~\ref{lem:graph-from-grad}.} Then Lemma~\ref{lem:graph-from-grad} gives (i) with slope $\le C_{\mathrm{graph}}\varepsilon$, and Lemma~\ref{lem:sliver-stability}(i) gives (iii) with the same slope parameter. \editamir{Applying Lemma~\ref{lem:sliver-stability}(ii) with $\varepsilon$ replaced by $C_{\mathrm{graph}}\varepsilon$ and using the separation assumption $\|t_a-t_b\|\ge 10\,C_{\mathrm{graph}}\varepsilon\,D_Q$ yields (ii).}
 \end{proof}
 \end{editblock}
 
@@ -6768,6 +6775,11 @@ Therefore $1\le hN_Q$ and
 \]
 which yields the stated form.
 \end{proof}
+
+\begin{remark}[Interpretation of the “many pieces” hypothesis in fixed-$m$ regimes]
+\editamir{The relative slow-variation form $|N_Q-N_{Q'}|\le C\,h\,N_Q$ is automatic once $N_Q\gtrsim h^{-1}$, i.e.\ once the additive rounding error is negligible compared to the local count.}
+\editamir{In the sliver/corner-exit regime at fixed cohomology multiplier $m$, this lower bound is achieved by shrinking the per-piece mass scale $A\asymp s^{k}$ (with $s\ll h$), so that $N_Q\sim M_Q/A$ is large even though the total budget $M_Q\asymp m\,h^{2n}$ is $O(m)$.}
+\end{remark}
 \begin{editblock}
 \begin{lemma}[Slow variation persists under $0$--$1$ discrepancy rounding]\label{lem:slow-variation-discrepancy}
 In the setting of Lemma~\ref{lem:slow-variation-rounding}, suppose instead of nearest-integer rounding we choose integers of the form

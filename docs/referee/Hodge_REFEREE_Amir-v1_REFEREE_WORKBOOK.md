@@ -1103,7 +1103,8 @@ For each item below, rewrite/annotate the proof. Recommended minimum deliverable
   - [ ] Proof verified
   - [ ] Downstream use verified
 - **Proof rewrite / verification notes**:
-  - 
+  - **Hygiene fix applied**: the statement previously wrote an “ordered master template \((y_a)_{a\ge 1}\subset B_{C_0\varrho h}(0)\cap \delta_\perp\mathbb Z^{2p}\)”. For fixed \(h\) and fixed \(\delta_\perp>0\) that grid intersection is finite, so an infinite \(\delta_\perp\)-separated subset cannot exist.
+    The TeX now correctly chooses a *finite* ordered list \((y_a)_{a=1}^{N_*}\) of grid atoms and requires the prefix length \(N_F\le N_*\).
 - **Dependencies / citations**:
   - 
 - **Questions / potential gaps**:
@@ -1494,7 +1495,7 @@ For each item below, rewrite/annotate the proof. Recommended minimum deliverable
   - [ ] Proof verified
   - [ ] Downstream use verified
 - **Proof rewrite / verification notes**:
-  - 
+  - **Small hygiene fix applied**: the proof previously said “trim/duplicate points to obtain exactly \(N\) while preserving separation,” but duplicating a point breaks \(\delta\)-separation. The TeX now states the standard fix correctly: choose the implicit constant in \(\delta\asymp rN^{-1/(d-1)}\) small so a maximal \(\delta\)-separated set has \(\ge N\) points, then select \(N\) of them.
 - **Dependencies / citations**:
   - 
 - **Questions / potential gaps**:
