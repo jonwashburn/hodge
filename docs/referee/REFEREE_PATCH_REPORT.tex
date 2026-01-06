@@ -1,0 +1,106 @@
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{hyperref}
+
+% Local operator definitions used in the manuscript
+\DeclareMathOperator{\Mass}{Mass}
+
+\geometry{margin=1in}
+\hypersetup{hidelinks}
+
+\title{\bfseries Referee Patch Report (Amir v1)\\
+\large Critical blockers raised by a hostile referee, and the concrete fixes applied}
+\author{Auto-generated in \texttt{docs/referee/} from the Cursor session}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section*{Scope}
+This note summarizes two \emph{critical} referee blockers previously identified in \texttt{Hodge\_REFEREE\_Amir-v1.tex}, and documents the corresponding edits that were applied:
+\begin{itemize}
+\item the impossible coverage statement in Proposition \texttt{prop:dense-holo};
+\item the per-cube mass matching step in Theorem \texttt{thm:global-cohom} (and its local precursor \texttt{lem:local-bary}), including the quantifier/scaling issue around fixed \(m\).
+\item \textbf{hygiene/readability fixes} prompted by the AI referee notes: removal of stray duplicate proof blocks and addition of a brief convention note for “algebraic class”.
+\end{itemize}
+This report is \emph{not} a proof audit of the full manuscript; it is a surgical “what changed and why” memo.
+
+\section{Blocker 1: Proposition \texttt{prop:dense-holo} (finite family covering every point)}
+\subsection*{Referee objection}
+The manuscript stated (paraphrasing) that for a compact set \(K\subset X\) and \(\varepsilon>0\), there exists a \emph{finite} family of proper calibrated submanifolds \(Y_1,\dots,Y_M\) such that for \emph{every} \(x\in K\) and \emph{every} calibrated plane \(\Pi\subset T_xX\), one can find \(j\) with \(x\in Y_j\) and \(T_xY_j\) \(\varepsilon\)-close to \(\Pi\).
+
+For \(p\ge 1\) and \(K\) with nonempty interior, a finite union of proper submanifolds cannot contain all points of \(K\). Hence the original formulation is false as stated (even if morally intended as a “finite net at centers” statement).
+
+\subsection*{Correction applied}
+The statement was replaced by the correct finite-net formulation:
+\begin{itemize}
+\item choose finitely many centers \(x_\alpha\) covering \(K\) at scale \(\varepsilon\);
+\item at each center \(x_\alpha\), realize a finite \(\varepsilon/2\)-net of calibrated planes by calibrated complete intersections \(Y_{\alpha,j}\) through \(x_\alpha\);
+\item compare an arbitrary \(x\in K\) to a nearby center via a fixed identification of tangent spaces in a coordinate ball (e.g.\ chart differential or parallel transport).
+\end{itemize}
+An explicit “Referee note” was added directly under the proposition explaining why the stronger global coverage formulation cannot hold for a finite family.
+
+\subsection*{Why this resolves the blocker}
+The revised statement matches what the proof actually constructs and removes an impossible topological/dimension claim. It also aligns with later discretization logic: directions are approximated at finitely many sample points and propagated by continuity estimates.
+
+\section{Blocker 2: Theorem \texttt{thm:global-cohom} (per-cube mass matching / quantifier swap)}
+\subsection*{Referee objection}
+In the per-cube local quantization step, the manuscript previously asserted:
+\begin{enumerate}
+\item “any affine calibrated sheet with tangent plane \(P_{Q,j}\) has the same \(\psi\)-mass in \(Q\), call it \(A_{Q,j}\)” (translation-independence in a cube);
+\item choose integers \(N_{Q,j}\) so that \(\sum_j N_{Q,j}A_{Q,j}\approx M_Q\), where \(M_Q:=m\int_Q\beta\wedge\psi\);
+\item justify existence by “\(m\) may be taken arbitrarily large.”
+\end{enumerate}
+The referee objection had two parts:
+\begin{itemize}
+\item The “common sheet mass” assertion is false for generic orientations (even in \(\mathbb R^2\), line--square intersection length depends on offset).
+\item A scaling obstruction: if \(A_{Q,j}\sim h^{k}\) with \(k=2n-2p\) and \(M_Q\sim m h^{2n}\), then \(M_Q/A_{Q,j}\sim m h^{2p}\to 0\) as \(h\to 0\) for fixed \(m\). Thus integer matching fails on sufficiently fine meshes unless one lets \(m\to\infty\), contradicting the fixed-\(m\) SYR definition.
+\end{itemize}
+
+\subsection*{Correction applied}
+The matching is now routed through the manuscript’s \emph{corner-exit template} mechanism:
+\begin{itemize}
+\item introduce a tunable footprint scale \(s\ll h:=\mathrm{side}(Q)\);
+\item use the corner-exit template lemmas to choose, for each direction label \((Q,j)\), a family of sheet pieces in \(Q\) with \emph{identical} corner-exit footprints (hence equal \(\psi\)-mass within the family, up to a common small-slope distortion factor);
+\item denote this common per-piece mass by \(A_{Q,j}\), with scaling \(A_{Q,j}\asymp s^{k}\) where \(k=2n-2p\);
+\item choose \(s\) small enough so that \(M_Q/A_{Q,j}\gg 1\), enabling integer rounding with fixed \(m\) (no “\(m\to\infty\)” quantifier swap).
+\end{itemize}
+The same idea was reflected in the local precursor lemma \texttt{lem:local-bary}, which was strengthened to explicitly include the cube budget \(M_Q:=m\int_Q\beta\wedge\psi\) and a quantitative error target \(|\Mass(S_Q)-M_Q|\le \delta M_Q\).
+
+\subsection*{Why this resolves the blocker}
+The equal-mass property is no longer a false geometric claim about generic translates; it becomes a \emph{design feature} of the template box. The scaling obstruction is addressed by shrinking the per-piece mass scale \(A_{Q,j}\asymp s^k\) with \(s\ll h\), allowing many pieces per cube while keeping the total budget \(M_Q\) fixed (so fixed-\(m\) SYR quantifiers are not violated).
+
+\section{Editorial hygiene (referee readability)}
+\subsection*{Duplicate proof blocks removed}
+Two locations contained \emph{duplicated} proof environments back-to-back (a common artifact when patching draft text with conditional blocks):
+\begin{itemize}
+\item a second proof following Lemma \texttt{lem:radial-min};
+\item a second proof following the distance-to-cone proposition in the “calibrated cone” preliminaries.
+\end{itemize}
+These duplicates were deleted, keeping a single clean proof in each case.
+Additionally, the extra duplicated proof blocks previously flagged around \texttt{lem:limit\_is\_calibrated} and \texttt{prop:almost-calibration} were removed so each result has exactly one proof in the compiled manuscript.
+
+\subsection*{Clarification in the transport $\Rightarrow$ flat norm step}
+In Proposition \texttt{prop:transport-flat-glue}, the Step~1 Lipschitz bound implicitly requires working on an \emph{interior} face patch after the standard edge-trimming/localization (so that each face slice is a cycle, i.e.\ has zero boundary as a current on the interior face).
+This hypothesis was made explicit in item~(b) and the proof was adjusted accordingly (dropping the spurious boundary-slice term in the homotopy/Lipschitz estimate).
+
+\subsection*{Convention note: “algebraic class”}
+A short remark was added near the main theorem stating the manuscript’s convention: an \emph{algebraic class} in \(H^{2p}(X,\mathbb Q)\) means a class in the \(\mathbb Q\)-span of cycle classes (equivalently, the image of the cycle class map with \(\mathbb Q\)-coefficients), hence a \(\mathbb Q\)-vector subspace.
+
+\section*{What remains to be checked}
+These edits remove two hard referee blockers but do not, by themselves, certify the full proof. The remaining highest-risk verification areas include:
+\begin{itemize}
+\item global coherence across all labels and meshes (integer data satisfying face constraints and period constraints simultaneously);
+\item transport \(\Rightarrow\) flat-norm gluing estimates and their parameter dependence;
+\item exact-class enforcement (\texttt{prop:cohomology-match}) under the full parameter schedule;
+\item ensuring the schedule can satisfy all asymptotic requirements simultaneously (including the new explicit footprint scale \(s_j\ll h_j\)).
+\end{itemize}
+
+\end{document}
+
+

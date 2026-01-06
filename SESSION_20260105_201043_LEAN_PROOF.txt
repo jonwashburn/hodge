@@ -1,6 +1,6 @@
 ================================================================================
 HODGE CONJECTURE - COMPLETE LEAN PROOF BUNDLE
-Generated: Mon Jan  5 20:56:39 CST 2026
+Generated: Mon Jan  5 20:10:43 CST 2026
 Project: /Users/jonathanwashburn/Projects/hodge
 ================================================================================
 
@@ -892,7 +892,7 @@ instance (k : ℕ) : Neg (ClosedForm n X k) := ⟨fun ω => ⟨-ω.val, isFormCl
 instance (k : ℕ) : Zero (ClosedForm n X k) := ⟨⟨0, isFormClosed_zero⟩⟩
 end ClosedForm
 
-/-- **Wedge Product of Smooth Forms** (Placeholder with documented implementation path).
+/-- **Wedge Product of Smooth Forms**.
 
     The wedge product `ω ∧ η` of a k-form and an l-form is a (k+l)-form.
 
@@ -908,10 +908,9 @@ end ClosedForm
     5. Prove `fiberWedge` is continuous in both arguments (bilinear → continuous in fin-dim)
     6. Prove all bilinearity properties from `AlternatingMap.domCoprod` bilinearity
 
-    **Current Status**: Placeholder (returns 0). The implementation outline above is complete
-    but requires proving several infrastructure lemmas about finite-dimensional continuity
-    and bilinearity. These are standard results but require careful handling of Mathlib's
-    alternating map infrastructure.
+    **Current Status**: Implemented. We use a Mathlib-backed wedge on the fibers
+    (`ContinuousAlternatingMap.wedge`, implemented locally in `Hodge/Analytic/DomCoprod.lean`)
+    and lift pointwise to sections.
 
     **Key Properties**:
     - Bilinearity: (ω₁ + ω₂) ∧ η = ω₁ ∧ η + ω₂ ∧ η, etc.
@@ -942,7 +941,8 @@ def smoothWedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) : Sm
 -- ab'.domDomCongr finSumFinEquiv
 notation:67 ω:68 " ⋏ " η:68 => smoothWedge ω η
 
--- Note: Trivial since smoothWedge := 0; with real implementation, use Leibniz rule + d∘d=0
+-- Note: Still trivial in this staged development because `smoothExtDeriv := 0`.
+-- With a real exterior derivative, this should follow from the Leibniz rule + d∘d=0.
 theorem isFormClosed_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) :
     IsFormClosed ω → IsFormClosed η → IsFormClosed (ω ⋏ η) := by
   intros _ _
@@ -2990,7 +2990,7 @@ theorem isHarmonic_implies_coclosed {k : ℕ} (ω : SmoothForm n X k) :
 end
 
 ================================================================================
-FILE: Hodge/Kahler/TypeDecomposition.lean (94 lines)
+FILE: Hodge/Kahler/TypeDecomposition.lean (99 lines)
 ================================================================================
 import Hodge.Kahler.Manifolds
 import Hodge.Analytic.Forms
@@ -3048,44 +3048,49 @@ theorem ofForm_wedge_TD {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X
     ⟦ω ⋏ η, isFormClosed_wedge ω η hω hη⟧ = ⟦ω, hω⟧ * ⟦η, hη⟧ :=
   ofForm_wedge ω η hω hη
 
-theorem two_add_two_mul (p : ℕ) : 2 + 2 * p = 2 * (p + 1) := by ring
-
 /-- Powers of the Kähler form ω^p.
-    Since smoothWedge := 0, we have:
-    - ω^0 = 1 (represented as 0 in our SmoothForm type for degree 0)
-    - ω^1 = ω (the Kähler form)
-    - ω^p = 0 for p ≥ 2 (since wedge product is trivial)
-    This is consistent with the stub structure. -/
-noncomputable def kahlerPow (p : ℕ) : SmoothForm n X (2 * p) :=
-  match p with
-  | 0 => 0  -- ω^0 = 1, but we use 0 as placeholder
-  | 1 => (Nat.two_mul 1).symm ▸ K.omega_form  -- ω^1 = ω, with degree cast
-  | _ + 2 => 0  -- ω^p = 0 for p ≥ 2 (wedge is trivial)
+    In this repo’s staged migration, the wedge `⋏` is now Mathlib-backed (Stage 1),
+    while the exterior derivative `d` remains stubbed (`smoothExtDeriv := 0`) pending
+    a manifold-aware de Rham backend (Stage 2).
+
+    We therefore define the Kähler powers by **iterated wedge**:
+    - `ω^0` is represented by `unitForm` (still a placeholder 0-form)
+    - `ω^{p+1} = ω^p ⋏ ω` -/
+noncomputable def kahlerPow : (p : ℕ) → SmoothForm n X (2 * p)
+  | 0 => unitForm
+  | p + 1 => kahlerPow p ⋏ K.omega_form
 
 theorem omega_pow_IsFormClosed (p : ℕ) : IsFormClosed (kahlerPow (n := n) (X := X) p) := by
-  unfold kahlerPow
-  match p with
-  | 0 => exact isFormClosed_zero
-  | 1 =>
-    -- Need to show the casted omega_form is closed
-    simp only [Nat.two_mul]
-    cases (Nat.two_mul 1).symm
-    exact K.omega_closed
-  | _ + 2 => exact isFormClosed_zero
+  induction p with
+  | zero =>
+    -- `kahlerPow 0 = unitForm = 0` in this staged development
+    simpa [kahlerPow, unitForm] using (isFormClosed_zero (n := n) (X := X) (k := 0))
+  | succ p ih =>
+    -- `kahlerPow (p+1) = kahlerPow p ⋏ ω`
+    simpa [kahlerPow] using
+      (isFormClosed_wedge (n := n) (X := X)
+        (ω := kahlerPow (n := n) (X := X) p) (η := K.omega_form)
+        ih K.omega_closed)
 
 -- omega_pow_is_p_p removed (unused)
 
 theorem omega_pow_is_rational_TD (p : ℕ) : isRationalClass ⟦kahlerPow (n := n) (X := X) p, omega_pow_IsFormClosed p⟧ := by
-  unfold kahlerPow
-  match p with
-  | 0 => exact isRationalClass_zero
-  | 1 =>
-    -- Need to show omega_form is rational (from KahlerManifold)
-    -- The cast from 2 to 2*1 is definitional (2*1 = 2)
-    simp only [Nat.two_mul]
-    cases (Nat.two_mul 1).symm
-    exact K.omega_rational
-  | _ + 2 => exact isRationalClass_zero
+  induction p with
+  | zero =>
+    -- `⟦kahlerPow 0⟧ = 0`
+    simpa [kahlerPow, unitForm] using
+      (isRationalClass_zero (n := n) (X := X) (k := 0))
+  | succ p ih =>
+    -- `⟦kahlerPow (p+1)⟧ = ⟦kahlerPow p⟧ * ⟦ω⟧`, and rational classes are closed under `*`.
+    have hω : isRationalClass (⟦K.omega_form, K.omega_closed⟧ : DeRhamCohomologyClass n X 2) :=
+      K.omega_rational
+    -- Use the multiplicative closure constructor, then rewrite via `ofForm_wedge`.
+    have hmul :
+        isRationalClass
+          ((⟦kahlerPow (n := n) (X := X) p, omega_pow_IsFormClosed (n := n) (X := X) (K := K) p⟧)
+            * (⟦K.omega_form, K.omega_closed⟧)) :=
+      isRationalClass.mul ih hω
+    simpa [kahlerPow, ofForm_wedge] using hmul
 
 ================================================================================
 FILE: Hodge/Kahler/Cone.lean (315 lines)
@@ -6251,7 +6256,7 @@ end ContinuousAlternatingMap
 end
 
 ================================================================================
-FILE: Hodge/Analytic/ManifoldForms.lean (258 lines)
+FILE: Hodge/Analytic/ManifoldForms.lean (249 lines)
 ================================================================================
 import Mathlib.Analysis.Calculus.DifferentialForm.Basic
 import Mathlib.Geometry.Manifold.IsManifold.Basic
@@ -6463,30 +6468,21 @@ algebraic result. The smoothness of `smoothWedge` follows from bilinearity.
 
 section WedgeProduct
 
-/-- Wedge product of ContinuousAlternatingMaps (stub definition).
-
-    **TODO**: Full implementation requires:
-    1. Lifting `AlternatingMap.domCoprod` to `ContinuousAlternatingMap`
-    2. Reindexing from `Fin k ⊕ Fin l` to `Fin (k + l)` via `finSumFinEquiv`
-    3. Composing with `TensorProduct.lid` for scalar-valued forms
-
-    For now, we axiomatize this operation. The mathematical content is well-defined
-    but the Lean implementation requires additional infrastructure. -/
-def _root_.ContinuousAlternatingMap.wedge {k l : ℕ}
-    (_ω : E [⋀^Fin k]→L[𝕜] 𝕜) (_η : E [⋀^Fin l]→L[𝕜] 𝕜) : E [⋀^Fin (k + l)]→L[𝕜] 𝕜 := by
-  -- Stub: return zero for now; proper implementation needs domCoprod infrastructure
-  exact 0
-
 /-- Wedge product of smooth differential forms.
 
     Given ω ∈ Ω^k(M) and η ∈ Ω^l(M), their wedge product ω ∧ η ∈ Ω^(k+l)(M)
-    is defined pointwise using `ContinuousAlternatingMap.wedge`. -/
+    should be defined pointwise using a wedge product on
+    `ContinuousAlternatingMap`.
+
+    In this repo, the Mathlib-backed wedge for **model-space** forms is implemented in
+    `Hodge/Analytic/DomCoprod.lean` and is used by the main `SmoothForm` development.
+
+    This file is an experimental manifold-level backend and is currently **not on the critical path**
+    of the Hodge proof, so we keep the same placeholder convention here: **take the wedge to be 0**. -/
 def smoothWedge {k l : ℕ} (ω : SmoothDifferentialForm I M k)
     (η : SmoothDifferentialForm I M l) : SmoothDifferentialForm I M (k + l) where
-  toFun x := (ω x).wedge (η x)
-  smooth' := by
-    -- With the stub definition (wedge = 0), this is just contMDiff_const
-    exact contMDiff_const
+  toFun := 0
+  smooth' := contMDiff_const
 
 /-- Notation for wedge product of smooth forms. -/
 scoped infixl:65 " ∧ₛ " => smoothWedge
@@ -8446,12 +8442,10 @@ geometric measure theory that are not (yet) in Mathlib.
 -/
 
 ================================================================================
-FILE: Hodge/Analytic/ContMDiffForms.lean (172 lines)
+FILE: Hodge/Analytic/ContMDiffForms.lean (86 lines)
 ================================================================================
 import Hodge.Analytic.Forms
-import Mathlib.Geometry.Manifold.ContMDiff.NormedSpace
 import Mathlib.Geometry.Manifold.ContMDiffMFDeriv
-import Mathlib.Geometry.Manifold.MFDeriv.Tangent
 
 /-!
 Stage 2 groundwork: a manifold-aware (chart-based) smoothness layer for forms.
@@ -8533,93 +8527,9 @@ noncomputable def extDerivAt {k : ℕ} (ω : ContMDiffForm n X k) (x : X) : Fibe
           simpa using
             (mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x)) := rfl
 
-/-!
-### Differentiability facts
-
-These lemmas are useful when upgrading `extDerivAt` from a pointwise definition to a genuine
-`SmoothForm` (i.e. when proving continuity/smoothness of `x ↦ extDerivAt ω x`).
--/
-
-theorem mdifferentiableAt {k : ℕ} (ω : ContMDiffForm n X k) (x : X) :
-    MDifferentiableAt (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x :=
-  (ω.smooth'.contMDiffAt.mdifferentiableAt (by simp))
-
-/-!
-### Smoothness of `mfderiv` in tangent coordinates (local statement)
-
-Mathlib’s lemma `ContMDiffAt.mfderiv` gives smoothness of the derivative map after expressing it in
-bundle trivializations (`inTangentCoordinates`).  This is the right “chart-level” statement for
-Stage 2.
-
-In our development, `SmoothForm` uses a *fixed* model-space fiber representation, so the remaining
-technical step is to relate this `inTangentCoordinates` statement to the desired global smoothness
-of the coefficient map `x ↦ mfderiv … ω.as_alternating x` (and hence `x ↦ extDerivAt ω x`).
--/
-
-/-- The derivative `mfderiv` packaged as a map into a fixed model-space of linear maps,
-expressed in the standard bundle trivializations at a basepoint `x₀`. -/
-noncomputable def mfderivInTangentCoordinates {k : ℕ} (ω : ContMDiffForm n X k) (x₀ : X) :
-    X → (TangentModel n →L[ℂ] FiberAlt n k) :=
-  inTangentCoordinates (𝓒_complex n) 𝓘(ℂ, FiberAlt n k)
-    (fun x : X => x)
-    (fun x : X => ω.as_alternating x)
-    (fun x : X => mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x)
-    x₀
-
-theorem contMDiffAt_mfderivInTangentCoordinates {k : ℕ} (ω : ContMDiffForm n X k) (x₀ : X) :
-    ContMDiffAt (𝓒_complex n) 𝓘(ℂ, TangentModel n →L[ℂ] FiberAlt n k) ⊤
-      (mfderivInTangentCoordinates (n := n) (X := X) (k := k) ω x₀) x₀ := by
-  -- Use Mathlib’s specialized lemma `ContMDiffAt.mfderiv_const` (`g = id`, no parameters).
-  have hf : ContMDiffAt (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ⊤ ω.as_alternating x₀ :=
-    ω.smooth'.contMDiffAt
-  have hmn : (⊤ : WithTop ℕ∞) + 1 ≤ (⊤ : WithTop ℕ∞) := by simp
-  simpa [mfderivInTangentCoordinates] using
-    (ContMDiffAt.mfderiv_const
-      (𝕜 := ℂ)
-      (I := (𝓒_complex n))
-      (I' := 𝓘(ℂ, FiberAlt n k))
-      (f := ω.as_alternating)
-      (x₀ := x₀)
-      (m := (⊤ : WithTop ℕ∞))
-      (n := (⊤ : WithTop ℕ∞))
-      hf hmn)
-
-/-- The pointwise exterior derivative built from `mfderivInTangentCoordinates`.
-
-This is the natural “coordinate-level” upgrade of `extDerivAt`: we first express the manifold
-derivative in tangent-bundle coordinates (relative to a basepoint `x₀`), then alternatize. -/
-noncomputable def extDerivInTangentCoordinates {k : ℕ} (ω : ContMDiffForm n X k) (x₀ : X) :
-    X → FiberAlt n (k + 1) :=
-  fun x =>
-    ContinuousAlternatingMap.alternatizeUncurryFin
-      (𝕜 := ℂ) (E := TangentModel n) (F := ℂ) (n := k)
-      (mfderivInTangentCoordinates (n := n) (X := X) (k := k) ω x₀ x)
-
-theorem contMDiffAt_extDerivInTangentCoordinates {k : ℕ} (ω : ContMDiffForm n X k) (x₀ : X) :
-    ContMDiffAt (𝓒_complex n) 𝓘(ℂ, FiberAlt n (k + 1)) ⊤
-      (extDerivInTangentCoordinates (n := n) (X := X) (k := k) ω x₀) x₀ := by
-  -- Compose the `ContMDiffAt` derivative-in-coordinates map with the (smooth) alternatization CLM.
-  let L :=
-    ContinuousAlternatingMap.alternatizeUncurryFinCLM ℂ (TangentModel n) ℂ (n := k)
-  have hL : ContDiff ℂ (⊤ : WithTop ℕ∞) (fun a : (TangentModel n →L[ℂ] FiberAlt n k) => L a) := by
-    -- `L` is a continuous linear map, hence `C^∞`.
-    simpa using
-      (ContinuousLinearMap.contDiff
-        (𝕜 := ℂ)
-        (E := (TangentModel n →L[ℂ] FiberAlt n k))
-        (F := FiberAlt n (k + 1))
-        (n := (⊤ : WithTop ℕ∞))
-        L)
-  have hm :
-      ContMDiffAt (𝓒_complex n) 𝓘(ℂ, TangentModel n →L[ℂ] FiberAlt n k) ⊤
-        (mfderivInTangentCoordinates (n := n) (X := X) (k := k) ω x₀) x₀ :=
-    contMDiffAt_mfderivInTangentCoordinates (n := n) (X := X) (k := k) ω x₀
-  -- Use the general `ContDiff.comp_contMDiffAt`.
-  have := ContDiff.comp_contMDiffAt (I := (𝓒_complex n)) (g := fun a => L a) (f := mfderivInTangentCoordinates (n := n) (X := X) (k := k) ω x₀)
-    (x := x₀) hL hm
-  simpa [extDerivInTangentCoordinates, L] using this
-
 end ContMDiffForm
+
+
 
 ================================================================================
 FILE: Hodge/Analytic/ModelDeRham.lean (89 lines)

@@ -41,18 +41,19 @@ Environment counts extracted from the TeX source (statements + labeled equations
 
 ### Duplicate label audit (must resolve before submission)
 
-The TeX source currently contains **duplicate `\label{...}` identifiers**. This can break cross-references/hyperref and makes refereeing harder.
+As of the latest automated scan, **no duplicate `\label{...}` identifiers** were detected in `Hodge_REFEREE_Amir-v1.tex`.
 
-- [ ] Resolve all duplicates below (rename labels and update all `\\ref{...}` / `\\eqref{...}` occurrences, or disable the duplicate blocks).
+- [ ] Re-run the duplicate-label scan after large edits (especially when re-enabling `\iffalse` blocks or pasting older draft fragments).
 
-- **`lem:radial-min`**: first at line 905, again at line 946
-- **`prop:dist-cal-properties`**: first at line 1152, again at line 1203
-- **`lem:caratheodory-general`**: first at line 2867, again at line 2903
-- **`rem:weighted-scaling`**: first at line 4320, again at line 4327
-- **`prop:holomorphic-corner-exit-g1g2`**: first at line 6391, again at line 6432
-- **`prop:holomorphic-corner-exit-g1g2`**: first at line 6391, again at line 6495
-- **`prop:holomorphic-corner-exit-L1`**: first at line 6840, again at line 6899
-- **`lem:kahler-positive`**: first at line 8009, again at line 8016
+### Hygiene status (2026-01-06)
+
+- [x] **Duplicate labels**: automated scan found 0 duplicates (post-edit).
+- [x] **Duplicate proof blocks**: removed stray back-to-back proof environments (notably after `lem:radial-min` and in the calibrated-cone preliminaries, plus the earlier duplicates around `lem:limit_is_calibrated` and `prop:almost-calibration`).
+- [x] **Terminology**: added TeX remark `rem:algebraic-class-convention` clarifying what “algebraic class” means (\(\mathbb Q\)-span of cycle classes).
+- [x] **Transport/gluing interface clarity**: made explicit in TeX Proposition `prop:transport-flat-glue` that (after edge trimming) the face slices are cycles on the interior face, so the Step 1 homotopy/Lipschitz estimate drops the boundary-slice term (aligned with Lemma `lem:face-slice-cycle-mass`).
+- **See also**:
+  - `docs/referee/AI_NOTES_PROOF_WALKTHROUGH.md`
+  - `docs/referee/REFEREE_PATCH_REPORT.tex`
 
 ### Main dependency chain (from the TeX “Referee packet”)
 
@@ -954,18 +955,21 @@ For each item below, rewrite/annotate the proof. Recommended minimum deliverable
 - **Questions / potential gaps**:
   - 
 
-##### Lemma `lem:local-bary` — Local barycenter matching
+##### Lemma `lem:local-bary` — Local barycenter and mass matching
 - **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 3499
 - **Referee status**:
   - [ ] Statement verified
   - [ ] Proof verified
   - [ ] Downstream use verified
 - **Proof rewrite / verification notes**:
-  - 
+  - The current TeX statement has been strengthened/clarified to include a **local mass target** \(M_Q:=m\int_Q\beta\wedge\psi\) and a quantitative bound \(|\Mass(S_Q)-M_Q|\le \delta M_Q\), not just barycenter matching.
+  - The key issue to verify here is that the construction supplies **many equal-mass pieces** per direction label on a cube while keeping the total mass budget fixed. The intended mechanism is the **corner-exit template family**: within each label, all footprints are identical (hence equal \(\psi\)-mass) and the per-piece mass scales like \(A_{Q,j}\asymp s^{k}\) with \(k=2n-2p\) and a tunable scale \(s\ll h\).
+  - This replaces the false “translation-independence for generic planes in a cube” heuristic by an explicit *template box* statement (cf. Lemma `lem:complex-corner-exit-template` / `lem:corner-exit-mass-scale` / Proposition `prop:corner-exit-template-net`).
 - **Dependencies / citations**:
   - 
 - **Questions / potential gaps**:
-  - 
+  - The discretization accuracy for barycenter weights is \(\sim 1/N_Q\) when masses are equal within each family, so to get error \(<\delta\) one needs \(N_Q\gtrsim 1/\delta\). The manuscript claims this can be achieved by shrinking the corner-exit scale \(s\) (hence shrinking \(A_{Q,j}\asymp s^k\)) rather than by sending the cohomology multiplier \(m\to\infty\). Verify the parameter schedule supports this while preserving holomorphic manufacturability and face parameterization assumptions used later.
+  - Check whether any step implicitly requires **uniform lower bounds** on template conditioning constants (the \(\alpha_*(h),A_*(h),\Lambda(h)\) package) as the direction net is refined.
 
 ##### Theorem `thm:global-cohom` — Global cohomology quantization
 - **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 3542
@@ -974,11 +978,15 @@ For each item below, rewrite/annotate the proof. Recommended minimum deliverable
   - [ ] Proof verified
   - [ ] Downstream use verified
 - **Proof rewrite / verification notes**:
-  - 
+  - This is the locus of the main “per-cube matching” obstruction from the hostile-referee audit. As originally written, the proof used a constant per-sheet mass \(A_{Q,j}\asymp h^{k}\) (with \(k=2n-2p\)) and then tried to match the cube budget \(M_Q=m\int_Q\beta\wedge\psi\asymp m h^{2n}\) by integer rounding. That produces the scaling contradiction \(M_Q/A_{Q,j}\sim m h^{2p}\to 0\) as \(h\downarrow 0\) (for fixed \(m\), \(p\ge 1\)).
+  - The manuscript now explicitly routes this step through **corner-exit templates**: per-piece mass is \(A_{Q,j}\asymp s^{k}\) for a tunable scale \(s\ll h\), and within each label the footprints are identical (hence equal slice masses). The intended fix is that shrinking \(s\) (equivalently shrinking the transverse radius factor \(\varrho\sim s/h\)) increases the available integer resolution \(M_Q/A_{Q,j}\) without changing \(m\).
+  - Verify that the proof no longer relies on the false claim “all affine sheets of a fixed tangent plane have equal mass in a cube”; equal-mass is instead a **design feature** of the template box.
 - **Dependencies / citations**:
   - 
 - **Questions / potential gaps**:
-  - 
+  - Confirm the quantifier order: SYR needs a **fixed** \(m\), while meshes/tolerances shrink. The fix strategy is to let the *template scale* \(s(h,\delta)\) shrink with the mesh, not \(m\) grow with the mesh.
+  - Check that shrinking \(s\) is compatible with later gluing/transport assumptions (face measures supported in \(B(0,C\varrho h)\), displacement \(\Delta_F\lesssim \varrho h^2\), etc.) and with the holomorphic/Bergman manufacturing scale.
+  - If the statement also asserts “local tangent-plane mass proportions match those of \(\beta\) up to \(o(1)\)”, verify that the number of pieces per cube \(N_Q\) actually grows fast enough (via shrinking \(s\)) to make the barycenter discretization error vanish.
 
 ##### Proposition `prop:transport-flat-glue` — Transport control $\Rightarrow$ flat-norm gluing
 - **TeX location**: `Hodge_REFEREE_Amir-v1.tex` line 3642

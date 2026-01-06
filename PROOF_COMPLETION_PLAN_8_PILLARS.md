@@ -29,14 +29,22 @@ These are the *only* axioms intended to remain:
 - **Stage 0 (done)**: Keep the proof “closed” (0 sorries) and make session snapshots automatic.
   - `./scripts/generate_lean_source.sh` now also writes `SESSION_YYYYMMDD_HHMMSS_LEAN_PROOF.txt`.
 
-- **Stage 1 (in progress)**: Replace the *placeholder wedge* used by cohomology (`SmoothForm ⋏`) with a Mathlib-backed wedge:
+- **Stage 1 (done)**: Replace the *placeholder wedge* used by cohomology (`SmoothForm ⋏`) with a Mathlib-backed wedge:
   - Implement/strengthen the wedge on fibers using `AlternatingMap.domCoprod` and continuous norms
   - Then lift to `SmoothForm` wedge with continuity of the coefficient map
   - Update cohomology multiplication and `kahlerPow` to become meaningful (ω^p via iterated wedge)
 
-- **Stage 2 (pending)**: Replace the *placeholder exterior derivative* (`extDerivLinearMap := 0`) with a Mathlib-backed `d`
-  - Model-space `extDeriv` exists in Mathlib; manifold-level packaging is not yet upstream
-  - We will stage this carefully to avoid breaking the main proof chain
+- **Stage 1.5 (done)**: Establish a **model-space** de Rham backend (safe foundation for Stage 2):
+  - `Hodge/Analytic/ModelDeRham.lean`: model-space forms + `ModelForm.d := extDeriv` + pointwise wedge
+  - `Hodge/Cohomology/ModelDeRham.lean`: model-space **C∞** forms + `d²=0` + additive cohomology quotient
+
+- **Stage 2 (in progress)**: Replace the *placeholder exterior derivative* (`extDerivLinearMap := 0`) with a Mathlib-backed `d`
+  - **Current blocker**: the main proof uses `SmoothForm n X k` on manifolds, which only carries continuity (`Continuous`) not differentiability.
+  - **Milestone (started)**: a manifold-aware “C^∞ form” backend exists in `Hodge/Analytic/ContMDiffForms.lean`
+    - Defines `ContMDiffForm` (a `ContMDiff` coefficient map into `FiberAlt`)
+    - Defines the **pointwise** exterior derivative `extDerivAt` via `mfderiv` + alternatization
+    - Proves `ContMDiffAt` smoothness in tangent coordinates (`mfderivInTangentCoordinates`) and its alternatized variant (`extDerivInTangentCoordinates`)
+  - **Next milestone**: prove continuity/smoothness of `x ↦ extDerivAt` and migrate `IsFormClosed/IsExact` + cohomology off the stubbed `smoothExtDeriv := 0`.
 
 - **Stage 3 (pending)**: Replace the current de Rham quotient (“cohomology”) with an actually well-defined Mathlib-backed complex if/when available, or a local equivalent construction.
 
@@ -56,6 +64,10 @@ Concretely, “complete” means:
 ---
 
 ## Accepted external inputs (the 8 Classical Pillars)
+
+**Historical note**: In the current codebase, the former “Pillar 2/4” axioms
+`federer_fleming_compactness` and `spine_theorem` were removed as unused. The live baseline is now
+**9 axioms** (see top of this file).
 
 Source of truth: `Classical_Inputs_8_Pillars_standalone.tex`.
 

@@ -60,6 +60,11 @@ We close this by a staged migration:
 - **Stage 2 (next)**: Replace the placeholder exterior derivative `extDerivLinearMap := 0` on `SmoothForm`
   with a Mathlib-backed `d` (requires a manifold-aware form backend / chart glue).
 
+  - **Stage 2 groundwork (in progress)**: A manifold-aware `C^∞` backend now exists in
+    `Hodge/Analytic/ContMDiffForms.lean`, defining `ContMDiffForm` and:
+    - pointwise `extDerivAt` via `mfderiv` + alternatization
+    - tangent-coordinate smoothness lemmas: `mfderivInTangentCoordinates`, `extDerivInTangentCoordinates`
+
 - **Stage 3**: Replace the current de Rham quotient/multiplication lemmas with a semantically correct de Rham complex/cohomology backend (local or Mathlib, depending on availability).
 
 ### The 9 Classical Pillars (USED AXIOMS)

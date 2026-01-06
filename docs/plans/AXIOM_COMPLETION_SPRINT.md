@@ -570,9 +570,9 @@ axiom caratheodory_decomposition (p x α) (hα : α ∈ stronglyPositiveCone p x
 
 All axioms converted:
 - `isPQForm` → inductive type
-- `kahlerPow` → definition (ω^0=0, ω^1=ω, ω^p=0 for p≥2)
-- `omega_pow_IsFormClosed` → theorem (by cases)
-- `omega_pow_is_rational_TD` → theorem (by cases)
+- `kahlerPow` → definition (iterated wedge: `ω^0 = unitForm` (placeholder), `ω^{p+1} = ω^p ⋏ ω`)
+- `omega_pow_IsFormClosed` → theorem (by induction using `isFormClosed_wedge`)
+- `omega_pow_is_rational_TD` → theorem (by induction using `isRationalClass.mul`)
 - All other axioms removed as unused
 
 ### Hodge/Kahler/Manifolds.lean (7 items)
@@ -1074,9 +1074,9 @@ Line 105: axiom caratheodory_decomposition → prove Carathéodory for cones
 ### Hodge/Kahler/TypeDecomposition.lean (0 items) ✅ COMPLETED
 All items resolved:
 - isPQForm → inductive type with constructors
-- kahlerPow → definition (ω^0=0, ω^1=ω, ω^p=0 for p≥2)
-- omega_pow_IsFormClosed → theorem (by cases)
-- omega_pow_is_rational_TD → theorem (by cases)
+- kahlerPow → definition (iterated wedge: `ω^0 = unitForm` (placeholder), `ω^{p+1} = ω^p ⋏ ω`)
+- omega_pow_IsFormClosed → theorem (by induction using `isFormClosed_wedge`)
+- omega_pow_is_rational_TD → theorem (by induction using `isRationalClass.mul`)
 - All other axioms removed as unused
 
 ### Hodge/Kahler/Manifolds.lean (7 items)

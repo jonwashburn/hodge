@@ -147,13 +147,15 @@ These stubs make the proof type-check but don't carry the mathematical meaning o
 | Stub | Current Definition | Correct Definition | Files Affected | Documentation |
 |------|-------------------|-------------------|----------------|---------------|
 | `extDerivLinearMap` | `:= 0` | Real exterior derivative d | `Analytic/Forms.lean` | ✅ Documented |
-| `smoothWedge` | `:= 0` | Real wedge product ∧ | `Analytic/Forms.lean` | ✅ Documented |
+| `smoothWedge` | Mathlib-backed (via `ContinuousAlternatingMap.wedge`) | Real wedge product ∧ | `Analytic/Forms.lean`, `Analytic/DomCoprod.lean` | ✅ Implemented |
 | | | | ↓ | |
 | De Rham cohomology | Uses stubbed d,∧ | Real quotient | `Cohomology/Basic.lean` | ✅ Works with stubs |
 
 **Dependencies**: Everything downstream depends on real `d` and `∧`.
 
-**Mathlib Status**: `Mathlib.Analysis.Calculus.DifferentialForm.Basic` has `extDeriv` for normed spaces. Lifting to manifolds requires chart-based construction. `AlternatingMap.domCoprod` exists for wedge but not for `ContinuousAlternatingMap`.
+**Mathlib Status**: `Mathlib.Analysis.Calculus.DifferentialForm.Basic` has `extDeriv` for normed spaces. Lifting to manifolds requires chart-based construction. This repo provides:
+- `Hodge/Analytic/DomCoprod.lean`: local overlay supplying `ContinuousAlternatingMap.wedge`
+- `Hodge/Analytic/ContMDiffForms.lean`: Stage‑2 groundwork (`ContMDiffForm`, `extDerivAt`, and tangent-coordinate smoothness via `mfderivInTangentCoordinates` / `extDerivInTangentCoordinates`)
 
 ### Tier 2: Kähler/Hodge Operators
 
@@ -163,7 +165,7 @@ These stubs make the proof type-check but don't carry the mathematical meaning o
 | `adjointDeriv` | `:= 0` | Real codifferential δ | Tier 1 + ⋆ | ✅ Documented |
 | `laplacian` | `:= 0` | Real Laplacian Δ | d, δ | ✅ Documented |
 | `lefschetzLambdaLinearMap` | `:= 0` | ⋆⁻¹ ∘ L ∘ ⋆ | ⋆ | ✅ Documented |
-| `kahlerPow` | match 0,1,else→0 | ω^p via real ∧ | Tier 1 ∧ | ✅ Works for p≤1 |
+| `kahlerPow` | iterated wedge (`ω^{p+1} = ω^p ⋏ ω`) | ω^p via real ∧ | Tier 1 ∧ | ✅ Implemented |
 
 **Files**: `Kahler/Manifolds.lean` (with module-level documentation), `Kahler/TypeDecomposition.lean`
 
