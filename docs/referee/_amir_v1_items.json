@@ -1,0 +1,1327 @@
+{
+  "items": [
+    {
+      "line": 248,
+      "section": "",
+      "env": "definition",
+      "title": "Flat norm on integral currents",
+      "label": "def:flat-norm"
+    },
+    {
+      "line": 353,
+      "section": "Introduction",
+      "env": "theorem",
+      "title": "Calibration--coercivity (cone-valued harmonic classes)",
+      "label": "thm:cal-coercivity-intro"
+    },
+    {
+      "line": 739,
+      "section": "Calibrated Grassmannian and Pointwise Cone Geometry",
+      "env": "lemma",
+      "title": "Closure of the calibrated cone",
+      "label": "lem:calibrated-cone-closed"
+    },
+    {
+      "line": 905,
+      "section": "Calibrated Grassmannian and Pointwise Cone Geometry",
+      "env": "lemma",
+      "title": "Explicit minimization in the radial parameter",
+      "label": "lem:radial-min"
+    },
+    {
+      "line": 933,
+      "section": "Calibrated Grassmannian and Pointwise Cone Geometry",
+      "env": "equation",
+      "title": "",
+      "label": "eq:ray-defect-formula"
+    },
+    {
+      "line": 946,
+      "section": "Calibrated Grassmannian and Pointwise Cone Geometry",
+      "env": "lemma",
+      "title": "Explicit minimization along a calibrated ray",
+      "label": "lem:radial-min"
+    },
+    {
+      "line": 959,
+      "section": "Calibrated Grassmannian and Pointwise Cone Geometry",
+      "env": "equation",
+      "title": "",
+      "label": "eq:ray-defect-formula"
+    },
+    {
+      "line": 1069,
+      "section": "Calibrated Grassmannian and Pointwise Cone Geometry",
+      "env": "lemma",
+      "title": "Trace $L^{2}$ control",
+      "label": "lem:trace-L2"
+    },
+    {
+      "line": 1090,
+      "section": "Calibrated Grassmannian and Pointwise Cone Geometry",
+      "env": "equation",
+      "title": "",
+      "label": "eq:trace-L2-bound"
+    },
+    {
+      "line": 1152,
+      "section": "Calibrated Grassmannian and Pointwise Cone Geometry",
+      "env": "proposition",
+      "title": "Well-posedness and basic properties",
+      "label": "prop:dist-cal-properties"
+    },
+    {
+      "line": 1203,
+      "section": "Calibrated Grassmannian and Pointwise Cone Geometry",
+      "env": "proposition",
+      "title": "Well-posedness and basic properties",
+      "label": "prop:dist-cal-properties"
+    },
+    {
+      "line": 1364,
+      "section": "Calibrated Grassmannian and Pointwise Cone Geometry",
+      "env": "lemma",
+      "title": "Quadratic control for small Jordan angles (principal angles)",
+      "label": "lem:kahler-angle"
+    },
+    {
+      "line": 1373,
+      "section": "Calibrated Grassmannian and Pointwise Cone Geometry",
+      "env": "equation",
+      "title": "",
+      "label": "eq:kahler-angle-est"
+    },
+    {
+      "line": 1420,
+      "section": "Calibrated Grassmannian and Pointwise Cone Geometry",
+      "env": "remark",
+      "title": "Geometric meaning of Lemma~\\ref{lem:kahler-angle}",
+      "label": null
+    },
+    {
+      "line": 1499,
+      "section": "Energy Gap and Primitive/Off--Type Controls",
+      "env": "equation",
+      "title": "",
+      "label": "eq:energy-split"
+    },
+    {
+      "line": 1514,
+      "section": "Energy Gap and Primitive/Off--Type Controls",
+      "env": "equation",
+      "title": "",
+      "label": "eq:type-split"
+    },
+    {
+      "line": 1525,
+      "section": "Energy Gap and Primitive/Off--Type Controls",
+      "env": "equation",
+      "title": "",
+      "label": "eq:primitive-control"
+    },
+    {
+      "line": 1538,
+      "section": "Energy Gap and Primitive/Off--Type Controls",
+      "env": "lemma",
+      "title": "Elliptic estimate on the Coulomb slice",
+      "label": "lem:elliptic-coulomb"
+    },
+    {
+      "line": 1559,
+      "section": "Energy Gap and Primitive/Off--Type Controls",
+      "env": "lemma",
+      "title": "Coulomb decomposition and energy identity",
+      "label": "lem:coulomb"
+    },
+    {
+      "line": 1695,
+      "section": "The Calibrated Grassmannian and an Explicit \\texorpdfstring{$\\varepsilon$",
+      "env": "lemma",
+      "title": "Covering number",
+      "label": "lem:covering-number"
+    },
+    {
+      "line": 1699,
+      "section": "The Calibrated Grassmannian and an Explicit \\texorpdfstring{$\\varepsilon$",
+      "env": "equation",
+      "title": "",
+      "label": "eq:grass-cover"
+    },
+    {
+      "line": 1818,
+      "section": "Pointwise Linear Algebra: Controlling the Net Distance",
+      "env": "equation",
+      "title": "",
+      "label": "eq:typesplit-orth"
+    },
+    {
+      "line": 1843,
+      "section": "Pointwise Linear Algebra: Controlling the Net Distance",
+      "env": "lemma",
+      "title": "Off--type separation for $D_{\\mathrm{net}}$",
+      "label": "lem:typesplit"
+    },
+    {
+      "line": 1846,
+      "section": "Pointwise Linear Algebra: Controlling the Net Distance",
+      "env": "equation",
+      "title": "",
+      "label": "eq:Dnet-typesplit"
+    },
+    {
+      "line": 1880,
+      "section": "Pointwise Linear Algebra: Controlling the Net Distance",
+      "env": "lemma",
+      "title": "Hermitian model for $(p,p)$",
+      "label": "lem:hermitian-model"
+    },
+    {
+      "line": 1945,
+      "section": "Pointwise Linear Algebra: Controlling the Net Distance",
+      "env": "remark",
+      "title": "Calibrated cone in the Hermitian model; not the full PSD cone for $1<p<n-1$",
+      "label": "rem:cone-not-full-psd"
+    },
+    {
+      "line": 1964,
+      "section": "Pointwise Linear Algebra: Controlling the Net Distance",
+      "env": "lemma",
+      "title": "Rank--one approximation controls the traceless part",
+      "label": "lem:rankone"
+    },
+    {
+      "line": 1995,
+      "section": "Pointwise Linear Algebra: Controlling the Net Distance",
+      "env": "proposition",
+      "title": "PSD surrogate for the $(p,p)$ projection",
+      "label": "prop:pp-projection"
+    },
+    {
+      "line": 2000,
+      "section": "Pointwise Linear Algebra: Controlling the Net Distance",
+      "env": "equation",
+      "title": "",
+      "label": "eq:pp-projection"
+    },
+    {
+      "line": 2030,
+      "section": "Pointwise Linear Algebra: Controlling the Net Distance",
+      "env": "corollary",
+      "title": "Pointwise rank--one PSD surrogate",
+      "label": "cor:Dpsd-pointwise"
+    },
+    {
+      "line": 2040,
+      "section": "Pointwise Linear Algebra: Controlling the Net Distance",
+      "env": "equation",
+      "title": "",
+      "label": "eq:Dpsd-pointwise"
+    },
+    {
+      "line": 2100,
+      "section": "Calibration--Coercivity (Explicit) and Its Proof",
+      "env": "theorem",
+      "title": "Calibration--coercivity (cone-valued harmonic classes, explicit)",
+      "label": "thm:cal-coercivity"
+    },
+    {
+      "line": 2104,
+      "section": "Calibration--Coercivity (Explicit) and Its Proof",
+      "env": "equation",
+      "title": "",
+      "label": "eq:global-coercivity"
+    },
+    {
+      "line": 2124,
+      "section": "Calibration--Coercivity (Explicit) and Its Proof",
+      "env": "remark",
+      "title": "On the coercivity hypothesis",
+      "label": "rem:coercivity-hypothesis"
+    },
+    {
+      "line": 2150,
+      "section": "Calibration--Coercivity (Explicit) and Its Proof",
+      "env": "equation",
+      "title": "",
+      "label": "eq:projection-identity"
+    },
+    {
+      "line": 2155,
+      "section": "Calibration--Coercivity (Explicit) and Its Proof",
+      "env": "remark",
+      "title": "Limitation of pointwise projection",
+      "label": null
+    },
+    {
+      "line": 2180,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "theorem",
+      "title": "Quantitative almost--mass--minimizing cycles (referee-checkable spine)",
+      "label": "thm:spine-quantitative"
+    },
+    {
+      "line": 2251,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "Where to look for (H1)--(H2) in this manuscript",
+      "label": null
+    },
+    {
+      "line": 2313,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Borderline ($p=n/2$): closure via a refined displacement schedule",
+      "label": "lem:borderline-p-half"
+    },
+    {
+      "line": 2404,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "proposition",
+      "title": "H1 package: local holomorphic multi-sheet manufacturing",
+      "label": "prop:h1-package"
+    },
+    {
+      "line": 2434,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "proposition",
+      "title": "H2 package: global face coherence and gluing (corner-exit route)",
+      "label": "prop:h2-package"
+    },
+    {
+      "line": 2450,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "theorem",
+      "title": "Realization from almost--calibrated sequences",
+      "label": "thm:realization-from-almost"
+    },
+    {
+      "line": 2524,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Flat limits of cycles are cycles",
+      "label": "lem:flat_limit_of_cycles_is_cycle"
+    },
+    {
+      "line": 2539,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Almost--calibrated limits are calibrated",
+      "label": "lem:limit_is_calibrated"
+    },
+    {
+      "line": 2595,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "How to use Theorem~\\ref{thm:realization-from-almost}",
+      "label": null
+    },
+    {
+      "line": 2608,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "theorem",
+      "title": "Codimension one (Lefschetz $(1,1)$)",
+      "label": "thm:codim1"
+    },
+    {
+      "line": 2624,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "Mass equality in the effective codimension-one case",
+      "label": null
+    },
+    {
+      "line": 2637,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "proposition",
+      "title": "Complete intersections",
+      "label": "prop:complete-intersection"
+    },
+    {
+      "line": 2657,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "definition",
+      "title": "Stationary Young--measure realizability (SYR)",
+      "label": "def:syr"
+    },
+    {
+      "line": 2685,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "theorem",
+      "title": "Calibrated realization under SYR",
+      "label": "thm:syr"
+    },
+    {
+      "line": 2723,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "",
+      "label": null
+    },
+    {
+      "line": 2737,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "definition",
+      "title": "Locally integrable calibrated decomposition (LICD)",
+      "label": null
+    },
+    {
+      "line": 2751,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "theorem",
+      "title": "Classical SYR under LICD",
+      "label": "thm:classical-syr-licd"
+    },
+    {
+      "line": 2816,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "corollary",
+      "title": "Closure of the program under LICD",
+      "label": "cor:closure-licd"
+    },
+    {
+      "line": 2867,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Uniform Carath\\'eodory decomposition",
+      "label": "lem:caratheodory-general"
+    },
+    {
+      "line": 2903,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Uniform Carath\\'eodory decomposition",
+      "label": "lem:caratheodory-general"
+    },
+    {
+      "line": 2944,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Lipschitz weights from a strongly convex simplex fit",
+      "label": "lem:lipschitz-qp-weights"
+    },
+    {
+      "line": 2992,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "Stable direction labeling via a growing net",
+      "label": "rem:direction-net-qp"
+    },
+    {
+      "line": 3015,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Jet surjectivity for ample powers (pointwise and for finite sets)",
+      "label": "lem:jet-surjectivity"
+    },
+    {
+      "line": 3063,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Uniform $C^1$ control on $m^{-1/2}$-balls via Bergman kernels",
+      "label": "lem:bergman-control"
+    },
+    {
+      "line": 3169,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Graph control from uniform gradient control",
+      "label": "lem:graph-from-grad"
+    },
+    {
+      "line": 3217,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "proposition",
+      "title": "Projective tangential approximation with $C^1$ control",
+      "label": "prop:tangent-approx-full"
+    },
+    {
+      "line": 3284,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "proposition",
+      "title": "Holomorphic density of calibrated directions",
+      "label": "prop:dense-holo"
+    },
+    {
+      "line": 3317,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "theorem",
+      "title": "Local multi-sheet construction",
+      "label": "thm:local-sheets"
+    },
+    {
+      "line": 3499,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Local barycenter matching",
+      "label": "lem:local-bary"
+    },
+    {
+      "line": 3542,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "theorem",
+      "title": "Global cohomology quantization",
+      "label": "thm:global-cohom"
+    },
+    {
+      "line": 3642,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "proposition",
+      "title": "Transport control $\\Rightarrow$ flat-norm gluing",
+      "label": "prop:transport-flat-glue"
+    },
+    {
+      "line": 3778,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "Why hypotheses (a)--(b) hold for the local sheet model",
+      "label": "rem:transport-hypotheses"
+    },
+    {
+      "line": 3810,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Automatic $W_1$-matching from smooth dependence of face maps",
+      "label": "lem:w1-auto"
+    },
+    {
+      "line": 3842,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Pointwise displacement bound under nearby face maps",
+      "label": "lem:face-displacement"
+    },
+    {
+      "line": 3865,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Template stability under small multiset edits",
+      "label": "lem:w1-template-edit"
+    },
+    {
+      "line": 3885,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "How Lemma~\\ref{lem:w1-auto} reduces the remaining matching task",
+      "label": "rem:w1-auto"
+    },
+    {
+      "line": 3908,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "Sliver regime: what changes in the global counting estimate",
+      "label": "rem:sliver-vs-template"
+    },
+    {
+      "line": 3929,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "proposition",
+      "title": "Weighted transport $\\Rightarrow$ flat-norm face control (sliver-compatible)",
+      "label": "prop:transport-flat-glue-weighted"
+    },
+    {
+      "line": 3976,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "proposition",
+      "title": "Integer transverse matching from the master prefix template (constructed here)",
+      "label": "prop:integer-transport"
+    },
+    {
+      "line": 4036,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "Exact geometric inequality needed for slivers",
+      "label": null
+    },
+    {
+      "line": 4050,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Boundary shrinkage for plane slices in smooth uniformly convex cells",
+      "label": "lem:uniformly-convex-slice-boundary"
+    },
+    {
+      "line": 4096,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "References for the geometric inputs",
+      "label": null
+    },
+    {
+      "line": 4105,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Flat-norm stability under translation",
+      "label": "lem:flat-translate"
+    },
+    {
+      "line": 4146,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Flat-norm stability under small $C^0$ deformations",
+      "label": "lem:flat-C0-deform"
+    },
+    {
+      "line": 4187,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "{\\color{blue}Interface face-slices are cycles with controlled mass}",
+      "label": "lem:face-slice-cycle-mass"
+    },
+    {
+      "line": 4244,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "corollary",
+      "title": "Global flat-norm bound from weighted face control (sliver-compatible)",
+      "label": "cor:global-flat-weighted"
+    },
+    {
+      "line": 4320,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "Consistency with the constant-mass-per-sheet template regime",
+      "label": "rem:weighted-scaling"
+    },
+    {
+      "line": 4327,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "Scaling consequence: weighted gluing + packing",
+      "label": "rem:weighted-scaling"
+    },
+    {
+      "line": 4372,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "On vanishing per-piece masses (no hidden lower bound)",
+      "label": "rem:no-vanishing-piece-mass"
+    },
+    {
+      "line": 4392,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "Model scaling at the Bergman cell size",
+      "label": "rem:sliver-bergman-scaling"
+    },
+    {
+      "line": 4426,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "Handling slowly varying multiplicities",
+      "label": "rem:w1-multiplicity"
+    },
+    {
+      "line": 4437,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Flat norm of a cycle supported in diameter $\\lesssim h$",
+      "label": "lem:flat-diameter"
+    },
+    {
+      "line": 4469,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Template displacement $\\Rightarrow$ per-face flat-norm mismatch",
+      "label": "lem:template-displacement"
+    },
+    {
+      "line": 4525,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Template displacement with insertions/deletions",
+      "label": "lem:template-displacement-edits"
+    },
+    {
+      "line": 4567,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "If edits are an $O(h)$ fraction, they are $h^2$ in flat norm",
+      "label": "lem:template-edits-oh"
+    },
+    {
+      "line": 4591,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "Bounded global corrections do not spoil the $O(h)$ edit regime",
+      "label": "rem:bounded-corrections"
+    },
+    {
+      "line": 4601,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "Nested prefix-template scheme",
+      "label": "rem:nested-template-scheme"
+    },
+    {
+      "line": 4614,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "proposition",
+      "title": "Prefix templates $\\Rightarrow$ interface coherence up to $O(h)$ edits",
+      "label": "prop:prefix-template-coherence"
+    },
+    {
+      "line": 4651,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "theorem",
+      "title": "Global prefix-template activation / mass matching (template bookkeeping)",
+      "label": "thm:sliver-mass-matching-on-template"
+    },
+    {
+      "line": 4715,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "Status of the activation hypotheses in the corner-exit route",
+      "label": "rem:activation-hypotheses-status"
+    },
+    {
+      "line": 4731,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "proposition",
+      "title": "Flat-ball model: prefix activation is feasible",
+      "label": "prop:prefix-activation-flat-ball"
+    },
+    {
+      "line": 4768,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "corollary",
+      "title": "Holomorphic prefix activation on a Bergman-scale ball cell",
+      "label": "cor:prefix-activation-holo"
+    },
+    {
+      "line": 4800,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "A sufficient condition for the $O(h)$ face-edit regime",
+      "label": "lem:oh-face-edit-regime"
+    },
+    {
+      "line": 4839,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "Item \\textnormal{(iv)}: tail-heaviness and how it is enforced",
+      "label": "rem:iv-what-remains"
+    },
+    {
+      "line": 4853,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "Parameter tension and the chosen regime",
+      "label": "rem:param-tension"
+    },
+    {
+      "line": 4868,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "Hard Lefschetz reduction to $p\\le n/2$",
+      "label": "rem:lefschetz-reduction"
+    },
+    {
+      "line": 4882,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Mass tunability of plane slices in the flat model",
+      "label": "lem:mass-tunable"
+    },
+    {
+      "line": 4910,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "Sliver pieces and fixed-$m$ microstructure",
+      "label": "rem:sliver"
+    },
+    {
+      "line": 4920,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Quantizing a Lipschitz density on a sphere",
+      "label": "lem:sphere-quantize"
+    },
+    {
+      "line": 4968,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Nested equal-weight quantization of the uniform sphere",
+      "label": "lem:sphere-quantize-nested"
+    },
+    {
+      "line": 4995,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "proposition",
+      "title": "Flat ball model slivers achieve $W_1$ transverse approximation",
+      "label": "prop:flat-sliver-local"
+    },
+    {
+      "line": 5029,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "corollary",
+      "title": "Holomorphic upgrade on a ball cell",
+      "label": "cor:holomorphic-flat-sliver-local"
+    },
+    {
+      "line": 5084,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "Interpretation",
+      "label": null
+    },
+    {
+      "line": 5096,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "conjecture",
+      "title": "Local sliver-sheet realizability (quantitative target)",
+      "label": "conj:sliver-local"
+    },
+    {
+      "line": 5123,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "Why we ask for a smooth convex cell",
+      "label": "rem:sliver-cell-shape"
+    },
+    {
+      "line": 5136,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "Why templates should live at vertices (pan-vertex distribution)",
+      "label": null
+    },
+    {
+      "line": 5148,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "definition",
+      "title": "Global vertex template (flat cubical model)",
+      "label": "def:vertex-template"
+    },
+    {
+      "line": 5184,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "A concrete \\emph{complex} corner-exit translation template in a cube",
+      "label": "lem:complex-corner-exit-template"
+    },
+    {
+      "line": 5251,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Corner-exit simplex mass scale and no-heavy-tail uniformity",
+      "label": "lem:corner-exit-mass-scale"
+    },
+    {
+      "line": 5281,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Corner-exit translation templates for a quantitative family of complex planes",
+      "label": "lem:corner-exit-template-open"
+    },
+    {
+      "line": 5357,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "proposition",
+      "title": "Robust corner-exit templates for a finite direction net",
+      "label": "prop:corner-exit-template-net"
+    },
+    {
+      "line": 5408,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "Supplying corner-exit template families for the direction net",
+      "label": "rem:corner-exit-direction-net"
+    },
+    {
+      "line": 5433,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Corner-exit simplex slices have optimal boundary scaling",
+      "label": "lem:cube-vertex-slice-boundary"
+    },
+    {
+      "line": 5471,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "proposition",
+      "title": "Vertex-template prefix lengths match local mass budgets (L2, cube model)",
+      "label": "prop:vertex-template-mass-matching"
+    },
+    {
+      "line": 5542,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "proposition",
+      "title": "Vertex templates $\\Rightarrow$ face-level $O(h)$ edit regime (hypothesis \\textnormal{(iv)})",
+      "label": "prop:vertex-template-face-edits"
+    },
+    {
+      "line": 5605,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "corollary",
+      "title": "Corner-exit vertex templates verify the activation hypotheses (iii)\u2013(iv)",
+      "label": "cor:corner-exit-iii-iv"
+    },
+    {
+      "line": 5662,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "{\\color{blue}Referee map: downstream invocations of Proposition~\\ref{prop:holomorphic-corner-exit-L1}}",
+      "label": "rem:L1-downstream-map"
+    },
+    {
+      "line": 5680,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "proposition",
+      "title": "Global coherence across all direction labels (B1, packaged)",
+      "label": "prop:global-coherence-all-labels"
+    },
+    {
+      "line": 5769,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "corollary",
+      "title": "Flat boundary of the raw current in the weighted scaling regime",
+      "label": "cor:raw-boundary-flat-small"
+    },
+    {
+      "line": 5823,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "Making the ``prefix-balanced face population'' explicit",
+      "label": null
+    },
+    {
+      "line": 5831,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "definition",
+      "title": "Cubical grid parity and checkerboard vertex anchoring",
+      "label": "def:checkerboard-anchoring"
+    },
+    {
+      "line": 5844,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "definition",
+      "title": "Block-uniform vertex-code sequence",
+      "label": "def:block-uniform-codes"
+    },
+    {
+      "line": 5852,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Prefix discrepancy for block-uniform codes",
+      "label": "lem:prefix-discrepancy"
+    },
+    {
+      "line": 5896,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Two-sided face population is automatic under checkerboarding",
+      "label": "lem:two-sided-face-pop"
+    },
+    {
+      "line": 5924,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "proposition",
+      "title": "Checkerboard corner assignment implies a face-level $O(h)$ edit regime",
+      "label": "prop:checkerboard-face-oh-edit"
+    },
+    {
+      "line": 6007,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "Rounded cubes",
+      "label": "rem:smooth-cells"
+    },
+    {
+      "line": 6014,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "Where the remaining analytic difficulty really lives",
+      "label": "rem:bergman-not-enough"
+    },
+    {
+      "line": 6026,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Global quantitative graph lemma (contraction criterion)",
+      "label": "lem:global-graph-contraction"
+    },
+    {
+      "line": 6106,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "Memorializing the new checkpoint: ``graph on the whole cell''",
+      "label": "rem:graph-whole-cell"
+    },
+    {
+      "line": 6148,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Bergman-scale affine model approximation via $\\bar\\partial$-solving",
+      "label": "lem:bergman-affine-approx-hormander"
+    },
+    {
+      "line": 6178,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "proposition",
+      "title": "\\editamir{Cell-scale linear-model complete intersections are single-sheet graphs}",
+      "label": "prop:cell-scale-linear-model-graph"
+    },
+    {
+      "line": 6259,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Vertex-ball locality excludes nonincident faces",
+      "label": "lem:ball-excludes-faces"
+    },
+    {
+      "line": 6275,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "{\\color{blue}Fat corner simplices force ``if'' on the designated exit faces}",
+      "label": "lem:corner-simplex-hits-designated-faces"
+    },
+    {
+      "line": 6317,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "{\\color{blue}Uniform per--face boundary mass for fat corner simplices}",
+      "label": "lem:corner-simplex-face-mass"
+    },
+    {
+      "line": 6369,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Small-slope graph distortion on $k$-- and $(k\\!-\\!1)$--areas",
+      "label": "lem:small-graph-distortion"
+    },
+    {
+      "line": 6391,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "proposition",
+      "title": "{\\color{blue}Corner--exit footprint geometry is preserved under small--slope holomorphic graphs}",
+      "label": "prop:holomorphic-corner-exit-g1g2"
+    },
+    {
+      "line": 6432,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "proposition",
+      "title": "{\\color{blue}Corner--exit footprint geometry for small--slope graphs}",
+      "label": "prop:holomorphic-corner-exit-g1g2"
+    },
+    {
+      "line": 6495,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "proposition",
+      "title": "{\\color{blue}Corner--exit footprint geometry for small--slope graphs}",
+      "label": "prop:holomorphic-corner-exit-g1g2"
+    },
+    {
+      "line": 6660,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "corollary",
+      "title": "{\\color{blue}Corner--exit faces persist uniformly across a finite template family}",
+      "label": "cor:holomorphic-corner-exit-inherits"
+    },
+    {
+      "line": 6697,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "Recognition Science interpretation (updated)",
+      "label": "rem:rs-interpretation"
+    },
+    {
+      "line": 6716,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Sliver stability under $C^1$-graph perturbations",
+      "label": "lem:sliver-stability"
+    },
+    {
+      "line": 6777,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Packing bound for disjoint sliver graphs",
+      "label": "lem:sliver-packing"
+    },
+    {
+      "line": 6800,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "proposition",
+      "title": "Realizing a finite translation template locally",
+      "label": "prop:finite-template"
+    },
+    {
+      "line": 6840,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "proposition",
+      "title": "{\\color{blue}Corner--exit: $L^1$ interface mass control on boundary faces}",
+      "label": "prop:holomorphic-corner-exit-L1"
+    },
+    {
+      "line": 6899,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "proposition",
+      "title": "{\\color{blue}Corner--exit: $L^1$ interface mass control on boundary faces}",
+      "label": "prop:holomorphic-corner-exit-L1"
+    },
+    {
+      "line": 6965,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "Vertex-star coherence (how to make the same template live across adjacent cubes)",
+      "label": "rem:vertex-star-coherence"
+    },
+    {
+      "line": 6980,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Slow variation under rounding of Lipschitz targets",
+      "label": "lem:slow-variation-rounding"
+    },
+    {
+      "line": 7013,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Slow variation persists under $0$--$1$ discrepancy rounding",
+      "label": "lem:slow-variation-discrepancy"
+    },
+    {
+      "line": 7057,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Flat-norm control of the gluing mismatch",
+      "label": "lem:flatnorm-gluing-mismatch"
+    },
+    {
+      "line": 7080,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "Referee note: this is the quantitative bottleneck",
+      "label": "rem:lean-bottleneck-flatnorm"
+    },
+    {
+      "line": 7090,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Federer--Fleming filling on $X$ for bounding cycles",
+      "label": "lem:FF-filling-X"
+    },
+    {
+      "line": 7133,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "proposition",
+      "title": "Microstructure/gluing estimate",
+      "label": "prop:glue-gap"
+    },
+    {
+      "line": 7173,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "Choosing the glue scale to make the correction negligible",
+      "label": "rem:glue-scaling"
+    },
+    {
+      "line": 7219,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Fixed-dimension discrepancy rounding (B\\'ar\\'any--Grinberg)",
+      "label": "lem:barany-grinberg"
+    },
+    {
+      "line": 7266,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "",
+      "label": null
+    },
+    {
+      "line": 7322,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Integral periods of integral cycles",
+      "label": "lem:integral-periods"
+    },
+    {
+      "line": 7342,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Lattice discreteness",
+      "label": "lem:lattice-discreteness"
+    },
+    {
+      "line": 7354,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "proposition",
+      "title": "Integral cohomology constraints",
+      "label": "prop:cohomology-match"
+    },
+    {
+      "line": 7569,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "proposition",
+      "title": "Almost--calibration and global mass convergence for the glued cycles",
+      "label": "prop:almost-calibration"
+    },
+    {
+      "line": 7672,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "The correction current need not be positive",
+      "label": "rem:correction-not-positive"
+    },
+    {
+      "line": 7687,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "theorem",
+      "title": "SYR Realization",
+      "label": "thm:syr-realization"
+    },
+    {
+      "line": 7750,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "equation",
+      "title": "",
+      "label": "eq:mass-lsc"
+    },
+    {
+      "line": 7812,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "corollary",
+      "title": "SYR limit is a holomorphic (hence algebraic) cycle",
+      "label": "cor:syr-limit-holomorphic-chain"
+    },
+    {
+      "line": 7829,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "The ``density vs.\\ mass'' objection",
+      "label": "rem:density-mass"
+    },
+    {
+      "line": 7845,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "Harvey--Lawson applicability",
+      "label": "rem:hl-applicable"
+    },
+    {
+      "line": 7873,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "The gluing/non-integrability objection",
+      "label": "rem:gluing"
+    },
+    {
+      "line": 7919,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "Why the construction succeeds",
+      "label": "rem:why-success"
+    },
+    {
+      "line": 7948,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "theorem",
+      "title": "Automatic SYR for cone-valued forms",
+      "label": "thm:automatic-syr"
+    },
+    {
+      "line": 8009,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "definition",
+      "title": "Cone--positive class (smooth $K_p$--positive)",
+      "label": "lem:kahler-positive"
+    },
+    {
+      "line": 8016,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Strict interior positivity of the K\\\"ahler power",
+      "label": "lem:kahler-positive"
+    },
+    {
+      "line": 8042,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "Signed Decomposition",
+      "label": "lem:signed-decomp"
+    },
+    {
+      "line": 8080,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "lemma",
+      "title": "$\\omega^p$ is algebraic",
+      "label": "lem:gamma-minus-alg"
+    },
+    {
+      "line": 8110,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "theorem",
+      "title": "Cone--positive classes are algebraic",
+      "label": "thm:effective-algebraic"
+    },
+    {
+      "line": 8132,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "Chow/GAGA for analytic subvarieties",
+      "label": "rem:chow-gaga"
+    },
+    {
+      "line": 8143,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "theorem",
+      "title": "Hodge Conjecture for rational $(p,p)$ classes",
+      "label": "thm:main-hodge"
+    },
+    {
+      "line": 8192,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "corollary",
+      "title": "Full Hodge conjecture",
+      "label": "cor:full-hodge"
+    },
+    {
+      "line": 8205,
+      "section": "From Cone\u2013Valued Minimizers to Calibrated Currents",
+      "env": "remark",
+      "title": "Why signed decomposition is the key",
+      "label": null
+    }
+  ],
+  "dup_labels": [
+    [
+      "lem:radial-min",
+      905,
+      946
+    ],
+    [
+      "prop:dist-cal-properties",
+      1152,
+      1203
+    ],
+    [
+      "lem:caratheodory-general",
+      2867,
+      2903
+    ],
+    [
+      "rem:weighted-scaling",
+      4320,
+      4327
+    ],
+    [
+      "prop:holomorphic-corner-exit-g1g2",
+      6391,
+      6432
+    ],
+    [
+      "prop:holomorphic-corner-exit-g1g2",
+      6391,
+      6495
+    ],
+    [
+      "prop:holomorphic-corner-exit-L1",
+      6840,
+      6899
+    ],
+    [
+      "lem:kahler-positive",
+      8009,
+      8016
+    ]
+  ]
+}
