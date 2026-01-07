@@ -335,10 +335,13 @@ def boundary (T : Current n X (k + 1)) : Current n X k where
     exact T.is_linear c (smoothExtDeriv ω₁) (smoothExtDeriv ω₂)
   is_continuous := T.is_continuous.comp smoothExtDeriv_continuous
   bound := by
-    -- `smoothExtDeriv` is the zero map in this development, so `boundary T` is the zero current.
-    refine ⟨0, ?_⟩
+    -- The bound follows from T's bound and continuity of smoothExtDeriv.
+    -- Stage 4: Formalize the bound using comass estimates.
+    obtain ⟨C, hC⟩ := T.bound
+    refine ⟨C, ?_⟩
     intro ω
-    simp [smoothExtDeriv, extDerivLinearMap, map_zero' T]
+    -- Use T's bound on dω; need comass(dω) ≤ const * comass(ω) (controlled by smoothness)
+    sorry
 
 def isCycle (T : Current n X (k + 1)) : Prop := T.boundary = 0
 

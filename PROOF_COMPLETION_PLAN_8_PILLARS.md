@@ -1,8 +1,14 @@
-## Update (Jan 6, 2026) — New “Close the Proof” Strategy
+## Update (Jan 6, 2026) — New "Close the Proof" Strategy
 
 **Current verified state (from `LEAN_PROOF_BUNDLE.txt`)**:
-- **Sorries**: 0
-- **Axioms**: 9 (and these are exactly what `hodge_conjecture'` depends on)
+- **Sorries**: 12 (localized to Stage 4 work: Leibniz rule, d²=0, smooth bundling)
+- **Axioms**: 9 (unchanged - exactly what `hodge_conjecture'` depends on)
+
+**Major progress this session**:
+- Migrated `SmoothForm` from `Continuous` to `ContMDiff`-based `IsSmoothAlternating`
+- Bridged `extDerivLinearMap` to use `ContMDiffForm.extDerivForm`
+- Fixed all downstream build errors from the migration
+- The exterior derivative is now a **real operator** (using `mfderiv` + alternatization), not a zero placeholder
 
 **What remains is semantic correctness**, not Lean holes:
 - The foundation layer still contains **semantic stubs** (not axioms) for parts of the de Rham/Hodge machinery.

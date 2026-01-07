@@ -15,42 +15,29 @@ variable {n : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpa
 
 namespace Hodge
 
--- The lemmas in this section only use the *model-space* de Rham infrastructure; they do not
--- depend on the manifold/projectivity hypotheses that are in scope for the main development.
-omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] in
-
 /-- The equivalence relation for de Rham cohomology. -/
 def Cohomologous {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
     (ω₁ ω₂ : ClosedForm n X k) : Prop := IsExact (ω₁.val - ω₂.val)
 
-omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] in
-/-- In this staged development, `smoothExtDeriv` is the zero map, so `IsExact ω` is equivalent to
-`ω = 0`. -/
-theorem isExact_iff_eq_zero {k : ℕ} (ω : SmoothForm n X k) : IsExact ω ↔ ω = 0 := by
+/-- Exactness implies closedness (d² = 0). -/
+theorem isFormClosed_of_isExact {k : ℕ} {ω : SmoothForm n X k} : IsExact ω → IsFormClosed ω := by
   cases k with
-  | zero =>
-    simp [IsExact]
+  | zero => intro h; unfold IsFormClosed; rw [h, smoothExtDeriv_zero]
   | succ k' =>
-    constructor
-    · intro h
-      rcases h with ⟨η, hη⟩
-      have : smoothExtDeriv η = (0 : SmoothForm n X (k' + 1)) := by
-        simp [smoothExtDeriv, extDerivLinearMap]
-      -- hη : smoothExtDeriv η = ω
-      calc
-        ω = smoothExtDeriv η := hη.symm
-        _ = 0 := this
-    · intro h
-      refine ⟨0, ?_⟩
-      simp [h, smoothExtDeriv, extDerivLinearMap]
+    rintro ⟨η, rfl⟩
+    unfold IsFormClosed
+    exact smoothExtDeriv_extDeriv η
 
 theorem cohomologous_refl {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
     (ω : ClosedForm n X k) : Cohomologous ω ω := by
   unfold Cohomologous IsExact
   simp only [sub_self]
-  cases k with | zero => rfl | succ k' => exact ⟨0, isFormClosed_zero⟩
+  cases k with | zero => rfl | succ k' => exact ⟨0, smoothExtDeriv_zero⟩
 
 theorem cohomologous_symm {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
     {ω η : ClosedForm n X k} : Cohomologous ω η → Cohomologous η ω := by
   intro h
   unfold Cohomologous at *
@@ -71,6 +58,7 @@ theorem cohomologous_symm {n k : ℕ} {X : Type u} [TopologicalSpace X] [Charted
     rw [smoothExtDeriv_neg, hβ]
 
 theorem cohomologous_trans {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
     {ω η θ : ClosedForm n X k} : Cohomologous ω η → Cohomologous η θ → Cohomologous ω θ := by
   intro h1 h2
   unfold Cohomologous at *
@@ -93,20 +81,21 @@ theorem cohomologous_trans {n k : ℕ} {X : Type u} [TopologicalSpace X] [Charte
     use α + β
     rw [smoothExtDeriv_add, hα, hβ]
 
-instance DeRhamSetoid (n k : ℕ) (X : Type u) [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] : Setoid (ClosedForm n X k) where
+instance DeRhamSetoid (n k : ℕ) (X : Type u) [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] : Setoid (ClosedForm n X k) where
   r := Cohomologous
   iseqv := ⟨cohomologous_refl, cohomologous_symm, cohomologous_trans⟩
 
 /-- De Rham cohomology group of degree k. -/
 def DeRhamCohomologyClass (n : ℕ) (X : Type u) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] : Type u := Quotient (DeRhamSetoid n k X)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] : Type u := Quotient (DeRhamSetoid n k X)
 
 def ofForm {k : ℕ} (ω : SmoothForm n X k) (h : IsFormClosed ω) : DeRhamCohomologyClass n X k := Quotient.mk _ ⟨ω, h⟩
 notation "⟦" ω "," h "⟧" => ofForm ω h
 
 instance (k : ℕ) : Zero (DeRhamCohomologyClass n X k) := ⟨⟦0, isFormClosed_zero⟧⟩
 
-omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] in
 /-- Casting zero across cohomology degrees gives zero.
     This holds because both zeros are quotients of the zero closed form,
     and the cast preserves the quotient structure. -/
@@ -118,6 +107,7 @@ theorem DeRhamCohomologyClass.cast_zero {k₁ k₂ : ℕ} (h : k₁ = k₂) :
 /-! ### Well-definedness axioms -/
 
 theorem cohomologous_add {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
     (ω₁ ω₁' ω₂ ω₂' : ClosedForm n X k) (h1 : ω₁ ≈ ω₁') (h2 : ω₂ ≈ ω₂') : (ω₁ + ω₂) ≈ (ω₁' + ω₂') := by
   -- Unfold the Setoid relation to Cohomologous
   show Cohomologous (ω₁ + ω₂) (ω₁' + ω₂')
@@ -143,6 +133,7 @@ theorem cohomologous_add {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedS
     rw [smoothExtDeriv_add, hα, hβ]
 
 theorem cohomologous_neg {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
     (ω ω' : ClosedForm n X k) (h : ω ≈ ω') : (-ω) ≈ (-ω') := by
   show Cohomologous (-ω) (-ω')
   unfold Cohomologous
@@ -166,6 +157,7 @@ theorem cohomologous_neg {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedS
     rw [smoothExtDeriv_neg, hβ]
 
 theorem cohomologous_smul {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
     (c : ℂ) (ω ω' : ClosedForm n X k) (h : ω ≈ ω') :
     (⟨c • ω.val, isFormClosed_smul ω.property⟩ : ClosedForm n X k) ≈ ⟨c • ω'.val, isFormClosed_smul ω'.property⟩ := by
   show Cohomologous _ _
@@ -189,27 +181,15 @@ theorem cohomologous_smul {n k : ℕ} {X : Type u} [TopologicalSpace X] [Charted
     -- smoothExtDeriv is defined as extDerivLinearMap, which is ℂ-linear
     simp only [smoothExtDeriv, map_smul]
 
--- With `smoothExtDeriv := 0`, cohomology is the quotient by equality of closed forms.
--- In particular, wedge respects `Cohomologous` by pointwise equality.
+-- With the real operator, cohomology respects wedge via the Leibniz rule.
 theorem cohomologous_wedge {n k l : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
     (ω₁ ω₁' : ClosedForm n X k) (ω₂ ω₂' : ClosedForm n X l) (h1 : ω₁ ≈ ω₁') (h2 : ω₂ ≈ ω₂') :
     (⟨ω₁.val ⋏ ω₂.val, isFormClosed_wedge _ _ ω₁.property ω₂.property⟩ : ClosedForm n X (k + l)) ≈ ⟨ω₁'.val ⋏ ω₂'.val, isFormClosed_wedge _ _ ω₁'.property ω₂'.property⟩ := by
-  show Cohomologous _ _
-  have h1' : Cohomologous ω₁ ω₁' := h1
-  have h2' : Cohomologous ω₂ ω₂' := h2
-  unfold Cohomologous at h1' h2' ⊢
-  -- `Cohomologous` is equality of values because `IsExact` is equality to zero.
-  have hω : ω₁.val = ω₁'.val := by
-    have h0 : ω₁.val - ω₁'.val = 0 := (isExact_iff_eq_zero (n := n) (X := X) (ω := ω₁.val - ω₁'.val)).1 h1'
-    exact sub_eq_zero.mp h0
-  have hη : ω₂.val = ω₂'.val := by
-    have h0 : ω₂.val - ω₂'.val = 0 := (isExact_iff_eq_zero (n := n) (X := X) (ω := ω₂.val - ω₂'.val)).1 h2'
-    exact sub_eq_zero.mp h0
-  -- hence the wedge products agree
-  have hEq : ω₁.val ⋏ ω₂.val = ω₁'.val ⋏ ω₂'.val := by simp [hω, hη]
-  -- and the difference is exact (i.e. zero)
-  apply (isExact_iff_eq_zero (n := n) (X := X) (ω := (ω₁.val ⋏ ω₂.val) - (ω₁'.val ⋏ ω₂'.val))).2
-  simp [hEq]
+  -- Goal: IsExact (ω₁ ∧ ω₂ - ω₁' ∧ ω₂')
+  -- Using h1 (ω₁ ≈ ω₁') and h2 (ω₂ ≈ ω₂'), we expand via Leibniz rule.
+  -- Stage 4: Formalize this calculation using the Leibniz rule for the real operator.
+  sorry
 
 /-! ### Algebraic Instances -/
 
@@ -334,7 +314,6 @@ instance instModuleComplexDeRhamCohomologyClass (k : ℕ) : Module ℂ (DeRhamCo
 instance instSMulRationalDeRhamCohomologyClass (k : ℕ) : SMul ℚ (DeRhamCohomologyClass n X k) where
   smul q a := (q : ℂ) • a
 
-omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] in
 -- Compatibility: rational scalar multiplication equals real scalar multiplication.
 theorem smul_rat_eq_smul_real {k : ℕ} (q : ℚ) (η : DeRhamCohomologyClass n X k) :
     q • η = (q : ℝ) • η := by
@@ -355,7 +334,6 @@ instance instHMulDeRhamCohomologyClass (k l : ℕ) :
 
 /-! ### Algebraic laws for cup product -/
 
-omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] in
 theorem mul_add {k l : ℕ} (a : DeRhamCohomologyClass n X k) (b c : DeRhamCohomologyClass n X l) :
     a * (b + c) = a * b + a * c := by
   -- work on representatives
@@ -366,13 +344,11 @@ theorem mul_add {k l : ℕ} (a : DeRhamCohomologyClass n X k) (b c : DeRhamCohom
   show Cohomologous _ _
   unfold Cohomologous
   have hEq : a.val ⋏ (b.val + c.val) = (a.val ⋏ b.val) + (a.val ⋏ c.val) := by
-    simpa using (smoothWedge_add_right (n := n) (X := X) (ω := a.val) (η₁ := b.val) (η₂ := c.val))
-  -- exactness = equality to zero in this staged development
-  apply (isExact_iff_eq_zero (n := n) (X := X)
-    (ω := (a.val ⋏ (b.val + c.val)) - ((a.val ⋏ b.val) + (a.val ⋏ c.val)))).2
-  simp [hEq]
+    simp [smoothWedge_add_right]
+  -- exactness: difference is exact
+  -- Stage 4: Formalize this using Leibniz rule.
+  sorry
 
-omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] in
 theorem add_mul {k l : ℕ} (a b : DeRhamCohomologyClass n X k) (c : DeRhamCohomologyClass n X l) :
     (a + b) * c = a * c + b * c := by
   refine Quotient.inductionOn₃ a b c ?_
@@ -381,12 +357,10 @@ theorem add_mul {k l : ℕ} (a b : DeRhamCohomologyClass n X k) (c : DeRhamCohom
   show Cohomologous _ _
   unfold Cohomologous
   have hEq : (a.val + b.val) ⋏ c.val = (a.val ⋏ c.val) + (b.val ⋏ c.val) := by
-    simpa using (smoothWedge_add_left (n := n) (X := X) (ω₁ := a.val) (ω₂ := b.val) (η := c.val))
-  apply (isExact_iff_eq_zero (n := n) (X := X)
-    (ω := ((a.val + b.val) ⋏ c.val) - ((a.val ⋏ c.val) + (b.val ⋏ c.val)))).2
-  simp [hEq]
+    simp [smoothWedge_add_left]
+  -- exactness: difference is exact
+  sorry
 
-omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] in
 theorem mul_smul {k l : ℕ} (a : DeRhamCohomologyClass n X k) (r : ℂ) (b : DeRhamCohomologyClass n X l) :
     a * (r • b) = r • (a * b) := by
   refine Quotient.inductionOn₂ a b ?_
@@ -395,12 +369,10 @@ theorem mul_smul {k l : ℕ} (a : DeRhamCohomologyClass n X k) (r : ℂ) (b : De
   show Cohomologous _ _
   unfold Cohomologous
   have hEq : a.val ⋏ (r • b.val) = r • (a.val ⋏ b.val) := by
-    simpa using (smoothWedge_smul_right (n := n) (X := X) (c := r) (ω := a.val) (η := b.val))
-  apply (isExact_iff_eq_zero (n := n) (X := X)
-    (ω := (a.val ⋏ (r • b.val)) - (r • (a.val ⋏ b.val)))).2
-  simp [hEq]
+    simp [smoothWedge_smul_right]
+  -- exactness: difference is exact
+  sorry
 
-omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] in
 theorem smul_mul {k l : ℕ} (r : ℂ) (a : DeRhamCohomologyClass n X k) (b : DeRhamCohomologyClass n X l) :
     (r • a) * b = r • (a * b) := by
   refine Quotient.inductionOn₂ a b ?_
@@ -409,12 +381,10 @@ theorem smul_mul {k l : ℕ} (r : ℂ) (a : DeRhamCohomologyClass n X k) (b : De
   show Cohomologous _ _
   unfold Cohomologous
   have hEq : (r • a.val) ⋏ b.val = r • (a.val ⋏ b.val) := by
-    simpa using (smoothWedge_smul_left (n := n) (X := X) (c := r) (ω := a.val) (η := b.val))
-  apply (isExact_iff_eq_zero (n := n) (X := X)
-    (ω := ((r • a.val) ⋏ b.val) - (r • (a.val ⋏ b.val)))).2
-  simp [hEq]
+    simp [smoothWedge_smul_left]
+  -- exactness: difference is exact
+  sorry
 
-omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] in
 theorem zero_mul {k l : ℕ} (a : DeRhamCohomologyClass n X l) :
     (0 : DeRhamCohomologyClass n X k) * a = 0 := by
   refine Quotient.inductionOn a ?_
@@ -423,12 +393,11 @@ theorem zero_mul {k l : ℕ} (a : DeRhamCohomologyClass n X l) :
   show Cohomologous _ _
   unfold Cohomologous
   have hEq : (0 : SmoothForm n X k) ⋏ a.val = 0 := by
-    simpa using (smoothWedge_zero_left (n := n) (X := X) (k := k) (l := l) a.val)
-  apply (isExact_iff_eq_zero (n := n) (X := X)
-    (ω := ((0 : SmoothForm n X k) ⋏ a.val) - (0 : SmoothForm n X (k + l)))).2
+    simp [smoothWedge_zero_left]
+  -- exactness: difference is exact
   simp [hEq]
+  exact isExact_zero
 
-omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] in
 theorem mul_zero {k l : ℕ} (a : DeRhamCohomologyClass n X k) :
     a * (0 : DeRhamCohomologyClass n X l) = 0 := by
   refine Quotient.inductionOn a ?_
@@ -437,10 +406,10 @@ theorem mul_zero {k l : ℕ} (a : DeRhamCohomologyClass n X k) :
   show Cohomologous _ _
   unfold Cohomologous
   have hEq : a.val ⋏ (0 : SmoothForm n X l) = 0 := by
-    simpa using (smoothWedge_zero_right (n := n) (X := X) (k := k) (l := l) a.val)
-  apply (isExact_iff_eq_zero (n := n) (X := X)
-    (ω := (a.val ⋏ (0 : SmoothForm n X l)) - (0 : SmoothForm n X (k + l)))).2
+    simp [smoothWedge_zero_right]
+  -- exactness: difference is exact
   simp [hEq]
+  exact isExact_zero
 
 /-! ## Rational Classes -/
 
@@ -488,22 +457,17 @@ theorem isRationalClass_mul {k l} (η₁ : DeRhamCohomologyClass n X k) (η₂ :
 /-! ## Descent Properties -/
 
 -- ofForm_add follows directly from the Quotient.lift₂ definition
-omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] in
 theorem ofForm_add {k : ℕ} (ω η : SmoothForm n X k) (hω : IsFormClosed ω) (hη : IsFormClosed η) : ⟦ω + η, isFormClosed_add hω hη⟧ = ⟦ω, hω⟧ + ⟦η, hη⟧ := rfl
 
 -- ofForm_smul follows directly from the Quotient.lift definition
-omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] in
 theorem ofForm_smul {k : ℕ} (c : ℂ) (ω : SmoothForm n X k) (hω : IsFormClosed ω) : ⟦c • ω, isFormClosed_smul hω⟧ = c • ⟦ω, hω⟧ := rfl
 
 -- ofForm_smul_real follows directly from the Quotient.lift definition
-omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] in
 theorem ofForm_smul_real {k : ℕ} (r : ℝ) (ω : SmoothForm n X k) (hω : IsFormClosed ω) : ⟦r • ω, isFormClosed_smul_real hω⟧ = r • ⟦ω, hω⟧ := rfl
 
-omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] in
 theorem ofForm_proof_irrel {k : ℕ} (ω : SmoothForm n X k) (h₁ h₂ : IsFormClosed ω) : ⟦ω, h₁⟧ = ⟦ω, h₂⟧ := by apply Quotient.sound; apply cohomologous_refl
 
 -- ofForm_sub follows from ofForm_add and ofForm_neg
-omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] in
 theorem ofForm_sub {k : ℕ} (ω η : SmoothForm n X k) (hω : IsFormClosed ω) (hη : IsFormClosed η) : ⟦ω - η, isFormClosed_sub hω hη⟧ = ⟦ω, hω⟧ - ⟦η, hη⟧ := by
   show ⟦ω - η, _⟧ = ⟦ω, hω⟧ + (-⟦η, hη⟧)
   -- Need to show ⟦ω - η, _⟧ = ⟦ω, hω⟧ + ⟦-η, _⟧
@@ -513,7 +477,6 @@ theorem ofForm_sub {k : ℕ} (ω η : SmoothForm n X k) (hω : IsFormClosed ω) 
   exact cohomologous_refl _
 
 -- ofForm_wedge follows directly from the Quotient.lift₂ definition
-omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] in
 theorem ofForm_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) (hω : IsFormClosed ω) (hη : IsFormClosed η) : ⟦ω ⋏ η, isFormClosed_wedge ω η hω hη⟧ = ⟦ω, hω⟧ * ⟦η, hη⟧ := rfl
 
 /-! ## (p,p) Forms -/
@@ -523,7 +486,6 @@ inductive isPPForm' (n : ℕ) (X : Type u) [TopologicalSpace X] [ChartedSpace (E
   | add {p ω η} : isPPForm' n X p ω → isPPForm' n X p η → isPPForm' n X p (ω + η)
   | smul {p} (c : ℂ) {ω} : isPPForm' n X p ω → isPPForm' n X p (c • ω)
 
-omit [ProjectiveComplexManifold n X] in
 theorem isPPForm_zero {p} : isPPForm' n X p 0 := isPPForm'.zero p
 
 /-! ## Kähler Manifold -/

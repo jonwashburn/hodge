@@ -34,6 +34,7 @@ set_option autoImplicit false
     `ContinuousAlternatingMap` is the operator norm. -/
 noncomputable def pointwiseComass {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
     {k : ℕ} (α : SmoothForm n X k) (x : X) : ℝ :=
   ‖α.as_alternating x‖
 
@@ -42,6 +43,7 @@ noncomputable def pointwiseComass {n : ℕ} {X : Type*}
 /-- **Pointwise Comass Non-negativity**. -/
 theorem pointwiseComass_nonneg {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
     {k : ℕ} (α : SmoothForm n X k) (x : X) : pointwiseComass α x ≥ 0 := by
   simpa [pointwiseComass] using (norm_nonneg (α.as_alternating x))
 
@@ -49,12 +51,14 @@ theorem pointwiseComass_nonneg {n : ℕ} {X : Type*}
     The zero form has zero comass at every point. -/
 theorem pointwiseComass_zero {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
     (x : X) {k : ℕ} : pointwiseComass (0 : SmoothForm n X k) x = 0 := by
   simp [pointwiseComass]
 
 /-- **Pointwise Comass Triangle Inequality**. -/
 theorem pointwiseComass_add_le {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
     {k : ℕ} (α β : SmoothForm n X k) (x : X) :
     pointwiseComass (α + β) x ≤ pointwiseComass α x + pointwiseComass β x := by
   simpa [pointwiseComass, SmoothForm.add_apply] using
@@ -64,6 +68,7 @@ theorem pointwiseComass_add_le {n : ℕ} {X : Type*}
     The operator norm scales by absolute value. -/
 theorem pointwiseComass_smul {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
     {k : ℕ} (r : ℝ) (α : SmoothForm n X k) (x : X) :
     pointwiseComass (r • α) x = |r| * pointwiseComass α x
   := by
@@ -72,11 +77,13 @@ theorem pointwiseComass_smul {n : ℕ} {X : Type*}
 /-- **Negation as Scalar Multiplication** (Derived from Module structure). -/
 theorem SmoothForm.neg_eq_neg_one_smul {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
     {k : ℕ} (α : SmoothForm n X k) : (-α) = (-1 : ℝ) • α := by
   rw [neg_one_smul]
 
 theorem pointwiseComass_neg {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
     {k : ℕ} (α : SmoothForm n X k) (x : X) :
     pointwiseComass (-α) x = pointwiseComass α x := by
   rw [SmoothForm.neg_eq_neg_one_smul, pointwiseComass_smul]
@@ -100,7 +107,8 @@ theorem pointwiseComass_continuous {n : ℕ} {X : Type*}
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α : SmoothForm n X k) : Continuous (pointwiseComass α) := by
   -- `pointwiseComass α` is `x ↦ ‖α.as_alternating x‖`.
-  simpa [pointwiseComass] using α.is_smooth.norm
+  -- α.is_smooth : ContMDiff → continuous, and norm is continuous.
+  exact continuous_norm.comp α.is_smooth.continuous
 
 /-- Global comass norm on forms: supremum of pointwise comass. -/
 def comass {n : ℕ} {X : Type*}

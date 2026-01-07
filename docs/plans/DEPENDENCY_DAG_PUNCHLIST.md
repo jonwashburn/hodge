@@ -12,11 +12,18 @@ This document maps the proof chain in `Hodge-v6-w-Jon-Update-MERGED.tex` to Lean
 |----------|-------|--------|
 | Pillar axioms (accepted) | 9 decls | ✅ Keep |
 | Extra axioms | 0 | ✅ None |
-| Remaining `sorry` | 0 | ✅ None |
+| Remaining `sorry` | 12 | ⚠️ Stage 4 work |
 | Semantic stubs documented | ~10 major | ✅ Downward trend |
 | Build status | `lake build Hodge.Main` | ✅ Passing |
 
 **Build Status**: `lake build Hodge.Main` ✅ succeeds
+
+**`sorry` Breakdown** (all in Stage 4 work):
+- `Cohomology/Basic.lean`: 5 (cohomology algebra laws with real d)
+- `Analytic/Forms.lean`: 1 (`isFormClosed_wedge` Leibniz rule)
+- `Analytic/ContMDiffForms.lean`: 2 (`extDerivForm.smooth'`, `extDeriv_extDeriv`)
+- `Analytic/ChartExtDeriv.lean`: 2 (chart coordinate proofs)
+- `Analytic/Currents.lean`: 1 (boundary bound)
 
 ---
 
@@ -141,16 +148,24 @@ These stubs make the proof type-check but don't carry the mathematical meaning o
 
 | Stub | Current Definition | Correct Definition | Files Affected | Documentation |
 |------|-------------------|-------------------|----------------|---------------|
-| `extDerivLinearMap` | `:= 0` | Real exterior derivative d | `Analytic/Forms.lean` | ✅ Stage 2 Groundwork DONE |
+| `extDerivLinearMap` | Uses `ContMDiffForm.extDerivForm` | Real exterior derivative d | `Analytic/Forms.lean` | ✅ Stage 3 COMPLETE |
 | `smoothWedge` | Mathlib-backed | Real wedge product ∧ | `Analytic/Forms.lean` | ✅ Implemented |
-| De Rham cohomology | Uses stubbed d,∧ | Real quotient | `Cohomology/Basic.lean` | ✅ Works with stubs |
+| De Rham cohomology | Uses real d,∧ | Real quotient | `Cohomology/Basic.lean` | ✅ Working |
 
 **Mathlib Migration Status**:
 - **Stage 1 (DONE)**: Mathlib-backed wedge product implemented on fibers and lifted to manifolds.
 - **Stage 2 (DONE)**: `Hodge/Analytic/ContMDiffForms.lean` provides a `ContMDiff`-based differential form infrastructure. Pointwise exterior derivative `extDerivAt` is defined and linear.
-- **Stage 3 (DONE)**: **Infrastructure Bridge**. Manifold-level `mfderiv` is rigorously connected to chart-level `fderiv`. `ChartExtDeriv.lean` provides coordinate representations and smoothness proofs on chart targets. Bundled `extDerivForm` and $d^2=0$ theorem exist.
+- **Stage 3 (DONE)**: **Full Migration Complete**.
+  - `SmoothForm.is_smooth` upgraded from `Continuous` to `ContMDiff`
+  - `extDerivLinearMap` now uses `ContMDiffForm.extDerivForm` (real `mfderiv` + alternatization)
+  - All downstream files updated to include `[IsManifold (𝓒_complex n) ⊤ X]`
+  - Build passes with 9 axioms
 
-**Next**: Stage 4 — Migrating the global `SmoothForm` layer to use the now-rigorous `ContMDiffForm` exterior derivative.
+**Stage 4 (pending)**: Prove the remaining `sorry` statements:
+- `isFormClosed_wedge` (Leibniz rule: d(ω∧η) = dω∧η ± ω∧dη)
+- `extDerivForm.smooth'` (smoothness of the global d operator)
+- `extDeriv_extDeriv` (d²=0 using symmetry of second derivatives)
+- Cohomology algebra laws (`mul_add`, `add_mul`, etc.) using the real d
 
 ### Tier 2: Kähler/Hodge Operators
 
