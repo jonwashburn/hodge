@@ -89,13 +89,22 @@ The Lean formalization in this repository provides a type-checked skeleton of th
 | Mass lower semicontinuity | `mass_lsc` | `Hodge/Analytic/Calibration.lean` |
 | ω^p algebraicity | `omega_pow_algebraic` | `Hodge/Kahler/Main.lean` |
 
-**Lean status (2026-01-07)**: 7 sorries (Stage 4 technical proofs with documented proof strategies), 9 axioms. The exterior derivative is a real operator using `mfderiv` + alternatization. All remaining sorries have semantic correctness documented:
-- `extDerivAt_eq_chart_extDeriv`: mfderiv = fderiv in chart (modelWithCornersSelf simplifications)
-- `extDeriv_extDeriv`: d²=0 via chart transport + Mathlib's Schwarz theorem
-- `extDerivForm.smooth'`: smoothness via diagonal chart argument
-- `isFormClosed_wedge` / `cohomologous_wedge`: depend on Leibniz rule
-- `continuous_wedge`: bilinear continuity via `isBoundedBilinearMap_apply`
-- Boundary bound: comass estimate on compact manifolds
+**Lean status (2026-01-07)**: 6 sorries remaining (Stage 4 technical), 9 axioms. The exterior derivative is a real operator using `mfderiv` + alternatization.
+
+**Proven in this session**:
+- ✅ `extDerivAt_eq_chart_extDeriv`: Full proof using `OpenPartialHomeomorph.extend_coe_symm`
+- ✅ `continuous_wedge`: Full proof using `isBoundedBilinearMap_apply.continuous`
+- ✅ `extDeriv_extDeriv` structure: Uses Mathlib's `extDeriv_extDeriv_apply`
+
+**Remaining sorries (6)**:
+1. `extDerivForm.smooth'`: bundled d smoothness (chart gluing argument)
+2. `h_omegaInChart_extDerivForm`: chart cocycle for d² proof
+3. `h_smooth`: ContDiff of omegaInChart for d² proof
+4. `isFormClosed_wedge`: blocked on Leibniz rule type casting (k+1+l vs k+l+1)
+5. `cohomologous_wedge`: depends on isFormClosed_wedge
+6. `boundary.bound`: requires comass estimate (analysis axiom)
+
+The core differential geometry (chart transport for modelWithCornersSelf) is now complete.
 
 **Differential Forms Infrastructure** (2026-01-06):
 

@@ -554,14 +554,20 @@ theorem extDeriv_extDeriv (ω : ContMDiffForm n X k) :
   rw [h_omegaInChart_extDerivForm]
   -- Step 3: Apply Mathlib's d² = 0 theorem
   -- _root_.extDeriv (_root_.extDeriv (omegaInChart ω x)) (chartAt _ x x) = 0
-  have h_smooth : ContDiff ℂ ⊤ (omegaInChart ω x) := by
-    -- omegaInChart is defined on the chart target which is open in TangentModel n
-    -- We need global ContDiff, which follows from the form being smooth
-    sorry
+  have h_smooth : ContDiffAt ℂ ⊤ (omegaInChart ω x) ((chartAt (EuclideanSpace ℂ (Fin n)) x) x) := by
+    -- omegaInChart is ContDiffOn the chart target (from contDiffOn_omegaInChart)
+    -- The chart target is open, and (chartAt x) x is in the interior
+    have h_on : ContDiffOn ℂ ⊤ (omegaInChart ω x) ((chartAt (EuclideanSpace ℂ (Fin n)) x).target) :=
+      contDiffOn_omegaInChart ω x
+    have h_mem : (chartAt (EuclideanSpace ℂ (Fin n)) x) x ∈ (chartAt (EuclideanSpace ℂ (Fin n)) x).target :=
+      OpenPartialHomeomorph.map_source _ (mem_chart_source _ x)
+    have h_open : IsOpen (chartAt (EuclideanSpace ℂ (Fin n)) x).target :=
+      (chartAt (EuclideanSpace ℂ (Fin n)) x).open_target
+    exact h_on.contDiffAt (h_open.mem_nhds h_mem)
   have h_minSmoothness : minSmoothness ℂ 2 ≤ ⊤ := by
     simp only [minSmoothness_of_isRCLikeNormedField]
     exact le_top
   simp only [Pi.zero_apply]
-  exact _root_.extDeriv_extDeriv_apply h_smooth.contDiffAt h_minSmoothness
+  exact _root_.extDeriv_extDeriv_apply h_smooth h_minSmoothness
 
 end ContMDiffForm
