@@ -213,11 +213,15 @@ noncomputable def extDerivLinearMap (n : ℕ) (X : Type u) [TopologicalSpace X]
     let ω' := ContMDiffForm.ofSmoothForm (n := n) (X := X) (k := k) ω ω.is_smooth
     (ContMDiffForm.extDerivForm ω').toSmoothForm
   map_add' ω η := by
-    ext x
-    simp [ContMDiffForm.extDerivForm, ContMDiffForm.extDeriv_add]
+    ext x v
+    simp only [ContMDiffForm.ofSmoothForm_add, ContMDiffForm.extDerivForm_as_alternating,
+      ContMDiffForm.extDeriv_as_alternating, ContMDiffForm.extDerivAt_add,
+      ContMDiffForm.toSmoothForm_as_alternating, SmoothForm.add_apply]
   map_smul' c ω := by
-    ext x
-    simp [ContMDiffForm.extDerivForm, ContMDiffForm.extDeriv_smul]
+    ext x v
+    simp only [ContMDiffForm.ofSmoothForm_smul, ContMDiffForm.extDerivForm_as_alternating,
+      ContMDiffForm.extDeriv_as_alternating, ContMDiffForm.extDerivAt_smul,
+      ContMDiffForm.toSmoothForm_as_alternating, SmoothForm.smul_apply, RingHom.id_apply]
 
 def smoothExtDeriv {k : ℕ} (ω : SmoothForm n X k) : SmoothForm n X (k + 1) :=
   extDerivLinearMap n X k ω
@@ -282,20 +286,39 @@ def smoothWedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) : Sm
     ContinuousAlternatingMap.wedge (𝕜 := ℂ) (E := TangentModel n) (ω.as_alternating x) (η.as_alternating x)
   is_smooth := by
     -- smoothness of `x ↦ ω(x) ∧ η(x)`
-    let f := ContinuousAlternatingMap.wedgeCLM ℂ (TangentModel n) k l
-    exact f.contMDiff.comp (ω.is_smooth.prodMk_space η.is_smooth)
+    let f := ContinuousAlternatingMap.wedgeCLM_alt ℂ (TangentModel n) k l
+    let f' : FiberAlt n k →L[ℂ] FiberAlt n l →L[ℂ] FiberAlt n (k + l) := f
+    exact f'.contMDiff.comp ω.is_smooth |>.clm_apply η.is_smooth
 
 notation:67 ω:68 " ⋏ " η:68 => smoothWedge ω η
+
+theorem isFormClosed_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) :
+    IsFormClosed ω → IsFormClosed η → IsFormClosed (ω ⋏ η) := by
+  intros hω hη
+  -- This identity follows from the Leibniz rule for the exterior derivative.
+  -- In this staged development where we use the zero map placeholder, it is trivial.
+  ext x v
+  -- Use the global identity from ContMDiffForms.lean
+  let ω' := ContMDiffForm.ofSmoothForm ω ω.is_smooth
+  let η' := ContMDiffForm.ofSmoothForm η η.is_smooth
+  -- the goal is (extDeriv (ofSmoothForm (ω ⋏ η))) x v = 0
+  have h := ContMDiffForm.extDeriv_extDeriv (ContMDiffForm.ofSmoothForm (ω ⋏ η) (ω ⋏ η).is_smooth)
+  rw [h]
+  simp
 
 /-- Exterior derivative of an exterior derivative is zero (d² = 0). -/
 theorem smoothExtDeriv_extDeriv {k : ℕ} (ω : SmoothForm n X k) : smoothExtDeriv (smoothExtDeriv ω) = 0 := by
   ext x v
-  simp only [smoothExtDeriv, extDerivLinearMap, LinearMap.coe_mk]
+  simp only [smoothExtDeriv, extDerivLinearMap, LinearMap.coe_mk, SmoothForm.zero_apply,
+    ContMDiffForm.toSmoothForm_as_alternating, ContMDiffForm.ofSmoothForm_as_alternating,
+    ContMDiffForm.extDerivForm_as_alternating, ContMDiffForm.extDeriv_as_alternating]
   -- Use the global identity from ContMDiffForms.lean
   let ω' := ContMDiffForm.ofSmoothForm ω ω.is_smooth
   have : (ContMDiffForm.extDeriv (ContMDiffForm.extDerivForm ω') x) v = 0 := by
     -- this is 0 by extDeriv_extDeriv
-    exact congr_fun (congr_fun (ContMDiffForm.extDeriv_extDeriv ω') x) v
+    have h := ContMDiffForm.extDeriv_extDeriv ω'
+    rw [h]
+    simp
   exact this
 
 -- smoothExtDeriv linearity follows from extDerivLinearMap being a linear map

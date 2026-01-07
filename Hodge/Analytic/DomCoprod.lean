@@ -261,7 +261,7 @@ theorem wedge_smul_right {k l : ℕ} (c : 𝕜)
     LinearMap.compAlternatingMap_smul, AlternatingMap.domDomCongr_smul]
 
 /-- Wedge product as a bundled bilinear continuous linear map. -/
-noncomputable def wedgeCLM (𝕜 : Type*) [NontriviallyNormedField 𝕜] [CompleteSpace 𝕜]
+noncomputable def wedgeCLM_alt (𝕜 : Type*) [NontriviallyNormedField 𝕜] [CompleteSpace 𝕜]
     (E : Type*) [NormedAddCommGroup E] [NormedSpace 𝕜 E] [FiniteDimensional 𝕜 E] (k l : ℕ) :
     (ContinuousAlternatingMap 𝕜 E 𝕜 (Fin k)) →L[𝕜]
       (ContinuousAlternatingMap 𝕜 E 𝕜 (Fin l) →L[𝕜]
@@ -269,7 +269,7 @@ noncomputable def wedgeCLM (𝕜 : Type*) [NontriviallyNormedField 𝕜] [Comple
   LinearMap.toContinuousLinearMap (𝕜 := 𝕜) (E := (ContinuousAlternatingMap 𝕜 E 𝕜 (Fin k)))
     (F' := ((ContinuousAlternatingMap 𝕜 E 𝕜 (Fin l)) →L[𝕜]
       (ContinuousAlternatingMap 𝕜 E 𝕜 (Fin (k + l))))) <|
-  { toFun := fun ω => 
+  { toFun := fun ω =>
       LinearMap.toContinuousLinearMap (𝕜 := 𝕜) (E := (ContinuousAlternatingMap 𝕜 E 𝕜 (Fin l)))
         (F' := (ContinuousAlternatingMap 𝕜 E 𝕜 (Fin (k + l)))) <|
       { toFun := fun η => wedge ω η
@@ -284,7 +284,7 @@ theorem continuous_wedge {k l : ℕ} :
           ContinuousAlternatingMap 𝕜 E 𝕜 (Fin l)) =>
         wedge (𝕜 := 𝕜) (E := E) p.1 p.2 := by
   classical
-  let f := wedgeCLM 𝕜 E k l
+  let f := wedgeCLM_alt 𝕜 E k l
   show Continuous fun p : _ × _ => (f p.1) p.2
   admit
 

@@ -409,6 +409,9 @@ theorem extDeriv_smul (c : ℂ) (ω : ContMDiffForm n X k) :
   funext x
   exact extDerivAt_smul c ω x
 
+@[simp] lemma extDeriv_as_alternating (ω : ContMDiffForm n X k) :
+    (extDeriv ω) = ω.extDerivAt := rfl
+
 /-- The bundled exterior derivative of a `C^∞` form. -/
 noncomputable def extDerivForm (ω : ContMDiffForm n X k) : ContMDiffForm n X (k + 1) where
   as_alternating := extDeriv ω
@@ -420,6 +423,9 @@ noncomputable def extDerivForm (ω : ContMDiffForm n X k) : ContMDiffForm n X (k
     -- (The infrastructure in ChartExtDeriv.lean contains the technical details.)
     intro x₀
     sorry
+
+@[simp] lemma extDerivForm_as_alternating (ω : ContMDiffForm n X k) :
+    (extDerivForm ω).as_alternating = extDeriv ω := rfl
 
 /-- The second exterior derivative of a `C^∞` form is zero (d² = 0).
 
