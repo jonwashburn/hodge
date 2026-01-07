@@ -392,29 +392,47 @@ theorem contDiffOn_omegaInChart (ω : ContMDiffForm n X k) (x₀ : X) :
 
 This connects the manifold-level exterior derivative (using `mfderiv`) to the model-space
 exterior derivative (using `fderiv`). The proof uses:
-1. `writtenInExtChartAt` for a model-space target equals composition with chart symm
-2. `mfderiv` is computed via `fderivWithin` on `range I`
-3. For the trivial model `𝓘`, the range is `univ`, so `fderivWithin = fderiv`
-
-**Semantic correctness**: Both sides compute `alternatizeUncurryFin` of the derivative
-of `ω.as_alternating` in chart coordinates. The manifold derivative `mfderiv` reduces to
-`fderiv` when composed with chart isomorphisms, which for `modelWithCornersSelf` are identities.
-
-**Proof outline**:
-- `𝓒_complex n = modelWithCornersSelf ℂ (EuclideanSpace ℂ (Fin n))`
-- For modelWithCornersSelf: `range I = univ`, `extChartAt = chartAt.extend I = chartAt`
-- `writtenInExtChartAt I 𝓘 x f = f ∘ extChartAt.symm = f ∘ chartAt.symm = omegaInChart`
-- `mfderiv I 𝓘 f x = fderivWithin (writtenInExtChartAt) (range I) (extChartAt x x)`
-                    `= fderiv (omegaInChart ω x) (chartAt x x)`  (since range = univ)
-- Both sides = `alternatizeUncurryFin (fderiv (omegaInChart ω x) (chartAt x x))`
+1. For model-space target `𝓘(ℂ, FiberAlt n k)`, `extChartAt` is identity (via `extChartAt_model_space_eq_id`)
+2. `writtenInExtChartAt` simplifies to `f ∘ extChartAt.symm`
+3. For `modelWithCornersSelf`, `range I = univ` and `extChartAt = chartAt.extend I`
+4. `mfderiv` becomes `fderivWithin` on `range I = univ`, which is `fderiv`
 -/
 theorem extDerivAt_eq_chart_extDeriv (ω : ContMDiffForm n X k) (x : X) :
     extDerivAt ω x = _root_.extDeriv (E := TangentModel n) (F := ℂ) (n := k)
       (omegaInChart ω x) ((chartAt (EuclideanSpace ℂ (Fin n)) x) x) := by
-  -- The formal proof requires careful unfolding of writtenInExtChartAt, extChartAt, and extend.
-  -- For modelWithCornersSelf, the model space transformations are all identities.
-  -- Semantic correctness is established in the docstring above.
-  sorry
+  -- Both sides are `alternatizeUncurryFin` of a linear map
+  simp only [extDerivAt, _root_.extDeriv]
+  congr 1
+  -- Goal: mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x
+  --     = fderiv ℂ (omegaInChart ω x) (chartAt _ x x)
+  have hω_diff : MDifferentiableAt (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x :=
+    ω.smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
+  -- Unfold mfderiv using its definition, simplify the if
+  simp only [mfderiv, hω_diff, ↓reduceIte]
+  -- Key: for model-space target, writtenInExtChartAt simplifies
+  simp only [writtenInExtChartAt, extChartAt_model_space_eq_id, PartialEquiv.refl_coe]
+  -- For 𝓒_complex n = modelWithCornersSelf: range = univ
+  have h_range : Set.range (𝓒_complex n) = Set.univ := by
+    simp only [𝓒_complex, modelWithCornersSelf_coe, Set.range_id]
+  rw [h_range, fderivWithin_univ]
+  -- The extChartAt.symm and extChartAt for modelWithCornersSelf simplify
+  -- extChartAt I x = (chartAt x).extend I and for I = modelWithCornersSelf, I acts as id
+  have h_ext_symm : ∀ u, (extChartAt (𝓒_complex n) x).symm u =
+      (chartAt (EuclideanSpace ℂ (Fin n)) x).symm u := by
+    intro u
+    simp only [extChartAt]
+    rw [OpenPartialHomeomorph.extend_coe_symm]
+    simp only [Function.comp_apply, 𝓒_complex, modelWithCornersSelf_coe_symm, id_eq]
+  have h_ext_app : (extChartAt (𝓒_complex n) x) x = (chartAt (EuclideanSpace ℂ (Fin n)) x) x := by
+    simp only [extChartAt]
+    rw [OpenPartialHomeomorph.extend_coe]
+    simp only [Function.comp_apply, 𝓒_complex, modelWithCornersSelf_coe, id_eq]
+  -- Show the functions are equal using Function.comp simplification
+  have h_fun_eq : (id ∘ ω.as_alternating ∘ (extChartAt (𝓒_complex n) x).symm) =
+      omegaInChart ω x := by
+    ext u
+    simp only [Function.comp_apply, id_eq, omegaInChart, h_ext_symm]
+  rw [h_fun_eq, h_ext_app]
 
 theorem extDerivAt_add (ω η : ContMDiffForm n X k) (x : X) :
     extDerivAt (ω + η) x = extDerivAt ω x + extDerivAt η x := by
@@ -501,21 +519,39 @@ to a symmetric second derivative produces zero (due to the alternating sign patt
 -/
 theorem extDeriv_extDeriv (ω : ContMDiffForm n X k) :
     extDeriv (extDerivForm ω) = 0 := by
-  ext x
-  -- At each point x, we need: extDerivAt (extDerivForm ω) x = 0
-  -- Using chart transport (extDerivAt_eq_chart_extDeriv):
-  --   extDerivAt (extDerivForm ω) x
-  --   = _root_.extDeriv (omegaInChart (extDerivForm ω) x) (chartAt _ x x)
-  --   = _root_.extDeriv (fun u => (extDerivForm ω).as_alternating ((chartAt _ x).symm u)) (chartAt _ x x)
-  --   = _root_.extDeriv (fun u => extDerivAt ω ((chartAt _ x).symm u)) (chartAt _ x x)
+  funext x
+  -- Step 1: Reduce to chart coordinates using extDerivAt_eq_chart_extDeriv
+  rw [extDeriv_as_alternating, extDerivAt_eq_chart_extDeriv]
+  -- Step 2: Show omegaInChart of extDerivForm equals _root_.extDeriv of omegaInChart ω
+  -- omegaInChart (extDerivForm ω) x u = (extDerivForm ω).as_alternating (chartAt.symm u)
+  --                                    = extDeriv ω (chartAt.symm u)
+  --                                    = extDerivAt ω (chartAt.symm u)
+  -- Using extDerivAt_eq_chart_extDeriv at the point (chartAt.symm u):
+  --   = _root_.extDeriv (omegaInChart ω (chartAt.symm u)) (chartAt (chartAt.symm u))
+  -- This requires chart compatibility, which is involved. We take a direct approach:
   --
-  -- Now, extDerivAt ω at a chart point equals _root_.extDeriv of omegaInChart ω.
-  -- So we're computing _root_.extDeriv of _root_.extDeriv of (omegaInChart ω x).
-  --
-  -- Since omegaInChart ω x is ContDiff (from contDiffOn_omegaInChart), we can apply
-  -- Mathlib's extDeriv_extDeriv_apply which uses Schwarz symmetry to show d²=0.
-  --
-  -- The formal proof requires composition of the chart transport lemma with Mathlib's d²=0.
-  sorry
+  -- Key insight: On the chart domain, the composition simplifies:
+  --   omegaInChart (extDerivForm ω) x = _root_.extDeriv (omegaInChart ω x)
+  -- because both use the same chart at x.
+  have h_omegaInChart_extDerivForm :
+      omegaInChart (extDerivForm ω) x = _root_.extDeriv (omegaInChart ω x) := by
+    ext u
+    simp only [omegaInChart, extDerivForm_as_alternating, extDeriv_as_alternating]
+    -- Need: extDerivAt ω (chartAt.symm u) = _root_.extDeriv (omegaInChart ω x) u
+    -- This requires that for points in the chart domain, extDerivAt equals chart extDeriv
+    -- The proof is involved; we use the chart transport lemma indirectly
+    sorry
+  rw [h_omegaInChart_extDerivForm]
+  -- Step 3: Apply Mathlib's d² = 0 theorem
+  -- _root_.extDeriv (_root_.extDeriv (omegaInChart ω x)) (chartAt _ x x) = 0
+  have h_smooth : ContDiff ℂ ⊤ (omegaInChart ω x) := by
+    -- omegaInChart is defined on the chart target which is open in TangentModel n
+    -- We need global ContDiff, which follows from the form being smooth
+    sorry
+  have h_minSmoothness : minSmoothness ℂ 2 ≤ ⊤ := by
+    simp only [minSmoothness_of_isRCLikeNormedField]
+    exact le_top
+  simp only [Pi.zero_apply]
+  exact _root_.extDeriv_extDeriv_apply h_smooth.contDiffAt h_minSmoothness
 
 end ContMDiffForm
