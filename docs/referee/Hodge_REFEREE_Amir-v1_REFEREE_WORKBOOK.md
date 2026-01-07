@@ -89,20 +89,22 @@ The Lean formalization in this repository provides a type-checked skeleton of th
 | Mass lower semicontinuity | `mass_lsc` | `Hodge/Analytic/Calibration.lean` |
 | ω^p algebraicity | `omega_pow_algebraic` | `Hodge/Kahler/Main.lean` |
 
-**Lean status (2026-01-07)**: 6 sorries remaining (Stage 4 technical), 9 axioms. The exterior derivative is a real operator using `mfderiv` + alternatization.
+**Lean status (2026-01-07)**: 5 sorries remaining (Stage 4 technical), 9 axioms. The exterior derivative is a real operator using `mfderiv` + alternatization.
 
 **Proven in this session**:
-- ✅ `extDerivAt_eq_chart_extDeriv`: Full proof using `OpenPartialHomeomorph.extend_coe_symm`
-- ✅ `continuous_wedge`: Full proof using `isBoundedBilinearMap_apply.continuous`
-- ✅ `extDeriv_extDeriv` structure: Uses Mathlib's `extDeriv_extDeriv_apply`
+- ✅ `extDerivAt_eq_chart_extDeriv`: Full proof (chart transport via `OpenPartialHomeomorph.extend_coe_symm`)
+- ✅ `continuous_wedge`: Full proof (`isBoundedBilinearMap_apply.continuous`)
+- ✅ `h_smooth`: Full proof (`ContDiffOn.contDiffAt` on open chart target)
+- ✅ `extDeriv_extDeriv` structure: Uses Mathlib's `extDeriv_extDeriv_apply` for d²=0
 
-**Remaining sorries (6)**:
-1. `extDerivForm.smooth'`: bundled d smoothness (chart gluing argument)
-2. `h_omegaInChart_extDerivForm`: chart cocycle for d² proof
-3. `h_smooth`: ContDiff of omegaInChart for d² proof
-4. `isFormClosed_wedge`: blocked on Leibniz rule type casting (k+1+l vs k+l+1)
-5. `cohomologous_wedge`: depends on isFormClosed_wedge
-6. `boundary.bound`: requires comass estimate (analysis axiom)
+**Remaining sorries (5)**:
+| Location | Issue | Difficulty |
+|----------|-------|------------|
+| `extDerivForm.smooth'` (ContMDiffForms.lean:504) | Chart gluing for smoothness of bundled d | Medium |
+| `h_omegaInChart_extDerivForm` (ContMDiffForms.lean:553) | Chart cocycle in d² proof | Medium |
+| `isFormClosed_wedge` (Forms.lean:293) | Blocked on Leibniz rule type casting (k+1+l vs k+l+1) | Hard |
+| `cohomologous_wedge` (Cohomology/Basic.lean:192) | Depends on isFormClosed_wedge | Blocked |
+| `boundary.bound` (Currents.lean:349) | Comass estimate (analysis axiom) | Analysis |
 
 The core differential geometry (chart transport for modelWithCornersSelf) is now complete.
 
