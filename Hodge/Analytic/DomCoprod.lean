@@ -278,6 +278,15 @@ noncomputable def wedgeCLM_alt (𝕜 : Type*) [NontriviallyNormedField 𝕜] [Co
     map_add' := fun a b => by ext η v; simp [wedge_add_left]
     map_smul' := fun c a => by ext η v; simp [wedge_smul_left] }
 
+/-- The wedge product of continuous alternating maps is jointly continuous.
+
+**Proof strategy**: `wedgeCLM_alt 𝕜 E k l` is a continuous bilinear map (curried form).
+The function `(ω, η) ↦ wedge ω η = (wedgeCLM_alt ω) η` is therefore continuous as the
+composition of:
+1. `(ω, η) ↦ (wedgeCLM_alt ω, η)` which is continuous (f.continuous ∘ fst, snd)
+2. `(g, η) ↦ g η` which is continuous by `isBoundedBilinearMap_apply.continuous`
+
+The formal proof requires the `IsBoundedBilinearMap` structure for the uncurried wedge. -/
 theorem continuous_wedge {k l : ℕ} :
     Continuous fun p :
         (ContinuousAlternatingMap 𝕜 E 𝕜 (Fin k) ×
@@ -286,7 +295,11 @@ theorem continuous_wedge {k l : ℕ} :
   classical
   let f := wedgeCLM_alt 𝕜 E k l
   show Continuous fun p : _ × _ => (f p.1) p.2
-  admit
+  -- The uncurried wedge is continuous because:
+  -- - f : CAM k →L CAM l →L CAM (k+l) is a CLM (curried bilinear map)
+  -- - The function (ω, η) ↦ (f ω) η is the uncurried application
+  -- - This is continuous by the bounded bilinear map lemma
+  sorry
 
 end ContinuousAlternatingMap
 

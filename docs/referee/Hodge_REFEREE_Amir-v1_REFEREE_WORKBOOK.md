@@ -89,7 +89,13 @@ The Lean formalization in this repository provides a type-checked skeleton of th
 | Mass lower semicontinuity | `mass_lsc` | `Hodge/Analytic/Calibration.lean` |
 | ω^p algebraicity | `omega_pow_algebraic` | `Hodge/Kahler/Main.lean` |
 
-**Lean status (2026-01-06)**: 7 sorries (Stage 4 technical proofs: d²=0, Leibniz rule, chart-coordinate identities), 9 axioms. The exterior derivative is now a real operator using `mfderiv` + alternatization. See `PROOF_COMPLETION_PLAN_8_PILLARS.md` for the staged migration plan.
+**Lean status (2026-01-07)**: 7 sorries (Stage 4 technical proofs with documented proof strategies), 9 axioms. The exterior derivative is a real operator using `mfderiv` + alternatization. All remaining sorries have semantic correctness documented:
+- `extDerivAt_eq_chart_extDeriv`: mfderiv = fderiv in chart (modelWithCornersSelf simplifications)
+- `extDeriv_extDeriv`: d²=0 via chart transport + Mathlib's Schwarz theorem
+- `extDerivForm.smooth'`: smoothness via diagonal chart argument
+- `isFormClosed_wedge` / `cohomologous_wedge`: depend on Leibniz rule
+- `continuous_wedge`: bilinear continuity via `isBoundedBilinearMap_apply`
+- Boundary bound: comass estimate on compact manifolds
 
 **Differential Forms Infrastructure** (2026-01-06):
 

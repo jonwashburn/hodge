@@ -69,15 +69,22 @@ These are the *only* axioms intended to remain:
 
 - **Stage 4 (in progress)**: Prove remaining `sorry` statements and complete chart-level identities:
   - **Proven (diagonal case)**: `mfderivInTangentCoordinates_eq_fderiv_diag`, `extDerivInTangentCoordinates_diag`
-  - **Remaining sorries** (7 total):
-    1. `extDerivForm.smooth'` - smoothness of bundled exterior derivative (needs chart gluing)
-    2. `extDeriv_extDeriv` - d²=0 (needs chart transfer to Mathlib's `extDeriv_extDeriv`)
-    3. `mfderivInTangentCoordinates_eq_fderiv` - general chart identity (off-diagonal case)
-    4. `extDerivAt_eq_extDeriv` - transport to chart coordinates
-    5. `isFormClosed_wedge` - Leibniz rule for closed forms
-    6. `cohomologous_wedge` - wedge of cohomologous forms (depends on Leibniz)
-    7. `Current.boundary.bound` - operator norm bound for boundary
-  - **Key insight**: The diagonal lemmas establish the foundation; the general case requires chain rule through chart transitions.
+  - **Remaining sorries** (7 total, all with documented proof strategies):
+    1. `extDerivAt_eq_chart_extDeriv` (`ContMDiffForms.lean:417`) - chart transport: mfderiv = fderiv
+       - **Strategy**: For `modelWithCornersSelf`, `writtenInExtChartAt = omegaInChart` and `range I = univ`
+    2. `extDerivForm.smooth'` (`ContMDiffForms.lean:486`) - smoothness of bundled exterior derivative
+       - **Strategy**: Diagonal chart argument using `contMDiffAt_extDerivInTangentCoordinates`
+    3. `extDeriv_extDeriv` (`ContMDiffForms.lean:519`) - d²=0
+       - **Strategy**: Chart transport to model space, then apply Mathlib's `extDeriv_extDeriv_apply`
+    4. `isFormClosed_wedge` (`Forms.lean:293`) - Leibniz rule for closed forms
+       - **Strategy**: Follows from manifold-level Leibniz once chart transport is complete
+    5. `cohomologous_wedge` (`Cohomology/Basic.lean:192`) - wedge of cohomologous forms
+       - **Strategy**: Depends on `isFormClosed_wedge`
+    6. `continuous_wedge` (`DomCoprod.lean:302`) - wedge continuity
+       - **Strategy**: `wedgeCLM_alt` is continuous bilinear via `isBoundedBilinearMap_apply`
+    7. `Current.boundary.bound` (`Currents.lean:349`) - operator norm bound for boundary
+       - **Strategy**: Comass estimate on compact manifolds
+  - **Key insight**: The diagonal lemmas establish the foundation; the remaining proofs require navigation of Mathlib's `modelWithCornersSelf` API.
 
 ---
 

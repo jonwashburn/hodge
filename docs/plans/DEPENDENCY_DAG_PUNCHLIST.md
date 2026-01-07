@@ -2,7 +2,7 @@
 
 This document maps the proof chain in `Hodge-v6-w-Jon-Update-MERGED.tex` to Lean files and identifies what remains to be completed (beyond the 8 accepted classical pillars).
 
-**Last Updated**: 2026-01-06 (Stage 3 Infrastructure Bridge complete)
+**Last Updated**: 2026-01-07 (Stage 4 in progress - proof outlines documented)
 
 ---
 
@@ -18,12 +18,15 @@ This document maps the proof chain in `Hodge-v6-w-Jon-Update-MERGED.tex` to Lean
 
 **Build Status**: `lake build Hodge.Main` ✅ succeeds
 
-**`sorry` Breakdown** (all in Stage 4 work):
-- `Cohomology/Basic.lean`: 1 (`cohomologous_wedge` - requires Leibniz rule)
-- `Analytic/Forms.lean`: 1 (`isFormClosed_wedge` - Leibniz rule)
-- `Analytic/ContMDiffForms.lean`: 2 (`extDerivForm.smooth'`, `extDeriv_extDeriv`)
-- `Analytic/ChartExtDeriv.lean`: 2 (`mfderivInTangentCoordinates_eq_fderiv`, `extDerivAt_eq_extDeriv`)
-- `Analytic/Currents.lean`: 1 (boundary bound)
+**`sorry` Breakdown** (all in Stage 4 work, with documented proof strategies):
+- `Cohomology/Basic.lean:192`: 1 (`cohomologous_wedge` - requires Leibniz rule)
+- `Analytic/Forms.lean:293`: 1 (`isFormClosed_wedge` - Leibniz rule)
+- `Analytic/ContMDiffForms.lean`: 3 sorries with proof outlines:
+  - `:417` - `extDerivAt_eq_chart_extDeriv` (chart transport: mfderiv = fderiv)
+  - `:486` - `extDerivForm.smooth'` (smoothness via chart gluing)
+  - `:519` - `extDeriv_extDeriv` (d²=0 via Mathlib's Schwarz theorem)
+- `Analytic/DomCoprod.lean:302`: 1 (`continuous_wedge` - bilinear continuity)
+- `Analytic/Currents.lean:349`: 1 (boundary operator bound - comass estimate)
 
 ---
 

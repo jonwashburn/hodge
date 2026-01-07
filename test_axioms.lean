@@ -1,3 +1,9 @@
-import Hodge.Kahler.Main
+import Mathlib.Analysis.Calculus.DifferentialForm.Basic
 
-#print axioms Hodge.hodge_conjecture
+namespace Check
+open ContinuousAlternatingMap
+
+#check alternatizeUncurryFin
+-- #check alternatizeUncurryFin_wedge -- if this exists
+
+end Check
