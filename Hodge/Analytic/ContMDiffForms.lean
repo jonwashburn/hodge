@@ -149,6 +149,31 @@ theorem contMDiffAt_extDerivInTangentCoordinates (ω : ContMDiffForm n X k) (x�
     (x := x₀) hL hm
   simpa [extDerivInTangentCoordinates, L] using this
 
+/-- On the diagonal (x = x₀), `extDerivInTangentCoordinates` equals `extDerivAt`.
+    This is crucial for the smoothness proof of the exterior derivative. -/
+theorem extDerivInTangentCoordinates_diag (ω : ContMDiffForm n X k) (x₀ : X) :
+    extDerivInTangentCoordinates (n := n) (X := X) (k := k) ω x₀ x₀ = extDerivAt ω x₀ := by
+  -- On the diagonal, tangent coordinate change is identity
+  have hx₀ : x₀ ∈ (extChartAt (𝓒_complex n) x₀).source := by
+    simp only [extChartAt_source]; exact mem_chart_source _ x₀
+  have hx₀_chart : x₀ ∈ (chartAt (EuclideanSpace ℂ (Fin n)) x₀).source := mem_chart_source _ x₀
+  -- mfderivInTangentCoordinates on diagonal = mfderiv ∘ id = mfderiv
+  have hdiag : tangentCoordChange (𝓒_complex n) x₀ x₀ x₀ = ContinuousLinearMap.id ℂ _ := by
+    apply ContinuousLinearMap.ext
+    intro v
+    exact tangentCoordChange_self (I := 𝓒_complex n) (x := x₀) (z := x₀) (v := v) hx₀
+  -- Use the fact that mfderivInTangentCoordinates = mfderiv ∘L tangentCoordChange
+  -- On diagonal, this simplifies to mfderiv ∘L id = mfderiv
+  have hmf_simp : mfderivInTangentCoordinates (n := n) (X := X) (k := k) ω x₀ x₀ =
+      mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x₀ := by
+    rw [mfderivInTangentCoordinates_eq (n := n) (X := X) (k := k) ω x₀ x₀ hx₀_chart]
+    rw [hdiag]
+    -- f.comp (id) = f for continuous linear maps
+    ext v
+    rfl
+  -- Now apply the simplified identity
+  simp only [extDerivInTangentCoordinates, extDerivAt, hmf_simp]
+
 /-!
 ### Transport of alternating maps along tangent coordinate changes (Stage 3 helper)
 
@@ -416,12 +441,19 @@ theorem extDeriv_smul (c : ℂ) (ω : ContMDiffForm n X k) :
 noncomputable def extDerivForm (ω : ContMDiffForm n X k) : ContMDiffForm n X (k + 1) where
   as_alternating := extDeriv ω
   smooth' := by
-    -- At each point x0, the operator is smooth in a chart.
-    -- The proof uses `contDiffOn_extDerivInChartWithin` from `ChartExtDeriv.lean`
-    -- and the transport identity.
-    -- For now, we take this as a milestone lemma with a localized sorry.
-    -- (The infrastructure in ChartExtDeriv.lean contains the technical details.)
+    -- At each point x₀, we show `ContMDiffAt` using the diagonal identity.
+    -- Key insight: `extDerivInTangentCoordinates ω x₀ x₀ = extDerivAt ω x₀` (by `extDerivInTangentCoordinates_diag`)
+    -- and `contMDiffAt_extDerivInTangentCoordinates` gives smoothness of the former.
     intro x₀
+    -- The function `extDerivInTangentCoordinates ω x₀` is smooth at `x₀`
+    have hsmooth := contMDiffAt_extDerivInTangentCoordinates (n := n) (X := X) (k := k) ω x₀
+    -- On the diagonal, it equals `extDerivAt ω x₀`
+    have hdiag := extDerivInTangentCoordinates_diag (n := n) (X := X) (k := k) ω x₀
+    -- Therefore `extDerivAt ω` is smooth at `x₀`
+    -- The key is that `extDerivInTangentCoordinates ω x₀` and `extDerivAt ω` agree at `x₀`
+    -- and near `x₀` (on the chart domain), they differ by a smooth chart transition.
+    -- This requires a technical argument about extension of smoothness.
+    -- For now, we use a placeholder since the diagonal identity establishes the core.
     sorry
 
 @[simp] lemma extDerivForm_as_alternating (ω : ContMDiffForm n X k) :
@@ -430,11 +462,31 @@ noncomputable def extDerivForm (ω : ContMDiffForm n X k) : ContMDiffForm n X (k
 /-- The second exterior derivative of a `C^∞` form is zero (d² = 0).
 
     **Mathematical Justification**: This follows from the symmetry of second manifold derivatives.
-    Locally, in a chart, it matches Mathlib's `extDeriv_extDeriv` for differential forms on normed spaces. -/
+    Locally, in a chart, it matches Mathlib's `extDeriv_extDeriv` for differential forms on normed spaces.
+
+    **Proof outline** (see `extDerivWithin_extDerivWithin_apply` in Mathlib):
+    1. At each point `x`, `d(dω)_x = alternatizeUncurryFin (mfderiv (dω).as_alternating x)`
+    2. Since `(dω).as_alternating = alternatizeUncurryFin ∘ mfderiv ω.as_alternating`,
+       by the chain rule: `mfderiv (dω).as_alternating x = alternatizeUncurryFinCLM ∘L (second mfderiv of ω)`
+    3. By `ContMDiffAt.isSymmSndFDerivAt` (Schwarz's theorem), the second derivative is symmetric.
+    4. By `alternatizeUncurryFin_alternatizeUncurryFinCLM_comp_of_symmetric`, the result is 0.
+
+    **Key Mathlib lemmas**:
+    - `ContinuousLinearMap.mfderiv`: `mfderiv` of a CLM applied to a function equals CLM ∘L mfderiv of the function
+    - `alternatizeUncurryFin_alternatizeUncurryFinCLM_comp_of_symmetric`: key algebraic identity
+    - `ContMDiffAt.isSymmSndFDerivAt`: Schwarz's theorem for manifolds
+
+    **Technical requirement**: Relating `mfderiv` to `fderiv` in charts to apply Schwarz's theorem. -/
 theorem extDeriv_extDeriv (ω : ContMDiffForm n X k) :
     extDeriv (extDerivForm ω) = 0 := by
-  funext x
-  -- At each point x, the identity follows from its local representation in a chart.
+  ext x
+  -- At each point x, d(dω)_x = 0.
+  -- This follows from Mathlib's `extDeriv_extDeriv` in the model space, applied via charts.
+  -- The key steps are:
+  -- 1. Express ω in a chart at x: `omegaInChart ω x`
+  -- 2. Use `_root_.extDeriv_extDeriv` which gives d²(omegaInChart) = 0
+  -- 3. Transfer back to manifold coordinates
+  -- The technical details require the chart-level identities from `ChartExtDeriv.lean`.
   sorry
 
 end ContMDiffForm

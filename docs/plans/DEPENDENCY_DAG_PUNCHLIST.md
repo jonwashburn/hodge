@@ -12,17 +12,17 @@ This document maps the proof chain in `Hodge-v6-w-Jon-Update-MERGED.tex` to Lean
 |----------|-------|--------|
 | Pillar axioms (accepted) | 9 decls | ✅ Keep |
 | Extra axioms | 0 | ✅ None |
-| Remaining `sorry` | 12 | ⚠️ Stage 4 work |
+| Remaining `sorry` | 7 | ⚠️ Stage 4 work |
 | Semantic stubs documented | ~10 major | ✅ Downward trend |
 | Build status | `lake build Hodge.Main` | ✅ Passing |
 
 **Build Status**: `lake build Hodge.Main` ✅ succeeds
 
 **`sorry` Breakdown** (all in Stage 4 work):
-- `Cohomology/Basic.lean`: 5 (cohomology algebra laws with real d)
-- `Analytic/Forms.lean`: 1 (`isFormClosed_wedge` Leibniz rule)
+- `Cohomology/Basic.lean`: 1 (`cohomologous_wedge` - requires Leibniz rule)
+- `Analytic/Forms.lean`: 1 (`isFormClosed_wedge` - Leibniz rule)
 - `Analytic/ContMDiffForms.lean`: 2 (`extDerivForm.smooth'`, `extDeriv_extDeriv`)
-- `Analytic/ChartExtDeriv.lean`: 2 (chart coordinate proofs)
+- `Analytic/ChartExtDeriv.lean`: 2 (`mfderivInTangentCoordinates_eq_fderiv`, `extDerivAt_eq_extDeriv`)
 - `Analytic/Currents.lean`: 1 (boundary bound)
 
 ---
@@ -161,11 +161,15 @@ These stubs make the proof type-check but don't carry the mathematical meaning o
   - All downstream files updated to include `[IsManifold (𝓒_complex n) ⊤ X]`
   - Build passes with 9 axioms
 
-**Stage 4 (pending)**: Prove the remaining `sorry` statements:
-- `isFormClosed_wedge` (Leibniz rule: d(ω∧η) = dω∧η ± ω∧dη)
-- `extDerivForm.smooth'` (smoothness of the global d operator)
-- `extDeriv_extDeriv` (d²=0 using symmetry of second derivatives)
-- Cohomology algebra laws (`mul_add`, `add_mul`, etc.) using the real d
+**Stage 4 (in progress)**: Prove the remaining `sorry` statements:
+- `isFormClosed_wedge` (Leibniz rule: d(ω∧η) = dω∧η ± ω∧dη) - pending
+- `extDerivForm.smooth'` (smoothness of the global d operator) - pending
+- `extDeriv_extDeriv` (d²=0 using symmetry of second derivatives) - pending
+- ~~Cohomology algebra laws (`mul_add`, `add_mul`, etc.) using the real d~~ ✅ DONE
+
+**Key lemmas proven**:
+- `mfderivInTangentCoordinates_eq_fderiv_diag` (chart identity on diagonal)
+- `extDerivInTangentCoordinates_diag` (diagonal smoothness link)
 
 ### Tier 2: Kähler/Hodge Operators
 

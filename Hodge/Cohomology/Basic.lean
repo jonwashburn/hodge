@@ -345,9 +345,9 @@ theorem mul_add {k l : ℕ} (a : DeRhamCohomologyClass n X k) (b c : DeRhamCohom
   unfold Cohomologous
   have hEq : a.val ⋏ (b.val + c.val) = (a.val ⋏ b.val) + (a.val ⋏ c.val) := by
     simp [smoothWedge_add_right]
-  -- exactness: difference is exact
-  -- Stage 4: Formalize this using Leibniz rule.
-  sorry
+  -- The difference is 0 by algebraic equality, hence exact.
+  simp [hEq]
+  exact isExact_zero
 
 theorem add_mul {k l : ℕ} (a b : DeRhamCohomologyClass n X k) (c : DeRhamCohomologyClass n X l) :
     (a + b) * c = a * c + b * c := by
@@ -358,8 +358,9 @@ theorem add_mul {k l : ℕ} (a b : DeRhamCohomologyClass n X k) (c : DeRhamCohom
   unfold Cohomologous
   have hEq : (a.val + b.val) ⋏ c.val = (a.val ⋏ c.val) + (b.val ⋏ c.val) := by
     simp [smoothWedge_add_left]
-  -- exactness: difference is exact
-  sorry
+  -- The difference is 0 by algebraic equality, hence exact.
+  simp [hEq]
+  exact isExact_zero
 
 theorem mul_smul {k l : ℕ} (a : DeRhamCohomologyClass n X k) (r : ℂ) (b : DeRhamCohomologyClass n X l) :
     a * (r • b) = r • (a * b) := by
@@ -370,8 +371,9 @@ theorem mul_smul {k l : ℕ} (a : DeRhamCohomologyClass n X k) (r : ℂ) (b : De
   unfold Cohomologous
   have hEq : a.val ⋏ (r • b.val) = r • (a.val ⋏ b.val) := by
     simp [smoothWedge_smul_right]
-  -- exactness: difference is exact
-  sorry
+  -- The difference is 0 by algebraic equality, hence exact.
+  simp [hEq]
+  exact isExact_zero
 
 theorem smul_mul {k l : ℕ} (r : ℂ) (a : DeRhamCohomologyClass n X k) (b : DeRhamCohomologyClass n X l) :
     (r • a) * b = r • (a * b) := by
@@ -382,8 +384,9 @@ theorem smul_mul {k l : ℕ} (r : ℂ) (a : DeRhamCohomologyClass n X k) (b : De
   unfold Cohomologous
   have hEq : (r • a.val) ⋏ b.val = r • (a.val ⋏ b.val) := by
     simp [smoothWedge_smul_left]
-  -- exactness: difference is exact
-  sorry
+  -- The difference is 0 by algebraic equality, hence exact.
+  simp [hEq]
+  exact isExact_zero
 
 theorem zero_mul {k l : ℕ} (a : DeRhamCohomologyClass n X l) :
     (0 : DeRhamCohomologyClass n X k) * a = 0 := by

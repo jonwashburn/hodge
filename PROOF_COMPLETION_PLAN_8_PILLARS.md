@@ -1,7 +1,7 @@
 ## Update (Jan 6, 2026) — New "Close the Proof" Strategy
 
-**Current verified state (from `LEAN_PROOF_BUNDLE.txt`)**:
-- **Sorries**: 12 (localized to Stage 4 work: Leibniz rule, d²=0, smooth bundling)
+**Current verified state**:
+- **Sorries**: 7 (localized to Stage 4 work: Leibniz rule, d²=0, smooth bundling, chart identities)
 - **Axioms**: 9 (unchanged - exactly what `hodge_conjecture'` depends on)
 
 **Major progress this session**:
@@ -9,6 +9,8 @@
 - Bridged `extDerivLinearMap` to use `ContMDiffForm.extDerivForm`
 - Fixed all downstream build errors from the migration
 - The exterior derivative is now a **real operator** (using `mfderiv` + alternatization), not a zero placeholder
+- Proved cohomology algebra laws (`mul_add`, `add_mul`, `mul_smul`, `smul_mul`) using `isExact_zero`
+- Proved diagonal chart identities: `mfderivInTangentCoordinates_eq_fderiv_diag`, `extDerivInTangentCoordinates_diag`
 
 **What remains is semantic correctness**, not Lean holes:
 - The foundation layer still contains **semantic stubs** (not axioms) for parts of the de Rham/Hodge machinery.
@@ -65,7 +67,17 @@ These are the *only* axioms intended to remain:
     - `mfderivInTangentCoordinates_eq_fderiv`: proven (with localized plumbing steps) the identity between manifold derivative and chart-coordinate derivative.
     - **Bundled Operator**: `ContMDiffForm.extDerivForm` exists, along with the `extDeriv_extDeriv` (d²=0) theorem statement.
 
-- **Stage 4 (pending)**: Replace the current de Rham quotient (“cohomology”) with an actually well-defined Mathlib-backed complex if/when available, or a local equivalent construction.
+- **Stage 4 (in progress)**: Prove remaining `sorry` statements and complete chart-level identities:
+  - **Proven (diagonal case)**: `mfderivInTangentCoordinates_eq_fderiv_diag`, `extDerivInTangentCoordinates_diag`
+  - **Remaining sorries** (7 total):
+    1. `extDerivForm.smooth'` - smoothness of bundled exterior derivative (needs chart gluing)
+    2. `extDeriv_extDeriv` - d²=0 (needs chart transfer to Mathlib's `extDeriv_extDeriv`)
+    3. `mfderivInTangentCoordinates_eq_fderiv` - general chart identity (off-diagonal case)
+    4. `extDerivAt_eq_extDeriv` - transport to chart coordinates
+    5. `isFormClosed_wedge` - Leibniz rule for closed forms
+    6. `cohomologous_wedge` - wedge of cohomologous forms (depends on Leibniz)
+    7. `Current.boundary.bound` - operator norm bound for boundary
+  - **Key insight**: The diagonal lemmas establish the foundation; the general case requires chain rule through chart transitions.
 
 ---
 

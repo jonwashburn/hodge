@@ -145,9 +145,9 @@ instance instAddCommGroupSmoothForm (k : ℕ) : AddCommGroup (SmoothForm n X k) 
 
 instance instModuleComplexSmoothForm (k : ℕ) : Module ℂ (SmoothForm n X k) where
   add_smul r s ω := by ext x v; simp [add_mul]
-  smul_add r ω η := by ext x v; simp [mul_add]
+  smul_add r ω η := by ext x v; simp
   mul_smul r s ω := by ext x v; simp [mul_assoc]
-  one_smul ω := by ext x v; simp [one_mul]
+  one_smul ω := by ext x v; simp
   smul_zero r := by ext x v; simp [mul_zero]
   zero_smul ω := by ext x v; simp [zero_mul]
 
@@ -282,9 +282,10 @@ notation:67 ω:68 " ⋏ " η:68 => smoothWedge ω η
 theorem isFormClosed_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) :
     IsFormClosed ω → IsFormClosed η → IsFormClosed (ω ⋏ η) := by
   intros hω hη
-  -- This identity follows from the Leibniz rule for the exterior derivative.
-  -- Stage 4: Prove Leibniz rule for the real operator.
-  -- For now, we admit this identity to keep the main Hodge proof valid while the semantic operator is migrated.
+  -- For closed forms, the Leibniz rule gives:
+  -- d(ω ∧ η) = dω ∧ η ± ω ∧ dη = 0 ∧ η ± ω ∧ 0 = 0
+  -- This requires proving the Leibniz rule: d(ω ∧ η) = dω ∧ η + (-1)^k ω ∧ dη
+  -- Stage 4: Full Leibniz rule proof.
   sorry
 
 /-- Exterior derivative of an exterior derivative is zero (d² = 0). -/

@@ -335,12 +335,17 @@ def boundary (T : Current n X (k + 1)) : Current n X k where
     exact T.is_linear c (smoothExtDeriv ω₁) (smoothExtDeriv ω₂)
   is_continuous := T.is_continuous.comp smoothExtDeriv_continuous
   bound := by
-    -- The bound follows from T's bound and continuity of smoothExtDeriv.
-    -- Stage 4: Formalize the bound using comass estimates.
+    -- The bound follows from T's bound and an operator norm estimate for d.
+    -- **Required estimate**: On a compact manifold, there exists C' such that
+    --   comass(dω) ≤ C' * comass(ω) for all smooth ω.
+    -- This follows from the finite-dimensionality of the space of smooth forms
+    -- and the continuity of d as a differential operator.
+    -- **Stage 4 TODO**: Formalize this using comass estimates when CompactSpace is available.
     obtain ⟨C, hC⟩ := T.bound
     refine ⟨C, ?_⟩
     intro ω
-    -- Use T's bound on dω; need comass(dω) ≤ const * comass(ω) (controlled by smoothness)
+    -- For now, we use a placeholder. The real proof requires:
+    -- |T(dω)| ≤ C_T * comass(dω) ≤ C_T * C' * comass(ω)
     sorry
 
 def isCycle (T : Current n X (k + 1)) : Prop := T.boundary = 0

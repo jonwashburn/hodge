@@ -2,7 +2,7 @@
 Complete the Lean 4 formalization of the Hodge Conjecture proof.
 
 # Current Status
-- **Sorries**: 12 (localized to Stage 4 proofs)
+- **Sorries**: 7 (localized to Stage 4 proofs)
 - **Axioms**: 9 (the accepted "Classical Pillars" - unchanged)
 - **Semantic Completeness**:
   - The exterior derivative is now a **real operator** (using `mfderiv` + alternatization).
@@ -36,6 +36,9 @@ Complete the Lean 4 formalization of the Hodge Conjecture proof.
 # Session History
 | Date | Sorries | Axioms | Notes |
 |------|---------|--------|-------|
-| Jan 6, 2026 | 12 | 9 | **Full Migration Complete**: `SmoothForm` upgraded to `ContMDiff` coefficients. `extDerivLinearMap` now uses real `mfderiv`-based exterior derivative. All downstream files fixed. Remaining sorries are Stage 4 proofs. |
+| Jan 6, 2026 | 7 | 9 | Extended proof documentation for remaining sorries. Added clear proof outlines referencing Mathlib's `extDeriv_extDeriv` for d²=0 and chart-level identities. Fixed linter warnings in `Forms.lean`. |
+| Jan 6, 2026 (earlier) | 7 | 9 | Proved diagonal lemmas: `mfderivInTangentCoordinates_eq_fderiv_diag` and `extDerivInTangentCoordinates_diag`. These are foundational for the smoothness proof of the exterior derivative. |
+| Jan 6, 2026 (earlier) | 7 | 9 | Proved cohomology algebra laws (`mul_add`, `add_mul`, `mul_smul`, `smul_mul`) using `isExact_zero`. Updated proof documentation with clear outlines for remaining sorries. |
+| Jan 6, 2026 (earlier) | 12 | 9 | **Full Migration Complete**: `SmoothForm` upgraded to `ContMDiff` coefficients. `extDerivLinearMap` now uses real `mfderiv`-based exterior derivative. All downstream files fixed. |
 | Jan 6, 2026 (earlier) | 0 | 9 | Stage 3 Infrastructure Bridge complete. Bridged manifold `mfderiv` to chart-level `fderiv`. |
 | Jan 5, 2026 | 0 | 9 | Stage 2 groundwork complete (pointwise `extDerivAt` on manifolds). |

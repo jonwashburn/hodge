@@ -89,7 +89,26 @@ The Lean formalization in this repository provides a type-checked skeleton of th
 | Mass lower semicontinuity | `mass_lsc` | `Hodge/Analytic/Calibration.lean` |
 | ω^p algebraicity | `omega_pow_algebraic` | `Hodge/Kahler/Main.lean` |
 
-**Lean status (2026-01-05)**: 0 sorries in main proof, 9 axioms. See `PROOF_COMPLETION_PLAN_8_PILLARS.md` for the staged migration plan.
+**Lean status (2026-01-06)**: 7 sorries (Stage 4 technical proofs: d²=0, Leibniz rule, chart-coordinate identities), 9 axioms. The exterior derivative is now a real operator using `mfderiv` + alternatization. See `PROOF_COMPLETION_PLAN_8_PILLARS.md` for the staged migration plan.
+
+**Differential Forms Infrastructure** (2026-01-06):
+
+| Component | Lean Declaration | File | Status |
+|-----------|------------------|------|--------|
+| Smooth k-form type | `SmoothForm n X k` | `Hodge/Analytic/Forms.lean` | ✅ Defined |
+| ContMDiff k-form type | `ContMDiffForm n X k` | `Hodge/Analytic/ContMDiffForms.lean` | ✅ Defined |
+| Pointwise exterior derivative | `extDerivAt` | `Hodge/Analytic/ContMDiffForms.lean` | ✅ Defined |
+| Exterior derivative (bundled) | `extDerivForm` | `Hodge/Analytic/ContMDiffForms.lean` | ⚠️ `smooth'` sorry |
+| Wedge product | `smoothWedge` | `Hodge/Analytic/Forms.lean` | ✅ Defined |
+| Chart-level exterior deriv | `extDerivInChartWithin` | `Hodge/Analytic/ChartExtDeriv.lean` | ✅ Defined |
+| Linearity (d(ω+η) = dω+dη) | `extDerivAt_add` | `Hodge/Analytic/ContMDiffForms.lean` | ✅ Proven |
+| Linearity (d(cω) = c·dω) | `extDerivAt_smul` | `Hodge/Analytic/ContMDiffForms.lean` | ✅ Proven |
+| Diagonal chart identity | `mfderivInTangentCoordinates_eq_fderiv_diag` | `Hodge/Analytic/ChartExtDeriv.lean` | ✅ Proven |
+| Diagonal smoothness link | `extDerivInTangentCoordinates_diag` | `Hodge/Analytic/ContMDiffForms.lean` | ✅ Proven |
+| d²=0 | `extDeriv_extDeriv` | `Hodge/Analytic/ContMDiffForms.lean` | ⚠️ sorry (uses Mathlib's Schwarz) |
+| Leibniz rule for closed forms | `isFormClosed_wedge` | `Hodge/Analytic/Forms.lean` | ⚠️ sorry |
+
+The exterior derivative `d` is defined as `alternatizeUncurryFin ∘ mfderiv`, matching the standard differential-geometric definition. The key remaining work is connecting the manifold-level `mfderiv` to chart-level `fderiv` for the off-diagonal case.
 
 ### Main dependency chain (from the TeX "Referee packet")
 
