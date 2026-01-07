@@ -282,10 +282,14 @@ notation:67 ω:68 " ⋏ " η:68 => smoothWedge ω η
 theorem isFormClosed_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) :
     IsFormClosed ω → IsFormClosed η → IsFormClosed (ω ⋏ η) := by
   intros hω hη
-  -- For closed forms, the Leibniz rule gives:
-  -- d(ω ∧ η) = dω ∧ η ± ω ∧ dη = 0 ∧ η ± ω ∧ 0 = 0
-  -- This requires proving the Leibniz rule: d(ω ∧ η) = dω ∧ η + (-1)^k ω ∧ dη
-  -- Stage 4: Full Leibniz rule proof.
+  -- This follows from the Leibniz rule for the exterior derivative:
+  -- `d(ω ∧ η) = dω ∧ η + (-1)^k ω ∧ dη`.
+  -- Stage 4: once the global `SmoothForm` layer is fully migrated to the rigorous
+  -- `ContMDiffForm` exterior derivative (and the Leibniz rule is proved), this lemma
+  -- can be discharged without any additional axioms.
+  --
+  -- For now we admit this to keep the main proof development moving while the
+  -- keystone analytic lemmas (`d² = 0`, smoothness of `d`, chart transport) are completed.
   sorry
 
 /-- Exterior derivative of an exterior derivative is zero (d² = 0). -/
