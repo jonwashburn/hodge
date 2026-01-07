@@ -6,6 +6,7 @@ import Mathlib.Analysis.Normed.Module.FiniteDimension
 import Mathlib.Topology.Algebra.Module.FiniteDimension
 import Mathlib.Analysis.Normed.Module.Multilinear.Basic
 import Mathlib.Analysis.Normed.Operator.Mul
+import Mathlib.Analysis.Normed.Operator.BoundedLinearMaps
 import Mathlib.Data.Real.Basic
 import Mathlib.LinearAlgebra.FreeModule.Finite.Basic
 import Mathlib.LinearAlgebra.Multilinear.FiniteDimensional
@@ -298,8 +299,14 @@ theorem continuous_wedge {k l : ℕ} :
   -- The uncurried wedge is continuous because:
   -- - f : CAM k →L CAM l →L CAM (k+l) is a CLM (curried bilinear map)
   -- - The function (ω, η) ↦ (f ω) η is the uncurried application
-  -- - This is continuous by the bounded bilinear map lemma
-  sorry
+  -- - isBoundedBilinearMap_apply shows (g, x) ↦ g x is continuous (CLM evaluation)
+  -- Compose with (f ∘ fst, snd) : Prod → CLM × CAM to get our result
+  let CAMk := ContinuousAlternatingMap 𝕜 E 𝕜 (Fin k)
+  let CAMl := ContinuousAlternatingMap 𝕜 E 𝕜 (Fin l)
+  let CAMkl := ContinuousAlternatingMap 𝕜 E 𝕜 (Fin (k + l))
+  have h1 : Continuous (fun p : CAMk × CAMl => ((f p.1 : CAMl →L[𝕜] CAMkl), p.2)) :=
+    (f.continuous.comp continuous_fst).prodMk continuous_snd
+  exact (isBoundedBilinearMap_apply (𝕜 := 𝕜) (E := CAMl) (F := CAMkl)).continuous.comp h1
 
 end ContinuousAlternatingMap
 

@@ -535,11 +535,21 @@ theorem extDeriv_extDeriv (ω : ContMDiffForm n X k) :
   -- because both use the same chart at x.
   have h_omegaInChart_extDerivForm :
       omegaInChart (extDerivForm ω) x = _root_.extDeriv (omegaInChart ω x) := by
-    ext u
-    simp only [omegaInChart, extDerivForm_as_alternating, extDeriv_as_alternating]
-    -- Need: extDerivAt ω (chartAt.symm u) = _root_.extDeriv (omegaInChart ω x) u
-    -- This requires that for points in the chart domain, extDerivAt equals chart extDeriv
-    -- The proof is involved; we use the chart transport lemma indirectly
+    -- omegaInChart (extDerivForm ω) x u = extDerivAt ω ((chartAt x).symm u)
+    -- _root_.extDeriv (omegaInChart ω x) u = alternatizeUncurryFin (fderiv (omegaInChart ω x) u)
+    --
+    -- Both compute the alternated derivative of ω in chart coordinates at the point
+    -- y = (chartAt x).symm u. The manifold derivative mfderiv reduces to fderiv
+    -- when working in the chart domain (via extDerivAt_eq_chart_extDeriv).
+    --
+    -- The technical challenge is that extDerivAt_eq_chart_extDeriv uses the chart at y,
+    -- not at x. For u in chartAt.target, y ∈ chartAt.source, so charts at x and y overlap.
+    -- On this overlap, the chart transition is smooth and the derivatives agree.
+    --
+    -- This follows from:
+    -- 1. extDerivAt_eq_chart_extDeriv at y gives: extDerivAt ω y = _root_.extDeriv (omegaInChart ω y) (chartAt y y)
+    -- 2. Chart cocycle: omegaInChart ω y ∘ (transition) = omegaInChart ω x on chart domain
+    -- 3. For modelWithCornersSelf, transitions are identity-like (no correction needed)
     sorry
   rw [h_omegaInChart_extDerivForm]
   -- Step 3: Apply Mathlib's d² = 0 theorem
