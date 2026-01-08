@@ -514,28 +514,27 @@ noncomputable def extDerivForm (ω : ContMDiffForm n X k) : ContMDiffForm n X (k
     --
     -- **Mathematical argument (diagonal restriction)**:
     -- 1. Define F : X × X → FiberAlt n (k+1) by F(x₀, y) = extDerivInTangentCoordinates ω x₀ y
-    -- 2. By ContMDiffAt.mfderiv_const, F is jointly smooth on X × X
+    -- 2. F is jointly smooth on X × X (requires ContMDiff on product manifold)
     -- 3. The diagonal Δ : X → X × X, x ↦ (x,x) is smooth
     -- 4. By extDerivInTangentCoordinates_diag, extDerivAt ω = F ∘ Δ
     -- 5. Therefore extDerivAt ω is smooth (composition of smooth maps)
     --
-    -- **Available lemmas**:
-    -- - contMDiffAt_extDerivInTangentCoordinates: proves smoothness at each x for fixed x
-    -- - extDerivInTangentCoordinates_diag: proves diagonal equality
-    -- - ContMDiffAt.mfderiv_const (Mathlib): mfderiv in tangent coordinates is smooth
+    -- **What we have**:
+    -- - contMDiffAt_extDerivInTangentCoordinates ω x₀: proves `extDerivInTangentCoordinates ω x₀`
+    --   is ContMDiffAt at x₀ (for FIXED x₀, as a function of the second variable)
+    -- - extDerivInTangentCoordinates_diag ω x: proves `extDerivInTangentCoordinates ω x x = extDerivAt ω x`
     --
-    -- **Formalization gap**: Proving joint smoothness of F on X × X requires
-    -- showing that (x₀, y) ↦ inTangentCoordinates ... ω.as_alternating x₀ y is smooth
-    -- as a function on the product manifold. Mathlib's ContMDiffAt.mfderiv handles
-    -- this when the basepoint is fixed, but extending to joint smoothness needs
-    -- additional infrastructure (product manifold ContMDiff lemmas).
+    -- **The gap**: We have ContMDiffAt for each fixed x₀, but need the function
+    -- `(x₀, y) ↦ extDerivInTangentCoordinates ω x₀ y` to be jointly ContMDiff on X × X.
+    -- Mathlib's ContMDiffAt.mfderiv handles this via inTangentCoordinates, but
+    -- the joint smoothness requires ContMDiff.prod_mk or ContMDiff.comp_diag.
     --
-    -- The mathematical content is standard: the exterior derivative of a C^∞ form is C^∞.
-    -- This follows from the fact that taking derivatives preserves smoothness.
+    -- **Standard result**: For C^∞ form ω, the exterior derivative dω is C^∞.
+    -- This is immediate in classical differential geometry (taking derivatives preserves smoothness).
     intro x
     have h_tc_smooth := contMDiffAt_extDerivInTangentCoordinates ω x
     have h_diag := extDerivInTangentCoordinates_diag ω x
-    -- The rigorous proof requires joint smoothness on X × X
+    -- The rigorous proof: joint smoothness + diagonal restriction
     sorry
 
 @[simp] lemma extDerivForm_as_alternating (ω : ContMDiffForm n X k) :
