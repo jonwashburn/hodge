@@ -20,12 +20,50 @@ If Mathlib lacks infrastructure, we build it ourselves. The goal is a complete f
 |----------|-------|--------|
 | Pillar axioms (accepted) | 9 decls | ✅ Keep |
 | Extra axioms | 0 | ✅ None |
-| Remaining `sorry` | 5 | 🔴 MUST CLOSE |
+| Remaining `sorry` | 10 | 🔴 MUST CLOSE |
 | Build status | `lake build Hodge.Main` | ✅ Passing |
 
 ---
 
-## The 5 Sorries — ATTACK PLAN
+## The 10 Sorries — ATTACK PLAN
+
+**Note**: The count increased from 5 to 10 because we created detailed infrastructure in
+`Hodge/Analytic/LeibnizRule.lean` to break down the Leibniz rule into smaller components.
+This is progress — the atomic lemmas are now explicit with clear proof sketches.
+
+### Sorry Breakdown by File:
+- `Cohomology/Basic.lean:225` — cohomologous_wedge (depends on Leibniz)
+- `Forms.lean:353` — smoothExtDeriv_wedge (uses LeibnizRule infrastructure)
+- `ContMDiffForms.lean:549` — extDerivAt_eq_chart_extDeriv_general (chart independence)
+- `ContMDiffForms.lean:597` — comment with sorry (cosmetic, not blocking)
+- `ContMDiffForms.lean:652` — extDerivForm.smooth' (joint smoothness)
+- `Currents.lean:358` — boundary.bound (off critical path)
+- `LeibnizRule.lean:126` — mfderiv_wedge_apply (manifold bilinear rule)
+- `LeibnizRule.lean:161` — alternatizeUncurryFin_wedge_right (index permutation)
+- `LeibnizRule.lean:192` — alternatizeUncurryFin_wedge_left (index + sign)
+- `LeibnizRule.lean:216` — extDerivAt_wedge (assembles the above)
+
+### Dependency Graph (→ means "enables"):
+```
+isBoundedBilinearMap_wedge ✅
+    ↓
+hasFDerivAt_wedge ✅
+    ↓
+mfderiv_wedge_apply ⚠️
+    ↓
+alternatizeUncurryFin_wedge_right ⚠️  +  alternatizeUncurryFin_wedge_left ⚠️
+    ↓
+extDerivAt_wedge ⚠️
+    ↓
+smoothExtDeriv_wedge ⚠️ → cohomologous_wedge ⚠️
+
+Independent track:
+extDerivAt_eq_chart_extDeriv_general ⚠️ (uses tangentCoordChange machinery)
+extDerivForm.smooth' ⚠️ (joint smoothness on X × X)
+boundary.bound ⚠️ (off critical path, model issue)
+```
+
+---
 
 ### Sorry 1: `extDerivAt_eq_chart_extDeriv_general` (ContMDiffForms.lean:522)
 
