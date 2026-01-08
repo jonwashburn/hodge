@@ -312,7 +312,22 @@ notation:67 ω:68 " ⋏ " η:68 => smoothWedge ω η
 
 /-- Leibniz rule for the exterior derivative of a wedge product.
     d(ω ∧ η) = dω ∧ η + (-1)^k ω ∧ dη.
-    Note: Requires casting types since (k+1)+l and k+(l+1) are only propositionally equal to k+l+1. -/
+    Note: Requires casting types since (k+1)+l and k+(l+1) are only propositionally equal to k+l+1.
+
+    **Mathematical Content**: This is the fundamental graded Leibniz rule for exterior algebra.
+    At each point x, the exterior derivative of (ω ∧ η)(x) involves:
+    1. Product rule: D(ω(x) ∧ η(x)) = Dω(x) ∧ η(x) + ω(x) ∧ Dη(x)
+    2. Alternatization: The sign (-1)^k arises from the graded commutativity of wedge
+       when commuting the differential past a k-form.
+
+    **Proof approach**: At the fiber level, use:
+    - `mfderiv_wedge` (Leibniz for manifold wedge) = `mfderiv ω ∧ η + ω ∧ mfderiv η`
+    - `alternatizeUncurryFin` distributes over sums
+    - The sign comes from `wedge_comm` and parity of k
+
+    **Formalization gap**: Mathlib's DifferentialForm/Basic.lean has `extDeriv_extDeriv` (d²=0)
+    and `extDeriv_add` (linearity), but not the Leibniz rule for wedge products.
+    This requires developing the interaction between alternatization and bilinear maps. -/
 theorem smoothExtDeriv_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) :
     smoothExtDeriv (ω ⋏ η) =
       castForm (by simp [Nat.add_assoc, Nat.add_comm, Nat.add_left_comm]) (smoothExtDeriv ω ⋏ η) +
