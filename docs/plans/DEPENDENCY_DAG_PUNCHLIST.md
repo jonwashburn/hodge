@@ -22,14 +22,19 @@ This document maps the proof chain in `Hodge-v6-w-Jon-Update-MERGED.tex` to Lean
 - `Cohomology/Basic.lean:192`: 1 (`cohomologous_wedge` - requires Leibniz rule)
 - `Analytic/Forms.lean:293`: 1 (`isFormClosed_wedge` - Leibniz rule)
 - `Analytic/ContMDiffForms.lean`: 2 sorries with proof outlines:
-  - `:528` - `extDerivForm.smooth'` (smoothness via diagonal argument)
-  - `:633` - `h_point_eq` in `extDeriv_extDeriv` (chart cocycle identity)
+  - `:510` - `extDerivForm.smooth'` (smoothness via diagonal/joint smoothness argument)
+  - `:543` - `h_key` in `extDeriv_extDeriv` (chart cocycle identity: mfderiv = fderiv ∘ chart transition)
 - `Analytic/Currents.lean:349`: 1 (boundary operator bound - comass estimate)
 
 **Key Theorems Proven**:
-- `extDerivAt_eq_chart_extDeriv`: Chart transport identity relating mfderiv to fderiv
-- `extDeriv_extDeriv`: d²=0 (modulo chart cocycle sorry) via Mathlib's `extDeriv_extDeriv_apply`
+- `extDerivAt_eq_chart_extDeriv`: Chart transport identity for modelWithCornersSelf
+- `extDeriv_extDeriv`: d²=0 structure (final step uses Mathlib's `extDeriv_extDeriv_apply`)
 - `continuous_wedge`: Wedge product is jointly continuous
+- `extDerivAt_add`, `extDerivAt_smul`: Linearity of pointwise exterior derivative
+
+**Remaining Technical Challenges**:
+1. **Chart cocycle identity**: For y = (chartAt x).symm u, relate `mfderiv f y` (using chartAt y) to `fderiv (f ∘ (chartAt x).symm) u` (using chartAt x). These differ by the chart transition derivative.
+2. **Leibniz rule type casting**: `d(ω∧η)` has type `FiberAlt ((k+l)+1)` while `dω∧η` has type `FiberAlt ((k+1)+l)`. The natural isomorphism `(k+l)+1 = (k+1)+l` needs explicit casting.
 
 ---
 

@@ -533,107 +533,64 @@ noncomputable def extDerivForm (ω : ContMDiffForm n X k) : ContMDiffForm n X (k
 /-- The second exterior derivative of a `C^∞` form is zero (d² = 0).
 
 **Proof outline**:
-1. Use `extDerivAt_eq_chart_extDeriv` twice to express `d(dω)` in chart coordinates.
-2. In chart coordinates, `omegaInChart ω x` is a `ContDiff` function `TangentModel n → FiberAlt n k`.
-3. Apply Mathlib's `extDeriv_extDeriv_apply` which proves d²=0 for ContDiff forms using
-   the symmetry of second partial derivatives (Schwarz's theorem).
+1. Use `extDerivAt_eq_chart_extDeriv` to express `d(dω)` in chart coordinates.
+2. Show that `omegaInChart (extDerivForm ω) x = _root_.extDeriv (omegaInChart ω x)`.
+3. Apply Mathlib's `extDeriv_extDeriv_apply` which proves d²=0.
 
-The semantic correctness follows from the fact that `alternatizeUncurryFin` applied twice
-to a symmetric second derivative produces zero (due to the alternating sign pattern).
+Step 2 requires showing that the manifold exterior derivative in chart coordinates
+equals the model-space exterior derivative.
 -/
 theorem extDeriv_extDeriv (ω : ContMDiffForm n X k) :
     extDeriv (extDerivForm ω) = 0 := by
   funext x
   -- Step 1: Express d(dω) at x using chart coordinates
-  -- extDeriv (extDerivForm ω) x = extDerivAt (extDerivForm ω) x
-  --                             = _root_.extDeriv (omegaInChart (extDerivForm ω) x) ((chartAt x) x)
-  -- by extDerivAt_eq_chart_extDeriv applied to (extDerivForm ω).
   rw [extDeriv_as_alternating, extDerivAt_eq_chart_extDeriv]
-  -- Now we need: _root_.extDeriv (omegaInChart (extDerivForm ω) x) ((chartAt x) x) = 0
+  -- Goal: _root_.extDeriv (omegaInChart (extDerivForm ω) x) ((chartAt x) x) = 0
   --
-  -- Step 2: Show that omegaInChart (extDerivForm ω) x at the point (chartAt x) x
-  -- equals _root_.extDeriv (omegaInChart ω x) at (chartAt x) x.
-  --
-  -- Key observation: By definition,
-  --   omegaInChart (extDerivForm ω) x u = extDerivAt ω ((chartAt x).symm u)
-  -- At u = (chartAt x) x, we have (chartAt x).symm ((chartAt x) x) = x, so:
-  --   omegaInChart (extDerivForm ω) x ((chartAt x) x) = extDerivAt ω x
-  --
-  -- And by extDerivAt_eq_chart_extDeriv applied to ω:
-  --   extDerivAt ω x = _root_.extDeriv (omegaInChart ω x) ((chartAt x) x)
-  --
-  -- So: omegaInChart (extDerivForm ω) x ((chartAt x) x) = _root_.extDeriv (omegaInChart ω x) ((chartAt x) x)
-  --
-  -- For the d²=0 argument, we need to show:
-  --   _root_.extDeriv (omegaInChart (extDerivForm ω) x) ((chartAt x) x) = 0
-  --
-  -- This requires understanding how _root_.extDeriv behaves when applied to
-  -- omegaInChart (extDerivForm ω) x = fun u => extDerivAt ω ((chartAt x).symm u).
-  --
-  -- The function u ↦ extDerivAt ω ((chartAt x).symm u) can be written as:
-  --   u ↦ _root_.extDeriv (omegaInChart ω ((chartAt x).symm u)) (chartAt ((chartAt x).symm u) ((chartAt x).symm u))
-  -- This involves a varying basepoint, making the analysis complex.
-  --
-  -- However, at the specific point u = (chartAt x) x where (chartAt x).symm u = x,
-  -- the function simplifies and we can use Mathlib's d²=0.
-  --
-  -- Technical approach: Show the functions agree near (chartAt x) x so the derivatives match.
-  -- Since both omegaInChart (extDerivForm ω) x and _root_.extDeriv (omegaInChart ω x)
-  -- are computed via mfderiv/fderiv applied to ω in chart coordinates, and for
-  -- modelWithCornersSelf the chart-to-chart transitions are trivial at the diagonal,
-  -- they have the same derivative structure at (chartAt x) x.
-  have h_point_eq : omegaInChart (extDerivForm ω) x = _root_.extDeriv (omegaInChart ω x) := by
-    -- Prove functional equality on the chart domain.
-    -- For u in (chartAt x).target, let y = (chartAt x).symm u.
-    -- LHS(u) = extDerivAt ω y
-    -- RHS(u) = alternatizeUncurryFin (fderiv (omegaInChart ω x) u)
-    --        = alternatizeUncurryFin (fderiv (ω.as_alternating ∘ (chartAt x).symm) u)
+  -- Step 2: Show omegaInChart (extDerivForm ω) x = _root_.extDeriv (omegaInChart ω x)
+  -- This relates the manifold exterior derivative (in chart coordinates) to the
+  -- model-space exterior derivative.
+  have h_key : omegaInChart (extDerivForm ω) x = _root_.extDeriv (omegaInChart ω x) := by
+    -- Unpack definitions:
+    -- LHS: omegaInChart (extDerivForm ω) x u = (extDerivForm ω).as_alternating ((chartAt x).symm u)
+    --                                        = extDeriv ω ((chartAt x).symm u)
+    --                                        = extDerivAt ω ((chartAt x).symm u)
+    --                                        = alternatizeUncurryFin (mfderiv ω.as_alternating ((chartAt x).symm u))
     --
-    -- For modelWithCornersSelf (I = 𝓒_complex n):
-    --   mfderiv I I' f y = fderivWithin ℂ (writtenInExtChartAt I I' y f) (range I) (extChartAt I y y)
-    --   For I = modelWithCornersSelf: range I = univ, so fderivWithin = fderiv.
-    --   writtenInExtChartAt I I' y f = f ∘ (extChartAt I y).symm (for model space I').
+    -- RHS: _root_.extDeriv (omegaInChart ω x) u = alternatizeUncurryFin (fderiv (omegaInChart ω x) u)
+    --     where omegaInChart ω x = ω.as_alternating ∘ (chartAt x).symm
     --
-    -- So: mfderiv I I' f y = fderiv (f ∘ (chartAt y).symm) (chartAt y y)
+    -- So: RHS = alternatizeUncurryFin (fderiv (ω.as_alternating ∘ (chartAt x).symm) u)
     --
-    -- Now: extDerivAt ω y = alternatizeUncurryFin (mfderiv I I' ω.as_alternating y)
-    --                     = alternatizeUncurryFin (fderiv (ω.as_alternating ∘ (chartAt y).symm) (chartAt y y))
+    -- The key question: when does mfderiv I I' f y = fderiv (f ∘ (chartAt x).symm) u
+    -- for y = (chartAt x).symm u?
     --
-    -- And: RHS(u) = alternatizeUncurryFin (fderiv (ω.as_alternating ∘ (chartAt x).symm) u)
+    -- For modelWithCornersSelf I, we have:
+    --   mfderiv I I' f y = fderiv (writtenInExtChartAt I I' y f) (extChartAt I y y)
+    --                    = fderiv (f ∘ (chartAt y).symm) (chartAt y y)
     --
-    -- These use different charts (chartAt y vs chartAt x), but for y = (chartAt x).symm u,
-    -- both are computing the derivative of ω.as_alternating at y in different coordinates.
-    -- The chart cocycle relates them.
+    -- If chartAt x = chartAt y (i.e., both use the same chart), then:
+    --   mfderiv I I' f y = fderiv (f ∘ (chartAt x).symm) (chartAt x y)
+    --                    = fderiv (omegaInChart f x) u  (where u = chartAt x y)
     --
-    -- For the specific case y = x (i.e., u = (chartAt x) x), both charts are chartAt x,
-    -- and the expressions are identical.
+    -- This holds when y is in the chart domain of x AND both use the same chart.
+    -- In an atlas where charts can differ, this requires chart compatibility.
     ext u
-    simp only [omegaInChart, extDerivForm_as_alternating, extDeriv_as_alternating]
-    -- Goal: extDerivAt ω ((chartAt x).symm u) = _root_.extDeriv (omegaInChart ω x) u
-    let y := (chartAt (EuclideanSpace ℂ (Fin n)) x).symm u
-    -- Use extDerivAt_eq_chart_extDeriv for ω at y:
-    --   extDerivAt ω y = _root_.extDeriv (omegaInChart ω y) (chartAt y y)
-    -- But we want _root_.extDeriv (omegaInChart ω x) u, which uses chartAt x, not chartAt y.
+    simp only [omegaInChart, extDerivForm_as_alternating, extDeriv_as_alternating, _root_.extDeriv]
+    -- Goal: extDerivAt ω ((chartAt x).symm u) = alternatizeUncurryFin (fderiv (ω.as_alternating ∘ (chartAt x).symm) u)
     --
-    -- The key insight is that for modelWithCornersSelf:
-    -- - omegaInChart ω y = ω.as_alternating ∘ (chartAt y).symm
-    -- - omegaInChart ω x = ω.as_alternating ∘ (chartAt x).symm
-    -- These are the same function where the charts overlap!
+    -- Use extDerivAt_eq_chart_extDeriv for ω at y := (chartAt x).symm u
+    -- This gives: extDerivAt ω y = _root_.extDeriv (omegaInChart ω y) (chartAt y y)
+    --           = alternatizeUncurryFin (fderiv (ω.as_alternating ∘ (chartAt y).symm) (chartAt y y))
     --
-    -- Specifically, on (chartAt y).target ∩ image of chart transitions from x:
-    --   omegaInChart ω y ∘ (chartAt y ∘ (chartAt x).symm) = omegaInChart ω x
+    -- We need to relate this to fderiv (ω.as_alternating ∘ (chartAt x).symm) u.
+    -- When chartAt y = chartAt x and u = chartAt x y, these are equal.
     --
-    -- For the derivatives, the chain rule gives the relationship.
-    -- At the specific point where both are evaluated at the "y" coordinate,
-    -- the derivatives match up.
-    --
-    -- This is a chart cocycle / transition map argument that requires
-    -- careful bookkeeping. The mathematical content is sound (d²=0 is a
-    -- coordinate-independent identity), but the formalization is technical.
+    -- For a general atlas, the chart cocycle relates them via the transition map.
+    -- This is the core technical challenge: formalizing chart transitions in Mathlib.
     sorry
-  rw [h_point_eq]
+  rw [h_key]
   -- Step 3: Apply Mathlib's d² = 0 theorem
-  -- _root_.extDeriv (_root_.extDeriv (omegaInChart ω x)) ((chartAt x) x) = 0
   have h_smooth : ContDiffAt ℂ ⊤ (omegaInChart ω x) ((chartAt (EuclideanSpace ℂ (Fin n)) x) x) := by
     have h_on : ContDiffOn ℂ ⊤ (omegaInChart ω x) ((chartAt (EuclideanSpace ℂ (Fin n)) x).target) :=
       contDiffOn_omegaInChart ω x
