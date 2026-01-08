@@ -146,6 +146,7 @@ lemma alternatizeUncurryFin_wedge_left (A : E →L[ℂ] ContinuousAlternatingMap
 # Session History
 | Date | Sorries | Axioms | Notes |
 |------|---------|--------|-------|
+| Jan 8, 2026 (update5) | 10 | 9 | **d²=0 proof restructured**. Two approaches documented: (1) chart independence via Filter.EventuallyEq, (2) direct Schwarz symmetry. Both reduce to fundamental d²=0 identity. Critical path: extDerivForm.smooth' and extDeriv_extDeriv. |
 | Jan 8, 2026 (update4) | 9 | 9 | **TeX alignment verified**. Main theorem chain doesn't require cup product (Leibniz). Cleaned up mfderiv_wedge_apply (strategy documented). Key blockers: chart independence, joint smoothness. |
 | Jan 8, 2026 (update3) | 10 | 9 | **Analysis**: Chart independence (`extDerivAt_eq_chart_extDeriv_general`) requires showing d is intrinsic. For model space: trivial (chartAt = refl). For general manifolds: needs coordinate change formula. Build passes. |
 | Jan 8, 2026 (update2) | 10 | 9 | **Leibniz infrastructure**: Created LeibnizRule.lean with hasFDerivAt_wedge ✓, isBoundedBilinearMap_wedge ✓. Connected smoothExtDeriv_wedge to infrastructure. Count increased due to explicit breakdown of atomic lemmas. |
