@@ -518,7 +518,34 @@ theorem extDerivAt_eq_chart_extDeriv_general (ω : ContMDiffForm n X k) (x y : X
   -- the same basepoint is the identity. This follows from `tangentCoordChange_self`
   -- in Mathlib, but requires careful type alignment with OpenPartialHomeomorph.
   --
-  -- **Formalization gap**: Bridging the mfderiv/fderiv and chart transition APIs.
+  -- Key Mathlib lemmas:
+  -- * tangentCoordChange_self: tangentCoordChange I x x z v = v (when z ∈ (extChartAt I x).source)
+  -- * tangentCoordChange_def: tangentCoordChange I x y z =
+  --     fderivWithin 𝕜 (extChartAt I y ∘ (extChartAt I x).symm) (range I) (extChartAt I x z)
+  -- * For modelWithCornersSelf: extChartAt = chartAt, range I = univ, fderivWithin_univ = fderiv
+  --
+  -- The chain rule argument:
+  -- LHS = fderiv (ω ∘ (chartAt y).symm) ((chartAt y) y)
+  --     = fderiv (ω ∘ (chartAt x).symm ∘ (chartAt x) ∘ (chartAt y).symm) ((chartAt y) y)
+  --     = fderiv (ω ∘ (chartAt x).symm) ((chartAt x) y) ∘ fderiv ((chartAt x) ∘ (chartAt y).symm) ((chartAt y) y)
+  --
+  -- For x = y (the special case already proven as extDerivAt_eq_chart_extDeriv):
+  --     fderiv ((chartAt x) ∘ (chartAt x).symm) ((chartAt x) x) = fderiv id _ = id ✓
+  --
+  -- For general y ≠ x, we use tangentCoordChange:
+  --     fderiv ((chartAt x) ∘ (chartAt y).symm) ((chartAt y) y) = tangentCoordChange I y x y
+  --
+  -- And we need: tangentCoordChange I y x y ∘ tangentCoordChange I x y y = id (by tangentCoordChange_comp + _self)
+  --
+  -- This shows the LHS and RHS differ by an invertible coordinate change factor.
+  -- The key insight is that both compute the SAME mfderiv ω y, just expressed in different charts.
+  -- They agree because mfderiv is intrinsically defined (chart-independent).
+  --
+  -- For the model space where chartAt = refl: the transition map is identity, so LHS = RHS directly.
+  -- For general manifolds: the proof requires showing that alternatizeUncurryFin is compatible with
+  -- coordinate changes, which is automatic when the coordinate change is a linear isomorphism.
+  --
+  -- Implementation: Apply tangentCoordChange_self for the y = y case within chart overlap.
   sorry
 
 theorem extDerivAt_add (ω η : ContMDiffForm n X k) (x : X) :
