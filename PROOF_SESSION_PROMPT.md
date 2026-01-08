@@ -146,6 +146,7 @@ lemma alternatizeUncurryFin_wedge_left (A : E →L[ℂ] ContinuousAlternatingMap
 # Session History
 | Date | Sorries | Axioms | Notes |
 |------|---------|--------|-------|
+| Jan 8, 2026 (update7) | 10 | 9 | **Product manifold strategy**. extDerivForm.smooth' proof: F(x₀,y)=extDerivInTangentCoordinates is smooth on X×X, diagonal Δ is smooth, F∘Δ=extDerivAt. Gap: joint smoothness via ContMDiff.mfderiv. |
 | Jan 8, 2026 (update6) | 10 | 9 | **TeX alignment verified**. Main theorem `hodge_conjecture'` matches TeX `thm:main-hodge`. Signed decomposition + cone-positive + ω^p algebraic chains verified. extDerivForm.smooth' gap: need joint smoothness on X×X for diagonal restriction. |
 | Jan 8, 2026 (update5) | 10 | 9 | **d²=0 proof restructured**. Two approaches documented: (1) chart independence via Filter.EventuallyEq, (2) direct Schwarz symmetry. Both reduce to fundamental d²=0 identity. Critical path: extDerivForm.smooth' and extDeriv_extDeriv. |
 | Jan 8, 2026 (update4) | 9 | 9 | **TeX alignment verified**. Main theorem chain doesn't require cup product (Leibniz). Cleaned up mfderiv_wedge_apply (strategy documented). Key blockers: chart independence, joint smoothness. |
