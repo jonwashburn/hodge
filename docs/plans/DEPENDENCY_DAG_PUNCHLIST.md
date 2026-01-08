@@ -33,8 +33,13 @@ This document maps the proof chain in `Hodge-v6-w-Jon-Update-MERGED.tex` to Lean
 - `extDerivAt_add`, `extDerivAt_smul`: Linearity of pointwise exterior derivative
 
 **Remaining Technical Challenges**:
-1. **Chart cocycle identity**: For y = (chartAt x).symm u, relate `mfderiv f y` (using chartAt y) to `fderiv (f ∘ (chartAt x).symm) u` (using chartAt x). These differ by the chart transition derivative.
-2. **Leibniz rule type casting**: `d(ω∧η)` has type `FiberAlt ((k+l)+1)` while `dω∧η` has type `FiberAlt ((k+1)+l)`. The natural isomorphism `(k+l)+1 = (k+1)+l` needs explicit casting.
+1. **Chart cocycle identity** (`h_key`): For y = (chartAt x).symm u, relate `mfderiv f y` (using chartAt y) to `fderiv (f ∘ (chartAt x).symm) u` (using chartAt x). These differ by the chart transition derivative. At u = (chartAt x) x, they agree (proven as `h_at_u₀`), but functional equality fails for general u.
+
+2. **extDerivForm smoothness**: Need to show `extDerivAt ω` is ContMDiff. The function `extDerivInTangentCoordinates ω x` is smooth at x, and equals `extDerivAt ω x` at the diagonal, but they differ in neighborhoods. Requires showing `mfderiv ω.as_alternating` is smooth as a bundle section.
+
+3. **Leibniz rule type casting**: `d(ω∧η)` has type `FiberAlt ((k+l)+1)` while `dω∧η` has type `FiberAlt ((k+1)+l)`. The natural isomorphism `(k+l)+1 = (k+1)+l` needs explicit casting. Mathlib's DifferentialForm/Basic.lean lacks wedge Leibniz (only has linearity and d²=0).
+
+4. **Comass boundedness of d**: For currents, need `comass(dω) ≤ C·comass(ω)`. Requires bounded operator theory on compact manifolds.
 
 ---
 
