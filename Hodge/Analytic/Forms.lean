@@ -333,11 +333,24 @@ notation:67 ω:68 " ⋏ " η:68 => smoothWedge ω η
     and `extDeriv_add` (linearity), but not:
     - `HasFDerivAt` for `ContinuousAlternatingMap.wedge` (Leibniz for bilinear wedge)
     - Interaction between `alternatizeUncurryFin` and `wedge` on fixed arguments
-    - Graded commutativity signs in the differential algebra structure -/
+    - Graded commutativity signs in the differential algebra structure
+
+    **Proof via LeibnizRule.lean**:
+    The theorem `LeibnizRule.extDerivAt_wedge` provides the pointwise identity.
+    This lifts to SmoothForm by extensionality. -/
 theorem smoothExtDeriv_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) :
     smoothExtDeriv (ω ⋏ η) =
       castForm (by simp [Nat.add_assoc, Nat.add_comm, Nat.add_left_comm]) (smoothExtDeriv ω ⋏ η) +
-      castForm (by simp [Nat.add_assoc]) ((-1 : ℂ)^k • (ω ⋏ smoothExtDeriv η)) := sorry
+      castForm (by simp [Nat.add_assoc]) ((-1 : ℂ)^k • (ω ⋏ smoothExtDeriv η)) := by
+  -- Use pointwise equality via LeibnizRule.extDerivAt_wedge
+  ext x v
+  -- LHS: smoothExtDeriv (ω ⋏ η) at x applied to v
+  -- = extDerivAt (ω.wedge η) x applied to v
+  simp only [smoothExtDeriv, extDerivLinearMap, LinearMap.coe_mk, AddHom.coe_mk,
+    ContMDiffForm.toSmoothForm_as_alternating, ContMDiffForm.extDerivForm_as_alternating]
+  -- Apply extDerivAt_wedge from LeibnizRule
+  -- This requires showing the connection between SmoothForm wedge and ContMDiffForm wedge
+  sorry
 
 theorem isFormClosed_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) :
     IsFormClosed ω → IsFormClosed η → IsFormClosed (ω ⋏ η) := by
