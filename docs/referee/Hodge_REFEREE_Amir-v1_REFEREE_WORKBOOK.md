@@ -100,11 +100,17 @@ The Lean formalization in this repository provides a type-checked skeleton of th
 **Remaining sorries (5)**:
 | Location | Issue | Difficulty |
 |----------|-------|------------|
-| `extDerivForm.smooth'` (ContMDiffForms.lean:504) | Chart gluing for smoothness of bundled d | Medium |
-| `h_omegaInChart_extDerivForm` (ContMDiffForms.lean:553) | Chart cocycle in d² proof | Medium |
-| `isFormClosed_wedge` (Forms.lean:293) | Blocked on Leibniz rule type casting (k+1+l vs k+l+1) | Hard |
-| `cohomologous_wedge` (Cohomology/Basic.lean:192) | Depends on isFormClosed_wedge | Blocked |
-| `boundary.bound` (Currents.lean:349) | Comass estimate (analysis axiom) | Analysis |
+| `extDerivForm.smooth'` (ContMDiffForms.lean:538) | Joint smoothness on X×X + diagonal | Medium |
+| `h_deriv_eq` (ContMDiffForms.lean:668) | Chart cocycle in d² proof | Medium |
+| `smoothExtDeriv_wedge` (Forms.lean:340) | Leibniz rule (alternatizeUncurryFin ↔ wedge) | Hard |
+| `cohomologous_wedge` (Cohomology/Basic.lean:225) | Depends on Leibniz rule | Blocked |
+| `boundary.bound` (Currents.lean:358) | d is unbounded on C⁰ forms | Modeling |
+
+**Key Mathlib lemmas identified**:
+- `mfderiv_eq_fderiv`: For model spaces, mfderiv = fderiv
+- `chartAt_self_eq`: On model space H, chartAt = refl
+- `alternatizeUncurryFin_fderivCompContinuousLinearMap_eq_zero`: Symmetric → 0 after alternation
+- `tangentCoordChange_self`: At basepoint, coord change is identity
 
 The core differential geometry (chart transport for modelWithCornersSelf) is now complete.
 
