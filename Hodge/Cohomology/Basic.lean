@@ -219,9 +219,24 @@ theorem cohomologous_wedge {n k l : ℕ} {X : Type u} [TopologicalSpace X] [Char
   change IsExact (ω₁.val - ω₁'.val) at h1
   change IsExact (ω₂.val - ω₂'.val) at h2
 
-  -- The full proof requires the Leibniz rule d(α ∧ β) = dα ∧ β ± α ∧ dβ
-  -- which is axiomatized as smoothExtDeriv_wedge
-  -- For now, we admit this pending that axiom's proof
+  -- **Proof strategy using Leibniz rule**:
+  --
+  -- From h1: ∃ β₁, d(β₁) = ω₁.val - ω₁'.val
+  -- From h2: ∃ β₂, d(β₂) = ω₂.val - ω₂'.val
+  -- Need to show: ∃ γ, d(γ) = (ω₁.val - ω₁'.val) ⋏ ω₂.val + ω₁'.val ⋏ (ω₂.val - ω₂'.val)
+  --
+  -- By Leibniz: d(β₁ ⋏ ω₂.val) = d(β₁) ⋏ ω₂.val + (-1)^(k-1) β₁ ⋏ d(ω₂.val)
+  --           = d(β₁) ⋏ ω₂.val + 0  (since ω₂ is closed: dω₂ = 0)
+  --           = (ω₁.val - ω₁'.val) ⋏ ω₂.val
+  --
+  -- By Leibniz: d(ω₁'.val ⋏ β₂) = d(ω₁'.val) ⋏ β₂ + (-1)^k ω₁'.val ⋏ d(β₂)
+  --           = 0 + (-1)^k ω₁'.val ⋏ (ω₂.val - ω₂'.val)  (since ω₁' is closed)
+  --
+  -- Combining: Take γ = β₁ ⋏ ω₂.val + (-1)^k ω₁'.val ⋏ β₂
+  -- Then: d(γ) = d(β₁) ⋏ ω₂.val + (-1)^k (-1)^k ω₁'.val ⋏ d(β₂)
+  --            = (ω₁ - ω₁') ⋏ ω₂ + ω₁' ⋏ (ω₂ - ω₂')  (since (-1)^k (-1)^k = 1)
+  --
+  -- This requires smoothExtDeriv_wedge (the Leibniz rule) which is in LeibnizRule.lean
   sorry
 
 /-! ### Algebraic Instances -/
