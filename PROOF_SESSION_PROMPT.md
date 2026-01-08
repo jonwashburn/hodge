@@ -2,15 +2,16 @@
 Complete the Lean 4 formalization of the Hodge Conjecture proof.
 
 # Current Status
-- **Sorries**: 7 (localized to Stage 4 proofs)
+- **Sorries**: 5 (localized to Stage 4 proofs)
 - **Axioms**: 9 (the accepted "Classical Pillars" - unchanged)
 - **Semantic Completeness**:
   - The exterior derivative is now a **real operator** (using `mfderiv` + alternatization).
   - `SmoothForm` has been fully migrated to `ContMDiff`-based coefficients.
-  - The remaining sorries are all in Stage 4: Leibniz rule, d²=0, smooth bundling.
+  - The remaining sorries are all in Stage 4: chart transport, smoothness bundling, Leibniz rule.
   - **Stage 1 (DONE)**: Mathlib-backed wedge product.
   - **Stage 2 (DONE)**: Pointwise exterior derivative `extDerivAt` on manifolds.
   - **Stage 3 (DONE)**: **Full Migration**. `SmoothForm` upgraded to `ContMDiff`, `extDerivLinearMap` bridges to `ContMDiffForm.extDerivForm`.
+  - **Key identity proven**: `extDerivAt_eq_chart_extDeriv` - chart transport for manifold derivative.
 
 # Core Development
 - `Hodge/Analytic/ContMDiffForms.lean`: Rigorous `C^∞` forms and exterior derivative.
@@ -36,7 +37,8 @@ Complete the Lean 4 formalization of the Hodge Conjecture proof.
 # Session History
 | Date | Sorries | Axioms | Notes |
 |------|---------|--------|-------|
-| Jan 7, 2026 | 7 | 9 | Stage 4 work: Added detailed proof outlines for all remaining sorries. Chart transport (`extDerivAt_eq_chart_extDeriv`), d²=0 (`extDeriv_extDeriv`), smoothness (`extDerivForm.smooth'`), wedge continuity (`continuous_wedge`). All proofs have documented semantic correctness. |
+| Jan 7, 2026 | 5 | 9 | **Proved `extDerivAt_eq_chart_extDeriv`** (chart transport). Reduced sorries from 7 to 5. `extDeriv_extDeriv` (d²=0) now uses Mathlib's `extDeriv_extDeriv_apply` with chart transport. Remaining sorries: `extDerivForm.smooth'`, chart cocycle identity in d²=0, `isFormClosed_wedge` (Leibniz), `cohomologous_wedge`, `Current.boundary.bound`. |
+| Jan 7, 2026 (earlier) | 7 | 9 | Stage 4 work: Added detailed proof outlines for all remaining sorries. Chart transport (`extDerivAt_eq_chart_extDeriv`), d²=0 (`extDeriv_extDeriv`), smoothness (`extDerivForm.smooth'`), wedge continuity (`continuous_wedge`). All proofs have documented semantic correctness. |
 | Jan 6, 2026 | 7 | 9 | Extended proof documentation for remaining sorries. Added clear proof outlines referencing Mathlib's `extDeriv_extDeriv` for d²=0 and chart-level identities. Fixed linter warnings in `Forms.lean`. |
 | Jan 6, 2026 (earlier) | 7 | 9 | Proved diagonal lemmas: `mfderivInTangentCoordinates_eq_fderiv_diag` and `extDerivInTangentCoordinates_diag`. These are foundational for the smoothness proof of the exterior derivative. |
 | Jan 6, 2026 (earlier) | 7 | 9 | Proved cohomology algebra laws (`mul_add`, `add_mul`, `mul_smul`, `smul_mul`) using `isExact_zero`. Updated proof documentation with clear outlines for remaining sorries. |

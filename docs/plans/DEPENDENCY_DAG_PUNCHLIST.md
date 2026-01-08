@@ -12,7 +12,7 @@ This document maps the proof chain in `Hodge-v6-w-Jon-Update-MERGED.tex` to Lean
 |----------|-------|--------|
 | Pillar axioms (accepted) | 9 decls | ✅ Keep |
 | Extra axioms | 0 | ✅ None |
-| Remaining `sorry` | 7 | ⚠️ Stage 4 work |
+| Remaining `sorry` | 5 | ⚠️ Stage 4 work |
 | Semantic stubs documented | ~10 major | ✅ Downward trend |
 | Build status | `lake build Hodge.Main` | ✅ Passing |
 
@@ -21,12 +21,15 @@ This document maps the proof chain in `Hodge-v6-w-Jon-Update-MERGED.tex` to Lean
 **`sorry` Breakdown** (all in Stage 4 work, with documented proof strategies):
 - `Cohomology/Basic.lean:192`: 1 (`cohomologous_wedge` - requires Leibniz rule)
 - `Analytic/Forms.lean:293`: 1 (`isFormClosed_wedge` - Leibniz rule)
-- `Analytic/ContMDiffForms.lean`: 3 sorries with proof outlines:
-  - `:417` - `extDerivAt_eq_chart_extDeriv` (chart transport: mfderiv = fderiv)
-  - `:486` - `extDerivForm.smooth'` (smoothness via chart gluing)
-  - `:519` - `extDeriv_extDeriv` (d²=0 via Mathlib's Schwarz theorem)
-- `Analytic/DomCoprod.lean:302`: 1 (`continuous_wedge` - bilinear continuity)
+- `Analytic/ContMDiffForms.lean`: 2 sorries with proof outlines:
+  - `:528` - `extDerivForm.smooth'` (smoothness via diagonal argument)
+  - `:633` - `h_point_eq` in `extDeriv_extDeriv` (chart cocycle identity)
 - `Analytic/Currents.lean:349`: 1 (boundary operator bound - comass estimate)
+
+**Key Theorems Proven**:
+- `extDerivAt_eq_chart_extDeriv`: Chart transport identity relating mfderiv to fderiv
+- `extDeriv_extDeriv`: d²=0 (modulo chart cocycle sorry) via Mathlib's `extDeriv_extDeriv_apply`
+- `continuous_wedge`: Wedge product is jointly continuous
 
 ---
 
