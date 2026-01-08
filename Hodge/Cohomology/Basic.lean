@@ -186,9 +186,31 @@ theorem cohomologous_wedge {n k l : ℕ} {X : Type u} [TopologicalSpace X] [Char
     [IsManifold (𝓒_complex n) ⊤ X]
     (ω₁ ω₁' : ClosedForm n X k) (ω₂ ω₂' : ClosedForm n X l) (h1 : ω₁ ≈ ω₁') (h2 : ω₂ ≈ ω₂') :
     (⟨ω₁.val ⋏ ω₂.val, isFormClosed_wedge _ _ ω₁.property ω₂.property⟩ : ClosedForm n X (k + l)) ≈ ⟨ω₁'.val ⋏ ω₂'.val, isFormClosed_wedge _ _ ω₁'.property ω₂'.property⟩ := by
-  -- Goal: IsExact (ω₁ ∧ ω₂ - ω₁' ∧ ω₂')
-  -- Using h1 (ω₁ ≈ ω₁') and h2 (ω₂ ≈ ω₂'), we expand via Leibniz rule.
-  -- Stage 4: Formalize this calculation using the Leibniz rule for the real operator.
+  -- Proof outline:
+  --
+  -- Goal: ω₁∧ω₂ - ω₁'∧ω₂' is exact, i.e., ∃ β, dβ = ω₁∧ω₂ - ω₁'∧ω₂'
+  --
+  -- Step 1: Expand the difference using bilinearity of wedge:
+  --   ω₁∧ω₂ - ω₁'∧ω₂' = (ω₁ - ω₁')∧ω₂ + ω₁'∧(ω₂ - ω₂')
+  --
+  -- Step 2: Use hypotheses:
+  --   h1: ω₁ ≈ ω₁' means ∃ β₁, dβ₁ = ω₁ - ω₁'
+  --   h2: ω₂ ≈ ω₂' means ∃ β₂, dβ₂ = ω₂ - ω₂'
+  --
+  -- Step 3: Apply Leibniz rule:
+  --   d(β₁ ∧ ω₂) = (dβ₁) ∧ ω₂ + (-1)^(k-1) β₁ ∧ (dω₂)
+  --             = (ω₁ - ω₁') ∧ ω₂ + 0    (since dω₂ = 0, ω₂ is closed)
+  --
+  --   d(ω₁' ∧ β₂) = (dω₁') ∧ β₂ + (-1)^k ω₁' ∧ (dβ₂)
+  --              = 0 + (-1)^k ω₁' ∧ (ω₂ - ω₂')   (since dω₁' = 0, ω₁' is closed)
+  --
+  -- Step 4: Combine:
+  --   ω₁∧ω₂ - ω₁'∧ω₂' = d(β₁ ∧ ω₂) + (-1)^k d(ω₁' ∧ β₂)
+  --                   = d(β₁ ∧ ω₂ + (-1)^k ω₁' ∧ β₂)
+  --
+  -- So β := β₁ ∧ ω₂ + (-1)^k ω₁' ∧ β₂ witnesses exactness.
+  --
+  -- Technical requirements: Leibniz rule (from isFormClosed_wedge proof path)
   sorry
 
 /-! ### Algebraic Instances -/
