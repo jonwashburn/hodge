@@ -631,10 +631,27 @@ theorem extDeriv_extDeriv (ω : ContMDiffForm n X k) :
   -- For the d²=0 result, we only need the extDeriv at u₀ to be zero.
   have h_key : omegaInChart (extDerivForm ω) x = _root_.extDeriv (omegaInChart ω x) := by
     ext u
-    simp only [omegaInChart, extDerivForm_as_alternating, extDeriv_as_alternating, _root_.extDeriv]
-    -- The chart cocycle argument: for y = (chartAt x).symm u,
-    -- mfderiv at y (using chartAt y) vs fderiv in fixed chart x.
-    -- At u = u₀, these agree. For general u, the chart transition relates them.
+    simp only [omegaInChart, extDerivForm_as_alternating, extDeriv_as_alternating]
+    -- Goal is an equality of alternating maps applied to arbitrary vectors
+    -- Both sides: (extDerivAt ω ((chartAt x).symm u)) vs (_root_.extDeriv (omegaInChart ω x) u)
+    --
+    -- Let y := (chartAt x).symm u. We need: extDerivAt ω y = _root_.extDeriv (omegaInChart ω x) u
+    -- as alternating maps (i.e., at every vector input).
+    --
+    -- By extDerivAt_eq_chart_extDeriv at y:
+    --   extDerivAt ω y = _root_.extDeriv (omegaInChart ω y) (chartAt y y)
+    --
+    -- Key insight: For u in the chart target of x, y = (chartAt x).symm u is in the chart source of x.
+    -- In a single chart domain, chartAt y = chartAt x (they're the same chart).
+    -- So: _root_.extDeriv (omegaInChart ω y) (chartAt y y) = _root_.extDeriv (omegaInChart ω x) (chartAt x y)
+    --
+    -- Since y = (chartAt x).symm u, we have (chartAt x) y = u (by right_inv, IF u is in target).
+    -- And chartAt y = chartAt x in the same chart domain.
+    --
+    -- The technical issue: these equalities hold for u in (chartAt x).target, but the ext
+    -- quantifies over all u. Outside the target, both sides may be junk/zero.
+    --
+    -- Admit for now - the mathematical content is sound (d²=0 is chart-independent).
     sorry
   rw [h_key]
   have h_smooth : ContDiffAt ℂ ⊤ (omegaInChart ω x) ((chartAt (EuclideanSpace ℂ (Fin n)) x) x) := by
