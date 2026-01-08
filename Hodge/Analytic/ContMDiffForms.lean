@@ -945,9 +945,44 @@ theorem extDeriv_extDeriv (ω : ContMDiffForm n X k) :
   -- **Mathematical truth**: d²ω = 0 is a fundamental identity in differential geometry.
   -- This sorry represents the formal proof that the manifold exterior derivative
   -- squares to zero, which requires the chart-independence machinery.
+  --
+  -- **Direct computation approach**:
+  -- Goal after simplification: _root_.extDeriv (omegaInChart (extDerivForm ω) x) u₀ = 0
+  --
+  -- The function g := omegaInChart (extDerivForm ω) x = extDerivAt ω ∘ (chartAt x).symm
+  --                = (alternatizeUncurryFin ∘ mfderiv ω) ∘ (chartAt x).symm
+  --
+  -- Its exterior derivative:
+  --   extDeriv g u₀ = alternatizeUncurryFin (fderiv g u₀)
+  --
+  -- By chain rule:
+  --   fderiv g u₀ = fderiv (alternatizeUncurryFin ∘ mfderiv ω) x ∘ fderiv ((chartAt x).symm) u₀
+  --               = alternatizeUncurryFinCLM ∘ fderiv (mfderiv ω) x ∘ L
+  --               (where L = fderiv ((chartAt x).symm) u₀ is the chart inverse derivative)
+  --
+  -- So: extDeriv g u₀ = alternatizeUncurryFin (alternatizeUncurryFinCLM ∘ fderiv (mfderiv ω) x ∘ L)
+  --
+  -- Key fact: At x, mfderiv ω x = fderiv (omegaInChart ω x) u₀.
+  -- The derivative fderiv (mfderiv ω) x ∘ L relates to fderiv² (omegaInChart ω x) u₀.
+  --
+  -- By Schwarz's theorem (ContDiffAt.isSymmSndFDerivAt), the second derivative of
+  -- omegaInChart ω x at u₀ is symmetric: fderiv² (omegaInChart ω x) u₀ v w = fderiv² (omegaInChart ω x) u₀ w v.
+  --
+  -- Therefore, by alternatizeUncurryFin_alternatizeUncurryFinCLM_comp_of_symmetric:
+  --   alternatizeUncurryFin (alternatizeUncurryFinCLM ∘ symmetric_map) = 0
+  --
+  -- **Formal proof sketch**:
+  -- 1. Compute fderiv g u₀ via chain rule
+  -- 2. Show fderiv (mfderiv ω) x ∘ L equals (or is related to) the symmetric second derivative
+  -- 3. Apply the double alternatization lemma
   simp only [Pi.zero_apply]
-  -- Goal: _root_.extDeriv (omegaInChart (extDerivForm ω) x) u₀ = 0
-  -- This is the manifold d²=0 identity in chart coordinates.
+  -- Apply the standard Euclidean d²=0 result.
+  -- The function omegaInChart (extDerivForm ω) x is smooth (by h_smooth_dω computed earlier).
+  -- Its exterior derivative at u₀ involves a double alternatization of a symmetric form.
+  -- By Schwarz + alternatizeUncurryFin_alternatizeUncurryFinCLM_comp_of_symmetric, this is 0.
+  --
+  -- The formal proof requires expressing the goal in terms of the Mathlib machinery.
+  -- For now, we mark this as the d²=0 principle.
   sorry
 
 end ContMDiffForm
