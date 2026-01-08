@@ -646,17 +646,24 @@ theorem extDeriv_extDeriv (ω : ContMDiffForm n X k) :
     --   1. omegaInChart ω y = omegaInChart ω x (same chart representation)
     --   2. (chartAt y) y = u
     -- Both hold when chartAt y = chartAt x, which is true when:
-    --   - X is the model space itself (chartAt is always identity)
+    --   - X is the model space itself (chartAt is always identity, by `chartAt_self_eq`)
     --   - y is in a locally constant chart region
     --
+    -- **Key Mathlib lemmas**:
+    -- - `mfderiv_eq_fderiv`: For maps between model spaces, mfderiv = fderiv
+    -- - `chartAt_self_eq`: On model space H, chartAt H x = refl (identity)
+    -- - `extChartAt_model_space_eq_id`: extChartAt on model space is identity
+    -- - `tangentCoordChange_self`: At basepoint, tangent coord change is identity
+    --
     -- **Mathematical justification**: The d²=0 property is a local computation that holds
-    -- in any chart. The chart cocycle relations ensure consistency across overlaps.
+    -- in any chart. The exterior derivative is chart-independent (`mfderiv` is intrinsic).
     -- For modelWithCornersSelf, the extended chart equals the base chart (no boundary),
     -- and the cocycle collapses to identity transformations.
     --
     -- **Formalization gap**: Proving this requires either:
     --   (a) Restricting to X = EuclideanSpace (where chartAt = refl, cocycle is trivial)
-    --   (b) Developing chart cocycle infrastructure for general smooth manifolds
+    --   (b) Showing that extDerivAt is chart-independent (uses ANY chart containing y)
+    --   (c) Developing chart cocycle infrastructure for general smooth manifolds
     -- The mathematical content is standard differential geometry.
     sorry
 
