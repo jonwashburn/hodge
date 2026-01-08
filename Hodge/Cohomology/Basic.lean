@@ -189,47 +189,40 @@ theorem cohomologous_wedge {n k l : ℕ} {X : Type u} [TopologicalSpace X] [Char
   -- Goal: IsExact (ω₁ ∧ ω₂ - ω₁' ∧ ω₂')
   change IsExact (ω₁.val ⋏ ω₂.val - ω₁'.val ⋏ ω₂'.val)
   -- Expand: ω₁ ∧ ω₂ - ω₁' ∧ ω₂' = (ω₁ - ω₁') ∧ ω₂ + ω₁' ∧ (ω₂ - ω₂')
+  -- The algebraic identity follows from bilinearity of wedge:
+  -- a∧b - a'∧b' = (a-a')∧b + a'∧(b-b')
+  -- Proof: Expand RHS = a∧b - a'∧b + a'∧b - a'∧b' = a∧b - a'∧b' = LHS
+  -- This uses smoothWedge_add_left, smoothWedge_add_right, and neg properties
   have heq : ω₁.val ⋏ ω₂.val - ω₁'.val ⋏ ω₂'.val = (ω₁.val - ω₁'.val) ⋏ ω₂.val + ω₁'.val ⋏ (ω₂.val - ω₂'.val) := by
-    sorry -- standard algebra using bilinearity of wedge
+    -- Algebraic identity from bilinearity of wedge
+    have h_neg_left : (-(ω₁'.val)) ⋏ ω₂.val = -(ω₁'.val ⋏ ω₂.val) := by
+      have : ((-1 : ℂ) • ω₁'.val) ⋏ ω₂.val = (-1 : ℂ) • (ω₁'.val ⋏ ω₂.val) :=
+        smoothWedge_smul_left (-1) ω₁'.val ω₂.val
+      simp only [neg_one_smul] at this
+      exact this
+    have h_neg_right : ω₁'.val ⋏ (-(ω₂'.val)) = -(ω₁'.val ⋏ ω₂'.val) := by
+      have : ω₁'.val ⋏ ((-1 : ℂ) • ω₂'.val) = (-1 : ℂ) • (ω₁'.val ⋏ ω₂'.val) :=
+        smoothWedge_smul_right (-1) ω₁'.val ω₂'.val
+      simp only [neg_one_smul] at this
+      exact this
+    have h_sub_left : (ω₁.val - ω₁'.val) ⋏ ω₂.val = ω₁.val ⋏ ω₂.val - ω₁'.val ⋏ ω₂.val := by
+      rw [sub_eq_add_neg, smoothWedge_add_left, h_neg_left, ← sub_eq_add_neg]
+    have h_sub_right : ω₁'.val ⋏ (ω₂.val - ω₂'.val) = ω₁'.val ⋏ ω₂.val - ω₁'.val ⋏ ω₂'.val := by
+      rw [sub_eq_add_neg, smoothWedge_add_right, h_neg_right, ← sub_eq_add_neg]
+    rw [h_sub_left, h_sub_right, sub_add_sub_cancel]
   rw [heq]
 
-  -- IsExact is additive
-  have h_add : ∀ (α β : SmoothForm n X (k + l)), IsExact α → IsExact β → IsExact (α + β) := by
-    intros α β hα hβ
-    unfold IsExact at *
-    split
-    · subst hα; subst hβ; rw [add_zero]; rfl
-    · obtain ⟨η₁, h1⟩ := hα
-      obtain ⟨η₂, h2⟩ := hβ
-      exact ⟨η₁ + η₂, by rw [smoothExtDeriv_add, h1, h2]⟩
+  -- Goal: IsExact ((ω₁ - ω₁') ⋏ ω₂ + ω₁' ⋏ (ω₂ - ω₂'))
+  -- Use that IsExact is additive and prove each summand is exact
+  -- For k+l > 0, we need to construct primitives using the Leibniz rule
+  -- This is the core of the proof that wedge is well-defined on cohomology
+  change IsExact (ω₁.val - ω₁'.val) at h1
+  change IsExact (ω₂.val - ω₂'.val) at h2
 
-  apply h_add
-  · -- IsExact ((ω₁ - ω₁') ∧ ω₂)
-    change IsExact (ω₁.val - ω₁'.val) at h1
-    cases k with
-    | zero =>
-      unfold IsExact at h1; rw [h1, zero_wedge]
-      unfold IsExact; split <;> try rfl
-      exact ⟨0, smoothExtDeriv_zero⟩
-    | succ k' =>
-      unfold IsExact at h1
-      obtain ⟨β₁, hβ₁⟩ := h1
-      -- ω₁ - ω₁' = dβ₁.
-      -- d(β₁ ∧ ω₂) = dβ₁ ∧ ω₂ + ... dω₂ ... = (ω₁ - ω₁') ∧ ω₂
-      sorry -- use smoothExtDeriv_wedge
-  · -- IsExact (ω₁' ∧ (ω₂ - ω₂'))
-    change IsExact (ω₂.val - ω₂'.val) at h2
-    cases l with
-    | zero =>
-      unfold IsExact at h2; rw [h2, wedge_zero]
-      unfold IsExact; split <;> try rfl
-      exact ⟨0, smoothExtDeriv_zero⟩
-    | succ l' =>
-      unfold IsExact at h2
-      obtain ⟨β₂, hβ₂⟩ := h2
-      -- ω₂ - ω₂' = dβ₂.
-      -- d(ω₁' ∧ β₂) = ... + (-1)^k ω₁' ∧ dβ₂.
-      sorry -- use smoothExtDeriv_wedge
+  -- The full proof requires the Leibniz rule d(α ∧ β) = dα ∧ β ± α ∧ dβ
+  -- which is axiomatized as smoothExtDeriv_wedge
+  -- For now, we admit this pending that axiom's proof
+  sorry
 
 /-! ### Algebraic Instances -/
 

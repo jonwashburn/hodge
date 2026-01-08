@@ -294,16 +294,21 @@ def smoothWedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) : Sm
 notation:67 ω:68 " ⋏ " η:68 => smoothWedge ω η
 
 @[simp] lemma zero_wedge {k l : ℕ} (η : SmoothForm n X l) : (0 : SmoothForm n X k) ⋏ η = 0 := by
-  ext x
-  simp [smoothWedge]
-  -- Linearity of wedge
-  sorry
+  ext x v
+  -- derive from `wedge_smul_left` with `c = 0`
+  simpa [smoothWedge] using
+    congrArg (fun (f : FiberAlt n (k + l)) => f v)
+      (ContinuousAlternatingMap.wedge_smul_left
+        (𝕜 := ℂ) (E := TangentModel n) (c := (0 : ℂ))
+        (ω := (0 : FiberAlt n k)) (η := η.as_alternating x))
 
 @[simp] lemma wedge_zero {k l : ℕ} (ω : SmoothForm n X k) : ω ⋏ (0 : SmoothForm n X l) = 0 := by
-  ext x
-  simp [smoothWedge]
-  -- Linearity of wedge
-  sorry
+  ext x v
+  simpa [smoothWedge] using
+    congrArg (fun (f : FiberAlt n (k + l)) => f v)
+      (ContinuousAlternatingMap.wedge_smul_right
+        (𝕜 := ℂ) (E := TangentModel n) (c := (0 : ℂ))
+        (ω := ω.as_alternating x) (η := (0 : FiberAlt n l)))
 
 /-- Leibniz rule for the exterior derivative of a wedge product.
     d(ω ∧ η) = dω ∧ η + (-1)^k ω ∧ dη.
