@@ -677,53 +677,36 @@ noncomputable def extDerivForm (ω : ContMDiffForm n X k) : ContMDiffForm n X (k
     -- **Standard result**: For C^∞ form ω, the exterior derivative dω is C^∞.
     -- This is immediate in classical differential geometry (taking derivatives preserves smoothness).
     intro x
-    have h_tc_smooth := contMDiffAt_extDerivInTangentCoordinates ω x
-    have h_diag := extDerivInTangentCoordinates_diag ω x
-    -- **Key insight**: extDerivAt ω x = extDerivInTangentCoordinates ω x x (by h_diag)
-    -- And extDerivInTangentCoordinates ω x is ContMDiffAt at x (by h_tc_smooth).
-    -- So extDerivAt ω is ContMDiffAt at x.
+    -- **Goal**: Show `extDeriv ω = extDerivAt ω` is ContMDiffAt at x.
     --
-    -- We need to show that there exists a neighborhood of x on which extDerivAt ω
-    -- is ContMDiff. The function extDerivInTangentCoordinates ω x works for the
-    -- second variable y near x, and on the diagonal y = x, it equals extDerivAt ω x.
+    -- **Key identity**: extDerivAt ω y = extDerivInTangentCoordinates ω y y (diagonal restriction)
     --
-    -- The precise argument: extDerivInTangentCoordinates ω x is smooth at x,
-    -- and at x it equals extDerivAt ω x. But we need extDerivAt ω to be smooth,
-    -- not extDerivInTangentCoordinates ω x.
+    -- **What we have**:
+    -- - `contMDiffAt_extDerivInTangentCoordinates ω x₀` proves that for FIXED x₀,
+    --   the function `y ↦ extDerivInTangentCoordinates ω x₀ y` is ContMDiffAt at y = x₀.
+    --   This is smoothness in the SECOND variable.
     --
-    -- Alternative approach: Use the definition of extDerivAt directly.
-    -- extDerivAt ω = alternatizeUncurryFin ∘ mfderiv ω.as_alternating
+    -- **What we need**: Smoothness of `x ↦ extDerivAt ω x = x ↦ extDerivInTangentCoordinates ω x x`.
+    --   This is smoothness of the DIAGONAL of the two-variable function
+    --   `(x₀, y) ↦ extDerivInTangentCoordinates ω x₀ y`.
     --
-    -- Since alternatizeUncurryFin is a smooth (linear) map, we need mfderiv ω.as_alternating
-    -- to be smooth. This follows from ω being C^∞.
+    -- **The gap**: We have smoothness in the second variable for fixed first variable.
+    --   For the diagonal to be smooth, we need JOINT smoothness in both variables.
     --
-    -- Mathlib has `ContMDiff.mfderiv` which shows that if f is ContMDiff (n+1),
-    -- then mfderiv f is ContMDiff n. For f = ω.as_alternating which is ContMDiff ⊤,
-    -- mfderiv f is also ContMDiff ⊤.
+    -- **Mathematical fact**: The exterior derivative of a C^∞ form is C^∞.
+    -- This is a fundamental result in differential geometry.
     --
-    -- The composition with the smooth (linear) alternatizeUncurryFin preserves smoothness.
-    -- **The gap**: We have `h_tc_smooth` which says that for FIXED x₀ = x,
-    -- the function y ↦ extDerivInTangentCoordinates ω x y is ContMDiffAt at y = x.
-    -- And `h_diag` says extDerivInTangentCoordinates ω x x = extDerivAt ω x (point equality).
+    -- **Mathlib machinery**: ContMDiff.contMDiff_tangentMap shows that if f : M → N is C^∞,
+    -- then the tangent map TM → TN is C^∞. This gives smoothness of mfderiv as a section.
     --
-    -- But the goal is to show x ↦ extDerivAt ω x is ContMDiff.
-    -- extDerivAt ω y = extDerivInTangentCoordinates ω y y (diagonal).
+    -- For our case with trivial target bundle FiberAlt, the proof would use:
+    -- 1. ω.as_alternating : X → FiberAlt is ContMDiff ⊤
+    -- 2. mfderiv ω.as_alternating : X → (TangentModel n →L[ℂ] FiberAlt) is ContMDiff (⊤ - 1) = ⊤
+    -- 3. alternatizeUncurryFinCLM is a CLM, so composing preserves ContMDiff
+    -- 4. Therefore extDerivAt ω = alternatizeUncurryFin ∘ mfderiv ω.as_alternating is ContMDiff
     --
-    -- For the diagonal restriction to be smooth, we need JOINT smoothness of
-    -- (x₀, y) ↦ extDerivInTangentCoordinates ω x₀ y on X × X.
-    --
-    -- Current state: We have pointwise smoothness (for each fixed x₀),
-    -- but not joint smoothness.
-    --
-    -- **Mathematical truth**: The exterior derivative of a C^∞ form is C^∞.
-    -- This follows from the fact that taking derivatives preserves smoothness,
-    -- and alternatizeUncurryFin is linear (hence smooth).
-    --
-    -- The rigorous formalization requires either:
-    -- 1. Proving joint smoothness of mfderiv on X × X (using Mathlib's ContMDiff.mfderiv)
-    -- 2. Or using a different approach that doesn't require joint smoothness
-    --
-    -- For now, this is marked as a standard result in differential geometry.
+    -- The formal proof requires the Mathlib lemma that mfderiv of a ContMDiff function
+    -- (as a section of the bundle of linear maps) is ContMDiff.
     sorry
 
 @[simp] lemma extDerivForm_as_alternating (ω : ContMDiffForm n X k) :
