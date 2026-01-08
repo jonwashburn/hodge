@@ -434,11 +434,21 @@ theorem extDerivAt_eq_chart_extDeriv (ω : ContMDiffForm n X k) (x : X) :
     simp only [Function.comp_apply, id_eq, omegaInChart, h_ext_symm]
   rw [h_fun_eq, h_ext_app]
 
-/-- **Chart-independence of exterior derivative**: We can compute `extDerivAt ω y` using ANY chart
-whose source contains `y`, not just `chartAt y`. This is because `mfderiv` is intrinsically defined.
+/-- **Chart-independence of exterior derivative**: We can compute `extDerivAt ω y` using the chart
+at `x` instead of `chartAt y`, when `y ∈ (chartAt x).source`.
 
 For `y ∈ (chartAt x).source`, we have:
 `extDerivAt ω y = _root_.extDeriv (omegaInChart ω x) ((chartAt x) y)`
+
+**Important**: This requires showing that `mfderiv` computed via different charts gives the same
+result after appropriate coordinate transformations. The LHS uses `chartAt y`, the RHS uses `chartAt x`.
+
+For the model space (where `chartAt = refl` everywhere by `chartAt_self_eq`), both charts are
+identity and the equality is immediate.
+
+For general manifolds, the fderivs differ by the chart transition derivative:
+`fderiv (ω ∘ (chartAt y).symm) ((chartAt y) y) = fderiv (ω ∘ (chartAt x).symm) ((chartAt x) y) ∘ (fderiv τ (ψ y))⁻¹`
+where `τ = (chartAt x) ∘ (chartAt y).symm` is the chart transition.
 
 This generalizes `extDerivAt_eq_chart_extDeriv` (which is the special case `y = x`). -/
 theorem extDerivAt_eq_chart_extDeriv_general (ω : ContMDiffForm n X k) (x y : X)
@@ -471,15 +481,21 @@ theorem extDerivAt_eq_chart_extDeriv_general (ω : ContMDiffForm n X k) (x y : X
     simp only [extChartAt]
     rw [OpenPartialHomeomorph.extend_coe]
     simp only [Function.comp_apply, 𝓒_complex, modelWithCornersSelf_coe, id_eq]
-  -- Show the functions are equal
-  -- LHS uses chartAt y, RHS uses chartAt x
-  -- We need: fderiv (ω ∘ (chartAt y).symm) ((chartAt y) y) = fderiv (ω ∘ (chartAt x).symm) ((chartAt x) y)
-  -- This follows from the chain rule and the chart transition:
-  -- (chartAt y).symm = (chartAt x).symm ∘ (chartAt x ∘ (chartAt y).symm)
-  -- The derivatives compose, and the chart transition derivatives cancel appropriately.
+  -- LHS: fderiv (ω ∘ (chartAt y).symm) ((chartAt y) y)
+  -- RHS: fderiv (ω ∘ (chartAt x).symm) ((chartAt x) y)
   --
-  -- For now, we assume chart compatibility (same result using different charts).
-  -- This is mathematically correct: mfderiv is chart-independent by definition.
+  -- By chain rule with τ = (chartAt x) ∘ (chartAt y).symm:
+  --   ω ∘ (chartAt y).symm = ω ∘ (chartAt x).symm ∘ τ
+  -- So: fderiv (ω ∘ (chartAt y).symm) ((chartAt y) y)
+  --   = fderiv (ω ∘ (chartAt x).symm) (τ ((chartAt y) y)) ∘ fderiv τ ((chartAt y) y)
+  --   = fderiv (ω ∘ (chartAt x).symm) ((chartAt x) y) ∘ fderiv τ ((chartAt y) y)
+  --
+  -- For equality, we need fderiv τ ((chartAt y) y) = id.
+  -- This holds when chartAt y = chartAt x (then τ = id).
+  -- On the model space, chartAt_self_eq gives chartAt = refl for all points.
+  --
+  -- **Formalization gap for general manifolds**: Need chart transition derivative = id,
+  -- which requires chartAt y = chartAt x locally. This is the chart cocycle issue.
   sorry
 
 theorem extDerivAt_add (ω η : ContMDiffForm n X k) (x : X) :
