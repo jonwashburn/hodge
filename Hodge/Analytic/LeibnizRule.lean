@@ -91,30 +91,59 @@ theorem mfderiv_wedge_apply {k l : ℕ} (ω : ContMDiffForm n X k) (η : ContMDi
   -- The wedge of ContMDiffForms has as_alternating = fun x => ω(x) ∧ η(x)
   have h_eq : (ω.wedge η).as_alternating = fun y => (ω.as_alternating y).wedge (η.as_alternating y) := rfl
   rw [h_eq]
-  -- For smooth forms, mfderiv is computed via chart coordinates
-  -- The key is that mfderiv of a composition follows the chain rule
-  -- mfderiv (fun y => B(f y, g y)) x = D_f B(f x, g x) ∘ mfderiv f x + D_g B(f x, g x) ∘ mfderiv g x
-  -- where B is bilinear (wedge) and f = ω.as_alternating, g = η.as_alternating
 
-  -- We use that mfderiv agrees with fderiv in chart coordinates for modelWithCornersSelf
-  -- For the model space target, writtenInExtChartAt is the identity
+  -- For smooth forms, we use that mfderiv can be computed via chart coordinates.
+  -- Key facts:
+  -- 1. For modelWithCornersSelf: range I = univ, so mfderiv = fderivWithin ... univ = fderiv (in chart)
+  -- 2. For 𝓘(ℂ, F) target: writtenInExtChartAt is essentially f ∘ (chartAt x).symm
+  -- 3. The bilinear derivative rule (hasFDerivAt_wedge) applies in chart coordinates
 
-  -- The key insight: since ω and η are smooth, their mfderivs exist
+  -- Smoothness gives differentiability
   have hω_diff : MDifferentiableAt (𝓒_complex n) 𝓘(ℂ, Alt n k) ω.as_alternating x :=
     ω.smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
   have hη_diff : MDifferentiableAt (𝓒_complex n) 𝓘(ℂ, Alt n l) η.as_alternating x :=
     η.smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
+  have hωη_diff : MDifferentiableAt (𝓒_complex n) 𝓘(ℂ, Alt n (k+l))
+      (fun y => (ω.as_alternating y).wedge (η.as_alternating y)) x :=
+    (ω.wedge η).smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
 
-  -- The formula follows from the bilinear derivative rule for mfderiv
-  -- This requires MDifferentiableAt.mfderiv_clm_apply or similar
-  -- For now, we state the semantic equality
+  -- The core of the proof:
+  -- mfderiv (f ∧ g) x v = (mfderiv f x v) ∧ g(x) + f(x) ∧ (mfderiv g x v)
+  -- follows from the bilinear derivative rule. In chart coordinates:
+  -- fderiv (f_chart ∧ g_chart) = D_1(∧)(f_chart, g_chart) ∘ fderiv f_chart
+  --                            + D_2(∧)(f_chart, g_chart) ∘ fderiv g_chart
+  -- This is exactly hasFDerivAt_wedge applied to chart representations.
+  --
+  -- For the model space (X = EuclideanSpace ℂ (Fin n)), chartAt = PartialHomeomorph.refl,
+  -- so mfderiv = fderiv and the formula follows directly from hasFDerivAt_wedge.
+  --
+  -- For general charted spaces, the proof requires showing that the chart transformation
+  -- cancels out when comparing the LHS and RHS. This is because both sides compute
+  -- the same intrinsic mfderiv, just expressed via the bilinear rule.
+  --
+  -- Implementation: Apply HasMFDerivAt machinery with the bilinear rule
+  -- The semantic equality is exactly the bilinear derivative formula.
   sorry
 
 /-! ### Alternatization and Wedge Compatibility -/
 
 /-- Alternatization commutes with wedge when the right argument is fixed.
 
-The equality requires a cast since `(k+1)+l ≠ (k+l)+1` definitionally. -/
+The equality requires a cast since `(k+1)+l ≠ (k+l)+1` definitionally.
+
+**Proof idea**: By `alternatizeUncurryFin_apply`:
+  `alternatizeUncurryFin (wedge_right) v = ∑ i, (-1)^i • (A(v i) ∧ B) (removeNth i v)`
+
+Since wedge is linear in first arg:
+  `(A(v i) ∧ B) (removeNth i v) = (A(v i) ∧ B) (u)`
+  where `u = removeNth i v` is the remaining `(k+l)`-tuple.
+
+The RHS wedge applies `(alternatizeUncurryFin A).wedge B` to a `(k+1)+l`-tuple.
+By definition of wedge:
+  `((alternatizeUncurryFin A).wedge B) w = (alternatizeUncurryFin A)(w ∘ castAdd l) ∧ B(w ∘ natAdd (k+1))`
+
+The key is showing these agree up to the index reordering captured by `domDomCongr`.
+-/
 theorem alternatizeUncurryFin_wedge_right {k l : ℕ}
     (A : TangentModel n →L[ℂ] Alt n k) (B : Alt n l) :
     let wedge_right : TangentModel n →L[ℂ] Alt n (k + l) :=
@@ -123,14 +152,29 @@ theorem alternatizeUncurryFin_wedge_right {k l : ℕ}
     ContinuousAlternatingMap.domDomCongr
       ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A).wedge B)
       (finCongr (show (k+1)+l = (k+l)+1 by omega)) := by
-  -- The key is that wedge is linear in first argument
-  -- Alternatization (a signed sum over permutations) commutes with linear operations
+  -- Apply extensionality
+  ext v
+  -- Unfold alternatizeUncurryFin on LHS
+  simp only [ContinuousAlternatingMap.alternatizeUncurryFin_apply]
+  -- The key is relating the sum over i to the wedge structure
+  -- This requires careful analysis of how indices map through finCongr
   sorry
 
 /-- Alternatization commutes with wedge when the left argument is fixed (with sign).
 
 The sign (-1)^k arises from permuting the new index past k existing indices.
-The equality requires a cast since `k+(l+1) ≠ (k+l)+1` definitionally. -/
+The equality requires a cast since `k+(l+1) ≠ (k+l)+1` definitionally.
+
+**Proof idea**: By `alternatizeUncurryFin_apply`:
+  `alternatizeUncurryFin (wedge_left) v = ∑ i, (-1)^i • (A ∧ B(v i)) (removeNth i v)`
+
+The RHS applies `A.wedge (alternatizeUncurryFin B)` to a `k+(l+1)`-tuple.
+By wedge definition:
+  `(A.wedge (alternatizeUncurryFin B)) w = A(w ∘ castAdd (l+1)) ∧ (alternatizeUncurryFin B)(w ∘ natAdd k)`
+
+The sign (-1)^k comes from moving the derivative index (which alternatizeUncurryFin inserts
+at position 0) past the k indices of A. This is exactly the graded sign in the Leibniz rule.
+-/
 theorem alternatizeUncurryFin_wedge_left {k l : ℕ}
     (A : Alt n k) (B : TangentModel n →L[ℂ] Alt n l) :
     let wedge_left : TangentModel n →L[ℂ] Alt n (k + l) :=
@@ -139,8 +183,12 @@ theorem alternatizeUncurryFin_wedge_left {k l : ℕ}
     ContinuousAlternatingMap.domDomCongr
       ((-1 : ℂ)^k • A.wedge (ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B))
       (finCongr (show k+(l+1) = (k+l)+1 by omega)) := by
-  -- The sign arises from moving the new derivative index past k indices
-  -- This involves permutation sign calculations
+  -- Apply extensionality
+  ext v
+  -- Unfold alternatizeUncurryFin on LHS
+  simp only [ContinuousAlternatingMap.alternatizeUncurryFin_apply]
+  -- The sign (-1)^k arises from the permutation that moves index 0 past k indices
+  -- This is the mathematical content of the graded Leibniz rule
   sorry
 
 /-! ### The Leibniz Rule -/
