@@ -293,6 +293,12 @@ def smoothWedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) : Sm
 
 notation:67 ω:68 " ⋏ " η:68 => smoothWedge ω η
 
+/-- The wedge product commutes with conversion between SmoothForm and ContMDiffForm. -/
+@[simp] lemma ContMDiffForm.toSmoothForm_wedge {k l : ℕ}
+    (ω : ContMDiffForm n X k) (η : ContMDiffForm n X l) :
+    (ω.wedge η).toSmoothForm = ω.toSmoothForm ⋏ η.toSmoothForm := by
+  ext x; rfl
+
 @[simp] lemma zero_wedge {k l : ℕ} (η : SmoothForm n X l) : (0 : SmoothForm n X k) ⋏ η = 0 := by
   ext x v
   -- derive from `wedge_smul_left` with `c = 0`

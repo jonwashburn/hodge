@@ -107,22 +107,30 @@ theorem mfderiv_wedge_apply {k l : ℕ} (ω : ContMDiffForm n X k) (η : ContMDi
       (fun y => (ω.as_alternating y).wedge (η.as_alternating y)) x :=
     (ω.wedge η).smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
 
-  -- The core of the proof:
-  -- mfderiv (f ∧ g) x v = (mfderiv f x v) ∧ g(x) + f(x) ∧ (mfderiv g x v)
-  -- follows from the bilinear derivative rule. In chart coordinates:
-  -- fderiv (f_chart ∧ g_chart) = D_1(∧)(f_chart, g_chart) ∘ fderiv f_chart
-  --                            + D_2(∧)(f_chart, g_chart) ∘ fderiv g_chart
-  -- This is exactly hasFDerivAt_wedge applied to chart representations.
+  -- The proof uses the chain rule for mfderiv with a bilinear map.
   --
-  -- For the model space (X = EuclideanSpace ℂ (Fin n)), chartAt = PartialHomeomorph.refl,
-  -- so mfderiv = fderiv and the formula follows directly from hasFDerivAt_wedge.
+  -- Key structure:
+  -- 1. wedge : Alt k × Alt l → Alt (k+l) is a smooth bilinear map
+  -- 2. (ω, η) : X → Alt k × Alt l has mfderiv = (mfderiv ω, mfderiv η) by HasMFDerivAt.prodMk
+  -- 3. wedge ∘ (ω, η) has mfderiv = D(wedge)((ω x, η x)) ∘ mfderiv (ω, η) by chain rule
+  -- 4. For bilinear W: DW((a,b))(v₁,v₂) = W(v₁,b) + W(a,v₂)
   --
-  -- For general charted spaces, the proof requires showing that the chart transformation
-  -- cancels out when comparing the LHS and RHS. This is because both sides compute
-  -- the same intrinsic mfderiv, just expressed via the bilinear rule.
+  -- Therefore:
+  --   mfderiv (ω.wedge η) x v = (mfderiv ω x v).wedge (η x) + (ω x).wedge (mfderiv η x v)
   --
-  -- Implementation: Apply HasMFDerivAt machinery with the bilinear rule
-  -- The semantic equality is exactly the bilinear derivative formula.
+  -- The formal proof requires:
+  -- (a) Showing wedge has HasMFDerivAt with derivative = isBoundedBilinearMap_wedge.deriv
+  -- (b) Using HasMFDerivAt.comp with HasMFDerivAt.prodMk
+  -- (c) Unfolding the derivative formula
+  --
+  -- For 𝓘(ℂ, F) targets (model spaces), this reduces to HasFDerivAt via
+  -- hasMFDerivAt_iff_hasFDerivAt, and we can use hasFDerivAt_wedge directly.
+  --
+  -- Implementation path:
+  -- 1. Get HasMFDerivAt for ω and η from smoothness
+  -- 2. Use HasMFDerivAt.prodMk to get HasMFDerivAt for (ω, η)
+  -- 3. wedge is a CLM^2 so it has HasMFDerivAt = bilinear deriv
+  -- 4. Compose and evaluate at v
   sorry
 
 /-! ### Alternatization and Wedge Compatibility -/
