@@ -522,9 +522,31 @@ noncomputable def extDerivForm (ω : ContMDiffForm n X k) : ContMDiffForm n X (k
     -- is jointly smooth. Restricting to the diagonal Δ : X → X × X, x ↦ (x,x) (which is smooth)
     -- gives extDerivAt. This requires proving joint smoothness in the product manifold.
     --
-    -- For modelWithCornersSelf (𝓒_complex n), the chart transitions are simpler, but the
-    -- full Mathlib formalization of this diagonal argument is infrastructure-heavy.
-    -- The semantic correctness is standard differential geometry: if f is C^∞, then df is C^∞.
+    -- Goal: show extDeriv ω = extDerivAt ω is smooth (ContMDiff ⊤).
+    -- We prove ContMDiffAt at each point x.
+    intro x
+    -- Strategy: Use that extDerivInTangentCoordinates ω x is smooth at x,
+    -- and it equals extDerivAt ω x at the diagonal.
+    have h_tc_smooth := contMDiffAt_extDerivInTangentCoordinates ω x
+    have h_diag := extDerivInTangentCoordinates_diag ω x
+    -- The functions extDerivInTangentCoordinates ω x and extDerivAt ω agree at x.
+    -- For smoothness of extDerivAt ω at x, we use that both functions are smooth
+    -- and they coincide at the evaluation point.
+    --
+    -- Key insight: ContMDiffAt only cares about local behavior. Near x, the two functions
+    -- may differ, but extDerivInTangentCoordinates is designed to capture the smooth structure.
+    -- The diagonal identity shows they have the same value at x.
+    --
+    -- Technical issue: ContMDiffAt requires the function to be smooth in a neighborhood,
+    -- not just at the point. The functions extDerivInTangentCoordinates ω x and extDerivAt ω
+    -- differ in a neighborhood of x (due to tangent coordinate changes).
+    --
+    -- The rigorous proof requires showing that extDerivAt ω is smooth in charts, which
+    -- amounts to showing that mfderiv ω.as_alternating is smooth (as a section of the
+    -- bundle of linear maps). This follows from ω being C^∞.
+    --
+    -- For modelWithCornersSelf, we can use that mfderiv is computed via fderiv in charts,
+    -- and fderiv of a smooth function is smooth.
     sorry
 
 @[simp] lemma extDerivForm_as_alternating (ω : ContMDiffForm n X k) :
