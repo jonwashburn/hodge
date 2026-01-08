@@ -51,10 +51,15 @@ lemma isBoundedBilinearMap_wedge {k l : ℕ} :
   add_right := fun x y₁ y₂ => ContinuousAlternatingMap.wedge_add_right x y₁ y₂
   smul_right := fun c x y => ContinuousAlternatingMap.wedge_smul_right c x y
   bound := by
-    -- Boundedness follows from finite-dimensionality
-    -- The wedge of continuous alternating maps is continuous
-    -- On finite-dimensional spaces, continuous bilinear = bounded bilinear
-    sorry
+    -- The wedge is the composition of wedgeCLM_alt with function application
+    -- wedgeCLM_alt : Alt k →L[ℂ] (Alt l →L[ℂ] Alt (k+l))
+    -- So (ω, η) ↦ (wedgeCLM_alt ω) η is bounded bilinear
+    let f := ContinuousAlternatingMap.wedgeCLM_alt ℂ (TangentModel n) k l
+    -- Use that (g, x) ↦ g x for g : E →L F, x : E is bounded bilinear
+    -- with bound max ‖f‖ 1
+    have h := f.isBoundedBilinearMap
+    obtain ⟨C, hC_pos, hC⟩ := h.bound
+    exact ⟨C, hC_pos, hC⟩
 
 /-- The derivative of the wedge product of two form-valued functions.
 
@@ -67,17 +72,15 @@ theorem hasFDerivAt_wedge {G : Type*} [NormedAddCommGroup G] [NormedSpace ℂ G]
     {ω' : G →L[ℂ] Alt n k} {η' : G →L[ℂ] Alt n l}
     (hω : HasFDerivAt ω ω' x) (hη : HasFDerivAt η η' x) :
     HasFDerivAt (fun y => (ω y).wedge (η y))
-      ((ContinuousLinearMap.compL ℂ (Alt n k) (Alt n l →L[ℂ] Alt n (k+l)) (Alt n (k+l))
-        (ContinuousLinearMap.apply ℂ (Alt n (k+l)) (η x))
-        (ContinuousAlternatingMap.wedgeCLM_alt ℂ (TangentModel n) k l)).comp ω' +
-       (ContinuousLinearMap.compL ℂ (Alt n l) (Alt n (k+l)) (Alt n (k+l))
-        (ContinuousLinearMap.id ℂ (Alt n (k+l)))
-        (ContinuousAlternatingMap.wedgeCLM_alt ℂ (TangentModel n) k l (ω x))).comp η') x := by
+      (isBoundedBilinearMap_wedge.deriv (ω x, η x) ∘L (ω'.prod η')) x := by
   -- Use the bounded bilinear map derivative rule
   have hB := isBoundedBilinearMap_wedge (n := n) (k := k) (l := l)
-  have h := hB.hasFDerivAt (ω x, η x)
-  -- Compose with (ω, η) : G → Alt k × Alt l
-  sorry
+  -- hB.hasFDerivAt gives: HasFDerivAt wedge (hB.deriv (a, b)) (a, b)
+  -- where hB.deriv (a, b) (v₁, v₂) = a.wedge v₂ + v₁.wedge b
+  have hBilin := hB.hasFDerivAt (ω x, η x)
+  -- Compose with (ω, η) : G → Alt k × Alt l using the chain rule
+  have hPair : HasFDerivAt (fun y => (ω y, η y)) (ω'.prod η') x := hω.prodMk hη
+  exact hBilin.comp x hPair
 
 /-- The manifold derivative of a wedge product follows the Leibniz rule (pointwise). -/
 theorem mfderiv_wedge_apply {k l : ℕ} (ω : ContMDiffForm n X k) (η : ContMDiffForm n X l) (x : X)
