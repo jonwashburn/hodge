@@ -1,15 +1,18 @@
 # Proof Completion Plan — NO GAPS ALLOWED
 
-**Status**: 5 sorries remain. We will close all of them.
+**Status**: 10 sorries remain (non-axiom gaps). We will close all of them.
 **Policy**: If blocked on deep math, we do the deep math. No gaps.
 
 ---
 
 ## Current Verified State
 
-- **Sorries**: 5 (must be eliminated)
+- **Sorries**: 10 (must be eliminated for a completely gap-free repo)
 - **Axioms**: 9 (exactly what `hodge_conjecture'` depends on — unchanged)
 - **Build**: `lake build Hodge.Main` ✅ passing
+- **Audit (TeX ↔ Lean)**: The TeX “Main closure chain” for `thm:main-hodge` (see `Hodge_REFEREE_Amir-v1-round2-teal.tex`, around the boxed checklist) is implemented in Lean in `Hodge/Kahler/Main.lean`. That file contains **no `sorry`**; the only non-proven inputs on the main theorem chain are the **9 axioms**.
+
+**Interpretation**: recent work in `Hodge/Analytic/ContMDiffForms.lean` and `Hodge/Analytic/LeibnizRule.lean` is **infrastructure cleanup** toward “0 sorries in the repo”, not required to finish the TeX main closure chain.
 
 ---
 
@@ -29,7 +32,11 @@ These are the *only* axioms intended to remain:
 
 ---
 
-## ATTACK PLAN: The 5 Remaining Sorries
+## ATTACK PLAN: The 10 Remaining Sorries
+
+**Authoritative per-sorry list**: `docs/plans/DEPENDENCY_DAG_PUNCHLIST.md` (kept up to date).
+
+**Audit note**: The Leibniz / cup-product chain is **not used** in the TeX main closure chain (Theorem `thm:main-hodge`). It is required only for completing the de Rham ring layer and removing all remaining `sorry`s from the repo.
 
 ### Priority 1: Leibniz Rule (`smoothExtDeriv_wedge`)
 **File**: `Hodge/Analytic/Forms.lean:340`
@@ -38,6 +45,11 @@ These are the *only* axioms intended to remain:
 **The Problem**: Mathlib has d²=0 and linearity but NOT the Leibniz rule for wedge product.
 
 **The Solution**: Build it ourselves.
+
+**Important update**: This work has been decomposed into smaller lemmas in `Hodge/Analytic/LeibnizRule.lean`
+(e.g. `mfderiv_wedge_apply`, `alternatizeUncurryFin_wedge_{left,right}`, `extDerivAt_wedge`) so it can be proven
+without monolithic timeouts. This decomposition increased the raw `sorry` count, but did not introduce new
+mathematical assumptions.
 
 ```lean
 -- Step 1: Bilinear derivative rule
