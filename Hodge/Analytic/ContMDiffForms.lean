@@ -981,8 +981,41 @@ theorem extDeriv_extDeriv (ω : ContMDiffForm n X k) :
   -- Its exterior derivative at u₀ involves a double alternatization of a symmetric form.
   -- By Schwarz + alternatizeUncurryFin_alternatizeUncurryFinCLM_comp_of_symmetric, this is 0.
   --
-  -- The formal proof requires expressing the goal in terms of the Mathlib machinery.
-  -- For now, we mark this as the d²=0 principle.
+  -- **Direct proof using symmetry**:
+  -- Goal: _root_.extDeriv (omegaInChart (extDerivForm ω) x) u₀ = 0
+  -- We have: _root_.extDeriv g u₀ = alternatizeUncurryFin (fderiv g u₀) for any smooth g.
+  --
+  -- Let g = omegaInChart (extDerivForm ω) x = alternatizeUncurryFin ∘ (mfderiv ω ∘ (chartAt x).symm).
+  -- Then fderiv g u₀ = alternatizeUncurryFinCLM ∘ fderiv (mfderiv ω ∘ (chartAt x).symm) u₀.
+  -- And extDeriv g u₀ = alternatizeUncurryFin (alternatizeUncurryFinCLM ∘ fderiv (mfderiv ω ∘ (chartAt x).symm) u₀).
+  --
+  -- **Key fact**: fderiv (mfderiv ω ∘ (chartAt x).symm) u₀ is related to D²(omegaInChart ω x) u₀
+  -- by the chain rule. At u₀, mfderiv ω x = fderiv (omegaInChart ω x) u₀, and the second
+  -- derivative of ω (in any representation) is symmetric by Schwarz's theorem.
+  --
+  -- By the lemma alternatizeUncurryFin_alternatizeUncurryFinCLM_comp_of_symmetric,
+  -- double alternatization of a symmetric form gives 0.
+  --
+  -- **Alternative**: Use Filter.EventuallyEq to show g =ᶠ[nhds u₀] _root_.extDeriv (omegaInChart ω x),
+  -- then apply extDeriv_extDeriv_apply to the RHS.
+  --
+  -- We already have h_at_u₀ : g u₀ = _root_.extDeriv (omegaInChart ω x) u₀.
+  -- For the extDerivs to match, we need their first derivatives to match at u₀.
+  -- Both involve the double alternatization of the second derivative of ω,
+  -- which is symmetric and hence gives 0 upon double alternatization.
+  --
+  -- **Conclusion**: Both extDeriv g u₀ and extDeriv (extDeriv (omegaInChart ω x)) u₀
+  -- equal alternatizeUncurryFin (alternatizeUncurryFinCLM ∘ D²ω_representation),
+  -- where D²ω_representation is symmetric. By the double alternatization lemma, this is 0.
+  --
+  -- The RHS is 0 by extDeriv_extDeriv_apply. The LHS equals the RHS because both
+  -- are double alternatizations of the (symmetric) second derivative of ω.
+  --
+  -- **Formal completion**: This requires showing that fderiv g u₀ (after unwrapping)
+  -- involves a symmetric bilinear form. The symmetry comes from Schwarz's theorem
+  -- applied to the smooth function omegaInChart ω x.
+  --
+  -- For now, this is marked as the fundamental d²=0 identity for manifolds.
   sorry
 
 end ContMDiffForm
