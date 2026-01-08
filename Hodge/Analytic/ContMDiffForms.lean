@@ -1088,6 +1088,31 @@ theorem extDeriv_extDeriv (ω : ContMDiffForm n X k) :
   -- **Formalization status**: The symmetry claim (step 2) requires formalizing that the
   -- tangent coordinate change contributes only second-order terms near the diagonal.
   -- This is geometrically clear but needs Mathlib API work.
+  --
+  -- **Alternative approach**: Use the fact that the goal and h_d_squared_zero are BOTH 0,
+  -- independently, because they're both double alternatizations of symmetric forms.
+  -- We don't need to show they're equal; just that they're both 0.
+  --
+  -- The goal is: alternatizeUncurryFin (alternatizeUncurryFinCLM ∘ fderiv h u₀) = 0
+  -- where h = mfderiv ω ∘ chart.symm.
+  --
+  -- For this, we need: fderiv h u₀ is symmetric.
+  --
+  -- **Direct Schwarz argument on the manifold function**:
+  -- The function ω.as_alternating : X → FiberAlt n k is ContMDiff ⊤.
+  -- Its manifold second derivative at x (expressed in chart coordinates) is symmetric.
+  -- This is because the manifold Hessian is the chart Hessian (at the basepoint),
+  -- which is symmetric by Schwarz.
+  --
+  -- Specifically: mfderiv ω ∘ chart.symm is the first derivative of ω in chart coordinates.
+  -- Its derivative fderiv (mfderiv ω ∘ chart.symm) u₀ is the second derivative of ω at x,
+  -- which is symmetric by the Schwarz theorem applied to the smooth function ω.
+  --
+  -- The formal proof would use ContDiffAt.isSymmSndFDerivAt on ω (in chart coordinates)
+  -- combined with the chain rule to show fderiv h u₀ is symmetric.
+  --
+  -- **Current status**: This is the fundamental d²=0 identity for manifold exterior derivatives.
+  -- The mathematical argument is complete; formalization requires Mathlib API navigation.
   sorry
 
 end ContMDiffForm
