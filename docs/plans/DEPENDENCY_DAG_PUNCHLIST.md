@@ -35,8 +35,8 @@ This is progress — the atomic lemmas are now explicit with clear proof sketche
 ### Sorry Breakdown by File (as of Jan 8, 2026):
 - `Cohomology/Basic.lean:240` — cohomologous_wedge (depends on Leibniz) — **BLOCKS COHOM RING**
 - `Forms.lean:422` — smoothExtDeriv_wedge (connected to LeibnizRule, has sorry)
-- `ContMDiffForms.lean:580` — extDerivAt_eq_chart_extDeriv_general (chart independence)
-- `ContMDiffForms.lean:683` — extDerivForm.smooth' (joint smoothness)
+- `ContMDiffForms.lean:580` — extDerivAt_eq_chart_extDeriv_general (chart independence) — **COMPLEX**
+- `ContMDiffForms.lean:683` — extDerivForm.smooth' (joint smoothness on X × X)
 - `Currents.lean:358` — boundary.bound (off critical path, model issue)
 - `LeibnizRule.lean:129` — mfderiv_wedge_apply (manifold bilinear rule) — **DOCUMENTED**
 - `LeibnizRule.lean:164` — alternatizeUncurryFin_wedge_right (index permutation) — **DOCUMENTED**
@@ -46,11 +46,28 @@ This is progress — the atomic lemmas are now explicit with clear proof sketche
 **Note**: Sorry count increased from 5 to 10 because we explicitly decomposed the Leibniz rule
 into atomic lemmas with clear proof strategies. This is progress — the gaps are now well-defined.
 
+### Analysis of `extDerivAt_eq_chart_extDeriv_general` (Jan 8, 2026):
+This lemma claims: For y ∈ (chartAt x).source, `extDerivAt ω y = extDeriv (omegaInChart ω x) ((chartAt x) y)`.
+
+**Issue**: The LHS uses `chartAt y`, the RHS uses `chartAt x`. These give equal results
+when `chartAt y = chartAt x`, but differ by a tangent coordinate change otherwise.
+
+**For the model space** (X = EuclideanSpace): chartAt = refl everywhere, so equality is trivial.
+
+**For general manifolds**: The claim is that exterior derivative is chart-independent.
+This is mathematically TRUE but requires showing that `alternatizeUncurryFin` respects
+the coordinate change factor that arises from the chain rule.
+
+**Current approach**: The d²=0 proof (`extDeriv_extDeriv`) uses this lemma via 
+`Filter.EventuallyEq.extDeriv_eq`. A fix may involve restricting to the neighborhood
+where `chartAt y = chartAt x`, or using the coordinate change formula explicitly.
+
 ### Proven Components (Jan 8, 2026):
 - ✅ `isBoundedBilinearMap_wedge` — wedge is bounded bilinear
 - ✅ `hasFDerivAt_wedge` — Fréchet derivative of wedge product
 - ✅ `ContMDiffForm.toSmoothForm_wedge` — wedge compatibility between form types
 - ✅ Connection from `smoothExtDeriv_wedge` to `LeibnizRule.extDerivAt_wedge`
+- ✅ `tangentCoordChange_comp_eq_id` — coordinate change inverses
 
 ### Dependency Graph (→ means "enables"):
 ```
