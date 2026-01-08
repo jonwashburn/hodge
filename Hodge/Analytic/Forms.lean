@@ -320,14 +320,20 @@ notation:67 ω:68 " ⋏ " η:68 => smoothWedge ω η
     2. Alternatization: The sign (-1)^k arises from the graded commutativity of wedge
        when commuting the differential past a k-form.
 
-    **Proof approach**: At the fiber level, use:
-    - `mfderiv_wedge` (Leibniz for manifold wedge) = `mfderiv ω ∧ η + ω ∧ mfderiv η`
-    - `alternatizeUncurryFin` distributes over sums
-    - The sign comes from `wedge_comm` and parity of k
+    **Proof sketch**:
+    1. `(ω ⋏ η).as_alternating = wedgeCLM_alt ∘ (ω.as_alternating, η.as_alternating)`
+    2. By the bilinear chain rule (`HasFDerivAt.clm_apply` or similar):
+       `mfderiv ((ω ⋏ η).as_alternating) x = wedge(mfderiv ω x ·, η x) + wedge(ω x, mfderiv η x ·)`
+    3. `alternatizeUncurryFin` distributes over sums (`alternatizeUncurryFin_add`)
+    4. The key missing lemma: `alternatizeUncurryFin (wedge(f ·, η)) = wedge(alternatizeUncurryFin f, η)`
+       This requires showing that alternatization commutes with fixing one argument of wedge.
+    5. The sign (-1)^k arises from `wedge_comm` when reordering basis elements.
 
     **Formalization gap**: Mathlib's DifferentialForm/Basic.lean has `extDeriv_extDeriv` (d²=0)
-    and `extDeriv_add` (linearity), but not the Leibniz rule for wedge products.
-    This requires developing the interaction between alternatization and bilinear maps. -/
+    and `extDeriv_add` (linearity), but not:
+    - `HasFDerivAt` for `ContinuousAlternatingMap.wedge` (Leibniz for bilinear wedge)
+    - Interaction between `alternatizeUncurryFin` and `wedge` on fixed arguments
+    - Graded commutativity signs in the differential algebra structure -/
 theorem smoothExtDeriv_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) :
     smoothExtDeriv (ω ⋏ η) =
       castForm (by simp [Nat.add_assoc, Nat.add_comm, Nat.add_left_comm]) (smoothExtDeriv ω ⋏ η) +
