@@ -88,7 +88,26 @@ theorem mfderiv_wedge_apply {k l : ℕ} (ω : ContMDiffForm n X k) (η : ContMDi
     mfderiv (𝓒_complex n) 𝓘(ℂ, Alt n (k+l)) (ω.wedge η).as_alternating x v =
     (mfderiv (𝓒_complex n) 𝓘(ℂ, Alt n k) ω.as_alternating x v).wedge (η.as_alternating x) +
     (ω.as_alternating x).wedge (mfderiv (𝓒_complex n) 𝓘(ℂ, Alt n l) η.as_alternating x v) := by
-  -- This follows from hasFDerivAt_wedge and the definition of mfderiv
+  -- The wedge of ContMDiffForms has as_alternating = fun x => ω(x) ∧ η(x)
+  have h_eq : (ω.wedge η).as_alternating = fun y => (ω.as_alternating y).wedge (η.as_alternating y) := rfl
+  rw [h_eq]
+  -- For smooth forms, mfderiv is computed via chart coordinates
+  -- The key is that mfderiv of a composition follows the chain rule
+  -- mfderiv (fun y => B(f y, g y)) x = D_f B(f x, g x) ∘ mfderiv f x + D_g B(f x, g x) ∘ mfderiv g x
+  -- where B is bilinear (wedge) and f = ω.as_alternating, g = η.as_alternating
+
+  -- We use that mfderiv agrees with fderiv in chart coordinates for modelWithCornersSelf
+  -- For the model space target, writtenInExtChartAt is the identity
+
+  -- The key insight: since ω and η are smooth, their mfderivs exist
+  have hω_diff : MDifferentiableAt (𝓒_complex n) 𝓘(ℂ, Alt n k) ω.as_alternating x :=
+    ω.smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
+  have hη_diff : MDifferentiableAt (𝓒_complex n) 𝓘(ℂ, Alt n l) η.as_alternating x :=
+    η.smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
+
+  -- The formula follows from the bilinear derivative rule for mfderiv
+  -- This requires MDifferentiableAt.mfderiv_clm_apply or similar
+  -- For now, we state the semantic equality
   sorry
 
 /-! ### Alternatization and Wedge Compatibility -/
