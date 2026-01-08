@@ -37,6 +37,7 @@ Complete the Lean 4 formalization of the Hodge Conjecture proof.
 # Session History
 | Date | Sorries | Axioms | Notes |
 |------|---------|--------|-------|
+| Jan 7, 2026 (cont2) | 5 | 9 | **Analyzed chart cocycle**: For u ∈ target, y=(chartAt x).symm u ∈ source. extDerivAt ω y uses chartAt y vs omegaInChart uses chartAt x. Transition map relates them but needs Mathlib cocycle machinery. |
 | Jan 7, 2026 (cont) | 5 | 9 | **Improved d²=0 proof**: Added `h_at_u₀` lemma proving pointwise equality at evaluation point. Identified core blocker: `h_key` requires functional equality which fails due to chart transitions. Mathlib lacks wedge Leibniz rule. |
 | Jan 7, 2026 | 5 | 9 | **Proved `extDerivAt_eq_chart_extDeriv`** (chart transport). Reduced sorries from 7 to 5. `extDeriv_extDeriv` (d²=0) now uses Mathlib's `extDeriv_extDeriv_apply` with chart transport. Remaining sorries: `extDerivForm.smooth'`, chart cocycle identity in d²=0, `isFormClosed_wedge` (Leibniz), `cohomologous_wedge`, `Current.boundary.bound`. |
 | Jan 7, 2026 (earlier) | 7 | 9 | Stage 4 work: Added detailed proof outlines for all remaining sorries. Chart transport (`extDerivAt_eq_chart_extDeriv`), d²=0 (`extDeriv_extDeriv`), smoothness (`extDerivForm.smooth'`), wedge continuity (`continuous_wedge`). All proofs have documented semantic correctness. |

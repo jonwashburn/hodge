@@ -629,29 +629,32 @@ theorem extDeriv_extDeriv (ω : ContMDiffForm n X k) :
   --
   -- The full functional equality h_key requires chart compatibility at all points.
   -- For the d²=0 result, we only need the extDeriv at u₀ to be zero.
+  -- We need: _root_.extDeriv (omegaInChart (extDerivForm ω) x) u₀ = 0
+  -- Strategy: Show the two functions agree on a neighborhood of u₀, then their extDerivs agree at u₀.
+  --
+  -- Key lemma: For u in (chartAt x).target, both sides of h_key agree because:
+  -- 1. y := (chartAt x).symm u is in (chartAt x).source
+  -- 2. extDerivAt ω y = _root_.extDeriv (omegaInChart ω y) (chartAt y y) by extDerivAt_eq_chart_extDeriv
+  -- 3. If chartAt y = chartAt x (same chart), then omegaInChart ω y = omegaInChart ω x
+  -- 4. And (chartAt x) y = u by right_inv
+  --
+  -- For the extDeriv at u₀, we only need equality in a neighborhood of u₀.
+  -- Since u₀ ∈ interior of (chartAt x).target, this neighborhood exists.
   have h_key : omegaInChart (extDerivForm ω) x = _root_.extDeriv (omegaInChart ω x) := by
     ext u
     simp only [omegaInChart, extDerivForm_as_alternating, extDeriv_as_alternating]
-    -- Goal is an equality of alternating maps applied to arbitrary vectors
-    -- Both sides: (extDerivAt ω ((chartAt x).symm u)) vs (_root_.extDeriv (omegaInChart ω x) u)
+    -- For u in (chartAt x).target, let y = (chartAt x).symm u ∈ (chartAt x).source.
+    -- The crucial question: does chartAt y = chartAt x?
     --
-    -- Let y := (chartAt x).symm u. We need: extDerivAt ω y = _root_.extDeriv (omegaInChart ω x) u
-    -- as alternating maps (i.e., at every vector input).
+    -- In general, chartAt y is some chart with y ∈ source. It may differ from chartAt x.
+    -- However, the atlas is compatible: the transition map (chartAt y) ∘ (chartAt x).symm
+    -- is smooth where defined.
     --
-    -- By extDerivAt_eq_chart_extDeriv at y:
-    --   extDerivAt ω y = _root_.extDeriv (omegaInChart ω y) (chartAt y y)
+    -- The mfderiv at y uses chartAt y. The fderiv of omegaInChart ω x uses chartAt x.
+    -- These are related by the derivative of the transition map.
     --
-    -- Key insight: For u in the chart target of x, y = (chartAt x).symm u is in the chart source of x.
-    -- In a single chart domain, chartAt y = chartAt x (they're the same chart).
-    -- So: _root_.extDeriv (omegaInChart ω y) (chartAt y y) = _root_.extDeriv (omegaInChart ω x) (chartAt x y)
-    --
-    -- Since y = (chartAt x).symm u, we have (chartAt x) y = u (by right_inv, IF u is in target).
-    -- And chartAt y = chartAt x in the same chart domain.
-    --
-    -- The technical issue: these equalities hold for u in (chartAt x).target, but the ext
-    -- quantifies over all u. Outside the target, both sides may be junk/zero.
-    --
-    -- Admit for now - the mathematical content is sound (d²=0 is chart-independent).
+    -- For d²=0, the alternating structure means the transition terms cancel.
+    -- But formalizing this requires Mathlib's cocycle machinery.
     sorry
   rw [h_key]
   have h_smooth : ContDiffAt ℂ ⊤ (omegaInChart ω x) ((chartAt (EuclideanSpace ℂ (Fin n)) x) x) := by
