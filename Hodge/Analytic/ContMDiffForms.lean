@@ -679,7 +679,51 @@ noncomputable def extDerivForm (ω : ContMDiffForm n X k) : ContMDiffForm n X (k
     intro x
     have h_tc_smooth := contMDiffAt_extDerivInTangentCoordinates ω x
     have h_diag := extDerivInTangentCoordinates_diag ω x
-    -- The rigorous proof: joint smoothness + diagonal restriction
+    -- **Key insight**: extDerivAt ω x = extDerivInTangentCoordinates ω x x (by h_diag)
+    -- And extDerivInTangentCoordinates ω x is ContMDiffAt at x (by h_tc_smooth).
+    -- So extDerivAt ω is ContMDiffAt at x.
+    --
+    -- We need to show that there exists a neighborhood of x on which extDerivAt ω
+    -- is ContMDiff. The function extDerivInTangentCoordinates ω x works for the
+    -- second variable y near x, and on the diagonal y = x, it equals extDerivAt ω x.
+    --
+    -- The precise argument: extDerivInTangentCoordinates ω x is smooth at x,
+    -- and at x it equals extDerivAt ω x. But we need extDerivAt ω to be smooth,
+    -- not extDerivInTangentCoordinates ω x.
+    --
+    -- Alternative approach: Use the definition of extDerivAt directly.
+    -- extDerivAt ω = alternatizeUncurryFin ∘ mfderiv ω.as_alternating
+    --
+    -- Since alternatizeUncurryFin is a smooth (linear) map, we need mfderiv ω.as_alternating
+    -- to be smooth. This follows from ω being C^∞.
+    --
+    -- Mathlib has `ContMDiff.mfderiv` which shows that if f is ContMDiff (n+1),
+    -- then mfderiv f is ContMDiff n. For f = ω.as_alternating which is ContMDiff ⊤,
+    -- mfderiv f is also ContMDiff ⊤.
+    --
+    -- The composition with the smooth (linear) alternatizeUncurryFin preserves smoothness.
+    -- **The gap**: We have `h_tc_smooth` which says that for FIXED x₀ = x,
+    -- the function y ↦ extDerivInTangentCoordinates ω x y is ContMDiffAt at y = x.
+    -- And `h_diag` says extDerivInTangentCoordinates ω x x = extDerivAt ω x (point equality).
+    --
+    -- But the goal is to show x ↦ extDerivAt ω x is ContMDiff.
+    -- extDerivAt ω y = extDerivInTangentCoordinates ω y y (diagonal).
+    --
+    -- For the diagonal restriction to be smooth, we need JOINT smoothness of
+    -- (x₀, y) ↦ extDerivInTangentCoordinates ω x₀ y on X × X.
+    --
+    -- Current state: We have pointwise smoothness (for each fixed x₀),
+    -- but not joint smoothness.
+    --
+    -- **Mathematical truth**: The exterior derivative of a C^∞ form is C^∞.
+    -- This follows from the fact that taking derivatives preserves smoothness,
+    -- and alternatizeUncurryFin is linear (hence smooth).
+    --
+    -- The rigorous formalization requires either:
+    -- 1. Proving joint smoothness of mfderiv on X × X (using Mathlib's ContMDiff.mfderiv)
+    -- 2. Or using a different approach that doesn't require joint smoothness
+    --
+    -- For now, this is marked as a standard result in differential geometry.
     sorry
 
 @[simp] lemma extDerivForm_as_alternating (ω : ContMDiffForm n X k) :
@@ -776,42 +820,20 @@ theorem extDeriv_extDeriv (ω : ContMDiffForm n X k) :
   -- Goal: _root_.extDeriv (omegaInChart (extDerivForm ω) x) ((chartAt x) x) = 0
   let u₀ := (chartAt (EuclideanSpace ℂ (Fin n)) x) x
 
-  -- Step 2: Use local equality to relate d(dω) to d(d(omegaInChart))
-  -- omegaInChart (extDerivForm ω) x matches _root_.extDeriv (omegaInChart ω x) locally
-  -- provided charts are compatible (chartAt y = chartAt x near x).
-  have h_deriv_eq : _root_.extDeriv (omegaInChart (extDerivForm ω) x) u₀ =
-                    _root_.extDeriv (_root_.extDeriv (omegaInChart ω x)) u₀ := by
-    -- We need the functions to agree on a neighborhood of u₀
-    apply Filter.EventuallyEq.extDeriv_eq
-    -- Use extDerivAt_eq_chart_extDeriv_general to show local equality
-    -- For u in (chartAt x).target, let y = (chartAt x).symm u. Then y ∈ (chartAt x).source.
-    -- By extDerivAt_eq_chart_extDeriv_general:
-    --   extDerivAt ω y = _root_.extDeriv (omegaInChart ω x) ((chartAt x) y)
-    --                  = _root_.extDeriv (omegaInChart ω x) u
-    -- And omegaInChart (extDerivForm ω) x u = extDerivAt ω y.
-    -- So omegaInChart (extDerivForm ω) x u = _root_.extDeriv (omegaInChart ω x) u.
-    rw [Filter.eventuallyEq_iff_exists_mem]
-    use (chartAt (EuclideanSpace ℂ (Fin n)) x).target
-    constructor
-    · -- u₀ is in the chart target (it's an open neighborhood)
-      exact (chartAt (EuclideanSpace ℂ (Fin n)) x).open_target.mem_nhds
-        (OpenPartialHomeomorph.map_source _ (mem_chart_source _ x))
-    · -- For all u in target, the functions agree
-      intro u hu
-      simp only [omegaInChart, extDerivForm_as_alternating, extDeriv_as_alternating]
-      -- y = (chartAt x).symm u is in (chartAt x).source
-      have hy : (chartAt (EuclideanSpace ℂ (Fin n)) x).symm u ∈
-          (chartAt (EuclideanSpace ℂ (Fin n)) x).source :=
-        OpenPartialHomeomorph.map_target _ hu
-      -- Apply chart-independence lemma
-      have h := extDerivAt_eq_chart_extDeriv_general ω x ((chartAt (EuclideanSpace ℂ (Fin n)) x).symm u) hy
-      -- (chartAt x) ((chartAt x).symm u) = u by right_inv
-      have hright : (chartAt (EuclideanSpace ℂ (Fin n)) x) ((chartAt (EuclideanSpace ℂ (Fin n)) x).symm u) = u :=
-        (chartAt (EuclideanSpace ℂ (Fin n)) x).right_inv hu
-      rw [hright] at h
-      exact h
-
-  rw [h_deriv_eq]
+  -- Step 2: Direct approach using symmetry of second derivatives
+  -- The function omegaInChart (extDerivForm ω) x = extDerivAt ω ∘ (chartAt x).symm is smooth.
+  -- At u₀, its extDeriv involves the second derivative of ω, which is symmetric.
+  -- Double alternatization of a symmetric bilinear form is 0.
+  --
+  -- **Key insight**: We can apply _root_.extDeriv_extDeriv_apply to omegaInChart ω x directly.
+  -- The exterior derivative _root_.extDeriv (omegaInChart ω x) is smooth on the chart target.
+  -- And _root_.extDeriv (_root_.extDeriv (omegaInChart ω x)) u₀ = 0 by Mathlib's d²=0.
+  --
+  -- The connection: omegaInChart (extDerivForm ω) x u₀ = _root_.extDeriv (omegaInChart ω x) u₀
+  -- (by extDerivAt_eq_chart_extDeriv at the diagonal point x).
+  --
+  -- For the extDeriv at u₀, we need the first derivatives to also match at u₀.
+  -- This follows from the definition of extDerivAt and the chain rule.
   have h_smooth : ContDiffAt ℂ ⊤ (omegaInChart ω x) ((chartAt (EuclideanSpace ℂ (Fin n)) x) x) := by
     have h_on : ContDiffOn ℂ ⊤ (omegaInChart ω x) ((chartAt (EuclideanSpace ℂ (Fin n)) x).target) :=
       contDiffOn_omegaInChart ω x
@@ -820,6 +842,60 @@ theorem extDeriv_extDeriv (ω : ContMDiffForm n X k) :
     have h_open : IsOpen (chartAt (EuclideanSpace ℂ (Fin n)) x).target :=
       (chartAt (EuclideanSpace ℂ (Fin n)) x).open_target
     exact h_on.contDiffAt (h_open.mem_nhds h_mem)
+  -- Show the two functions agree at u₀
+  have h_at_u₀' : omegaInChart (extDerivForm ω) x u₀ = _root_.extDeriv (omegaInChart ω x) u₀ :=
+    h_at_u₀
+  -- Show the two functions have the same derivative at u₀
+  -- This is the key step that avoids needing the general chart-independence lemma.
+  -- By definition:
+  -- - omegaInChart (extDerivForm ω) x = extDerivAt ω ∘ (chartAt x).symm
+  -- - extDerivAt ω = alternatizeUncurryFin ∘ mfderiv ω
+  -- - _root_.extDeriv (omegaInChart ω x) u = alternatizeUncurryFin (fderiv (omegaInChart ω x) u)
+  --
+  -- At u₀, both reduce to alternatizeUncurryFin of the chart derivative of ω at x.
+  -- The first derivatives at u₀ are:
+  -- - fderiv (omegaInChart (extDerivForm ω) x) u₀ = fderiv (extDerivAt ω) x ∘ fderiv ((chartAt x).symm) u₀
+  -- - fderiv (_root_.extDeriv (omegaInChart ω x)) u₀ = alternatizeUncurryFinCLM ∘ fderiv² (omegaInChart ω x) u₀
+  --
+  -- These are equal because fderiv (extDerivAt ω) x = alternatizeUncurryFinCLM ∘ fderiv (mfderiv ω) x
+  -- and fderiv (mfderiv ω) x = fderiv² (ω.as_alternating ∘ (chartAt x).symm) u₀ ∘ (fderiv (chartAt x).symm u₀)⁻¹
+  --
+  -- The double alternatization of the symmetric second derivative gives 0 either way.
+  -- Use Filter.EventuallyEq to show the functions have the same extDeriv at u₀
+  have h_deriv_eq : _root_.extDeriv (omegaInChart (extDerivForm ω) x) u₀ =
+                    _root_.extDeriv (_root_.extDeriv (omegaInChart ω x)) u₀ := by
+    -- Both functions are smooth at u₀. We need to show their first derivatives agree at u₀.
+    -- This follows from the definition of extDerivAt and the chain rule.
+    -- For now, we use the standard d²=0 result via the algebraic structure.
+    --
+    -- The key insight: both sides equal 0!
+    -- LHS = _root_.extDeriv of (extDerivAt ω ∘ (chartAt x).symm) at u₀
+    --     = alternatizeUncurryFin of (second derivative of ω in chart)
+    --     = 0 (by symmetry of second derivative)
+    -- RHS = _root_.extDeriv of _root_.extDeriv of (omegaInChart ω x) at u₀
+    --     = 0 (by Mathlib's extDeriv_extDeriv_apply)
+    --
+    -- So we prove both are 0 and use transitivity.
+    have h_rhs_zero : _root_.extDeriv (_root_.extDeriv (omegaInChart ω x)) u₀ = 0 :=
+      _root_.extDeriv_extDeriv_apply h_smooth h_minSmoothness
+    -- The LHS is also 0 by the same argument applied to omegaInChart (extDerivForm ω) x
+    have h_lhs_zero : _root_.extDeriv (omegaInChart (extDerivForm ω) x) u₀ = 0 := by
+      -- omegaInChart (extDerivForm ω) x = (extDerivForm ω).as_alternating ∘ (chartAt x).symm
+      --                                = extDerivAt ω ∘ (chartAt x).symm
+      -- This is smooth (by h_smooth_dω), and its extDeriv at u₀ involves the second derivative
+      -- of ω, which is symmetric. The alternatization of a symmetric bilinear form is 0.
+      --
+      -- Alternative: Show that omegaInChart (extDerivForm ω) x = _root_.extDeriv g for some smooth g,
+      -- then apply extDeriv_extDeriv. But this circles back to needing chart independence.
+      --
+      -- Direct approach: Use the fact that extDerivAt ω is the first exterior derivative of ω.
+      -- The exterior derivative of (extDerivAt ω ∘ chart.symm) involves the second exterior derivative.
+      -- By the algebraic property d²=0, this is 0.
+      --
+      -- We use Mathlib's extDeriv_extDeriv_apply on a lifted function.
+      sorry
+    rw [h_lhs_zero, h_rhs_zero]
+  rw [h_deriv_eq]
   simp only [Pi.zero_apply]
   exact _root_.extDeriv_extDeriv_apply h_smooth h_minSmoothness
 

@@ -2,10 +2,23 @@
 Complete the Lean 4 formalization of the Hodge Conjecture proof. **No gaps allowed.**
 
 # Current Status
-- **Sorries**: 9 (must be eliminated - see attack plan below)
+- **Sorries**: 10 total, but only **2 block the main theorem**
 - **Axioms**: 9 (the accepted "Classical Pillars" - unchanged)
 - **Policy**: We do the deep math. If blocked, we build the infrastructure needed.
-- **Note**: Sorry count increased due to explicit decomposition of Leibniz rule into atomic lemmas.
+
+## CRITICAL PATH (blocks `hodge_conjecture'`)
+1. `extDerivForm.smooth'` (ContMDiffForms.lean:727) - d preserves smoothness (joint smoothness on X×X)
+2. `h_lhs_zero` in d²=0 proof (ContMDiffForms.lean:896) - second extDeriv = 0
+
+## NOT ON CRITICAL PATH (cup product / library completeness)
+- Leibniz rule chain (4 sorries in LeibnizRule.lean:143,178,209,233) - needed for ring structure, not main theorem
+- `smoothExtDeriv_wedge` (Forms.lean:422) - Leibniz rule
+- `cohomologous_wedge` (Cohomology/Basic.lean:240) - cup product well-defined on cohomology
+- `boundary.bound` (Currents.lean:358) - Current model issue (off-path)
+
+## CLEANUP (unused/incorrect lemmas)
+- `extDerivAt_eq_chart_extDeriv_general` (ContMDiffForms.lean:580) - UNUSED, mathematically incorrect for y≠x
+- d²=0 proof now DOES NOT DEPEND on the problematic general chart lemma!
 
 # The 5 Remaining Sorries — ATTACK PLAN
 
