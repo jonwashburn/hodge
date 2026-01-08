@@ -510,43 +510,32 @@ changes) to the raw `mfderiv`. This is resolved by the diagonal identity:
 noncomputable def extDerivForm (ω : ContMDiffForm n X k) : ContMDiffForm n X (k + 1) where
   as_alternating := extDeriv ω
   smooth' := by
-    -- Proven at each point using the diagonal argument:
-    -- extDerivAt ω = alternatizeUncurryFin ∘ mfderiv, and mfderiv is smooth by
-    -- contMDiffAt_mfderivInTangentCoordinates combined with the diagonal identity.
+    -- **Goal**: Show extDeriv ω = extDerivAt ω is ContMDiff ⊤.
     --
-    -- Key lemmas:
-    -- - contMDiffAt_extDerivInTangentCoordinates: extDerivInTangentCoordinates ω x is smooth at x
-    -- - extDerivInTangentCoordinates_diag: on diagonal, equals extDerivAt
+    -- **Mathematical argument (diagonal restriction)**:
+    -- 1. Define F : X × X → FiberAlt n (k+1) by F(x₀, y) = extDerivInTangentCoordinates ω x₀ y
+    -- 2. By ContMDiffAt.mfderiv_const, F is jointly smooth on X × X
+    -- 3. The diagonal Δ : X → X × X, x ↦ (x,x) is smooth
+    -- 4. By extDerivInTangentCoordinates_diag, extDerivAt ω = F ∘ Δ
+    -- 5. Therefore extDerivAt ω is smooth (composition of smooth maps)
     --
-    -- The mathematically correct argument: The function (x₀, y) ↦ extDerivInTangentCoordinates ω x₀ y
-    -- is jointly smooth. Restricting to the diagonal Δ : X → X × X, x ↦ (x,x) (which is smooth)
-    -- gives extDerivAt. This requires proving joint smoothness in the product manifold.
+    -- **Available lemmas**:
+    -- - contMDiffAt_extDerivInTangentCoordinates: proves smoothness at each x for fixed x
+    -- - extDerivInTangentCoordinates_diag: proves diagonal equality
+    -- - ContMDiffAt.mfderiv_const (Mathlib): mfderiv in tangent coordinates is smooth
     --
-    -- Goal: show extDeriv ω = extDerivAt ω is smooth (ContMDiff ⊤).
-    -- We prove ContMDiffAt at each point x.
+    -- **Formalization gap**: Proving joint smoothness of F on X × X requires
+    -- showing that (x₀, y) ↦ inTangentCoordinates ... ω.as_alternating x₀ y is smooth
+    -- as a function on the product manifold. Mathlib's ContMDiffAt.mfderiv handles
+    -- this when the basepoint is fixed, but extending to joint smoothness needs
+    -- additional infrastructure (product manifold ContMDiff lemmas).
+    --
+    -- The mathematical content is standard: the exterior derivative of a C^∞ form is C^∞.
+    -- This follows from the fact that taking derivatives preserves smoothness.
     intro x
-    -- Strategy: Use that extDerivInTangentCoordinates ω x is smooth at x,
-    -- and it equals extDerivAt ω x at the diagonal.
     have h_tc_smooth := contMDiffAt_extDerivInTangentCoordinates ω x
     have h_diag := extDerivInTangentCoordinates_diag ω x
-    -- The functions extDerivInTangentCoordinates ω x and extDerivAt ω agree at x.
-    -- For smoothness of extDerivAt ω at x, we use that both functions are smooth
-    -- and they coincide at the evaluation point.
-    --
-    -- Key insight: ContMDiffAt only cares about local behavior. Near x, the two functions
-    -- may differ, but extDerivInTangentCoordinates is designed to capture the smooth structure.
-    -- The diagonal identity shows they have the same value at x.
-    --
-    -- Technical issue: ContMDiffAt requires the function to be smooth in a neighborhood,
-    -- not just at the point. The functions extDerivInTangentCoordinates ω x and extDerivAt ω
-    -- differ in a neighborhood of x (due to tangent coordinate changes).
-    --
-    -- The rigorous proof requires showing that extDerivAt ω is smooth in charts, which
-    -- amounts to showing that mfderiv ω.as_alternating is smooth (as a section of the
-    -- bundle of linear maps). This follows from ω being C^∞.
-    --
-    -- For modelWithCornersSelf, we can use that mfderiv is computed via fderiv in charts,
-    -- and fderiv of a smooth function is smooth.
+    -- The rigorous proof requires joint smoothness on X × X
     sorry
 
 @[simp] lemma extDerivForm_as_alternating (ω : ContMDiffForm n X k) :
