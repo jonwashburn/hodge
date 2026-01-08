@@ -1015,7 +1015,34 @@ theorem extDeriv_extDeriv (ω : ContMDiffForm n X k) :
   -- involves a symmetric bilinear form. The symmetry comes from Schwarz's theorem
   -- applied to the smooth function omegaInChart ω x.
   --
-  -- For now, this is marked as the fundamental d²=0 identity for manifolds.
+  -- **Detailed proof**:
+  -- 1. Let ψ := omegaInChart ω x = ω ∘ (chartAt x).symm, which is ContDiff ⊤.
+  -- 2. By ContDiffAt.isSymmSndFDerivAt, D²ψ u₀ is symmetric:
+  --    (D²ψ u₀ v) w = (D²ψ u₀ w) v for all v, w.
+  -- 3. Define h := mfderiv ω ∘ (chartAt x).symm : TangentModel n → (TangentModel n →L FiberAlt).
+  -- 4. At u₀: h(u₀) = mfderiv ω x = fderiv ψ u₀ = Dψ u₀.
+  -- 5. The function h and Dψ agree at u₀. Their derivatives at u₀ also agree because
+  --    the tangent coordinate change at the diagonal is identity (tangentCoordChange_self).
+  -- 6. Therefore D(h) u₀ = D(Dψ) u₀ = D²ψ u₀, which is symmetric.
+  -- 7. fderiv g u₀ = alternatizeUncurryFinCLM ∘ D(h) u₀ = alternatizeUncurryFinCLM ∘ D²ψ u₀.
+  -- 8. extDeriv g u₀ = alternatizeUncurryFin (fderiv g u₀)
+  --                  = alternatizeUncurryFin (alternatizeUncurryFinCLM ∘ D²ψ u₀)
+  --                  = 0 (by alternatizeUncurryFin_alternatizeUncurryFinCLM_comp_of_symmetric).
+  --
+  -- **Formalization gap**: Step 5 (derivatives of h and Dψ agree at u₀) requires
+  -- showing that the tangent coordinate change contributes only second-order terms.
+  -- This follows from tangentCoordChange_self but needs careful Mathlib API work.
+  --
+  -- **Alternative direct approach**: Apply extDeriv_extDeriv_apply to ψ to get
+  -- extDeriv (extDeriv ψ) u₀ = 0. Then show extDeriv g u₀ = extDeriv (extDeriv ψ) u₀
+  -- by showing g and extDeriv ψ have the same fderiv at u₀.
+  have h_d_squared_zero : _root_.extDeriv (_root_.extDeriv (omegaInChart ω x)) u₀ = 0 :=
+    _root_.extDeriv_extDeriv_apply h_smooth h_minSmoothness
+  -- The goal is to show: extDeriv g u₀ = 0, where g = omegaInChart (extDerivForm ω) x.
+  -- We have: extDeriv (extDeriv ψ) u₀ = 0 for ψ = omegaInChart ω x.
+  -- Both extDeriv g u₀ and extDeriv (extDeriv ψ) u₀ are double alternatizations of
+  -- the second derivative of ω at x, expressed in chart coordinates.
+  -- Since D²ψ u₀ is symmetric (by Schwarz), both double alternatizations are 0.
   sorry
 
 end ContMDiffForm
