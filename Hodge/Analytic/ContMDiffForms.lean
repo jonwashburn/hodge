@@ -646,7 +646,7 @@ theorem extDeriv_extDeriv (ω : ContMDiffForm n X k) :
   -- Step 2: Use local equality to relate d(dω) to d(d(omegaInChart))
   -- omegaInChart (extDerivForm ω) x matches _root_.extDeriv (omegaInChart ω x) locally
   -- provided charts are compatible (chartAt y = chartAt x near x).
-  have h_deriv_eq : _root_.extDeriv (omegaInChart (extDerivForm ω) x) u₀ = 
+  have h_deriv_eq : _root_.extDeriv (omegaInChart (extDerivForm ω) x) u₀ =
                     _root_.extDeriv (_root_.extDeriv (omegaInChart ω x)) u₀ := by
     -- We need the functions to agree on a neighborhood of u₀
     apply Filter.EventuallyEq.extDeriv_eq
