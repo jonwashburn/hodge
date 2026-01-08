@@ -888,51 +888,40 @@ theorem extDeriv_extDeriv (ω : ContMDiffForm n X k) :
   --    of u₀, then apply Filter.EventuallyEq.extDeriv_eq and use extDeriv_extDeriv_apply.
   -- 2. Directly prove the result using the structure of the exterior derivative.
   --
-  -- **Direct approach**: Show that _root_.extDeriv (omegaInChart (extDerivForm ω) x) u₀ = 0
-  -- by using the symmetry of second derivatives (Schwarz's theorem).
+  -- **Chart independence approach**:
+  -- Show that omegaInChart (extDerivForm ω) x = extDeriv (omegaInChart ω x) on a neighborhood of u₀,
+  -- then apply Filter.EventuallyEq.extDeriv_eq and extDeriv_extDeriv_apply.
   --
-  -- The function g := omegaInChart (extDerivForm ω) x = extDerivAt ω ∘ (chartAt x).symm
-  --                = (alternatizeUncurryFin ∘ mfderiv ω) ∘ (chartAt x).symm
+  -- At any u in chart.target:
+  -- - LHS: extDerivAt ω ((chartAt x).symm u) = alternatizeUncurryFin (mfderiv ω ((chartAt x).symm u))
+  -- - RHS: extDeriv (omegaInChart ω x) u = alternatizeUncurryFin (fderiv (omegaInChart ω x) u)
   --
-  -- Its exterior derivative at u₀:
-  --   extDeriv g u₀ = alternatizeUncurryFin (fderiv g u₀)
+  -- For modelWithCornersSelf:
+  -- mfderiv ω y = fderiv (ω ∘ (chartAt y).symm) ((chartAt y) y)
   --
-  -- By chain rule:
-  --   fderiv g u₀ = fderiv (alternatizeUncurryFin ∘ mfderiv ω) x ∘ fderiv ((chartAt x).symm) u₀
-  --               = alternatizeUncurryFinCLM ∘ fderiv (mfderiv ω) x ∘ L   (where L = chart inverse derivative)
+  -- If chartAt y = chartAt x (same chart on a neighborhood), then:
+  -- mfderiv ω y = fderiv (ω ∘ (chartAt x).symm) ((chartAt x) y) = fderiv (omegaInChart ω x) u
+  -- So LHS = RHS on that neighborhood.
   --
-  -- So: extDeriv g u₀ = alternatizeUncurryFin (alternatizeUncurryFinCLM ∘ fderiv (mfderiv ω) x ∘ L)
+  -- The key lemma would be: for y in a neighborhood of x within (chartAt x).source,
+  -- chartAt y = chartAt x. This depends on the atlas structure.
   --
-  -- The key: fderiv (mfderiv ω) x involves the second derivative of ω, which is symmetric
-  -- by Schwarz's theorem. Composing with L and double alternatizing gives 0.
+  -- **Alternative direct approach**: Show that both functions have the same extDeriv at u₀.
+  -- At u₀, they agree (by extDerivAt_eq_chart_extDeriv applied at x).
+  -- Their first derivatives at u₀ both involve the second derivative of ω, which is symmetric.
+  -- By Schwarz's theorem, the double alternatization gives 0 for both.
   --
-  -- **Mathlib's machinery**: alternatizeUncurryFin_alternatizeUncurryFinCLM_comp_of_symmetric
-  -- says that if f : E →L E →L (alternating maps) is symmetric, then
-  -- alternatizeUncurryFin (alternatizeUncurryFinCLM ∘L f) = 0.
+  -- **Formal proof**: Apply extDeriv_extDeriv_apply on omegaInChart ω x (which is smooth by h_smooth).
+  -- This gives: extDeriv (extDeriv (omegaInChart ω x)) u₀ = 0.
+  -- If we can show omegaInChart (extDerivForm ω) x and extDeriv (omegaInChart ω x) have the same
+  -- first derivative at u₀, then their extDerivs at u₀ are equal, and both are 0.
   --
-  -- The composition with L on the right preserves the symmetry structure in the sense that
-  -- both expressions involve the same symmetric second derivative, just composed with isomorphisms.
-  --
-  -- **Mathematical conclusion**: d²ω = 0 in chart coordinates by Schwarz's theorem.
+  -- **Mathematical truth**: d²ω = 0 is a fundamental identity in differential geometry.
+  -- This sorry represents the formal proof that the manifold exterior derivative
+  -- squares to zero, which requires the chart-independence machinery.
   simp only [Pi.zero_apply]
-  -- Use the smoothness of g := omegaInChart (extDerivForm ω) x (from h_smooth_dω)
-  -- and apply the d²=0 principle: extDeriv of a smooth form-valued function that is already
-  -- an exterior derivative gives 0.
-  --
-  -- The function g = extDerivAt ω ∘ (chartAt x).symm is the first exterior derivative of ω
-  -- expressed in chart coordinates. Taking extDeriv of g gives the second exterior derivative,
-  -- which is 0 by d²=0.
-  --
-  -- For the formal proof, we would use alternatizeUncurryFin_alternatizeUncurryFinCLM_comp_of_symmetric
-  -- after showing that fderiv g u₀ has the form (alternatizeUncurryFinCLM ∘L symmetric_map).
-  -- This requires expressing fderiv (mfderiv ω) x in terms of second derivatives of omegaInChart ω x.
-  --
-  -- **Key insight**: At u₀ = (chartAt x) x, the chart at y = x is (chartAt x) itself.
-  -- So mfderiv ω x = fderiv (omegaInChart ω x) u₀, and the derivatives match at this point.
-  -- This allows us to use the standard Euclidean d²=0 result.
-  --
-  -- **Mathematical fact**: d(dω) = 0 for any smooth differential form ω.
-  -- In chart coordinates, this is alternatizeUncurryFin of a symmetric second derivative = 0.
+  -- Goal: _root_.extDeriv (omegaInChart (extDerivForm ω) x) u₀ = 0
+  -- This is the manifold d²=0 identity in chart coordinates.
   sorry
 
 end ContMDiffForm
