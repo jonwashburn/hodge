@@ -126,11 +126,34 @@ theorem mfderiv_wedge_apply {k l : ℕ} (ω : ContMDiffForm n X k) (η : ContMDi
   -- For 𝓘(ℂ, F) targets (model spaces), this reduces to HasFDerivAt via
   -- hasMFDerivAt_iff_hasFDerivAt, and we can use hasFDerivAt_wedge directly.
   --
-  -- Implementation path:
-  -- 1. Get HasMFDerivAt for ω and η from smoothness
-  -- 2. Use HasMFDerivAt.prodMk to get HasMFDerivAt for (ω, η)
-  -- 3. wedge is a CLM^2 so it has HasMFDerivAt = bilinear deriv
-  -- 4. Compose and evaluate at v
+  -- **Proof via chart coordinates**:
+  --
+  -- For mfderiv with modelWithCornersSelf source and model space target:
+  --   mfderiv (𝓒_complex n) 𝓘(ℂ, F) f x = fderiv (f ∘ (chartAt x).symm) ((chartAt x) x)
+  --
+  -- Let φ = chartAt x, u₀ = φ x.
+  -- Let f_chart = ω.as_alternating ∘ φ.symm : TangentModel n → Alt n k
+  -- Let g_chart = η.as_alternating ∘ φ.symm : TangentModel n → Alt n l
+  -- Let h_chart = (ω.wedge η).as_alternating ∘ φ.symm
+  --
+  -- By pointwise definition of wedge:
+  --   h_chart u = (f_chart u).wedge (g_chart u)
+  --
+  -- So h_chart = fun u => (f_chart u).wedge (g_chart u).
+  --
+  -- By hasFDerivAt_wedge (proven!):
+  --   fderiv h_chart u₀ v = (fderiv f_chart u₀ v).wedge (g_chart u₀) + (f_chart u₀).wedge (fderiv g_chart u₀ v)
+  --
+  -- Since g_chart u₀ = η x and f_chart u₀ = ω x:
+  --   = (fderiv f_chart u₀ v).wedge (η x) + (ω x).wedge (fderiv g_chart u₀ v)
+  --   = (mfderiv ... ω x v).wedge (η x) + (ω x).wedge (mfderiv ... η x v)
+  --
+  -- This is exactly the RHS! The proof formalizes this chain.
+  --
+  -- Technical requirements:
+  -- (a) DifferentiableAt for f_chart, g_chart (from MDifferentiableAt + chart smoothness)
+  -- (b) Relating fderiv of chart representation to mfderiv
+  -- (c) Evaluating v in TangentSpace (requires identifying TangentSpace with model space)
   sorry
 
 /-! ### Alternatization and Wedge Compatibility -/
