@@ -186,32 +186,45 @@ theorem cohomologous_wedge {n k l : ℕ} {X : Type u} [TopologicalSpace X] [Char
     [IsManifold (𝓒_complex n) ⊤ X]
     (ω₁ ω₁' : ClosedForm n X k) (ω₂ ω₂' : ClosedForm n X l) (h1 : ω₁ ≈ ω₁') (h2 : ω₂ ≈ ω₂') :
     (⟨ω₁.val ⋏ ω₂.val, isFormClosed_wedge _ _ ω₁.property ω₂.property⟩ : ClosedForm n X (k + l)) ≈ ⟨ω₁'.val ⋏ ω₂'.val, isFormClosed_wedge _ _ ω₁'.property ω₂'.property⟩ := by
-  -- Proof outline:
-  --
-  -- Goal: ω₁∧ω₂ - ω₁'∧ω₂' is exact, i.e., ∃ β, dβ = ω₁∧ω₂ - ω₁'∧ω₂'
-  --
-  -- Step 1: Expand the difference using bilinearity of wedge:
-  --   ω₁∧ω₂ - ω₁'∧ω₂' = (ω₁ - ω₁')∧ω₂ + ω₁'∧(ω₂ - ω₂')
-  --
-  -- Step 2: Use hypotheses:
-  --   h1: ω₁ ≈ ω₁' means ∃ β₁, dβ₁ = ω₁ - ω₁'
-  --   h2: ω₂ ≈ ω₂' means ∃ β₂, dβ₂ = ω₂ - ω₂'
-  --
-  -- Step 3: Apply Leibniz rule:
-  --   d(β₁ ∧ ω₂) = (dβ₁) ∧ ω₂ + (-1)^(k-1) β₁ ∧ (dω₂)
-  --             = (ω₁ - ω₁') ∧ ω₂ + 0    (since dω₂ = 0, ω₂ is closed)
-  --
-  --   d(ω₁' ∧ β₂) = (dω₁') ∧ β₂ + (-1)^k ω₁' ∧ (dβ₂)
-  --              = 0 + (-1)^k ω₁' ∧ (ω₂ - ω₂')   (since dω₁' = 0, ω₁' is closed)
-  --
-  -- Step 4: Combine:
-  --   ω₁∧ω₂ - ω₁'∧ω₂' = d(β₁ ∧ ω₂) + (-1)^k d(ω₁' ∧ β₂)
-  --                   = d(β₁ ∧ ω₂ + (-1)^k ω₁' ∧ β₂)
-  --
-  -- So β := β₁ ∧ ω₂ + (-1)^k ω₁' ∧ β₂ witnesses exactness.
-  --
-  -- Technical requirements: Leibniz rule (from isFormClosed_wedge proof path)
-  sorry
+  -- Goal: IsExact (ω₁ ∧ ω₂ - ω₁' ∧ ω₂')
+  change IsExact (ω₁.val ⋏ ω₂.val - ω₁'.val ⋏ ω₂'.val)
+  -- Expand: ω₁ ∧ ω₂ - ω₁' ∧ ω₂' = (ω₁ - ω₁') ∧ ω₂ + ω₁' ∧ (ω₂ - ω₂')
+  have heq : ω₁.val ⋏ ω₂.val - ω₁'.val ⋏ ω₂'.val = (ω₁.val - ω₁'.val) ⋏ ω₂.val + ω₁'.val ⋏ (ω₂.val - ω₂'.val) := by
+    sorry -- standard algebra using bilinearity of wedge
+  rw [heq]
+  
+  -- IsExact is additive
+  have h_add : ∀ (α β : SmoothForm n X (k + l)), IsExact α → IsExact β → IsExact (α + β) := by
+    intros α β hα hβ
+    unfold IsExact at *
+    split
+    · rw [hα, hβ, add_zero]
+    · intro m
+      obtain ⟨η₁, h1⟩ := hα
+      obtain ⟨η₂, h2⟩ := hβ
+      exact ⟨η₁ + η₂, by rw [smoothExtDeriv_add, h1, h2]⟩
+
+  apply h_add
+  · -- IsExact ((ω₁ - ω₁') ∧ ω₂)
+    change IsExact (ω₁.val - ω₁'.val) at h1
+    cases k
+    case zero =>
+      unfold IsExact at h1; rw [h1, zero_wedge]
+      unfold IsExact; split; { rfl }; { exact ⟨0, smoothExtDeriv_zero⟩ }
+    case succ k' =>
+      unfold IsExact at h1
+      obtain ⟨β₁, hβ₁⟩ := h1
+      sorry -- use smoothExtDeriv_wedge
+  · -- IsExact (ω₁' ∧ (ω₂ - ω₂'))
+    change IsExact (ω₂.val - ω₂'.val) at h2
+    cases l
+    case zero =>
+      unfold IsExact at h2; rw [h2, wedge_zero]
+      unfold IsExact; split; { rfl }; { exact ⟨0, smoothExtDeriv_zero⟩ }
+    case succ l' =>
+      unfold IsExact at h2
+      obtain ⟨β₂, hβ₂⟩ := h2
+      sorry -- use smoothExtDeriv_wedge
 
 /-! ### Algebraic Instances -/
 

@@ -88,6 +88,20 @@ instance (k : ℕ) : SMul ℝ (SmoothForm n X k) :=
 @[simp] lemma SmoothForm.smul_real_apply (k : ℕ) (r : ℝ) (ω : SmoothForm n X k) (x : X) :
     (r • ω).as_alternating x = r • ω.as_alternating x := rfl
 
+/-- Cast a `SmoothForm` between equal degrees. -/
+def castForm {k k' : ℕ} (h : k = k') (ω : SmoothForm n X k) : SmoothForm n X k' :=
+  h ▸ ω
+
+@[simp] lemma castForm_refl (k : ℕ) (ω : SmoothForm n X k) : castForm rfl ω = ω := rfl
+
+@[simp] lemma castForm_zero {k k' : ℕ} (h : k = k') : castForm h (0 : SmoothForm n X k) = 0 := by
+  subst h; rfl
+
+@[simp] lemma castForm_add {k k' : ℕ} (h : k = k') (ω η : SmoothForm n X k) :
+    castForm h (ω + η) = castForm h ω + castForm h η := by
+  subst h; rfl
+
+
 /-!
 ### Conversion from/to SmoothForm
 -/
@@ -279,31 +293,33 @@ def smoothWedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) : Sm
 
 notation:67 ω:68 " ⋏ " η:68 => smoothWedge ω η
 
+@[simp] lemma zero_wedge {k l : ℕ} (η : SmoothForm n X l) : (0 : SmoothForm n X k) ⋏ η = 0 := by
+  ext x
+  simp [smoothWedge]
+  -- Linearity of wedge
+  sorry
+
+@[simp] lemma wedge_zero {k l : ℕ} (ω : SmoothForm n X k) : ω ⋏ (0 : SmoothForm n X l) = 0 := by
+  ext x
+  simp [smoothWedge]
+  -- Linearity of wedge
+  sorry
+
+/-- Leibniz rule for the exterior derivative of a wedge product.
+    d(ω ∧ η) = dω ∧ η + (-1)^k ω ∧ dη.
+    Note: Requires casting types since (k+1)+l and k+(l+1) are only propositionally equal to k+l+1. -/
+theorem smoothExtDeriv_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) :
+    smoothExtDeriv (ω ⋏ η) =
+      castForm (by simp [Nat.add_assoc, Nat.add_comm, Nat.add_left_comm]) (smoothExtDeriv ω ⋏ η) +
+      castForm (by simp [Nat.add_assoc]) ((-1 : ℂ)^k • (ω ⋏ smoothExtDeriv η)) := sorry
+
 theorem isFormClosed_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) :
     IsFormClosed ω → IsFormClosed η → IsFormClosed (ω ⋏ η) := by
   intros hω hη
-  -- Proof outline using the Leibniz rule:
-  --
-  -- 1. Leibniz rule: `d(ω ∧ η) = dω ∧ η + (-1)^k ω ∧ dη`
-  --    - Follows from `ContinuousLinearMap.fderiv_of_bilinear` (Mathlib) applied to
-  --      the wedge product bilinear map B = ContinuousAlternatingMap.wedge
-  --    - For mfderiv, reduces to fderiv in chart coordinates (modelWithCornersSelf)
-  --
-  -- 2. Given: dω = 0 (hω) and dη = 0 (hη)
-  --    - `IsFormClosed ω` means `smoothExtDeriv ω = 0`, i.e., for all x:
-  --      `alternatizeUncurryFin (mfderiv ω.as_alternating x) = 0`
-  --
-  -- 3. Conclusion: d(ω ∧ η) = dω ∧ η + (-1)^k ω ∧ dη = 0 ∧ η + (-1)^k ω ∧ 0 = 0
-  --    - Requires showing that `0 ⋏ η = 0` and `ω ⋏ 0 = 0` (wedge with zero is zero)
-  --
-  -- Technical requirements:
-  --    - Bilinear mfderiv product rule (via fderiv_of_bilinear + chart reduction)
-  --    - Type casting: FiberAlt n ((k+l)+1) ↔ FiberAlt n ((k+1)+l) + FiberAlt n (k+(l+1))
-  --    - Sign factor (-1)^k for graded commutativity
-  --
-  -- The mathematical content is standard (Leibniz rule for differential forms).
-  -- Formalization requires Mathlib's bilinear calculus machinery.
-  sorry
+  unfold IsFormClosed at *
+  rw [smoothExtDeriv_wedge]
+  rw [hω, hη]
+  simp [zero_wedge, wedge_zero]
 
 /-- Exterior derivative of an exterior derivative is zero (d² = 0). -/
 theorem smoothExtDeriv_extDeriv {k : ℕ} (ω : SmoothForm n X k) : smoothExtDeriv (smoothExtDeriv ω) = 0 := by
