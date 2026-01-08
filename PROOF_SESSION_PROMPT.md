@@ -37,6 +37,7 @@ Complete the Lean 4 formalization of the Hodge Conjecture proof.
 # Session History
 | Date | Sorries | Axioms | Notes |
 |------|---------|--------|-------|
+| Jan 7, 2026 (update4) | 5 | 9 | **Deep-dive on chart cocycle**: Key mechanism is `alternatizeUncurryFin_fderivCompContinuousLinearMap_eq_zero` - symmetric second derivatives vanish under alternatization. Gap is chart composition handling. For model space, `chartAt_self_eq` gives identity. |
 | Jan 7, 2026 (update3) | 5 | 9 | **Analyzed chartAt_self_eq**: For model space H, chartAt = refl (Mathlib). For general manifolds, chart cocycle requires additional infrastructure. Documented all 5 sorries with mathematical justification. Key insight: on model space, omegaInChart simplifies to identity, making cocycle trivial. |
 | Jan 7, 2026 (update2) | 5 | 9 | **Proved zero_wedge/wedge_zero**: Used wedge_smul_left/right with c=0. Proved heq bilinearity in cohomologous_wedge. Added detailed documentation for chart cocycle and Leibniz gaps. All 5 remaining sorries now have mathematical justification documented. |
 | Jan 7, 2026 (final) | 5 | 9 | **Implemented cohomology ring structure**: Proved `isFormClosed_wedge` and `cohomologous_wedge` using the Leibniz rule axiom. Refined `extDeriv_extDeriv` to use local equality (`h_deriv_eq`), isolating the chart cocycle assumption. The semantic structure of the cohomology ring is now formally established. |
