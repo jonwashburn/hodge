@@ -146,6 +146,7 @@ lemma alternatizeUncurryFin_wedge_left (A : E →L[ℂ] ContinuousAlternatingMap
 # Session History
 | Date | Sorries | Axioms | Notes |
 |------|---------|--------|-------|
+| Jan 8, 2026 (update9) | 10 | 9 | **d²=0 gap narrowed**. h_d_squared_zero proven via extDeriv_extDeriv_apply. Gap: show fderiv (mfderiv ω ∘ chart.symm) u₀ is symmetric (relates to D²ψ u₀ via tangentCoordChange_self). |
 | Jan 8, 2026 (update8) | 10 | 9 | **Symmetry argument complete**. extDeriv_extDeriv: extDeriv g = alternatize(alternatizeCLM ∘ D²ω), D²ω symmetric by Schwarz, double alternatization = 0. Both critical sorries now have complete mathematical arguments. |
 | Jan 8, 2026 (update7) | 10 | 9 | **Product manifold strategy**. extDerivForm.smooth' proof: F(x₀,y)=extDerivInTangentCoordinates is smooth on X×X, diagonal Δ is smooth, F∘Δ=extDerivAt. Gap: joint smoothness via ContMDiff.mfderiv. |
 | Jan 8, 2026 (update6) | 10 | 9 | **TeX alignment verified**. Main theorem `hodge_conjecture'` matches TeX `thm:main-hodge`. Signed decomposition + cone-positive + ω^p algebraic chains verified. extDerivForm.smooth' gap: need joint smoothness on X×X for diagonal restriction. |
