@@ -20,13 +20,18 @@ This document maps the proof chain in `Hodge-v6-w-Jon-Update-MERGED.tex` to Lean
 
 **`sorry` Breakdown** (all in Stage 4 work, with documented proof strategies):
 - `Cohomology/Basic.lean:225`: 1 (`cohomologous_wedge` - requires Leibniz rule)
-- `Analytic/Forms.lean:334`: 1 (`smoothExtDeriv_wedge` - Leibniz rule d(ω∧η))
+- `Analytic/Forms.lean:340`: 1 (`smoothExtDeriv_wedge` - Leibniz rule d(ω∧η))
 - `Analytic/ContMDiffForms.lean`: 2 sorries with proof outlines:
-  - `:539` - `extDerivForm.smooth'` (smoothness via diagonal/joint smoothness argument)
-  - `:662` - `h_deriv_eq` in `extDeriv_extDeriv` (chart cocycle: needs chartAt y = chartAt x locally)
-- `Analytic/Currents.lean:349`: 1 (boundary operator bound - comass estimate)
+  - `:538` - `extDerivForm.smooth'` (smoothness via diagonal/joint smoothness argument)
+  - `:661` - `h_deriv_eq` in `extDeriv_extDeriv` (chart cocycle: needs chartAt y = chartAt x locally)
+- `Analytic/Currents.lean:358`: 1 (boundary operator bound - comass estimate)
 
 **Note**: `isFormClosed_wedge` is now PROVEN using `smoothExtDeriv_wedge` + `zero_wedge` + `wedge_zero`.
+
+**Key Mathlib Mechanisms Identified**:
+- `alternatizeUncurryFin_fderivCompContinuousLinearMap_eq_zero`: Symmetric 2nd derivatives vanish under alternation (d²=0)
+- `chartAt_self_eq`: For model space H, `chartAt H x = refl` (trivializes chart cocycle)
+- `ContMDiffAt.mfderiv_const`: mfderiv in tangent coordinates is smooth (but need joint smoothness)
 
 **Key Theorems Proven**:
 - `extDerivAt_eq_chart_extDeriv`: Chart transport identity for modelWithCornersSelf
