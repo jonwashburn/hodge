@@ -20,48 +20,45 @@ Complete the Lean 4 formalization of the Hodge Conjecture proof. **No gaps allow
 - `extDerivAt_eq_chart_extDeriv_general` (ContMDiffForms.lean:580) - UNUSED, mathematically incorrect for y≠x
 - d²=0 proof now DOES NOT DEPEND on the problematic general chart lemma!
 
-# The 5 Remaining Sorries — ATTACK PLAN
+# The 2 Critical Path Sorries — ATTACK PLAN
 
-## 1. `extDerivAt_eq_chart_extDeriv_general` (ContMDiffForms.lean:522)
-**The Problem**: Prove chart independence of exterior derivative. Need:
-```lean
-fderiv (ω ∘ (chartAt y).symm) ((chartAt y) y) = fderiv (ω ∘ (chartAt x).symm) ((chartAt x) y)
-```
-
-**The Deep Math**: By chain rule with τ = (chartAt x) ∘ (chartAt y).symm:
-- LHS = RHS ∘ fderiv τ ((chartAt y) y)
-- Need: `fderiv τ ((chartAt y) y) = id`
-
-**Attack Strategy**:
-1. Use Mathlib's `tangentCoordChange_def`: `tangentCoordChange I x y z = fderivWithin (extChartAt y ∘ (extChartAt x).symm) (range I) (extChartAt x z)`
-2. For `modelWithCornersSelf`, `range I = univ` so `fderivWithin = fderiv`
-3. Key: `tangentCoordChange I y x y = fderiv ((chartAt x) ∘ (chartAt y).symm) ((chartAt y) y)`
-4. Use `hasFDerivWithinAt_tangentCoordChange` to extract the derivative
-5. The inverse `tangentCoordChange I x y y` cancels it to give identity
-
-**Mathlib lemmas to use**:
-- `tangentCoordChange_def`, `hasFDerivWithinAt_tangentCoordChange`
-- `tangentCoordChange_comp` (composition law)
-- For model space: `extChartAt_model_space_eq_id`
-
-## 2. `extDerivForm.smooth'` (ContMDiffForms.lean:625)
+## 1. `extDerivForm.smooth'` (ContMDiffForms.lean:727)
 **The Problem**: Prove `extDerivAt ω : X → FiberAlt n (k+1)` is ContMDiff.
 
-**The Deep Math**: Joint smoothness on X × X then restrict to diagonal.
-- Have: `contMDiffAt_extDerivInTangentCoordinates ω x₀` (smooth in 2nd arg for fixed 1st)
-- Need: `(x₀, y) ↦ extDerivInTangentCoordinates ω x₀ y` jointly smooth
+**Mathematical Truth**: For a C^∞ form ω, the exterior derivative dω is C^∞.
+
+**Current Status**: Have `contMDiffAt_extDerivInTangentCoordinates ω x` (smooth in 2nd arg for fixed 1st).
+Need joint smoothness on X × X, then restrict to diagonal.
 
 **Attack Strategy**:
-1. Define `F : X × X → FiberAlt n (k+1)` by `F(x₀, y) = extDerivInTangentCoordinates ω x₀ y`
-2. Use product manifold structure: show ContMDiff on X × X
-3. The diagonal Δ : X → X × X, x ↦ (x,x) is smooth (`contMDiff_id.prodMk contMDiff_id`)
-4. By `extDerivInTangentCoordinates_diag`, `extDerivAt ω = F ∘ Δ`
-5. Composition of smooth maps is smooth
+1. `extDerivAt ω = alternatizeUncurryFin ∘ mfderiv ω.as_alternating`
+2. `alternatizeUncurryFin` is a continuous linear map (hence smooth)
+3. Use `ContMDiff.contMDiff_tangentMap`: if ω is ContMDiff ⊤, tangent map is ContMDiff ⊤
+4. Project to get smoothness of `x ↦ mfderiv ω x`
+5. Compose with smooth alternatizeUncurryFin
 
-**Key infrastructure**: Need to prove F is jointly smooth. Use:
-- `ContMDiff.comp` for function composition
-- The explicit formula for `extDerivInTangentCoordinates` involves smooth maps
-- `mfderiv` varies smoothly in tangent coordinates (`ContMDiffAt.mfderiv_const`)
+**Mathlib infrastructure**:
+- `ContMDiff.contMDiff_tangentMap` (tangent map is smooth)
+- `ContMDiffAt.mfderiv_const` (mfderiv in tangent coordinates is smooth at basepoint)
+- For joint smoothness: need `(x₀, y) ↦ tangentCoordChange I x₀ y y` to be smooth
+
+## 2. `h_lhs_zero` in d²=0 proof (ContMDiffForms.lean:896)
+**The Problem**: Prove `_root_.extDeriv (omegaInChart (extDerivForm ω) x) u₀ = 0`.
+
+**Mathematical Truth**: The second exterior derivative is 0 by symmetry of second partial derivatives (Schwarz's theorem).
+
+**Current Status**: This is a direct application of Mathlib's `extDeriv_extDeriv_apply` once we show
+the function is in the right form. The function `omegaInChart (extDerivForm ω) x` is smooth.
+
+**Attack Strategy**:
+1. Show `omegaInChart (extDerivForm ω) x` is smooth (we have `h_smooth_dω`)
+2. Apply `extDeriv_extDeriv_apply` which gives d²=0 for smooth functions on Euclidean space
+3. The key is that the second derivative is symmetric, so alternatizing it gives 0
+
+## Archived: `extDerivAt_eq_chart_extDeriv_general`
+**Status**: UNUSED and mathematically incorrect for y ≠ x. The d²=0 proof no longer depends on it.
+The lemma claimed equality of exterior derivatives computed using different charts, but this
+fails when chartAt y ≠ chartAt x (the two sides differ by a tangent coordinate change factor).
 
 ## 3. `smoothExtDeriv_wedge` (Forms.lean:340) — THE LEIBNIZ RULE
 **The Problem**: Prove d(ω ∧ η) = dω ∧ η + (-1)^k ω ∧ dη
