@@ -8,7 +8,7 @@ Complete the Lean 4 formalization of the Hodge Conjecture proof. **No gaps allow
 
 ## CRITICAL PATH (blocks `hodge_conjecture'`)
 1. `extDerivForm.smooth'` (ContMDiffForms.lean:727) - d preserves smoothness (joint smoothness on X×X)
-2. `h_lhs_zero` in d²=0 proof (ContMDiffForms.lean:896) - second extDeriv = 0
+2. `extDeriv_extDeriv` final step (ContMDiffForms.lean:896) - d(dω)=0 in chart coordinates
 
 ## NOT ON CRITICAL PATH (cup product / library completeness)
 - Leibniz rule chain (4 sorries in LeibnizRule.lean:143,178,209,233) - needed for ring structure, not main theorem

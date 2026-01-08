@@ -862,41 +862,37 @@ theorem extDeriv_extDeriv (ω : ContMDiffForm n X k) :
   --
   -- The double alternatization of the symmetric second derivative gives 0 either way.
   -- Use Filter.EventuallyEq to show the functions have the same extDeriv at u₀
-  have h_deriv_eq : _root_.extDeriv (omegaInChart (extDerivForm ω) x) u₀ =
-                    _root_.extDeriv (_root_.extDeriv (omegaInChart ω x)) u₀ := by
-    -- Both functions are smooth at u₀. We need to show their first derivatives agree at u₀.
-    -- This follows from the definition of extDerivAt and the chain rule.
-    -- For now, we use the standard d²=0 result via the algebraic structure.
-    --
-    -- The key insight: both sides equal 0!
-    -- LHS = _root_.extDeriv of (extDerivAt ω ∘ (chartAt x).symm) at u₀
-    --     = alternatizeUncurryFin of (second derivative of ω in chart)
-    --     = 0 (by symmetry of second derivative)
-    -- RHS = _root_.extDeriv of _root_.extDeriv of (omegaInChart ω x) at u₀
-    --     = 0 (by Mathlib's extDeriv_extDeriv_apply)
-    --
-    -- So we prove both are 0 and use transitivity.
-    have h_rhs_zero : _root_.extDeriv (_root_.extDeriv (omegaInChart ω x)) u₀ = 0 :=
-      _root_.extDeriv_extDeriv_apply h_smooth h_minSmoothness
-    -- The LHS is also 0 by the same argument applied to omegaInChart (extDerivForm ω) x
-    have h_lhs_zero : _root_.extDeriv (omegaInChart (extDerivForm ω) x) u₀ = 0 := by
-      -- omegaInChart (extDerivForm ω) x = (extDerivForm ω).as_alternating ∘ (chartAt x).symm
-      --                                = extDerivAt ω ∘ (chartAt x).symm
-      -- This is smooth (by h_smooth_dω), and its extDeriv at u₀ involves the second derivative
-      -- of ω, which is symmetric. The alternatization of a symmetric bilinear form is 0.
-      --
-      -- Alternative: Show that omegaInChart (extDerivForm ω) x = _root_.extDeriv g for some smooth g,
-      -- then apply extDeriv_extDeriv. But this circles back to needing chart independence.
-      --
-      -- Direct approach: Use the fact that extDerivAt ω is the first exterior derivative of ω.
-      -- The exterior derivative of (extDerivAt ω ∘ chart.symm) involves the second exterior derivative.
-      -- By the algebraic property d²=0, this is 0.
-      --
-      -- We use Mathlib's extDeriv_extDeriv_apply on a lifted function.
-      sorry
-    rw [h_lhs_zero, h_rhs_zero]
-  rw [h_deriv_eq]
+  -- Goal: _root_.extDeriv (omegaInChart (extDerivForm ω) x) u₀ = 0
+  --
+  -- The function omegaInChart (extDerivForm ω) x : TangentModel n → FiberAlt n (k+1)
+  -- is smooth by h_smooth_dω.
+  --
+  -- **Mathematical Truth**: Taking the exterior derivative of a smooth form-valued function,
+  -- then taking extDeriv again, gives 0. This is because extDeriv involves alternatizing
+  -- the second derivative, which is symmetric by Schwarz's theorem.
+  --
+  -- The function omegaInChart (extDerivForm ω) x = extDerivAt ω ∘ (chartAt x).symm
+  --                                              = alternatizeUncurryFin ∘ mfderiv(ω) ∘ (chartAt x).symm
+  --
+  -- Taking extDeriv of this involves:
+  -- fderiv (alternatizeUncurryFin ∘ mfderiv(ω) ∘ (chartAt x).symm) u₀
+  -- = alternatizeUncurryFinCLM ∘ fderiv (mfderiv(ω) ∘ (chartAt x).symm) u₀
+  --
+  -- This is the second derivative of ω in chart coordinates, alternatized.
+  -- By Schwarz, the second derivative is symmetric, so alternatizing gives 0.
+  --
+  -- Formally, we need: _root_.extDeriv (omegaInChart (extDerivForm ω) x) u₀ = 0
+  --
+  -- We have two approaches:
+  -- 1. Show omegaInChart (extDerivForm ω) x = _root_.extDeriv (omegaInChart ω x) on a neighborhood
+  --    of u₀, then apply Filter.EventuallyEq.extDeriv_eq and use extDeriv_extDeriv_apply.
+  -- 2. Directly prove the result using the structure of the exterior derivative.
+  --
+  -- Approach 1 requires the general chart-independence lemma which is problematic.
+  -- For now, we mark this as the mathematical d²=0 principle.
   simp only [Pi.zero_apply]
-  exact _root_.extDeriv_extDeriv_apply h_smooth h_minSmoothness
+  -- The goal is: _root_.extDeriv (omegaInChart (extDerivForm ω) x) u₀ = 0
+  -- This is d(dω) = 0 in chart coordinates, a fundamental identity.
+  sorry
 
 end ContMDiffForm
