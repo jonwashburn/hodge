@@ -1043,6 +1043,33 @@ theorem extDeriv_extDeriv (ω : ContMDiffForm n X k) :
   -- Both extDeriv g u₀ and extDeriv (extDeriv ψ) u₀ are double alternatizations of
   -- the second derivative of ω at x, expressed in chart coordinates.
   -- Since D²ψ u₀ is symmetric (by Schwarz), both double alternatizations are 0.
+  --
+  -- **Final step**: The goal extDeriv g u₀ = 0 follows from the symmetry argument.
+  -- We computed h_d_squared_zero showing extDeriv (extDeriv (omegaInChart ω x)) u₀ = 0.
+  --
+  -- The key observation is that both g = omegaInChart (extDerivForm ω) x and
+  -- extDeriv (omegaInChart ω x) are smooth functions whose exterior derivatives at u₀
+  -- are given by double alternatization of the second derivative of ω.
+  --
+  -- At u₀, both involve fderiv of (first derivative of ω), which is the second derivative.
+  -- By Schwarz, any C^2 function has symmetric second derivative.
+  -- By alternatizeUncurryFin_alternatizeUncurryFinCLM_comp_of_symmetric, this gives 0.
+  --
+  -- **Structure of proof**: Both paths lead to the same result:
+  -- 1. h_d_squared_zero shows one path (chart → extDeriv → extDeriv) gives 0.
+  -- 2. The goal shows the other path (extDerivForm → chart → extDeriv) is also 0.
+  -- Both are 0 because they're double alternatizations of symmetric second derivatives.
+  --
+  -- **Formal gap**: We would need to show:
+  -- fderiv (omegaInChart (extDerivForm ω) x) u₀ has the form alternatizeUncurryFinCLM ∘ h
+  -- where h : TangentModel n →L (TangentModel n →L FiberAlt) is symmetric (h v w = h w v).
+  --
+  -- This follows from:
+  -- - g = alternatizeUncurryFin ∘ (mfderiv ω ∘ chart.symm)
+  -- - fderiv g u₀ = alternatizeUncurryFinCLM ∘ fderiv (mfderiv ω ∘ chart.symm) u₀
+  -- - fderiv (mfderiv ω ∘ chart.symm) u₀ relates to D²(omegaInChart ω x) u₀ (symmetric by Schwarz)
+  --
+  -- For now, this fundamental identity d²=0 for manifold exterior derivatives is marked.
   sorry
 
 end ContMDiffForm
