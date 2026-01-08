@@ -4,6 +4,7 @@ import Mathlib.Geometry.Manifold.ContMDiff.NormedSpace
 import Mathlib.Geometry.Manifold.ContMDiffMFDeriv
 import Mathlib.Geometry.Manifold.MFDeriv.Tangent
 import Mathlib.Analysis.Calculus.DifferentialForm.Basic
+import Mathlib.Analysis.Calculus.FDeriv.Symmetric
 
 /-!
 Stage 2 groundwork: a manifold-aware (chart-based) smoothness layer for forms.
