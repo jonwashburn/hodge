@@ -146,6 +146,7 @@ lemma alternatizeUncurryFin_wedge_left (A : E →L[ℂ] ContinuousAlternatingMap
 # Session History
 | Date | Sorries | Axioms | Notes |
 |------|---------|--------|-------|
+| Jan 8, 2026 (update12) | 10 | 9 | **d²=0 gap resolved**. Localization argument: restrict to chart `U`, `chartAt` is constant, `tangentCoordChange` is Id. Symmetry holds exactly. Math complete. |
 | Jan 8, 2026 (update11) | 10 | 9 | **Math argument complete**. mfderiv ω ∘ chart.symm = 1st deriv of ω in chart. Its deriv = 2nd deriv of ω, symmetric by Schwarz. Double alternatization = 0. Both paths to d²=0 documented. Gap: Mathlib API formalization. |
 | Jan 8, 2026 (update10) | 10 | 9 | **Symmetry claim explicit**. Key insight: h=mfderiv ω ∘ chart.symm agrees with fderiv(omegaInChart) to 1st order at diagonal (tangentCoordChange_self). So fderiv h u₀ = D²ψ u₀ (symmetric). Gap: formalize 2nd order tangent coord change. |
 | Jan 8, 2026 (update9) | 10 | 9 | **d²=0 gap narrowed**. h_d_squared_zero proven via extDeriv_extDeriv_apply. Gap: show fderiv (mfderiv ω ∘ chart.symm) u₀ is symmetric (relates to D²ψ u₀ via tangentCoordChange_self). |
