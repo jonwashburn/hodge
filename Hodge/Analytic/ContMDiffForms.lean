@@ -650,10 +650,26 @@ theorem extDeriv_extDeriv (ω : ContMDiffForm n X k) :
                     _root_.extDeriv (_root_.extDeriv (omegaInChart ω x)) u₀ := by
     -- We need the functions to agree on a neighborhood of u₀
     apply Filter.EventuallyEq.extDeriv_eq
-    -- For u near u₀, y = symm u is near x.
-    -- If chartAt y = chartAt x, then the identity holds.
-    -- This is the chart cocycle property.
-    -- We assume the atlas is "good" enough (e.g. Euclidean space or locally constant charts).
+    -- **Chart Cocycle Property**:
+    -- For u near u₀, let y = (chartAt x).symm u. Then:
+    --   omegaInChart (extDerivForm ω) x u = extDerivAt ω y
+    --     = _root_.extDeriv (omegaInChart ω y) ((chartAt y) y)  [by extDerivAt_eq_chart_extDeriv]
+    -- For this to equal _root_.extDeriv (omegaInChart ω x) u, we need:
+    --   1. omegaInChart ω y = omegaInChart ω x (same chart representation)
+    --   2. (chartAt y) y = u
+    -- Both hold when chartAt y = chartAt x, which is true when:
+    --   - X is the model space itself (chartAt is always identity)
+    --   - y is in a locally constant chart region
+    --
+    -- **Mathematical justification**: The d²=0 property is a local computation that holds
+    -- in any chart. The chart cocycle relations ensure consistency across overlaps.
+    -- For modelWithCornersSelf, the extended chart equals the base chart (no boundary),
+    -- and the cocycle collapses to identity transformations.
+    --
+    -- **Formalization gap**: Proving this requires either:
+    --   (a) Restricting to X = EuclideanSpace (where chartAt = refl, cocycle is trivial)
+    --   (b) Developing chart cocycle infrastructure for general smooth manifolds
+    -- The mathematical content is standard differential geometry.
     sorry
 
   rw [h_deriv_eq]
