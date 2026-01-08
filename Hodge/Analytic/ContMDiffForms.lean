@@ -545,7 +545,31 @@ theorem extDerivAt_eq_chart_extDeriv_general (ω : ContMDiffForm n X k) (x y : X
   -- For general manifolds: the proof requires showing that alternatizeUncurryFin is compatible with
   -- coordinate changes, which is automatic when the coordinate change is a linear isomorphism.
   --
-  -- Implementation: Apply tangentCoordChange_self for the y = y case within chart overlap.
+  -- Implementation: The proof requires showing chart independence of the exterior derivative.
+  --
+  -- Goal: fderiv (ω ∘ (extChartAt y).symm) ((extChartAt y) y)
+  --     = fderiv (ω ∘ (chartAt x).symm) ((chartAt x) y)
+  --
+  -- For a general charted space X over EuclideanSpace:
+  -- 1. The LHS uses chartAt y, the RHS uses chartAt x
+  -- 2. By chain rule: LHS = fderiv (ω ∘ (chartAt x).symm) ((chartAt x) y) ∘ fderiv τ ((chartAt y) y)
+  --    where τ = (chartAt x) ∘ (chartAt y).symm is the chart transition
+  -- 3. The proof requires showing fderiv τ ((chartAt y) y) = id
+  --
+  -- Key Mathlib lemma: tangentCoordChange_self states that the tangent coordinate change
+  -- at the basepoint is the identity: tangentCoordChange I y x y = id when y = basepoint.
+  --
+  -- The complication is that we're evaluating at (chartAt y) y, not at a point in the intersection
+  -- of chart domains. The proof requires careful use of:
+  -- - hasFDerivWithinAt_tangentCoordChange
+  -- - The fact that (chartAt y) y ∈ (chartAt y).target ∩ (chartAt x).target (by hy)
+  --
+  -- **Alternative approach**: Use the intrinsic definition of mfderiv.
+  -- Both sides compute mfderiv ω y (by definition). The mfderiv is chart-independent,
+  -- so they must agree. This is essentially a tautology once we unfold the definitions correctly.
+  --
+  -- For now, we mark this as sorry pending the careful API navigation.
+  -- The mathematical content is that mfderiv is intrinsically defined (chart-independent).
   sorry
 
 theorem extDerivAt_add (ω η : ContMDiffForm n X k) (x : X) :
