@@ -1069,7 +1069,25 @@ theorem extDeriv_extDeriv (ω : ContMDiffForm n X k) :
   -- - fderiv g u₀ = alternatizeUncurryFinCLM ∘ fderiv (mfderiv ω ∘ chart.symm) u₀
   -- - fderiv (mfderiv ω ∘ chart.symm) u₀ relates to D²(omegaInChart ω x) u₀ (symmetric by Schwarz)
   --
-  -- For now, this fundamental identity d²=0 for manifold exterior derivatives is marked.
+  -- **Key symmetry claim**: The function h := mfderiv ω ∘ chart.symm satisfies:
+  --   fderiv h u₀ is symmetric, i.e., (fderiv h u₀ v) w = (fderiv h u₀ w) v for all v, w.
+  --
+  -- Proof of symmetry claim:
+  -- 1. h = mfderiv ω ∘ chart.symm at u₀ equals fderiv (omegaInChart ω x) u₀
+  --    (by the mfderiv formula for modelWithCornersSelf).
+  -- 2. Near u₀, h and fderiv (omegaInChart ω x) agree to first order
+  --    (tangent coordinate change is identity at the diagonal, by tangentCoordChange_self).
+  -- 3. Therefore, fderiv h u₀ = fderiv (fderiv (omegaInChart ω x)) u₀ = D²(omegaInChart ω x) u₀.
+  -- 4. By Schwarz (ContDiffAt.isSymmSndFDerivAt), D²(omegaInChart ω x) u₀ is symmetric.
+  --
+  -- Given this symmetry, the proof completes by:
+  -- extDeriv g u₀ = alternatizeUncurryFin (fderiv g u₀)
+  --               = alternatizeUncurryFin (alternatizeUncurryFinCLM ∘ fderiv h u₀)
+  --               = 0 (by alternatizeUncurryFin_alternatizeUncurryFinCLM_comp_of_symmetric).
+  --
+  -- **Formalization status**: The symmetry claim (step 2) requires formalizing that the
+  -- tangent coordinate change contributes only second-order terms near the diagonal.
+  -- This is geometrically clear but needs Mathlib API work.
   sorry
 
 end ContMDiffForm
