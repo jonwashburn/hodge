@@ -889,10 +889,48 @@ theorem extDeriv_extDeriv (ω : ContMDiffForm n X k) :
   -- 2. Directly prove the result using the structure of the exterior derivative.
   --
   -- Approach 1 requires the general chart-independence lemma which is problematic.
-  -- For now, we mark this as the mathematical d²=0 principle.
+  --
+  -- **Key insight**: The functions `omegaInChart (extDerivForm ω) x` and
+  -- `_root_.extDeriv (omegaInChart ω x)` agree on a neighborhood of u₀ because
+  -- for points y in the chart source of (chartAt x), the exterior derivative
+  -- computation is the same whether using chartAt y or chartAt x.
+  --
+  -- We use Filter.EventuallyEq.extDeriv_eq to transfer the d²=0 result.
+  have h_eq : omegaInChart (extDerivForm ω) x =ᶠ[nhds u₀] _root_.extDeriv (omegaInChart ω x) := by
+    -- The functions agree on the chart target (an open neighborhood of u₀)
+    rw [Filter.eventuallyEq_iff_exists_mem]
+    use (chartAt (EuclideanSpace ℂ (Fin n)) x).target
+    constructor
+    · exact (chartAt (EuclideanSpace ℂ (Fin n)) x).open_target.mem_nhds
+        (OpenPartialHomeomorph.map_source _ (mem_chart_source _ x))
+    · intro u hu
+      -- For u in chart.target, both sides compute the exterior derivative of ω at y := (chartAt x).symm u
+      simp only [omegaInChart, extDerivForm_as_alternating, extDeriv_as_alternating]
+      -- Goal: extDerivAt ω ((chartAt x).symm u) = _root_.extDeriv (omegaInChart ω x) u
+      -- This is extDerivAt_eq_chart_extDeriv_general applied at y = (chartAt x).symm u
+      -- with the chart being (chartAt x).
+      --
+      -- The key: for modelWithCornersSelf (our 𝓒_complex), mfderiv = fderiv in chart coords.
+      -- At y = (chartAt x).symm u, we're computing in the chart (chartAt x).
+      --
+      -- mfderiv ω y uses (chartAt y), but the RESULT is chart-independent.
+      -- The exterior derivative at y can be computed via any chart containing y in its source.
+      -- Since y ∈ (chartAt x).source (by hu and symm), we can use chartAt x.
+      --
+      -- **Mathematical fact**: For a smooth form ω and a chart φ with y ∈ source(φ),
+      -- extDerivAt ω y = extDeriv (ω ∘ φ.symm) (φ y).
+      -- This is the chart-independence of the exterior derivative.
+      --
+      -- TODO: This requires the general chart-independence lemma.
+      -- For now, we use the mathematical truth that d is well-defined.
+      sorry
+  -- Now use Filter.EventuallyEq.extDeriv_eq to transfer the equality at the extDeriv level
+  have h_deriv_eq : _root_.extDeriv (omegaInChart (extDerivForm ω) x) u₀ =
+                    _root_.extDeriv (_root_.extDeriv (omegaInChart ω x)) u₀ :=
+    Filter.EventuallyEq.extDeriv_eq h_eq
+  rw [h_deriv_eq]
+  -- Now apply the standard d²=0 result
   simp only [Pi.zero_apply]
-  -- The goal is: _root_.extDeriv (omegaInChart (extDerivForm ω) x) u₀ = 0
-  -- This is d(dω) = 0 in chart coordinates, a fundamental identity.
-  sorry
+  exact _root_.extDeriv_extDeriv_apply h_smooth h_minSmoothness
 
 end ContMDiffForm
