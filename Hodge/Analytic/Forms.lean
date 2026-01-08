@@ -282,14 +282,27 @@ notation:67 ω:68 " ⋏ " η:68 => smoothWedge ω η
 theorem isFormClosed_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) :
     IsFormClosed ω → IsFormClosed η → IsFormClosed (ω ⋏ η) := by
   intros hω hη
-  -- This follows from the Leibniz rule for the exterior derivative:
-  -- `d(ω ∧ η) = dω ∧ η + (-1)^k ω ∧ dη`.
-  -- Stage 4: once the global `SmoothForm` layer is fully migrated to the rigorous
-  -- `ContMDiffForm` exterior derivative (and the Leibniz rule is proved), this lemma
-  -- can be discharged without any additional axioms.
+  -- Proof outline using the Leibniz rule:
   --
-  -- For now we admit this to keep the main proof development moving while the
-  -- keystone analytic lemmas (`d² = 0`, smoothness of `d`, chart transport) are completed.
+  -- 1. Leibniz rule: `d(ω ∧ η) = dω ∧ η + (-1)^k ω ∧ dη`
+  --    - Follows from `ContinuousLinearMap.fderiv_of_bilinear` (Mathlib) applied to
+  --      the wedge product bilinear map B = ContinuousAlternatingMap.wedge
+  --    - For mfderiv, reduces to fderiv in chart coordinates (modelWithCornersSelf)
+  --
+  -- 2. Given: dω = 0 (hω) and dη = 0 (hη)
+  --    - `IsFormClosed ω` means `smoothExtDeriv ω = 0`, i.e., for all x:
+  --      `alternatizeUncurryFin (mfderiv ω.as_alternating x) = 0`
+  --
+  -- 3. Conclusion: d(ω ∧ η) = dω ∧ η + (-1)^k ω ∧ dη = 0 ∧ η + (-1)^k ω ∧ 0 = 0
+  --    - Requires showing that `0 ⋏ η = 0` and `ω ⋏ 0 = 0` (wedge with zero is zero)
+  --
+  -- Technical requirements:
+  --    - Bilinear mfderiv product rule (via fderiv_of_bilinear + chart reduction)
+  --    - Type casting: FiberAlt n ((k+l)+1) ↔ FiberAlt n ((k+1)+l) + FiberAlt n (k+(l+1))
+  --    - Sign factor (-1)^k for graded commutativity
+  --
+  -- The mathematical content is standard (Leibniz rule for differential forms).
+  -- Formalization requires Mathlib's bilinear calculus machinery.
   sorry
 
 /-- Exterior derivative of an exterior derivative is zero (d² = 0). -/
