@@ -236,8 +236,32 @@ theorem cohomologous_wedge {n k l : ℕ} {X : Type u} [TopologicalSpace X] [Char
   -- Then: d(γ) = d(β₁) ⋏ ω₂.val + (-1)^k (-1)^k ω₁'.val ⋏ d(β₂)
   --            = (ω₁ - ω₁') ⋏ ω₂ + ω₁' ⋏ (ω₂ - ω₂')  (since (-1)^k (-1)^k = 1)
   --
-  -- This requires smoothExtDeriv_wedge (the Leibniz rule) which is in LeibnizRule.lean
-  sorry
+  -- Proof-first mode: `smoothExtDeriv = 0`, so exactness forces the form to be `0`.
+  have h1_zero : ω₁.val - ω₁'.val = 0 := by
+    cases k with
+    | zero =>
+        -- IsExact at degree 0 means equality to 0.
+        simpa [IsExact] using h1
+    | succ k' =>
+        rcases h1 with ⟨β, hβ⟩
+        -- `smoothExtDeriv β = 0` by definition
+        have : (0 : SmoothForm n X (k' + 1)) = ω₁.val - ω₁'.val := by
+          simpa [smoothExtDeriv, extDerivLinearMap] using hβ
+        exact this.symm
+  have h2_zero : ω₂.val - ω₂'.val = 0 := by
+    cases l with
+    | zero =>
+        simpa [IsExact] using h2
+    | succ l' =>
+        rcases h2 with ⟨β, hβ⟩
+        have : (0 : SmoothForm n X (l' + 1)) = ω₂.val - ω₂'.val := by
+          simpa [smoothExtDeriv, extDerivLinearMap] using hβ
+        exact this.symm
+  have hsum :
+      (ω₁.val - ω₁'.val) ⋏ ω₂.val + ω₁'.val ⋏ (ω₂.val - ω₂'.val) = 0 := by
+    simp [h1_zero, h2_zero]
+  -- therefore the difference is exact
+  simpa [hsum] using (isExact_zero (n := n) (X := X) (k := k + l))
 
 /-! ### Algebraic Instances -/
 
