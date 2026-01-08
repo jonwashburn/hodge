@@ -494,8 +494,31 @@ theorem extDerivAt_eq_chart_extDeriv_general (ω : ContMDiffForm n X k) (x y : X
   -- This holds when chartAt y = chartAt x (then τ = id).
   -- On the model space, chartAt_self_eq gives chartAt = refl for all points.
   --
-  -- **Formalization gap for general manifolds**: Need chart transition derivative = id,
-  -- which requires chartAt y = chartAt x locally. This is the chart cocycle issue.
+  -- **Key observation**: The goal is:
+  --   fderiv (ω ∘ (chartAt y).symm) ((chartAt y) y) = fderiv (ω ∘ (chartAt x).symm) ((chartAt x) y)
+  --
+  -- Both sides compute the manifold derivative mfderiv ω y, just using different charts.
+  -- By the chain rule with τ = (chartAt x) ∘ (chartAt y).symm:
+  --   LHS = fderiv (ω ∘ (chartAt x).symm) ((chartAt x) y) ∘ fderiv τ ((chartAt y) y)
+  --
+  -- So LHS = RHS iff fderiv τ ((chartAt y) y) = id.
+  --
+  -- For the model space (X = EuclideanSpace), chartAt_self_eq gives chartAt = refl always,
+  -- so τ = refl ∘ refl.symm = id, and fderiv id = id. ✓
+  --
+  -- For general manifolds, this requires the chart cocycle to be trivial at y.
+  -- The mathematical content is that mfderiv is chart-independent (intrinsic).
+  -- The full proof involves:
+  --   1. Showing the functions agree on a neighborhood via chart overlap
+  --   2. Applying fderiv_congr to get equality of derivatives
+  --   3. Using the chain rule to relate the chart transition term
+  --   4. Showing fderiv (chartAt x ∘ (chartAt y).symm) ((chartAt y) y) = id
+  --
+  -- Step 4 is the core geometric content: the tangent coordinate change at y using
+  -- the same basepoint is the identity. This follows from `tangentCoordChange_self`
+  -- in Mathlib, but requires careful type alignment with OpenPartialHomeomorph.
+  --
+  -- **Formalization gap**: Bridging the mfderiv/fderiv and chart transition APIs.
   sorry
 
 theorem extDerivAt_add (ω η : ContMDiffForm n X k) (x : X) :
