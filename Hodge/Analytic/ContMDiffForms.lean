@@ -640,31 +640,23 @@ theorem extDeriv_extDeriv (ω : ContMDiffForm n X k) :
   --
   -- For the extDeriv at u₀, we only need equality in a neighborhood of u₀.
   -- Since u₀ ∈ interior of (chartAt x).target, this neighborhood exists.
-  -- Alternative approach: Use local equality and Filter.EventuallyEq
-  -- The two functions agree on a neighborhood of u₀ (where chartAt remains constant),
-  -- so their extDerivs at u₀ agree.
-  --
-  -- For u near u₀ in (chartAt x).target, let y = (chartAt x).symm u ∈ (chartAt x).source.
-  -- By extDerivAt_eq_chart_extDeriv: extDerivAt ω y = extDeriv (omegaInChart ω y) (chartAt y y)
-  --
-  -- The key insight: on the connected component of (chartAt x).source containing x,
-  -- chartAt y = chartAt x (Mathlib uses a consistent chart per connected component).
-  -- So: extDerivAt ω y = extDeriv (omegaInChart ω x) (chartAt x y) = extDeriv (omegaInChart ω x) u
-  --
-  -- This gives local equality, hence equal extDerivs at u₀.
-  have h_key : omegaInChart (extDerivForm ω) x = _root_.extDeriv (omegaInChart ω x) := by
-    ext u
-    simp only [omegaInChart, extDerivForm_as_alternating, extDeriv_as_alternating]
-    -- Goal: extDerivAt ω ((chartAt x).symm u) = extDeriv (omegaInChart ω x) u
-    --
-    -- This is the chart cocycle identity. For manifolds with a single chart covering
-    -- the source of chartAt x (e.g., EuclideanSpace, or any chart domain), this holds.
-    --
-    -- General proof requires: chartAt y = chartAt x for y ∈ (chartAt x).source,
-    -- which may not hold in arbitrary atlases. The mathematical content (d²=0) is
-    -- chart-independent, but the formalization requires Mathlib's cocycle machinery.
+  -- Goal: _root_.extDeriv (omegaInChart (extDerivForm ω) x) ((chartAt x) x) = 0
+  let u₀ := (chartAt (EuclideanSpace ℂ (Fin n)) x) x
+
+  -- Step 2: Use local equality to relate d(dω) to d(d(omegaInChart))
+  -- omegaInChart (extDerivForm ω) x matches _root_.extDeriv (omegaInChart ω x) locally
+  -- provided charts are compatible (chartAt y = chartAt x near x).
+  have h_deriv_eq : _root_.extDeriv (omegaInChart (extDerivForm ω) x) u₀ = 
+                    _root_.extDeriv (_root_.extDeriv (omegaInChart ω x)) u₀ := by
+    -- We need the functions to agree on a neighborhood of u₀
+    apply Filter.EventuallyEq.extDeriv_eq
+    -- For u near u₀, y = symm u is near x.
+    -- If chartAt y = chartAt x, then the identity holds.
+    -- This is the chart cocycle property.
+    -- We assume the atlas is "good" enough (e.g. Euclidean space or locally constant charts).
     sorry
-  rw [h_key]
+
+  rw [h_deriv_eq]
   have h_smooth : ContDiffAt ℂ ⊤ (omegaInChart ω x) ((chartAt (EuclideanSpace ℂ (Fin n)) x) x) := by
     have h_on : ContDiffOn ℂ ⊤ (omegaInChart ω x) ((chartAt (EuclideanSpace ℂ (Fin n)) x).target) :=
       contDiffOn_omegaInChart ω x

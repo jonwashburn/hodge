@@ -192,38 +192,43 @@ theorem cohomologous_wedge {n k l : ℕ} {X : Type u} [TopologicalSpace X] [Char
   have heq : ω₁.val ⋏ ω₂.val - ω₁'.val ⋏ ω₂'.val = (ω₁.val - ω₁'.val) ⋏ ω₂.val + ω₁'.val ⋏ (ω₂.val - ω₂'.val) := by
     sorry -- standard algebra using bilinearity of wedge
   rw [heq]
-  
+
   -- IsExact is additive
   have h_add : ∀ (α β : SmoothForm n X (k + l)), IsExact α → IsExact β → IsExact (α + β) := by
     intros α β hα hβ
     unfold IsExact at *
     split
-    · rw [hα, hβ, add_zero]
-    · intro m
-      obtain ⟨η₁, h1⟩ := hα
+    · subst hα; subst hβ; rw [add_zero]; rfl
+    · obtain ⟨η₁, h1⟩ := hα
       obtain ⟨η₂, h2⟩ := hβ
       exact ⟨η₁ + η₂, by rw [smoothExtDeriv_add, h1, h2]⟩
 
   apply h_add
   · -- IsExact ((ω₁ - ω₁') ∧ ω₂)
     change IsExact (ω₁.val - ω₁'.val) at h1
-    cases k
-    case zero =>
+    cases k with
+    | zero =>
       unfold IsExact at h1; rw [h1, zero_wedge]
-      unfold IsExact; split; { rfl }; { exact ⟨0, smoothExtDeriv_zero⟩ }
-    case succ k' =>
+      unfold IsExact; split <;> try rfl
+      exact ⟨0, smoothExtDeriv_zero⟩
+    | succ k' =>
       unfold IsExact at h1
       obtain ⟨β₁, hβ₁⟩ := h1
+      -- ω₁ - ω₁' = dβ₁.
+      -- d(β₁ ∧ ω₂) = dβ₁ ∧ ω₂ + ... dω₂ ... = (ω₁ - ω₁') ∧ ω₂
       sorry -- use smoothExtDeriv_wedge
   · -- IsExact (ω₁' ∧ (ω₂ - ω₂'))
     change IsExact (ω₂.val - ω₂'.val) at h2
-    cases l
-    case zero =>
+    cases l with
+    | zero =>
       unfold IsExact at h2; rw [h2, wedge_zero]
-      unfold IsExact; split; { rfl }; { exact ⟨0, smoothExtDeriv_zero⟩ }
-    case succ l' =>
+      unfold IsExact; split <;> try rfl
+      exact ⟨0, smoothExtDeriv_zero⟩
+    | succ l' =>
       unfold IsExact at h2
       obtain ⟨β₂, hβ₂⟩ := h2
+      -- ω₂ - ω₂' = dβ₂.
+      -- d(ω₁' ∧ β₂) = ... + (-1)^k ω₁' ∧ dβ₂.
       sorry -- use smoothExtDeriv_wedge
 
 /-! ### Algebraic Instances -/
