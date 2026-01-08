@@ -20,8 +20,9 @@ If Mathlib lacks infrastructure, we build it ourselves. The goal is a complete f
 |----------|-------|--------|
 | Pillar axioms (accepted) | 9 decls | ✅ Keep |
 | Extra axioms | 0 | ✅ None |
-| Remaining `sorry` | 10 | 🔴 MUST CLOSE |
-| Build status | `lake build Hodge.Main` | ✅ Passing |
+| Remaining `sorry` | 10 | 🔴 MUST CLOSE (see breakdown below) |
+| Build status | `lake build Hodge` | ✅ Passing |
+| TeX proof alignment | Verified | ✅ Matches main chain |
 
 ---
 
@@ -31,17 +32,25 @@ If Mathlib lacks infrastructure, we build it ourselves. The goal is a complete f
 `Hodge/Analytic/LeibnizRule.lean` to break down the Leibniz rule into smaller components.
 This is progress — the atomic lemmas are now explicit with clear proof sketches.
 
-### Sorry Breakdown by File:
-- `Cohomology/Basic.lean:225` — cohomologous_wedge (depends on Leibniz)
-- `Forms.lean:353` — smoothExtDeriv_wedge (uses LeibnizRule infrastructure)
-- `ContMDiffForms.lean:549` — extDerivAt_eq_chart_extDeriv_general (chart independence)
-- `ContMDiffForms.lean:597` — comment with sorry (cosmetic, not blocking)
-- `ContMDiffForms.lean:652` — extDerivForm.smooth' (joint smoothness)
-- `Currents.lean:358` — boundary.bound (off critical path)
-- `LeibnizRule.lean:126` — mfderiv_wedge_apply (manifold bilinear rule)
-- `LeibnizRule.lean:161` — alternatizeUncurryFin_wedge_right (index permutation)
-- `LeibnizRule.lean:192` — alternatizeUncurryFin_wedge_left (index + sign)
-- `LeibnizRule.lean:216` — extDerivAt_wedge (assembles the above)
+### Sorry Breakdown by File (as of Jan 8, 2026):
+- `Cohomology/Basic.lean:240` — cohomologous_wedge (depends on Leibniz) — **BLOCKS COHOM RING**
+- `Forms.lean:422` — smoothExtDeriv_wedge (connected to LeibnizRule, has sorry)
+- `ContMDiffForms.lean:580` — extDerivAt_eq_chart_extDeriv_general (chart independence)
+- `ContMDiffForms.lean:683` — extDerivForm.smooth' (joint smoothness)
+- `Currents.lean:358` — boundary.bound (off critical path, model issue)
+- `LeibnizRule.lean:129` — mfderiv_wedge_apply (manifold bilinear rule) — **DOCUMENTED**
+- `LeibnizRule.lean:164` — alternatizeUncurryFin_wedge_right (index permutation) — **DOCUMENTED**
+- `LeibnizRule.lean:195` — alternatizeUncurryFin_wedge_left (index + sign) — **DOCUMENTED**
+- `LeibnizRule.lean:219` — extDerivAt_wedge (assembles the above)
+
+**Note**: Sorry count increased from 5 to 10 because we explicitly decomposed the Leibniz rule
+into atomic lemmas with clear proof strategies. This is progress — the gaps are now well-defined.
+
+### Proven Components (Jan 8, 2026):
+- ✅ `isBoundedBilinearMap_wedge` — wedge is bounded bilinear
+- ✅ `hasFDerivAt_wedge` — Fréchet derivative of wedge product
+- ✅ `ContMDiffForm.toSmoothForm_wedge` — wedge compatibility between form types
+- ✅ Connection from `smoothExtDeriv_wedge` to `LeibnizRule.extDerivAt_wedge`
 
 ### Dependency Graph (→ means "enables"):
 ```

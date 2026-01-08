@@ -135,6 +135,7 @@ lemma alternatizeUncurryFin_wedge_left (A : E →L[ℂ] ContinuousAlternatingMap
 # Session History
 | Date | Sorries | Axioms | Notes |
 |------|---------|--------|-------|
+| Jan 8, 2026 (update2) | 10 | 9 | **Leibniz infrastructure**: Created LeibnizRule.lean with hasFDerivAt_wedge ✓, isBoundedBilinearMap_wedge ✓. Connected smoothExtDeriv_wedge to infrastructure. Count increased due to explicit breakdown of atomic lemmas. |
 | Jan 8, 2026 | 5 | 9 | **Updated strategy**: No gaps allowed. Detailed attack plans for all 5 sorries. Key insight: Leibniz rule needs to be built from scratch using bilinear derivative rules. |
 | Jan 7, 2026 (update4) | 5 | 9 | Deep-dive on chart cocycle: Key mechanism is `alternatizeUncurryFin_fderivCompContinuousLinearMap_eq_zero`. |
 | Jan 7, 2026 (update3) | 5 | 9 | Analyzed chartAt_self_eq: For model space H, chartAt = refl. |
