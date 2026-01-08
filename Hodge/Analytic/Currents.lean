@@ -335,17 +335,26 @@ def boundary (T : Current n X (k + 1)) : Current n X k where
     exact T.is_linear c (smoothExtDeriv ω₁) (smoothExtDeriv ω₂)
   is_continuous := T.is_continuous.comp smoothExtDeriv_continuous
   bound := by
-    -- The bound follows from T's bound and an operator norm estimate for d.
-    -- **Required estimate**: On a compact manifold, there exists C' such that
-    --   comass(dω) ≤ C' * comass(ω) for all smooth ω.
-    -- This follows from the finite-dimensionality of the space of smooth forms
-    -- and the continuity of d as a differential operator.
-    -- **Stage 4 TODO**: Formalize this using comass estimates when CompactSpace is available.
+    -- **Mathematical subtlety**: The exterior derivative d is an unbounded operator
+    -- on forms equipped with the comass (C^0) norm. It maps C^k → C^{k-1} forms.
+    --
+    -- The `Current.bound` field requires: |T(ω)| ≤ M * ‖ω‖_comass (order 0 continuity).
+    -- For ∂T(ω) = T(dω), we would need: |T(dω)| ≤ M' * ‖ω‖_comass.
+    -- This requires: ‖dω‖_comass ≤ C * ‖ω‖_comass, which is FALSE in general.
+    --
+    -- **Resolution options**:
+    -- (a) Restrict to currents of finite order (bounded by C^k norms)
+    -- (b) Use the flat norm topology instead of operator norm
+    -- (c) For integration currents [Z], the boundary [∂Z] is itself an integration
+    --     current, so order 0 bounds hold for this special case
+    --
+    -- **Status**: Off critical path. The Hodge proof uses integration currents
+    -- where this is not an issue (Stokes theorem relates [∂Z] to boundary integrals).
     obtain ⟨C, hC⟩ := T.bound
     refine ⟨C, ?_⟩
     intro ω
-    -- For now, we use a placeholder. The real proof requires:
-    -- |T(dω)| ≤ C_T * comass(dω) ≤ C_T * C' * comass(ω)
+    -- Placeholder: requires either restricting Current definition or
+    -- proving specific bounds for the currents used in the Hodge proof
     sorry
 
 def isCycle (T : Current n X (k + 1)) : Prop := T.boundary = 0
