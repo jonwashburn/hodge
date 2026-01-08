@@ -640,21 +640,29 @@ theorem extDeriv_extDeriv (ω : ContMDiffForm n X k) :
   --
   -- For the extDeriv at u₀, we only need equality in a neighborhood of u₀.
   -- Since u₀ ∈ interior of (chartAt x).target, this neighborhood exists.
+  -- Alternative approach: Use local equality and Filter.EventuallyEq
+  -- The two functions agree on a neighborhood of u₀ (where chartAt remains constant),
+  -- so their extDerivs at u₀ agree.
+  --
+  -- For u near u₀ in (chartAt x).target, let y = (chartAt x).symm u ∈ (chartAt x).source.
+  -- By extDerivAt_eq_chart_extDeriv: extDerivAt ω y = extDeriv (omegaInChart ω y) (chartAt y y)
+  --
+  -- The key insight: on the connected component of (chartAt x).source containing x,
+  -- chartAt y = chartAt x (Mathlib uses a consistent chart per connected component).
+  -- So: extDerivAt ω y = extDeriv (omegaInChart ω x) (chartAt x y) = extDeriv (omegaInChart ω x) u
+  --
+  -- This gives local equality, hence equal extDerivs at u₀.
   have h_key : omegaInChart (extDerivForm ω) x = _root_.extDeriv (omegaInChart ω x) := by
     ext u
     simp only [omegaInChart, extDerivForm_as_alternating, extDeriv_as_alternating]
-    -- For u in (chartAt x).target, let y = (chartAt x).symm u ∈ (chartAt x).source.
-    -- The crucial question: does chartAt y = chartAt x?
+    -- Goal: extDerivAt ω ((chartAt x).symm u) = extDeriv (omegaInChart ω x) u
     --
-    -- In general, chartAt y is some chart with y ∈ source. It may differ from chartAt x.
-    -- However, the atlas is compatible: the transition map (chartAt y) ∘ (chartAt x).symm
-    -- is smooth where defined.
+    -- This is the chart cocycle identity. For manifolds with a single chart covering
+    -- the source of chartAt x (e.g., EuclideanSpace, or any chart domain), this holds.
     --
-    -- The mfderiv at y uses chartAt y. The fderiv of omegaInChart ω x uses chartAt x.
-    -- These are related by the derivative of the transition map.
-    --
-    -- For d²=0, the alternating structure means the transition terms cancel.
-    -- But formalizing this requires Mathlib's cocycle machinery.
+    -- General proof requires: chartAt y = chartAt x for y ∈ (chartAt x).source,
+    -- which may not hold in arbitrary atlases. The mathematical content (d²=0) is
+    -- chart-independent, but the formalization requires Mathlib's cocycle machinery.
     sorry
   rw [h_key]
   have h_smooth : ContDiffAt ℂ ⊤ (omegaInChart ω x) ((chartAt (EuclideanSpace ℂ (Fin n)) x) x) := by
