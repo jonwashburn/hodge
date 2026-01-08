@@ -82,7 +82,16 @@ theorem hasFDerivAt_wedge {G : Type*} [NormedAddCommGroup G] [NormedSpace ℂ G]
   have hPair : HasFDerivAt (fun y => (ω y, η y)) (ω'.prod η') x := hω.prodMk hη
   exact hBilin.comp x hPair
 
-/-- The manifold derivative of a wedge product follows the Leibniz rule (pointwise). -/
+/-- The manifold derivative of a wedge product follows the Leibniz rule (pointwise).
+
+**Proof strategy**: For `modelWithCornersSelf`, `mfderiv` reduces to `fderiv` in chart coordinates.
+The bilinear chain rule for wedge (`hasFDerivAt_wedge`) then gives the Leibniz formula.
+
+The technical details involve:
+1. Expressing mfderiv as fderivWithin on range I = univ (hence fderiv)
+2. Identifying extChartAt with chartAt for modelWithCornersSelf
+3. Applying hasFDerivAt_wedge to the chart representations
+4. Relating fderiv of chart representation back to mfderiv -/
 theorem mfderiv_wedge_apply {k l : ℕ} (ω : ContMDiffForm n X k) (η : ContMDiffForm n X l) (x : X)
     (v : TangentSpace (𝓒_complex n) x) :
     mfderiv (𝓒_complex n) 𝓘(ℂ, Alt n (k+l)) (ω.wedge η).as_alternating x v =
@@ -92,68 +101,31 @@ theorem mfderiv_wedge_apply {k l : ℕ} (ω : ContMDiffForm n X k) (η : ContMDi
   have h_eq : (ω.wedge η).as_alternating = fun y => (ω.as_alternating y).wedge (η.as_alternating y) := rfl
   rw [h_eq]
 
-  -- For smooth forms, we use that mfderiv can be computed via chart coordinates.
-  -- Key facts:
-  -- 1. For modelWithCornersSelf: range I = univ, so mfderiv = fderivWithin ... univ = fderiv (in chart)
-  -- 2. For 𝓘(ℂ, F) target: writtenInExtChartAt is essentially f ∘ (chartAt x).symm
-  -- 3. The bilinear derivative rule (hasFDerivAt_wedge) applies in chart coordinates
+  -- Define chart representations
+  let φ := chartAt (EuclideanSpace ℂ (Fin n)) x
+  let u₀ := φ x
+  let f_chart := ω.as_alternating ∘ φ.symm
+  let g_chart := η.as_alternating ∘ φ.symm
 
-  -- Smoothness gives differentiability
-  have hω_diff : MDifferentiableAt (𝓒_complex n) 𝓘(ℂ, Alt n k) ω.as_alternating x :=
-    ω.smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
-  have hη_diff : MDifferentiableAt (𝓒_complex n) 𝓘(ℂ, Alt n l) η.as_alternating x :=
-    η.smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
-  have hωη_diff : MDifferentiableAt (𝓒_complex n) 𝓘(ℂ, Alt n (k+l))
-      (fun y => (ω.as_alternating y).wedge (η.as_alternating y)) x :=
-    (ω.wedge η).smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
+  -- Key identity for modelWithCornersSelf:
+  -- mfderiv (𝓒_complex n) 𝓘(ℂ, F) f x = fderiv (f ∘ φ.symm) u₀
+  -- This follows from:
+  -- 1. mfderiv = fderivWithin (writtenInExtChartAt) (range I)
+  -- 2. For modelWithCornersSelf: range I = univ, writtenInExtChartAt = id ∘ f ∘ extChartAt.symm
+  -- 3. For modelWithCornersSelf: extChartAt = chartAt
+  -- 4. fderivWithin ... univ = fderiv
 
-  -- The proof uses the chain rule for mfderiv with a bilinear map.
-  --
-  -- Key structure:
-  -- 1. wedge : Alt k × Alt l → Alt (k+l) is a smooth bilinear map
-  -- 2. (ω, η) : X → Alt k × Alt l has mfderiv = (mfderiv ω, mfderiv η) by HasMFDerivAt.prodMk
-  -- 3. wedge ∘ (ω, η) has mfderiv = D(wedge)((ω x, η x)) ∘ mfderiv (ω, η) by chain rule
-  -- 4. For bilinear W: DW((a,b))(v₁,v₂) = W(v₁,b) + W(a,v₂)
-  --
-  -- Therefore:
-  --   mfderiv (ω.wedge η) x v = (mfderiv ω x v).wedge (η x) + (ω x).wedge (mfderiv η x v)
-  --
-  -- The formal proof requires:
-  -- (a) Showing wedge has HasMFDerivAt with derivative = isBoundedBilinearMap_wedge.deriv
-  -- (b) Using HasMFDerivAt.comp with HasMFDerivAt.prodMk
-  -- (c) Unfolding the derivative formula
-  --
-  -- For 𝓘(ℂ, F) targets (model spaces), this reduces to HasFDerivAt via
-  -- hasMFDerivAt_iff_hasFDerivAt, and we can use hasFDerivAt_wedge directly.
-  --
-  -- **Proof via chart coordinates**:
-  --
-  -- For mfderiv with modelWithCornersSelf source and model space target:
-  --   mfderiv (𝓒_complex n) 𝓘(ℂ, F) f x = fderiv (f ∘ (chartAt x).symm) ((chartAt x) x)
-  --
-  -- Let φ = chartAt x, u₀ = φ x.
-  -- Let f_chart = ω.as_alternating ∘ φ.symm : TangentModel n → Alt n k
-  -- Let g_chart = η.as_alternating ∘ φ.symm : TangentModel n → Alt n l
-  -- Let h_chart = (ω.wedge η).as_alternating ∘ φ.symm
-  --
-  -- By pointwise definition of wedge:
-  --   h_chart u = (f_chart u).wedge (g_chart u)
-  --
-  -- So h_chart = fun u => (f_chart u).wedge (g_chart u).
-  --
-  -- By hasFDerivAt_wedge (proven!):
-  --   fderiv h_chart u₀ v = (fderiv f_chart u₀ v).wedge (g_chart u₀) + (f_chart u₀).wedge (fderiv g_chart u₀ v)
-  --
-  -- Since g_chart u₀ = η x and f_chart u₀ = ω x:
+  -- The proof requires careful type alignment between TangentSpace and TangentModel.
+  -- For modelWithCornersSelf, these are definitionally equal.
+
+  -- Apply hasFDerivAt_wedge in chart coordinates:
+  -- fderiv (fun u => (f_chart u).wedge (g_chart u)) u₀ v
+  --   = (fderiv f_chart u₀ v).wedge (g_chart u₀) + (f_chart u₀).wedge (fderiv g_chart u₀ v)
   --   = (fderiv f_chart u₀ v).wedge (η x) + (ω x).wedge (fderiv g_chart u₀ v)
-  --   = (mfderiv ... ω x v).wedge (η x) + (ω x).wedge (mfderiv ... η x v)
-  --
-  -- This is exactly the RHS! The proof formalizes this chain.
-  --
-  -- Technical requirements:
-  -- (a) DifferentiableAt for f_chart, g_chart (from MDifferentiableAt + chart smoothness)
-  -- (b) Relating fderiv of chart representation to mfderiv
-  -- (c) Evaluating v in TangentSpace (requires identifying TangentSpace with model space)
+  --   = (mfderiv ω x v).wedge (η x) + (ω x).wedge (mfderiv η x v)
+
+  -- The full proof formalizes this chain via unwinding definitions.
+  -- Marked as sorry pending Mathlib API alignment for the chart coordinate machinery.
   sorry
 
 /-! ### Alternatization and Wedge Compatibility -/

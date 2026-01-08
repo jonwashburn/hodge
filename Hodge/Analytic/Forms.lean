@@ -3,6 +3,7 @@ import Mathlib.Geometry.Manifold.Algebra.Monoid
 import Hodge.Analytic.DomCoprod
 import Hodge.Analytic.FormType
 import Hodge.Analytic.ContMDiffForms
+import Hodge.Analytic.LeibnizRule
 
 
 noncomputable section
@@ -351,11 +352,73 @@ theorem smoothExtDeriv_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothFor
   -- Use pointwise equality via LeibnizRule.extDerivAt_wedge
   ext x v
   -- LHS: smoothExtDeriv (ω ⋏ η) at x applied to v
-  -- = extDerivAt (ω.wedge η) x applied to v
+  -- = extDerivAt (ofSmoothForm (ω ⋏ η)) x applied to v
   simp only [smoothExtDeriv, extDerivLinearMap, LinearMap.coe_mk, AddHom.coe_mk,
     ContMDiffForm.toSmoothForm_as_alternating, ContMDiffForm.extDerivForm_as_alternating]
-  -- Apply extDerivAt_wedge from LeibnizRule
-  -- This requires showing the connection between SmoothForm wedge and ContMDiffForm wedge
+
+  -- Convert SmoothForms to ContMDiffForms
+  let ω' := ContMDiffForm.ofSmoothForm ω ω.is_smooth
+  let η' := ContMDiffForm.ofSmoothForm η η.is_smooth
+
+  -- Key: The wedge of SmoothForms matches the wedge of ContMDiffForms
+  -- (ω ⋏ η).as_alternating = (ω'.wedge η').as_alternating
+  have h_wedge_eq : ∀ y, (ω ⋏ η).as_alternating y = (ω'.wedge η').as_alternating y := by
+    intro y
+    -- ω'.as_alternating = ω.as_alternating by definition of ofSmoothForm
+    simp only [smoothWedge, ContMDiffForm.wedge]
+    rfl
+
+  -- The ofSmoothForm of (ω ⋏ η) has the same coefficients as ω'.wedge η'
+  have h_of_wedge : ∀ y,
+      (ContMDiffForm.ofSmoothForm (ω ⋏ η) (ω ⋏ η).is_smooth).as_alternating y =
+      (ω'.wedge η').as_alternating y := by
+    intro y
+    simp only [ContMDiffForm.ofSmoothForm_as_alternating, h_wedge_eq y]
+
+  -- Therefore extDerivAt of the wedge equals extDerivAt of ω'.wedge η'
+  have h_extDeriv_eq :
+      ContMDiffForm.extDerivAt (ContMDiffForm.ofSmoothForm (ω ⋏ η) (ω ⋏ η).is_smooth) x =
+      ContMDiffForm.extDerivAt (ω'.wedge η') x := by
+    -- Both sides unfold to alternatizeUncurryFin (mfderiv f x)
+    -- The functions are equal, so mfderiv and hence extDerivAt are equal
+    have h_fun_eq : (ContMDiffForm.ofSmoothForm (ω ⋏ η) (ω ⋏ η).is_smooth).as_alternating =
+        (ω'.wedge η').as_alternating := by
+      funext y; exact h_of_wedge y
+    simp only [ContMDiffForm.extDerivAt]
+    rw [h_fun_eq]
+
+  rw [ContMDiffForm.extDeriv_as_alternating]
+  rw [h_extDeriv_eq]
+
+  -- Now apply extDerivAt_wedge from LeibnizRule
+  rw [LeibnizRule.extDerivAt_wedge ω' η' x]
+
+  -- Goal: (castAlt ...) + (castAlt ((-1)^k • ...)) applied to v
+  --     = castForm (dω ⋏ η) + castForm ((-1)^k • ω ⋏ dη) applied to v
+
+  -- This requires showing that extDerivAt ω' = (smoothExtDeriv ω).as_alternating
+  -- and η'.as_alternating x = η.as_alternating x (by definition of ofSmoothForm)
+  have h_dω : ContMDiffForm.extDerivAt ω' x =
+      (ContMDiffForm.extDerivForm ω').as_alternating x := rfl
+  have h_dη : ContMDiffForm.extDerivAt η' x =
+      (ContMDiffForm.extDerivForm η').as_alternating x := rfl
+
+  -- The RHS uses smoothExtDeriv which goes through extDerivForm
+  -- smoothExtDeriv ω = extDerivLinearMap ω = (extDerivForm (ofSmoothForm ω)).toSmoothForm
+
+  -- For the type cast, we need to show the degree equalities align
+  -- and that castAlt and castForm produce the same result
+
+  simp only [SmoothForm.add_apply, SmoothForm.smul_apply, castForm]
+  simp only [h_dω, h_dη]
+
+  -- The key remaining step: show castAlt from LeibnizRule agrees with castForm
+  -- and that the wedge operations align after conversion
+  -- This is a type-level equation involving:
+  -- 1. (k+1)+l = (k+l)+1 and k+(l+1) = (k+l)+1
+  -- 2. Both castForm and castAlt use ▸ or domDomCongr/finCongr
+
+  -- For now, the equality holds by extensionality once the type casts align
   sorry
 
 theorem isFormClosed_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) :
