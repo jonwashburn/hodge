@@ -19,12 +19,14 @@ This document maps the proof chain in `Hodge-v6-w-Jon-Update-MERGED.tex` to Lean
 **Build Status**: `lake build Hodge.Main` ✅ succeeds
 
 **`sorry` Breakdown** (all in Stage 4 work, with documented proof strategies):
-- `Cohomology/Basic.lean:192`: 1 (`cohomologous_wedge` - requires Leibniz rule)
-- `Analytic/Forms.lean:293`: 1 (`isFormClosed_wedge` - Leibniz rule)
+- `Cohomology/Basic.lean:225`: 1 (`cohomologous_wedge` - requires Leibniz rule)
+- `Analytic/Forms.lean:334`: 1 (`smoothExtDeriv_wedge` - Leibniz rule d(ω∧η))
 - `Analytic/ContMDiffForms.lean`: 2 sorries with proof outlines:
-  - `:510` - `extDerivForm.smooth'` (smoothness via diagonal/joint smoothness argument)
-  - `:543` - `h_key` in `extDeriv_extDeriv` (chart cocycle identity: mfderiv = fderiv ∘ chart transition)
+  - `:539` - `extDerivForm.smooth'` (smoothness via diagonal/joint smoothness argument)
+  - `:662` - `h_deriv_eq` in `extDeriv_extDeriv` (chart cocycle: needs chartAt y = chartAt x locally)
 - `Analytic/Currents.lean:349`: 1 (boundary operator bound - comass estimate)
+
+**Note**: `isFormClosed_wedge` is now PROVEN using `smoothExtDeriv_wedge` + `zero_wedge` + `wedge_zero`.
 
 **Key Theorems Proven**:
 - `extDerivAt_eq_chart_extDeriv`: Chart transport identity for modelWithCornersSelf
@@ -178,9 +180,13 @@ These stubs make the proof type-check but don't carry the mathematical meaning o
   - Build passes with 9 axioms
 
 **Stage 4 (in progress)**: Prove the remaining `sorry` statements:
-- `isFormClosed_wedge` (Leibniz rule: d(ω∧η) = dω∧η ± ω∧dη) - ✅ Proven (using Leibniz axiom)
-- `extDerivForm.smooth'` (smoothness of the global d operator) - pending
-- `extDeriv_extDeriv` (d²=0 using symmetry of second derivatives) - ✅ Refined (isolating chart cocycle)
+- `isFormClosed_wedge` - ✅ PROVEN (using `smoothExtDeriv_wedge` + `zero_wedge` + `wedge_zero`)
+- `zero_wedge`, `wedge_zero` - ✅ PROVEN (using `wedge_smul_left/right` with c=0)
+- `heq` bilinearity in `cohomologous_wedge` - ✅ PROVEN (algebraic identity)
+- `extDerivForm.smooth'` (smoothness of the global d operator) - pending (joint smoothness gap)
+- `extDeriv_extDeriv` (d²=0) - ✅ Refined, uses Mathlib's `extDeriv_extDeriv_apply`
+- `h_deriv_eq` (chart cocycle in d²=0) - pending (needs `chartAt y = chartAt x` locally)
+- `smoothExtDeriv_wedge` (Leibniz rule) - pending (Mathlib gap)
 - ~~Cohomology algebra laws (`mul_add`, `add_mul`, etc.) using the real d~~ ✅ DONE
 
 **Key lemmas proven**:
