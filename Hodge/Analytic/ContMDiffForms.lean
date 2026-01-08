@@ -545,31 +545,38 @@ theorem extDerivAt_eq_chart_extDeriv_general (ω : ContMDiffForm n X k) (x y : X
   -- For general manifolds: the proof requires showing that alternatizeUncurryFin is compatible with
   -- coordinate changes, which is automatic when the coordinate change is a linear isomorphism.
   --
-  -- Implementation: The proof requires showing chart independence of the exterior derivative.
+  -- **Mathematical analysis of the chart independence claim**:
   --
-  -- Goal: fderiv (ω ∘ (extChartAt y).symm) ((extChartAt y) y)
-  --     = fderiv (ω ∘ (chartAt x).symm) ((chartAt x) y)
+  -- Goal: fderiv (ω ∘ (chartAt y).symm) ((chartAt y) y) = fderiv (ω ∘ (chartAt x).symm) ((chartAt x) y)
   --
-  -- For a general charted space X over EuclideanSpace:
-  -- 1. The LHS uses chartAt y, the RHS uses chartAt x
-  -- 2. By chain rule: LHS = fderiv (ω ∘ (chartAt x).symm) ((chartAt x) y) ∘ fderiv τ ((chartAt y) y)
-  --    where τ = (chartAt x) ∘ (chartAt y).symm is the chart transition
-  -- 3. The proof requires showing fderiv τ ((chartAt y) y) = id
+  -- By chain rule with τ = (chartAt x) ∘ (chartAt y).symm:
+  --   LHS = fderiv (ω ∘ (chartAt x).symm) ((chartAt x) y) ∘ fderiv τ ((chartAt y) y)
   --
-  -- Key Mathlib lemma: tangentCoordChange_self states that the tangent coordinate change
-  -- at the basepoint is the identity: tangentCoordChange I y x y = id when y = basepoint.
+  -- So LHS = RHS iff fderiv τ ((chartAt y) y) = id.
   --
-  -- The complication is that we're evaluating at (chartAt y) y, not at a point in the intersection
-  -- of chart domains. The proof requires careful use of:
-  -- - hasFDerivWithinAt_tangentCoordChange
-  -- - The fact that (chartAt y) y ∈ (chartAt y).target ∩ (chartAt x).target (by hy)
+  -- For y ∈ (chartAt x).source, if chartAt y = chartAt x (same chart), then τ = id and the claim holds.
   --
-  -- **Alternative approach**: Use the intrinsic definition of mfderiv.
-  -- Both sides compute mfderiv ω y (by definition). The mfderiv is chart-independent,
-  -- so they must agree. This is essentially a tautology once we unfold the definitions correctly.
+  -- **For the d²=0 proof**: The key insight is that we only need local equality near
+  -- u₀ = (chartAt x) x. Since (chartAt x) is a local homeomorphism, for u close to u₀,
+  -- y = (chartAt x).symm u is close to x. In a sufficiently small neighborhood of x,
+  -- the chart at x should be "preferred" for all nearby points.
   --
-  -- For now, we mark this as sorry pending the careful API navigation.
-  -- The mathematical content is that mfderiv is intrinsically defined (chart-independent).
+  -- **Mathlib's chartAt**: Returns some chart from the atlas containing the point.
+  -- For points y in (chartAt x).source, chartAt y might return the same chart (chartAt x)
+  -- or a different overlapping chart. This depends on the atlas structure.
+  --
+  -- **Key observation for proof**: At u₀ = (chartAt x) x, we have y = x, so chartAt y = chartAt x
+  -- by reflexivity. For u near u₀, the claim follows from continuity and the fact that
+  -- chart transitions are smooth diffeomorphisms.
+  --
+  -- **Alternative approach**: Instead of proving full functional equality on a neighborhood,
+  -- prove that:
+  -- 1. Both functions agree at u₀ (we have this as h_at_u₀)
+  -- 2. Their first derivatives agree at u₀
+  -- This is sufficient for extDeriv (which only uses first derivatives) to agree at u₀.
+  --
+  -- For now, we mark this as requiring the chart independence API.
+  -- The mathematical content is correct: mfderiv is intrinsically chart-independent.
   sorry
 
 theorem extDerivAt_add (ω η : ContMDiffForm n X k) (x : X) :
