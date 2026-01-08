@@ -2,9 +2,10 @@
 Complete the Lean 4 formalization of the Hodge Conjecture proof. **No gaps allowed.**
 
 # Current Status
-- **Sorries**: 5 (must be eliminated - see attack plan below)
+- **Sorries**: 9 (must be eliminated - see attack plan below)
 - **Axioms**: 9 (the accepted "Classical Pillars" - unchanged)
 - **Policy**: We do the deep math. If blocked, we build the infrastructure needed.
+- **Note**: Sorry count increased due to explicit decomposition of Leibniz rule into atomic lemmas.
 
 # The 5 Remaining Sorries — ATTACK PLAN
 
@@ -135,6 +136,7 @@ lemma alternatizeUncurryFin_wedge_left (A : E →L[ℂ] ContinuousAlternatingMap
 # Session History
 | Date | Sorries | Axioms | Notes |
 |------|---------|--------|-------|
+| Jan 8, 2026 (update4) | 9 | 9 | **TeX alignment verified**. Main theorem chain doesn't require cup product (Leibniz). Cleaned up mfderiv_wedge_apply (strategy documented). Key blockers: chart independence, joint smoothness. |
 | Jan 8, 2026 (update3) | 10 | 9 | **Analysis**: Chart independence (`extDerivAt_eq_chart_extDeriv_general`) requires showing d is intrinsic. For model space: trivial (chartAt = refl). For general manifolds: needs coordinate change formula. Build passes. |
 | Jan 8, 2026 (update2) | 10 | 9 | **Leibniz infrastructure**: Created LeibnizRule.lean with hasFDerivAt_wedge ✓, isBoundedBilinearMap_wedge ✓. Connected smoothExtDeriv_wedge to infrastructure. Count increased due to explicit breakdown of atomic lemmas. |
 | Jan 8, 2026 | 5 | 9 | **Updated strategy**: No gaps allowed. Detailed attack plans for all 5 sorries. Key insight: Leibniz rule needs to be built from scratch using bilinear derivative rules. |
