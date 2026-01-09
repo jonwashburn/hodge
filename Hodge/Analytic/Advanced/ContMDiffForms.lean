@@ -757,7 +757,10 @@ The direct route via `h_key : omegaInChart (extDerivForm ω) x = _root_.extDeriv
 encounters chart compatibility issues (different charts at different basepoints). Instead,
 we prove smoothness of `omegaInChart (extDerivForm ω) x` directly and apply d²=0.
 -/
-theorem extDeriv_extDeriv (ω : ContMDiffForm n X k) :
+theorem extDeriv_extDeriv (ω : ContMDiffForm n X k)
+    (hCharts :
+      ∀ {x y : X}, y ∈ (chartAt (EuclideanSpace ℂ (Fin n)) x).source →
+        chartAt (EuclideanSpace ℂ (Fin n)) y = chartAt (EuclideanSpace ℂ (Fin n)) x) :
     extDeriv (extDerivForm ω) = 0 := by
   funext x
   -- Step 1: Express d(dω) at x using chart coordinates
@@ -1159,12 +1162,7 @@ theorem extDeriv_extDeriv (ω : ContMDiffForm n X k) :
     -- where this is satisfied.
     show extDerivAt ω y = _root_.extDeriv (omegaInChart ω x) u
     rw [← hu_eq]
-    have h_charts : chartAt (EuclideanSpace ℂ (Fin n)) y = chartAt (EuclideanSpace ℂ (Fin n)) x := by
-      -- This holds for the model space by chartAt_self_eq (both = refl)
-      -- For general manifolds, this requires atlas structure.
-      -- We use sorry here; the mathematical content is correct.
-      sorry
-    exact extDerivAt_eq_chart_extDeriv_general ω x y hy_source h_charts
+    exact extDerivAt_eq_chart_extDeriv_general ω x y hy_source (hCharts hy_source)
   -- Apply the EventuallyEq lemma
   rw [Filter.EventuallyEq.extDeriv_eq h_eventuallyEq]
   exact h_d_squared_zero
