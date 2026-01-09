@@ -1128,6 +1128,47 @@ theorem extDeriv_extDeriv (ω : ContMDiffForm n X k) :
   --
   -- **Current status**: This is the fundamental d²=0 identity for manifold exterior derivatives.
   -- The mathematical argument is complete and robust (via localization to a chart).
-  sorry
+  --
+  -- **Direct proof using Filter.EventuallyEq**:
+  -- We show that omegaInChart (extDerivForm ω) x =ᶠ[nhds u₀] extDeriv (omegaInChart ω x).
+  -- Then by Filter.EventuallyEq.extDeriv_eq, extDeriv of both functions are equal at u₀.
+  -- And h_d_squared_zero says extDeriv (extDeriv (omegaInChart ω x)) u₀ = 0.
+  --
+  -- The Filter.EventuallyEq follows from extDerivAt_eq_chart_extDeriv_general applied to all
+  -- y = (chartAt x).symm u for u in a neighborhood of u₀ (namely, (chartAt x).target).
+  --
+  -- **Blocked by**: extDerivAt_eq_chart_extDeriv_general (chart independence)
+  -- For now, we use the proven fact that both expressions involve the double alternatization
+  -- of the second derivative of ω, which is symmetric.
+  --
+  -- **Workaround**: Use the structural fact that extDeriv (extDerivForm ω) is semantically
+  -- d(dω) = 0, a fundamental identity in differential geometry.
+  have h_eventuallyEq : omegaInChart (extDerivForm ω) x =ᶠ[nhds u₀]
+      _root_.extDeriv (omegaInChart ω x) := by
+    -- This follows from extDerivAt_eq_chart_extDeriv_general on the chart neighborhood
+    have h_open : IsOpen (chartAt (EuclideanSpace ℂ (Fin n)) x).target :=
+      (chartAt (EuclideanSpace ℂ (Fin n)) x).open_target
+    have h_u₀_mem : u₀ ∈ (chartAt (EuclideanSpace ℂ (Fin n)) x).target :=
+      OpenPartialHomeomorph.map_source _ (mem_chart_source _ x)
+    filter_upwards [h_open.mem_nhds h_u₀_mem] with u hu
+    -- For u ∈ chart.target, let y = chart.symm u
+    let y := (chartAt (EuclideanSpace ℂ (Fin n)) x).symm u
+    have hy_source : y ∈ (chartAt (EuclideanSpace ℂ (Fin n)) x).source := by
+      exact (chartAt (EuclideanSpace ℂ (Fin n)) x).map_target hu
+    have hu_eq : (chartAt (EuclideanSpace ℂ (Fin n)) x) y = u := by
+      exact (chartAt (EuclideanSpace ℂ (Fin n)) x).right_inv hu
+    -- By definition: omegaInChart (extDerivForm ω) x u = extDerivAt ω y
+    simp only [omegaInChart, extDerivForm_as_alternating, extDeriv_as_alternating]
+    -- Goal: extDerivAt ω ((chartAt x).symm u) = _root_.extDeriv (omegaInChart ω x) u
+    -- Note: y = (chartAt x).symm u, and (chartAt x) y = u by right_inv
+    -- We need: extDerivAt ω y = _root_.extDeriv (omegaInChart ω x) ((chartAt x) y)
+    -- which is exactly extDerivAt_eq_chart_extDeriv_general ω x y hy_source
+    -- But the goal has ((chartAt x).symm u) on LHS, so we unfold y:
+    show extDerivAt ω y = _root_.extDeriv (omegaInChart ω x) u
+    rw [← hu_eq]
+    exact extDerivAt_eq_chart_extDeriv_general ω x y hy_source
+  -- Apply the EventuallyEq lemma
+  rw [Filter.EventuallyEq.extDeriv_eq h_eventuallyEq]
+  exact h_d_squared_zero
 
 end ContMDiffForm
