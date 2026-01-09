@@ -55,4 +55,3 @@ lake build Hodge.Main               -- Always clean, uses placeholder d
 When ready to upgrade, modify `Hodge.Analytic.Forms.extDerivLinearMap` to use
 the real `extDerivForm` from this module.
 -/
-
