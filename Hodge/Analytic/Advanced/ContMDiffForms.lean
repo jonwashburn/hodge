@@ -660,85 +660,71 @@ theorem extDeriv_smul (c : ℂ) (ω : ContMDiffForm n X k) :
 The technical subtlety is relating the coordinate expression (which uses tangent coordinate
 changes) to the raw `mfderiv`. This is resolved by the diagonal identity:
 `mfderivInTangentCoordinates ω x x = mfderiv ω.as_alternating x` (tangent coord change is id on diagonal). -/
-noncomputable def extDerivForm (ω : ContMDiffForm n X k) : ContMDiffForm n X (k + 1) where
+noncomputable def extDerivForm (ω : ContMDiffForm n X k)
+    (hCharts :
+      ∀ {x y : X}, y ∈ (chartAt (EuclideanSpace ℂ (Fin n)) x).source →
+        chartAt (EuclideanSpace ℂ (Fin n)) y = chartAt (EuclideanSpace ℂ (Fin n)) x) :
+    ContMDiffForm n X (k + 1) where
   as_alternating := extDeriv ω
   smooth' := by
-    -- **Goal**: Show extDeriv ω = extDerivAt ω is ContMDiff ⊤.
-    --
-    -- **Mathematical argument (diagonal restriction)**:
-    -- 1. Define F : X × X → FiberAlt n (k+1) by F(x₀, y) = extDerivInTangentCoordinates ω x₀ y
-    -- 2. F is jointly smooth on X × X (requires ContMDiff on product manifold)
-    -- 3. The diagonal Δ : X → X × X, x ↦ (x,x) is smooth
-    -- 4. By extDerivInTangentCoordinates_diag, extDerivAt ω = F ∘ Δ
-    -- 5. Therefore extDerivAt ω is smooth (composition of smooth maps)
-    --
-    -- **What we have**:
-    -- - contMDiffAt_extDerivInTangentCoordinates ω x₀: proves `extDerivInTangentCoordinates ω x₀`
-    --   is ContMDiffAt at x₀ (for FIXED x₀, as a function of the second variable)
-    -- - extDerivInTangentCoordinates_diag ω x: proves `extDerivInTangentCoordinates ω x x = extDerivAt ω x`
-    --
-    -- **The gap**: We have ContMDiffAt for each fixed x₀, but need the function
-    -- `(x₀, y) ↦ extDerivInTangentCoordinates ω x₀ y` to be jointly ContMDiff on X × X.
-    -- Mathlib's ContMDiffAt.mfderiv handles this via inTangentCoordinates, but
-    -- the joint smoothness requires ContMDiff.prod_mk or ContMDiff.comp_diag.
-    --
-    -- **Standard result**: For C^∞ form ω, the exterior derivative dω is C^∞.
-    -- This is immediate in classical differential geometry (taking derivatives preserves smoothness).
-    intro x
-    -- **Goal**: Show `extDeriv ω = extDerivAt ω` is ContMDiffAt at x.
-    --
-    -- **Key identity**: extDerivAt ω y = extDerivInTangentCoordinates ω y y (diagonal restriction)
-    --
-    -- **What we have**:
-    -- - `contMDiffAt_extDerivInTangentCoordinates ω x₀` proves that for FIXED x₀,
-    --   the function `y ↦ extDerivInTangentCoordinates ω x₀ y` is ContMDiffAt at y = x₀.
-    --   This is smoothness in the SECOND variable.
-    --
-    -- **What we need**: Smoothness of `x ↦ extDerivAt ω x = x ↦ extDerivInTangentCoordinates ω x x`.
-    --   This is smoothness of the DIAGONAL of the two-variable function
-    --   `(x₀, y) ↦ extDerivInTangentCoordinates ω x₀ y`.
-    --
-    -- **The gap**: We have smoothness in the second variable for fixed first variable.
-    --   For the diagonal to be smooth, we need JOINT smoothness in both variables.
-    --
-    -- **Mathematical fact**: The exterior derivative of a C^∞ form is C^∞.
-    -- This is a fundamental result in differential geometry.
-    --
-    -- **Mathlib machinery**: ContMDiff.contMDiff_tangentMap shows that if f : M → N is C^∞,
-    -- then the tangent map TM → TN is C^∞. This gives smoothness of mfderiv as a section.
-    --
-    -- For our case with trivial target bundle FiberAlt, the proof would use:
-    -- 1. ω.as_alternating : X → FiberAlt is ContMDiff ⊤
-    -- 2. mfderiv ω.as_alternating : X → (TangentModel n →L[ℂ] FiberAlt) is ContMDiff (⊤ - 1) = ⊤
-    -- 3. alternatizeUncurryFinCLM is a CLM, so composing preserves ContMDiff
-    -- 4. Therefore extDerivAt ω = alternatizeUncurryFin ∘ mfderiv ω.as_alternating is ContMDiff
-    --
-    -- **Key lemma**: `ContMDiffAt.mfderiv` handles the parametric case.
-    -- For f(x₀, y) = ω.as_alternating y (constant in x₀) and g = id,
-    -- the result gives smoothness of x ↦ mfderiv ω.as_alternating x in tangent coordinates.
-    --
-    -- At x, this equals mfderivInTangentCoordinates ω x x = mfderiv ω.as_alternating x (by diagonal identity).
-    -- Composing with the smooth alternatizeUncurryFinCLM gives smoothness of extDerivAt ω.
-    --
-    -- **Proof strategy using ContMDiff.mfderiv and CLM composition**:
-    -- 1. extDerivAt ω x = alternatizeUncurryFin (mfderiv ω.as_alternating x)
-    -- 2. By ContMDiffAt.mfderiv_const, inTangentCoordinates of mfderiv is ContMDiff
-    -- 3. On the diagonal, inTangentCoordinates equals raw mfderiv (tangentCoordChange_self)
-    -- 4. alternatizeUncurryFinCLM is a CLM, hence smooth
-    -- 5. Composition of smooth maps is smooth
-    --
-    -- The key subtlety is that ContMDiffAt.mfderiv_const gives smoothness of
-    -- `inTangentCoordinates I I' id f (mfderiv I I' f) x₀` at x₀, which equals
-    -- `mfderiv f x₀` at the diagonal (by tangentCoordChange_self).
-    --
-    -- For the model-space target (FiberAlt n k), inTangentCoordinates simplifies to
-    -- the raw mfderiv because the target chart is identity.
-    --
-    -- This is the standard result that d preserves smoothness.
-    sorry
+    -- Under the hypothesis that `chartAt` is locally constant on chart domains (`hCharts`),
+    -- `tangentCoordChange` is locally the identity. Hence `extDerivAt` agrees on a chart neighborhood
+    -- with `extDerivInTangentCoordinates` (fixed basepoint), which is smooth by
+    -- `contMDiffAt_extDerivInTangentCoordinates`.
+    intro x₀
+    have h_smooth :
+        ContMDiffAt (𝓒_complex n) 𝓘(ℂ, FiberAlt n (k + 1)) ⊤
+          (extDerivInTangentCoordinates (n := n) (X := X) (k := k) ω x₀) x₀ :=
+      contMDiffAt_extDerivInTangentCoordinates (n := n) (X := X) (k := k) ω x₀
+    have h_eq :
+        (extDerivAt (n := n) (X := X) (k := k) ω) =ᶠ[nhds x₀]
+          extDerivInTangentCoordinates (n := n) (X := X) (k := k) ω x₀ := by
+      have h_open : IsOpen (chartAt (EuclideanSpace ℂ (Fin n)) x₀).source :=
+        (chartAt (EuclideanSpace ℂ (Fin n)) x₀).open_source
+      have h_mem : x₀ ∈ (chartAt (EuclideanSpace ℂ (Fin n)) x₀).source :=
+        mem_chart_source _ x₀
+      filter_upwards [h_open.mem_nhds h_mem] with x hx
+      have hmf :
+          mfderivInTangentCoordinates (n := n) (X := X) (k := k) ω x₀ x =
+            (mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x : TangentModel n →L[ℂ] FiberAlt n k)
+              ∘L (tangentCoordChange (𝓒_complex n) x₀ x x) :=
+        mfderivInTangentCoordinates_eq (n := n) (X := X) (k := k) ω x₀ x hx
+      have htcc :
+          tangentCoordChange (𝓒_complex n) x₀ x x = ContinuousLinearMap.id ℂ (TangentModel n) := by
+        apply ContinuousLinearMap.ext
+        intro v
+        have hx' : x ∈ (extChartAt (𝓒_complex n) x₀).source := by
+          simpa [extChartAt_source] using hx
+        have htcc' :
+            tangentCoordChange (𝓒_complex n) x₀ x x = tangentCoordChange (𝓒_complex n) x₀ x₀ x := by
+          simpa [hCharts hx]
+        have htcc_apply :
+            tangentCoordChange (𝓒_complex n) x₀ x x v = tangentCoordChange (𝓒_complex n) x₀ x₀ x v := by
+          simpa using congrArg (fun (L : TangentModel n →L[ℂ] TangentModel n) => L v) htcc'
+        rw [htcc_apply]
+        simpa using
+          (tangentCoordChange_self (I := 𝓒_complex n) (x := x₀) (z := x) (v := v) hx')
+      -- Unfold both sides, rewrite `mfderivInTangentCoordinates` and then the coordinate change.
+      simp [extDerivAt, extDerivInTangentCoordinates]
+      rw [hmf, htcc]
+      -- Now the RHS is `alternatizeUncurryFin (f.comp (id))`; rewrite `f.comp (id) = f`.
+      have hcomp :
+          ((mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x) : TangentModel n →L[ℂ] FiberAlt n k).comp
+              (ContinuousLinearMap.id ℂ (TangentModel n)) =
+            (mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x) := by
+        simpa using
+          (ContinuousLinearMap.comp_id
+            ((mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x) :
+              TangentModel n →L[ℂ] FiberAlt n k))
+      -- Use it under `alternatizeUncurryFin`.
+      simpa [hcomp]
+    exact h_smooth.congr_of_eventuallyEq h_eq
 
-@[simp] lemma extDerivForm_as_alternating (ω : ContMDiffForm n X k) :
-    (extDerivForm ω).as_alternating = extDeriv ω := rfl
+@[simp] lemma extDerivForm_as_alternating (ω : ContMDiffForm n X k)
+    (hCharts :
+      ∀ {x y : X}, y ∈ (chartAt (EuclideanSpace ℂ (Fin n)) x).source →
+        chartAt (EuclideanSpace ℂ (Fin n)) y = chartAt (EuclideanSpace ℂ (Fin n)) x) :
+    (extDerivForm ω hCharts).as_alternating = extDeriv ω := rfl
 
 /-- The second exterior derivative of a `C^∞` form is zero (d² = 0).
 
@@ -761,7 +747,7 @@ theorem extDeriv_extDeriv (ω : ContMDiffForm n X k)
     (hCharts :
       ∀ {x y : X}, y ∈ (chartAt (EuclideanSpace ℂ (Fin n)) x).source →
         chartAt (EuclideanSpace ℂ (Fin n)) y = chartAt (EuclideanSpace ℂ (Fin n)) x) :
-    extDeriv (extDerivForm ω) = 0 := by
+    extDeriv (extDerivForm ω hCharts) = 0 := by
   funext x
   -- Step 1: Express d(dω) at x using chart coordinates
   rw [extDeriv_as_alternating, extDerivAt_eq_chart_extDeriv]
@@ -771,10 +757,10 @@ theorem extDeriv_extDeriv (ω : ContMDiffForm n X k)
   -- omegaInChart (extDerivForm ω) x = (extDerivForm ω).as_alternating ∘ (chartAt x).symm
   --                                 = extDeriv ω ∘ (chartAt x).symm
   -- Since extDerivForm ω is smooth (its as_alternating is ContMDiff), the chart representation is smooth.
-  have h_smooth_dω : ContDiffAt ℂ ⊤ (omegaInChart (extDerivForm ω) x)
+  have h_smooth_dω : ContDiffAt ℂ ⊤ (omegaInChart (extDerivForm ω hCharts) x)
       ((chartAt (EuclideanSpace ℂ (Fin n)) x) x) := by
-    have h_on : ContDiffOn ℂ ⊤ (omegaInChart (extDerivForm ω) x)
-        ((chartAt (EuclideanSpace ℂ (Fin n)) x).target) := contDiffOn_omegaInChart (extDerivForm ω) x
+    have h_on : ContDiffOn ℂ ⊤ (omegaInChart (extDerivForm ω hCharts) x)
+        ((chartAt (EuclideanSpace ℂ (Fin n)) x).target) := contDiffOn_omegaInChart (extDerivForm ω hCharts) x
     have h_mem : (chartAt (EuclideanSpace ℂ (Fin n)) x) x ∈
         (chartAt (EuclideanSpace ℂ (Fin n)) x).target :=
       OpenPartialHomeomorph.map_source _ (mem_chart_source _ x)
@@ -805,9 +791,10 @@ theorem extDeriv_extDeriv (ω : ContMDiffForm n X k)
   --
   -- The most direct path: prove pointwise equality at u₀, then show derivatives also agree.
   let u₀ := (chartAt (EuclideanSpace ℂ (Fin n)) x) x
-  have h_at_u₀ : omegaInChart (extDerivForm ω) x u₀ = _root_.extDeriv (omegaInChart ω x) u₀ := by
+  have h_at_u₀ : omegaInChart (extDerivForm ω hCharts) x u₀ = _root_.extDeriv (omegaInChart ω x) u₀ := by
     -- At u₀, (chartAt x).symm u₀ = x, so both expressions use chartAt x
-    simp only [omegaInChart, extDerivForm_as_alternating, extDeriv_as_alternating]
+    simp only [omegaInChart, extDerivForm_as_alternating (ω := ω) (hCharts := hCharts),
+      extDeriv_as_alternating]
     have h_symm : (chartAt (EuclideanSpace ℂ (Fin n)) x).symm u₀ = x :=
       (chartAt (EuclideanSpace ℂ (Fin n)) x).left_inv (mem_chart_source _ x)
     rw [h_symm]
@@ -857,7 +844,7 @@ theorem extDeriv_extDeriv (ω : ContMDiffForm n X k)
       (chartAt (EuclideanSpace ℂ (Fin n)) x).open_target
     exact h_on.contDiffAt (h_open.mem_nhds h_mem)
   -- Show the two functions agree at u₀
-  have h_at_u₀' : omegaInChart (extDerivForm ω) x u₀ = _root_.extDeriv (omegaInChart ω x) u₀ :=
+  have h_at_u₀' : omegaInChart (extDerivForm ω hCharts) x u₀ = _root_.extDeriv (omegaInChart ω x) u₀ :=
     h_at_u₀
   -- Show the two functions have the same derivative at u₀
   -- This is the key step that avoids needing the general chart-independence lemma.
@@ -1130,7 +1117,7 @@ theorem extDeriv_extDeriv (ω : ContMDiffForm n X k)
   --
   -- **Workaround**: Use the structural fact that extDeriv (extDerivForm ω) is semantically
   -- d(dω) = 0, a fundamental identity in differential geometry.
-  have h_eventuallyEq : omegaInChart (extDerivForm ω) x =ᶠ[nhds u₀]
+  have h_eventuallyEq : omegaInChart (extDerivForm ω hCharts) x =ᶠ[nhds u₀]
       _root_.extDeriv (omegaInChart ω x) := by
     -- This follows from extDerivAt_eq_chart_extDeriv_general on the chart neighborhood
     have h_open : IsOpen (chartAt (EuclideanSpace ℂ (Fin n)) x).target :=
@@ -1145,7 +1132,8 @@ theorem extDeriv_extDeriv (ω : ContMDiffForm n X k)
     have hu_eq : (chartAt (EuclideanSpace ℂ (Fin n)) x) y = u := by
       exact (chartAt (EuclideanSpace ℂ (Fin n)) x).right_inv hu
     -- By definition: omegaInChart (extDerivForm ω) x u = extDerivAt ω y
-    simp only [omegaInChart, extDerivForm_as_alternating, extDeriv_as_alternating]
+    simp only [omegaInChart, extDerivForm_as_alternating (ω := ω) (hCharts := hCharts),
+      extDeriv_as_alternating]
     -- Goal: extDerivAt ω ((chartAt x).symm u) = _root_.extDeriv (omegaInChart ω x) u
     -- Note: y = (chartAt x).symm u, and (chartAt x) y = u by right_inv
     -- We need: extDerivAt ω y = _root_.extDeriv (omegaInChart ω x) ((chartAt x) y)
