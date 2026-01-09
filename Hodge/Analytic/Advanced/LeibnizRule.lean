@@ -212,18 +212,16 @@ theorem alternatizeUncurryFin_wedge_right {k l : ℕ}
     ContinuousAlternatingMap.domDomCongr
       ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A).wedge B)
       (finCongr (show (k+1)+l = (k+l)+1 by omega)) := by
+  classical
+  intro wedge_right
   -- Apply extensionality
   ext v
   -- Unfold alternatizeUncurryFin on LHS
   simp only [ContinuousAlternatingMap.alternatizeUncurryFin_apply]
+  -- Unfold domDomCongr on RHS
+  simp only [ContinuousAlternatingMap.domDomCongr_apply]
   -- Goal: ∑ i, (-1)^i • (A(v i) ∧ B) (removeNth i v) =
   --       ((alternatizeUncurryFin A).wedge B) (v ∘ finCongr ...)
-  --
-  -- The RHS is: ((alternatizeUncurryFin A).wedge B) (v')
-  -- where v' : Fin ((k+1)+l) → TangentModel n is v reindexed.
-  --
-  -- By the wedge definition:
-  --   (ω.wedge η) w = (ω ⊗ₜ η applied to domCoprod of w)
   --
   -- This is a deep combinatorial identity relating:
   -- 1. Alternatizing the wedge product
@@ -239,9 +237,14 @@ theorem alternatizeUncurryFin_wedge_right {k l : ℕ}
   -- This requires detailed finite sum manipulations and sign tracking.
   -- For a rigorous proof, one would need to:
   -- 1. Expand the wedge definition using domCoprod
-  -- 2. Show the shuffles and signs match
+  -- 2. Show the shuffles and signs match via Finset.sum_bij
   --
-  -- TODO: Complete this combinatorial argument
+  -- **Key Mathlib lemmas**:
+  -- - ContinuousAlternatingMap.wedge_apply: definition of wedge product
+  -- - AlternatingMap.alternatization_apply: sum over permutations
+  -- - Finset.sum_bij: bijection between finite sums
+  --
+  -- TODO: Complete this combinatorial argument using shuffle sum bijection
   sorry
 
 /-- Alternatization commutes with wedge when the left argument is fixed (with sign).
