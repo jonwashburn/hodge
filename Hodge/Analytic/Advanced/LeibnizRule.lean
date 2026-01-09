@@ -115,31 +115,19 @@ theorem mfderiv_wedge_apply {k l : ℕ} (ω : ContMDiffForm n X k) (η : ContMDi
   -- 3. For modelWithCornersSelf: extChartAt = chartAt
   -- 4. fderivWithin ... univ = fderiv
 
-  -- The proof requires careful type alignment between TangentSpace and TangentModel.
-  -- For modelWithCornersSelf, these are definitionally equal.
-
-  -- Apply hasFDerivAt_wedge in chart coordinates:
-  -- fderiv (fun u => (f_chart u).wedge (g_chart u)) u₀ v
-  --   = (fderiv f_chart u₀ v).wedge (g_chart u₀) + (f_chart u₀).wedge (fderiv g_chart u₀ v)
-  --   = (fderiv f_chart u₀ v).wedge (η x) + (ω x).wedge (fderiv g_chart u₀ v)
-  --   = (mfderiv ω x v).wedge (η x) + (ω x).wedge (mfderiv η x v)
-
-  -- For modelWithCornersSelf, mfderiv reduces to fderiv in chart coordinates:
-  --   mfderiv I 𝓘(ℂ, F) f x = fderiv (f ∘ (chartAt x).symm) ((chartAt x) x)
+  -- **Proof strategy**: Use mfderiv_comp with the bilinear wedge map.
   --
-  -- The bilinear chain rule (hasFDerivAt_wedge) gives:
-  --   fderiv (fun u => (f_chart u).wedge (g_chart u)) u₀ v
-  --     = (fderiv f_chart u₀ v).wedge (g_chart u₀) + (f_chart u₀).wedge (fderiv g_chart u₀ v)
+  -- The wedge can be factored as: (ω.wedge η).as_alternating = B ∘ pair
+  -- where B (a, b) = a.wedge b and pair y = (ω y, η y)
   --
-  -- Converting back to mfderiv gives the claimed identity.
+  -- By chain rule: mfderiv (B ∘ pair) x = mfderiv B (pair x) ∘ mfderiv pair x
+  -- For B bilinear: fderiv B (a,b) (v₁,v₂) = v₁.wedge b + a.wedge v₂
+  -- For pair: mfderiv pair x v = (mfderiv ω x v, mfderiv η x v)
   --
-  -- The full formalization requires:
-  -- 1. Type alignment: For modelWithCornersSelf, the product model is definitionally equal
-  -- 2. Converting MDifferentiableAt to DifferentiableAt in chart coordinates
-  -- 3. Applying hasFDerivAt_wedge to the chart representations
-  -- 4. Converting back to mfderiv
+  -- Composing: (mfderiv (B ∘ pair) x) v = (mfderiv ω x v).wedge η(x) + ω(x).wedge (mfderiv η x v)
   --
-  -- This is proven once Mathlib provides the appropriate type equalities.
+  -- **Technical gap**: The type unification between `𝓘(ℂ, E).prod 𝓘(ℂ, F)` and `𝓘(ℂ, E × F)`
+  -- requires explicit casts in Mathlib. The mathematical content is clear.
   sorry
 
 /-! ### Alternatization and Wedge Compatibility -/
