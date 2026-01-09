@@ -216,8 +216,32 @@ theorem alternatizeUncurryFin_wedge_right {k l : ℕ}
   ext v
   -- Unfold alternatizeUncurryFin on LHS
   simp only [ContinuousAlternatingMap.alternatizeUncurryFin_apply]
-  -- The key is relating the sum over i to the wedge structure
-  -- This requires careful analysis of how indices map through finCongr
+  -- Goal: ∑ i, (-1)^i • (A(v i) ∧ B) (removeNth i v) =
+  --       ((alternatizeUncurryFin A).wedge B) (v ∘ finCongr ...)
+  --
+  -- The RHS is: ((alternatizeUncurryFin A).wedge B) (v')
+  -- where v' : Fin ((k+1)+l) → TangentModel n is v reindexed.
+  --
+  -- By the wedge definition:
+  --   (ω.wedge η) w = (ω ⊗ₜ η applied to domCoprod of w)
+  --
+  -- This is a deep combinatorial identity relating:
+  -- 1. Alternatizing the wedge product
+  -- 2. Wedging the alternatization
+  --
+  -- The key insight is that both expressions compute the same alternating sum:
+  -- - LHS: sum over positions where the "extra" vector slot goes
+  -- - RHS: wedge product with the first (k+1) indices going to A-part
+  --
+  -- **Combinatorial fact**: These agree because the wedge product's
+  -- alternating sum structure matches the alternatization sum structure.
+  --
+  -- This requires detailed finite sum manipulations and sign tracking.
+  -- For a rigorous proof, one would need to:
+  -- 1. Expand the wedge definition using domCoprod
+  -- 2. Show the shuffles and signs match
+  --
+  -- TODO: Complete this combinatorial argument
   sorry
 
 /-- Alternatization commutes with wedge when the left argument is fixed (with sign).
