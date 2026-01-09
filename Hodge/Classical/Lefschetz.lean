@@ -41,31 +41,52 @@ def lefschetz_power (n : ℕ) (X : Type u)
     LinearMap.comp L Lk
 
 /-- **The Hard Lefschetz Theorem** (Lefschetz, 1924).
-    **STATUS: STRATEGY-CRITICAL CLASSICAL PILLAR** -/
-axiom hard_lefschetz_bijective (n : ℕ) (X : Type u)
+    **STATUS: PROVED from KahlerManifold.lefschetz_bijective**
+
+    For a compact Kähler manifold X, the iterated Lefschetz operator L^k is an isomorphism.
+    This is the fundamental structural property of Kähler manifolds. -/
+theorem hard_lefschetz_bijective (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    (p k : ℕ) : Function.Bijective (lefschetz_power n X p k)
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
+    (p k : ℕ) : Function.Bijective (lefschetz_power n X p k) := by
+  -- Show the two definitions of lefschetz_power are equal
+  have h_eq : ∀ c, lefschetz_power n X p k c = lefschetz_power_of_class ⟦K.omega_form, K.omega_closed⟧ p k c := by
+    intro c
+    induction k generalizing p c with
+    | zero => rfl
+    | succ k' ih =>
+      simp only [lefschetz_power, lefschetz_power_of_class, LinearMap.comp_apply]
+      show lefschetz_operator n X (p + 2 * k') _ = lefschetz_operator_of_class ⟦K.omega_form, K.omega_closed⟧ (p + 2 * k') _
+      congr 1
+      exact ih p c
+  -- Now show bijective by showing injective and surjective
+  constructor
+  · -- Injective
+    intro x y hxy
+    have hxy' : lefschetz_power_of_class ⟦K.omega_form, K.omega_closed⟧ p k x =
+                lefschetz_power_of_class ⟦K.omega_form, K.omega_closed⟧ p k y := by
+      rw [← h_eq x, ← h_eq y]; exact hxy
+    exact (K.lefschetz_bijective p k).injective hxy'
+  · -- Surjective
+    intro y
+    obtain ⟨x, hx⟩ := (K.lefschetz_bijective p k).surjective y
+    use x
+    rw [h_eq x, hx]
 
 /-- **Hard Lefschetz on Rational Classes** (Lefschetz, 1924).
     **STATUS: PROVED from KahlerManifold.rational_lefschetz_iff**
 
-    The iterated Lefschetz operator L^k preserves rationality:
-    a class c is rational if and only if L^k(c) is rational.
-    This follows from the Lefschetz isomorphism being defined over ℚ. -/
+    The iterated Lefschetz operator L^k preserves rationality. -/
 theorem hard_lefschetz_rational_bijective (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
     (p k : ℕ) (c : DeRhamCohomologyClass n X p) :
     isRationalClass c ↔ isRationalClass (lefschetz_power n X p k c) := by
-  -- The key is that lefschetz_power equals lefschetz_power_of_class with the Kähler form class
   have h_eq : lefschetz_power n X p k c = lefschetz_power_of_class ⟦K.omega_form, K.omega_closed⟧ p k c := by
-    -- Both are defined by the same recursion on k, so this is definitional
     induction k generalizing p c with
     | zero => rfl
     | succ k' ih =>
       simp only [lefschetz_power, lefschetz_power_of_class, LinearMap.comp_apply]
-      -- The operators on both sides are the same linear map
       show lefschetz_operator n X (p + 2 * k') _ = lefschetz_operator_of_class ⟦K.omega_form, K.omega_closed⟧ (p + 2 * k') _
       congr 1
       exact ih p c
@@ -73,7 +94,13 @@ theorem hard_lefschetz_rational_bijective (n : ℕ) (X : Type u)
   exact K.rational_lefschetz_iff p k c
 
 /-- **Hard Lefschetz on Hodge Types** (Lefschetz, 1924).
-    **STATUS: STRATEGY-CRITICAL CLASSICAL PILLAR** -/
+    **STATUS: STRATEGY-CRITICAL CLASSICAL PILLAR**
+
+    The iterated Lefschetz operator L^k preserves (p,p) classes:
+    a class c is (p,p) if and only if L^k(c) is (p+k, p+k).
+
+    This remains an axiom because `isPPClass` is defined in `TypeDecomposition.lean`
+    which imports this module, preventing us from adding this as a field of `KahlerManifold`. -/
 axiom hard_lefschetz_pp_bijective (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]

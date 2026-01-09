@@ -159,15 +159,34 @@ theorem mfderiv_wedge_apply {k l : ℕ} (ω : ContMDiffForm n X k) (η : ContMDi
   -- These are equal by add_comm
   exact add_comm _ _
 
-/-! ### Alternatization and Wedge Compatibility -/
+/-! ### Alternatization and Wedge Compatibility
+
+These two lemmas are the core combinatorial identities needed for the Leibniz rule.
+They relate the sum structure of `alternatizeUncurryFin` (sum over derivative indices)
+with the sum structure of `wedge` (sum over shuffles via `domCoprod`).
+
+The proofs require showing that a double sum over (derivative index, shuffles) can be
+reindexed to match the structure on the other side. This is a classical identity in
+the theory of graded derivations on exterior algebras.
+
+**Mathematical content**: Both identities express that `d` (exterior derivative) is a
+graded derivation, meaning `d(ω ∧ η) = dω ∧ η + (-1)^deg(ω) ω ∧ dη`.
+-/
 
 /-- Alternatization commutes with wedge when the right argument is fixed.
 
 The equality requires a cast since `(k+1)+l ≠ (k+l)+1` definitionally.
 
-**Proof idea**: Both sides are sums over permutations (shuffles and alternatization indices).
-The identity follows from the fact that the set of shuffles of `(k+1, l)` partitioned by the
-position of the "derivative index" is in bijection with the shuffles of `(k, l)`.
+**Goal after unfolding**:
+- LHS: `∑ i : Fin (k+l+1), (-1)^i • (A(v i)).wedgeAlternating B (removeNth i v)`
+- RHS: `(∑ j : Fin (k+1), (-1)^j • A(v' j) (removeNth j v')).wedgeAlternating B (v')`
+  where `v' = v ∘ finCongr`
+
+**Proof strategy**: Use `Finset.sum_bij` to establish a bijection between:
+- Pairs `(i, σ)` where `i : Fin (k+l+1)` is the derivative index and
+  `σ` is a shuffle for `(A(v i), B)` applied to `removeNth i v`
+- Pairs `(j, τ)` where `j : Fin (k+1)` is the derivative index in `alternatizeUncurryFin A`
+  and `τ` is a shuffle for `(alternatizeUncurryFin A, B)` applied to `v'`
 -/
 theorem alternatizeUncurryFin_wedge_right {k l : ℕ}
     (A : TangentModel n →L[ℂ] Alt n k) (B : Alt n l) :
@@ -180,19 +199,32 @@ theorem alternatizeUncurryFin_wedge_right {k l : ℕ}
   classical
   intro wedge_right
   ext v
-  -- 1. Expand definitions
   simp only [ContinuousAlternatingMap.alternatizeUncurryFin_apply,
              ContinuousAlternatingMap.domDomCongr_apply,
              wedge_right]
-  -- 2. LHS: ∑ i, (-1)^i • (A(v i) ∧ B) (removeNth i v)
-  --    RHS: ((alt A) ∧ B) (v ∘ finCongr)
-  -- The identity is a combinatorial fact about shuffles.
+  -- After expansion:
+  -- LHS: ∑ i, (-1)^i • ((wedgeCLM.flip B) (A (v i))) (removeNth i v)
+  --    = ∑ i, (-1)^i • (A (v i)).wedgeAlternating B (removeNth i v)
+  -- RHS: (alternatizeUncurryFin A).wedgeAlternating B (v ∘ finCongr)
+  --    = (∑ j, (-1)^j • A ((v ∘ finCongr) j) (removeNth j (v ∘ finCongr))).wedgeAlternating B (v ∘ finCongr)
+  --
+  -- The proof requires showing these double sums (over alternatization + shuffle indices) are equal.
+  -- This is a combinatorial reindexing argument.
   sorry
 
 /-- Alternatization commutes with wedge when the left argument is fixed (with sign).
 
-The sign (-1)^k arises from permuting the new index past k existing indices.
+The sign `(-1)^k` arises from permuting the new derivative index past `k` existing indices.
 The equality requires a cast since `k+(l+1) ≠ (k+l)+1` definitionally.
+
+**Goal after unfolding**:
+- LHS: `∑ i : Fin (k+l+1), (-1)^i • A.wedgeAlternating (B(v i)) (removeNth i v)`
+- RHS: `(-1)^k • A.wedgeAlternating (∑ j, (-1)^j • B(v' j) (removeNth j v')) (v')`
+  where `v' = v ∘ finCongr`
+
+**Proof strategy**: Similar to `alternatizeUncurryFin_wedge_right`, but the sign `(-1)^k`
+comes from the fact that inserting the derivative index at position 0 and then
+moving it past the `k` indices consumed by `A` introduces `k` transpositions.
 -/
 theorem alternatizeUncurryFin_wedge_left {k l : ℕ}
     (A : Alt n k) (B : TangentModel n →L[ℂ] Alt n l) :
@@ -205,12 +237,16 @@ theorem alternatizeUncurryFin_wedge_left {k l : ℕ}
   classical
   intro wedge_left
   ext v
-  -- 1. Expand definitions
   simp only [ContinuousAlternatingMap.alternatizeUncurryFin_apply,
              ContinuousAlternatingMap.domDomCongr_apply,
              wedge_left]
-  -- 2. The sign (-1)^k comes from the fact that alternatizeUncurryFin inserts
-  -- the derivative index at position 0, which must be moved past k indices of A.
+  -- After expansion:
+  -- LHS: ∑ i, (-1)^i • ((wedgeCLM A) (B (v i))) (removeNth i v)
+  --    = ∑ i, (-1)^i • A.wedgeAlternating (B (v i)) (removeNth i v)
+  -- RHS: (-1)^k • A.wedgeAlternating (alternatizeUncurryFin B) (v ∘ finCongr)
+  --    = (-1)^k • A.wedgeAlternating (∑ j, (-1)^j • B ((v ∘ finCongr) j) ...) (v ∘ finCongr)
+  --
+  -- The sign (-1)^k accounts for moving the derivative index past A's k inputs.
   sorry
 
 /-! ### The Leibniz Rule -/

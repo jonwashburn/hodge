@@ -627,6 +627,10 @@ class KahlerManifold (n : ℕ) (X : Type u)
       This follows from the Lefschetz isomorphism being defined over ℚ. -/
   rational_lefschetz_iff : ∀ (p k : ℕ) (c : DeRhamCohomologyClass n X p),
     isRationalClass c ↔ isRationalClass (lefschetz_power_of_class ⟦omega_form, omega_closed⟧ p k c)
+  /-- **Hard Lefschetz on Hodge Types** (Lefschetz, 1924).
+      The iterated Lefschetz operator L^k preserves (p,p) type. -/
+  pp_lefschetz_iff : ∀ (p k : ℕ) (c : DeRhamCohomologyClass n X p),
+    isPPClass p c ↔ isPPClass (p + 2 * k) (lefschetz_power_of_class ⟦omega_form, omega_closed⟧ p k c)
 
 /-! ## Lefschetz Operator -/
 

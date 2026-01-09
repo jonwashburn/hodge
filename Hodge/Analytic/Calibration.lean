@@ -140,10 +140,9 @@ theorem eval_tendsto_of_flatNorm_tendsto {k : ℕ} (T : ℕ → Current n X k) (
 
 /-- **Lower Semicontinuity of Mass** (Federer, 1969).
 
-    **Status**: Axiom. The proof requires careful handling of `liminf_le_liminf`
-    bounding conditions. The mathematical content is classical:
-    mass(T) = sup { |T(ω)| : comass ω ≤ 1 } is an lsc function as a
-    supremum of continuous linear functionals.
+    **STATUS: AXIOM** - The mass functional is lower semicontinuous with respect
+    to the flat norm topology. This is classical: mass(T) = sup { |T(ω)| : comass ω ≤ 1 }
+    is the supremum of continuous linear functionals, hence lower semicontinuous.
 
     Reference: [H. Federer, "Geometric Measure Theory", Springer, 1969, Section 4.1.7]. -/
 axiom mass_lsc {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k)
