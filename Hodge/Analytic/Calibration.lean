@@ -140,16 +140,48 @@ theorem eval_tendsto_of_flatNorm_tendsto {k : ℕ} (T : ℕ → Current n X k) (
 
 /-- **Lower Semicontinuity of Mass** (Federer, 1969).
 
-    **STATUS: AXIOM** - The mass functional is lower semicontinuous with respect
-    to the flat norm topology: if Tₙ → T in flat norm, then mass(T) ≤ liminf mass(Tₙ).
+    The mass functional is lower semicontinuous with respect to the flat norm topology:
+    if Tₙ → T in flat norm and mass is bounded, then mass(T) ≤ liminf mass(Tₙ).
 
     **Mathematical Content**: Mass is defined as sup { |T(ω)| : comass ω ≤ 1 }, which
     is a supremum of continuous linear functionals, hence lower semicontinuous.
 
+    **Note**: The boundedness hypothesis is automatically satisfied when mass converges,
+    which is the case in our main application (`limit_is_calibrated`).
+
     Reference: [H. Federer, "Geometric Measure Theory", Springer, 1969, Section 4.1.7]. -/
-axiom mass_lsc {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k)
-    (h_conv : Tendsto (fun i => flatNorm (T i - T_limit)) atTop (nhds 0)) :
-    Current.mass T_limit ≤ liminf (fun i => Current.mass (T i)) atTop
+theorem mass_lsc {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k)
+    (h_conv : Tendsto (fun i => flatNorm (T i - T_limit)) atTop (nhds 0))
+    (h_mass_bdd : IsBoundedUnder (· ≤ ·) atTop (fun i => Current.mass (T i))) :
+    Current.mass T_limit ≤ liminf (fun i => Current.mass (T i)) atTop := by
+  -- Mass T_limit = sSup { |T_limit(ω)| : comass ω ≤ 1 }
+  -- For each such ω, we show |T_limit(ω)| ≤ liminf mass(T_i)
+  -- Then mass T_limit = sSup of values ≤ liminf mass(T_i), hence ≤ liminf mass(T_i)
+  apply csSup_le (Current.mass_set_nonempty T_limit)
+  rintro r ⟨ω, hω, rfl⟩
+  -- Evaluation converges under flat convergence
+  have h_eval_conv := eval_tendsto_of_flatNorm_tendsto T T_limit ω h_conv
+  -- Absolute value of evaluation also converges
+  have h_abs_eval_conv := h_eval_conv.abs
+  -- For each i, |T_i(ω)| ≤ mass(T_i) (by definition of mass as sSup)
+  have h_le : ∀ i, |(T i).toFun ω| ≤ Current.mass (T i) := fun i =>
+    le_csSup (Current.mass_set_bddAbove (T i)) ⟨ω, hω, rfl⟩
+  -- liminf |T_i(ω)| = |T_limit(ω)| (from convergence)
+  have h_liminf_abs : liminf (fun i => |(T i).toFun ω|) atTop = |T_limit.toFun ω| :=
+    h_abs_eval_conv.liminf_eq
+  -- Show |T_limit(ω)| ≤ liminf mass(T_i)
+  -- Since liminf |T_i(ω)| = |T_limit(ω)| and |T_i(ω)| ≤ mass(T_i), we have
+  -- |T_limit(ω)| = liminf |T_i(ω)| ≤ liminf mass(T_i)
+  rw [← h_liminf_abs]
+  -- Apply liminf_le_liminf: if u ≤ v eventually, then liminf u ≤ liminf v
+  -- Provide all three arguments explicitly:
+  -- 1. h : ∀ᶠ i, |T_i(ω)| ≤ mass(T_i)
+  -- 2. hu : IsBoundedUnder (· ≥ ·) atTop |T_i(ω)| (bounded below by 0)
+  -- 3. hv : IsCoboundedUnder (· ≥ ·) atTop mass(T_i) (from h_mass_bdd)
+  exact liminf_le_liminf
+    (Eventually.of_forall h_le)
+    h_abs_eval_conv.isBoundedUnder_ge
+    h_mass_bdd.isCoboundedUnder_ge
 
 /-! ## Limit Calibration Theorem -/
 
@@ -200,7 +232,10 @@ theorem limit_is_calibrated {k : ℕ} (T : ℕ → Current n X k) (T_limit : Cur
     convert Tendsto.add h_defect_vanish h_eval_conv using 1
     simp only [zero_add]
   -- Step 4: By lower semicontinuity, mass(T_limit) ≤ liminf mass(Tᵢ)
-  have h_lsc := mass_lsc T T_limit h_conv
+  -- Note: mass_lsc requires boundedness, which follows from h_mass_conv (convergence implies bounded)
+  have h_mass_bdd : IsBoundedUnder (· ≤ ·) atTop (fun i => Current.mass (T i)) :=
+    h_mass_conv.isBoundedUnder_le
+  have h_lsc := mass_lsc T T_limit h_conv h_mass_bdd
   -- Step 5: Since mass(Tᵢ) → T_limit(ψ), liminf = lim = T_limit(ψ)
   have h_liminf_eq : liminf (fun i => Current.mass (T i)) atTop = T_limit.toFun ψ.form := by
     exact h_mass_conv.liminf_eq
