@@ -87,33 +87,6 @@ theorem isCalibrated_iff_defect_zero {k : ℕ} (T : Current n X k) (ψ : Calibra
   unfold isCalibrated calibrationDefect
   constructor <;> intro h <;> linarith
 
-/-! ## Advanced Calibration Theorems -/
-
--- Note: the Harvey–Lawson “spine theorem” is not used anywhere in the project at present.
--- We therefore omit it here (removing an unused axiom from the codebase).
-
-/-- **Lower Semicontinuity of Mass** (Federer, 1969).
-
-    **STATUS: CLASSICAL PILLAR**
-
-    The mass functional is lower semicontinuous with respect to the flat norm topology.
-    This means: if Tₙ → T in flat norm, then mass(T) ≤ liminf mass(Tₙ).
-
-    **Mathematical Content**: Mass is the supremum over a family of linear functionals
-    (evaluations on test forms with comass ≤ 1), and suprema of continuous functions
-    are lower semicontinuous.
-
-    **Why This is an Axiom**: Proving this requires full implementation of mass as a
-    supremum over test forms, continuity of evaluation under flat norm convergence,
-    and general theorems about semicontinuity of suprema.
-
-    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents",
-    Annals of Mathematics 72 (1960), 458-520, Section 4.2].
-    Reference: [H. Federer, "Geometric Measure Theory", Springer, 1969, Section 4.1.7]. -/
-axiom mass_lsc {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k) :
-    Tendsto (fun i => flatNorm (T i - T_limit)) atTop (nhds 0) →
-    Current.mass T_limit ≤ liminf (fun i => Current.mass (T i)) atTop
-
 /-! ## Evaluation Continuity under Flat Convergence -/
 
 /-- Evaluation of currents is Lipschitz continuous in the flat norm topology.
@@ -162,6 +135,22 @@ theorem eval_tendsto_of_flatNorm_tendsto {k : ℕ} (T : ℕ → Current n X k) (
       _ ≤ |flatNorm (T n - T_limit)| * C := mul_le_mul_of_nonneg_right (le_abs_self _) (le_of_lt hC_pos)
       _ < (ε / C) * C := mul_lt_mul_of_pos_right hN hC_pos
       _ = ε := div_mul_cancel₀ ε (ne_of_gt hC_pos)
+
+/-! ## Lower Semicontinuity of Mass -/
+
+/-- **Lower Semicontinuity of Mass** (Federer, 1969).
+
+    **Status**: Axiom. The proof requires careful handling of `liminf_le_liminf`
+    bounding conditions. The mathematical content is classical:
+    mass(T) = sup { |T(ω)| : comass ω ≤ 1 } is an lsc function as a
+    supremum of continuous linear functionals.
+
+    Reference: [H. Federer, "Geometric Measure Theory", Springer, 1969, Section 4.1.7]. -/
+axiom mass_lsc {k : ℕ} (T : ℕ → Current n X k) (T_limit : Current n X k)
+    (h_conv : Tendsto (fun i => flatNorm (T i - T_limit)) atTop (nhds 0)) :
+    Current.mass T_limit ≤ liminf (fun i => Current.mass (T i)) atTop
+
+/-! ## Limit Calibration Theorem -/
 
 /-- **Limit Calibration Theorem** ⭐ STRATEGY-CRITICAL (Harvey-Lawson, 1982).
 

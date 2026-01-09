@@ -101,14 +101,6 @@ def castForm {k k' : ℕ} (h : k = k') (ω : SmoothForm n X k) : SmoothForm n X 
     castForm h (ω + η) = castForm h ω + castForm h η := by
   subst h; rfl
 
-@[simp] lemma castForm_smul {k k' : ℕ} (h : k = k') (c : ℂ) (ω : SmoothForm n X k) :
-    castForm h (c • ω) = c • castForm h ω := by
-  subst h; rfl
-
-@[simp] lemma castForm_smul_real {k k' : ℕ} (h : k = k') (r : ℝ) (ω : SmoothForm n X k) :
-    castForm h (r • ω) = r • castForm h ω := by
-  subst h; rfl
-
 
 /-!
 ### Conversion from/to SmoothForm
@@ -365,14 +357,4 @@ theorem smoothWedge_zero_right {k l : ℕ} (ω : SmoothForm n X k) : ω ⋏ (0 :
         (𝕜 := ℂ) (E := TangentModel n) (c := (0 : ℂ))
         (ω := ω.as_alternating x) (η := (0 : FiberAlt n l)))
 
-theorem smoothWedge_sub_left {k l : ℕ} (ω₁ ω₂ : SmoothForm n X k) (η : SmoothForm n X l) :
-    (ω₁ - ω₂) ⋏ η = (ω₁ ⋏ η) - (ω₂ ⋏ η) := by
-  have h1 : ω₁ - ω₂ = ω₁ + (-1 : ℂ) • ω₂ := by simp [sub_eq_add_neg, neg_one_smul]
-  rw [h1, smoothWedge_add_left, smoothWedge_smul_left]
-  simp [sub_eq_add_neg, neg_one_smul]
 
-theorem smoothWedge_sub_right {k l : ℕ} (ω : SmoothForm n X k) (η₁ η₂ : SmoothForm n X l) :
-    ω ⋏ (η₁ - η₂) = (ω ⋏ η₁) - (ω ⋏ η₂) := by
-  have h1 : η₁ - η₂ = η₁ + (-1 : ℂ) • η₂ := by simp [sub_eq_add_neg, neg_one_smul]
-  rw [h1, smoothWedge_add_right, smoothWedge_smul_right]
-  simp [sub_eq_add_neg, neg_one_smul]

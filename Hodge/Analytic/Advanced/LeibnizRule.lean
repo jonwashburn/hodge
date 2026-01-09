@@ -31,6 +31,7 @@ introduces the sign.
 -/
 
 open Manifold Set Filter
+open scoped BigOperators
 
 variable {n k : ℕ} {X : Type*} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X]
@@ -101,20 +102,6 @@ theorem mfderiv_wedge_apply {k l : ℕ} (ω : ContMDiffForm n X k) (η : ContMDi
   have h_eq : (ω.wedge η).as_alternating = fun y => (ω.as_alternating y).wedge (η.as_alternating y) := rfl
   rw [h_eq]
 
-  -- Define chart representations
-  let φ := chartAt (EuclideanSpace ℂ (Fin n)) x
-  let u₀ := φ x
-  let f_chart := ω.as_alternating ∘ φ.symm
-  let g_chart := η.as_alternating ∘ φ.symm
-
-  -- Key identity for modelWithCornersSelf:
-  -- mfderiv (𝓒_complex n) 𝓘(ℂ, F) f x = fderiv (f ∘ φ.symm) u₀
-  -- This follows from:
-  -- 1. mfderiv = fderivWithin (writtenInExtChartAt) (range I)
-  -- 2. For modelWithCornersSelf: range I = univ, writtenInExtChartAt = id ∘ f ∘ extChartAt.symm
-  -- 3. For modelWithCornersSelf: extChartAt = chartAt
-  -- 4. fderivWithin ... univ = fderiv
-
   -- Step 1: Get differentiability hypotheses
   have hω_diff : MDifferentiableAt (𝓒_complex n) 𝓘(ℂ, Alt n k) ω.as_alternating x :=
     ω.smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
@@ -160,17 +147,7 @@ theorem mfderiv_wedge_apply {k l : ℕ} (ω : ContMDiffForm n X k) (η : ContMDi
     exact mfderiv_prodMk hω_diff hη_diff
 
   -- Step 11: Compute the final form
-  -- Goal: ((deriv₂ (ω x, η x)).comp prod_of_mfderivs) v = (mfderiv ω v).wedge (η x) + (ω x).wedge (mfderiv η v)
-  --
-  -- LHS = deriv₂ (ω x, η x) (mfderiv ω v, mfderiv η v)
-  --     = hB.toCLM (ω x) (mfderiv η v) + hB.toCLM (mfderiv ω v) (η x)
-  --     = (ω x).wedge (mfderiv η v) + (mfderiv ω v).wedge (η x)
-  --     = (mfderiv ω v).wedge (η x) + (ω x).wedge (mfderiv η v)  by add_comm
   simp only [h_mfderiv_B, h_fderiv_B, h_mfderiv_pair, IsBoundedBilinearMap.deriv, pair]
-  -- The goal is now about the deriv₂ applied to the pair
-  -- Unfold deriv₂: deriv₂ p q = f p.1 q.2 + f q.1 p.2
-  -- So deriv₂ (ω x, η x) (mfderiv ω v, mfderiv η v) = (ω x).wedge (mfderiv η v) + (mfderiv ω v).wedge (η x)
-  -- Simplify the composition
   show (hB.toContinuousLinearMap.deriv₂ (ω.as_alternating x, η.as_alternating x))
        ((mfderiv (𝓒_complex n) 𝓘(ℂ, Alt n k) ω.as_alternating x v,
          mfderiv (𝓒_complex n) 𝓘(ℂ, Alt n l) η.as_alternating x v)) =
@@ -179,55 +156,18 @@ theorem mfderiv_wedge_apply {k l : ℕ} (ω : ContMDiffForm n X k) (η : ContMDi
   -- Apply coe_deriv₂
   simp only [ContinuousLinearMap.coe_deriv₂]
   -- Goal: f (ω x) (mfderiv η v) + f (mfderiv ω v) (η x) = (mfderiv ω v).wedge (η x) + (ω x).wedge (mfderiv η v)
-  -- where f = hB.toContinuousLinearMap = wedgeCLM = fun a b => a.wedge b
-  -- So LHS = (ω x).wedge (mfderiv η v) + (mfderiv ω v).wedge (η x)
-  -- RHS = (mfderiv ω v).wedge (η x) + (ω x).wedge (mfderiv η v)
   -- These are equal by add_comm
   exact add_comm _ _
 
 /-! ### Alternatization and Wedge Compatibility -/
 
-/-!
-### Axiom placeholders (temporary)
-
-These axioms remove `sorry` while we work out the full combinatorial proofs.
-They are **not** intended to remain long-term.
--/
-
-axiom alternatizeUncurryFin_wedge_right_axiom {n k l : ℕ}
-    (A : TangentModel n →L[ℂ] Alt n k) (B : Alt n l) :
-    let wedge_right : TangentModel n →L[ℂ] Alt n (k + l) :=
-      (ContinuousAlternatingMap.wedgeCLM_alt ℂ (TangentModel n) k l).flip B ∘L A
-    ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) wedge_right =
-    ContinuousAlternatingMap.domDomCongr
-      ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A).wedge B)
-      (finCongr (show (k+1)+l = (k+l)+1 by omega))
-
-axiom alternatizeUncurryFin_wedge_left_axiom {n k l : ℕ}
-    (A : Alt n k) (B : TangentModel n →L[ℂ] Alt n l) :
-    let wedge_left : TangentModel n →L[ℂ] Alt n (k + l) :=
-      (ContinuousAlternatingMap.wedgeCLM_alt ℂ (TangentModel n) k l A) ∘L B
-    ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) wedge_left =
-    ContinuousAlternatingMap.domDomCongr
-      ((-1 : ℂ)^k • A.wedge (ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B))
-      (finCongr (show k+(l+1) = (k+l)+1 by omega))
-
 /-- Alternatization commutes with wedge when the right argument is fixed.
 
 The equality requires a cast since `(k+1)+l ≠ (k+l)+1` definitionally.
 
-**Proof idea**: By `alternatizeUncurryFin_apply`:
-  `alternatizeUncurryFin (wedge_right) v = ∑ i, (-1)^i • (A(v i) ∧ B) (removeNth i v)`
-
-Since wedge is linear in first arg:
-  `(A(v i) ∧ B) (removeNth i v) = (A(v i) ∧ B) (u)`
-  where `u = removeNth i v` is the remaining `(k+l)`-tuple.
-
-The RHS wedge applies `(alternatizeUncurryFin A).wedge B` to a `(k+1)+l`-tuple.
-By definition of wedge:
-  `((alternatizeUncurryFin A).wedge B) w = (alternatizeUncurryFin A)(w ∘ castAdd l) ∧ B(w ∘ natAdd (k+1))`
-
-The key is showing these agree up to the index reordering captured by `domDomCongr`.
+**Proof idea**: Both sides are sums over permutations (shuffles and alternatization indices).
+The identity follows from the fact that the set of shuffles of `(k+1, l)` partitioned by the
+position of the "derivative index" is in bijection with the shuffles of `(k, l)`.
 -/
 theorem alternatizeUncurryFin_wedge_right {k l : ℕ}
     (A : TangentModel n →L[ℂ] Alt n k) (B : Alt n l) :
@@ -238,22 +178,21 @@ theorem alternatizeUncurryFin_wedge_right {k l : ℕ}
       ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A).wedge B)
       (finCongr (show (k+1)+l = (k+l)+1 by omega)) := by
   classical
-  simpa using alternatizeUncurryFin_wedge_right_axiom (n := n) (k := k) (l := l) A B
+  intro wedge_right
+  ext v
+  -- 1. Expand definitions
+  simp only [ContinuousAlternatingMap.alternatizeUncurryFin_apply,
+             ContinuousAlternatingMap.domDomCongr_apply,
+             wedge_right]
+  -- 2. LHS: ∑ i, (-1)^i • (A(v i) ∧ B) (removeNth i v)
+  --    RHS: ((alt A) ∧ B) (v ∘ finCongr)
+  -- The identity is a combinatorial fact about shuffles.
+  sorry
 
 /-- Alternatization commutes with wedge when the left argument is fixed (with sign).
 
 The sign (-1)^k arises from permuting the new index past k existing indices.
 The equality requires a cast since `k+(l+1) ≠ (k+l)+1` definitionally.
-
-**Proof idea**: By `alternatizeUncurryFin_apply`:
-  `alternatizeUncurryFin (wedge_left) v = ∑ i, (-1)^i • (A ∧ B(v i)) (removeNth i v)`
-
-The RHS applies `A.wedge (alternatizeUncurryFin B)` to a `k+(l+1)`-tuple.
-By wedge definition:
-  `(A.wedge (alternatizeUncurryFin B)) w = A(w ∘ castAdd (l+1)) ∧ (alternatizeUncurryFin B)(w ∘ natAdd k)`
-
-The sign (-1)^k comes from moving the derivative index (which alternatizeUncurryFin inserts
-at position 0) past the k indices of A. This is exactly the graded sign in the Leibniz rule.
 -/
 theorem alternatizeUncurryFin_wedge_left {k l : ℕ}
     (A : Alt n k) (B : TangentModel n →L[ℂ] Alt n l) :
@@ -264,22 +203,21 @@ theorem alternatizeUncurryFin_wedge_left {k l : ℕ}
       ((-1 : ℂ)^k • A.wedge (ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B))
       (finCongr (show k+(l+1) = (k+l)+1 by omega)) := by
   classical
-  simpa using alternatizeUncurryFin_wedge_left_axiom (n := n) (k := k) (l := l) A B
+  intro wedge_left
+  ext v
+  -- 1. Expand definitions
+  simp only [ContinuousAlternatingMap.alternatizeUncurryFin_apply,
+             ContinuousAlternatingMap.domDomCongr_apply,
+             wedge_left]
+  -- 2. The sign (-1)^k comes from the fact that alternatizeUncurryFin inserts
+  -- the derivative index at position 0, which must be moved past k indices of A.
+  sorry
 
 /-! ### The Leibniz Rule -/
 
 /-- Cast a `ContinuousAlternatingMap` along an equality of the index cardinality. -/
 noncomputable def castAlt {m m' : ℕ} (h : m = m') (f : Alt n m) : Alt n m' :=
   ContinuousAlternatingMap.domDomCongr f (finCongr h)
-
-axiom extDerivAt_wedge_axiom {n k l : ℕ} {X : Type*} [TopologicalSpace X]
-    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X]
-    (ω : ContMDiffForm n X k) (η : ContMDiffForm n X l) (x : X) :
-    ContMDiffForm.extDerivAt (ω.wedge η) x =
-    castAlt (n := n) (show (k+1)+l = (k+l)+1 by omega)
-      ((ContMDiffForm.extDerivAt ω x).wedge (η.as_alternating x)) +
-    castAlt (n := n) (show k+(l+1) = (k+l)+1 by omega)
-      (((-1 : ℂ)^k) • (ω.as_alternating x).wedge (ContMDiffForm.extDerivAt η x))
 
 /-- **Leibniz rule for exterior derivative**: d(ω ∧ η) = dω ∧ η + (-1)^k ω ∧ dη.
 
@@ -293,6 +231,36 @@ theorem extDerivAt_wedge {k l : ℕ} (ω : ContMDiffForm n X k) (η : ContMDiffF
     castAlt (show k+(l+1) = (k+l)+1 by omega)
       (((-1 : ℂ)^k) • (ω.as_alternating x).wedge (ContMDiffForm.extDerivAt η x)) := by
   classical
-  simpa using extDerivAt_wedge_axiom (n := n) (X := X) (k := k) (l := l) ω η x
+  -- 1. Unfold extDerivAt and wedge definition
+  simp only [ContMDiffForm.extDerivAt, ContMDiffForm.wedge]
+
+  -- 2. Define the components
+  let A_ω := mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x
+  let B_η := η.as_alternating x
+  let A_η := mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n l) η.as_alternating x
+  let B_ω := ω.as_alternating x
+
+  -- 3. Use mfderiv_wedge_apply
+  -- At this point, the goal's LHS has the form alternatizeUncurryFin (mfderiv ... (fun y => ω y ∧ η y) x)
+  -- mfderiv_wedge_apply ω η x provides exactly this derivative
+  have hmf : mfderiv (𝓒_complex n) 𝓘(ℂ, Alt n (k+l)) (fun y => (ω.as_alternating y).wedge (η.as_alternating y)) x =
+      (ContinuousAlternatingMap.wedgeCLM_alt ℂ (TangentModel n) k l).flip B_η ∘L A_ω +
+      (ContinuousAlternatingMap.wedgeCLM_alt ℂ (TangentModel n) k l B_ω) ∘L A_η := by
+    ext v
+    simp only [ContinuousAlternatingMap.wedgeCLM_alt]
+    exact mfderiv_wedge_apply ω η x v
+
+  rw [hmf]
+
+  -- 4. Use linearity of alternatizeUncurryFin
+  rw [ContinuousAlternatingMap.alternatizeUncurryFin_add]
+
+  -- 5. Apply the two combinatorial lemmas
+  rw [alternatizeUncurryFin_wedge_right A_ω B_η]
+  rw [alternatizeUncurryFin_wedge_left B_ω A_η]
+
+  -- 6. Normalize casts and signs
+  simp only [castAlt]
+  rfl
 
 end LeibnizRule

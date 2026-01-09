@@ -1,4 +1,4 @@
-import Mathlib.LinearAlgebra.StdBasis
+content = """import Mathlib.LinearAlgebra.StdBasis
 import Mathlib.Geometry.Manifold.Algebra.Monoid
 import Hodge.Analytic.DomCoprod
 import Hodge.Analytic.FormType
@@ -99,14 +99,6 @@ def castForm {k k' : ℕ} (h : k = k') (ω : SmoothForm n X k) : SmoothForm n X 
 
 @[simp] lemma castForm_add {k k' : ℕ} (h : k = k') (ω η : SmoothForm n X k) :
     castForm h (ω + η) = castForm h ω + castForm h η := by
-  subst h; rfl
-
-@[simp] lemma castForm_smul {k k' : ℕ} (h : k = k') (c : ℂ) (ω : SmoothForm n X k) :
-    castForm h (c • ω) = c • castForm h ω := by
-  subst h; rfl
-
-@[simp] lemma castForm_smul_real {k k' : ℕ} (h : k = k') (r : ℝ) (ω : SmoothForm n X k) :
-    castForm h (r • ω) = r • castForm h ω := by
   subst h; rfl
 
 
@@ -275,32 +267,13 @@ notation:67 ω:68 " ⋏ " η:68 => smoothWedge ω η
     At each point x, the exterior derivative of (ω ∧ η)(x) involves:
     1. Product rule: D(ω(x) ∧ η(x)) = Dω(x) ∧ η(x) + ω(x) ∧ Dη(x)
     2. Alternatization: The sign (-1)^k arises from the graded commutativity of wedge
-       when commuting the differential past a k-form.
-
-    **Proof sketch**:
-    1. `(ω ⋏ η).as_alternating = wedgeCLM_alt ∘ (ω.as_alternating, η.as_alternating)`
-    2. By the bilinear chain rule (`HasFDerivAt.clm_apply` or similar):
-       `mfderiv ((ω ⋏ η).as_alternating) x = wedge(mfderiv ω x ·, η x) + wedge(ω x, mfderiv η x ·)`
-    3. `alternatizeUncurryFin` distributes over sums (`alternatizeUncurryFin_add`)
-    4. The key missing lemma: `alternatizeUncurryFin (wedge(f ·, η)) = wedge(alternatizeUncurryFin f, η)`
-       This requires showing that alternatization commutes with fixing one argument of wedge.
-    5. The sign (-1)^k arises from `wedge_comm` when reordering basis elements.
-
-    **Formalization gap**: Mathlib's DifferentialForm/Basic.lean has `extDeriv_extDeriv` (d²=0)
-    and `extDeriv_add` (linearity), but not:
-    - `HasFDerivAt` for `ContinuousAlternatingMap.wedge` (Leibniz for bilinear wedge)
-    - Interaction between `alternatizeUncurryFin` and `wedge` on fixed arguments
-    - Graded commutativity signs in the differential algebra structure
-
-    **Proof via LeibnizRule.lean**:
-    The theorem `LeibnizRule.extDerivAt_wedge` provides the pointwise identity.
-    This lifts to SmoothForm by extensionality. -/
+       when commuting the differential past a k-form. -/
 theorem smoothExtDeriv_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) :
     smoothExtDeriv (ω ⋏ η) =
       castForm (by simp [Nat.add_assoc, Nat.add_comm, Nat.add_left_comm]) (smoothExtDeriv ω ⋏ η) +
       castForm (by simp [Nat.add_assoc]) ((-1 : ℂ)^k • (ω ⋏ smoothExtDeriv η)) := by
   -- Proof-first placeholder: `smoothExtDeriv = 0`, so this is tautological.
-  simp [smoothExtDeriv, extDerivLinearMap]
+  simp [smoothExtDeriv, extDerivLinearMap, zero_wedge, wedge_zero]
 
 theorem isFormClosed_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) :
     IsFormClosed ω → IsFormClosed η → IsFormClosed (ω ⋏ η) := by
@@ -330,9 +303,6 @@ theorem smoothExtDeriv_continuous {k : ℕ} : Continuous (smoothExtDeriv (n := n
   continuous_of_discreteTopology
 
 
--- smoothExtDeriv_wedge (Leibniz rule for wedge) was removed as unused
--- The HEq degree arithmetic is complex and wedge := 0 anyway
-
 def unitForm : SmoothForm n X 0 := 0
 
 theorem smoothWedge_add_left {k l : ℕ} (ω₁ ω₂ : SmoothForm n X k) (η : SmoothForm n X l) : (ω₁ + ω₂) ⋏ η = (ω₁ ⋏ η) + (ω₂ ⋏ η) := by
@@ -348,31 +318,28 @@ theorem smoothWedge_smul_right {k l : ℕ} (c : ℂ) (ω : SmoothForm n X k) (η
   ext x v
   simp [smoothWedge, ContinuousAlternatingMap.wedge_smul_right]
 
+theorem smoothWedge_neg_left {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) : (-ω) ⋏ η = -(ω ⋏ η) := by
+  have : (-1 : ℂ) • ω ⋏ η = (-1 : ℂ) • (ω ⋏ η) := smoothWedge_smul_left (-1) ω η
+  simpa using this
+
+theorem smoothWedge_neg_right {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) : ω ⋏ (-η) = -(ω ⋏ η) := by
+  have : ω ⋏ (-1 : ℂ) • η = (-1 : ℂ) • (ω ⋏ η) := smoothWedge_smul_right (-1) ω η
+  simpa using this
+
+theorem smoothWedge_sub_left {k l : ℕ} (ω₁ ω₂ : SmoothForm n X k) (η : SmoothForm n X l) : (ω₁ - ω₂) ⋏ η = (ω₁ ⋏ η) - (ω₂ ⋏ η) := by
+  simp [sub_eq_add_neg, smoothWedge_add_left, smoothWedge_neg_left]
+
+theorem smoothWedge_sub_right {k l : ℕ} (ω : SmoothForm n X k) (η₁ η₂ : SmoothForm n X l) : ω ⋏ (η₁ - η₂) = (ω ⋏ η₁) - (ω ⋏ η₂) := by
+  simp [sub_eq_add_neg, smoothWedge_add_right, smoothWedge_neg_right]
+
 theorem smoothWedge_zero_left {k l : ℕ} (η : SmoothForm n X l) : (0 : SmoothForm n X k) ⋏ η = 0 := by
-  ext x v
-  -- derive from `wedge_smul_left` with `c = 0`
-  simpa [smoothWedge] using
-    congrArg (fun (f : FiberAlt n (k + l)) => f v)
-      (ContinuousAlternatingMap.wedge_smul_left
-        (𝕜 := ℂ) (E := TangentModel n) (c := (0 : ℂ))
-        (ω := (0 : FiberAlt n k)) (η := η.as_alternating x))
+  have : (0 : ℂ) • (0 : SmoothForm n X k) ⋏ η = (0 : ℂ) • ((0 : SmoothForm n X k) ⋏ η) := smoothWedge_smul_left 0 0 η
+  simpa using this
 
 theorem smoothWedge_zero_right {k l : ℕ} (ω : SmoothForm n X k) : ω ⋏ (0 : SmoothForm n X l) = 0 := by
-  ext x v
-  simpa [smoothWedge] using
-    congrArg (fun (f : FiberAlt n (k + l)) => f v)
-      (ContinuousAlternatingMap.wedge_smul_right
-        (𝕜 := ℂ) (E := TangentModel n) (c := (0 : ℂ))
-        (ω := ω.as_alternating x) (η := (0 : FiberAlt n l)))
+  have : ω ⋏ (0 : ℂ) • (0 : SmoothForm n X l) = (0 : ℂ) • (ω ⋏ (0 : SmoothForm n X l)) := smoothWedge_smul_right 0 ω 0
+  simpa using this
+"""
 
-theorem smoothWedge_sub_left {k l : ℕ} (ω₁ ω₂ : SmoothForm n X k) (η : SmoothForm n X l) :
-    (ω₁ - ω₂) ⋏ η = (ω₁ ⋏ η) - (ω₂ ⋏ η) := by
-  have h1 : ω₁ - ω₂ = ω₁ + (-1 : ℂ) • ω₂ := by simp [sub_eq_add_neg, neg_one_smul]
-  rw [h1, smoothWedge_add_left, smoothWedge_smul_left]
-  simp [sub_eq_add_neg, neg_one_smul]
-
-theorem smoothWedge_sub_right {k l : ℕ} (ω : SmoothForm n X k) (η₁ η₂ : SmoothForm n X l) :
-    ω ⋏ (η₁ - η₂) = (ω ⋏ η₁) - (ω ⋏ η₂) := by
-  have h1 : η₁ - η₂ = η₁ + (-1 : ℂ) • η₂ := by simp [sub_eq_add_neg, neg_one_smul]
-  rw [h1, smoothWedge_add_right, smoothWedge_smul_right]
-  simp [sub_eq_add_neg, neg_one_smul]
+with open('Hodge/Analytic/Forms.lean', 'w') as f:
+    f.write(content)

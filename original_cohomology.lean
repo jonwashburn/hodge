@@ -560,49 +560,8 @@ inductive isPPForm' (n : ℕ) (X : Type u) [TopologicalSpace X] [ChartedSpace (E
   | zero (p) : isPPForm' n X p 0
   | add {p ω η} : isPPForm' n X p ω → isPPForm' n X p η → isPPForm' n X p (ω + η)
   | smul {p} (c : ℂ) {ω} : isPPForm' n X p ω → isPPForm' n X p (c • ω)
-  | wedge {p q} {ω : SmoothForm n X (2 * p)} {η : SmoothForm n X (2 * q)} :
-      isPPForm' n X p ω → isPPForm' n X q η →
-      isPPForm' n X (p + q) (castForm (by ring : 2 * p + 2 * q = 2 * (p + q)) (ω ⋏ η))
 
 theorem isPPForm_zero {p} : isPPForm' n X p 0 := isPPForm'.zero p
-
-theorem isPPForm_wedge {p q} {ω : SmoothForm n X (2 * p)} {η : SmoothForm n X (2 * q)}
-    (hp : isPPForm' n X p ω) (hq : isPPForm' n X q η) :
-    isPPForm' n X (p + q) (castForm (by ring : 2 * p + 2 * q = 2 * (p + q)) (ω ⋏ η)) :=
-  isPPForm'.wedge hp hq
-
-/-- A cohomology class is of type (p,p) if it has a (p,p) representative form.
-    This is used in the statement of the Hard Lefschetz theorem on Hodge types. -/
-def isPPClass (k : ℕ) (c : DeRhamCohomologyClass n X k) : Prop :=
-  ∃ (p : ℕ) (hk : k = 2 * p) (η : SmoothForm n X k) (hc : IsFormClosed η),
-    ⟦η, hc⟧ = c ∧ isPPForm' n X p (hk ▸ η)
-
-/-! ## General Lefschetz Operators (parameterized by cohomology class) -/
-
-/-- General Lefschetz operator defined by multiplication with a degree-2 cohomology class. -/
-noncomputable def lefschetz_operator_of_class {n : ℕ} {X : Type u}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X]
-    (ω : DeRhamCohomologyClass n X 2) (p : ℕ) :
-    DeRhamCohomologyClass n X p →ₗ[ℂ] DeRhamCohomologyClass n X (p + 2) where
-  toFun c := c * ω
-  map_add' c₁ c₂ := add_mul c₁ c₂ ω
-  map_smul' r c := by
-    simp only [RingHom.id_apply]
-    exact smul_mul r c ω
-
-/-- General iterated Lefschetz map defined by multiplication with a degree-2 cohomology class. -/
-def lefschetz_power_of_class {n : ℕ} {X : Type u}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X]
-    (ω : DeRhamCohomologyClass n X 2) (p k : ℕ) :
-    DeRhamCohomologyClass n X p →ₗ[ℂ] DeRhamCohomologyClass n X (p + 2 * k) :=
-  match k with
-  | 0 => LinearMap.id
-  | k' + 1 =>
-    let L := lefschetz_operator_of_class ω (p + 2 * k')
-    let Lk := lefschetz_power_of_class ω p k'
-    LinearMap.comp L Lk
 
 /-! ## Kähler Manifold -/
 
@@ -616,17 +575,6 @@ class KahlerManifold (n : ℕ) (X : Type u)
   omega_rational : isRationalClass ⟦omega_form, omega_closed⟧
   omega_J_invariant : ∀ (x : X) (v w : TangentSpace (𝓒_complex n) x),
     omega_form.as_alternating x ![Complex.I • v, Complex.I • w] = omega_form.as_alternating x ![v, w]
-  /-- **Hard Lefschetz Theorem** (Lefschetz, 1924).
-      The iterated Lefschetz operator L^k : H^p(X) → H^{p+2k}(X) is a bijection.
-      This is the fundamental structural property of Kähler manifolds. -/
-  lefschetz_bijective : ∀ (p k : ℕ),
-    Function.Bijective (lefschetz_power_of_class ⟦omega_form, omega_closed⟧ p k)
-  /-- **Hard Lefschetz on Rational Classes** (Lefschetz, 1924).
-      The iterated Lefschetz operator L^k preserves rationality:
-      a class c is rational iff L^k(c) is rational.
-      This follows from the Lefschetz isomorphism being defined over ℚ. -/
-  rational_lefschetz_iff : ∀ (p k : ℕ) (c : DeRhamCohomologyClass n X p),
-    isRationalClass c ↔ isRationalClass (lefschetz_power_of_class ⟦omega_form, omega_closed⟧ p k c)
 
 /-! ## Lefschetz Operator -/
 
@@ -643,3 +591,5 @@ noncomputable def lefschetzL {k : ℕ} (η : SmoothForm n X k) : SmoothForm n X 
 end Hodge
 
 end
+
+

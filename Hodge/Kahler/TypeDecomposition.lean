@@ -34,15 +34,7 @@ def isPPFormTD (n : ℕ) (X : Type u)
     (p : ℕ) (ω : SmoothForm n X (2 * p)) : Prop :=
   isPQForm n X p p (by rw [Nat.two_mul]) ω
 
-namespace Hodge
-
-/-- A cohomology class is of type (p,p) if it has a (p,p) representative form. -/
-def isPPClass {n : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] (k : ℕ) (c : DeRhamCohomologyClass n X k) : Prop :=
-  ∃ (p : ℕ) (hk : k = 2 * p) (η : SmoothForm n X k) (hc : IsFormClosed η),
-    ⟦η, hc⟧ = c ∧ isPPForm' n X p (hk ▸ η)
-
-end Hodge
+-- isPPClass is defined in Hodge.Cohomology.Basic to avoid circular dependencies
 
 variable {n : ℕ} {X : Type u}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
