@@ -94,18 +94,26 @@ theorem hard_lefschetz_rational_bijective (n : ℕ) (X : Type u)
   exact K.rational_lefschetz_iff p k c
 
 /-- **Hard Lefschetz on Hodge Types** (Lefschetz, 1924).
-    **STATUS: STRATEGY-CRITICAL CLASSICAL PILLAR**
+    **STATUS: PROVED from KahlerManifold.pp_lefschetz_iff**
 
     The iterated Lefschetz operator L^k preserves (p,p) classes:
-    a class c is (p,p) if and only if L^k(c) is (p+k, p+k).
-
-    This remains an axiom because `isPPClass` is defined in `TypeDecomposition.lean`
-    which imports this module, preventing us from adding this as a field of `KahlerManifold`. -/
-axiom hard_lefschetz_pp_bijective (n : ℕ) (X : Type u)
+    a class c is (p,p) if and only if L^k(c) is (p+k, p+k). -/
+theorem hard_lefschetz_pp_bijective (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
     (p k : ℕ) (c : DeRhamCohomologyClass n X p) :
-    isPPClass p c ↔ isPPClass (p + 2 * k) (lefschetz_power n X p k c)
+    isPPClass p c ↔ isPPClass (p + 2 * k) (lefschetz_power n X p k c) := by
+  -- Show that lefschetz_power equals lefschetz_power_of_class with the Kähler form class
+  have h_eq : lefschetz_power n X p k c = lefschetz_power_of_class ⟦K.omega_form, K.omega_closed⟧ p k c := by
+    induction k generalizing p c with
+    | zero => rfl
+    | succ k' ih =>
+      simp only [lefschetz_power, lefschetz_power_of_class, LinearMap.comp_apply]
+      show lefschetz_operator n X (p + 2 * k') _ = lefschetz_operator_of_class ⟦K.omega_form, K.omega_closed⟧ (p + 2 * k') _
+      congr 1
+      exact ih p c
+  rw [h_eq]
+  exact K.pp_lefschetz_iff p k c
 
 /-- **Hodge Decomposition: Existence of Representative Form** (Hodge, 1941).
     **STATUS: PROVED from isPPClass definition** -/
