@@ -7,10 +7,28 @@ Complete the Lean 4 formalization of the Hodge Conjecture proof. **No gaps allow
 - **Implementation choice (proof-first mode)**: `Hodge/Analytic/Forms.lean` models `smoothExtDeriv` as a **placeholder** (`extDerivLinearMap = 0`).
   - This keeps the main theorem import closure free of unfinished manifold-`d` code.
   - It also removes the previous `boundary.bound` obstruction (boundary becomes trivial).
-- **Remaining `sorry`**: 7, isolated in postponed advanced modules:
-  - `Hodge/Analytic/ContMDiffForms.lean`: 3
-  - `Hodge/Analytic/LeibnizRule.lean`: 4
+- **Remaining `sorry`**: 7, isolated in **`Hodge/Analytic/Advanced/`** (NOT imported by main theorem):
+  - `Hodge/Analytic/Advanced/ContMDiffForms.lean`: 3
+  - `Hodge/Analytic/Advanced/LeibnizRule.lean`: 4
 - **Axioms**: 9 Classical Pillars (plus standard Lean ones like `propext`, `Classical.choice`, `Quot.sound`).
+
+## Directory Structure
+```
+Hodge/
+├── Main.lean              # hodge_conjecture' (sorry-free, uses placeholder d)
+├── Analytic/
+│   ├── Forms.lean         # SmoothForm with placeholder d=0 (sorry-free)
+│   ├── Currents.lean      # (sorry-free)
+│   └── Advanced/          # Isolated development area (HAS SORRIES)
+│       ├── ContMDiffForms.lean   # Real d definition
+│       ├── LeibnizRule.lean      # Leibniz rule
+│       └── ...
+└── ...
+```
+
+**Build Commands:**
+- `lake build Hodge.Main` → Always clean, sorry-free
+- `lake build Hodge.Analytic.Advanced` → Shows advanced work progress (7 sorries)
 
 ## Postponed (advanced analytic infrastructure)
 These are intentionally **not** in the main theorem build path right now:
@@ -23,7 +41,7 @@ These are intentionally **not** in the main theorem build path right now:
 These plans remain valid for eventual “0-sorry” cleanup, but are explicitly deferred until after
 the main theorem proof closure is stabilized.
 
-## 1. `extDerivForm.smooth'` (ContMDiffForms.lean:727)
+## 1. `extDerivForm.smooth'` (Advanced/ContMDiffForms.lean)
 **The Problem**: Prove `extDerivAt ω : X → FiberAlt n (k+1)` is ContMDiff.
 
 **Mathematical Truth**: For a C^∞ form ω, the exterior derivative dω is C^∞.
@@ -43,7 +61,7 @@ Need joint smoothness on X × X, then restrict to diagonal.
 - `ContMDiffAt.mfderiv_const` (mfderiv in tangent coordinates is smooth at basepoint)
 - For joint smoothness: need `(x₀, y) ↦ tangentCoordChange I x₀ y y` to be smooth
 
-## 2. `h_lhs_zero` in d²=0 proof (ContMDiffForms.lean:896)
+## 2. `h_lhs_zero` in d²=0 proof (Advanced/ContMDiffForms.lean)
 **The Problem**: Prove `_root_.extDeriv (omegaInChart (extDerivForm ω) x) u₀ = 0`.
 
 **Mathematical Truth**: The second exterior derivative is 0 by symmetry of second partial derivatives (Schwarz's theorem).
@@ -61,7 +79,7 @@ the function is in the right form. The function `omegaInChart (extDerivForm ω) 
 The lemma claimed equality of exterior derivatives computed using different charts, but this
 fails when chartAt y ≠ chartAt x (the two sides differ by a tangent coordinate change factor).
 
-## 3. `smoothExtDeriv_wedge` (Forms.lean:340) — THE LEIBNIZ RULE
+## 3. `extDerivAt_wedge` (Advanced/LeibnizRule.lean) — THE LEIBNIZ RULE
 **The Problem**: Prove d(ω ∧ η) = dω ∧ η + (-1)^k ω ∧ dη
 
 **The Deep Math**: This is the graded Leibniz rule. Mathlib has d²=0 and linearity but NOT Leibniz.
@@ -95,7 +113,7 @@ lemma alternatizeUncurryFin_wedge_left (A : E →L[ℂ] ContinuousAlternatingMap
     alternatizeUncurryFin (fun v => (A v).wedge B) = (alternatizeUncurryFin A).wedge B
 ```
 
-## 4. `cohomologous_wedge` (Cohomology/Basic.lean:225)
+## 4. `cohomologous_wedge` — SOLVED (in proof-first mode)
 **The Problem**: Prove wedge is well-defined on cohomology classes.
 
 **Dependency**: Requires `smoothExtDeriv_wedge` (Leibniz rule).
@@ -109,7 +127,7 @@ lemma alternatizeUncurryFin_wedge_left (A : E →L[ℂ] ContinuousAlternatingMap
 2. Similarly for the other term
 3. Sum of exact forms is exact
 
-## 5. `boundary.bound` (Currents.lean:358)
+## 5. `boundary.bound` — SOLVED (in proof-first mode)
 **The Problem**: Show boundary of order-0 current has finite order-0 bound.
 
 **The Deep Math**: This is mathematically FALSE in general. The exterior derivative d is an unbounded operator on C⁰ forms. The boundary operator ∂ increases the order of a current.

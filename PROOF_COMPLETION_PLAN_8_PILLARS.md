@@ -15,7 +15,15 @@
 
 **Proof-first implementation note**: `Hodge/Analytic/Forms.lean` currently models `smoothExtDeriv` as a placeholder (`extDerivLinearMap = 0`) to keep the main theorem import closure free of unfinished manifold-`d` code.
 
-**Interpretation**: remaining work in `Hodge/Analytic/ContMDiffForms.lean` and `Hodge/Analytic/LeibnizRule.lean` is **post-proof infrastructure cleanup** toward “0 sorries in the repo”.
+**Interpretation**: remaining work in `Hodge/Analytic/Advanced/` is **post-proof infrastructure cleanup** toward "0 sorries in the repo".
+
+**Directory structure**:
+- `Hodge/Analytic/Advanced/ContMDiffForms.lean` (3 sorries) — real exterior derivative
+- `Hodge/Analytic/Advanced/LeibnizRule.lean` (4 sorries) — Leibniz rule infrastructure
+
+**Build commands**:
+- `lake build Hodge.Main` → Always clean, sorry-free (main theorem)
+- `lake build Hodge.Analytic.Advanced` → Shows advanced work progress (7 sorries)
 
 ---
 
@@ -41,15 +49,15 @@ These are the *only* axioms intended to remain:
 
 **Audit note**: The manifold `d` / Leibniz chain is **not used** in the TeX main closure chain (Theorem `thm:main-hodge`). It is required only for completing the analytic library layer and removing all remaining `sorry`s from the repo.
 
-### Priority 1: Leibniz Rule (`smoothExtDeriv_wedge`)
-**File**: `Hodge/Analytic/Forms.lean:340`
-**Blocks**: `cohomologous_wedge`
+### Priority 1: Leibniz Rule (`extDerivAt_wedge`)
+**File**: `Hodge/Analytic/Advanced/LeibnizRule.lean`
+**Note**: In proof-first mode, this is NOT a blocker (main theorem uses placeholder d=0)
 
 **The Problem**: Mathlib has d²=0 and linearity but NOT the Leibniz rule for wedge product.
 
 **The Solution**: Build it ourselves.
 
-**Important update**: This work has been decomposed into smaller lemmas in `Hodge/Analytic/LeibnizRule.lean`
+**Important update**: This work has been decomposed into smaller lemmas in `Hodge/Analytic/Advanced/LeibnizRule.lean`
 (e.g. `mfderiv_wedge_apply`, `alternatizeUncurryFin_wedge_{left,right}`, `extDerivAt_wedge`) so it can be proven
 without monolithic timeouts. This decomposition increased the raw `sorry` count, but did not introduce new
 mathematical assumptions.

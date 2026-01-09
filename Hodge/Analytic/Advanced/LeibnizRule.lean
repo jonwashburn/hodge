@@ -3,7 +3,7 @@ Copyright (c) 2025-2026. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jonathan Washburn
 -/
-import Hodge.Analytic.ContMDiffForms
+import Hodge.Analytic.Advanced.ContMDiffForms
 import Hodge.Analytic.DomCoprod
 import Mathlib.Analysis.Calculus.FDeriv.Bilinear
 import Mathlib.Analysis.Calculus.FDeriv.CompCLM

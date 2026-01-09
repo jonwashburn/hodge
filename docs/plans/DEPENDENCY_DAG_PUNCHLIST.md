@@ -41,15 +41,22 @@ These are intentionally **not** in the main theorem closure right now. They rema
 eventual “0-sorry repo” completeness.
 
 ### Sorry Breakdown by File (as of Jan 8, 2026):
-- `Hodge/Analytic/ContMDiffForms.lean` (3 sorries):
+
+**Location**: `Hodge/Analytic/Advanced/` (isolated from main theorem)
+
+- `Hodge/Analytic/Advanced/ContMDiffForms.lean` (3 sorries):
   - `extDerivAt_eq_chart_extDeriv_general` (chart independence) — complex
   - `extDerivForm.smooth'` (smoothness of `d`) — complex
   - `extDeriv_extDeriv` (d²=0) — complex
-- `Hodge/Analytic/LeibnizRule.lean` (4 sorries):
+- `Hodge/Analytic/Advanced/LeibnizRule.lean` (4 sorries):
   - `mfderiv_wedge_apply`
   - `alternatizeUncurryFin_wedge_right`
   - `alternatizeUncurryFin_wedge_left`
   - `extDerivAt_wedge`
+
+**Build commands**:
+- `lake build Hodge.Main` → Always clean, sorry-free (main theorem)
+- `lake build Hodge.Analytic.Advanced` → Shows advanced work progress (7 sorries)
 
 ### Analysis of `extDerivAt_eq_chart_extDeriv_general` (Jan 8, 2026):
 This lemma claims: For y ∈ (chartAt x).source, `extDerivAt ω y = extDeriv (omegaInChart ω x) ((chartAt x) y)`.
