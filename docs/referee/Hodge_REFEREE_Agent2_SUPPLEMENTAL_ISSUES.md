@@ -99,28 +99,41 @@ def CalibratedConeAtFiber (p : ℕ) (x : X) :=
 
 ---
 
-### H. Type Decomposition (TypeDecomposition.lean)
+### H. Type Decomposition (TypeDecomposition.lean) - ⚠️ CRITICAL SEMANTIC STUB
 
 **Location**: `Hodge/Kahler/TypeDecomposition.lean`
 
-**Key definitions to audit**:
+**🚨 CRITICAL FINDING**: `kahlerPow` is a DEGENERATE DEFINITION:
+
 ```lean
-def kahlerPow (p : ℕ) : SmoothForm n X (2 * p) := ...
-def isPPForm ... -- (p,p)-form predicate
+noncomputable def kahlerPow (p : ℕ) : SmoothForm n X (2 * p) :=
+  match p with
+  | 0 => 0  -- ω^0 = 1, but we use 0 as placeholder  ❌ WRONG
+  | 1 => K.omega_form  -- ω^1 = ω ✅ CORRECT
+  | _ + 2 => 0  -- ω^p = 0 for p ≥ 2 ❌ DEGENERATE
 ```
 
-**Concerns from referee doc**:
-- `ω^0` not implemented as unit form
-- Wedge semantics may be stubbed
-- `[ω^p] ≠ 0` not provable if wedge is zero
+**Impact on `Cone.lean` work**:
+- For `p = 1`: Cone machinery works correctly (ω^1 = actual Kähler form)
+- For `p ≥ 2`: **ENTIRE CONE COLLAPSES** because `kahlerPow p = 0`
+- The `exists_uniform_interior_radius` theorem is technically correct but **semantically vacuous for p ≥ 2**
 
-**Audit tasks**:
-| Item | Check | Priority |
-|------|-------|----------|
-| `kahlerPow 0` | Should be unit 1 | High |
-| `kahlerPow 1` | Should equal `kahlerForm` | High |
-| `kahlerPow (p+1)` | Should be `ω ∧ ω^p` | High |
-| Wedge associativity | Used in proofs? | Medium |
+**Root cause**: `smoothWedge := 0` stub makes `ω ∧ ω = 0`
+
+**Severity**: 🔴 HIGH - This is exactly the "degenerate model proof" problem (Section E of primary doc)
+
+**Remediation options**:
+1. **Short-term**: Document that proofs are only semantically valid for p = 1
+2. **Medium-term**: Implement real wedge product for Kähler forms
+3. **Long-term**: Full exterior algebra with Mathlib integration
+
+**Validation needed**:
+| Item | Current | Required | Status |
+|------|---------|----------|--------|
+| `kahlerPow 0` | 0 | Unit form 1 | ❌ |
+| `kahlerPow 1` | ω | ω | ✅ |
+| `kahlerPow 2` | 0 | ω ∧ ω | ❌ |
+| `kahlerPow n` | 0 | ω^n | ❌ |
 
 ---
 
@@ -178,9 +191,16 @@ theorem comass_nonneg ...
 theorem comass_bddAbove ...
 ```
 
-**Status**: These appear to be real theorems (not stubs).
+**Status**: Core theorems appear real.
 
-**Verification task**: Confirm `pointwiseComass` uses the actual alternating map norm, not a trivial definition.
+**⚠️ STUB FOUND**:
+```lean
+-- Lines with := 0 in Norms.lean:
+{k : ℕ} (_α _β : SmoothForm n X k) (_x : X) : ℝ := 0  -- some pairing
+{k : ℕ} (_α _β : SmoothForm n X k) : ℝ := 0          -- some global pairing
+```
+
+**Verification needed**: These stubs may affect inner product / Hodge theory but NOT the comass infrastructure used by Cone.lean.
 
 ---
 
