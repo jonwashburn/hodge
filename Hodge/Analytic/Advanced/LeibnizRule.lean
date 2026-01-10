@@ -173,16 +173,20 @@ the theory of graded derivations on exterior algebras.
 graded derivation, meaning `d(ω ∧ η) = dω ∧ η + (-1)^deg(ω) ω ∧ dη`.
 -/
 
-/-- Alternatization commutes with wedge when the right argument is fixed.
+/-- This theorem requires proving a combinatorial identity about how alternatization
+(the sum defining exterior derivative) commutes with the wedge product.
 
-The equality requires a cast since `(k+1)+l ≠ (k+l)+1` definitionally.
+The identity states that for A : E → Alt k and constant B : Alt l:
+  alternatize(v ↦ A(v).wedge B) = (alternatize A).wedge B
 
-This identity is fundamental to the Leibniz rule. It states that the exterior
-derivative of a wedge product `(d(A ⊗ B))` when `B` is fixed is equal to
-`(dA) ∧ B` up to reindexing.
+Both sides compute sums over shuffle permutations (from wedge) and derivative
+indices (from alternatize). The key is that these sums commute because B is
+constant, so only A contributes derivatives.
 
-The proof relies on the bilinearity of the wedge product and the definition
-of alternatization as a signed sum over removal indices. -/
+This is equivalent to the graded Leibniz rule: d(ω ∧ η)|_{η=const} = dω ∧ η
+
+TODO: Complete the combinatorial proof using Finset.sum_bij to establish
+a bijection between terms of the double sums on both sides. -/
 theorem alternatizeUncurryFin_wedge_right {k l : ℕ}
     (A : TangentModel n →L[ℂ] Alt n k) (B : Alt n l) :
     let wedge_right : TangentModel n →L[ℂ] Alt n (k + l) :=
@@ -191,129 +195,67 @@ theorem alternatizeUncurryFin_wedge_right {k l : ℕ}
     ContinuousAlternatingMap.domDomCongr
       ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A).wedge B)
       (finCongr (show (k+1)+l = (k+l)+1 by omega)) := by
-  classical
   intro wedge_right
-  -- Proof by extensionality - both sides are equal as alternating maps
   ext v
+  simp only [ContinuousAlternatingMap.alternatizeUncurryFin_apply,
+             ContinuousAlternatingMap.domDomCongr_apply,
+             ContinuousAlternatingMap.wedge_apply,
+             ContinuousAlternatingMap.wedgeAlternating,
+             ContinuousAlternatingMap.wedgeAlternatingTensor,
+             AlternatingMap.domDomCongr_apply,
+             LinearMap.compAlternatingMap_apply]
+  -- LHS = ∑ i : Fin(k+l+1), (-1)^i • ∑ σ : shuffles(k,l), sign(σ) • A(v i)(...) • B(...)
+  -- RHS = ∑ τ : shuffles(k+1,l), sign(τ) • (∑ j : Fin(k+1), (-1)^j • A(...)(...)) • B(...)
+  --
+  -- Both are double sums. The identity follows from:
+  -- 1. Fubini (swapping order of summation)
+  -- 2. A bijection between (i, σ) pairs and (τ, j) pairs
+  -- 3. Matching signs and values
 
-  -- Expand the LHS: alternatizeUncurryFin of a composed linear map
-  rw [ContinuousAlternatingMap.alternatizeUncurryFin_apply]
-
-  -- Expand the RHS: domDomCongr of wedge of alternatizeUncurryFin
-  rw [ContinuousAlternatingMap.domDomCongr_apply]
-
-  -- Expand the wedge product on RHS
-  rw [ContinuousAlternatingMap.wedge_apply,
-      ContinuousAlternatingMap.wedgeAlternating,
-      ContinuousAlternatingMap.wedgeAlternatingTensor]
-
-  -- At this point:
-  -- LHS: ∑ i, (-1)^i • (wedge_right (v i)) (removeNth i v)
-  -- RHS: LinearMap.mul' (domCoprod' (alternatizeUncurryFin A ⊗ B)) ((v ∘ finCongr) ∘ finSumFinEquiv)
-
-  -- The wedge_right (v i) unfolds to (A (v i)).wedge B by definition
-  -- Unfold this on each term of the sum
+  -- Expand wedge on LHS
   conv_lhs =>
-    congr
-    · skip
-    · ext i
-      rw [show wedge_right (v i) = (A (v i)).wedge B from rfl,
-          ContinuousAlternatingMap.wedge_apply,
-          ContinuousAlternatingMap.wedgeAlternating,
-          ContinuousAlternatingMap.wedgeAlternatingTensor]
+    arg 2; ext i
+    rw [ContinuousAlternatingMap.wedge_apply,
+        ContinuousAlternatingMap.wedgeAlternating,
+        ContinuousAlternatingMap.wedgeAlternatingTensor,
+        AlternatingMap.domDomCongr_apply,
+        LinearMap.compAlternatingMap_apply,
+        AlternatingMap.domCoprod'_apply]
 
-  -- Now both sides are mul' composed with domCoprod' expressions
-  -- The key is to show these domCoprod' expressions are equal after reindexing
+  -- Now both sides should have matching structure
+  -- LHS: ∑ i, (-1)^i • domCoprod (A(v i)) B (removeNth i v via finSumFinEquiv)
+  -- RHS: domCoprod (alternatizeUncurryFin A) B (v ∘ finCongr via finSumFinEquiv)
 
-  -- Goal at this point (after ext v):
-  -- LHS: ∑ i, (-1)^i • (domDomCongr finSumFinEquiv (mul'.compAlt (domCoprod' (A(v i) ⊗ B)))) (removeNth i v)
-  -- RHS: (domDomCongr finSumFinEquiv (mul'.compAlt (domCoprod' (alternatizeUncurryFin A ⊗ B)))) (v ∘ finCongr)
-  -- Both sides are scalars in ℂ.
-
-  -- The fundamental identity is that both sides compute the same value:
-  -- the exterior derivative of A applied to v, then wedged with B.
-  -- This follows from the linearity of the wedge product and the definition of alternatizeUncurryFin.
-
-  -- Key mathematical fact: For a constant B, d(A ∧ B) = (dA) ∧ B
-  -- The LHS computes this by alternatizing the wedge A ∧ B
-  -- The RHS computes this by wedging the alternatized dA with B
-  -- These are equal by bilinearity of wedge.
-
-  -- Expand the domDomCongr and LinearMap applications
-  simp only [AlternatingMap.domDomCongr_apply, LinearMap.compAlternatingMap_apply]
-
-  -- Convert continuous to algebraic
-  rw [ContinuousAlternatingMap.toAlternatingMap_alternatizeUncurryFin]
-
-  -- Expand domCoprod'
-  simp only [AlternatingMap.domCoprod'_apply]
-
-  -- The remaining proof requires showing that the shuffle sum structure of domCoprod
-  -- is compatible with the derivative sum structure of alternatizeUncurryFin.
-  -- This is a non-trivial combinatorial identity.
-
-  -- For the LHS: each term is mul' applied to a domCoprod of A(v i) with B
-  -- For the RHS: mul' applied to a domCoprod of (∑ j, (-1)^j • ...) with B
-
-  -- The equality follows from the multilinearity of domCoprod in its first argument.
-  -- Specifically, domCoprod distributes over sums and commutes with scalar multiplication
-  -- in its first argument (viewing domCoprod as a bilinear operation on alternating maps).
-
-  -- Since domCoprod' is defined via the tensor product lift, and tensor products
-  -- distribute over sums, we can pull the alternatizeUncurryFin sum outside.
-
-  -- Use that both sides compute the same sum after appropriate reindexing
-  -- The proof proceeds by showing the sums are equal term-by-term after matching indices.
-
-  -- Unfold to the level of domCoprod (shuffle) sums
+  -- Expand domCoprod on both sides
   simp only [AlternatingMap.domCoprod_apply]
 
-  -- At this point, both sides involve sums over Perm.ModSumCongr
-  -- The LHS has an outer sum over derivative indices
-  -- The RHS has the derivative sum inside via alternatizeUncurryFin
+  -- Both sides are now sums over ModSumCongr. The LHS has an additional
+  -- outer sum over i : Fin(k+l+1).
 
-  -- The equality requires showing these commute appropriately
-  -- This is essentially showing that differentiation commutes with the shuffle sum
+  -- Use Finset.sum_comm to swap the order of summation on LHS
+  rw [Finset.sum_comm]
 
-  -- The remaining goal after unfolding requires showing that the shuffle sums
-  -- commute with the alternatization sum. This is a complex combinatorial identity.
+  -- Now need to show the inner sums match
+  -- This requires the key bijection: for each shuffle σ in (k,l),
+  -- the terms sum over i correspond to terms from shuffle τ in (k+1,l)
+  -- with the derivative index j determined by i's position.
 
-  -- Both sides compute the same value by the following reasoning:
-  -- 1. The LHS is: ∑_i (-1)^i • ∑_σ sign(σ) • A(v_i)(σ-reordering) * B(σ-reordering)
-  -- 2. The RHS is: ∑_σ sign(σ) • (∑_j (-1)^j • A(...)(...))(σ-reordering) * B(σ-reordering)
-  -- After distributing the sums and reindexing, these are equal.
-
-  -- The formal proof requires establishing a bijection between the terms of the double sums.
-  -- This requires showing that domCoprod.summand distributes over sums in its first argument,
-  -- which follows from the bilinearity of domCoprod. The combinatorial reindexing via finCongr
-  -- then shows the sums are equal term-by-term.
-
-  -- **Mathematical content proved above**: The combinatorial identity holds.
-  --
-  -- **Formalization gap**: The remaining goal requires Mathlib lemmas about
-  -- AlternatingMap.domCoprod.summand distributing over sums:
-  --   summand (∑ i, c_i • f_i) b σ = ∑ i, c_i • summand f_i b σ
-  -- This follows from the definition of summand via MultilinearMap.domCoprod and
-  -- bilinearity, but requires careful manipulation of the Mathlib API.
-  --
-  -- **Status**: Known open formalization task (Leibniz combinatorics)
-  -- **Priority**: Low (not blocking main theorem architecture)
+  -- The formal proof requires establishing this bijection explicitly.
+  -- This is a classical result in exterior algebra / graded derivations.
   sorry
 
-/-- Alternatization commutes with wedge when the left argument is fixed (with sign).
+/-- This theorem requires proving a combinatorial identity about how alternatization
+commutes with the wedge product when the left argument is fixed.
 
-The sign `(-1)^k` arises from permuting the new derivative index past `k` existing indices.
-The equality requires a cast since `k+(l+1) ≠ (k+l)+1` definitionally.
+The sign (-1)^k arises because:
+- alternatize inserts the derivative direction at index 0
+- Moving this past k existing indices (consumed by A) requires k transpositions
+- Each transposition introduces a factor of -1
 
-**Goal after unfolding**:
-- LHS: `∑ i : Fin (k+l+1), (-1)^i • A.wedgeAlternating (B(v i)) (removeNth i v)`
-- RHS: `(-1)^k • A.wedgeAlternating (∑ j, (-1)^j • B(v' j) (removeNth j v')) (v')`
-  where `v' = v ∘ finCongr`
+This is equivalent to: d(ω ∧ η)|_{ω=const} = (-1)^{deg ω} ω ∧ dη
 
-**Proof strategy**: Similar to `alternatizeUncurryFin_wedge_right`, but the sign `(-1)^k`
-comes from the fact that inserting the derivative index at position 0 and then
-moving it past the `k` indices consumed by `A` introduces `k` transpositions.
--/
+TODO: Complete the combinatorial proof using Finset.sum_bij to establish
+a bijection between terms, accounting for the sign from index permutation. -/
 theorem alternatizeUncurryFin_wedge_left {k l : ℕ}
     (A : Alt n k) (B : TangentModel n →L[ℂ] Alt n l) :
     let wedge_left : TangentModel n →L[ℂ] Alt n (k + l) :=
@@ -322,23 +264,22 @@ theorem alternatizeUncurryFin_wedge_left {k l : ℕ}
     ContinuousAlternatingMap.domDomCongr
       ((-1 : ℂ)^k • A.wedge (ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B))
       (finCongr (show k+(l+1) = (k+l)+1 by omega)) := by
-  classical
   intro wedge_left
   ext v
   simp only [ContinuousAlternatingMap.alternatizeUncurryFin_apply,
              ContinuousAlternatingMap.domDomCongr_apply,
-             wedge_left]
-  -- After expansion:
-  -- LHS: ∑ i, (-1)^i • ((wedgeCLM A) (B (v i))) (removeNth i v)
-  --    = ∑ i, (-1)^i • A.wedgeAlternating (B (v i)) (removeNth i v)
-  -- RHS: (-1)^k • A.wedgeAlternating (alternatizeUncurryFin B) (v ∘ finCongr)
-  --    = (-1)^k • A.wedgeAlternating (∑ j, (-1)^j • B ((v ∘ finCongr) j) ...) (v ∘ finCongr)
+             ContinuousAlternatingMap.smul_apply,
+             ContinuousAlternatingMap.wedge_apply,
+             ContinuousAlternatingMap.wedgeAlternating,
+             ContinuousAlternatingMap.wedgeAlternatingTensor,
+             AlternatingMap.domDomCongr_apply,
+             LinearMap.compAlternatingMap_apply]
+  -- Goal: show two shuffle-sum expressions are equal with sign (-1)^k
+  -- LHS: ∑ x, (-1)^x • (wedgeCLM A (B (v x)))(removeNth x v)
+  -- RHS: (-1)^k • ∑ σ, mul' (domCoprod.summand A (alternatizeUncurryFin B) σ) (v ∘ finSumFinEquiv)
   --
   -- The sign (-1)^k accounts for moving the derivative index past A's k inputs.
-  --
-  -- **Mathematical content**: The graded sign identity for exterior derivative.
-  -- **Status**: Known open formalization task (Leibniz combinatorics with sign)
-  -- **Priority**: Low (not blocking main theorem architecture)
+  -- The formal proof needs Finset.sum_bij with sign tracking.
   sorry
 
 /-! ### The Leibniz Rule -/

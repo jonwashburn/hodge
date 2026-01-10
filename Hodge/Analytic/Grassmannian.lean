@@ -315,6 +315,55 @@ theorem CalibratedConeAtFiber_convex (p : ℕ) (x : X) :
   unfold CalibratedConeAtFiber
   exact PointedCone.convex _
 
+/-- Simple calibrated forms at a fiber is non-empty when p ≤ n.
+
+    For 1 ≤ p ≤ n, the tangent space at x has complex dimension n, so it contains
+    complex p-dimensional subspaces. Each such subspace has a volume form,
+    which is a simple calibrated form.
+
+    **Mathematical Content**: The Grassmannian G_p(T_x X) is non-empty when p ≤ n.
+    This follows from linear algebra: a vector space of dimension n contains
+    subspaces of all dimensions from 0 to n.
+
+    **Proof**: Uses `exists_linearIndependent_of_le_finrank` to get p linearly independent
+    vectors in the tangent space (which has finrank n ≥ p), then takes their span. -/
+theorem SimpleCalibratedFormsAtFiber_nonempty (p : ℕ) (x : X) (hp : p ≤ n) (_hn : 0 < n) :
+    (SimpleCalibratedFormsAtFiber (n := n) p x).Nonempty := by
+  -- TangentSpace = EuclideanSpace ℂ (Fin n) has finrank n
+  have h_finrank : Module.finrank ℂ (TangentSpace (𝓒_complex n) x) = n := by
+    -- TangentSpace (𝓒_complex n) x = TangentModel n = EuclideanSpace ℂ (Fin n)
+    simp only [TangentSpace, TangentModel]
+    rw [finrank_euclideanSpace, Fintype.card_fin]
+  have hp' : p ≤ Module.finrank ℂ (TangentSpace (𝓒_complex n) x) := hp.trans_eq h_finrank.symm
+  -- Get p linearly independent vectors (this works even for p=0)
+  obtain ⟨f, hf_li⟩ := exists_linearIndependent_of_le_finrank hp'
+  -- Their span is a p-dimensional subspace
+  let V := Submodule.span ℂ (Set.range f)
+  have hV : Module.finrank ℂ V = p := by
+    rw [finrank_span_eq_card hf_li]
+    exact Fintype.card_fin p
+  use simpleCalibratedForm_raw (n := n) (X := X) p x V hV
+  exact ⟨V, hV, rfl⟩
+
+/-- The calibrated cone contains non-zero elements when 1 ≤ p ≤ n.
+
+    This shows the cone is non-trivially non-empty (not just {0}).
+    The proof uses that every p-dimensional subspace has a non-zero volume form. -/
+theorem CalibratedConeAtFiber_nontrivial (p : ℕ) (x : X) (hp : 1 ≤ p) (hpn : p ≤ n) (hn : 0 < n) :
+    ∃ φ ∈ CalibratedConeAtFiber (n := n) p x, φ ≠ 0 := by
+  -- Get a simple calibrated form from the nonempty generating set
+  obtain ⟨φ, hφ⟩ := SimpleCalibratedFormsAtFiber_nonempty p x hpn hn
+  use φ
+  constructor
+  · -- φ is in the cone (as a generator, it's in the span)
+    unfold CalibratedConeAtFiber
+    exact Submodule.subset_span hφ
+  · -- φ ≠ 0: The volume form of a p-dimensional subspace (p ≥ 1) is non-zero
+    obtain ⟨V, hV, rfl⟩ := hφ
+    unfold simpleCalibratedForm_raw volume_form_of_submodule
+    have h_spec := Classical.choose_spec (exists_volume_form_of_submodule p x V hV)
+    exact IsVolumeFormOn_nonzero x p V _ hV h_spec
+
 /-- Evaluate a SmoothForm at a point to get an element of the fiber.
     We coerce from the continuous alternating map to the underlying linear alternating map. -/
 def SmoothForm.evalAt {k : ℕ} (α : SmoothForm n X k) (x : X) :
