@@ -326,10 +326,19 @@ theorem isRationalClass_eq_zero {k : ℕ} (η : DeRhamCohomologyClass n X k)
     (h : isRationalClass η) : η = 0 := by
   induction h with
   | zero => rfl
-  | add _ _ ih1 ih2 => simp only [ih1, ih2, add_zero]
-  | smul_rat q _ ih => rw [ih]; exact smul_zero q
-  | neg _ ih => simp only [ih, neg_zero]
-  | mul _ _ ih1 ih2 => rw [ih1, ih2]; exact zero_mul 0
+  | add _ _ ih1 ih2 => rw [ih1, ih2, add_zero]
+  | smul_rat q _ ih =>
+    -- q • η where η = 0, so q • 0 = 0
+    rw [ih]
+    -- Now need q • (0 : DeRhamCohomologyClass n X k) = 0
+    -- SMul ℚ is defined as (q : ℂ) • _, and Module ℂ has smul_zero
+    show (q : ℂ) • (0 : DeRhamCohomologyClass n X _) = 0
+    exact smul_zero (q : ℂ)
+  | neg _ ih => rw [ih, neg_zero]
+  | mul _ _ ih1 ih2 =>
+    -- η₁ * η₂ where η₁ = 0 and η₂ = 0
+    rw [ih1]
+    exact zero_mul _
 
 /-- **Theorem: Harvey-Lawson Fundamental Class Bridge.**
     When a calibrated cycle T is represented by analytic subvarieties from Harvey-Lawson,
