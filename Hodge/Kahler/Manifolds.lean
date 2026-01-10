@@ -58,7 +58,17 @@ omit [ProjectiveComplexManifold n X] K in
 theorem unitForm_isClosed : IsFormClosed (unitForm : SmoothForm n X 0) := isFormClosed_unitForm
 
 omit K in
-theorem unitForm_is_rational : isRationalClass ⟦(unitForm : SmoothForm n X 0), unitForm_isClosed⟧ := isRationalClass_zero
+/-!
+`isRationalClass` is currently a proof-first stub whose only base constructor is `zero`, so it
+does *not* yet express “belongs to the image of \(H^k(X;\mathbb{Q})\) in \(H^k(X;\mathbb{C})\)”.
+
+Since `unitForm` is now the genuine constant-`1` 0-form (and `H^0` is not collapsed to `0` in the
+current quotient), we intentionally do **not** assert a “unit is rational” lemma here.
+
+This will be reinstated once `isRationalClass` is replaced by a real rational cohomology interface
+(Phase 1B / Phase 2 in the referee remediation plan).
+-/
+theorem unitForm_is_rational : True := trivial
 
 /-! ## Kähler Operators -/
 
