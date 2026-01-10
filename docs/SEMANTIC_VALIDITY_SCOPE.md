@@ -5,43 +5,54 @@
 This document clarifies which parts of the formalization carry full mathematical
 content versus structural scaffolding.
 
-## Axiom Status
+## Axiom Status (proof-term axioms)
 
 **Current status (as of 2026-01-09):**
-- ✅ **No non-standard axioms** in the codebase
-- ✅ Only standard Lean foundation: `propext`, `Classical.choice`, `Quot.sound`
-- ✅ `exists_uniform_interior_radius` eliminated (proven theorem)
-- ✅ `FundamentalClassSet_represents_class` axiom removed
+- ✅ **No project-level `axiom` declarations** in `Hodge/` on the main build path
+- ✅ Only standard Lean foundation axioms appear in `#print axioms` (e.g. `propext`, `Classical.choice`, `Quot.sound`)
+- ✅ `opaque` declarations are eliminated in `Hodge/`
 
-## Fully Proven Components
+**Important caveat**: “No axioms in the proof term” is **not** the same as Clay-standard.
+The development still contains **semantic stubs** (degenerate definitions like `d := 0`)
+that make many statements provable for the wrong reason. The referee remediation plan
+(`docs/referee/Hodge_REFEREE_Amir-v1b_ISSUES_AND_REMEDIATION_PLAN.md`) treats these as
+Clay-critical.
 
-### Cone Infrastructure (`Hodge/Kahler/Cone.lean`)
-- `stronglyPositiveCone` - proper geometric definition using `pointwiseComass`
-- `exists_uniform_interior_radius` - proven from cone definition + compactness
-- `shift_makes_conePositive` - proven from cone structure
-- `kahlerPow_mem_stronglyPositiveCone` - proven
+## What is *actually* semantically faithful today?
 
-### Calibrated Grassmannian (`Hodge/Analytic/Grassmannian.lean`)
-- `CalibratedGrassmannian` - properly defined as set of p-planes
-- `SimpleCalibratedFormsAtFiber` - volume forms on p-planes
-- `CalibratedConeAtFiber` - pointed cone span of simple forms
-- `exists_volume_form_of_submodule` - proven using exterior algebra
+### Proven (within the current `SmoothForm`/`FiberAlt` model)
+- **Fiberwise wedge product** (`Hodge/Analytic/DomCoprod.lean`): a real construction of
+  `ContinuousAlternatingMap.wedge` and its linearity properties.
+- **Model-space exterior derivative** (`Hodge/Analytic/ModelDeRham.lean`): `ModelForm.d` is defined
+  using Mathlib’s `extDeriv` on the model space `ℂⁿ` (this is *not* yet integrated into the main path).
 
-### Norms and Metrics (`Hodge/Analytic/Norms.lean`)
-- `pointwiseComass` - real operator norm `‖α.as_alternating x‖`
-- `pointwiseComass_continuous` - proven from smoothness
-- `comass` - supremum norm, properly defined
-- Triangle inequality, homogeneity - proven
+## Critical semantic stubs (affecting the main theorem path)
 
-### Signed Decomposition (`Hodge/Kahler/SignedDecomp.lean`)
-- Full signed decomposition construction
-- Rationality preservation through decomposition
-- Cone-positivity of shifted forms
+These are the main “degenerate model” points referenced by Section **E** of the referee plan.
 
-### Cohomology (`Hodge/Cohomology/Basic.lean`)
-- de Rham cohomology as quotient of closed by exact
-- Ring structure via wedge product
-- Rational classes via spanning lemmas
+### Exterior derivative stub (`Hodge/Analytic/Forms.lean`)
+- `extDerivLinearMap := 0`, hence `smoothExtDeriv = 0`
+- **Impact**: “closed/exact” and de Rham cohomology are not the intended mathematics yet.
+
+### Fundamental class stub (`Hodge/Classical/GAGA.lean`)
+- `FundamentalClassSet_impl := 0` (cycle class map returns the zero form)
+- **Impact**: algebraic-cycle → cohomology comparisons are presently vacuous.
+
+### Current/integration stubs (`Hodge/Analytic/Currents.lean`)
+- `integration_current := 0` (definitional stub)
+- **Impact**: the measure-theoretic integration/current pairing is not implemented yet.
+
+### Rationality stub (`Hodge/Cohomology/Basic.lean`)
+- `isRationalClass` is an inductive closure with base case `zero`
+- **Impact**: many “rationality” arguments collapse to “everything rational is 0”.
+
+### Hodge-type stub (`Hodge/Cohomology/Basic.lean`)
+- `isPPForm'` has only the base constructor `zero` plus closure operations
+- **Impact**: any form satisfying `isPPForm'` is forced to be `0` (used to deduce `omega_form = 0`).
+
+### Unit element stub (`Hodge/Analytic/Forms.lean`)
+- `unitForm := 0` (placeholder for the constant-1 0-form)
+- **Impact**: the cohomology-ring “unit” lemmas are proved by degeneracy, not by the true wedge identity.
 
 ## Known Stubs (Not Affecting Main Theorem)
 
@@ -66,11 +77,11 @@ L2Inner := 0
 
 **Impact**: None on main theorem. Used only for energy minimization proofs.
 
-### `kahlerPow p` for `p ≥ 2`
-Now defined **recursively using the actual wedge product** (with a degree cast),
-so it no longer degenerates to `0` for `p ≥ 2`.
+### `kahlerPow`
+`kahlerPow` is now defined **recursively using the actual wedge product** (with a degree cast),
+so it no longer degenerates to `0` by definition for `p ≥ 2`.
 
-**Remaining stub**: ω^0 is still represented by `0` (unit form not yet implemented).
+**Remaining stub**: ω^0 is still represented using the placeholder `unitForm := 0`.
 
 ## Sorry Blocks
 
@@ -86,14 +97,13 @@ These are documentation comments, not actual sorry usage in proofs.
 
 ## Semantic Validity Assessment
 
-### Main Theorem Path
-The main theorem `hodge_conjecture` follows this path:
-1. Signed decomposition of rational Hodge class ✅
-2. Cone-positive classes represented by currents ✅  
-3. Currents represented by algebraic cycles ✅
-4. Combination via difference ✅
+### Main theorem status (`hodge_conjecture`)
+The theorem statement type-checks and builds, but **the current proof is not Clay-standard**
+because it depends on the semantic stubs listed above (in particular `d := 0` and
+`FundamentalClassSet := 0`).
 
-All steps are proven using real mathematical content, not scaffolding.
+This repo is explicitly in a staged “proof-first” mode; the referee remediation plan documents
+the work needed to replace these stubs with real mathematics.
 
 ### What "Clay Standards" Would Require
 1. **Kähler operators**: Replace stubs with real definitions using Riemannian metrics

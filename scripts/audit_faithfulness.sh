@@ -101,6 +101,19 @@ else
   fi
 fi
 
+# 4d) Unit form stub (unit 0-form is currently `0`)
+say ""
+say "### Unit form stub (showing unitForm definition snippet)"
+unit_snip="$(grep -n -A 3 -B 1 "def unitForm" Hodge/Analytic/Forms.lean 2>/dev/null || true)"
+if [[ -z "${unit_snip}" ]]; then
+  say "(definition not found)"
+else
+  say "${unit_snip}"
+  if echo "${unit_snip}" | grep -qE 'def unitForm[^=]*:=[[:space:]]*0[[:space:]]*$'; then
+    fail_count=$((fail_count + 1))
+  fi
+fi
+
 # 5) Known semantic stubs: major Kähler/Hodge operators set to 0 (show defining snippets)
 say ""
 say "### Kähler/Hodge operator stubs (key definitions in Hodge/Kahler/Manifolds.lean)"
