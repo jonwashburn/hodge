@@ -109,40 +109,39 @@ def CalibratedConeAtFiber (p : ℕ) (x : X) :=
 
 **Location**: `Hodge/Kahler/TypeDecomposition.lean`
 
-**🚨 CRITICAL FINDING**: `kahlerPow` is a DEGENERATE DEFINITION:
+**Status update**: The previous degeneracy in `kahlerPow` (returning `0` for `p ≥ 2`) has been fixed.
 
 ```lean
 noncomputable def kahlerPow (p : ℕ) : SmoothForm n X (2 * p) :=
   match p with
-  | 0 => 0  -- ω^0 = 1, but we use 0 as placeholder  ❌ WRONG
-  | 1 => K.omega_form  -- ω^1 = ω ✅ CORRECT
-  | _ + 2 => 0  -- ω^p = 0 for p ≥ 2 ❌ DEGENERATE
+  | 0 => 0  -- ω^0 = 1, still a placeholder (unit form not implemented yet)
+  | 1 => K.omega_form  -- ω^1 = ω
+  | p + 2 => castForm (two_add_two_mul (p + 1)) (K.omega_form ⋏ kahlerPow (p + 1))  -- ω^(p+2) = ω ∧ ω^(p+1)
 ```
 
 **Impact on `Cone.lean` work**:
 - For `p = 1`: Cone machinery works correctly (ω^1 = actual Kähler form)
-- For `p ≥ 2`: The intended ω^p geometry **degenerates** in the current implementation because `kahlerPow p = 0`
-- The `exists_uniform_interior_radius` theorem is technically correct but **semantically vacuous for p ≥ 2**
+- For `p ≥ 2`: ω^p is now defined via actual wedges (no longer degenerates to `0` by definition)
+- Remaining semantic stub: ω^0 is still represented by `0`
 
 **Root cause (corrected)**:
 - `smoothWedge` is **not** stubbed (it uses `ContinuousAlternatingMap.wedge`).
-- The degeneracy is from the current **definition of `kahlerPow`** in `TypeDecomposition.lean`,
-  which returns `0` for `p ≥ 2` (short-term workaround for degree-indexed casting complexity).
+- The earlier degeneracy was from a simplified `kahlerPow` definition. It has been replaced by a
+  recursive wedge definition using `castForm` and cohomology cast lemmas.
 
 **Severity**: 🔴 HIGH - This is exactly the "degenerate model proof" problem (Section E of primary doc)
 
 **Remediation options**:
-1. **Short-term**: Document that proofs are only semantically valid for p = 1
-2. **Medium-term**: Implement a real recursive `kahlerPow` using `⋏` plus cast/transport lemmas
-3. **Long-term**: Full ω^p / p! calibration + Wirtinger inequality + integration compatibility
+1. Implement a genuine unit form ω^0 = 1 (instead of `0`)
+2. Full ω^p / p! calibration + Wirtinger inequality + integration compatibility
 
 **Validation needed**:
 | Item | Current | Required | Status |
 |------|---------|----------|--------|
 | `kahlerPow 0` | 0 | Unit form 1 | ❌ |
 | `kahlerPow 1` | ω | ω | ✅ |
-| `kahlerPow 2` | 0 | ω ∧ ω | ❌ |
-| `kahlerPow n` | 0 | ω^n | ❌ |
+| `kahlerPow 2` | ω ∧ ω | ω ∧ ω | ✅ |
+| `kahlerPow n` | ω^n (recursive) | ω^n | ✅ (up to ω^0 stub) |
 
 ---
 

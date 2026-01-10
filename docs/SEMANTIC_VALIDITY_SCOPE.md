@@ -67,12 +67,10 @@ L2Inner := 0
 **Impact**: None on main theorem. Used only for energy minimization proofs.
 
 ### `kahlerPow p` for `p ≥ 2`
-Currently returns `0` for `p ≥ 2` due to degree-indexed type complexity.
-The full recursive wedge product is defined but transport lemmas for
-cohomology classes need development.
+Now defined **recursively using the actual wedge product** (with a degree cast),
+so it no longer degenerates to `0` for `p ≥ 2`.
 
-**Impact**: Low. The main theorem works for all `p`, using forms directly.
-The `kahlerPow` helper is only needed for explicit omega power computations.
+**Remaining stub**: ω^0 is still represented by `0` (unit form not yet implemented).
 
 ## Sorry Blocks
 

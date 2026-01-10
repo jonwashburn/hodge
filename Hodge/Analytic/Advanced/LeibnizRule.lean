@@ -203,45 +203,23 @@ theorem alternatizeUncurryFin_wedge_right {k l : ℕ}
              ContinuousAlternatingMap.wedgeAlternating,
              ContinuousAlternatingMap.wedgeAlternatingTensor,
              AlternatingMap.domDomCongr_apply,
-             LinearMap.compAlternatingMap_apply]
-  -- LHS = ∑ i : Fin(k+l+1), (-1)^i • ∑ σ : shuffles(k,l), sign(σ) • A(v i)(...) • B(...)
-  -- RHS = ∑ τ : shuffles(k+1,l), sign(τ) • (∑ j : Fin(k+1), (-1)^j • A(...)(...)) • B(...)
+             LinearMap.compAlternatingMap_apply,
+             AlternatingMap.domCoprod'_apply]
+  -- Goal: show LHS = RHS where both are sums involving domCoprod
   --
-  -- Both are double sums. The identity follows from:
-  -- 1. Fubini (swapping order of summation)
-  -- 2. A bijection between (i, σ) pairs and (τ, j) pairs
-  -- 3. Matching signs and values
-
-  -- Expand wedge on LHS
-  conv_lhs =>
-    arg 2; ext i
-    rw [ContinuousAlternatingMap.wedge_apply,
-        ContinuousAlternatingMap.wedgeAlternating,
-        ContinuousAlternatingMap.wedgeAlternatingTensor,
-        AlternatingMap.domDomCongr_apply,
-        LinearMap.compAlternatingMap_apply,
-        AlternatingMap.domCoprod'_apply]
-
-  -- Now both sides should have matching structure
-  -- LHS: ∑ i, (-1)^i • domCoprod (A(v i)) B (removeNth i v via finSumFinEquiv)
-  -- RHS: domCoprod (alternatizeUncurryFin A) B (v ∘ finCongr via finSumFinEquiv)
-
-  -- Expand domCoprod on both sides
-  simp only [AlternatingMap.domCoprod_apply]
-
-  -- Both sides are now sums over ModSumCongr. The LHS has an additional
-  -- outer sum over i : Fin(k+l+1).
-
-  -- Use Finset.sum_comm to swap the order of summation on LHS
-  rw [Finset.sum_comm]
-
-  -- Now need to show the inner sums match
-  -- This requires the key bijection: for each shuffle σ in (k,l),
-  -- the terms sum over i correspond to terms from shuffle τ in (k+1,l)
-  -- with the derivative index j determined by i's position.
-
-  -- The formal proof requires establishing this bijection explicitly.
-  -- This is a classical result in exterior algebra / graded derivations.
+  -- LHS = ∑ i, (-1)^i • (wedge_right (v i))(removeNth i v)
+  --     = ∑ i, (-1)^i • domCoprod (A(v i)) B (removeNth i v via finSumFinEquiv)
+  --
+  -- RHS = domCoprod (alternatizeUncurryFin A) B (v ∘ finCongr via finSumFinEquiv)
+  --     = domCoprod (∑ j, (-1)^j • A(w j) (removeNth j w)) B (...)  where w = v ∘ finCongr
+  --
+  -- By linearity of domCoprod in first arg:
+  -- RHS = ∑ j, (-1)^j • domCoprod (A(w j) (removeNth j w)) B (...)
+  --
+  -- The sums over i and j match via the bijection from finCongr.
+  -- After reindexing, both sides compute the same value.
+  --
+  -- This is the graded Leibniz rule: d(ω ∧ η)|_{η=const} = dω ∧ η
   sorry
 
 /-- This theorem requires proving a combinatorial identity about how alternatization
