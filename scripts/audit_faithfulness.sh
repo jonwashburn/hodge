@@ -55,11 +55,11 @@ report_grep "Project axioms (Lean axiom declarations)" '^axiom\b' "Hodge" \
 report_grep "Opaque constants (opaque declarations)" '^opaque\b' "Hodge"
 
 # 3) Sorries (outside Advanced sandbox)
-report_grep "Sorries outside Hodge/Analytic/Advanced/" '^[[:space:]]*sorry\b' "Hodge" \
+report_grep "Sorries outside Hodge/Analytic/Advanced/" '^[[:space:]]*sorry([[:space:]]|$)' "Hodge" \
   --exclude-dir="Advanced"
 
 # 3b) Sorries inside Advanced sandbox (tracked, but currently quarantined)
-report_grep "Sorries inside Hodge/Analytic/Advanced/ (quarantined)" '^[[:space:]]*sorry\b' "Hodge/Analytic/Advanced"
+report_grep "Sorries inside Hodge/Analytic/Advanced/ (quarantined)" '^[[:space:]]*sorry([[:space:]]|$)' "Hodge/Analytic/Advanced"
 
 # 4) Known semantic stubs: exterior derivative placeholder (show defining snippet)
 say ""
@@ -88,6 +88,34 @@ else
   fi
 fi
 
+# 4b2) integration_current stub (current integration placeholder)
+say ""
+say "### integration_current stub (showing integration_current definition snippet)"
+ic_snip="$(grep -n -A 8 -B 1 "def integration_current" Hodge/Analytic/Currents.lean 2>/dev/null || true)"
+if [[ -z "${ic_snip}" ]]; then
+  say "(definition not found)"
+else
+  say "${ic_snip}"
+  if echo "${ic_snip}" | grep -qE ':[[:space:]]*=[[:space:]]*0[[:space:]]*$|:[[:space:]]*:= *0[[:space:]]*$|^[0-9]+:[[:space:]]*0[[:space:]]*$'; then
+    fail_count=$((fail_count + 1))
+  fi
+fi
+
+# 4b3) isRationalClass stub (constructor base case is `zero` only)
+say ""
+say "### isRationalClass stub (showing inductive definition snippet)"
+rat_snip="$(grep -n -A 20 -B 2 "inductive isRationalClass" Hodge/Cohomology/Basic.lean 2>/dev/null || true)"
+if [[ -z "${rat_snip}" ]]; then
+  say "(definition not found)"
+else
+  say "${rat_snip}"
+  # Heuristic: the presence of a `| zero` base constructor (and no reference to an actual ℚ-subspace map)
+  # indicates the current proof-first stub.
+  if echo "${rat_snip}" | grep -qF "| zero"; then
+    fail_count=$((fail_count + 1))
+  fi
+fi
+
 # 4c) Kähler power stub(s)
 say ""
 say "### Kähler power stub (showing kahlerPow base case snippet)"
@@ -96,7 +124,7 @@ if [[ -z "${kp_snip}" ]]; then
   say "(definition not found)"
 else
   say "${kp_snip}"
-  if echo "${kp_snip}" | grep -qE '\|[[:space:]]*0[[:space:]]*=>[[:space:]]*0'; then
+  if echo "${kp_snip}" | grep -qF "| 0 => 0"; then
     fail_count=$((fail_count + 1))
   fi
 fi
@@ -117,12 +145,17 @@ fi
 # 5) Known semantic stubs: major Kähler/Hodge operators set to 0 (show defining snippets)
 say ""
 say "### Kähler/Hodge operator stubs (key definitions in Hodge/Kahler/Manifolds.lean)"
-kahler_defs="$(grep -n -E "def lefschetzLambdaLinearMap|def hodgeStar|def adjointDeriv|def laplacian" Hodge/Kahler/Manifolds.lean 2>/dev/null || true)"
-if [[ -z "${kahler_defs}" ]]; then
+kahler_snip="$(
+  { grep -n -A 3 -B 0 "def lefschetzLambdaLinearMap" Hodge/Kahler/Manifolds.lean || true; echo ""; } ;
+  { grep -n -A 3 -B 0 "def hodgeStar" Hodge/Kahler/Manifolds.lean || true; echo ""; } ;
+  { grep -n -A 1 -B 0 "def adjointDeriv" Hodge/Kahler/Manifolds.lean || true; echo ""; } ;
+  { grep -n -A 1 -B 0 "def laplacian" Hodge/Kahler/Manifolds.lean || true; }
+)"
+if [[ -z "${kahler_snip//$'\n'/}" ]]; then
   say "(no matching definitions found)"
 else
-  say "${kahler_defs}"
-  if echo "${kahler_defs}" | grep -qE ':=[[:space:]]*0([[:space:]]|$)'; then
+  say "${kahler_snip}"
+  if echo "${kahler_snip}" | grep -qE ':=[[:space:]]*0([[:space:]]|$)|^[0-9]+:[[:space:]]*0[[:space:]]*$'; then
     fail_count=$((fail_count + 1))
   fi
 fi

@@ -59,7 +59,7 @@ theorem two_add_two_mul (p : ℕ) : 2 + 2 * p = 2 * (p + 1) := by ring
     The only remaining semantic stub here is ω^0. -/
 noncomputable def kahlerPow (p : ℕ) : SmoothForm n X (2 * p) :=
   match p with
-  | 0 => 0  -- ω^0: placeholder (unit form is currently stubbed)
+  | 0 => 0  -- ω^0: placeholder (unit form exists, but ω^0 is not yet wired to it)
   | 1 => (Nat.two_mul 1).symm ▸ K.omega_form  -- ω^1 = ω
   | p + 2 =>
       -- ω^(p+2) = ω ∧ ω^(p+1), with degree cast:
