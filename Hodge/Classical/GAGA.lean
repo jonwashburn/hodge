@@ -2,6 +2,7 @@ import Hodge.Classical.HarveyLawson
 import Hodge.Classical.Bergman
 import Hodge.Classical.SerreVanishing
 import Hodge.Classical.Lefschetz
+import Hodge.Classical.CycleClass
 import Hodge.Analytic.Currents
 
 noncomputable section
@@ -240,10 +241,16 @@ theorem isAlgebraicSubvariety_intersection {Z₁ Z₂ : Set X}
     3. The de Rham isomorphism gives a closed 2p-form representing this class
     4. On a Kähler manifold, this form is of type (p,p)
 
-    **Implementation**: Stub implementation returning 0 for all inputs.
-    This is sufficient for the proof architecture where the key properties
-    are axiomatized. The stub allows us to prove `FundamentalClassSet_empty`
-    directly while keeping other properties as axioms.
+    **Implementation**: Uses the axiomatized Poincaré dual form from CycleClass.lean.
+    This is NOT the trivial zero stub - the form is:
+    - Zero for empty sets (by `fundamentalClassImpl_empty`)
+    - Potentially non-zero for non-empty algebraic sets (via axiomatized construction)
+
+    Properties are proved from the axiomatized interface:
+    - Closedness: `fundamentalClassImpl_isClosed`
+    - (p,p)-type: `fundamentalClassImpl_isPP`
+    - Rationality: `fundamentalClassImpl_isRational`
+    - Additivity: `fundamentalClassImpl_additive`
 
     Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry",
     Wiley, 1978, Chapter 1, Section 1]. -/
@@ -252,7 +259,7 @@ def FundamentalClassSet_impl : (n : ℕ) → (X : Type u) →
     [IsManifold (𝓒_complex n) ⊤ X] →
     [ProjectiveComplexManifold n X] → [KahlerManifold n X] →
     (p : ℕ) → Set X → SmoothForm n X (2 * p) :=
-  fun _n _X _ _ _ _ _ _p _Z => 0
+  fun n X _ _ _ _ _ p Z => fundamentalClassImpl n X p Z
 
 /-- The fundamental class map from algebraic subvarieties to closed (p,p)-forms. -/
 noncomputable def FundamentalClassSet (n : ℕ) (X : Type u)
@@ -266,145 +273,104 @@ noncomputable def FundamentalClassSet (n : ℕ) (X : Type u)
     This is a fundamental property from Hodge theory: integration currents over
     closed analytic submanifolds are d-closed.
 
-    **Proof**: Since the stub implementation returns 0, and 0 is closed (by `isFormClosed_zero`),
-    the fundamental class is always closed.
+    **Proof**: Follows from the axiomatized property `fundamentalClassImpl_isClosed`
+    which is a mathematical consequence of the cycle having no boundary.
 
     Reference: [Griffiths-Harris, 1978, Chapter 1]. -/
 theorem FundamentalClassSet_isClosed (p : ℕ) (Z : Set X) (_h : isAlgebraicSubvariety n X Z) :
     IsFormClosed (FundamentalClassSet n X p Z) := by
-  -- FundamentalClassSet returns 0 by definition of the stub
   show IsFormClosed (FundamentalClassSet_impl n X p Z)
   simp only [FundamentalClassSet_impl]
-  exact isFormClosed_zero
-
-/-- **Theorem: The fundamental class is always zero (stub implementation).**
-    In the stub architecture, `FundamentalClassSet_impl` returns 0 for all inputs. -/
-theorem FundamentalClassSet_stub_zero (p : ℕ) (Z : Set X) :
-    FundamentalClassSet n X p Z = 0 := rfl
+  exact fundamentalClassImpl_isClosed p Z
 
 /-- **Theorem: The fundamental class of the empty set is zero.**
     The empty subvariety carries no homology class, hence its Poincaré dual is 0.
 
-    **Proof**: By definition, `FundamentalClassSet` uses the stub implementation
-    which returns 0 for all inputs. -/
-theorem FundamentalClassSet_empty (p : ℕ) :
-    FundamentalClassSet n X p (∅ : Set X) = 0 := FundamentalClassSet_stub_zero p ∅
+    **Proof**: Follows from `fundamentalClassImpl_empty`.
 
-/-- **Theorem: The fundamental class is a (p,p)-form (stub implementation).**
+    Reference: [Griffiths-Harris, 1978, Chapter 1]. -/
+theorem FundamentalClassSet_empty (p : ℕ) :
+    FundamentalClassSet n X p (∅ : Set X) = 0 := by
+  simp only [FundamentalClassSet, FundamentalClassSet_impl]
+  exact fundamentalClassImpl_empty p
+
+/-- **Theorem: The fundamental class is a (p,p)-form.**
     On a Kähler manifold, the integration current over a codimension-p analytic
     subvariety is of type (p,p). This follows from the fact that complex
     submanifolds are calibrated by powers of the Kähler form.
 
-    **Proof (stub)**: `FundamentalClassSet` is definitionally `0`, and `0` is (p,p).
+    **Proof**: Follows from the axiomatized property `fundamentalClassImpl_isPP`,
+    which is a consequence of calibration theory.
 
     Reference: [Griffiths-Harris, 1978, Chapter 0, Section 7]. -/
 theorem FundamentalClassSet_is_p_p (p : ℕ) (Z : Set X) (_h : isAlgebraicSubvariety n X Z) :
     isPPForm' n X p (FundamentalClassSet n X p Z) := by
-  simpa [FundamentalClassSet, FundamentalClassSet_impl] using
-    (isPPForm_zero (n := n) (X := X) (p := p))
+  simp only [FundamentalClassSet, FundamentalClassSet_impl]
+  exact fundamentalClassImpl_isPP p Z
 
-/-- **Theorem: Additivity of Fundamental Classes (stub implementation).**
+/-- **Theorem: Additivity of Fundamental Classes.**
     The fundamental class of a disjoint union is the sum of fundamental classes.
     This follows from the additivity of integration currents.
 
-    **Proof (stub)**: all fundamental classes are definitionally `0`.
+    **Proof**: Follows from the axiomatized property `fundamentalClassImpl_additive`,
+    which is a consequence of the additivity of integration.
 
     Reference: [Federer, "Geometric Measure Theory", 1969]. -/
-theorem FundamentalClassSet_additive (p : ℕ) (Z₁ Z₂ : Set X) (_h_disjoint : Disjoint Z₁ Z₂)
+theorem FundamentalClassSet_additive (p : ℕ) (Z₁ Z₂ : Set X) (h_disjoint : Disjoint Z₁ Z₂)
     (_h1 : isAlgebraicSubvariety n X Z₁) (_h2 : isAlgebraicSubvariety n X Z₂) :
     FundamentalClassSet n X p (Z₁ ∪ Z₂) = FundamentalClassSet n X p Z₁ + FundamentalClassSet n X p Z₂ := by
-  simp [FundamentalClassSet, FundamentalClassSet_impl]
+  simp only [FundamentalClassSet, FundamentalClassSet_impl]
+  exact fundamentalClassImpl_additive p Z₁ Z₂ h_disjoint
 
-/-- **Theorem: Rationality of Fundamental Classes (stub implementation).**
+/-- **Theorem: Rationality of Fundamental Classes.**
     The cohomology class of the fundamental class of an algebraic subvariety
     lies in H^{2p}(X, ℚ). This is because algebraic cycles define integral
     homology classes, which map to rational cohomology via Poincaré duality.
 
-    **Proof (stub)**: the associated cohomology class is `0`, hence rational.
+    **Proof**: Follows from the axiomatized property `fundamentalClassImpl_isRational`,
+    which is a consequence of algebraic cycles defining integral homology classes.
 
     Reference: [Voisin, "Hodge Theory and Complex Algebraic Geometry", 2002]. -/
 theorem FundamentalClassSet_rational (p : ℕ) (Z : Set X) (h : isAlgebraicSubvariety n X Z) :
     isRationalClass (ofForm (FundamentalClassSet n X p Z)
       (FundamentalClassSet_isClosed p Z h)) := by
-  -- Reduce to the rationality of `0 : DeRhamCohomologyClass n X (2 * p)`.
-  have hclass :
-      (⟦FundamentalClassSet n X p Z, FundamentalClassSet_isClosed p Z h⟧ :
-          DeRhamCohomologyClass n X (2 * p)) = 0 := by
-    -- `FundamentalClassSet` is definitionally `0`; then use proof-irrelevance of `ofForm`.
-    have hproof :
-        (⟦(0 : SmoothForm n X (2 * p)), FundamentalClassSet_isClosed p Z h⟧ :
-            DeRhamCohomologyClass n X (2 * p)) =
-          (⟦(0 : SmoothForm n X (2 * p)), isFormClosed_zero⟧ :
-            DeRhamCohomologyClass n X (2 * p)) := by
-      exact ofForm_proof_irrel (n := n) (X := X) (k := 2 * p)
-        (ω := (0 : SmoothForm n X (2 * p)))
-        (h₁ := FundamentalClassSet_isClosed p Z h) (h₂ := isFormClosed_zero)
-    -- Rewrite the form component to `0` and finish by unfolding `0` in cohomology.
-    calc
-      (⟦FundamentalClassSet n X p Z, FundamentalClassSet_isClosed p Z h⟧ :
-          DeRhamCohomologyClass n X (2 * p))
-          = (⟦(0 : SmoothForm n X (2 * p)), FundamentalClassSet_isClosed p Z h⟧ :
-              DeRhamCohomologyClass n X (2 * p)) := by
-              simp [FundamentalClassSet, FundamentalClassSet_impl]
-      _ = (⟦(0 : SmoothForm n X (2 * p)), isFormClosed_zero⟧ :
-            DeRhamCohomologyClass n X (2 * p)) := hproof
-      _ = 0 := rfl
-  simpa [hclass] using (isRationalClass_zero (n := n) (X := X) (k := 2 * p))
+  -- The proof uses the axiomatized rationality property.
+  -- We need to show the cohomology classes are equal via proof irrelevance.
+  have h_eq : ofForm (FundamentalClassSet n X p Z) (FundamentalClassSet_isClosed p Z h) =
+              ofForm (fundamentalClassImpl n X p Z) (fundamentalClassImpl_isClosed p Z) := by
+    simp only [FundamentalClassSet, FundamentalClassSet_impl]
+    exact ofForm_proof_irrel (fundamentalClassImpl n X p Z)
+      (FundamentalClassSet_isClosed p Z h) (fundamentalClassImpl_isClosed p Z)
+  rw [h_eq]
+  exact fundamentalClassImpl_isRational p Z
 
-/-- **Theorem: All Rational Classes Are Zero (Stub Architecture).**
-    In the stub architecture, the only way to build a rational class is from 0
-    using operations that preserve 0 (add, smul_rat, neg, mul).
-    Therefore all rational classes are 0. -/
-theorem isRationalClass_eq_zero {k : ℕ} (η : DeRhamCohomologyClass n X k)
-    (h : isRationalClass η) : η = 0 := by
-  induction h with
-  | zero => rfl
-  | add _ _ ih1 ih2 => rw [ih1, ih2, add_zero]
-  | smul_rat q _ ih =>
-    -- q • η where η = 0, so q • 0 = 0
-    rw [ih]
-    -- Now need q • (0 : DeRhamCohomologyClass n X k) = 0
-    -- SMul ℚ is defined as (q : ℂ) • _, and Module ℂ has smul_zero
-    show (q : ℂ) • (0 : DeRhamCohomologyClass n X _) = 0
-    exact smul_zero (q : ℂ)
-  | neg _ ih => rw [ih, neg_zero]
-  | mul _ _ ih1 ih2 =>
-    -- η₁ * η₂ where η₁ = 0 and η₂ = 0
-    rw [ih1]
-    exact zero_mul _
+/-- **Theorem: Harvey-Lawson Fundamental Class Bridge** (Axiomatized).
 
-/-- **Theorem: Harvey-Lawson Fundamental Class Bridge.**
     When a calibrated cycle T is represented by analytic subvarieties from Harvey-Lawson,
     and those varieties are algebraic (via GAGA), the fundamental class of their union
     equals the original cohomology class [γ] that T represents.
 
-    **Proof (Stub Architecture)**:
-    Under the stub:
-    1. FundamentalClassSet Z = 0, so LHS = ⟦0, ...⟧ = 0
-    2. h_rational says ofForm γ hγ is rational
-    3. isRationalClass_eq_zero shows all rational classes are 0
-    4. So RHS = ofForm γ hγ = 0
-    5. Therefore LHS = RHS
+    **Mathematical Content**:
+    This theorem is the bridge between geometric measure theory (calibrated currents)
+    and algebraic geometry (fundamental classes of varieties). It requires:
+    1. The integration current over Z equals the limit current T
+    2. The de Rham class of T equals [γ] (by the calibration theory)
+    3. The fundamental class [Z] equals the integration current class
+
+    **Implementation**: Axiomatized. The proof requires the full `FundamentalClassSet`
+    implementation (currently stubbed as 0). Once `FundamentalClassSet` is implemented
+    via integration currents (Task 1), this theorem can be derived.
 
     Reference: [Harvey-Lawson, "Calibrated Geometries", 1982, Theorem 5.2].
     Reference: [Serre, "GAGA", 1956]. -/
-theorem FundamentalClassSet_represents_class (p : ℕ) (Z : Set X) [Nonempty X]
+axiom FundamentalClassSet_represents_class (p : ℕ) (Z : Set X) [Nonempty X]
     (γ : SmoothForm n X (2 * p)) (hγ : IsFormClosed γ)
     (h_alg : isAlgebraicSubvariety n X Z)
     (h_rational : isRationalClass (ofForm γ hγ))
     (_h_representation : ∃ (T : Current n X (2 * (n - p))),
       ∃ (hl : HarveyLawsonConclusion n X (2 * (n - p))),
         hl.represents T ∧ Z = ⋃ v ∈ hl.varieties, v.carrier) :
-    ⟦FundamentalClassSet n X p Z, FundamentalClassSet_isClosed p Z h_alg⟧ = ofForm γ hγ := by
-  -- LHS = ⟦0, ...⟧ = 0 (since FundamentalClassSet returns 0 in stub)
-  have h_lhs : ⟦FundamentalClassSet n X p Z, FundamentalClassSet_isClosed p Z h_alg⟧ =
-      (0 : DeRhamCohomologyClass n X (2 * p)) := by
-    rw [FundamentalClassSet_stub_zero]
-    rfl
-  -- RHS = 0 (since all rational classes are 0 in stub)
-  have h_rhs : ofForm γ hγ = (0 : DeRhamCohomologyClass n X (2 * p)) :=
-    isRationalClass_eq_zero (ofForm γ hγ) h_rational
-  rw [h_lhs, h_rhs]
+    ⟦FundamentalClassSet n X p Z, FundamentalClassSet_isClosed p Z h_alg⟧ = ofForm γ hγ
 
 /-! ## Fundamental Class for Structured Algebraic Subvarieties -/
 
@@ -501,38 +467,39 @@ def SignedAlgebraicCycle.intersect_power (Z : SignedAlgebraicCycle n X) (H : Alg
   | 0 => Z
   | k + 1 => (Z.intersect_power H k).intersect H
 
-/-- **Theorem: The fundamental class of any signed cycle is zero (stub).**
-    Under the stub architecture, `FundamentalClassSet` returns 0 for all inputs,
-    so the signed difference is also 0. -/
-theorem SignedAlgebraicCycle.fundamentalClass_stub_zero (p : ℕ) (Z : SignedAlgebraicCycle n X) :
+/-- **Theorem: The fundamental class of an empty signed cycle is zero.**
+    When both pos and neg are empty, the signed difference is 0. -/
+theorem SignedAlgebraicCycle.fundamentalClass_empty_zero (p : ℕ)
+    (Z : SignedAlgebraicCycle n X) (h_pos : Z.pos = ∅) (h_neg : Z.neg = ∅) :
     Z.fundamentalClass p = 0 := by
   unfold SignedAlgebraicCycle.fundamentalClass
-  simp only [FundamentalClassSet_stub_zero, sub_self]
+  rw [h_pos, h_neg, FundamentalClassSet_empty, FundamentalClassSet_empty]
+  simp
 
-/-- **Theorem: The cycle class of any signed cycle is zero (stub).**
-    Under the stub architecture, all signed cycles represent the zero cohomology class. -/
-theorem SignedAlgebraicCycle.cycleClass_stub_zero (p : ℕ) (Z : SignedAlgebraicCycle n X) :
-    Z.cycleClass p = 0 := by
-  unfold SignedAlgebraicCycle.cycleClass
-  rw [SignedAlgebraicCycle.fundamentalClass_stub_zero]
-  rfl
+/-- **Note**: Signed cycle classes are not necessarily zero in the new architecture.
+    The fundamental class of a non-empty algebraic set can be non-zero. -/
 
-/-- **Theorem: Lefschetz Lift for Signed Cycles.**
+/-- **Axiom: Lefschetz Lift for Signed Cycles.**
 
     When p > n/2 and we have a signed cycle Z_η representing η ∈ H^{2(n-p)}(X),
     we can construct a signed cycle representing γ ∈ H^{2p}(X) via intersection
     with hyperplane sections.
 
-    **Proof (Stub Architecture)**: Under the stub:
-    1. h_rep says Z_η.cycleClass = ofForm η hη, but cycleClass = 0 (stub)
-    2. So ofForm η hη = 0
-    3. lefschetz_power is linear, so lefschetz_power ... 0 = 0
-    4. From h_lef, ofForm γ hγ = (cast) 0 = 0
-    5. Take Z := Z_η; then Z.cycleClass p = 0 = ofForm γ hγ
+    **Mathematical Content**:
+    This is a consequence of the Hard Lefschetz theorem being an isomorphism:
+    - L^k : H^{n-k}(X) → H^{n+k}(X) is bijective
+    - If η is represented by an algebraic cycle Z_η, then L^k(η) = [ω]^k ∪ η
+    - The class [ω]^k ∪ η can be represented geometrically by intersecting
+      Z_η with k generic hyperplane sections
+
+    **Implementation**: Axiomatized. The proof requires:
+    1. A theory of intersection products for cycles
+    2. Relating cup product to geometric intersection
+    3. Showing the intersection with hyperplanes represents [ω] ∪ (-)
 
     Reference: [Voisin, "Hodge Theory and Complex Algebraic Geometry", Vol. I,
     Cambridge University Press, 2002, Chapter 6, Theorem 6.25]. -/
-theorem SignedAlgebraicCycle.lefschetz_lift {p : ℕ}
+axiom SignedAlgebraicCycle.lefschetz_lift {p : ℕ}
     (γ : SmoothForm n X (2 * p)) (hγ : IsFormClosed γ)
     (η : SmoothForm n X (2 * (n - p))) (hη : IsFormClosed η)
     (Z_η : SignedAlgebraicCycle n X)
@@ -540,24 +507,6 @@ theorem SignedAlgebraicCycle.lefschetz_lift {p : ℕ}
     (h_rep : Z_η.RepresentsClass (ofForm η hη))
     (h_lef : ofForm γ hγ = (lefschetz_degree_eq n p hp) ▸
              lefschetz_power n X (2 * (n - p)) (p - (n - p)) (ofForm η hη)) :
-    ∃ (Z : SignedAlgebraicCycle n X), Z.RepresentsClass (ofForm γ hγ) := by
-  -- Step 1: From h_rep, Z_η.cycleClass = ofForm η hη
-  -- Step 2: Under stub, Z_η.cycleClass = 0, so ofForm η hη = 0
-  have h_eta_zero : ofForm η hη = 0 := by
-    rw [← h_rep]
-    exact SignedAlgebraicCycle.cycleClass_stub_zero (n - p) Z_η
-  -- Step 3: lefschetz_power is linear, so lefschetz_power ... 0 = 0
-  have h_lef_zero : lefschetz_power n X (2 * (n - p)) (p - (n - p)) (ofForm η hη) = 0 := by
-    rw [h_eta_zero]
-    exact map_zero _
-  -- Step 4: From h_lef, ofForm γ hγ = (cast) 0 = 0
-  have h_gamma_zero : ofForm γ hγ = 0 := by
-    rw [h_lef, h_lef_zero]
-    exact DeRhamCohomologyClass.cast_zero _
-  -- Step 5: Take Z := Z_η; its cycle class is 0 = ofForm γ hγ
-  use Z_η
-  unfold SignedAlgebraicCycle.RepresentsClass
-  rw [h_gamma_zero]
-  exact SignedAlgebraicCycle.cycleClass_stub_zero p Z_η
+    ∃ (Z : SignedAlgebraicCycle n X), Z.RepresentsClass (ofForm γ hγ)
 
 end
