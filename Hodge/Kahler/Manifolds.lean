@@ -55,7 +55,7 @@ theorem omega_is_pp : isPPForm' n X 1 K.omega_form :=
   K.omega_is_pp
 
 omit [ProjectiveComplexManifold n X] K in
-theorem unitForm_isClosed : IsFormClosed (unitForm : SmoothForm n X 0) := isFormClosed_zero
+theorem unitForm_isClosed : IsFormClosed (unitForm : SmoothForm n X 0) := isFormClosed_unitForm
 
 omit K in
 theorem unitForm_is_rational : isRationalClass ⟦(unitForm : SmoothForm n X 0), unitForm_isClosed⟧ := isRationalClass_zero

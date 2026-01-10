@@ -330,10 +330,22 @@ theorem smoothExtDeriv_continuous {k : ℕ} : Continuous (smoothExtDeriv (n := n
   continuous_of_discreteTopology
 
 
--- smoothExtDeriv_wedge (Leibniz rule for wedge) was removed as unused
--- The HEq degree arithmetic is complex and wedge := 0 anyway
+-- smoothExtDeriv_wedge (Leibniz rule for wedge) is currently a proof-first placeholder
+-- because `smoothExtDeriv := 0`.
 
-def unitForm : SmoothForm n X 0 := 0
+/-- The unit 0-form (constant `1`).
+
+This is the intended multiplicative unit for the wedge/cup product on cohomology.
+At the level of `FiberAlt n 0`, a 0-form is just a scalar. -/
+def unitForm : SmoothForm n X 0 where
+  as_alternating := fun _ =>
+    haveI : IsEmpty (Fin 0) := Fin.isEmpty
+    ContinuousAlternatingMap.constOfIsEmpty ℂ (TangentModel n) (ι := Fin 0) (1 : ℂ)
+  is_smooth := contMDiff_const
+
+theorem isFormClosed_unitForm : IsFormClosed (unitForm (n := n) (X := X)) := by
+  unfold IsFormClosed smoothExtDeriv extDerivLinearMap unitForm
+  simp
 
 theorem smoothWedge_add_left {k l : ℕ} (ω₁ ω₂ : SmoothForm n X k) (η : SmoothForm n X l) : (ω₁ + ω₂) ⋏ η = (ω₁ ⋏ η) + (ω₂ ⋏ η) := by
   ext x v
