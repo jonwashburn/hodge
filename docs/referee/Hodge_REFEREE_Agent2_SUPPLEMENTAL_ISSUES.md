@@ -229,15 +229,15 @@ theorem comass_bddAbove ...
 
 **Location**: `Hodge/Analytic/Advanced/`
 
-**Detailed sorry map**:
+**Status**: ✅ ALL SORRY STATEMENTS ELIMINATED
 
-| File | Line(s) | Description |
-|------|---------|-------------|
-| `LeibnizRule.lean` | ~213, ~250 | Leibniz rule cases |
-| `ContMDiffForms.lean` | Various | Smooth form constructions |
-| `ChartExtDeriv.lean` | Check | Chart compatibility |
+| File | Status | Notes |
+|------|--------|-------|
+| `LeibnizRule.lean` | ✅ No sorry | Combinatorial lemmas proved via `rfl` after simp expansion |
+| `ContMDiffForms.lean` | ✅ No sorry | All proofs complete |
+| `ChartExtDeriv.lean` | ✅ No sorry | Chart compatibility proved |
 
-**Agent 2 task**: Fix sorry blocks that don't require d≠0 infrastructure.
+**Verification**: `grep -rn '\bsorry\b' Hodge/ --include="*.lean"` returns no actual sorry statements.
 
 ---
 
@@ -315,7 +315,7 @@ grep -r ":= 0\|toFun := 0" Hodge/ --include="*.lean" | grep -v test
 
 ## Success Criteria (Agent 2)
 
-- [ ] All files in Agent 2 ownership have no `sorry` (**remaining**: 2 combinatorial lemmas in `Hodge/Analytic/Advanced/LeibnizRule.lean`)
+- [x] All files in Agent 2 ownership have no `sorry` (LeibnizRule.lean combinatorial lemmas now proved via `rfl`)
 - [x] All files in Agent 2 ownership have no `axiom`
 - [x] Opaque/stub detection scripts added and passing (`scripts/audit_stubs.sh`)
 - [x] `stronglyPositiveCone` semantically documented (`docs/SEMANTIC_VALIDITY_SCOPE.md`)
