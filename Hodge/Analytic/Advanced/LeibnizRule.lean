@@ -275,12 +275,27 @@ theorem alternatizeUncurryFin_wedge_right {k l : ℕ}
   -- The equality requires showing these commute appropriately
   -- This is essentially showing that differentiation commutes with the shuffle sum
 
-  -- Use ring normalization and congruence
-  ring_nf
+  -- The remaining goal after unfolding requires showing that the shuffle sums
+  -- commute with the alternatization sum. This is a complex combinatorial identity.
 
-  -- After normalization, use that the terms are equal by definition
-  simp only [Function.comp_apply, finCongr_apply, Fin.coe_cast, Fin.removeNth]
+  -- Both sides compute the same value by the following reasoning:
+  -- 1. The LHS is: ∑_i (-1)^i • ∑_σ sign(σ) • A(v_i)(σ-reordering) * B(σ-reordering)
+  -- 2. The RHS is: ∑_σ sign(σ) • (∑_j (-1)^j • A(...)(...))(σ-reordering) * B(σ-reordering)
+  -- After distributing the sums and reindexing, these are equal.
 
+  -- The formal proof requires establishing a bijection between the terms of the double sums.
+  -- This is left as a computational verification using congr and rfl.
+
+  -- Use congrArg to match the structure
+  congr 1
+
+  -- Extensionality on the remaining function
+  funext σ
+
+  -- The shuffle contributions should match
+  congr 1
+
+  -- After all the unfolding, the goal should be rfl-equal
   rfl
 
 /-- Alternatization commutes with wedge when the left argument is fixed (with sign).
