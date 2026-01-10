@@ -388,7 +388,7 @@ theorem L2NormForm_smul {n : ℕ} {X : Type*}
     {k : ℕ} (r : ℝ) (α : SmoothForm n X k) :
     L2NormForm (r • α) = |r| * L2NormForm α := by
   unfold L2NormForm; rw [L2Inner_smul_left, L2Inner_smul_right]
-  rw [← mul_assoc, show r * r = r ^ 2 from sq r ▸ rfl]
+  rw [← _root_.mul_assoc, show r * r = r ^ 2 from sq r ▸ rfl]
   rw [Real.sqrt_mul (sq_nonneg r), Real.sqrt_sq_eq_abs]
 
 end

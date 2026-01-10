@@ -56,10 +56,10 @@ theorem two_add_two_mul (p : ℕ) : 2 + 2 * p = 2 * (p + 1) := by ring
     - ω^(p+2) = ω ∧ ω^(p+1) (with a degree cast using `castForm`)
 
     **Note**: This removes the previous degeneracy `kahlerPow p = 0` for `p ≥ 2`.
-    The only remaining semantic stub here is ω^0. -/
+    `kahlerPow 0` is now the unit form (constant 1). -/
 noncomputable def kahlerPow (p : ℕ) : SmoothForm n X (2 * p) :=
   match p with
-  | 0 => 0  -- ω^0: placeholder (unit form exists, but ω^0 is not yet wired to it)
+  | 0 => unitForm  -- ω^0 = 1 (unit form)
   | 1 => (Nat.two_mul 1).symm ▸ K.omega_form  -- ω^1 = ω
   | p + 2 =>
       -- ω^(p+2) = ω ∧ ω^(p+1), with degree cast:
@@ -69,7 +69,7 @@ noncomputable def kahlerPow (p : ℕ) : SmoothForm n X (2 * p) :=
 theorem omega_pow_IsFormClosed (p : ℕ) : IsFormClosed (kahlerPow (n := n) (X := X) p) := by
   unfold kahlerPow
   match p with
-  | 0 => exact isFormClosed_zero
+  | 0 => exact isFormClosed_unitForm
   | 1 =>
     cases (Nat.two_mul 1).symm
     exact K.omega_closed
@@ -90,8 +90,12 @@ theorem omega_pow_is_rational_TD (p : ℕ) :
   unfold kahlerPow
   match p with
   | 0 =>
-    -- ω^0 placeholder
-    exact isRationalClass_zero
+    -- ω^0 = unitForm, which is rational
+    have h : ⟦unitForm, omega_pow_IsFormClosed (n := n) (X := X) 0⟧ = unitClass := by
+      apply Quotient.sound
+      exact cohomologous_refl _
+    rw [h]
+    exact isRationalClass_unit
   | 1 =>
     cases (Nat.two_mul 1).symm
     exact K.omega_rational

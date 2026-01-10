@@ -571,6 +571,7 @@ inductive isRationalClass {n : ℕ} {X : Type u}
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] :
     ∀ {k : ℕ}, DeRhamCohomologyClass n X k → Prop where
   | zero {k : ℕ} : isRationalClass (0 : DeRhamCohomologyClass n X k)
+  | unit : isRationalClass unitClass  -- The unit (constant 1) is rational
   | add {k : ℕ} {η₁ η₂ : DeRhamCohomologyClass n X k} :
       isRationalClass η₁ → isRationalClass η₂ → isRationalClass (η₁ + η₂)
   | smul_rat {k : ℕ} (q : ℚ) {η : DeRhamCohomologyClass n X k} :
@@ -590,6 +591,10 @@ theorem isRationalClass_cast {k₁ k₂ : ℕ} (h : k₁ = k₂) (η : DeRhamCoh
 theorem isRationalClass_zero {k : ℕ} :
     isRationalClass (n := n) (X := X) (k := k) (0 : DeRhamCohomologyClass n X k) :=
   isRationalClass.zero
+
+theorem isRationalClass_unit :
+    isRationalClass (n := n) (X := X) unitClass :=
+  isRationalClass.unit
 
 theorem isRationalClass_add {k : ℕ} (η₁ η₂ : DeRhamCohomologyClass n X k) :
     isRationalClass η₁ → isRationalClass η₂ → isRationalClass (η₁ + η₂) :=
