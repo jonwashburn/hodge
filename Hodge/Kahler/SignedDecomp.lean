@@ -21,25 +21,6 @@ variable {n : ℕ} {X : Type*}
   [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
   [Nonempty X]
 
-/-! ## Form Boundedness -/
-
-/-- Any smooth form on a compact manifold has a finite supremum norm. -/
-theorem form_is_bounded {k : ℕ} (α : SmoothForm n X k) :
-    ∃ M : ℝ, M > 0 ∧ ∀ x, pointwiseComass α x ≤ M := by
-  classical
-  -- Take the global comass (a supremum over X) as a uniform bound, with +1 to ensure positivity.
-  refine ⟨comass α + 1, ?_, ?_⟩
-  · have h_nonneg : (0 : ℝ) ≤ comass α := by
-      simpa using (comass_nonneg α)
-    have h1 : (1 : ℝ) ≤ comass α + 1 := by
-      simpa using (add_le_add_right h_nonneg 1)
-    exact lt_of_lt_of_le zero_lt_one h1
-  · intro x
-    have hx_le : pointwiseComass α x ≤ comass α := by
-      unfold comass
-      exact le_csSup (comass_bddAbove α) (mem_range_self x)
-    exact le_trans hx_le (le_add_of_nonneg_right (show (0 : ℝ) ≤ (1 : ℝ) from le_of_lt zero_lt_one))
-
 /-! ## Helper lemmas for rationality -/
 
 /-- ω^p is a rational class. -/
