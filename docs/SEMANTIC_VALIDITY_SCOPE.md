@@ -51,8 +51,10 @@ These are the main “degenerate model” points referenced by Section **E** of 
 - **Impact**: any form satisfying `isPPForm'` is forced to be `0` (used to deduce `omega_form = 0`).
 
 ### Unit element stub (`Hodge/Analytic/Forms.lean`)
-- `unitForm := 0` (placeholder for the constant-1 0-form)
-- **Impact**: the cohomology-ring “unit” lemmas are proved by degeneracy, not by the true wedge identity.
+`unitForm` is now implemented as the constant-`1` 0-form.
+
+**Remaining gap**: the cohomology-ring unit laws should eventually be re-proved against a real exterior
+derivative / real de Rham quotient (not `smoothExtDeriv := 0`).
 
 ## Known Stubs (Not Affecting Main Theorem)
 
