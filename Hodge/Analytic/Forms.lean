@@ -1,6 +1,5 @@
 import Mathlib.LinearAlgebra.StdBasis
 import Mathlib.Geometry.Manifold.Algebra.Monoid
-import Mathlib.Geometry.Manifold.ContMDiffMFDeriv
 import Hodge.Analytic.DomCoprod
 import Hodge.Analytic.FormType
 -- Proof-first: keep the main theorem import closure free of unfinished manifold-`d` infrastructure.
@@ -174,38 +173,6 @@ noncomputable def extDerivLinearMap (n : ℕ) (X : Type u) [TopologicalSpace X]
     [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X] (k : ℕ) :
     SmoothForm n X k →ₗ[ℂ] SmoothForm n X (k + 1) :=
   0
-
-/-!
-### Pointwise exterior derivative (real, but unbundled)
-
-The project currently uses `smoothExtDeriv` bundled as a `LinearMap` into `SmoothForm`, and that
-map is still a placeholder (`0`) until the chart-gluing argument is completed (Phase 2B).
-
-However, we can already define the **pointwise** exterior derivative value
-`extDerivAt ω x : FiberAlt n (k+1)` for a `SmoothForm` using Mathlib’s manifold derivative
-`mfderiv` followed by alternatization. This is a genuine mathematical definition; what remains
-is proving that `x ↦ extDerivAt ω x` is smooth so it can be bundled back into `SmoothForm`.
--/
-
-/-- Pointwise exterior derivative value (as a fiber element), defined via `mfderiv` and
-alternatization. -/
-noncomputable def extDerivAt {k : ℕ} (ω : SmoothForm n X k) (x : X) : FiberAlt n (k + 1) :=
-  ContinuousAlternatingMap.alternatizeUncurryFin
-    (𝕜 := ℂ) (E := TangentModel n) (F := ℂ) (n := k)
-    (mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x)
-
-@[simp] lemma extDerivAt_def {k : ℕ} (ω : SmoothForm n X k) (x : X) :
-    extDerivAt (n := n) (X := X) ω x =
-      ContinuousAlternatingMap.alternatizeUncurryFin
-        (𝕜 := ℂ) (E := TangentModel n) (F := ℂ) (n := k)
-        (mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x) := rfl
-
-/-- A “real” closedness predicate: `ω` is closed if its pointwise exterior derivative vanishes.
-
-This is **not** yet used by the cohomology layer (which still uses the bundled `smoothExtDeriv`
-placeholder), but it is the intended replacement target in Phase 2B. -/
-def IsFormClosed_pointwise {k : ℕ} (ω : SmoothForm n X k) : Prop :=
-  ∀ x : X, extDerivAt (n := n) (X := X) ω x = 0
 
 def smoothExtDeriv {k : ℕ} (ω : SmoothForm n X k) : SmoothForm n X (k + 1) :=
   extDerivLinearMap n X k ω
@@ -412,12 +379,12 @@ theorem smoothWedge_zero_right {k l : ℕ} (ω : SmoothForm n X k) : ω ⋏ (0 :
 
 theorem smoothWedge_sub_left {k l : ℕ} (ω₁ ω₂ : SmoothForm n X k) (η : SmoothForm n X l) :
     (ω₁ - ω₂) ⋏ η = (ω₁ ⋏ η) - (ω₂ ⋏ η) := by
-  have h1 : ω₁ - ω₂ = ω₁ + (-1 : ℂ) • ω₂ := by simp [sub_eq_add_neg]
+  have h1 : ω₁ - ω₂ = ω₁ + (-1 : ℂ) • ω₂ := by simp [sub_eq_add_neg, neg_one_smul]
   rw [h1, smoothWedge_add_left, smoothWedge_smul_left]
-  simp [sub_eq_add_neg]
+  simp [sub_eq_add_neg, neg_one_smul]
 
 theorem smoothWedge_sub_right {k l : ℕ} (ω : SmoothForm n X k) (η₁ η₂ : SmoothForm n X l) :
     ω ⋏ (η₁ - η₂) = (ω ⋏ η₁) - (ω ⋏ η₂) := by
-  have h1 : η₁ - η₂ = η₁ + (-1 : ℂ) • η₂ := by simp [sub_eq_add_neg]
+  have h1 : η₁ - η₂ = η₁ + (-1 : ℂ) • η₂ := by simp [sub_eq_add_neg, neg_one_smul]
   rw [h1, smoothWedge_add_right, smoothWedge_smul_right]
-  simp [sub_eq_add_neg]
+  simp [sub_eq_add_neg, neg_one_smul]
