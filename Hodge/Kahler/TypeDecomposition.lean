@@ -50,28 +50,21 @@ theorem two_add_two_mul (p : ℕ) : 2 + 2 * p = 2 * (p + 1) := by ring
 
 /-- Powers of the Kähler form ω^p.
 
-    **Current Implementation:**
-    - ω^0 = 0 (placeholder; the unit form lives in degree 0 as a separate entity)
+    **Implementation:**
+    - ω^0 = 0 (placeholder; unit form lives in degree 0, but is stubbed elsewhere)
     - ω^1 = ω (the Kähler form)
-    - ω^(p+2) = 0 (simplified; see note below)
+    - ω^(p+2) = ω ∧ ω^(p+1) (with a degree cast using `castForm`)
 
-    **Note on p ≥ 2:**
-    The wedge product infrastructure (`smoothWedge` using `ContinuousAlternatingMap.wedge`)
-    is fully functional. However, defining ω^p for p ≥ 2 via recursive wedge products
-    requires careful handling of degree-indexed type equality (`2 + 2*(p+1) = 2*(p+2)`).
-    This involves transporting cohomology classes along these equalities.
-
-    For the current proof architecture, the main theorem only requires ω^1 = ω,
-    so we use a simplified definition. A full implementation would use:
-      `kahlerPow (p+2) := cast (ω ⋏ kahlerPow (p+1))`
-    with appropriate transport lemmas for `IsFormClosed` and `isRationalClass`.
-
-    **TODO:** Implement full ω^p using wedge products when needed for higher-degree results. -/
+    **Note**: This removes the previous degeneracy `kahlerPow p = 0` for `p ≥ 2`.
+    The only remaining semantic stub here is ω^0. -/
 noncomputable def kahlerPow (p : ℕ) : SmoothForm n X (2 * p) :=
   match p with
-  | 0 => 0  -- ω^0: placeholder
+  | 0 => 0  -- ω^0: placeholder (unit form is currently stubbed)
   | 1 => (Nat.two_mul 1).symm ▸ K.omega_form  -- ω^1 = ω
-  | _ + 2 => 0  -- Simplified for now
+  | p + 2 =>
+      -- ω^(p+2) = ω ∧ ω^(p+1), with degree cast:
+      -- deg(ω) = 2, deg(ω^(p+1)) = 2*(p+1), so deg = 2 + 2*(p+1) = 2*(p+2)
+      castForm (two_add_two_mul (p + 1)) (K.omega_form ⋏ kahlerPow (p + 1))
 
 theorem omega_pow_IsFormClosed (p : ℕ) : IsFormClosed (kahlerPow (n := n) (X := X) p) := by
   unfold kahlerPow
@@ -80,13 +73,47 @@ theorem omega_pow_IsFormClosed (p : ℕ) : IsFormClosed (kahlerPow (n := n) (X :
   | 1 =>
     cases (Nat.two_mul 1).symm
     exact K.omega_closed
-  | _ + 2 => exact isFormClosed_zero
+  | p + 2 =>
+    -- cast preserves closedness
+    -- (in the current stubbed setup, all forms are closed anyway, but we keep the structured proof)
+    have hω : IsFormClosed (K.omega_form) := K.omega_closed
+    have hp1 : IsFormClosed (kahlerPow (n := n) (X := X) (p + 1)) := omega_pow_IsFormClosed (p + 1)
+    have hw : IsFormClosed (K.omega_form ⋏ kahlerPow (n := n) (X := X) (p + 1)) :=
+      isFormClosed_wedge _ _ hω hp1
+    -- `castForm` preserves closedness
+    exact
+      IsFormClosed_castForm (n := n) (X := X) (two_add_two_mul (p + 1))
+        (K.omega_form ⋏ kahlerPow (n := n) (X := X) (p + 1)) hw
 
-theorem omega_pow_is_rational_TD (p : ℕ) : isRationalClass ⟦kahlerPow (n := n) (X := X) p, omega_pow_IsFormClosed p⟧ := by
+theorem omega_pow_is_rational_TD (p : ℕ) :
+    isRationalClass ⟦kahlerPow (n := n) (X := X) p, omega_pow_IsFormClosed p⟧ := by
   unfold kahlerPow
   match p with
-  | 0 => exact isRationalClass_zero
+  | 0 =>
+    -- ω^0 placeholder
+    exact isRationalClass_zero
   | 1 =>
     cases (Nat.two_mul 1).symm
     exact K.omega_rational
-  | _ + 2 => exact isRationalClass_zero
+  | p + 2 =>
+    -- ω^(p+2) = cast (ω ∧ ω^(p+1)); rationality follows from product of rationals
+    have hω_closed : IsFormClosed (K.omega_form) := K.omega_closed
+    have hp1_closed : IsFormClosed (kahlerPow (n := n) (X := X) (p + 1)) := omega_pow_IsFormClosed (p + 1)
+    have hω_rat : isRationalClass ⟦K.omega_form, hω_closed⟧ := K.omega_rational
+    have hp1_rat : isRationalClass ⟦kahlerPow (n := n) (X := X) (p + 1), hp1_closed⟧ :=
+      omega_pow_is_rational_TD (p + 1)
+    have hw_closed : IsFormClosed (K.omega_form ⋏ kahlerPow (n := n) (X := X) (p + 1)) :=
+      isFormClosed_wedge _ _ hω_closed hp1_closed
+    -- rationality of the wedge (product in cohomology)
+    have hprod :
+        isRationalClass (⟦K.omega_form, hω_closed⟧ * ⟦kahlerPow (n := n) (X := X) (p + 1), hp1_closed⟧) :=
+      isRationalClass_mul _ _ hω_rat hp1_rat
+    have hw_rat :
+        isRationalClass (⟦K.omega_form ⋏ kahlerPow (n := n) (X := X) (p + 1), hw_closed⟧) := by
+      simpa [ofForm_wedge] using hprod
+    -- transport along the degree cast used in `kahlerPow`
+    have hcast :=
+      isRationalClass_cast (n := n) (X := X) (two_add_two_mul (p + 1))
+        (⟦K.omega_form ⋏ kahlerPow (n := n) (X := X) (p + 1), hw_closed⟧) hw_rat
+    -- rewrite casted class as the class of the casted representative (`kahlerPow (p+2)`)
+    simpa [DeRhamCohomologyClass.cast_ofForm, IsFormClosed_castForm, castForm] using hcast

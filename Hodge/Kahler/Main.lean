@@ -214,18 +214,24 @@ theorem omega_form_eq_zero : K.omega_form = 0 := by
 
 /-- **Corollary: All Kähler Powers Are Zero**
 
-    Since kahlerPow is defined as 0 for p ≠ 1, and kahlerPow 1 = omega_form = 0,
-    all Kähler powers are zero. -/
+    In the current stub architecture, `omega_form = 0`. Since `kahlerPow` is built
+    recursively using wedge products with `omega_form`, all Kähler powers are zero. -/
 theorem kahlerPow_eq_zero (p : ℕ) : kahlerPow (n := n) (X := X) p = 0 := by
-  unfold kahlerPow
-  match p with
-  | 0 => rfl
-  | 1 =>
-    -- kahlerPow 1 = (Nat.two_mul 1).symm ▸ omega_form
-    -- omega_form = 0, so we need to show (eq ▸ 0) = 0
-    have h : K.omega_form = 0 := omega_form_eq_zero
-    simp only [h, eq_rec_constant]
-  | _ + 2 => rfl
+  have hω : K.omega_form = 0 := omega_form_eq_zero
+  cases p with
+  | zero =>
+    simp [kahlerPow]
+  | succ p =>
+    cases p with
+    | zero =>
+      -- p = 1
+      unfold kahlerPow
+      -- reduce the degree cast
+      cases (Nat.two_mul 1).symm
+      simpa [hω]
+    | succ p =>
+      -- p = p.succ.succ = (p+2)
+      simp [kahlerPow, hω]
 
 /-- **Rational Multiple of Kähler Power is Algebraic** (Griffiths-Harris, 1978).
 

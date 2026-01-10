@@ -104,6 +104,23 @@ theorem DeRhamCohomologyClass.cast_zero {k₁ k₂ : ℕ} (h : k₁ = k₂) :
   subst h
   rfl
 
+/-- Casting a closedness proof along a degree equality.
+    This is a small helper for working with degree-indexed forms. -/
+theorem IsFormClosed_castForm {k₁ k₂ : ℕ} (h : k₁ = k₂) (ω : SmoothForm n X k₁)
+    (hω : IsFormClosed ω) : IsFormClosed (castForm (n := n) (X := X) h ω) := by
+  subst h
+  simpa [castForm] using hω
+
+/-- `ofForm` is compatible with degree casts: casting the cohomology class equals
+the class of the casted representative form. -/
+theorem DeRhamCohomologyClass.cast_ofForm {k₁ k₂ : ℕ} (h : k₁ = k₂)
+    (ω : SmoothForm n X k₁) (hω : IsFormClosed ω) :
+    h ▸ (⟦ω, hω⟧ : DeRhamCohomologyClass n X k₁) =
+      (⟦castForm (n := n) (X := X) h ω, IsFormClosed_castForm (n := n) (X := X) h ω hω⟧ :
+        DeRhamCohomologyClass n X k₂) := by
+  subst h
+  rfl
+
 /-! ### Well-definedness axioms -/
 
 theorem cohomologous_add {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
@@ -501,6 +518,13 @@ inductive isRationalClass {n : ℕ} {X : Type u}
       isRationalClass η → isRationalClass (-η)
   | mul {k l : ℕ} {η₁ : DeRhamCohomologyClass n X k} {η₂ : DeRhamCohomologyClass n X l} :
       isRationalClass η₁ → isRationalClass η₂ → isRationalClass (η₁ * η₂)
+
+/-- `isRationalClass` is stable under degree casts. -/
+theorem isRationalClass_cast {k₁ k₂ : ℕ} (h : k₁ = k₂) (η : DeRhamCohomologyClass n X k₁) :
+    isRationalClass η → isRationalClass (h ▸ η) := by
+  intro hη
+  subst h
+  simpa using hη
 
 theorem isRationalClass_zero {k : ℕ} :
     isRationalClass (n := n) (X := X) (k := k) (0 : DeRhamCohomologyClass n X k) :=
