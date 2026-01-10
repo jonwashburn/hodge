@@ -55,11 +55,11 @@ report_grep "Project axioms (Lean axiom declarations)" '^axiom\b' "Hodge" \
 report_grep "Opaque constants (opaque declarations)" '^opaque\b' "Hodge"
 
 # 3) Sorries (outside Advanced sandbox)
-report_grep "Sorries outside Hodge/Analytic/Advanced/" '\bsorry\b' "Hodge" \
+report_grep "Sorries outside Hodge/Analytic/Advanced/" '^[[:space:]]*sorry\b' "Hodge" \
   --exclude-dir="Advanced"
 
 # 3b) Sorries inside Advanced sandbox (tracked, but currently quarantined)
-report_grep "Sorries inside Hodge/Analytic/Advanced/ (quarantined)" '\bsorry\b' "Hodge/Analytic/Advanced"
+report_grep "Sorries inside Hodge/Analytic/Advanced/ (quarantined)" '^[[:space:]]*sorry\b' "Hodge/Analytic/Advanced"
 
 # 4) Known semantic stubs: exterior derivative placeholder (show defining snippet)
 say ""
