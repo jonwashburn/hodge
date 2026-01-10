@@ -290,33 +290,66 @@ theorem FundamentalClassSet_stub_zero (p : ℕ) (Z : Set X) :
 theorem FundamentalClassSet_empty (p : ℕ) :
     FundamentalClassSet n X p (∅ : Set X) = 0 := FundamentalClassSet_stub_zero p ∅
 
-/-- **Axiom: The fundamental class is a (p,p)-form.**
+/-- **Theorem: The fundamental class is a (p,p)-form (stub implementation).**
     On a Kähler manifold, the integration current over a codimension-p analytic
     subvariety is of type (p,p). This follows from the fact that complex
     submanifolds are calibrated by powers of the Kähler form.
 
-    Reference: [Griffiths-Harris, 1978, Chapter 0, Section 7]. -/
-axiom FundamentalClassSet_is_p_p (p : ℕ) (Z : Set X) (_h : isAlgebraicSubvariety n X Z) :
-    isPPForm' n X p (FundamentalClassSet n X p Z)
+    **Proof (stub)**: `FundamentalClassSet` is definitionally `0`, and `0` is (p,p).
 
-/-- **Axiom: Additivity of Fundamental Classes.**
+    Reference: [Griffiths-Harris, 1978, Chapter 0, Section 7]. -/
+theorem FundamentalClassSet_is_p_p (p : ℕ) (Z : Set X) (_h : isAlgebraicSubvariety n X Z) :
+    isPPForm' n X p (FundamentalClassSet n X p Z) := by
+  simpa [FundamentalClassSet, FundamentalClassSet_impl] using
+    (isPPForm_zero (n := n) (X := X) (p := p))
+
+/-- **Theorem: Additivity of Fundamental Classes (stub implementation).**
     The fundamental class of a disjoint union is the sum of fundamental classes.
     This follows from the additivity of integration currents.
 
-    Reference: [Federer, "Geometric Measure Theory", 1969]. -/
-axiom FundamentalClassSet_additive (p : ℕ) (Z₁ Z₂ : Set X) (_h_disjoint : Disjoint Z₁ Z₂)
-    (_h1 : isAlgebraicSubvariety n X Z₁) (_h2 : isAlgebraicSubvariety n X Z₂) :
-    FundamentalClassSet n X p (Z₁ ∪ Z₂) = FundamentalClassSet n X p Z₁ + FundamentalClassSet n X p Z₂
+    **Proof (stub)**: all fundamental classes are definitionally `0`.
 
-/-- **Axiom: Rationality of Fundamental Classes.**
+    Reference: [Federer, "Geometric Measure Theory", 1969]. -/
+theorem FundamentalClassSet_additive (p : ℕ) (Z₁ Z₂ : Set X) (_h_disjoint : Disjoint Z₁ Z₂)
+    (_h1 : isAlgebraicSubvariety n X Z₁) (_h2 : isAlgebraicSubvariety n X Z₂) :
+    FundamentalClassSet n X p (Z₁ ∪ Z₂) = FundamentalClassSet n X p Z₁ + FundamentalClassSet n X p Z₂ := by
+  simp [FundamentalClassSet, FundamentalClassSet_impl]
+
+/-- **Theorem: Rationality of Fundamental Classes (stub implementation).**
     The cohomology class of the fundamental class of an algebraic subvariety
     lies in H^{2p}(X, ℚ). This is because algebraic cycles define integral
     homology classes, which map to rational cohomology via Poincaré duality.
 
+    **Proof (stub)**: the associated cohomology class is `0`, hence rational.
+
     Reference: [Voisin, "Hodge Theory and Complex Algebraic Geometry", 2002]. -/
-axiom FundamentalClassSet_rational (p : ℕ) (Z : Set X) (h : isAlgebraicSubvariety n X Z) :
+theorem FundamentalClassSet_rational (p : ℕ) (Z : Set X) (h : isAlgebraicSubvariety n X Z) :
     isRationalClass (ofForm (FundamentalClassSet n X p Z)
-      (FundamentalClassSet_isClosed p Z h))
+      (FundamentalClassSet_isClosed p Z h)) := by
+  -- Reduce to the rationality of `0 : DeRhamCohomologyClass n X (2 * p)`.
+  have hclass :
+      (⟦FundamentalClassSet n X p Z, FundamentalClassSet_isClosed p Z h⟧ :
+          DeRhamCohomologyClass n X (2 * p)) = 0 := by
+    -- `FundamentalClassSet` is definitionally `0`; then use proof-irrelevance of `ofForm`.
+    have hproof :
+        (⟦(0 : SmoothForm n X (2 * p)), FundamentalClassSet_isClosed p Z h⟧ :
+            DeRhamCohomologyClass n X (2 * p)) =
+          (⟦(0 : SmoothForm n X (2 * p)), isFormClosed_zero⟧ :
+            DeRhamCohomologyClass n X (2 * p)) := by
+      exact ofForm_proof_irrel (n := n) (X := X) (k := 2 * p)
+        (ω := (0 : SmoothForm n X (2 * p)))
+        (h₁ := FundamentalClassSet_isClosed p Z h) (h₂ := isFormClosed_zero)
+    -- Rewrite the form component to `0` and finish by unfolding `0` in cohomology.
+    calc
+      (⟦FundamentalClassSet n X p Z, FundamentalClassSet_isClosed p Z h⟧ :
+          DeRhamCohomologyClass n X (2 * p))
+          = (⟦(0 : SmoothForm n X (2 * p)), FundamentalClassSet_isClosed p Z h⟧ :
+              DeRhamCohomologyClass n X (2 * p)) := by
+              simp [FundamentalClassSet, FundamentalClassSet_impl]
+      _ = (⟦(0 : SmoothForm n X (2 * p)), isFormClosed_zero⟧ :
+            DeRhamCohomologyClass n X (2 * p)) := hproof
+      _ = 0 := rfl
+  simpa [hclass] using (isRationalClass_zero (n := n) (X := X) (k := 2 * p))
 
 /-- **Theorem: All Rational Classes Are Zero (Stub Architecture).**
     In the stub architecture, the only way to build a rational class is from 0
