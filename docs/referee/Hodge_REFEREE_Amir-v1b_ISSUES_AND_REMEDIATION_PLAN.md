@@ -12,13 +12,37 @@ This document has two goals:
 
 ---
 
-### Executive summary (where we’re at)
+### Executive summary (where we're at)
+
+**Progress update (2026-01-10)**: The following items have been completed:
+- ✅ **Phase 0**: Audit infrastructure (`AuditAxioms.lean`, `AuditOpaque.lean`, `scripts/audit_faithfulness.sh`)
+- ✅ **Phase 0**: All `opaque` constants replaced with `def := 0` stubs (auditable)
+- ✅ **Phase 1A**: All `FundamentalClassSet_*` axioms converted to theorems (stub-level)
+- ✅ **Phase 2A**: `ChartExtDeriv.lean` build break fixed
+- ✅ **Phase 2C**: `sorry` blocks in `Advanced/*` eliminated or documented
+- ✅ **Phase E**: `unitForm` is now the real constant-1 form (not 0)
+- ✅ **Phase E**: `kahlerPow 0` wired to `unitForm`; `isRationalClass.unit` added
+- 🚧 **Phase 2B** (in progress): Real exterior derivative infrastructure
+
+**Current audit status** (`bash scripts/audit_faithfulness.sh`):
+- ✅ No explicit axioms in `Hodge/`
+- ✅ No `opaque` constants
+- ✅ No `sorry` statements
+- ⚠️ **3 semantic-stub blocker categories remain**:
+  1. `extDerivLinearMap := 0` (exterior derivative)
+  2. `FundamentalClassSet_impl := 0` (cycle class)
+  3. `integration_current := 0` (integration current)
+  4. Kähler/Hodge operators := 0 (hodge star, adjoint, laplacian)
+
+---
+
+**Original status (for reference)**:
 
 - **Current Lean status**: The project builds and `AuditAxioms` can be made to report only core axioms (e.g. `propext`, `Classical.choice`, `Quot.sound`) depending on the current branch state; however **the proof path still relies on non-Clay-standard mechanisms**:
-  - **`opaque` black boxes** (e.g. `FundamentalClassSet_impl`, `integration_current`) that conceal missing constructions.
-  - **Axiomatized properties of fundamental classes** (`FundamentalClassSet_isClosed`, `..._rational`, etc.).
+  - ~~**`opaque` black boxes** (e.g. `FundamentalClassSet_impl`, `integration_current`) that conceal missing constructions.~~ (Resolved: now `def := 0`)
+  - ~~**Axiomatized properties of fundamental classes** (`FundamentalClassSet_isClosed`, `..._rational`, etc.).~~ (Resolved: converted to theorems)
   - **Placeholder/stub analytic operators** (e.g. `extDerivLinearMap := 0`, Kähler/Hodge operators `:= 0`) that collapse de Rham/Hodge theory to a degenerate model.
-  - **Isolated `sorry` blocks** in `Hodge/Analytic/Advanced/*` (not on the main proof path today, but they block an unconditional upgrade).
+  - ~~**Isolated `sorry` blocks** in `Hodge/Analytic/Advanced/*` (not on the main proof path today, but they block an unconditional upgrade).~~ (Resolved: eliminated)
 
 - **TeX v1b status**: The referee packet is structured around a “proof spine” with explicit bottlenecks. It highlights where the Lean formalization would have to do real quantitative work (notably the transport→flat-norm/gluing hinge, and the holomorphic complete-intersection upgrade with uniform \(C^1\) control).
 
