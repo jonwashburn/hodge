@@ -1,8 +1,52 @@
 # Hodge Conjecture Formalization: COMPLETE PROOF PLAN
 
-**Document Version**: 2.0  
+**Document Version**: 3.0  
 **Date**: January 11, 2026  
 **Goal**: Complete proof with **ZERO custom axioms** and **ZERO sorry statements**
+
+---
+
+## 🔴 CURRENT PROOF TRACK STATUS (as of 2026-01-11)
+
+### `#print axioms hodge_conjecture'` Output:
+
+```
+'hodge_conjecture'' depends on axioms: [
+  FundamentalClassSet_represents_class,   -- Custom axiom (GAGA.lean:419)
+  propext,                                 -- ✅ Standard Lean
+  sorryAx,                                 -- 🔴 FROM SORRY IN LEIBNIZRULE.LEAN
+  Classical.choice,                        -- ✅ Standard Lean
+  Current.smoothExtDeriv_comass_bound,     -- Custom axiom (Currents.lean:345)
+  Quot.sound                               -- ✅ Standard Lean
+]
+```
+
+### Axiom Breakdown:
+
+| Category | Axiom | Location | Status |
+|----------|-------|----------|--------|
+| **🔴 SORRY** | `sorryAx` | LeibnizRule.lean:397, 461 | **MUST FIX** |
+| **Custom** | `smoothExtDeriv_comass_bound` | Currents.lean:345 | Infrastructure axiom |
+| **Custom** | `FundamentalClassSet_represents_class` | GAGA.lean:419 | Deep geometric result |
+| **Custom** | `poincareDualForm_isPP` | CycleClass.lean:231 | (p,p)-type property |
+| **Custom** | `poincareDualForm_isRational` | CycleClass.lean:254 | Rationality property |
+| **Custom** | `poincareDualForm_additive` | CycleClass.lean:275 | Additivity property |
+| **Custom** | 8 Kähler axioms | Manifolds.lean | Hodge star, Λ, δ, etc. |
+| ✅ Standard | `propext`, `Classical.choice`, `Quot.sound` | Lean kernel | Always present |
+
+### Priority Actions:
+
+1. **🔴 CRITICAL**: Remove `sorry` from `LeibnizRule.lean` (causes `sorryAx`)
+   - Line 397: `shuffle_bijection_right` (induction case)
+   - Line 461: `shuffle_bijection_left`
+
+2. **Phase 2**: Prove Leibniz shuffle lemmas (removes 2 axioms after sorry→axiom)
+
+3. **Phase 3**: Prove CycleClass axioms (3 axioms - needs GMT infrastructure)
+
+4. **Phase 4**: Prove Kähler operator axioms (~8 axioms - hardest)
+
+5. **Phase 5**: Prove `FundamentalClassSet_represents_class` (deepest geometric result)
 
 ---
 
@@ -92,30 +136,62 @@ An agent’s work is “done” if and only if it results in one of:
 
 ---
 
-## Current Status
+## Current Status (Updated 2026-01-11)
 
-### Proof Track Axioms Status (Updated)
+### Proof Track Axioms Status
 
-**Latest `#print axioms hodge_conjecture'` output** (7 custom + 3 standard):
+**Latest `#print axioms hodge_conjecture'` output**:
 ```
-extDerivLinearMap, isFormClosed_unitForm, smoothExtDeriv_extDeriv, smoothExtDeriv_wedge,
-Current.smoothExtDeriv_comass_bound, FundamentalClassSet_represents_class,
-Hodge.cohomologous_wedge
-+ propext, Classical.choice, Quot.sound (standard)
+FundamentalClassSet_represents_class, propext, sorryAx, Classical.choice,
+Current.smoothExtDeriv_comass_bound, Quot.sound
 ```
 
-| # | Axiom | Status | Notes |
-|---|-------|--------|-------|
-| 1 | `extDerivLinearMap` | ⚠️ NEEDS PROOF | `mfderiv` + alternatization |
-| 2 | `isFormClosed_unitForm` | ⚠️ NEEDS PROOF | `mfderiv_const` = 0 |
-| 3 | `isSmoothAlternating_wedge` | ✅ **PROVED** | Bilinear map composition |
-| 4 | `smoothExtDeriv_extDeriv` | ⚠️ NEEDS PROOF | Symmetry of mixed partials |
-| 5 | `smoothExtDeriv_wedge` | ⚠️ NEEDS PROOF | Leibniz rule for derivatives |
-| 6 | `FundamentalClassSet_represents_class` | ⚠️ NEEDS PROOF | Poincaré duality / current→cohomology bridge |
-| 7 | `SignedAlgebraicCycle.lefschetz_lift` | ✅ **PROVED** | Now theorem, corollary of hodge_conjecture' |
-| 8 | `omega_pow_algebraic` | ✅ **PROVED** | Uses cone_positive_represents |
-| 9 | `Current.boundary_bound` | 🔄 **REFACTORED** | → `smoothExtDeriv_comass_bound` |
-| 10 | `cohomologous_wedge` | ⚠️ NEEDS PROOF | Leibniz rule |
+### Immediate Blockers (🔴 CRITICAL)
+
+| Issue | Location | Fix |
+|-------|----------|-----|
+| **`sorryAx`** | LeibnizRule.lean:397, 461 | Remove `sorry` from shuffle lemmas |
+
+### Custom Axioms on Proof Track
+
+| # | Axiom | Location | Difficulty | Notes |
+|---|-------|----------|------------|-------|
+| 1 | `smoothExtDeriv_comass_bound` | Currents.lean:345 | 🟡 Infrastructure | Needs Fréchet topology |
+| 2 | `FundamentalClassSet_represents_class` | GAGA.lean:419 | 🔴 Hard | Deep geometric result |
+
+### CycleClass Axioms (contribute to axiom #2 above)
+
+| # | Axiom | Location | Difficulty |
+|---|-------|----------|------------|
+| 3 | `poincareDualForm_isPP` | CycleClass.lean:231 | 🟠 Medium |
+| 4 | `poincareDualForm_isRational` | CycleClass.lean:254 | 🟠 Medium |
+| 5 | `poincareDualForm_additive` | CycleClass.lean:275 | 🟠 Medium |
+
+### Kähler/Manifolds Axioms
+
+| # | Axiom | Location | Difficulty |
+|---|-------|----------|------------|
+| 6 | `lefschetzLambdaLinearMap` | Manifolds.lean:111 | 🔴 Hard |
+| 7 | `lefschetzLambda_adjoint` | Manifolds.lean:144 | 🔴 Hard |
+| 8 | `lefschetzLambda_hodgeStar_formula` | Manifolds.lean:168 | 🔴 Hard |
+| 9 | `hodgeStarLinearMap` | Manifolds.lean:218 | 🔴 Hard |
+| 10 | `hodgeStar_hodgeStar` | Manifolds.lean:264 | 🟠 Medium |
+| 11 | `adjointDerivLinearMap` | Manifolds.lean:298 | 🔴 Hard |
+| 12 | `adjointDeriv_squared` | Manifolds.lean:350 | 🟠 Medium |
+| 13 | `laplacianLinearMap` | Manifolds.lean:381 | 🔴 Hard |
+| 14 | `isHarmonic_implies_coclosed` | Manifolds.lean:478 | 🟠 Medium |
+| 15 | `isHarmonic_implies_closed` | Manifolds.lean:487 | 🟠 Medium |
+
+### Completed Items ✅
+
+| Item | Status | Notes |
+|------|--------|-------|
+| `extDerivLinearMap` | ✅ **DEFINED** | Now a `def` not `axiom` |
+| `isSmoothAlternating_wedge` | ✅ **PROVED** | Bilinear map composition |
+| `SignedAlgebraicCycle.lefschetz_lift` | ✅ **PROVED** | Now theorem |
+| `omega_pow_algebraic` | ✅ **PROVED** | Uses cone_positive_represents |
+| `Current.boundary_bound` | ✅ **PROVED** | From `smoothExtDeriv_comass_bound` |
+| `wedge_constOfIsEmpty_left/right` | ✅ **PROVED** | DomCoprod.lean |
 
 ### Agent 3 Report: Current.smoothExtDeriv_comass_bound
 
@@ -151,6 +227,55 @@ Hodge.cohomologous_wedge
 
 **Resolution**: Accept as infrastructure axiom. This is analogous to how Mathlib accepts
 `Quot.sound` and `propext` — foundational assumptions needed for the theory to work.
+
+---
+
+## 🔴 IMMEDIATE ACTION: Fix `sorryAx` in LeibnizRule.lean
+
+The `sorryAx` in `#print axioms` comes from two `sorry` statements that MUST be fixed:
+
+### Location 1: `shuffle_bijection_right` (line 397)
+
+```lean
+/-- Shuffle Bijection Lemma (right case) -/
+private lemma shuffle_bijection_right {k l : ℕ}
+    (v : Fin ((k+l)+1) → TangentModel n)
+    (A : TangentModel n →L[ℂ] Alt n k)
+    (B : Alt n l) :
+    ∑ i : Fin ((k+l)+1), ((-1 : ℤ)^(i : ℕ)) • ((A (v i)).wedge B) (Fin.removeNth i v) =
+    ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A).wedge B)
+      (v ∘ finCongr (show (k+1)+l = (k+l)+1 by omega)) := by
+  induction l with
+  | zero => exact shuffle_bijection_right_l0 v A B
+  | succ l' _ =>
+    sorry  -- 🔴 THIS CAUSES sorryAx
+```
+
+### Location 2: `shuffle_bijection_left` (line 461)
+
+```lean
+/-- Shuffle Bijection Lemma (left case) -/
+private lemma shuffle_bijection_left {k l : ℕ}
+    (v : Fin ((k+l)+1) → TangentModel n)
+    (A : Alt n k)
+    (B : TangentModel n →L[ℂ] Alt n l) :
+    ∑ i : Fin ((k+l)+1), ((-1 : ℤ)^(i : ℕ)) • (A.wedge (B (v i))) (Fin.removeNth i v) =
+    ((-1 : ℂ)^k • A.wedge (ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B))
+      (v ∘ finCongr (show k+(l+1) = (k+l)+1 by omega)) := by
+  sorry  -- 🔴 THIS CAUSES sorryAx
+```
+
+### Options to Fix:
+
+**Option A: Convert to explicit axioms** (quick fix)
+- Replace `sorry` with well-documented `axiom` declarations
+- Removes `sorryAx` from output and makes dependencies transparent
+- Does NOT reduce total custom axioms but cleans up the proof track
+
+**Option B: Prove the lemmas** (harder but eliminates axioms)
+- These are combinatorial shuffle bijection lemmas
+- Math is documented in the file (Bott-Tu, Warner references)
+- Requires constructing explicit bijections on shuffle quotients
 
 ---
 
@@ -673,6 +798,29 @@ Converting a `sorry` to an `axiom` is **NOT proving** - it's just changing the l
 
 ---
 
-*Document Version*: 2.0  
+---
+
+## Appendix C: Quick Commands
+
+```bash
+# Fetch Mathlib cache (ALWAYS run before building)
+lake exe cache get
+
+# Safe build (uses helper script)
+./scripts/build.sh
+
+# Check proof track axioms
+lake env lean Hodge/Utils/DependencyCheck.lean
+
+# Run audit script
+./scripts/audit_stubs.sh
+
+# Full grep for sorry/axiom
+grep -rn "sorry\|^axiom" Hodge/ --include="*.lean"
+```
+
+---
+
+*Document Version*: 3.0  
 *Updated*: January 11, 2026  
 *Goal*: ZERO custom axioms, ZERO sorry statements
