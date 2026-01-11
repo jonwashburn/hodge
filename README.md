@@ -19,8 +19,10 @@ theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : Is
 This theorem asserts that every rational (p,p)-class on a smooth projective complex manifold is represented by a signed algebraic cycle.
 
 ## Project Status
-- **Sorries**: run `grep -R "sorry\\|admit" Hodge/**/*.lean` to verify.
-- **Axioms**: see `PROOF_CHAIN_AXIOMS.md` (proof-chain list) and `CLASSICAL_PILLARS.md` (the 6 intended keep-as-axiom pillars).
+- **Proof-track ground truth**: run `lake env lean Hodge/Utils/DependencyCheck.lean` (this is the authoritative kernel report for `hodge_conjecture` / `hodge_conjecture'`).
+- **Quick audit**: run `./scripts/audit_stubs.sh` (defaults to proof-track; pass `--full` for a full-repo grep scan).
+- **Axioms (design docs)**: see `docs/plans/PROOF_CHAIN_AXIOMS.md` and `CLASSICAL_PILLARS.md`.
+- **Where we are (human-readable)**: see `docs/PROOF_TRACK_STATUS.md`.
 - **Documentation**: the classical pillars are cited in Lean docstrings and summarized in `CLASSICAL_PILLARS.md`.
 
 ## Axiom List & Citations
@@ -43,10 +45,10 @@ This project uses Lean 4. To verify the proof:
 
 ```bash
 lake build
-lake env lean DependencyCheck.lean
+lake env lean Hodge/Utils/DependencyCheck.lean
 ```
 
-To check for any remaining `sorry` or `admit`:
+To scan the whole repo for any remaining `sorry` or `admit` (note: this includes off-track files):
 
 ```bash
 grep -R "sorry\|admit" Hodge

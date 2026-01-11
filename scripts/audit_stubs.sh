@@ -9,8 +9,42 @@ echo ""
 
 cd "$(dirname "$0")/.." || exit 1
 
-echo "1. AXIOMS"
-echo "========="
+MODE="proof-track"
+if [ "${1:-}" = "--full" ]; then
+    MODE="full"
+fi
+
+if [ "$MODE" = "proof-track" ]; then
+    echo "1. PROOF-TRACK AXIOMS (Lean kernel report)"
+    echo "========================================="
+    echo "Ground truth is Lean's kernel dependency list:"
+    echo "  #print axioms hodge_conjecture"
+    echo "  #print axioms hodge_conjecture'"
+    echo ""
+    echo "Running: lake env lean Hodge/Utils/DependencyCheck.lean"
+    echo ""
+    lake env lean Hodge/Utils/DependencyCheck.lean
+    echo ""
+
+    echo "2. NOTE"
+    echo "======="
+    echo "This default mode reports ONLY the active proof track."
+    echo "It intentionally does NOT grep the whole repo for '^axiom'/'sorry', because that"
+    echo "includes off-track or unused development stubs that are not in the dependency cone"
+    echo "of the main theorem."
+    echo ""
+    echo "To run the full repo scan (noisy by design), run:"
+    echo "  ./scripts/audit_stubs.sh --full"
+    echo ""
+
+    echo "========================================"
+    echo "AUDIT COMPLETE"
+    echo "========================================"
+    exit 0
+fi
+
+echo "1. AXIOMS (FULL REPO SCAN)"
+echo "========================="
 axiom_count=$(grep -rn "^axiom" Hodge/ 2>/dev/null | wc -l)
 if [ "$axiom_count" -eq 0 ]; then
     echo "✓ No axioms found"
@@ -63,12 +97,8 @@ echo ""
 
 echo "6. AXIOM AUDIT (VIA LEAN)"
 echo "========================="
-if [ -f "Hodge/Utils/AuditAxioms.lean" ]; then
-    echo "Running lake env lean Hodge/Utils/AuditAxioms.lean..."
-    lake env lean Hodge/Utils/AuditAxioms.lean 2>&1 | grep -E "(axiom|sorry|opaque)" || echo "✓ No non-standard axioms detected"
-else
-    echo "⚠ AuditAxioms.lean not found"
-fi
+echo "Running: lake env lean Hodge/Utils/DependencyCheck.lean"
+lake env lean Hodge/Utils/DependencyCheck.lean
 echo ""
 
 echo "========================================"
