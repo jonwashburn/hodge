@@ -1,0 +1,50 @@
+# Hodge Conjecture Lean 4 Formalization - Workspace Rules
+
+## CRITICAL: Mathlib Cache (NEVER rebuild Mathlib from source!)
+
+**Before running ANY `lake build` command, ALWAYS run:**
+```bash
+lake exe cache get
+```
+
+This downloads pre-compiled Mathlib binaries (~2-5 min) instead of building from source (2-4 hours).
+
+**Use the helper script for safe builds:**
+```bash
+./scripts/build.sh
+```
+
+## Project Context
+
+This is a Lean 4 formalization of the Hodge Conjecture. The main theorem is `hodge_conjecture'` in `Hodge/Kahler/Main.lean`.
+
+### Checking Proof Status
+
+To see what axioms remain on the proof track:
+```bash
+lake env lean Hodge/Utils/DependencyCheck.lean
+```
+
+Or use the audit script:
+```bash
+./scripts/audit_stubs.sh
+```
+
+### Key Files
+- `Hodge/Kahler/Main.lean` - Main theorem
+- `Hodge/Analytic/Currents.lean` - Current infrastructure  
+- `Hodge/Analytic/DomCoprod.lean` - Wedge product definitions
+- `Hodge/Analytic/Advanced/LeibnizRule.lean` - Leibniz rule lemmas
+- `docs/PROOF_TRACK_STATUS.md` - Current axiom status
+
+### Goal
+Eliminate all custom axioms from the proof track. Currently working on:
+- `LeibnizRule.alternatizeUncurryFin_wedge_left`
+- `LeibnizRule.alternatizeUncurryFin_wedge_right`
+- `Current.smoothExtDeriv_comass_bound` (infrastructure axiom)
+- `FundamentalClassSet_represents_class` (deep geometric result)
+
+## Code Style
+- Follow existing Lean 4 / Mathlib conventions
+- Use `theorem` for provable facts, only use `axiom` when absolutely necessary
+- Document any new axioms in `docs/PROOF_TRACK_STATUS.md`
