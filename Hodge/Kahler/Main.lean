@@ -102,25 +102,6 @@ theorem automatic_syr {p : ℕ} (γ : SmoothForm n X (2 * p))
     Axiomatized due to missing type class instances. -/
 theorem omega_pow_represents_multiple (_p : ℕ) : True := trivial
 
-/-- **Lemma: In stub regime, rational classes are zero**
-
-    With the current `isRationalClass` definition where the only base case is `zero`,
-    every rational class can be shown to equal 0 by induction on the constructors. -/
-theorem isRationalClass_implies_zero {k : ℕ} (c : DeRhamCohomologyClass n X k)
-    (hc : isRationalClass c) : c = 0 := by
-  induction hc with
-  | zero => rfl
-  | add _ _ ih1 ih2 => rw [ih1, ih2, add_zero]
-  | smul_rat q _ ih =>
-    -- q • η = (q : ℂ) • η, and (q : ℂ) • 0 = 0
-    show q • _ = 0
-    rw [ih]
-    -- q • 0 = (q : ℂ) • 0 = 0 by the Module instance
-    unfold HSMul.hSMul instHSMul SMul.smul instSMulRationalDeRhamCohomologyClass
-    exact smul_zero (q : ℂ)
-  | neg _ ih => rw [ih, neg_zero]
-  | mul _ _ ih1 ih2 => rw [ih1]; exact Hodge.zero_mul _
-
 /-- **Harvey-Lawson Fundamental Class Bridge Theorem**
 
     When a calibrated cycle is represented by analytic subvarieties from Harvey-Lawson,
@@ -183,68 +164,35 @@ theorem cone_positive_represents {p : ℕ}
     have h_rep := harvey_lawson_represents hyp
     exact harvey_lawson_fundamental_class γ h_closed h_cone hl_concl T_limit.toFun h_rep h_rational
 
-/-- **Lemma: (p,p)-Forms Are Zero in Stub Architecture**
+/-! ## Non-Triviality of (p,p)-Forms
 
-    In the current stub architecture, the only forms satisfying `isPPForm'` are zero.
-    This is because:
-    1. The base case is `zero p` which gives 0
-    2. `add` of zeros is zero
-    3. `smul` of zero is zero
-    4. `wedge` of zeros is zero (via `smoothWedge_zero_left`)
+With the addition of `unitForm` and `jInvariant` base cases to `isPPForm'`,
+(p,p)-forms are no longer trivially zero. The Kähler form ω is a genuine (1,1)-form
+via its J-invariance property. -/
 
-    This is a structural property of the stub that makes the proof go through. -/
-theorem isPPForm'_eq_zero {p : ℕ} (ω : SmoothForm n X (2 * p)) (h : isPPForm' n X p ω) : ω = 0 := by
-  induction h with
-  | zero _ => rfl
-  | add _ _ ih1 ih2 => simp only [ih1, ih2, add_zero]
-  | smul c _ ih => simp only [ih, smul_zero]
-  | wedge _ _ ihω ihη =>
-    simp only [ihω, ihη, smoothWedge_zero_left]
-    -- castForm of 0 is 0
-    exact castForm_zero _
+/-- The Kähler form is a (1,1)-form via J-invariance.
 
-/-- **Corollary: The Kähler Form is Zero in the Stub**
-
-    Since omega_form must satisfy `isPPForm' n X 1 omega_form` (from the KahlerManifold class),
-    and the only such form is 0, we have omega_form = 0. -/
-theorem omega_form_eq_zero : K.omega_form = 0 := by
-  have h := isPPForm'_eq_zero (p := 1) K.omega_form K.omega_is_pp
-  simp only [Nat.mul_one] at h
-  exact h
-
-/-- **Corollary: All Kähler Powers Are Zero**
-
-    In the current stub architecture, `omega_form = 0`. Since `kahlerPow` is built
-    recursively using wedge products with `omega_form`, all Kähler powers are zero. -/
-theorem kahlerPow_eq_zero (p : ℕ) : kahlerPow (n := n) (X := X) p = 0 := by
-  have hω : K.omega_form = 0 := omega_form_eq_zero
-  cases p with
-  | zero =>
-    simp [kahlerPow]
-  | succ p =>
-    cases p with
-    | zero =>
-      -- p = 1
-      unfold kahlerPow
-      -- reduce the degree cast
-      cases (Nat.two_mul 1).symm
-      simpa [hω]
-    | succ p =>
-      -- p = p.succ.succ = (p+2)
-      simp [kahlerPow, hω]
+This follows directly from the `omega_J_invariant` field in `KahlerManifold`,
+which states that ω(Jv, Jw) = ω(v, w). This is exactly the defining property
+of (1,1)-forms on complex manifolds. -/
+theorem omega_isPP_via_J : isPPForm' n X 1 ((Nat.two_mul 1).symm ▸ K.omega_form) :=
+  isPPForm_of_JInvariant K.omega_form K.omega_J_invariant
 
 /-- **Rational Multiple of Kähler Power is Algebraic** (Griffiths-Harris, 1978).
-
-    **STATUS: PROVED (was Classical Pillar 8)**
 
     For any positive rational c > 0, the cohomology class c·[ω^p] is algebraic,
     meaning it is represented by the fundamental class of an algebraic subvariety.
 
-    **Proof**: In the stub architecture, all Kähler powers are zero (since omega_form = 0
-    due to isPPForm' constraints). Therefore:
-    - LHS: [FundamentalClassSet Z] = [0] = 0 (since FundamentalClassSet = 0)
-    - RHS: c • [kahlerPow p] = c • [0] = 0
-    - Both sides equal 0, so the equality holds.
+    **Mathematical Content**: On a projective variety, any rational multiple of
+    a power of the Kähler class [ω]^p can be represented by an algebraic cycle.
+    This follows from:
+    1. The Kähler class [ω] itself is the first Chern class of an ample line bundle
+    2. Powers [ω]^p correspond to complete intersections of hyperplane sections
+    3. Rational multiples preserve algebraicity
+
+    **TODO**: This theorem requires a real proof now that (p,p)-forms are non-trivial.
+    The proof should construct the representing algebraic cycle using hyperplane
+    sections or Chern class theory.
 
     Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry",
     Wiley, 1978, Chapter 1, Section 2]. -/
@@ -253,25 +201,7 @@ theorem omega_pow_algebraic {p : ℕ} (c : ℚ) (_hc : c > 0) :
     ∃ (hZ : IsFormClosed (FundamentalClassSet n X p Z)),
       ⟦FundamentalClassSet n X p Z, hZ⟧ =
         (c : ℝ) • ⟦kahlerPow (n := n) (X := X) p, omega_pow_IsFormClosed p⟧ := by
-  -- Use the empty set as witness (any algebraic set works)
-  use ∅
-  constructor
-  · exact isAlgebraicSubvariety_empty n X
-  · -- FundamentalClassSet ∅ = 0
-    have h_fund : FundamentalClassSet n X p ∅ = 0 := FundamentalClassSet_empty p
-    -- kahlerPow p = 0
-    have h_kah : kahlerPow (n := n) (X := X) p = 0 := kahlerPow_eq_zero p
-    -- The closedness proof
-    use FundamentalClassSet_isClosed p ∅ (isAlgebraicSubvariety_empty n X)
-    -- Rewrite using the zero forms
-    rw [h_fund, h_kah]
-    -- Both sides are now [0] and c • [0]
-    -- Apply proof irrelevance for the closedness witnesses
-    apply Quotient.sound
-    -- Show the forms are cohomologous: 0 ~ (c : ℝ) • 0
-    show Cohomologous _ _
-    simp only [_root_.smul_zero]
-    exact cohomologous_refl _
+  sorry
 
 /-- **Lefschetz Lift for Signed Cycles** (Voisin, 2002).
 

@@ -514,20 +514,34 @@ The cup product on cohomology is associative: `(a * b) * c = a * (b * c)`.
 Since `(k + l) + m = k + (l + m)` propositionally but not definitionally,
 we need to cast one side. -/
 
-/-- **TODO (blocked)**: Associativity of cup product.
+/-- Associativity of cup product on de Rham cohomology.
 
-The proper statement is:
-`(Nat.add_assoc k l m) ▸ ((a * b) * c) = a * (b * c)`
+The cup product is associative up to the natural degree cast:
+`(a * b) * c = cast(a * (b * c))`
 
-This requires wedge associativity on differential forms
-(`ContinuousAlternatingMap.wedge_assoc`), which is not yet in Mathlib.
+where the cast is induced by `Nat.add_assoc k l m : (k + l) + m = k + (l + m)`.
 
-For now, we state a trivially true placeholder so the file compiles without `sorry`.
-Once wedge associativity is available, replace this with the real theorem. -/
+This follows from wedge associativity on differential forms (via the Classical Pillar
+axiom `ContinuousAlternatingMap.wedge_assoc`). -/
 theorem mul_assoc {k l m : ℕ}
-    (_a : DeRhamCohomologyClass n X k)
-    (_b : DeRhamCohomologyClass n X l)
-    (_c : DeRhamCohomologyClass n X m) : True := trivial
+    (a : DeRhamCohomologyClass n X k)
+    (b : DeRhamCohomologyClass n X l)
+    (c : DeRhamCohomologyClass n X m) :
+    (a * b) * c = (Nat.add_assoc k l m) ▸ (a * (b * c)) := by
+  -- Induction on the quotient representatives
+  induction a using Quotient.ind with | h a =>
+  induction b using Quotient.ind with | h b =>
+  induction c using Quotient.ind with | h c =>
+  -- Unfold multiplication on quotients
+  show ⟦a.val ⋏ b.val, _⟧ * ⟦c.val, _⟧ = _
+  simp only [instHMulDeRhamCohomologyClassDeRhamCohomologyClass]
+  show ⟦(a.val ⋏ b.val) ⋏ c.val, _⟧ = _
+  -- Use wedge associativity
+  have h := smoothWedge_assoc a.val b.val c.val
+  -- The equality follows from the form-level associativity
+  congr 1
+  simp only [h, castForm]
+  rfl
 
 /-! ### Unit Element for Cup Product
 
@@ -540,38 +554,79 @@ using the current cohomology quotient infrastructure. -/
 /-- The unit cohomology class in H⁰(X). -/
 def unitClass : DeRhamCohomologyClass n X 0 := ⟦unitForm, isFormClosed_unitForm⟧
 
-/-- **TODO (blocked)**: Left multiplication by unit.
+/-- Left multiplication by unit: `unitClass * a = a` (up to degree cast).
 
-The proper statement is:
-`(by omega : 0 + k = k) ▸ (unitClass * a) = a`
+The unit cohomology class acts as a left identity for the cup product.
+The cast is induced by `0 + k = k`.
 
-This requires proving that `unitForm ⋏ ω` is cohomologous to `ω` (i.e., the wedge
-with the unit form acts as identity up to cohomology). The current proof-first
-regime (`smoothExtDeriv := 0`) makes this non-trivial to prove correctly.
+This follows from the form-level identity `unitForm ⋏ ω = ω` (via the Classical Pillar
+axiom `ContinuousAlternatingMap.wedge_constOfIsEmpty_left`). -/
+theorem one_mul {k : ℕ} (a : DeRhamCohomologyClass n X k) :
+    unitClass * a = (Nat.zero_add k) ▸ a := by
+  induction a using Quotient.ind with | h a =>
+  show ⟦unitForm ⋏ a.val, _⟧ = _
+  have h := smoothWedge_unitForm_left a.val
+  simp only [h, castForm]
+  rfl
 
-For now, we state a trivially true placeholder so the file compiles without `sorry`. -/
-theorem one_mul {k : ℕ} (_a : DeRhamCohomologyClass n X k) : True := trivial
+/-- Right multiplication by unit: `a * unitClass = a` (up to degree cast).
 
-/-- **TODO (blocked)**: Right multiplication by unit.
+The unit cohomology class acts as a right identity for the cup product.
+The cast is induced by `k + 0 = k`.
 
-The proper statement is:
-`(by omega : k + 0 = k) ▸ (a * unitClass) = a`
-
-This requires proving that `ω ⋏ unitForm` is cohomologous to `ω` (i.e., the wedge
-with the unit form acts as identity up to cohomology). The current proof-first
-regime (`smoothExtDeriv := 0`) makes this non-trivial to prove correctly.
-
-For now, we state a trivially true placeholder so the file compiles without `sorry`. -/
-theorem mul_one {k : ℕ} (_a : DeRhamCohomologyClass n X k) : True := trivial
+This follows from the form-level identity `ω ⋏ unitForm = ω` (via the Classical Pillar
+axiom `ContinuousAlternatingMap.wedge_constOfIsEmpty_right`). -/
+theorem mul_one {k : ℕ} (a : DeRhamCohomologyClass n X k) :
+    a * unitClass = (Nat.add_zero k) ▸ a := by
+  induction a using Quotient.ind with | h a =>
+  show ⟦a.val ⋏ unitForm, _⟧ = _
+  have h := smoothWedge_unitForm_right a.val
+  simp only [h, castForm]
+  rfl
 
 /-! ## Rational Classes -/
 
+/-- **Witness class for rational forms** (Comparison Isomorphism).
+
+    A form ω is in this class when its de Rham cohomology class lies in the image
+    of the comparison map H^k(X, ℚ) → H^k(X, ℂ).
+
+    **Mathematical Background**:
+    On a projective variety X, the comparison isomorphism identifies:
+    - Singular cohomology H^k(X, ℂ) with de Rham cohomology H^k_dR(X, ℂ)
+    - The rational lattice H^k(X, ℚ) ⊗ ℂ maps to rational de Rham classes
+
+    This class serves as an axiomatized interface: specific forms (like the Kähler form)
+    can be declared as witnesses without requiring the full comparison theory.
+
+    Reference: [Voisin, "Hodge Theory and Complex Algebraic Geometry", Vol. I, Chapter 5]. -/
+class IsRationalFormWitness (n : ℕ) (X : Type u) [TopologicalSpace X]
+    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X]
+    [ProjectiveComplexManifold n X] (k : ℕ) (ω : SmoothForm n X k) : Prop where
+  /-- The form is closed (required for it to define a cohomology class). -/
+  is_closed : IsFormClosed ω
+
+/-- **Rational cohomology classes** (Hodge Theory).
+
+    A de Rham cohomology class is rational if it lies in the ℚ-span of:
+    1. The zero class (trivially rational)
+    2. The unit class in H⁰ (represented by constant functions)
+    3. Classes represented by forms with an `IsRationalFormWitness` instance
+    4. Sums, rational scalar multiples, negations, and products of rational classes
+
+    **Key change from previous definition**: The `of_witness` constructor allows
+    non-zero rational classes to be declared axiomatically. This breaks the
+    previous collapse where all rational classes were provably zero.
+
+    Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", 1978, Chapter 0]. -/
 inductive isRationalClass {n : ℕ} {X : Type u}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] :
     ∀ {k : ℕ}, DeRhamCohomologyClass n X k → Prop where
   | zero {k : ℕ} : isRationalClass (0 : DeRhamCohomologyClass n X k)
   | unit : isRationalClass unitClass  -- The unit (constant 1) is rational
+  | of_witness {k : ℕ} (ω : SmoothForm n X k) [hw : IsRationalFormWitness n X k ω] :
+      isRationalClass ⟦ω, hw.is_closed⟧
   | add {k : ℕ} {η₁ η₂ : DeRhamCohomologyClass n X k} :
       isRationalClass η₁ → isRationalClass η₂ → isRationalClass (η₁ + η₂)
   | smul_rat {k : ℕ} (q : ℚ) {η : DeRhamCohomologyClass n X k} :
@@ -595,6 +650,15 @@ theorem isRationalClass_zero {k : ℕ} :
 theorem isRationalClass_unit :
     isRationalClass (n := n) (X := X) unitClass :=
   isRationalClass.unit
+
+/-- A form with an `IsRationalFormWitness` instance defines a rational cohomology class.
+    This version allows providing an explicit closedness proof for flexibility. -/
+theorem isRationalClass_of_witness {k : ℕ} (ω : SmoothForm n X k)
+    [hw : IsRationalFormWitness n X k ω] (h_closed : IsFormClosed ω) :
+    isRationalClass ⟦ω, h_closed⟧ := by
+  have h : ⟦ω, h_closed⟧ = ⟦ω, hw.is_closed⟧ := ofForm_proof_irrel ω h_closed hw.is_closed
+  rw [h]
+  exact isRationalClass.of_witness ω
 
 theorem isRationalClass_add {k : ℕ} (η₁ η₂ : DeRhamCohomologyClass n X k) :
     isRationalClass η₁ → isRationalClass η₂ → isRationalClass (η₁ + η₂) :=
@@ -646,8 +710,34 @@ theorem ofForm_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l)
 
 /-! ## (p,p) Forms -/
 
+/-- **J-Invariance Property for (1,1)-Forms**
+
+A 2-form ω on a complex manifold is of type (1,1) iff it is invariant under the almost
+complex structure J: ω(Jv, Jw) = ω(v, w). On EuclideanSpace ℂ (Fin n), J acts as
+multiplication by Complex.I on each coordinate.
+
+This is the defining property that distinguishes (1,1)-forms from (2,0) or (0,2) forms. -/
+def IsJInvariant2Form {n : ℕ} {X : Type u} [TopologicalSpace X]
+    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X]
+    (ω : SmoothForm n X 2) : Prop :=
+  ∀ (x : X) (v w : TangentSpace (𝓒_complex n) x),
+    ω.as_alternating x ![Complex.I • v, Complex.I • w] = ω.as_alternating x ![v, w]
+
+/-- **Inductive characterization of (p,p)-forms**
+
+A differential form is of type (p,p) if it can be built from:
+1. The zero form (trivial)
+2. The unit form (constant 1, type (0,0))
+3. Any J-invariant 2-form (type (1,1)) - this includes the Kähler form
+4. Sums, scalar multiples, and wedge products of (p,p)-forms
+
+This inductive captures the algebraic structure of (p,p)-forms while providing
+non-trivial base cases that prevent the degenerate "all forms = 0" situation. -/
 inductive isPPForm' (n : ℕ) (X : Type u) [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X] : (p : ℕ) → SmoothForm n X (2 * p) → Prop where
   | zero (p) : isPPForm' n X p 0
+  | unitForm : isPPForm' n X 0 unitForm
+  | jInvariant (ω : SmoothForm n X 2) (hJ : IsJInvariant2Form ω) :
+      isPPForm' n X 1 ((Nat.two_mul 1).symm ▸ ω)
   | add {p ω η} : isPPForm' n X p ω → isPPForm' n X p η → isPPForm' n X p (ω + η)
   | smul {p} (c : ℂ) {ω} : isPPForm' n X p ω → isPPForm' n X p (c • ω)
   | wedge {p q} {ω : SmoothForm n X (2 * p)} {η : SmoothForm n X (2 * q)} :
@@ -655,6 +745,17 @@ inductive isPPForm' (n : ℕ) (X : Type u) [TopologicalSpace X] [ChartedSpace (E
       isPPForm' n X (p + q) (castForm (by ring : 2 * p + 2 * q = 2 * (p + q)) (ω ⋏ η))
 
 theorem isPPForm_zero {p} : isPPForm' n X p 0 := isPPForm'.zero p
+
+/-- The unit form (constant 1) is a (0,0)-form. -/
+theorem isPPForm_unitForm : isPPForm' n X 0 unitForm := isPPForm'.unitForm
+
+/-- Any J-invariant 2-form is a (1,1)-form.
+
+This is the key non-trivial base case that allows the Kähler form to be (1,1)
+without degenerating to zero. -/
+theorem isPPForm_of_JInvariant (ω : SmoothForm n X 2) (hJ : IsJInvariant2Form ω) :
+    isPPForm' n X 1 ((Nat.two_mul 1).symm ▸ ω) :=
+  isPPForm'.jInvariant ω hJ
 
 theorem isPPForm_wedge {p q} {ω : SmoothForm n X (2 * p)} {η : SmoothForm n X (2 * q)}
     (hp : isPPForm' n X p ω) (hq : isPPForm' n X q η) :
@@ -696,6 +797,36 @@ def lefschetz_power_of_class {n : ℕ} {X : Type u}
 
 /-! ## Kähler Manifold -/
 
+/-!
+### Classical Pillar: Hard Lefschetz Theorem
+
+The **Hard Lefschetz Theorem** (Lefschetz, 1924) states that for a compact Kähler
+manifold X of complex dimension n, the iterated Lefschetz operator
+```
+  L^k : H^{n-k}(X, ℂ) → H^{n+k}(X, ℂ)
+```
+defined by `L^k(α) = [ω]^k ∪ α` is an isomorphism.
+
+**Axiomatization Status**: This is a Classical Pillar axiom in the KahlerManifold
+typeclass. A full proof from first principles requires:
+1. **Kähler identities**: `[Λ, d] = i∂̄*`, `[L, d*] = -i∂̄`
+2. **Hodge decomposition**: H^k = ⊕_{p+q=k} H^{p,q}
+3. **Primitive decomposition**: H^k = ⊕_r L^r(P^{k-2r})
+4. **sl(2) representation theory**: L, Λ, H form an sl(2) representation
+
+**Proof Path**: The complete proof would proceed as follows:
+- Define the operators L (Lefschetz), Λ (dual Lefschetz), H (weight)
+- Prove the Kähler identities using ∂, ∂̄, ⋆ operators
+- Show that (L, Λ, H) satisfy sl(2) commutation relations
+- Apply representation theory: highest weight vectors are primitive
+- Conclude that L^k is an isomorphism by the sl(2) structure
+
+**Estimated Effort**: 6-12 months for a complete formalization.
+
+**Reference**: [Griffiths-Harris, "Principles of Algebraic Geometry", Ch. 0, §6-7]
+             [Voisin, "Hodge Theory and Complex Algebraic Geometry I", Ch. 5-6]
+-/
+
 class KahlerManifold (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] where
@@ -703,24 +834,58 @@ class KahlerManifold (n : ℕ) (X : Type u)
   omega_closed : IsFormClosed omega_form
   omega_positive : ∀ (x : X) (v : TangentSpace (𝓒_complex n) x), v ≠ 0 → True
   omega_is_pp : isPPForm' n X 1 omega_form
-  omega_rational : isRationalClass ⟦omega_form, omega_closed⟧
+  /-- **Kähler form rationality witness** (Comparison Isomorphism).
+      The Kähler form defines a rational cohomology class because it is the first
+      Chern class of an ample line bundle on a projective variety.
+      Reference: [Griffiths-Harris, 1978, Chapter 1]. -/
+  omega_rational_witness : IsRationalFormWitness n X 2 omega_form
   omega_J_invariant : ∀ (x : X) (v w : TangentSpace (𝓒_complex n) x),
     omega_form.as_alternating x ![Complex.I • v, Complex.I • w] = omega_form.as_alternating x ![v, w]
-  /-- **Hard Lefschetz Theorem** (Lefschetz, 1924).
+  /-- **Hard Lefschetz Theorem** (Classical Pillar Axiom).
+
       The iterated Lefschetz operator L^k : H^p(X) → H^{p+2k}(X) is a bijection.
-      This is the fundamental structural property of Kähler manifolds. -/
+      This is the fundamental structural property of Kähler manifolds.
+
+      **Axiomatization Justification**:
+      This is axiomatized as a typeclass field because:
+      1. The proof requires Kähler identities and sl(2) representation theory
+      2. Full formalization would take 6-12 months
+      3. This is a classical theorem (Lefschetz 1924) with multiple textbook proofs
+
+      **Mathematical Status**: CLASSICAL THEOREM (not a conjecture or speculation)
+      **Proof References**:
+      - [Griffiths-Harris, "Principles of Algebraic Geometry", Ch. 0, §7]
+      - [Voisin, "Hodge Theory and Complex Algebraic Geometry I", Ch. 6]
+      - [Wells, "Differential Analysis on Complex Manifolds", Ch. IV] -/
   lefschetz_bijective : ∀ (p k : ℕ),
     Function.Bijective (lefschetz_power_of_class ⟦omega_form, omega_closed⟧ p k)
-  /-- **Hard Lefschetz on Rational Classes** (Lefschetz, 1924).
+  /-- **Hard Lefschetz on Rational Classes** (Classical Pillar Axiom).
+
       The iterated Lefschetz operator L^k preserves rationality:
       a class c is rational iff L^k(c) is rational.
-      This follows from the Lefschetz isomorphism being defined over ℚ. -/
+      This follows from the Lefschetz isomorphism being defined over ℚ.
+
+      **Axiomatization Justification**: Follows from lefschetz_bijective plus
+      the fact that L is defined by cup product with the rational class [ω]. -/
   rational_lefschetz_iff : ∀ (p k : ℕ) (c : DeRhamCohomologyClass n X p),
     isRationalClass c ↔ isRationalClass (lefschetz_power_of_class ⟦omega_form, omega_closed⟧ p k c)
-  /-- **Hard Lefschetz on Hodge Types** (Lefschetz, 1924).
-      The iterated Lefschetz operator L^k preserves (p,p) type. -/
+  /-- **Hard Lefschetz on Hodge Types** (Classical Pillar Axiom).
+
+      The iterated Lefschetz operator L^k preserves (p,p) type.
+
+      **Axiomatization Justification**: Follows from the Hodge decomposition being
+      compatible with the Lefschetz operator (L maps H^{p,q} to H^{p+1,q+1}). -/
   pp_lefschetz_iff : ∀ (p k : ℕ) (c : DeRhamCohomologyClass n X p),
     isPPClass p c ↔ isPPClass (p + 2 * k) (lefschetz_power_of_class ⟦omega_form, omega_closed⟧ p k c)
+
+/-- **Kähler form is rational** (Derived from witness).
+    This theorem extracts the rationality of the Kähler form's cohomology class
+    from the `IsRationalFormWitness` instance in the `KahlerManifold` class.
+    This replaces the former `omega_rational` field. -/
+theorem KahlerManifold.omega_rational [K : KahlerManifold n X] :
+    isRationalClass ⟦K.omega_form, K.omega_closed⟧ := by
+  haveI : IsRationalFormWitness n X 2 K.omega_form := K.omega_rational_witness
+  exact isRationalClass_of_witness K.omega_form K.omega_closed
 
 /-! ## Lefschetz Operator -/
 

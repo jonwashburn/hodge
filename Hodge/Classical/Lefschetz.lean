@@ -13,6 +13,31 @@ universe u
 
 /-!
 ## Track A.3.1: Hard Lefschetz Theorem
+
+### Classical Pillar Status
+
+The Hard Lefschetz Theorem is axiomatized in the `KahlerManifold` typeclass as the
+field `lefschetz_bijective`. This file derives consequences from that axiom.
+
+**Why is this axiomatized?**
+
+The Hard Lefschetz Theorem is a deep result requiring:
+1. **Kähler identities**: Relations between d, δ, ∂, ∂̄, L, Λ
+2. **Hodge decomposition**: H^k(X,ℂ) = ⊕_{p+q=k} H^{p,q}(X)
+3. **sl(2) representation theory**: L, Λ, H generate an sl(2) action on cohomology
+4. **Primitive decomposition**: Each cohomology class decomposes uniquely
+
+A full proof from first principles would require:
+- Complete Hodge theory (Laplacian, harmonic forms, etc.)
+- Kähler identities as proven theorems
+- Representation theory of sl(2,ℂ)
+
+**Estimated formalization effort**: 6-12 months
+
+**References**:
+- [Griffiths-Harris, "Principles of Algebraic Geometry", Ch. 0, §7]
+- [Voisin, "Hodge Theory and Complex Algebraic Geometry I", Ch. 5-6]
+- [Huybrechts, "Complex Geometry: An Introduction", Ch. 3]
 -/
 
 /-- The Lefschetz operator L : H^p(X) → H^{p+2}(X)

@@ -308,6 +308,93 @@ theorem continuous_wedge {k l : ℕ} :
     (f.continuous.comp continuous_fst).prodMk continuous_snd
   exact (isBoundedBilinearMap_apply (𝕜 := 𝕜) (E := CAMl) (F := CAMkl)).continuous.comp h1
 
+/-! ### Wedge with 0-forms (scalar multiplication)
+
+When one of the forms is a 0-form (i.e., a constant scalar), the wedge product
+reduces to scalar multiplication. This is the key identity for proving
+that the unit 0-form acts as the identity for the cup product.
+
+## Classical Pillar: Exterior Algebra Unit Laws
+
+The wedge product with 0-forms (scalars) satisfies the expected unit laws from
+exterior algebra. These are axiomatized as they require detailed shuffle arguments
+on the `domCoprod` construction that are not yet available in Mathlib.
+
+**Mathematical justification**:
+- A 0-form on `Fin 0` takes no tangent vectors, so it's just a scalar `c : 𝕜`.
+- For any l-form η and vectors v₁, ..., vₗ:
+  `(c ∧ η)(v₁, ..., vₗ) = c · η(v₁, ..., vₗ)`
+
+This follows from the definition of `domCoprod` where the sum over (0,l)-shuffles
+has exactly one term (the identity), and the empty alternating map contributes
+just its scalar value.
+
+Reference: [Warner, "Foundations of Differentiable Manifolds and Lie Groups", Prop. 2.14] -/
+
+/-- **Axiom (Classical Pillar)**: Wedge of a constant 0-form with an l-form is scalar multiplication.
+
+A 0-form on `Fin 0` is just a scalar value. When we wedge it with an l-form,
+the result is the l-form scaled by that scalar (with index type `Fin (0 + l) ≃ Fin l`).
+
+This axiom encodes the standard exterior algebra identity: `1 ∧ η = η`.
+The proof requires shuffle combinatorics on `AlternatingMap.domCoprod` that are
+not yet formalized in Mathlib. -/
+axiom wedge_constOfIsEmpty_left {l : ℕ} (c : 𝕜)
+    (η : ContinuousAlternatingMap 𝕜 E 𝕜 (Fin l)) :
+    wedge (𝕜 := 𝕜) (E := E) (ContinuousAlternatingMap.constOfIsEmpty 𝕜 E c) η =
+      (c • η).domDomCongr finSumFinEquiv.symm
+
+/-- **Axiom (Classical Pillar)**: Wedge of an l-form with a constant 0-form is scalar multiplication.
+
+This is the right-handed version of the scalar identity: `η ∧ 1 = η`.
+Combined with wedge_constOfIsEmpty_left, these give the unit laws for the cup product. -/
+axiom wedge_constOfIsEmpty_right {k : ℕ} (c : 𝕜)
+    (ω : ContinuousAlternatingMap 𝕜 E 𝕜 (Fin k)) :
+    wedge (𝕜 := 𝕜) (E := E) ω (ContinuousAlternatingMap.constOfIsEmpty 𝕜 E c) =
+      (c • ω).domDomCongr (finSumFinEquiv.trans (finCongr (Nat.add_zero k).symm)).symm
+
+/-! ### Wedge associativity
+
+The wedge product is associative up to index reordering. This is the key property
+needed for the cohomology ring structure.
+
+## Classical Pillar: Exterior Algebra Associativity
+
+**Mathematical justification**:
+The wedge product on differential forms is associative:
+`(ω ∧ η) ∧ θ = ω ∧ (η ∧ θ)`
+
+This follows from:
+1. Tensor product associativity in the underlying algebra
+2. The shuffle product formula for domCoprod being associative
+3. The definition of wedge as domCoprod composed with multiplication
+
+The proof requires matching shuffle permutations across different index decompositions,
+which is a substantial combinatorial argument not yet formalized in Mathlib.
+
+Reference: [Bott & Tu, "Differential Forms in Algebraic Topology", §1.2]
+           [Warner, "Foundations of Differentiable Manifolds and Lie Groups", Prop. 2.14] -/
+
+/-- **Axiom (Classical Pillar)**: Wedge product is associative (up to index equivalence).
+
+For forms of degrees k, l, m, we have:
+`wedge (wedge ω η) θ = (wedge ω (wedge η θ)).domDomCongr h`
+
+where h is the equivalence `Fin ((k + l) + m) ≃ Fin (k + (l + m))` given by
+natural number associativity.
+
+This axiom encodes the standard exterior algebra associativity:
+`(ω ∧ η) ∧ θ = ω ∧ (η ∧ θ)`.
+
+The proof requires detailed shuffle counting on `AlternatingMap.domCoprod` that
+is not yet formalized in Mathlib. -/
+axiom wedge_assoc {k l m : ℕ}
+    (ω : ContinuousAlternatingMap 𝕜 E 𝕜 (Fin k))
+    (η : ContinuousAlternatingMap 𝕜 E 𝕜 (Fin l))
+    (θ : ContinuousAlternatingMap 𝕜 E 𝕜 (Fin m)) :
+    wedge (𝕜 := 𝕜) (E := E) (wedge ω η) θ =
+      (wedge ω (wedge η θ)).domDomCongr (finCongr (Nat.add_assoc k l m).symm)
+
 end ContinuousAlternatingMap
 
 end

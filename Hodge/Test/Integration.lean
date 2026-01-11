@@ -8,12 +8,12 @@ This file contains end-to-end integration tests that verify the proof pipeline w
 
 ## Test Strategy
 
-Since the current formalization uses the "stub architecture" where:
-- `FundamentalClassSet := 0`
-- `smoothExtDeriv := 0`
-- `isPPForm'` only admits zero forms
+The formalization uses a "stub architecture" for some components:
+- `FundamentalClassSet := 0` (stub - TODO)
+- `smoothExtDeriv := 0` (stub - TODO)
+- `isPPForm'` now has non-trivial base cases: `unitForm` and `jInvariant` 2-forms
 
-...all tests use the zero form as the primary test case. This validates that:
+Most tests use the zero form as the primary test case. This validates that:
 1. All type signatures compose correctly
 2. The proof pipeline terminates
 3. The output types are correct
