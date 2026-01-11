@@ -342,7 +342,7 @@ not yet formalized in Mathlib. -/
 axiom wedge_constOfIsEmpty_left {l : ℕ} (c : 𝕜)
     (η : ContinuousAlternatingMap 𝕜 E 𝕜 (Fin l)) :
     wedge (𝕜 := 𝕜) (E := E) (ContinuousAlternatingMap.constOfIsEmpty 𝕜 E (ι := Fin 0) c) η =
-      (c • η).domDomCongr (finSumFinEquiv (m := 0) (n := l)).symm
+      (c • η).domDomCongr (finCongr (Nat.zero_add l).symm)
 
 /-- **Axiom (Classical Pillar)**: Wedge of an l-form with a constant 0-form is scalar multiplication.
 
@@ -351,7 +351,7 @@ Combined with wedge_constOfIsEmpty_left, these give the unit laws for the cup pr
 axiom wedge_constOfIsEmpty_right {k : ℕ} (c : 𝕜)
     (ω : ContinuousAlternatingMap 𝕜 E 𝕜 (Fin k)) :
     wedge (𝕜 := 𝕜) (E := E) ω (ContinuousAlternatingMap.constOfIsEmpty 𝕜 E (ι := Fin 0) c) =
-      (c • ω).domDomCongr ((finSumFinEquiv (m := k) (n := 0)).trans (finCongr (Nat.add_zero k).symm)).symm
+      (c • ω).domDomCongr (finCongr (Nat.add_zero k).symm)
 
 /-! ### Wedge associativity
 
