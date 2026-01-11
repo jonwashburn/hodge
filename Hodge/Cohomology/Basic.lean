@@ -478,8 +478,30 @@ theorem mul_assoc {k l m : ℕ}
     (b : DeRhamCohomologyClass n X l)
     (c : DeRhamCohomologyClass n X m) :
     (a * b) * c = (Nat.add_assoc k l m).symm ▸ (a * (b * c)) := by
-  -- Uses the Classical Pillar axiom smoothWedge_assoc on form representatives
-  sorry
+  refine Quotient.inductionOn₃ a b c ?_
+  intro a b c
+  -- Compute both sides on representatives (note: `ofForm` expands to `Quotient.mk`).
+  simp [instHMulDeRhamCohomologyClass, ofForm]
+  -- Rewrite the explicit degree cast on the RHS into an `ofForm` of the casted form.
+  -- (After the simp step, the RHS is a cast of a `Quotient.mk` of a `ClosedForm`;
+  --  we rewrite it into the `ofForm`-notation expected by `cast_ofForm`.)
+  change
+    (⟦(a.val ⋏ b.val) ⋏ c.val, ?_⟧ : DeRhamCohomologyClass n X ((k + l) + m)) =
+      (Nat.add_assoc k l m).symm ▸ (⟦a.val ⋏ (b.val ⋏ c.val), ?_⟧ : DeRhamCohomologyClass n X (k + (l + m)))
+  rw [DeRhamCohomologyClass.cast_ofForm (n := n) (X := X)
+        (h := (Nat.add_assoc k l m).symm)
+        (ω := a.val ⋏ (b.val ⋏ c.val))]
+  -- Now both sides are `ofForm` of degree-((k+l)+m) forms; use wedge associativity.
+  apply Quotient.sound
+  show Cohomologous _ _
+  unfold Cohomologous
+  have hEq :
+      ((a.val ⋏ b.val) ⋏ c.val) =
+        castForm (n := n) (X := X) (Nat.add_assoc k l m).symm (a.val ⋏ (b.val ⋏ c.val)) := by
+    simpa using
+      (smoothWedge_assoc (n := n) (X := X) (k := k) (l := l) (m := m) a.val b.val c.val)
+  simp [hEq]
+  exact isExact_zero
 
 /-! ### Unit Element for Cup Product
 
@@ -500,7 +522,25 @@ The cast is induced by `0 + k = k`.
 This follows from the form-level identity `unitForm ⋏ ω = ω` (via the Classical Pillar
 axiom `ContinuousAlternatingMap.wedge_constOfIsEmpty_left`). -/
 theorem one_mul {k : ℕ} (a : DeRhamCohomologyClass n X k) :
-    (unitClass (n := n) (X := X)) * a = (Nat.zero_add k).symm ▸ a := sorry
+    (unitClass (n := n) (X := X)) * a = (Nat.zero_add k).symm ▸ a := by
+  refine Quotient.inductionOn a ?_
+  rintro ⟨ω, hω⟩
+  -- Compute the product on representatives.
+  simp [unitClass, instHMulDeRhamCohomologyClass, ofForm]
+  -- Rewrite the degree cast on the RHS into an `ofForm` of the casted form.
+  change
+    (⟦unitForm ⋏ ω, ?_⟧ : DeRhamCohomologyClass n X (0 + k)) =
+      (Nat.zero_add k).symm ▸ (⟦ω, hω⟧ : DeRhamCohomologyClass n X k)
+  rw [DeRhamCohomologyClass.cast_ofForm (n := n) (X := X)
+        (h := (Nat.zero_add k).symm)
+        (ω := ω)]
+  apply Quotient.sound
+  show Cohomologous _ _
+  unfold Cohomologous
+  have hEq : unitForm ⋏ ω = castForm (n := n) (X := X) (Nat.zero_add k).symm ω := by
+    simpa using (smoothWedge_unitForm_left (n := n) (X := X) (k := k) ω)
+  simp [hEq]
+  exact isExact_zero
 
 /-- Right multiplication by unit: `a * unitClass = a` (up to degree cast).
 
@@ -510,7 +550,25 @@ The cast is induced by `k + 0 = k`.
 This follows from the form-level identity `ω ⋏ unitForm = castForm _ ω` (via the Classical Pillar
 axiom `smoothWedge_unitForm_right`). -/
 theorem mul_one {k : ℕ} (a : DeRhamCohomologyClass n X k) :
-    a * (unitClass (n := n) (X := X)) = (Nat.add_zero k).symm ▸ a := sorry
+    a * (unitClass (n := n) (X := X)) = (Nat.add_zero k).symm ▸ a := by
+  refine Quotient.inductionOn a ?_
+  rintro ⟨ω, hω⟩
+  -- Compute the product on representatives.
+  simp [unitClass, instHMulDeRhamCohomologyClass, ofForm]
+  -- Rewrite the degree cast on the RHS into an `ofForm` of the casted form.
+  change
+    (⟦ω ⋏ unitForm, ?_⟧ : DeRhamCohomologyClass n X (k + 0)) =
+      (Nat.add_zero k).symm ▸ (⟦ω, hω⟧ : DeRhamCohomologyClass n X k)
+  rw [DeRhamCohomologyClass.cast_ofForm (n := n) (X := X)
+        (h := (Nat.add_zero k).symm)
+        (ω := ω)]
+  apply Quotient.sound
+  show Cohomologous _ _
+  unfold Cohomologous
+  have hEq : ω ⋏ unitForm = castForm (n := n) (X := X) (Nat.add_zero k).symm ω := by
+    simpa using (smoothWedge_unitForm_right (n := n) (X := X) (k := k) ω)
+  simp [hEq]
+  exact isExact_zero
 
 /-! ## Rational Classes -/
 

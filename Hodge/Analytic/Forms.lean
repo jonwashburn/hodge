@@ -341,10 +341,17 @@ This axiom is **ON THE PROOF TRACK** for `hodge_conjecture'`. It is used to:
 - [Lee, "Introduction to Smooth Manifolds", 2nd ed., Ch. 14]
 - [Spivak, "Calculus on Manifolds", Ch. 4]
 -/
-axiom isSmoothAlternating_wedge (k l : ℕ) (ω : SmoothForm n X k) (η : SmoothForm n X l) :
+theorem isSmoothAlternating_wedge (k l : ℕ) (ω : SmoothForm n X k) (η : SmoothForm n X l) :
     IsSmoothAlternating n X (k + l)
       (fun x => ContinuousAlternatingMap.wedge (𝕜 := ℂ) (E := TangentModel n)
-                  (ω.as_alternating x) (η.as_alternating x))
+                  (ω.as_alternating x) (η.as_alternating x)) := by
+  -- wedgeCLM_alt is a continuous bilinear map, composition with smooth is smooth
+  let f := ContinuousAlternatingMap.wedgeCLM_alt ℂ (TangentModel n) k l
+  -- f : (FiberAlt n k) →L[ℂ] (FiberAlt n l) →L[ℂ] (FiberAlt n (k + l))
+  -- We need: ContMDiff ... (fun x => f (ω x) (η x))
+  -- f.contMDiff.comp ω.is_smooth gives: ContMDiff ... (fun x => f (ω x)) as a CLM
+  -- Then .clm_apply η.is_smooth gives: ContMDiff ... (fun x => f (ω x) (η x))
+  exact f.contMDiff.comp ω.is_smooth |>.clm_apply η.is_smooth
 
 noncomputable def smoothWedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) : SmoothForm n X (k + l) where
   as_alternating := fun x =>

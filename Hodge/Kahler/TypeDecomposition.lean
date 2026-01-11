@@ -26,7 +26,8 @@ inductive isPQForm (n : ℕ) (X : Type u)
   | wedge {p q r s : ℕ} {k l : ℕ} (hpq : p + q = k) (hrs : r + s = l)
       {ω : SmoothForm n X k} {η : SmoothForm n X l} :
       isPQForm n X p q hpq ω → isPQForm n X r s hrs η →
-      isPQForm n X (p + r) (q + s) (by omega) (smoothWedge ω η)
+      isPQForm n X (p + r) (q + s) (by omega)
+        (castForm (by omega : k + l = (p + r) + (q + s)) (smoothWedge ω η))
 
 def isPPFormTD (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
