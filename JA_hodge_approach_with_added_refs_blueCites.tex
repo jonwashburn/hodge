@@ -1156,7 +1156,7 @@ is continuous (indeed, $1$--Lipschitz) in its argument.  Item (4) is immediate f
 
 \begin{proof}
 	(1) The calibrated Grassmannian $\Gp(x)$ is a compact homogeneous space
-	(isomorphic to the complex Grassmannian $G_{\C}(p,n)$), hence compact in the
+	(isomorphic to the complex Grassmannian $G_{\C}(p,n)$ \REVMZ{\cite{GH78}}), hence compact in the
 	topology induced by the Riemannian metric.
 	For fixed $\alpha_{x}$, the map
 	\[
@@ -1403,7 +1403,7 @@ Fix a representative \(\alpha\) of \([\alpha]\).  Since \(d\alpha=0\), the ellip
 \[
 d^{*}d\eta = d^{*}\alpha
 \]
-admits a unique solution \(\eta\) orthogonal to \(\ker d\) (equivalently, orthogonal to harmonic \((2p-1)\)-forms), giving the Hodge decomposition
+admits a unique solution \(\eta\) orthogonal to \(\ker d\) (equivalently, orthogonal to harmonic \((2p-1)\)-forms), giving the Hodge decomposition \REVMZ{\cite{Wells,Voisin02}}
 \[
 \alpha = \gamma_{\harm} + d\eta,
 \qquad d^*\eta=0.
@@ -2265,6 +2265,7 @@ Thus the hypothesis \textnormal{(H2)} in Theorem~\ref{thm:spine-quantitative} ho
 \begin{lemma}[Flat limits of cycles are cycles]\label{lem:flat_limit_of_cycles_is_cycle}
 \label{lem:cone-closed-seq}
 \label{lem:flat-compactness-setup}
+\REVMZ{(See \cite{Fed69,Sim83} for general compactness results.)}
 Let $T_k$ be integral currents of dimension $m$ on $X$ with $\partial T_k=0$ and
 $\sup_k\Mass(T_k)<\infty$.  Assume $T_k\to T$ in the flat norm.  Then $T$ is an
 integral $m$--cycle, i.e.\ $\partial T=0$.
@@ -2645,9 +2646,9 @@ with $\partial T_k=0$, $[T_k]=\mathrm{PD}(m[\gamma])$, and
 Applying the theorem ``Realization from almost--calibrated sequences'' yields, after passing to a subsequence, a weak limit $T$
 with $[T]=\mathrm{PD}(m[\gamma])$, $\Mass(T)=m\int_X \beta\wedge\psi$, and $T$ $\psi$-calibrated.
 By Harvey--Lawson
- structure theory, a $\psi$-calibrated integral cycle in a K\"ahler manifold is a positive sum of currents of integration
+ structure theory \REVMZ{\cite{HL82}}, a $\psi$-calibrated integral cycle in a K\"ahler manifold is a positive sum of currents of integration
 over irreducible complex analytic subvarieties of codimension $p$.
-Since $X$ is projective, Chow's theorem
+Since $X$ is projective, Chow's theorem \REVMZ{\cite{Chow49}}
  identifies these analytic cycles with algebraic cycles.
 Dividing by $m$ expresses $[\gamma]$ as a rational algebraic cycle.
 \end{proof}
@@ -5938,7 +5939,7 @@ Rebalancing these weights can be done by transporting mass between nearby cells 
 W_1(\mu_N,\rho\,d\sigma)\lesssim \delta\,(M+\mathrm{Lip}(\rho)\,r^{d-1}).
 \)
 We record the rate and dependencies here; a detailed implementation of this standard quantization argument can be found, for example, in texts on optimal quantization
-or empirical $W_1$ convergence on compact manifolds.
+or empirical $W_1$ convergence on compact manifolds \REVMZ{\cite{Villani03}}.
 \end{proof}
 
 
@@ -7184,7 +7185,7 @@ If in addition $\sup_{(u,w)\in U}\|\partial_u F(u,w)\|\le \eta$, then $g$ is Lip
 \|Dg\|\ \le\ \frac{\|A^{-1}\|\,\eta}{1-\|A^{-1}\|\,\eta}\ \le\ 2\,\|A^{-1}\|\,\eta.
 \]
 
-In particular, since $F$ is $C^1$ and $\partial_wF(u,g(u))$ is invertible for all $u\in U_u$, the implicit function theorem implies $g\in C^1(U_u)$; hence the displayed bound holds for every $u\in U_u$.
+In particular, since $F$ is $C^1$ and $\partial_wF(u,g(u))$ is invertible for all $u\in U_u$, the implicit function theorem \REVMZ{\cite{LangGmT}} implies $g\in C^1(U_u)$; hence the displayed bound holds for every $u\in U_u$.
 
 
 \end{lemma}
@@ -7508,7 +7509,7 @@ sheet to $F$ and to the vertex star, provided the sheet is realized by a single 
 \begin{proposition}[Integral transport for graph-template measures]\label{prop:graph-template-transport}
 Let $\mu=\sum_{\ell} a_\ell\,\delta_{x_\ell}$ and $\nu=\sum_{\ell} b_\ell\,\delta_{x_\ell}$ be atomic measures on a common finite set of atoms
 $\{x_\ell\}$ (e.g. the translation net in the transverse space), with integer weights $a_\ell,b_\ell\ge 0$.
-Then there exists an \emph{integral} transport plan $\pi$ from $\mu$ to $\nu$ with optimal $W_1$ cost, and in particular
+Then there exists an \emph{integral} transport plan $\pi$ from $\mu$ to $\nu$ with optimal $W_1$ cost \REVMZ{\cite{Villani03}}, and in particular
 \[
 W_1(\mu,\nu)\;=\;\inf_{\pi\in\Pi(\mu,\nu)}\int |x-y|\,d\pi(x,y)
 \]
@@ -8061,7 +8062,7 @@ there exists a function $\varepsilon_{\mathrm{glue}}=\varepsilon_{\mathrm{glue}}
 \begin{proof}
 Let $k:=2n-2p$ so that $\partial T^{\mathrm{raw}}$ is a $(k-1)$--current.
 By the Federer--Fleming
- dual characterization of the flat norm, it suffices to test $\partial T^{\mathrm{raw}}$
+ dual characterization of the flat norm \REVMZ{\cite{FF60}}, it suffices to test $\partial T^{\mathrm{raw}}$
 against smooth compactly-supported $(k-1)$--forms $\eta$ with $\|\eta\|_{\infty}\le 1$ and $\|d\eta\|_{\infty}\le 1$.
 Decompose $\partial T^{\mathrm{raw}}$ as the alternating sum of face-mismatch currents across adjacent cubes in the partition.
 
@@ -8217,6 +8218,7 @@ I_\ell:=\int_X \beta\wedge \eta_\ell\in\Q
 has bounded denominator.  Choose $m\ge 1$ so that $m\,I_\ell\in\Z$ for all $\ell$.
 
 \begin{lemma}[Fixed-dimension discrepancy rounding (B\'ar\'any--Grinberg)]\label{lem:barany-grinberg}
+\REVMZ{(See \cite{BaranyGrinberg81,Schrijver86}.)}
 Let $d\ge 1$ and let $v_1,\dots,v_M\in\R^d$ satisfy $\|v_i\|_{\ell^\infty}\le 1$.
 For any coefficients $a_1,\dots,a_M\in[0,1]$, there exist $\varepsilon_1,\dots,\varepsilon_M\in\{0,1\}$ such that
 \[

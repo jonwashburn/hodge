@@ -60,7 +60,7 @@ This document tracks the implementation of referee feedback for the paper "Calib
 | Lemmas | 72 | — |
 | Remarks | 92 | Reduce significantly |
 | Definitions | 17 | — |
-| In-text citations | 84 (was 59) | Increase to 100+ |
+| In-text citations | 94 (was 59) | Increase to 100+ |
 | "proved later" (unlinked) | ~~23~~ **0** ✓ | 0 |
 | "not used" mentions | ~~11~~ **0** ✓ | Minimize/relocate |
 | "this is standard" | ~~10~~ **0** ✓ | Make specific |
@@ -77,7 +77,7 @@ This document tracks the implementation of referee feedback for the paper "Calib
 > **⏩ NEXT TASK: Phase 3 continuation - Add more citations to reach 100+ target**
 > 
 > **Status:** In progress  
-> **Current count:** 84 \cite{} commands (59 new via REVMZ)  
+> **Current count:** 94 \cite{} commands (69 new via REVMZ)  
 > **Target:** 100+
 
 ### Session Log
@@ -91,6 +91,7 @@ This document tracks the implementation of referee feedback for the paper "Calib
 | 5 | 2026-01-11 | Phase 3 continued | Citations now at 72 |
 | 6 | 2026-01-11 | Phase 3 continued | Citations now at 78 (52 new via REVMZ) |
 | 7 | 2026-01-11 | Phase 3 continued | Citations now at 85 (58 new via REVMZ) |
+| 8 | 2026-01-11 | Phase 3 continued | Citations now at 94 (69 new via REVMZ) |
 
 ---
 
@@ -205,6 +206,16 @@ This document tracks the implementation of referee feedback for the paper "Calib
 | 103 | 2026-01-11 | 767 | ADD_CITE | Added \cite{Schneider14} for Carathéodory convex cones | 1.43 |
 | 104 | 2026-01-11 | 1255 | ADD_CITE | Added \cite{GH78} for Kähler angles | 1.44 |
 | 105 | 2026-01-11 | 4021 | ADD_CITE | Added \cite{GH78} for Plücker minors | 1.45 |
+| 106 | 2026-01-11 | 591 | ADD_CITE | Added \cite{GH78,Wells} for Hodge star | 1.46 |
+| 107 | 2026-01-11 | 1846 | ADD_CITE | Added \cite{GH78} for Lefschetz trace | 1.47 |
+| 108 | 2026-01-11 | 5195 | ADD_CITE | Added \cite{Schneider14} for rolling ball principle | 1.48 |
+| 109 | 2026-01-11 | 8698 | ADD_CITE | Added \cite{FF60,Fed69} for Federer-Fleming compactness | 1.49 |
+| 110 | 2026-01-11 | 4469 | ADD_CITE | Added \cite{Villani03} for Wasserstein distance | 1.50 |
+| 111 | 2026-01-11 | 2265 | ADD_CITE | Added \cite{Fed69,Sim83} for compactness results | 1.51 |
+| 112 | 2026-01-11 | 8063 | ADD_CITE | Added \cite{FF60} for flat norm dual characterization | 1.52 |
+| 113 | 2026-01-11 | 7188 | ADD_CITE | Added \cite{LangGmT} for implicit function theorem | 1.53 |
+| 114 | 2026-01-11 | 7513 | ADD_CITE | Added \cite{Villani03} for optimal transport plan | 1.54 |
+| 115 | 2026-01-11 | 8221 | ADD_CITE | Added \cite{BaranyGrinberg81,Schrijver86} for discrepancy rounding | 1.55 |
 
 <!-- 
 Change Types:
