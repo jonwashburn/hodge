@@ -191,12 +191,16 @@ echo 'import Hodge.Kahler.Main
 
 ### Task Batch B: Axiom Documentation (PARALLEL)
 
-These tasks can be done simultaneously.
+**Status (2026-01-11)**: ✅ Completed — the four proof-track axioms below now have detailed
+docstrings (in their source files) stating the mathematical content, why they are axiomatized,
+and giving standard literature references.
 
 #### Task B1: Document `extDerivLinearMap`
 **Priority**: 🟡 High  
 **Estimated Effort**: 1-2 hours  
 **File**: `Hodge/Analytic/Forms.lean:183`
+
+**Status**: ✅ Completed (see the docstring immediately above `extDerivLinearMap`).
 
 **Instructions**:
 ```
@@ -218,6 +222,8 @@ ACCEPTANCE: lake build Hodge.Analytic.Forms
 **Estimated Effort**: 1-2 hours  
 **File**: `Hodge/Classical/CycleClass.lean:118`
 
+**Status**: ✅ Completed (docstring updated to explicitly note it backs `FundamentalClassSet`).
+
 **Instructions**:
 ```
 TASK: Enhance documentation for poincareDualFormExists axiom
@@ -237,6 +243,8 @@ ACCEPTANCE: lake build Hodge.Classical.CycleClass
 **Estimated Effort**: 1-2 hours  
 **File**: `Hodge/Classical/GAGA.lean:364`
 
+**Status**: ✅ Completed (see the docstring immediately above `FundamentalClassSet_represents_class`).
+
 **Instructions**:
 ```
 TASK: Enhance documentation for FundamentalClassSet_represents_class
@@ -255,6 +263,8 @@ ACCEPTANCE: lake build Hodge.Classical.GAGA
 **Priority**: 🟡 High  
 **Estimated Effort**: 1-2 hours  
 **File**: `Hodge/Classical/GAGA.lean:499`
+
+**Status**: ✅ Completed (see the docstring immediately above `SignedAlgebraicCycle.lefschetz_lift`).
 
 **Instructions**:
 ```

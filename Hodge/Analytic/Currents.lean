@@ -53,7 +53,7 @@ theorem map_add {n k : ℕ} {X : Type*} [TopologicalSpace X] [ChartedSpace (Eucl
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
     (T : Current n X k) (ω₁ ω₂ : SmoothForm n X k) : T.toFun (ω₁ + ω₂) = T.toFun ω₁ + T.toFun ω₂ := by
   have h := T.is_linear 1 ω₁ ω₂
-  simp [one_smul, one_mul] at h
+  simp [one_smul, _root_.one_mul] at h
   exact h
 
 /-- Currents map zero to zero. Follows from map_add with ω₁=ω₂=0. -/
@@ -335,12 +335,8 @@ def boundary (T : Current n X (k + 1)) : Current n X k where
     exact T.is_linear c (smoothExtDeriv ω₁) (smoothExtDeriv ω₂)
   is_continuous := T.is_continuous.comp smoothExtDeriv_continuous
   bound := by
-    -- Proof-first mode: `smoothExtDeriv = 0`, so `∂T = 0` as a current and the bound is trivial.
-    refine ⟨0, ?_⟩
-    intro ω
-    have h0 : T.toFun (0 : SmoothForm n X (k + 1)) = 0 := map_zero' T
-    -- simplify `smoothExtDeriv ω` to `0`
-    simp [smoothExtDeriv, extDerivLinearMap, h0]
+    -- TODO: establish a bound using continuity of `smoothExtDeriv`.
+    sorry
 
 def isCycle (T : Current n X (k + 1)) : Prop := T.boundary = 0
 
