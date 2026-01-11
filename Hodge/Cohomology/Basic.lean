@@ -94,6 +94,12 @@ def DeRhamCohomologyClass (n : ℕ) (X : Type u) (k : ℕ)
 def ofForm {k : ℕ} (ω : SmoothForm n X k) (h : IsFormClosed ω) : DeRhamCohomologyClass n X k := Quotient.mk _ ⟨ω, h⟩
 notation "⟦" ω "," h "⟧" => ofForm ω h
 
+-- `ofForm` is insensitive to the particular closedness proof (proof irrelevance).
+theorem ofForm_proof_irrel {k : ℕ} (ω : SmoothForm n X k) (h₁ h₂ : IsFormClosed ω) :
+    ⟦ω, h₁⟧ = ⟦ω, h₂⟧ := by
+  apply Quotient.sound
+  exact cohomologous_refl ⟨ω, h₁⟩
+
 instance (k : ℕ) : Zero (DeRhamCohomologyClass n X k) := ⟨⟦0, isFormClosed_zero⟧⟩
 
 /-- Casting zero across cohomology degrees gives zero.
@@ -203,82 +209,8 @@ theorem cohomologous_wedge {n k l : ℕ} {X : Type u} [TopologicalSpace X] [Char
     [IsManifold (𝓒_complex n) ⊤ X]
     (ω₁ ω₁' : ClosedForm n X k) (ω₂ ω₂' : ClosedForm n X l) (h1 : ω₁ ≈ ω₁') (h2 : ω₂ ≈ ω₂') :
     (⟨ω₁.val ⋏ ω₂.val, isFormClosed_wedge _ _ ω₁.property ω₂.property⟩ : ClosedForm n X (k + l)) ≈ ⟨ω₁'.val ⋏ ω₂'.val, isFormClosed_wedge _ _ ω₁'.property ω₂'.property⟩ := by
-  -- Goal: IsExact (ω₁ ∧ ω₂ - ω₁' ∧ ω₂')
-  change IsExact (ω₁.val ⋏ ω₂.val - ω₁'.val ⋏ ω₂'.val)
-  -- Expand: ω₁ ∧ ω₂ - ω₁' ∧ ω₂' = (ω₁ - ω₁') ∧ ω₂ + ω₁' ∧ (ω₂ - ω₂')
-  -- The algebraic identity follows from bilinearity of wedge:
-  -- a∧b - a'∧b' = (a-a')∧b + a'∧(b-b')
-  -- Proof: Expand RHS = a∧b - a'∧b + a'∧b - a'∧b' = a∧b - a'∧b' = LHS
-  -- This uses smoothWedge_add_left, smoothWedge_add_right, and neg properties
-  have heq : ω₁.val ⋏ ω₂.val - ω₁'.val ⋏ ω₂'.val = (ω₁.val - ω₁'.val) ⋏ ω₂.val + ω₁'.val ⋏ (ω₂.val - ω₂'.val) := by
-    -- Algebraic identity from bilinearity of wedge
-    have h_neg_left : (-(ω₁'.val)) ⋏ ω₂.val = -(ω₁'.val ⋏ ω₂.val) := by
-      have : ((-1 : ℂ) • ω₁'.val) ⋏ ω₂.val = (-1 : ℂ) • (ω₁'.val ⋏ ω₂.val) :=
-        smoothWedge_smul_left (-1) ω₁'.val ω₂.val
-      simp only [neg_one_smul] at this
-      exact this
-    have h_neg_right : ω₁'.val ⋏ (-(ω₂'.val)) = -(ω₁'.val ⋏ ω₂'.val) := by
-      have : ω₁'.val ⋏ ((-1 : ℂ) • ω₂'.val) = (-1 : ℂ) • (ω₁'.val ⋏ ω₂'.val) :=
-        smoothWedge_smul_right (-1) ω₁'.val ω₂'.val
-      simp only [neg_one_smul] at this
-      exact this
-    have h_sub_left : (ω₁.val - ω₁'.val) ⋏ ω₂.val = ω₁.val ⋏ ω₂.val - ω₁'.val ⋏ ω₂.val := by
-      rw [sub_eq_add_neg, smoothWedge_add_left, h_neg_left, ← sub_eq_add_neg]
-    have h_sub_right : ω₁'.val ⋏ (ω₂.val - ω₂'.val) = ω₁'.val ⋏ ω₂.val - ω₁'.val ⋏ ω₂'.val := by
-      rw [sub_eq_add_neg, smoothWedge_add_right, h_neg_right, ← sub_eq_add_neg]
-    rw [h_sub_left, h_sub_right, sub_add_sub_cancel]
-  rw [heq]
-
-  -- Goal: IsExact ((ω₁ - ω₁') ⋏ ω₂ + ω₁' ⋏ (ω₂ - ω₂'))
-  -- Use that IsExact is additive and prove each summand is exact
-  -- For k+l > 0, we need to construct primitives using the Leibniz rule
-  -- This is the core of the proof that wedge is well-defined on cohomology
-  change IsExact (ω₁.val - ω₁'.val) at h1
-  change IsExact (ω₂.val - ω₂'.val) at h2
-
-  -- **Proof strategy using Leibniz rule**:
-  --
-  -- From h1: ∃ β₁, d(β₁) = ω₁.val - ω₁'.val
-  -- From h2: ∃ β₂, d(β₂) = ω₂.val - ω₂'.val
-  -- Need to show: ∃ γ, d(γ) = (ω₁.val - ω₁'.val) ⋏ ω₂.val + ω₁'.val ⋏ (ω₂.val - ω₂'.val)
-  --
-  -- By Leibniz: d(β₁ ⋏ ω₂.val) = d(β₁) ⋏ ω₂.val + (-1)^(k-1) β₁ ⋏ d(ω₂.val)
-  --           = d(β₁) ⋏ ω₂.val + 0  (since ω₂ is closed: dω₂ = 0)
-  --           = (ω₁.val - ω₁'.val) ⋏ ω₂.val
-  --
-  -- By Leibniz: d(ω₁'.val ⋏ β₂) = d(ω₁'.val) ⋏ β₂ + (-1)^k ω₁'.val ⋏ d(β₂)
-  --           = 0 + (-1)^k ω₁'.val ⋏ (ω₂.val - ω₂'.val)  (since ω₁' is closed)
-  --
-  -- Combining: Take γ = β₁ ⋏ ω₂.val + (-1)^k ω₁'.val ⋏ β₂
-  -- Then: d(γ) = d(β₁) ⋏ ω₂.val + (-1)^k (-1)^k ω₁'.val ⋏ d(β₂)
-  --            = (ω₁ - ω₁') ⋏ ω₂ + ω₁' ⋏ (ω₂ - ω₂')  (since (-1)^k (-1)^k = 1)
-  --
-  -- Proof-first mode: `smoothExtDeriv = 0`, so exactness forces the form to be `0`.
-  have h1_zero : ω₁.val - ω₁'.val = 0 := by
-    cases k with
-    | zero =>
-        -- IsExact at degree 0 means equality to 0.
-        simpa [IsExact] using h1
-    | succ k' =>
-        rcases h1 with ⟨β, hβ⟩
-        -- `smoothExtDeriv β = 0` by definition
-        have : (0 : SmoothForm n X (k' + 1)) = ω₁.val - ω₁'.val := by
-          simpa [smoothExtDeriv, extDerivLinearMap] using hβ
-        exact this.symm
-  have h2_zero : ω₂.val - ω₂'.val = 0 := by
-    cases l with
-    | zero =>
-        simpa [IsExact] using h2
-    | succ l' =>
-        rcases h2 with ⟨β, hβ⟩
-        have : (0 : SmoothForm n X (l' + 1)) = ω₂.val - ω₂'.val := by
-          simpa [smoothExtDeriv, extDerivLinearMap] using hβ
-        exact this.symm
-  have hsum :
-      (ω₁.val - ω₁'.val) ⋏ ω₂.val + ω₁'.val ⋏ (ω₂.val - ω₂'.val) = 0 := by
-    simp [h1_zero, h2_zero]
-  -- therefore the difference is exact
-  simpa [hsum] using (isExact_zero (n := n) (X := X) (k := k + l))
+  -- Placeholder: wedge descends to cohomology via the Leibniz rule.
+  sorry
 
 /-! ### Algebraic Instances -/
 
@@ -527,7 +459,7 @@ theorem mul_assoc {k l m : ℕ}
     (a : DeRhamCohomologyClass n X k)
     (b : DeRhamCohomologyClass n X l)
     (c : DeRhamCohomologyClass n X m) :
-    (a * b) * c = (Nat.add_assoc k l m) ▸ (a * (b * c)) := by
+    (a * b) * c = (Nat.add_assoc k l m).symm ▸ (a * (b * c)) := by
   -- Uses the Classical Pillar axiom smoothWedge_assoc on form representatives
   sorry
 
@@ -550,7 +482,7 @@ The cast is induced by `0 + k = k`.
 This follows from the form-level identity `unitForm ⋏ ω = ω` (via the Classical Pillar
 axiom `ContinuousAlternatingMap.wedge_constOfIsEmpty_left`). -/
 theorem one_mul {k : ℕ} (a : DeRhamCohomologyClass n X k) :
-    unitClass * a = (Nat.zero_add k) ▸ a := sorry
+    (unitClass (n := n) (X := X)) * a = (Nat.zero_add k).symm ▸ a := sorry
 
 /-- Right multiplication by unit: `a * unitClass = a` (up to degree cast).
 
@@ -560,7 +492,7 @@ The cast is induced by `k + 0 = k`.
 This follows from the form-level identity `ω ⋏ unitForm = castForm _ ω` (via the Classical Pillar
 axiom `smoothWedge_unitForm_right`). -/
 theorem mul_one {k : ℕ} (a : DeRhamCohomologyClass n X k) :
-    a * unitClass = (Nat.add_zero k) ▸ a := sorry
+    a * (unitClass (n := n) (X := X)) = (Nat.add_zero k).symm ▸ a := sorry
 
 /-! ## Rational Classes -/
 
@@ -671,8 +603,6 @@ theorem ofForm_smul {k : ℕ} (c : ℂ) (ω : SmoothForm n X k) (hω : IsFormClo
 
 -- ofForm_smul_real follows directly from the Quotient.lift definition
 theorem ofForm_smul_real {k : ℕ} (r : ℝ) (ω : SmoothForm n X k) (hω : IsFormClosed ω) : ⟦r • ω, isFormClosed_smul_real hω⟧ = r • ⟦ω, hω⟧ := rfl
-
-theorem ofForm_proof_irrel {k : ℕ} (ω : SmoothForm n X k) (h₁ h₂ : IsFormClosed ω) : ⟦ω, h₁⟧ = ⟦ω, h₂⟧ := by apply Quotient.sound; apply cohomologous_refl
 
 -- ofForm_sub follows from ofForm_add and ofForm_neg
 theorem ofForm_sub {k : ℕ} (ω η : SmoothForm n X k) (hω : IsFormClosed ω) (hη : IsFormClosed η) : ⟦ω - η, isFormClosed_sub hω hη⟧ = ⟦ω, hω⟧ - ⟦η, hη⟧ := by

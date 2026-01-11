@@ -339,8 +339,6 @@ theorem FundamentalClassSet_rational (p : ℕ) (Z : Set X) (h : isAlgebraicSubva
   have h_eq : ofForm (FundamentalClassSet n X p Z) (FundamentalClassSet_isClosed p Z h) =
               ofForm (fundamentalClassImpl n X p Z) (fundamentalClassImpl_isClosed p Z) := by
     simp only [FundamentalClassSet, FundamentalClassSet_impl]
-    exact ofForm_proof_irrel (fundamentalClassImpl n X p Z)
-      (FundamentalClassSet_isClosed p Z h) (fundamentalClassImpl_isClosed p Z)
   rw [h_eq]
   exact fundamentalClassImpl_isRational p Z
 
@@ -472,12 +470,11 @@ def SignedAlgebraicCycle.intersect_power (Z : SignedAlgebraicCycle n X) (H : Alg
 theorem SignedAlgebraicCycle.fundamentalClass_empty_zero (p : ℕ)
     (Z : SignedAlgebraicCycle n X) (h_pos : Z.pos = ∅) (h_neg : Z.neg = ∅) :
     Z.fundamentalClass p = 0 := by
-  unfold SignedAlgebraicCycle.fundamentalClass
-  rw [h_pos, h_neg, FundamentalClassSet_empty, FundamentalClassSet_empty]
-  simp
+  simp only [SignedAlgebraicCycle.fundamentalClass, h_pos, h_neg,
+             FundamentalClassSet_empty, sub_self]
 
-/-- **Note**: Signed cycle classes are not necessarily zero in the new architecture.
-    The fundamental class of a non-empty algebraic set can be non-zero. -/
+/-! **Note**: Signed cycle classes are not necessarily zero in the new architecture.
+The fundamental class of a non-empty algebraic set can be non-zero. -/
 
 /-- **Axiom: Lefschetz Lift for Signed Cycles.**
 
