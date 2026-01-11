@@ -398,49 +398,96 @@ axiom omega_pow_algebraic {p : ℕ} (c : ℚ) (hc : c > 0) : ∃ (Z : Set X), ..
 
 ---
 
-## Part 4: Parallel Execution Plan
+## Part 4: 5-Agent Parallel Work Packages (Large Assignments)
 
-### Phase 1: Foundation (Weeks 1-2)
-**5 agents in parallel**
+You asked for **large, stable agent assignments** so you don’t have to constantly re-task agents. The work below is grouped into **5 big charters** that can run in parallel, with clear “done” criteria tied to the *global* proof track (no hole‑shuffling).
 
-| Agent | Task | Hours | Deliverable |
-|-------|------|-------|-------------|
-| 1A | Task 1.1: extDerivLinearMap | 8-16 | PROVED def |
-| 1B | Task 1.2: isFormClosed_unitForm | 2-4 | PROVED theorem |
-| 1C | Task 1.3: isSmoothAlternating_wedge | 4-8 | PROVED theorem |
-| 1D | Task 1.4: d² = 0 | 16-32 | PROVED theorem |
-| 1E | Task 1.5: Leibniz | 16-32 | PROVED theorem |
+### Global “Done” for the Whole Project (unchanged)
+The project is done when:
 
-### Phase 2: Cohomology (Week 2)
-**Depends on Phase 1**
+```bash
+cat > /tmp/axioms.lean << 'EOF'
+import Hodge.Kahler.Main
+#print axioms hodge_conjecture'
+EOF
+lake env lean /tmp/axioms.lean
 
-| Agent | Task | Hours | Deliverable |
-|-------|------|-------|-------------|
-| 2A | Task 1.6: cohomologous_wedge | 8-16 | PROVED theorem |
+# REQUIRED:
+# 'hodge_conjecture'' depends on axioms: [propext, Classical.choice, Quot.sound]
+```
 
-### Phase 3: GMT (Weeks 2-4)
-**Hardest phase**
+### Agent 1 — Differential Forms Core (Ωᵏ, d, ∧)
+**Primary goal**: eliminate the *differential forms* axioms from the proof track by implementing `d` and proving its core laws.
 
-| Agent | Task | Hours | Deliverable |
-|-------|------|-------|-------------|
-| 3A | Task 2.1: Poincaré duality | 40-80 | PROVED theorem |
-| 3B | Task 2.2: Fundamental class | 16-32 | PROVED theorem |
-| 3C | Task 2.3: Boundary bound | 8-16 | PROVED theorem |
+- **Owns**: `Hodge/Analytic/Forms.lean` (and any supporting lemmas it needs).
+- **Must remove these proof-track axioms**:
+  - `extDerivLinearMap`
+  - `isFormClosed_unitForm`
+  - `isSmoothAlternating_wedge`
+  - `smoothExtDeriv_extDeriv` (d²=0)
+  - `smoothExtDeriv_wedge` (Leibniz rule)
+- **Likely supporting files**: `Hodge/Analytic/Advanced/LeibnizRule.lean`, `Hodge/Analytic/DomCoprod.lean`.
+- **Definition of done**:
+  - The above names no longer appear as axioms in the repo, and
+  - `#print axioms hodge_conjecture'` no longer lists them.
 
-### Phase 4: Lefschetz (Weeks 3-4)
-**Parallel with Phase 3**
+### Agent 2 — De Rham Cohomology Ring (Well-defined cup product)
+**Primary goal**: make the cohomology ring construction genuinely well-defined (no axioms/sorries for “wedge descends to cohomology”).
 
-| Agent | Task | Hours | Deliverable |
-|-------|------|-------|-------------|
-| 4A | Task 3.1: Lefschetz lift | 24-48 | PROVED theorem |
-| 4B | Task 3.2: omega algebraic | 16-32 | PROVED theorem |
+- **Owns**: `Hodge/Cohomology/Basic.lean`.
+- **Must remove these proof-track axioms**:
+  - `Hodge.cohomologous_wedge`
+- **Depends on**: Agent 1’s Leibniz rule (`smoothExtDeriv_wedge`) and d²=0.
+- **Definition of done**:
+  - `cohomologous_wedge` is a proved theorem (not an axiom),
+  - all ring structure lemmas used by the main proof compile without `sorry`,
+  - `#print axioms hodge_conjecture'` no longer lists `Hodge.cohomologous_wedge`.
 
-### Phase 5: Integration (Week 5)
-**Final verification**
+### Agent 3 — Currents / Analytic Infrastructure (Remove current-theory axioms)
+**Primary goal**: eliminate current-theory holes on the proof track and provide the minimal analytic infrastructure needed by the Harvey–Lawson bridge and cycle-class comparisons.
 
-| Agent | Task | Hours | Deliverable |
-|-------|------|-------|-------------|
-| 5A | Integration & testing | 8-16 | Final build |
+- **Owns**: `Hodge/Analytic/Currents.lean` (+ any analytic support modules).
+- **Must remove these proof-track axioms**:
+  - `Current.boundary_bound`
+- **Definition of done**:
+  - `Current.boundary_bound` is proved (or the main proof is refactored to avoid needing it),
+  - `#print axioms hodge_conjecture'` no longer lists it.
+
+### Agent 4 — Poincaré Duality + Fundamental Class Representation (GMT/Integration core)
+**Primary goal**: eliminate the two biggest geometric “black boxes” by constructing the fundamental class / Poincaré dual forms from proved integration/current theory.
+
+- **Owns**:
+  - `Hodge/Classical/CycleClass.lean`
+  - `Hodge/Classical/GAGA.lean` (the fundamental class representation theorem)
+- **Must remove these proof-track axioms**:
+  - `CycleClass.poincareDualFormExists`
+  - `FundamentalClassSet_represents_class`
+- **Depends on**: likely Agent 3 (currents) and some integration infrastructure.
+- **Definition of done**:
+  - both theorems are proved (no `axiom`),
+  - `#print axioms hodge_conjecture'` no longer lists either.
+
+### Agent 5 — Algebraicity Engine (ω^p algebraic + Lefschetz lift)
+**Primary goal**: remove the remaining algebraic-geometry axioms on the proof track by proving the two “algebraicity transfer” steps.
+
+- **Owns**:
+  - `Hodge/Kahler/Main.lean` (ω^p algebraic)
+  - `Hodge/Classical/GAGA.lean` (Lefschetz lift statement)
+- **Must remove these proof-track axioms**:
+  - `omega_pow_algebraic`
+  - `SignedAlgebraicCycle.lefschetz_lift`
+- **Depends on**: Agent 2 (cohomology ring / cup product well-definedness) and Agent 4 (cycle-class/fundamental class correctness).
+- **Definition of done**:
+  - both are proved theorems and disappear from `#print axioms hodge_conjecture'`.
+
+### Merge / Coordination Rule (to avoid thrash)
+- Agents can work in parallel on their branches.
+- We merge in dependency order to avoid conflicts:
+  1. Agent 1 and Agent 3 first (forms + currents foundations)
+  2. Agent 2 next (cohomology well-definedness)
+  3. Agent 4 next (PD/fundamental class)
+  4. Agent 5 last (algebraicity + Lefschetz lift)
+- Every merge must satisfy the “no hole‑shuffling” gate from the earlier workflow section.
 
 ---
 
@@ -449,17 +496,17 @@ axiom omega_pow_algebraic {p : ℕ} (c : ℚ) (hc : c > 0) : ∃ (Z : Set X), ..
 ```
 ## STRICT REQUIREMENTS FOR ALL AGENTS
 
-1. You are PROVING a theorem, not axiomatizing it.
-2. The keyword "axiom" is FORBIDDEN in your output.
-3. The keyword "sorry" is FORBIDDEN in your output.
-4. You must provide COMPLETE proofs that compile.
+1. You are PROVING a theorem, not “closing a ticket”.
+2. **Hole‑shuffling is forbidden**: do not replace a hard proof with a new `axiom` or move an `axiom` to a `sorry`.
+3. Temporary `sorry` is allowed **only** in a WIP branch or off-proof-track modules, but must be removed before merge.
+4. The PR is “done” only if it reduces the proof-track hole set (or proves infrastructure without increasing it).
 
 ## If You Get Stuck
 
 If a proof seems impossible with current Mathlib:
 1. STOP and report the specific blocker
 2. Identify what Mathlib API is missing
-3. DO NOT convert to axiom as a workaround
+3. DO NOT convert to axiom as a workaround (and do not “bounce” between axiom/sorry)
 4. We will either:
    - Find an alternative proof route
    - Build the missing infrastructure
@@ -469,13 +516,14 @@ If a proof seems impossible with current Mathlib:
 
 After completing your task:
 1. Run: lake build [YourModule]
-2. Run: grep "axiom [your_theorem]" [file]  # Must return nothing
-3. Run: grep "sorry" [file]  # Must return nothing on proof track
+2. Run: echo 'import Hodge.Kahler.Main\n#print axioms hodge_conjecture'\'' | lake env lean --stdin
+3. Confirm your target hole(s) disappeared and no new holes appeared
+4. Before merge: grep for `axiom`/`sorry` in proof-track files (must be empty)
 
 ## Acceptance Criteria
 - [ ] File compiles with `lake build`
-- [ ] NO axiom keyword for your theorem
-- [ ] NO sorry in your proof
+- [ ] Proof-track hole set strictly decreases (or stays same only when adding proved infrastructure)
+- [ ] No new proof-track `axiom` or `sorry` introduced
 - [ ] Proof is mathematically correct
 ```
 
