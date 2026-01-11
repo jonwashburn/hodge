@@ -56,7 +56,7 @@ open Classical Hodge
 universe u
 
 variable {n : ℕ} {X : Type u} [TopologicalSpace X]
-  [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X]
+  [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
 
 /-! ## Primitive Cohomology Classes -/

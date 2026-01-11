@@ -10,7 +10,7 @@ set_option autoImplicit false
 
 variable {n : ℕ} {X : Type*}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-  [IsManifold (𝓒_complex n) ⊤ X]
+  [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
   [Nonempty X]
 
@@ -29,7 +29,7 @@ variable {n : ℕ} {X : Type*}
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", 1978, Chapter 0.3]. -/
 inductive IsAnalyticSet {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] : Set X → Prop where
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] : Set X → Prop where
   | empty : IsAnalyticSet ∅
   | univ : IsAnalyticSet Set.univ
   | union (S T : Set X) : IsAnalyticSet S → IsAnalyticSet T → IsAnalyticSet (S ∪ T)
@@ -38,21 +38,21 @@ inductive IsAnalyticSet {n : ℕ} {X : Type*}
 /-- The empty set is analytic. -/
 theorem IsAnalyticSet_empty {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] :
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] :
     IsAnalyticSet (n := n) (X := X) (∅ : Set X) :=
   IsAnalyticSet.empty
 
 /-- The whole space is analytic. -/
 theorem IsAnalyticSet_univ {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] :
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] :
     IsAnalyticSet (n := n) (X := X) (Set.univ : Set X) :=
   IsAnalyticSet.univ
 
 /-- Finite unions of analytic sets are analytic. -/
 theorem IsAnalyticSet_union {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     (S T : Set X) :
     IsAnalyticSet (n := n) (X := X) S →
     IsAnalyticSet (n := n) (X := X) T →
@@ -62,7 +62,7 @@ theorem IsAnalyticSet_union {n : ℕ} {X : Type*}
 /-- Finite intersections of analytic sets are analytic. -/
 theorem IsAnalyticSet_inter {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     (S T : Set X) :
     IsAnalyticSet (n := n) (X := X) S →
     IsAnalyticSet (n := n) (X := X) T →
@@ -77,7 +77,7 @@ theorem IsAnalyticSet_inter {n : ℕ} {X : Type*}
     - Intersection of closed sets is closed -/
 theorem IsAnalyticSet_isClosed {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     (S : Set X) : IsAnalyticSet (n := n) (X := X) S → IsClosed S := by
   intro h
   induction h with
@@ -92,7 +92,7 @@ theorem IsAnalyticSet_isClosed {n : ℕ} {X : Type*}
     more than one point, the manifold must have more than one point. -/
 theorem nontrivial_of_dim_pos {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [Nonempty X] (hn : n ≥ 1) : Nontrivial X := by
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [Nonempty X] (hn : n ≥ 1) : Nontrivial X := by
   -- Get a point x from Nonempty X
   obtain ⟨x⟩ := ‹Nonempty X›
   -- Access the chart at x
@@ -157,7 +157,7 @@ theorem nontrivial_of_dim_pos {n : ℕ} {X : Type*}
     subsets exist that are neither ∅ nor univ. -/
 theorem IsAnalyticSet_nontrivial {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [Nonempty X] (hn : n ≥ 1) :
     ∃ S : Set X, ¬ IsAnalyticSet (n := n) (X := X) S := by
   -- We show that the only sets in the inductive family are ∅ and univ
@@ -201,7 +201,7 @@ theorem IsAnalyticSet_nontrivial {n : ℕ} {X : Type*}
 /-- A complex analytic subvariety of a complex manifold X. -/
 structure AnalyticSubvariety (n : ℕ) (X : Type*)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] where
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] where
   carrier : Set X
   codim : ℕ
   is_analytic : IsAnalyticSet (n := n) (X := X) carrier
@@ -219,7 +219,7 @@ def integrationCurrentHL {p k : ℕ} (V : AnalyticSubvariety n X) (_hV : V.codim
 /-- The hypothesis structure for the Harvey-Lawson theorem. -/
 structure HarveyLawsonHypothesis (n : ℕ) (X : Type*) (k : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [K : KahlerManifold n X] [Nonempty X] where
   T : IntegralCurrent n X k
   ψ : CalibratingForm n X k
@@ -229,7 +229,7 @@ structure HarveyLawsonHypothesis (n : ℕ) (X : Type*) (k : ℕ)
 /-- The conclusion structure for the Harvey-Lawson theorem. -/
 structure HarveyLawsonConclusion (n : ℕ) (X : Type*) (k : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [K : KahlerManifold n X] [Nonempty X] where
   varieties : Finset (AnalyticSubvariety n X)
   multiplicities : varieties → ℕ+

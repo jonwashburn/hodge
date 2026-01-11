@@ -44,7 +44,7 @@ A full proof from first principles would require:
     is the linear map induced by wedging with the Kähler form class [ω]. -/
 noncomputable def lefschetz_operator (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     (p : ℕ) : DeRhamCohomologyClass n X p →ₗ[ℂ] DeRhamCohomologyClass n X (p + 2) where
   toFun c := c * ⟦KahlerManifold.omega_form, KahlerManifold.omega_closed⟧
   map_add' c₁ c₂ := add_mul c₁ c₂ ⟦KahlerManifold.omega_form, KahlerManifold.omega_closed⟧
@@ -56,7 +56,7 @@ noncomputable def lefschetz_operator (n : ℕ) (X : Type u)
 /-- The iterated Lefschetz map L^k : H^p(X) → H^{p+2k}(X). -/
 def lefschetz_power (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     (p k : ℕ) : DeRhamCohomologyClass n X p →ₗ[ℂ] DeRhamCohomologyClass n X (p + 2 * k) :=
   match k with
   | 0 => LinearMap.id
@@ -70,7 +70,7 @@ def lefschetz_power (n : ℕ) (X : Type u)
     that if dω = 0 then d(Λω) is controlled. On harmonic forms, Λ preserves harmonicity. -/
 axiom isFormClosed_lefschetzLambda {n : ℕ} {X : Type u}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (ω : SmoothForm n X k) (hω : IsFormClosed ω) :
     IsFormClosed (lefschetzLambdaLinearMap n X k ω)
 
@@ -78,7 +78,7 @@ axiom isFormClosed_lefschetzLambda {n : ℕ} {X : Type u}
     If ω₁ ~ ω₂ (differ by an exact form), then Λω₁ ~ Λω₂. -/
 axiom cohomologous_lefschetzLambda {n : ℕ} {X : Type u}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (ω₁ ω₂ : SmoothForm n X k) (h₁ : IsFormClosed ω₁) (h₂ : IsFormClosed ω₂)
     (hcoh : Cohomologous ⟨ω₁, h₁⟩ ⟨ω₂, h₂⟩) :
     Cohomologous ⟨lefschetzLambdaLinearMap n X k ω₁, isFormClosed_lefschetzLambda ω₁ h₁⟩
@@ -99,7 +99,7 @@ axiom cohomologous_lefschetzLambda {n : ℕ} {X : Type u}
     Reference: [Griffiths-Harris, Ch. 0, §7], [Voisin, Ch. 5-6] -/
 noncomputable def lefschetz_lambda_cohomology (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     (k : ℕ) (hk : k ≥ 2 := by omega) :
     DeRhamCohomologyClass n X k →ₗ[ℂ] DeRhamCohomologyClass n X (k - 2) where
   toFun c := Quotient.liftOn c
@@ -135,7 +135,7 @@ noncomputable def lefschetz_lambda_cohomology (n : ℕ) (X : Type u)
     This is the fundamental structural property of Kähler manifolds. -/
 theorem hard_lefschetz_bijective (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
     (p k : ℕ) : Function.Bijective (lefschetz_power n X p k) := by
   -- Show the two definitions of lefschetz_power are equal
   have h_eq : ∀ c, lefschetz_power n X p k c = lefschetz_power_of_class ⟦K.omega_form, K.omega_closed⟧ p k c := by
@@ -167,7 +167,7 @@ theorem hard_lefschetz_bijective (n : ℕ) (X : Type u)
     The iterated Lefschetz operator L^k preserves rationality. -/
 theorem hard_lefschetz_rational_bijective (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
     (p k : ℕ) (c : DeRhamCohomologyClass n X p) :
     isRationalClass c ↔ isRationalClass (lefschetz_power n X p k c) := by
   have h_eq : lefschetz_power n X p k c = lefschetz_power_of_class ⟦K.omega_form, K.omega_closed⟧ p k c := by
@@ -188,7 +188,7 @@ theorem hard_lefschetz_rational_bijective (n : ℕ) (X : Type u)
     a class c is (p,p) if and only if L^k(c) is (p+k, p+k). -/
 theorem hard_lefschetz_pp_bijective (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
     (p k : ℕ) (c : DeRhamCohomologyClass n X p) :
     isPPClass p c ↔ isPPClass (p + 2 * k) (lefschetz_power n X p k c) := by
   -- Show that lefschetz_power equals lefschetz_power_of_class with the Kähler form class
@@ -207,7 +207,7 @@ theorem hard_lefschetz_pp_bijective (n : ℕ) (X : Type u)
     **STATUS: PROVED from isPPClass definition** -/
 theorem existence_of_representative_form {n : ℕ} {X : Type u}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     {k : ℕ} (c : DeRhamCohomologyClass n X k)
     (h_pp : isPPClass k c) :
     ∃ (p : ℕ) (h : 2 * p = k) (η : SmoothForm n X k) (hc : IsFormClosed η), ⟦η, hc⟧ = c ∧ isPPForm' n X p (h ▸ η) :=
@@ -217,14 +217,14 @@ theorem existence_of_representative_form {n : ℕ} {X : Type u}
 /-- The inverse Lefschetz map. -/
 def lefschetz_inverse_cohomology (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     (p k : ℕ) (_h : p ≤ n) : DeRhamCohomologyClass n X (p + 2 * k) →ₗ[ℂ] DeRhamCohomologyClass n X p := 0
 
 /-! ## Hard Lefschetz Isomorphism for Forms -/
 
 variable {n : ℕ} {X : Type u}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-  [IsManifold (𝓒_complex n) ⊤ X]
+  [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
   [ProjectiveComplexManifold n X] [KahlerManifold n X]
   [Nonempty X]
 

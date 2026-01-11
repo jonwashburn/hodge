@@ -48,7 +48,7 @@ universe u
 
 variable {n : ℕ} {X : Type u}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-  [IsManifold (𝓒_complex n) ⊤ X]
+  [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
 
 namespace CycleClass
 
@@ -74,7 +74,7 @@ We axiomatize the existence of such a form with these properties. -/
     Reference: [Griffiths-Harris, 1978, Chapter 1]. -/
 structure PoincareDualFormData (n : ℕ) (X : Type u) (p : ℕ) (Z : Set X)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] where
   /-- The Poincaré dual form representing the integration current -/
   form : SmoothForm n X (2 * p)
@@ -169,7 +169,7 @@ Conceptually, it provides the bridge between:
  -/
 noncomputable def poincareDualFormExists (n : ℕ) (X : Type u) (p : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     (Z : Set X) : PoincareDualFormData n X p Z := by
   classical
@@ -191,7 +191,7 @@ noncomputable def poincareDualFormExists (n : ℕ) (X : Type u) (p : ℕ)
     - Z ≠ ∅: returns a potentially non-zero closed form -/
 def poincareDualForm (n : ℕ) (X : Type u) (p : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     (Z : Set X) : SmoothForm n X (2 * p) :=
   (poincareDualFormExists n X p Z).form
@@ -199,7 +199,7 @@ def poincareDualForm (n : ℕ) (X : Type u) (p : ℕ)
 /-- The Poincaré dual form is closed. -/
 theorem poincareDualForm_isClosed (n : ℕ) (X : Type u) (p : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     (Z : Set X) : IsFormClosed (poincareDualForm n X p Z) :=
   (poincareDualFormExists n X p Z).is_closed
@@ -207,7 +207,7 @@ theorem poincareDualForm_isClosed (n : ℕ) (X : Type u) (p : ℕ)
 /-- The Poincaré dual form of the empty set is zero. -/
 theorem poincareDualForm_empty (n : ℕ) (X : Type u) (p : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] :
     poincareDualForm n X p (∅ : Set X) = 0 :=
   (poincareDualFormExists n X p ∅).empty_vanishes rfl
@@ -230,7 +230,7 @@ We axiomatize this property for algebraic sets. -/
     Reference: [Griffiths-Harris, 1978, Chapter 0, Section 7]. -/
 axiom poincareDualForm_isPP (n : ℕ) (X : Type u) (p : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     (Z : Set X) : isPPForm' n X p (poincareDualForm n X p Z)
 
@@ -253,7 +253,7 @@ We axiomatize this for algebraic sets. -/
     Reference: [Voisin, "Hodge Theory and Complex Algebraic Geometry", 2002]. -/
 axiom poincareDualForm_isRational (n : ℕ) (X : Type u) (p : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     (Z : Set X) : isRationalClass (ofForm (poincareDualForm n X p Z)
                                           (poincareDualForm_isClosed n X p Z))
@@ -274,7 +274,7 @@ This follows from the additivity of integration currents. -/
     Reference: [Federer, "Geometric Measure Theory", 1969]. -/
 axiom poincareDualForm_additive (n : ℕ) (X : Type u) (p : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     (Z₁ Z₂ : Set X) (h_disjoint : Disjoint Z₁ Z₂) :
     poincareDualForm n X p (Z₁ ∪ Z₂) =
@@ -306,7 +306,7 @@ variable [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
     4. Additivity (by `poincareDualForm_additive`) -/
 def fundamentalClassImpl (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     (p : ℕ) (Z : Set X) : SmoothForm n X (2 * p) :=
   CycleClass.poincareDualForm n X p Z

@@ -25,7 +25,7 @@ set_option autoImplicit false
 
 variable {n : ℕ} {X : Type*}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-  [IsManifold (𝓒_complex n) ⊤ X]
+  [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
   [Nonempty X]
 
@@ -44,7 +44,7 @@ def IsComplexSubmanifold (Y : Set X) (p : ℕ) : Prop :=
 /-- A cubulation of X is a finite cover by coordinate cubes. -/
 structure Cubulation (n : ℕ) (X : Type*)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] (h : ℝ) where
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] (h : ℝ) where
   cubes : Finset (Set X)
   is_cover : (⋃ Q ∈ cubes, Q) = Set.univ
   overlap_bound : ∃ C : ℕ, ∀ x, (cubes.filter (x ∈ ·)).card ≤ C
@@ -90,7 +90,7 @@ def IsValidIntegerApproximation {h : ℝ} {C : Cubulation n X h}
 /-- The raw sheet sum on a mesh: local holomorphic pieces in each cube. -/
 structure RawSheetSum (n : ℕ) (X : Type*) (p : ℕ) (h : ℝ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
     (C : Cubulation n X h) where
   sheets : ∀ Q ∈ C.cubes, Set X
   sheet_submanifold : ∀ Q hQ, IsComplexSubmanifold (sheets Q hQ) p
@@ -113,7 +113,7 @@ than as a separate axiom about an opaque function.
     This bundles the cycle proof with the current itself. -/
 structure CycleIntegralCurrent (n : ℕ) (X : Type*) (k : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] where
   current : IntegralCurrent n X k
   is_cycle : current.isCycleAt

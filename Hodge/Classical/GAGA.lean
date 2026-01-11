@@ -25,7 +25,7 @@ universe u
 
     Reference: [R. Hartshorne, "Algebraic Geometry", Springer, 1977, Chapter I.1]. -/
 inductive IsZariskiClosed {n : ℕ} (X : Type u) [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] : Set X → Prop where
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X] : Set X → Prop where
   | empty : IsZariskiClosed X ∅
   | univ : IsZariskiClosed X Set.univ
   | union (Z₁ Z₂ : Set X) : IsZariskiClosed X Z₁ → IsZariskiClosed X Z₂ → IsZariskiClosed X (Z₁ ∪ Z₂)
@@ -35,14 +35,14 @@ inductive IsZariskiClosed {n : ℕ} (X : Type u) [TopologicalSpace X] [ChartedSp
     A subset Z ⊆ X of a projective variety is *algebraic* if it is closed in the Zariski topology. -/
 def IsAlgebraicSet (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [K : KahlerManifold n X] (Z : Set X) : Prop :=
   IsZariskiClosed (n := n) X Z
 
 /-- An algebraic subvariety of a projective variety X. -/
 structure AlgebraicSubvariety (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [K : KahlerManifold n X] where
   carrier : Set X
   codim : ℕ
@@ -51,35 +51,35 @@ structure AlgebraicSubvariety (n : ℕ) (X : Type u)
 /-- Predicate for a set being an algebraic subvariety. -/
 def isAlgebraicSubvariety (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [K : KahlerManifold n X] (Z : Set X) : Prop :=
   ∃ (W : AlgebraicSubvariety n X), W.carrier = Z
 
 /-- The empty set is algebraic. -/
 theorem IsAlgebraicSet_empty (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [K : KahlerManifold n X] : IsAlgebraicSet n X (∅ : Set X) :=
   IsZariskiClosed.empty
 
 /-- The empty set is an algebraic subvariety. -/
 theorem isAlgebraicSubvariety_empty (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [K : KahlerManifold n X] : isAlgebraicSubvariety n X (∅ : Set X) :=
   ⟨⟨∅, 0, IsAlgebraicSet_empty n X⟩, rfl⟩
 
 /-- The entire manifold is algebraic. -/
 theorem IsAlgebraicSet_univ (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [K : KahlerManifold n X] : IsAlgebraicSet n X (Set.univ : Set X) :=
   IsZariskiClosed.univ
 
 /-- The union of two algebraic sets is algebraic. -/
 theorem IsAlgebraicSet_union (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [K : KahlerManifold n X] {Z₁ Z₂ : Set X} :
     IsAlgebraicSet n X Z₁ → IsAlgebraicSet n X Z₂ → IsAlgebraicSet n X (Z₁ ∪ Z₂) :=
   IsZariskiClosed.union Z₁ Z₂
@@ -87,7 +87,7 @@ theorem IsAlgebraicSet_union (n : ℕ) (X : Type u)
 /-- The intersection of two algebraic sets is algebraic. -/
 theorem IsAlgebraicSet_intersection (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [K : KahlerManifold n X] {Z₁ Z₂ : Set X} :
     IsAlgebraicSet n X Z₁ → IsAlgebraicSet n X Z₂ → IsAlgebraicSet n X (Z₁ ∩ Z₂) :=
   IsZariskiClosed.inter Z₁ Z₂
@@ -97,7 +97,7 @@ theorem IsAlgebraicSet_intersection (n : ℕ) (X : Type u)
     Reference: [Hartshorne, 1977, Chapter I, Proposition 1.2]. -/
 theorem IsAlgebraicSet_isClosed (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
     (S : Set X) : IsAlgebraicSet n X S → IsClosed S := by
   intro h
@@ -119,7 +119,7 @@ theorem IsAlgebraicSet_isClosed (n : ℕ) (X : Type u)
     Reference: [Hartshorne, 1977, Appendix B, Corollary B.3]. -/
 theorem IsAlgebraicSet_isAnalyticSet (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [K : KahlerManifold n X] (Z : Set X) :
     IsAlgebraicSet n X Z → IsAnalyticSet (n := n) (X := X) Z := by
   intro h
@@ -132,7 +132,7 @@ theorem IsAlgebraicSet_isAnalyticSet (n : ℕ) (X : Type u)
 
 variable {n : ℕ} {X : Type u}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-  [IsManifold (𝓒_complex n) ⊤ X]
+  [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
 
 /-- **Analytic Sets are Algebraic** (Chow's Theorem / GAGA).
@@ -256,15 +256,15 @@ theorem isAlgebraicSubvariety_intersection {Z₁ Z₂ : Set X}
     Wiley, 1978, Chapter 1, Section 1]. -/
 def FundamentalClassSet_impl : (n : ℕ) → (X : Type u) →
     [TopologicalSpace X] → [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] →
-    [IsManifold (𝓒_complex n) ⊤ X] →
+    [IsManifold (𝓒_complex n) ⊤ X] → [HasLocallyConstantCharts n X] →
     [ProjectiveComplexManifold n X] → [KahlerManifold n X] →
     (p : ℕ) → Set X → SmoothForm n X (2 * p) :=
-  fun n X _ _ _ _ _ p Z => fundamentalClassImpl n X p Z
+  fun n X _ _ _ _ _ _ p Z => fundamentalClassImpl n X p Z
 
 /-- The fundamental class map from algebraic subvarieties to closed (p,p)-forms. -/
 noncomputable def FundamentalClassSet (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     (p : ℕ) (Z : Set X) : SmoothForm n X (2 * p) :=
   FundamentalClassSet_impl n X p Z
@@ -473,7 +473,7 @@ theorem isAlgebraicSubvariety_intersection_power {Z : Set X} {k : ℕ}
 
 structure SignedAlgebraicCycle (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] where
   pos : Set X
   neg : Set X

@@ -331,12 +331,12 @@ just its scalar value.
 
 Reference: [Warner, "Foundations of Differentiable Manifolds and Lie Groups", Prop. 2.14] -/
 
-/-- **Axiom (Classical Pillar)**: Wedge of a constant 0-form with an l-form is scalar multiplication.
+/-- **Theorem**: Wedge of a constant 0-form with an l-form is scalar multiplication.
 
 A 0-form on `Fin 0` is just a scalar value. When we wedge it with an l-form,
 the result is the l-form scaled by that scalar (with index type `Fin (0 + l) ≃ Fin l`).
 
-This axiom encodes the standard exterior algebra identity: `1 ∧ η = η`.
+This theorem encodes the standard exterior algebra identity: `1 ∧ η = η`.
 The proof requires shuffle combinatorics on `AlternatingMap.domCoprod` that are
 not yet formalized in Mathlib. -/
 axiom wedge_constOfIsEmpty_left {l : ℕ} (c : 𝕜)

@@ -22,7 +22,7 @@ universe u
 
 variable {n : ℕ} {X : Type u}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-  [IsManifold (𝓒_complex n) ⊤ X] [CompactSpace X]
+  [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [CompactSpace X]
 
 /-- The standard model for ℂ as a complex manifold. -/
 def 𝓒_ℂ : ModelWithCorners ℂ ℂ ℂ := modelWithCornersSelf ℂ ℂ
@@ -43,7 +43,7 @@ def LocalTrivialization {X : Type*} [TopologicalSpace X] (Fiber : X → Type*)
     holomorphic structure and cocycle condition. -/
 structure HolomorphicLineBundle (n : ℕ) (X : Type*)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] where
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] where
   Fiber : X → Type*
   fiber_add : ∀ x, AddCommGroup (Fiber x)
   fiber_module : ∀ x, Module ℂ (Fiber x)
@@ -76,7 +76,7 @@ theorem HolomorphicLineBundle.has_local_trivializations (L : HolomorphicLineBund
 /-- The trivial bundle has local trivializations. -/
 theorem trivial_bundle_has_local_trivializations {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] (x : X) :
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] (x : X) :
     ∃ (U : Opens X) (hx : x ∈ U), Nonempty (LocalTrivialization (fun _ => ℂ) (fun _ => inferInstance) (fun _ => inferInstance) U) :=
 by
   refine ⟨⊤, ?_, ?_⟩
@@ -114,7 +114,7 @@ def HolomorphicLineBundle.power (L : HolomorphicLineBundle n X) : ℕ → Holomo
 /-- A Hermitian metric on L. -/
 structure HermitianMetric {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] (L : HolomorphicLineBundle n X) where
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] (L : HolomorphicLineBundle n X) where
   inner : (x : X) → L.Fiber x → L.Fiber x → ℂ
   inner_re_pos : ∀ x v, v ≠ 0 → (inner x v v).re > 0
   inner_conj_symm : ∀ x v w, inner x v w = star (inner x w v)

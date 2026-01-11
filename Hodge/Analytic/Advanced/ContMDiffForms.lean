@@ -729,6 +729,25 @@ noncomputable def extDerivForm (ω : ContMDiffForm n X k)
         chartAt (EuclideanSpace ℂ (Fin n)) y = chartAt (EuclideanSpace ℂ (Fin n)) x) :
     (extDerivForm ω hCharts).as_alternating = extDeriv ω := rfl
 
+/-- `extDerivForm` distributes over addition. -/
+theorem extDerivForm_add (ω η : ContMDiffForm n X k)
+    (hCharts :
+      ∀ {x y : X}, y ∈ (chartAt (EuclideanSpace ℂ (Fin n)) x).source →
+        chartAt (EuclideanSpace ℂ (Fin n)) y = chartAt (EuclideanSpace ℂ (Fin n)) x) :
+    extDerivForm (ω + η) hCharts = extDerivForm ω hCharts + extDerivForm η hCharts := by
+  refine ext _ _ (fun x => ?_)
+  simp only [extDerivForm_as_alternating (ω := ω + η), extDerivForm_as_alternating (ω := ω),
+             extDerivForm_as_alternating (ω := η), add_as_alternating, extDeriv_add, Pi.add_apply]
+
+/-- `extDerivForm` respects scalar multiplication. -/
+theorem extDerivForm_smul (c : ℂ) (ω : ContMDiffForm n X k)
+    (hCharts :
+      ∀ {x y : X}, y ∈ (chartAt (EuclideanSpace ℂ (Fin n)) x).source →
+        chartAt (EuclideanSpace ℂ (Fin n)) y = chartAt (EuclideanSpace ℂ (Fin n)) x) :
+    extDerivForm (c • ω) hCharts = c • extDerivForm ω hCharts := by
+  refine ext _ _ (fun x => ?_)
+  simp only [extDerivForm_as_alternating, smul_as_alternating, extDeriv_smul, Pi.smul_apply]
+
 /-- The second exterior derivative of a `C^∞` form is zero (d² = 0).
 
 **Proof strategy**:
@@ -1158,5 +1177,55 @@ theorem extDeriv_extDeriv (ω : ContMDiffForm n X k)
   -- Apply the EventuallyEq lemma
   rw [Filter.EventuallyEq.extDeriv_eq h_eventuallyEq]
   exact h_d_squared_zero
+
+end ContMDiffForm
+
+/-!
+## Conversion between SmoothForm and ContMDiffForm
+
+The types `SmoothForm n X k` and `ContMDiffForm n X k` are structurally identical
+(both have `as_alternating : X → FiberAlt n k` and a `ContMDiff` proof). These
+conversions allow us to use the `ContMDiffForm` infrastructure for `SmoothForm`.
+-/
+
+variable {n : ℕ} {X : Type u} [TopologicalSpace X]
+  [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X]
+  {k : ℕ}
+
+/-- Convert a `SmoothForm` to a `ContMDiffForm`. The types are structurally identical. -/
+def SmoothForm.toContMDiffForm (ω : SmoothForm n X k) : ContMDiffForm n X k where
+  as_alternating := ω.as_alternating
+  smooth' := ω.is_smooth
+
+/-- Convert a `ContMDiffForm` to a `SmoothForm`. The types are structurally identical. -/
+def ContMDiffForm.toSmoothForm (ω : ContMDiffForm n X k) : SmoothForm n X k where
+  as_alternating := ω.as_alternating
+  is_smooth := ω.smooth'
+
+namespace SmoothForm
+
+variable {n : ℕ} {X : Type u} [TopologicalSpace X]
+  [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X]
+  {k : ℕ}
+
+@[simp] lemma toContMDiffForm_as_alternating (ω : SmoothForm n X k) :
+    ω.toContMDiffForm.as_alternating = ω.as_alternating := rfl
+
+@[simp] lemma toContMDiffForm_toSmoothForm (ω : SmoothForm n X k) :
+    ω.toContMDiffForm.toSmoothForm = ω := rfl
+
+end SmoothForm
+
+namespace ContMDiffForm
+
+variable {n : ℕ} {X : Type u} [TopologicalSpace X]
+  [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X]
+  {k : ℕ}
+
+@[simp] lemma toSmoothForm_as_alternating (ω : ContMDiffForm n X k) :
+    ω.toSmoothForm.as_alternating = ω.as_alternating := rfl
+
+@[simp] lemma toSmoothForm_toContMDiffForm (ω : ContMDiffForm n X k) :
+    ω.toSmoothForm.toContMDiffForm = ω := rfl
 
 end ContMDiffForm

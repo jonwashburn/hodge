@@ -44,7 +44,7 @@ set_option autoImplicit false
 universe u
 
 variable {n : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-  [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X]
+  [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X]
 
 variable [K : KahlerManifold n X]
 
@@ -58,7 +58,7 @@ theorem omega_is_rational : isRationalClass ⟦K.omega_form, omega_isClosed⟧ :
 theorem omega_is_pp : isPPForm' n X 1 K.omega_form :=
   K.omega_is_pp
 
-omit [ProjectiveComplexManifold n X] K in
+omit K in
 theorem unitForm_isClosed : IsFormClosed (unitForm : SmoothForm n X 0) := isFormClosed_unitForm
 
 omit K in
@@ -109,7 +109,7 @@ Voisin "Hodge Theory and Complex Algebraic Geometry" Ch. 5-6.
 
 /-- **Dual Lefschetz Operator Λ** as a smooth linear map (axiomatized). -/
 axiom lefschetzLambdaLinearMap (n : ℕ) (X : Type u) [TopologicalSpace X]
-    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X]
+    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] (k : ℕ) :
     SmoothForm n X k →ₗ[ℂ] SmoothForm n X (k - 2)
 
@@ -142,7 +142,7 @@ theorem lefschetzLambda_neg {k : ℕ} (α : SmoothForm n X k) :
 
     **Mathematical Reference**: Griffiths-Harris §0.7, Voisin Ch. 5. -/
 axiom lefschetzLambda_adjoint (n : ℕ) (X : Type u) [TopologicalSpace X]
-    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X]
+    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] (k : ℕ)
     (α : SmoothForm n X k) (β : SmoothForm n X (k + 2)) :
     -- L² inner product of Lα and β equals L² inner product of α and Λβ
@@ -166,7 +166,7 @@ axiom lefschetzLambda_adjoint (n : ℕ) (X : Type u) [TopologicalSpace X]
 
     **Mathematical Reference**: Wells "Differential Analysis on Complex Manifolds" §6.1. -/
 axiom lefschetzLambda_hodgeStar_formula (n : ℕ) (X : Type u) [TopologicalSpace X]
-    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X]
+    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] (k : ℕ) (hk : k ≤ 2 * n)
     (ω : SmoothForm n X k) :
     -- Λω = sign • ⋆(L(⋆ω))
@@ -216,7 +216,7 @@ This is standard (Griffiths-Harris §0.6, Wells "Differential Analysis", Ch. IV)
 
     This operator is axiomatized as a `LinearMap`. -/
 axiom hodgeStarLinearMap (n : ℕ) (X : Type u) [TopologicalSpace X]
-    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X]
+    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] (k : ℕ) (hk : k ≤ 2 * n) :
     SmoothForm n X k →ₗ[ℂ] SmoothForm n X (2 * n - k)
 
@@ -296,7 +296,7 @@ Reference: [Wells, "Differential Analysis on Complex Manifolds", Ch. IV]
 
     This is a genuine operator defined compositionally from ⋆ and d. -/
 axiom adjointDerivLinearMap (n : ℕ) (X : Type u) [TopologicalSpace X]
-    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X]
+    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] (k : ℕ)
     (hk : k ≤ 2 * n := by omega) (hk1 : k ≥ 1 := by omega) :
     SmoothForm n X k →ₗ[ℂ] SmoothForm n X (k - 1)
@@ -379,7 +379,7 @@ Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", Ch. 0, §6]
 
     This is a genuine operator defined compositionally from d and δ. -/
 axiom laplacianLinearMap (n : ℕ) (X : Type u) [TopologicalSpace X]
-    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X]
+    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] (k : ℕ)
     (hk : k ≤ 2 * n := by omega) (hk1 : 1 ≤ k := by omega) (hk2 : k + 1 ≤ 2 * n := by omega) :
     SmoothForm n X k →ₗ[ℂ] SmoothForm n X k

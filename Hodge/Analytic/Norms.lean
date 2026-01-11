@@ -34,7 +34,7 @@ set_option autoImplicit false
     `ContinuousAlternatingMap` is the operator norm. -/
 noncomputable def pointwiseComass {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     {k : ℕ} (α : SmoothForm n X k) (x : X) : ℝ :=
   ‖α.as_alternating x‖
 
@@ -43,7 +43,7 @@ noncomputable def pointwiseComass {n : ℕ} {X : Type*}
 /-- **Pointwise Comass Non-negativity**. -/
 theorem pointwiseComass_nonneg {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     {k : ℕ} (α : SmoothForm n X k) (x : X) : pointwiseComass α x ≥ 0 := by
   simpa [pointwiseComass] using (norm_nonneg (α.as_alternating x))
 
@@ -51,14 +51,14 @@ theorem pointwiseComass_nonneg {n : ℕ} {X : Type*}
     The zero form has zero comass at every point. -/
 theorem pointwiseComass_zero {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [HasLocallyConstantCharts n X]
     (x : X) {k : ℕ} : pointwiseComass (0 : SmoothForm n X k) x = 0 := by
   simp [pointwiseComass]
 
 /-- **Pointwise Comass Triangle Inequality**. -/
 theorem pointwiseComass_add_le {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [HasLocallyConstantCharts n X]
     {k : ℕ} (α β : SmoothForm n X k) (x : X) :
     pointwiseComass (α + β) x ≤ pointwiseComass α x + pointwiseComass β x := by
   simpa [pointwiseComass, SmoothForm.add_apply] using
@@ -68,7 +68,7 @@ theorem pointwiseComass_add_le {n : ℕ} {X : Type*}
     The operator norm scales by absolute value. -/
 theorem pointwiseComass_smul {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     {k : ℕ} (r : ℝ) (α : SmoothForm n X k) (x : X) :
     pointwiseComass (r • α) x = |r| * pointwiseComass α x
   := by
@@ -77,13 +77,13 @@ theorem pointwiseComass_smul {n : ℕ} {X : Type*}
 /-- **Negation as Scalar Multiplication** (Derived from Module structure). -/
 theorem SmoothForm.neg_eq_neg_one_smul {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     {k : ℕ} (α : SmoothForm n X k) : (-α) = (-1 : ℝ) • α := by
   rw [neg_one_smul]
 
 theorem pointwiseComass_neg {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     {k : ℕ} (α : SmoothForm n X k) (x : X) :
     pointwiseComass (-α) x = pointwiseComass α x := by
   rw [SmoothForm.neg_eq_neg_one_smul, pointwiseComass_smul]
@@ -104,7 +104,7 @@ theorem pointwiseComass_neg {n : ℕ} {X : Type*}
     Reference: [C. Voisin, "Hodge Theory and Complex Algebraic Geometry I", 2002, Section 3.1]. -/
 theorem pointwiseComass_continuous {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α : SmoothForm n X k) : Continuous (pointwiseComass α) := by
   -- `pointwiseComass α` is `x ↦ ‖α.as_alternating x‖`.
   -- α.is_smooth : ContMDiff → continuous, and norm is continuous.
@@ -113,14 +113,14 @@ theorem pointwiseComass_continuous {n : ℕ} {X : Type*}
 /-- Global comass norm on forms: supremum of pointwise comass. -/
 def comass {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [CompactSpace X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [CompactSpace X]
     {k : ℕ} (α : SmoothForm n X k) : ℝ :=
   sSup (range (pointwiseComass α))
 
 /-- **Comass Nonnegativity**: Comass is always nonneg (supremum of nonneg values). -/
 theorem comass_nonneg {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [CompactSpace X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [CompactSpace X]
     {k : ℕ} (α : SmoothForm n X k) : comass α ≥ 0 := by
   unfold comass
   apply Real.sSup_nonneg
@@ -133,7 +133,7 @@ theorem comass_nonneg {n : ℕ} {X : Type*}
 -- Definiteness would require proper norm setup
 theorem comass_eq_zero_of_zero {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [CompactSpace X] [Nonempty X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [CompactSpace X] [Nonempty X]
     {k : ℕ} : comass (0 : SmoothForm n X k) = 0 := by
   unfold comass
   have h_set : range (pointwiseComass (0 : SmoothForm n X k)) = {0} := by
@@ -153,13 +153,13 @@ theorem comass_eq_zero_of_zero {n : ℕ} {X : Type*}
 /-- Instance: Norm on Smooth Forms using Comass. -/
 instance instNormSmoothForm {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [CompactSpace X] {k : ℕ} :
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [CompactSpace X] {k : ℕ} :
     Norm (SmoothForm n X k) := ⟨comass⟩
 
 /-- Global comass is bounded above on compact manifolds. -/
 theorem comass_bddAbove {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α : SmoothForm n X k) :
     BddAbove (range (pointwiseComass α)) := by
   apply IsCompact.bddAbove
@@ -169,7 +169,7 @@ theorem comass_bddAbove {n : ℕ} {X : Type*}
 /-- The comass of the zero form is zero. -/
 theorem comass_zero {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [CompactSpace X] [Nonempty X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [CompactSpace X] [Nonempty X]
     {k : ℕ} : comass (n := n) (0 : SmoothForm n X k) = 0 := by
   unfold comass
   have h : range (pointwiseComass (0 : SmoothForm n X k)) = {0} := by
@@ -184,7 +184,7 @@ theorem comass_zero {n : ℕ} {X : Type*}
 /-- Global comass satisfies triangle inequality. -/
 theorem comass_add_le {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [Nonempty X]
     {k : ℕ} (α β : SmoothForm n X k) :
     comass (α + β) ≤ comass α + comass β := by
@@ -206,7 +206,7 @@ theorem comass_add_le {n : ℕ} {X : Type*}
     **BLOCKER**: Depends on `pointwiseComass_smul` and set algebra. -/
 theorem comass_smul {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [CompactSpace X] [Nonempty X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [CompactSpace X] [Nonempty X]
     {k : ℕ} (c : ℝ) (ω : SmoothForm n X k) : comass (c • ω) = |c| * comass ω
   := by
   unfold comass
@@ -235,54 +235,54 @@ theorem comass_smul {n : ℕ} {X : Type*}
 /-- Pointwise inner product of differential forms. -/
 noncomputable def pointwiseInner {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (_α _β : SmoothForm n X k) (_x : X) : ℝ := 0
 
 /-- **Pointwise Inner Product Positivity**. -/
 theorem pointwiseInner_self_nonneg {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α : SmoothForm n X k) (x : X) :
     pointwiseInner α α x ≥ 0 := by simp [pointwiseInner]
 
 /-- Pointwise norm induced by the inner product. -/
 def pointwiseNorm {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α : SmoothForm n X k) (x : X) : ℝ :=
   Real.sqrt (pointwiseInner α α x)
 
 /-- Global L2 inner product of two k-forms. -/
 noncomputable def L2Inner {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (_α _β : SmoothForm n X k) : ℝ := 0
 
 /-- **L2 Inner Product Left Additivity**. -/
 theorem L2Inner_add_left {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α₁ α₂ β : SmoothForm n X k) :
     L2Inner (α₁ + α₂) β = L2Inner α₁ β + L2Inner α₂ β := by simp [L2Inner]
 
 /-- **L2 Inner Product Scalar Left Linearity**. -/
 theorem L2Inner_smul_left {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (r : ℝ) (α β : SmoothForm n X k) :
     L2Inner (r • α) β = r * L2Inner α β := by simp [L2Inner]
 
 /-- **L2 Inner Product Positivity**. -/
 theorem L2Inner_self_nonneg {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α : SmoothForm n X k) :
     L2Inner α α ≥ 0 := by simp [L2Inner]
 
 /-- Global L2 norm of a k-form. -/
 def L2NormForm {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α : SmoothForm n X k) : ℝ :=
   Real.sqrt (L2Inner α α)
 
@@ -291,13 +291,13 @@ def L2NormForm {n : ℕ} {X : Type*}
 /-- The energy of a form is the L2 norm squared. -/
 def energy {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α : SmoothForm n X k) : ℝ := L2Inner α α
 
 /-- **Energy Minimizer Existence** (Removed as unused). -/
 theorem energy_minimizer_trivial {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     (k : ℕ) (c : DeRhamCohomologyClass n X k) :
     ∃ ω : SmoothForm n X k, ∃ h : IsFormClosed ω, ⟦ω, h⟧ = c ∧ True := by
   induction c using Quotient.ind with
@@ -314,60 +314,60 @@ theorem energy_minimizer_trivial {n : ℕ} {X : Type*}
 
 theorem L2NormForm_nonneg {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α : SmoothForm n X k) : L2NormForm α ≥ 0 := Real.sqrt_nonneg _
 
 theorem pointwiseNorm_nonneg {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α : SmoothForm n X k) (x : X) : pointwiseNorm α x ≥ 0 := Real.sqrt_nonneg _
 
 theorem energy_nonneg {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α : SmoothForm n X k) : energy α ≥ 0 := L2Inner_self_nonneg α
 
 theorem L2NormForm_sq_eq_energy {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α : SmoothForm n X k) : (L2NormForm α) ^ 2 = energy α := by
   unfold L2NormForm energy; rw [Real.sq_sqrt (L2Inner_self_nonneg α)]
 
 theorem pointwiseInner_comm {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α β : SmoothForm n X k) (x : X) :
     pointwiseInner α β x = pointwiseInner β α x := by simp [pointwiseInner]
 
 theorem L2Inner_comm {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α β : SmoothForm n X k) :
     L2Inner α β = L2Inner β α := by simp [L2Inner]
 
 theorem L2Inner_add_right {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α β₁ β₂ : SmoothForm n X k) :
     L2Inner α (β₁ + β₂) = L2Inner α β₁ + L2Inner α β₂ := by
   rw [L2Inner_comm α (β₁ + β₂), L2Inner_add_left, L2Inner_comm β₁ α, L2Inner_comm β₂ α]
 
 theorem L2Inner_smul_right {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (r : ℝ) (α β : SmoothForm n X k) :
     L2Inner α (r • β) = r * L2Inner α β := by
   rw [L2Inner_comm α (r • β), L2Inner_smul_left, L2Inner_comm β α]
 
 theorem L2Inner_cauchy_schwarz {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α β : SmoothForm n X k) :
     (L2Inner α β) ^ 2 ≤ (L2Inner α α) * (L2Inner β β) := by simp [L2Inner]
 
 theorem L2NormForm_add_le {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α β : SmoothForm n X k) :
     L2NormForm (α + β) ≤ L2NormForm α + L2NormForm β := by
   unfold L2NormForm
@@ -384,7 +384,7 @@ theorem L2NormForm_add_le {n : ℕ} {X : Type*}
 
 theorem L2NormForm_smul {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (r : ℝ) (α : SmoothForm n X k) :
     L2NormForm (r • α) = |r| * L2NormForm α := by
   unfold L2NormForm; rw [L2Inner_smul_left, L2Inner_smul_right]

@@ -2,6 +2,8 @@ import Mathlib.LinearAlgebra.StdBasis
 import Mathlib.Geometry.Manifold.Algebra.Monoid
 import Hodge.Analytic.DomCoprod
 import Hodge.Analytic.FormType
+import Hodge.Analytic.Advanced.ContMDiffForms
+import Hodge.Analytic.Advanced.LeibnizRule
 import Hodge.Basic
 
 
@@ -16,7 +18,7 @@ universe u
 
 variable {n : ℕ} {X : Type u} [TopologicalSpace X]
   [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-  [IsManifold (𝓒_complex n) ⊤ X]
+  [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
 
 /-- The zero form has smooth (constantly zero) coefficients. -/
 theorem isSmoothAlternating_zero (k : ℕ) : IsSmoothAlternating n X k (fun _ => 0) :=
@@ -170,6 +172,41 @@ where `D(ω)(x) : TₓX → Altᵏ(TₓX, ℂ)` is the derivative of the coeffic
 - Leibniz: `d(ω ∧ η) = dω ∧ η + (-1)^k ω ∧ dη`
 -/
 
+/-!
+## SmoothForm ↔ ContMDiffForm Conversion (Algebraic Structure Lemmas)
+
+These lemmas show that the conversion between SmoothForm and ContMDiffForm respects
+the algebraic structure. They are placed here (in Forms.lean) rather than in
+ContMDiffForms.lean because they depend on the Add/SMul instances for SmoothForm
+which are defined in this file.
+-/
+
+/-- `toContMDiffForm` respects addition. -/
+lemma SmoothForm.toContMDiffForm_add {k : ℕ} (ω η : SmoothForm n X k) :
+    (ω + η).toContMDiffForm = ω.toContMDiffForm + η.toContMDiffForm := by
+  refine ContMDiffForm.ext _ _ (fun x => ?_)
+  rfl
+
+/-- `toContMDiffForm` respects scalar multiplication. -/
+lemma SmoothForm.toContMDiffForm_smul {k : ℕ} (c : ℂ) (ω : SmoothForm n X k) :
+    (c • ω).toContMDiffForm = c • ω.toContMDiffForm := by
+  refine ContMDiffForm.ext _ _ (fun x => ?_)
+  rfl
+
+/-- `toSmoothForm` respects addition. -/
+lemma ContMDiffForm.toSmoothForm_add {k : ℕ} (ω η : ContMDiffForm n X k) :
+    (ω + η).toSmoothForm = ω.toSmoothForm + η.toSmoothForm := by
+  apply SmoothForm.ext
+  funext x
+  rfl
+
+/-- `toSmoothForm` respects scalar multiplication. -/
+lemma ContMDiffForm.toSmoothForm_smul {k : ℕ} (c : ℂ) (ω : ContMDiffForm n X k) :
+    (c • ω).toSmoothForm = c • ω.toSmoothForm := by
+  apply SmoothForm.ext
+  funext x
+  rfl
+
 /-- **The exterior derivative as a ℂ-linear map** (Classical Pillar Axiom).
 
 ## Mathematical Definition
@@ -215,9 +252,20 @@ This axiom is **ON THE PROOF TRACK** for `hodge_conjecture'`. It is used to:
 - [Bott-Tu, "Differential Forms in Algebraic Topology", GTM 82, Ch. I]
 - [Lee, "Introduction to Smooth Manifolds", 2nd ed., Springer, 2012, Ch. 14]
 -/
-axiom extDerivLinearMap (n : ℕ) (X : Type u) [TopologicalSpace X]
-    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X] (k : ℕ) :
-    SmoothForm n X k →ₗ[ℂ] SmoothForm n X (k + 1)
+noncomputable def extDerivLinearMap (n : ℕ) (X : Type u) [TopologicalSpace X]
+    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X]
+    [HasLocallyConstantCharts n X] (k : ℕ) :
+    SmoothForm n X k →ₗ[ℂ] SmoothForm n X (k + 1) where
+  toFun ω := (ContMDiffForm.extDerivForm ω.toContMDiffForm HasLocallyConstantCharts.hCharts).toSmoothForm
+  map_add' := fun ω η => by
+    rw [SmoothForm.toContMDiffForm_add]
+    rw [ContMDiffForm.extDerivForm_add]
+    rw [ContMDiffForm.toSmoothForm_add]
+  map_smul' := fun c ω => by
+    simp only [RingHom.id_apply]
+    rw [SmoothForm.toContMDiffForm_smul]
+    rw [ContMDiffForm.extDerivForm_smul]
+    rw [ContMDiffForm.toSmoothForm_smul]
 
 /-- The exterior derivative of a smooth form. -/
 noncomputable def smoothExtDeriv {k : ℕ} (ω : SmoothForm n X k) : SmoothForm n X (k + 1) :=
@@ -289,11 +337,14 @@ theorem isExact_zero {k : ℕ} : IsExact (0 : SmoothForm n X k) := by
 
 structure ClosedForm (n : ℕ) (X : Type u) (k : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] where
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] where
   val : SmoothForm n X k
   property : IsFormClosed val
 
 namespace ClosedForm
+variable {n : ℕ} {X : Type u} [TopologicalSpace X]
+  [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X]
+  [HasLocallyConstantCharts n X]
 instance (k : ℕ) : Add (ClosedForm n X k) := ⟨fun ω η => ⟨ω.val + η.val, isFormClosed_add ω.property η.property⟩⟩
 instance (k : ℕ) : Neg (ClosedForm n X k) := ⟨fun ω => ⟨-ω.val, isFormClosed_neg ω.property⟩⟩
 instance (k : ℕ) : Zero (ClosedForm n X k) := ⟨⟨0, isFormClosed_zero⟩⟩
@@ -427,9 +478,34 @@ This axiom is **ON THE PROOF TRACK** for `hodge_conjecture'`. It ensures:
 - [de Rham, "Variétés Différentiables", 1955, Ch. 1]
 - [Warner, "Foundations of Differentiable Manifolds", GTM 94, Theorem 2.14]
 - [Bott-Tu, "Differential Forms in Algebraic Topology", GTM 82, Ch. 1]
--/
-axiom smoothExtDeriv_extDeriv {k : ℕ} (ω : SmoothForm n X k) :
-    smoothExtDeriv (smoothExtDeriv ω) = 0
+
+**NOW PROVED** using ContMDiffForm.extDeriv_extDeriv. -/
+theorem smoothExtDeriv_extDeriv {k : ℕ} (ω : SmoothForm n X k) :
+    smoothExtDeriv (smoothExtDeriv ω) = 0 := by
+  -- d²ω = 0 by the symmetry of second derivatives (Schwarz's theorem)
+  -- We use the ContMDiffForm.extDeriv_extDeriv infrastructure
+  -- smoothExtDeriv ω = (extDerivForm ω.toContMDiffForm hCharts).toSmoothForm
+  -- So (smoothExtDeriv ω).toContMDiffForm = (extDerivForm ω.toContMDiffForm hCharts).toSmoothForm.toContMDiffForm
+  --                                       = extDerivForm ω.toContMDiffForm hCharts
+  --
+  -- Then smoothExtDeriv (smoothExtDeriv ω) = (extDerivForm (smoothExtDeriv ω).toContMDiffForm hCharts).toSmoothForm
+  --                                        = (extDerivForm (extDerivForm ω.toContMDiffForm hCharts) hCharts).toSmoothForm
+  --
+  -- By ContMDiffForm.extDeriv_extDeriv: extDeriv (extDerivForm ω.toContMDiffForm hCharts) = 0
+  -- The extDerivForm of something with extDeriv = 0 has as_alternating = 0.
+  apply SmoothForm.ext
+  funext x
+  simp only [SmoothForm.zero_apply]
+  -- Goal: show (smoothExtDeriv (smoothExtDeriv ω)).as_alternating x = 0
+  unfold smoothExtDeriv extDerivLinearMap
+  simp only [LinearMap.coe_mk, AddHom.coe_mk, ContMDiffForm.toSmoothForm_as_alternating]
+  -- Goal: (extDerivForm ((extDerivForm ω.toContMDiffForm hCharts).toSmoothForm.toContMDiffForm) hCharts).as_alternating x = 0
+  simp only [ContMDiffForm.toSmoothForm_toContMDiffForm]
+  -- Goal: (extDerivForm (extDerivForm ω.toContMDiffForm hCharts) hCharts).as_alternating x = 0
+  simp only [ContMDiffForm.extDerivForm_as_alternating]
+  -- Goal: ContMDiffForm.extDeriv (extDerivForm ω.toContMDiffForm hCharts) x = 0
+  rw [ContMDiffForm.extDeriv_extDeriv ω.toContMDiffForm HasLocallyConstantCharts.hCharts]
+  rfl
 
 /-- **Graded Leibniz Rule for Exterior Derivative** (Classical Pillar Axiom).
 
@@ -485,10 +561,65 @@ This axiom is **ON THE PROOF TRACK** for `hodge_conjecture'`. It is used to:
 - [Lee, "Introduction to Smooth Manifolds", 2nd ed., Prop. 14.28]
 - [Bott-Tu, "Differential Forms in Algebraic Topology", GTM 82, Ch. 1]
 -/
-axiom smoothExtDeriv_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) :
+-- Helper lemma: relates domDomCongr-based casts to transport-based casts for wedge products
+private lemma castAlt_eq_transport_wedge {m m' : ℕ} (h : m = m')
+    (f : FiberAlt n m) :
+    f.domDomCongr (finCongr h) = h ▸ f := by
+  subst h; rfl
+
+-- Lemma: castForm of smul
+private lemma castForm_smul_as_alternating {m m' : ℕ} (h : m = m') (c : ℂ)
+    (ω : SmoothForm n X m) (x : X) :
+    (castForm h (c • ω)).as_alternating x = h ▸ (c • ω.as_alternating x) := by
+  subst h; rfl
+
+-- Lemma: castForm of wedge
+private lemma castForm_wedge_as_alternating {k' l' m : ℕ} (h : k' + l' = m)
+    (ω : SmoothForm n X k') (η : SmoothForm n X l') (x : X) :
+    (castForm h (ω ⋏ η)).as_alternating x = h ▸ (ω.as_alternating x).wedge (η.as_alternating x) := by
+  subst h; rfl
+
+theorem smoothExtDeriv_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) :
     smoothExtDeriv (ω ⋏ η) =
       castForm (by omega : (k + 1) + l = (k + l) + 1) (smoothExtDeriv ω ⋏ η) +
-      castForm (by omega : k + (l + 1) = (k + l) + 1) ((-1 : ℂ)^k • (ω ⋏ smoothExtDeriv η))
+      castForm (by omega : k + (l + 1) = (k + l) + 1) ((-1 : ℂ)^k • (ω ⋏ smoothExtDeriv η)) := by
+  -- This proof uses LeibnizRule.extDerivAt_wedge, which depends on
+  -- alternatizeUncurryFin_wedge_right and alternatizeUncurryFin_wedge_left
+  -- (currently marked with sorry in LeibnizRule.lean)
+  apply SmoothForm.ext
+  funext x
+  -- Compute LHS using LeibnizRule.extDerivAt_wedge
+  have h_wedge_eq : (ω ⋏ η).toContMDiffForm = ω.toContMDiffForm.wedge η.toContMDiffForm := by
+    apply ContMDiffForm.ext; intro y; rfl
+  have h_lhs : (smoothExtDeriv (ω ⋏ η)).as_alternating x =
+      ContMDiffForm.extDerivAt (ω.toContMDiffForm.wedge η.toContMDiffForm) x := by
+    simp only [smoothExtDeriv, extDerivLinearMap, LinearMap.coe_mk, AddHom.coe_mk,
+               ContMDiffForm.toSmoothForm_as_alternating, h_wedge_eq,
+               ContMDiffForm.extDerivForm_as_alternating, ContMDiffForm.extDeriv_as_alternating]
+  rw [h_lhs, LeibnizRule.extDerivAt_wedge]
+  -- Compute RHS
+  simp only [SmoothForm.add_apply]
+  -- First term: castForm (smoothExtDeriv ω ⋏ η)
+  have h_rhs1 : (castForm (by omega : (k + 1) + l = (k + l) + 1) (smoothExtDeriv ω ⋏ η)).as_alternating x =
+      (by omega : (k + 1) + l = (k + l) + 1) ▸
+        ((smoothExtDeriv ω).as_alternating x).wedge (η.as_alternating x) := by
+    exact castForm_wedge_as_alternating _ _ _ _
+  -- Second term: castForm ((-1)^k • (ω ⋏ smoothExtDeriv η))
+  have h_rhs2 : (castForm (by omega : k + (l + 1) = (k + l) + 1)
+      ((-1 : ℂ)^k • (ω ⋏ smoothExtDeriv η))).as_alternating x =
+      (by omega : k + (l + 1) = (k + l) + 1) ▸
+        ((-1 : ℂ)^k • (ω.as_alternating x).wedge ((smoothExtDeriv η).as_alternating x)) := by
+    simp only [castForm_smul_as_alternating, SmoothForm.smul_apply, SmoothForm.wedge_apply]
+  rw [h_rhs1, h_rhs2]
+  -- Now LHS and RHS have the same structure
+  simp only [LeibnizRule.castAlt]
+  -- Simplify smoothExtDeriv
+  simp only [smoothExtDeriv, extDerivLinearMap, LinearMap.coe_mk, AddHom.coe_mk,
+             ContMDiffForm.toSmoothForm_as_alternating, SmoothForm.toContMDiffForm_as_alternating,
+             ContMDiffForm.extDerivForm_as_alternating, ContMDiffForm.extDeriv_as_alternating]
+  -- Convert domDomCongr to ▸
+  rw [castAlt_eq_transport_wedge (by omega : (k+1) + l = (k+l) + 1)]
+  rw [castAlt_eq_transport_wedge (by omega : k + (l+1) = (k+l) + 1)]
 
 theorem isFormClosed_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) :
     IsFormClosed ω → IsFormClosed η → IsFormClosed (ω ⋏ η) := by
@@ -567,8 +698,31 @@ This axiom is **ON THE PROOF TRACK** for `hodge_conjecture'`. It ensures:
 - [Warner, "Foundations of Differentiable Manifolds", GTM 94, Ch. 2]
 - [Lee, "Introduction to Smooth Manifolds", 2nd ed., Example 14.10]
 - [Bott-Tu, "Differential Forms in Algebraic Topology", GTM 82, Ch. 1]
--/
-axiom isFormClosed_unitForm : IsFormClosed (unitForm (n := n) (X := X))
+
+**NOW PROVED** using mfderiv_const (the derivative of a constant is 0). -/
+theorem isFormClosed_unitForm : IsFormClosed (unitForm (n := n) (X := X)) := by
+  -- d(constant) = 0 because mfderiv of a constant is 0
+  -- The proof uses: mfderiv_const and alternatizeUncurryFin 0 = 0
+  unfold IsFormClosed smoothExtDeriv extDerivLinearMap
+  simp only [LinearMap.coe_mk, AddHom.coe_mk]
+  -- Goal: (extDerivForm unitForm.toContMDiffForm hCharts).toSmoothForm = 0
+  apply SmoothForm.ext
+  funext x
+  simp only [SmoothForm.zero_apply, ContMDiffForm.toSmoothForm_as_alternating,
+             ContMDiffForm.extDerivForm_as_alternating]
+  -- Goal: ContMDiffForm.extDeriv unitForm.toContMDiffForm x = 0
+  simp only [ContMDiffForm.extDeriv_as_alternating, ContMDiffForm.extDerivAt_def]
+  -- Goal: alternatizeUncurryFin (mfderiv unitForm.as_alternating x) = 0
+  -- unitForm.as_alternating = const (constOfIsEmpty 1), so mfderiv = 0
+  -- mfderiv of a constant function is 0
+  have h_mf_zero : mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n 0)
+      (unitForm (n := n) (X := X)).as_alternating x = 0 := by
+    unfold unitForm
+    exact mfderiv_const
+  rw [SmoothForm.toContMDiffForm_as_alternating, h_mf_zero]
+  -- alternatizeUncurryFin 0 = 0 because it's a linear map
+  simp only [ContinuousAlternatingMap.alternatizeUncurryFin]
+  exact (ContinuousAlternatingMap.alternatizeUncurryFinCLM ℂ (TangentModel n) ℂ (n := 0)).map_zero
 
 theorem smoothWedge_add_left {k l : ℕ} (ω₁ ω₂ : SmoothForm n X k) (η : SmoothForm n X l) :
     (ω₁ + ω₂) ⋏ η = (ω₁ ⋏ η) + (ω₂ ⋏ η) := by
@@ -602,16 +756,69 @@ For a k-form ω, the 0-form `unitForm` acts as a multiplicative unit:
 - `unitForm x = constOfIsEmpty 1` (the scalar 1 as a 0-form)
 - `(unitForm ⋏ ω) x = wedge (constOfIsEmpty 1) (ω x) = 1 • ω x = ω x`
 
-The result lives in `Fin (0 + k)` which equals `Fin k` propositionally. -/
-axiom smoothWedge_unitForm_left {k : ℕ} (ω : SmoothForm n X k) :
-    unitForm ⋏ ω = castForm (Nat.zero_add k).symm ω
+The result lives in `Fin (0 + k)` which equals `Fin k` propositionally.
 
-/-- Wedge of any k-form with unit form gives back the k-form (up to degree cast). -/
-axiom smoothWedge_unitForm_right {k : ℕ} (ω : SmoothForm n X k) :
-    ω ⋏ unitForm = castForm (Nat.add_zero k).symm ω
+## References
 
-/-- Wedge product on smooth forms is associative (up to index equivalence). -/
-axiom smoothWedge_assoc {k l m : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) (θ : SmoothForm n X m) :
-    (ω ⋏ η) ⋏ θ = castForm (Nat.add_assoc k l m).symm (ω ⋏ (η ⋏ θ))
+- [Bott-Tu, "Differential Forms in Algebraic Topology", GTM 82, Ch. 1]
+- [Warner, "Foundations of Differentiable Manifolds", GTM 94, Ch. 2] -/
+theorem smoothWedge_unitForm_left {k : ℕ} (ω : SmoothForm n X k) :
+    unitForm ⋏ ω = castForm (Nat.zero_add k).symm ω := by
+  apply SmoothForm.ext
+  funext x
+  -- LHS: (unitForm ⋏ ω).as_alternating x = wedge (unitForm.as_alternating x) (ω.as_alternating x)
+  simp only [SmoothForm.wedge_apply]
+  -- unitForm.as_alternating x = constOfIsEmpty ℂ (TangentModel n) 1
+  have h_unit : unitForm.as_alternating x =
+      ContinuousAlternatingMap.constOfIsEmpty ℂ (TangentModel n) (ι := Fin 0) 1 := rfl
+  rw [h_unit]
+  -- Use the axiom wedge_constOfIsEmpty_left from DomCoprod.lean
+  rw [ContinuousAlternatingMap.wedge_constOfIsEmpty_left]
+  -- Now RHS: (1 • ω.as_alternating x).domDomCongr (finCongr (Nat.zero_add k).symm)
+  simp only [one_smul]
+  -- castForm gives h ▸ ω, and at point x: h ▸ ω.as_alternating x
+  simp only [SmoothForm.castForm_as_alternating]
+  -- Use castAlt_eq_transport_wedge: domDomCongr (finCongr h) = h ▸
+  rw [castAlt_eq_transport_wedge]
+
+/-- Wedge of any k-form with unit form gives back the k-form (up to degree cast).
+
+## References
+
+- [Bott-Tu, "Differential Forms in Algebraic Topology", GTM 82, Ch. 1]
+- [Warner, "Foundations of Differentiable Manifolds", GTM 94, Ch. 2] -/
+theorem smoothWedge_unitForm_right {k : ℕ} (ω : SmoothForm n X k) :
+    ω ⋏ unitForm = castForm (Nat.add_zero k).symm ω := by
+  apply SmoothForm.ext
+  funext x
+  simp only [SmoothForm.wedge_apply]
+  have h_unit : unitForm.as_alternating x =
+      ContinuousAlternatingMap.constOfIsEmpty ℂ (TangentModel n) (ι := Fin 0) 1 := rfl
+  rw [h_unit]
+  rw [ContinuousAlternatingMap.wedge_constOfIsEmpty_right]
+  simp only [one_smul]
+  simp only [SmoothForm.castForm_as_alternating]
+  rw [castAlt_eq_transport_wedge]
+
+/-- Wedge product on smooth forms is associative (up to index equivalence).
+
+The wedge product satisfies: `(ω ∧ η) ∧ θ = ω ∧ (η ∧ θ)`
+with the appropriate degree cast from `(k + l) + m` to `k + (l + m)`.
+
+## References
+
+- [Bott-Tu, "Differential Forms in Algebraic Topology", GTM 82, §1.2]
+- [Warner, "Foundations of Differentiable Manifolds", GTM 94, Prop. 2.14] -/
+theorem smoothWedge_assoc {k l m : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) (θ : SmoothForm n X m) :
+    (ω ⋏ η) ⋏ θ = castForm (Nat.add_assoc k l m).symm (ω ⋏ (η ⋏ θ)) := by
+  apply SmoothForm.ext
+  funext x
+  -- LHS: ((ω ⋏ η) ⋏ θ).as_alternating x = wedge (wedge (ω x) (η x)) (θ x)
+  simp only [SmoothForm.wedge_apply]
+  -- RHS: castForm ... (ω ⋏ (η ⋏ θ)) at x = h ▸ (wedge (ω x) (wedge (η x) (θ x)))
+  simp only [SmoothForm.castForm_as_alternating, SmoothForm.wedge_apply]
+  -- Use wedge_assoc from DomCoprod.lean
+  rw [ContinuousAlternatingMap.wedge_assoc]
+  rw [castAlt_eq_transport_wedge]
 
 end

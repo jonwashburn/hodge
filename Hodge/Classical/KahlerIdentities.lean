@@ -46,7 +46,7 @@ open Classical Hodge
 universe u
 
 variable {n : ℕ} {X : Type u} [TopologicalSpace X]
-  [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X]
+  [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
 
 /-! ## Lefschetz Operator on Forms
@@ -58,7 +58,7 @@ We need L as a LinearMap on forms (not just cohomology) to state the Kähler ide
     L(α) = ω ∧ α where ω is the Kähler form.
     Maps k-forms to (k+2)-forms. -/
 axiom lefschetzL_LinearMap (n : ℕ) (X : Type u) [TopologicalSpace X]
-    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X]
+    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] (k : ℕ) :
     SmoothForm n X k →ₗ[ℂ] SmoothForm n X (k + 2)
 
@@ -89,7 +89,7 @@ exterior derivative d.
 
     Reference: [Griffiths-Harris, Ch. 0, §7, Lemma on p.111] -/
 axiom kahler_identity_Lambda_d (n : ℕ) (X : Type u) [TopologicalSpace X]
-    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X]
+    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] (k : ℕ) (hk : k ≥ 2) :
     SmoothForm n X k →ₗ[ℂ] SmoothForm n X (k - 1)
 
@@ -122,7 +122,7 @@ codifferential (adjoint derivative) δ.
 
     Reference: [Wells, "Differential Analysis on Complex Manifolds", Ch. IV, Prop. 4.7] -/
 axiom kahler_identity_L_delta (n : ℕ) (X : Type u) [TopologicalSpace X]
-    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X]
+    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] (k : ℕ) (hk : k ≥ 1) :
     SmoothForm n X k →ₗ[ℂ] SmoothForm n X (k + 1)
 

@@ -11,13 +11,13 @@ set_option autoImplicit false
 universe u
 
 variable {n : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-  [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X]
+  [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X]
 
 namespace Hodge
 
 /-- The equivalence relation for de Rham cohomology. -/
 def Cohomologous {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     (ω₁ ω₂ : ClosedForm n X k) : Prop := IsExact (ω₁.val - ω₂.val)
 
 /-- Exactness implies closedness (d² = 0). -/
@@ -30,14 +30,14 @@ theorem isFormClosed_of_isExact {k : ℕ} {ω : SmoothForm n X k} : IsExact ω �
     exact smoothExtDeriv_extDeriv η
 
 theorem cohomologous_refl {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     (ω : ClosedForm n X k) : Cohomologous ω ω := by
   unfold Cohomologous IsExact
   simp only [sub_self]
   cases k with | zero => rfl | succ k' => exact ⟨0, smoothExtDeriv_zero⟩
 
 theorem cohomologous_symm {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     {ω η : ClosedForm n X k} : Cohomologous ω η → Cohomologous η ω := by
   intro h
   unfold Cohomologous at *
@@ -58,7 +58,7 @@ theorem cohomologous_symm {n k : ℕ} {X : Type u} [TopologicalSpace X] [Charted
     rw [smoothExtDeriv_neg, hβ]
 
 theorem cohomologous_trans {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     {ω η θ : ClosedForm n X k} : Cohomologous ω η → Cohomologous η θ → Cohomologous ω θ := by
   intro h1 h2
   unfold Cohomologous at *
@@ -82,14 +82,14 @@ theorem cohomologous_trans {n k : ℕ} {X : Type u} [TopologicalSpace X] [Charte
     rw [smoothExtDeriv_add, hα, hβ]
 
 instance DeRhamSetoid (n k : ℕ) (X : Type u) [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] : Setoid (ClosedForm n X k) where
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] : Setoid (ClosedForm n X k) where
   r := Cohomologous
   iseqv := ⟨cohomologous_refl, cohomologous_symm, cohomologous_trans⟩
 
 /-- De Rham cohomology group of degree k. -/
 def DeRhamCohomologyClass (n : ℕ) (X : Type u) (k : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] : Type u := Quotient (DeRhamSetoid n k X)
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] : Type u := Quotient (DeRhamSetoid n k X)
 
 def ofForm {k : ℕ} (ω : SmoothForm n X k) (h : IsFormClosed ω) : DeRhamCohomologyClass n X k := Quotient.mk _ ⟨ω, h⟩
 notation "⟦" ω "," h "⟧" => ofForm ω h
@@ -130,7 +130,7 @@ theorem DeRhamCohomologyClass.cast_ofForm {k₁ k₂ : ℕ} (h : k₁ = k₂)
 /-! ### Well-definedness axioms -/
 
 theorem cohomologous_add {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     (ω₁ ω₁' ω₂ ω₂' : ClosedForm n X k) (h1 : ω₁ ≈ ω₁') (h2 : ω₂ ≈ ω₂') : (ω₁ + ω₂) ≈ (ω₁' + ω₂') := by
   -- Unfold the Setoid relation to Cohomologous
   show Cohomologous (ω₁ + ω₂) (ω₁' + ω₂')
@@ -156,7 +156,7 @@ theorem cohomologous_add {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedS
     rw [smoothExtDeriv_add, hα, hβ]
 
 theorem cohomologous_neg {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     (ω ω' : ClosedForm n X k) (h : ω ≈ ω') : (-ω) ≈ (-ω') := by
   show Cohomologous (-ω) (-ω')
   unfold Cohomologous
@@ -180,7 +180,7 @@ theorem cohomologous_neg {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedS
     rw [smoothExtDeriv_neg, hβ]
 
 theorem cohomologous_smul {n k : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     (c : ℂ) (ω ω' : ClosedForm n X k) (h : ω ≈ ω') :
     (⟨c • ω.val, isFormClosed_smul ω.property⟩ : ClosedForm n X k) ≈ ⟨c • ω'.val, isFormClosed_smul ω'.property⟩ := by
   show Cohomologous _ _
@@ -204,31 +204,144 @@ theorem cohomologous_smul {n k : ℕ} {X : Type u} [TopologicalSpace X] [Charted
     -- smoothExtDeriv is defined as extDerivLinearMap, which is ℂ-linear
     simp only [smoothExtDeriv, map_smul]
 
-/-- **Wedge Product Respects Cohomology** (Classical Pillar).
+/-! ### Helper theorems for cohomologous_wedge -/
+
+-- Helper: casting zero gives zero (via Eq.rec)
+omit [ProjectiveComplexManifold n X] in
+@[simp] private theorem eqRec_zero {k k' : ℕ} (h : k = k') :
+    h ▸ (0 : SmoothForm n X k) = (0 : SmoothForm n X k') := by subst h; rfl
+
+-- Helper: exterior derivative commutes with castForm
+omit [ProjectiveComplexManifold n X] in
+@[simp] private theorem smoothExtDeriv_castForm {k k' : ℕ} (h : k = k') (ω : SmoothForm n X k) :
+    smoothExtDeriv (castForm (n := n) (X := X) h ω) =
+      castForm (congrArg (· + 1) h) (smoothExtDeriv ω) := by subst h; rfl
+
+-- Helper: exterior derivative commutes with Eq.rec (▸)
+omit [ProjectiveComplexManifold n X] in
+@[simp] private theorem smoothExtDeriv_eqRec {k k' : ℕ} (h : k = k') (ω : SmoothForm n X k) :
+    smoothExtDeriv (h ▸ ω) = (congrArg (· + 1) h) ▸ smoothExtDeriv ω := by subst h; rfl
+
+-- Helper: castForm commutes with scalar multiplication
+omit [ProjectiveComplexManifold n X] in
+@[simp] private theorem castForm_smul {k k' : ℕ} (h : k = k') (c : ℂ) (ω : SmoothForm n X k) :
+    castForm h (c • ω) = c • castForm h ω := by subst h; rfl
+
+-- Helper: nested castForm resolves when degrees match
+omit [ProjectiveComplexManifold n X] in
+@[simp] private theorem castForm_castForm {k k' k'' : ℕ} (h : k = k') (h' : k' = k'') (ω : SmoothForm n X k) :
+    castForm h' (castForm h ω) = castForm (h.trans h') ω := by subst h; subst h'; rfl
+
+-- Helper: castForm with equality proof resolves to the form when degrees are the same type
+omit [ProjectiveComplexManifold n X] in
+private theorem castForm_eq_of_proof_irrel {k : ℕ} (h : k = k) (ω : SmoothForm n X k) :
+    castForm h ω = ω := by rfl
+
+-- Helper: Eq.rec with reflexive equality is identity
+omit [ProjectiveComplexManifold n X] in
+@[simp] private theorem eqRec_trans {k k' k'' : ℕ} (h : k = k') (h' : k' = k'') (ω : SmoothForm n X k) :
+    h' ▸ (h ▸ ω) = (h.trans h') ▸ ω := by subst h; subst h'; rfl
+
+-- Helper: Eq.rec with proof that types match is identity
+omit [ProjectiveComplexManifold n X] in
+@[simp] private theorem eqRec_refl' {k : ℕ} (h : k = k) (ω : SmoothForm n X k) :
+    h ▸ ω = ω := by rfl
+
+omit [ProjectiveComplexManifold n X] in
+private theorem smoothWedge_sub_left' {k l : ℕ} (ω₁ ω₂ : SmoothForm n X k) (η : SmoothForm n X l) :
+    (ω₁ - ω₂) ⋏ η = (ω₁ ⋏ η) - (ω₂ ⋏ η) := by
+  rw [sub_eq_add_neg, smoothWedge_add_left]
+  have h : (-ω₂) ⋏ η = -(ω₂ ⋏ η) := by
+    rw [show (-ω₂) = (-1 : ℂ) • ω₂ by simp, smoothWedge_smul_left, neg_one_smul]
+  rw [h, ← sub_eq_add_neg]
+
+omit [ProjectiveComplexManifold n X] in
+private theorem smoothWedge_sub_right' {k l : ℕ} (ω : SmoothForm n X k) (η₁ η₂ : SmoothForm n X l) :
+    ω ⋏ (η₁ - η₂) = (ω ⋏ η₁) - (ω ⋏ η₂) := by
+  rw [sub_eq_add_neg, smoothWedge_add_right]
+  have h : ω ⋏ (-η₂) = -(ω ⋏ η₂) := by
+    rw [show (-η₂) = (-1 : ℂ) • η₂ by simp, smoothWedge_smul_right, neg_one_smul]
+  rw [h, ← sub_eq_add_neg]
+
+omit [ProjectiveComplexManifold n X] in
+private theorem wedge_sub_decompose' {k l : ℕ}
+    (ω₁ ω₁' : SmoothForm n X k) (ω₂ ω₂' : SmoothForm n X l) :
+    (ω₁ ⋏ ω₂) - (ω₁' ⋏ ω₂') = ((ω₁ - ω₁') ⋏ ω₂) + (ω₁' ⋏ (ω₂ - ω₂')) := by
+  rw [smoothWedge_sub_left', smoothWedge_sub_right']
+  simp only [sub_add_sub_cancel]
+
+/-- **Wedge Product Respects Cohomology** (PROVED).
 
     If ω₁ ~ ω₁' and ω₂ ~ ω₂' (cohomologous forms), then ω₁ ∧ ω₂ ~ ω₁' ∧ ω₂'.
 
-    ## Mathematical Content
-
-    This is the key property that allows the cup product to be defined on cohomology.
-    The proof uses the Leibniz rule:
-    - If ω₁ - ω₁' = dη₁ and ω₂ - ω₂' = dη₂, then
-    - ω₁ ∧ ω₂ - ω₁' ∧ ω₂' = d(η₁ ∧ ω₂' + (-1)^k ω₁ ∧ η₂) + exact terms
-
-    ## Axiomatization Justification
-
-    This is axiomatized because the proof requires:
-    - The graded Leibniz rule d(α ∧ β) = dα ∧ β + (-1)^deg(α) α ∧ dβ
-    - Careful sign tracking for the grading
+    The proof uses the Leibniz rule: d(α ∧ β) = dα ∧ β + (-1)^deg(α) α ∧ dβ.
 
     ## References
 
     - [Bott-Tu, "Differential Forms in Algebraic Topology", Ch. 1]
     - [Warner, "Foundations of Differentiable Manifolds and Lie Groups", Ch. 5] -/
-axiom cohomologous_wedge {n k l : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+theorem cohomologous_wedge {n k l : ℕ} {X : Type u} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     (ω₁ ω₁' : ClosedForm n X k) (ω₂ ω₂' : ClosedForm n X l) (h1 : ω₁ ≈ ω₁') (h2 : ω₂ ≈ ω₂') :
-    (⟨ω₁.val ⋏ ω₂.val, isFormClosed_wedge _ _ ω₁.property ω₂.property⟩ : ClosedForm n X (k + l)) ≈ ⟨ω₁'.val ⋏ ω₂'.val, isFormClosed_wedge _ _ ω₁'.property ω₂'.property⟩
+    (⟨ω₁.val ⋏ ω₂.val, isFormClosed_wedge _ _ ω₁.property ω₂.property⟩ : ClosedForm n X (k + l)) ≈
+      ⟨ω₁'.val ⋏ ω₂'.val, isFormClosed_wedge _ _ ω₁'.property ω₂'.property⟩ := by
+  show Cohomologous _ _
+  unfold Cohomologous
+  rw [wedge_sub_decompose']
+  have h1' : Cohomologous ω₁ ω₁' := h1
+  have h2' : Cohomologous ω₂ ω₂' := h2
+  unfold Cohomologous at h1' h2'
+  unfold IsExact at *
+  cases k with
+  | zero =>
+    have hω1_eq : ω₁.val = ω₁'.val := sub_eq_zero.mp h1'
+    simp only [hω1_eq, sub_self, smoothWedge_zero_left, zero_add]
+    cases l with
+    | zero =>
+      have hω2_eq : ω₂.val = ω₂'.val := sub_eq_zero.mp h2'
+      simp only [hω2_eq, sub_self, wedge_zero]
+    | succ l' =>
+      obtain ⟨η₂, hη₂⟩ := h2'
+      refine ⟨ω₁'.val ⋏ η₂, ?_⟩
+      have hLeibniz := smoothExtDeriv_wedge ω₁'.val η₂
+      have hClosed : smoothExtDeriv ω₁'.val = 0 := ω₁'.property
+      simp only [hLeibniz, hClosed, smoothWedge_zero_left, eqRec_zero, castForm_zero,
+                 zero_add, pow_zero, one_smul, ← hη₂, castForm]
+  | succ k' =>
+    obtain ⟨η₁, hη₁⟩ := h1'
+    cases l with
+    | zero =>
+      have hω2_eq : ω₂.val = ω₂'.val := sub_eq_zero.mp h2'
+      simp only [hω2_eq, sub_self, wedge_zero, add_zero]
+      refine ⟨η₁ ⋏ ω₂'.val, ?_⟩
+      have hLeibniz := smoothExtDeriv_wedge η₁ ω₂'.val
+      have hClosed : smoothExtDeriv ω₂'.val = 0 := ω₂'.property
+      simp only [hLeibniz, hClosed, wedge_zero, smul_zero, add_zero, ← hη₁, castForm,
+                 eqRec_trans, eqRec_refl']
+    | succ l' =>
+      obtain ⟨η₂, hη₂⟩ := h2'
+      let β₁ : SmoothForm n X (k' + (l' + 1)) := η₁ ⋏ ω₂.val
+      let β₂ : SmoothForm n X ((k' + 1) + l') := ω₁'.val ⋏ η₂
+      have hdeg : k' + (l' + 1) = (k' + 1) + l' := by omega
+      refine ⟨castForm hdeg β₁ + (-1 : ℂ)^(k' + 1) • β₂, ?_⟩
+      have hLeibniz1 := smoothExtDeriv_wedge η₁ ω₂.val
+      have hClosed2 : smoothExtDeriv ω₂.val = 0 := ω₂.property
+      have hLeibniz2 := smoothExtDeriv_wedge ω₁'.val η₂
+      have hClosed1' : smoothExtDeriv ω₁'.val = 0 := ω₁'.property
+      have hSign : ((-1 : ℂ)^(k' + 1)) * ((-1 : ℂ)^(k' + 1)) = 1 := by
+        rw [← pow_add, show k' + 1 + (k' + 1) = 2 * (k' + 1) by ring,
+            pow_mul, neg_one_sq, one_pow]
+      -- Complete proof using Leibniz rule
+      dsimp only [β₁, β₂]
+      rw [smoothExtDeriv_add, smoothExtDeriv_smul, smoothExtDeriv_castForm]
+      rw [hLeibniz1, hClosed2, wedge_zero, smul_zero]
+      simp only [castForm_zero, add_zero]
+      rw [hLeibniz2, hClosed1', smoothWedge_zero_left]
+      simp only [castForm_zero, zero_add]
+      simp only [smul_comm ((-1 : ℂ)^(k' + 1)) (castForm _ _), castForm_smul, smul_smul, hSign, one_smul]
+      rw [← hη₁, ← hη₂]
+      simp only [eqRec_trans, eqRec_refl', castForm]
+
 
 /-! ### Algebraic Instances -/
 
@@ -587,7 +700,7 @@ theorem mul_one {k : ℕ} (a : DeRhamCohomologyClass n X k) :
 
     Reference: [Voisin, "Hodge Theory and Complex Algebraic Geometry", Vol. I, Chapter 5]. -/
 class IsRationalFormWitness (n : ℕ) (X : Type u) [TopologicalSpace X]
-    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X]
+    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] (k : ℕ) (ω : SmoothForm n X k) : Prop where
   /-- The form is closed (required for it to define a cohomology class). -/
   is_closed : IsFormClosed ω
@@ -607,7 +720,7 @@ class IsRationalFormWitness (n : ℕ) (X : Type u) [TopologicalSpace X]
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", 1978, Chapter 0]. -/
 inductive isRationalClass {n : ℕ} {X : Type u}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] :
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] :
     ∀ {k : ℕ}, DeRhamCohomologyClass n X k → Prop where
   | zero {k : ℕ} : isRationalClass (0 : DeRhamCohomologyClass n X k)
   | unit : isRationalClass unitClass  -- The unit (constant 1) is rational
@@ -702,7 +815,7 @@ multiplication by Complex.I on each coordinate.
 
 This is the defining property that distinguishes (1,1)-forms from (2,0) or (0,2) forms. -/
 def IsJInvariant2Form {n : ℕ} {X : Type u} [TopologicalSpace X]
-    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X]
+    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     (ω : SmoothForm n X 2) : Prop :=
   ∀ (x : X) (v w : TangentSpace (𝓒_complex n) x),
     ω.as_alternating x ![Complex.I • v, Complex.I • w] = ω.as_alternating x ![v, w]
@@ -717,7 +830,7 @@ A differential form is of type (p,p) if it can be built from:
 
 This inductive captures the algebraic structure of (p,p)-forms while providing
 non-trivial base cases that prevent the degenerate "all forms = 0" situation. -/
-inductive isPPForm' (n : ℕ) (X : Type u) [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X] : (p : ℕ) → SmoothForm n X (2 * p) → Prop where
+inductive isPPForm' (n : ℕ) (X : Type u) [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] : (p : ℕ) → SmoothForm n X (2 * p) → Prop where
   | zero (p) : isPPForm' n X p 0
   | unitForm : isPPForm' n X 0 unitForm
   | jInvariant (ω : SmoothForm n X 2) (hJ : IsJInvariant2Form ω) :
@@ -757,7 +870,7 @@ def isPPClass (k : ℕ) (c : DeRhamCohomologyClass n X k) : Prop :=
 /-- General Lefschetz operator defined by multiplication with a degree-2 cohomology class. -/
 noncomputable def lefschetz_operator_of_class {n : ℕ} {X : Type u}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X]
     (ω : DeRhamCohomologyClass n X 2) (p : ℕ) :
     DeRhamCohomologyClass n X p →ₗ[ℂ] DeRhamCohomologyClass n X (p + 2) where
   toFun c := c * ω
@@ -769,7 +882,7 @@ noncomputable def lefschetz_operator_of_class {n : ℕ} {X : Type u}
 /-- General iterated Lefschetz map defined by multiplication with a degree-2 cohomology class. -/
 def lefschetz_power_of_class {n : ℕ} {X : Type u}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X]
     (ω : DeRhamCohomologyClass n X 2) (p k : ℕ) :
     DeRhamCohomologyClass n X p →ₗ[ℂ] DeRhamCohomologyClass n X (p + 2 * k) :=
   match k with
@@ -813,7 +926,7 @@ typeclass. A full proof from first principles requires:
 
 class KahlerManifold (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] where
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] where
   omega_form : SmoothForm n X 2
   omega_closed : IsFormClosed omega_form
   omega_positive : ∀ (x : X) (v : TangentSpace (𝓒_complex n) x), v ≠ 0 → True

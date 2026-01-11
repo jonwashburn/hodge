@@ -10,7 +10,7 @@ universe u
 
 inductive isPQForm (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [HasLocallyConstantCharts n X]
     : (p q : ℕ) → {k : ℕ} → (h : p + q = k) → (ω : SmoothForm n X k) → Prop where
   | zero (p q : ℕ) {k : ℕ} (h : p + q = k) :
       isPQForm n X p q h (0 : SmoothForm n X k)
@@ -31,7 +31,7 @@ inductive isPQForm (n : ℕ) (X : Type u)
 
 def isPPFormTD (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [HasLocallyConstantCharts n X]
     (p : ℕ) (ω : SmoothForm n X (2 * p)) : Prop :=
   isPQForm n X p p (by rw [Nat.two_mul]) ω
 
@@ -39,7 +39,7 @@ def isPPFormTD (n : ℕ) (X : Type u)
 
 variable {n : ℕ} {X : Type u}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-  [IsManifold (𝓒_complex n) ⊤ X]
+  [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
 
 theorem ofForm_wedge_TD {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l)

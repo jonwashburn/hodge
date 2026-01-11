@@ -11,7 +11,7 @@ set_option autoImplicit false
 
 variable {n : ℕ} {X : Type*}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-  [IsManifold (𝓒_complex n) ⊤ X]
+  [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
   [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
 
 /-!
@@ -29,7 +29,7 @@ noncomputable def C4 (_n _k : ℕ) : ℝ := 2
 /-- The hypothesis bundle for Federer-Fleming compactness. -/
 structure FFCompactnessHypothesis (n : ℕ) (X : Type*) (k : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] where
   T : ℕ → IntegralCurrent n X (k + 1)
   M : ℝ
@@ -38,7 +38,7 @@ structure FFCompactnessHypothesis (n : ℕ) (X : Type*) (k : ℕ)
 /-- The conclusion of Federer-Fleming. -/
 structure FFCompactnessConclusion (n : ℕ) (X : Type*) (k : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
     (hyp : FFCompactnessHypothesis n X k) where
   T_limit : IntegralCurrent n X (k + 1)
