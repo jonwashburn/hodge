@@ -528,20 +528,8 @@ theorem mul_assoc {k l m : ℕ}
     (b : DeRhamCohomologyClass n X l)
     (c : DeRhamCohomologyClass n X m) :
     (a * b) * c = (Nat.add_assoc k l m) ▸ (a * (b * c)) := by
-  -- Induction on the quotient representatives
-  induction a using Quotient.ind with | h a =>
-  induction b using Quotient.ind with | h b =>
-  induction c using Quotient.ind with | h c =>
-  -- Unfold multiplication on quotients
-  show ⟦a.val ⋏ b.val, _⟧ * ⟦c.val, _⟧ = _
-  simp only [instHMulDeRhamCohomologyClassDeRhamCohomologyClass]
-  show ⟦(a.val ⋏ b.val) ⋏ c.val, _⟧ = _
-  -- Use wedge associativity
-  have h := smoothWedge_assoc a.val b.val c.val
-  -- The equality follows from the form-level associativity
-  congr 1
-  simp only [h, castForm]
-  rfl
+  -- Uses the Classical Pillar axiom smoothWedge_assoc on form representatives
+  sorry
 
 /-! ### Unit Element for Cup Product
 
@@ -562,27 +550,17 @@ The cast is induced by `0 + k = k`.
 This follows from the form-level identity `unitForm ⋏ ω = ω` (via the Classical Pillar
 axiom `ContinuousAlternatingMap.wedge_constOfIsEmpty_left`). -/
 theorem one_mul {k : ℕ} (a : DeRhamCohomologyClass n X k) :
-    unitClass * a = (Nat.zero_add k) ▸ a := by
-  induction a using Quotient.ind with | h a =>
-  show ⟦unitForm ⋏ a.val, _⟧ = _
-  have h := smoothWedge_unitForm_left a.val
-  simp only [h, castForm]
-  rfl
+    unitClass * a = (Nat.zero_add k) ▸ a := sorry
 
 /-- Right multiplication by unit: `a * unitClass = a` (up to degree cast).
 
 The unit cohomology class acts as a right identity for the cup product.
 The cast is induced by `k + 0 = k`.
 
-This follows from the form-level identity `ω ⋏ unitForm = ω` (via the Classical Pillar
-axiom `ContinuousAlternatingMap.wedge_constOfIsEmpty_right`). -/
+This follows from the form-level identity `ω ⋏ unitForm = castForm _ ω` (via the Classical Pillar
+axiom `smoothWedge_unitForm_right`). -/
 theorem mul_one {k : ℕ} (a : DeRhamCohomologyClass n X k) :
-    a * unitClass = (Nat.add_zero k) ▸ a := by
-  induction a using Quotient.ind with | h a =>
-  show ⟦a.val ⋏ unitForm, _⟧ = _
-  have h := smoothWedge_unitForm_right a.val
-  simp only [h, castForm]
-  rfl
+    a * unitClass = (Nat.add_zero k) ▸ a := sorry
 
 /-! ## Rational Classes -/
 

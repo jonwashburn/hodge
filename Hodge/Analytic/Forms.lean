@@ -101,28 +101,25 @@ def castForm {k k' : ℕ} (h : k = k') (ω : SmoothForm n X k) : SmoothForm n X 
     (castForm h ω).as_alternating x = h ▸ ω.as_alternating x := by
   subst h; rfl
 
-instance (k : ℕ) : AddCommGroup (SmoothForm n X k) := by
-  refine
-    { add := (· + ·)
-      zero := 0
-      neg := (- ·)
-      sub := (· - ·)
-      nsmul := nsmulRec
-      zsmul := zsmulRec
-      add_assoc := ?_
-      zero_add := ?_
-      add_zero := ?_
-      add_left_neg := ?_
-      add_comm := ?_
-      sub_eq_add_neg := ?_ }
-  all_goals
-    intro ω
-    try intro η
-    try intro θ
-    apply SmoothForm.ext
-    funext x
-    simp [add_assoc, add_comm]
-    -- remaining goals are closed by `simp [add_assoc, add_comm]` or definitionally true
+instance (k : ℕ) : AddCommGroup (SmoothForm n X k) where
+  add := (· + ·)
+  zero := 0
+  neg := (- ·)
+  sub := (· - ·)
+  nsmul := nsmulRec
+  zsmul := zsmulRec
+  add_assoc := fun ω η θ => by
+    apply SmoothForm.ext; funext x; simp only [SmoothForm.add_apply]; ring
+  zero_add := fun ω => by
+    apply SmoothForm.ext; funext x; simp only [SmoothForm.add_apply, SmoothForm.zero_apply, zero_add]
+  add_zero := fun ω => by
+    apply SmoothForm.ext; funext x; simp only [SmoothForm.add_apply, SmoothForm.zero_apply, add_zero]
+  neg_add_cancel := fun ω => by
+    apply SmoothForm.ext; funext x; simp only [SmoothForm.add_apply, SmoothForm.neg_apply, SmoothForm.zero_apply, neg_add_cancel]
+  add_comm := fun ω η => by
+    apply SmoothForm.ext; funext x; simp only [SmoothForm.add_apply, add_comm]
+  sub_eq_add_neg := fun ω η => by
+    apply SmoothForm.ext; funext x; simp only [SmoothForm.sub_apply, SmoothForm.add_apply, SmoothForm.neg_apply, sub_eq_add_neg]
 
 instance (k : ℕ) : Module ℂ (SmoothForm n X k) where
   one_smul ω := by ext x v; simp [one_smul]
