@@ -225,7 +225,8 @@ theorem alternatizeUncurryFin_wedge_right {k l : ℕ}
   simp only [AlternatingMap.domCoprod_apply]
   -- After full expansion, both sides are equal by the properties of scalar multiplication
   -- and the tensor product structure of domCoprod.summand
-  rfl
+  -- TODO: finish the reindexing / shuffle-combinatorics proof
+  sorry
 
 /-- This theorem requires proving a combinatorial identity about how alternatization
 commutes with the wedge product when the left argument is fixed.
@@ -270,7 +271,8 @@ theorem alternatizeUncurryFin_wedge_left {k l : ℕ}
   -- After simp expansion, the goal reduces to equality of two sums over
   -- shuffle permutations. The key observation is that the tensor structure of
   -- wedge products (via domCoprod) respects linearity in each factor.
-  rfl
+  -- TODO: finish the reindexing / shuffle-combinatorics proof
+  sorry
 
 /-! ### The Leibniz Rule -/
 
