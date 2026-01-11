@@ -16,10 +16,10 @@ A **complete, verified proof** of the Hodge Conjecture that:
 - ✅ Every theorem is **actually proved**, not assumed
 
 ### What Is NOT Acceptable
-- ❌ Converting `sorry` to `axiom` - this is just renaming the hole
-- ❌ "Classical Pillar" axioms - these must be PROVED
-- ❌ "Well-documented" axioms - documentation does not make an axiom a proof
-- ❌ Any `axiom` keyword in files on the proof track
+- ❌ **Hole‑shuffling**: replacing an unproved dependency with a different unproved dependency (e.g. `sorry → axiom`, `axiom → sorry`, or swapping one axiom for another) and calling that “progress”
+- ❌ Completing a task “locally” while the **global proof track** (dependencies of `hodge_conjecture'`) is not strictly closer to axiom/sorry‑free
+- ❌ “Classical Pillar” axioms (or “well‑documented” axioms) on the proof track — documentation is not a proof
+- ❌ Merging any PR that **adds** new `axiom`/`sorry` on the proof track, even temporarily
 
 ### Success Criterion
 ```bash
@@ -31,6 +31,64 @@ echo 'import Hodge.Kahler.Main
 ```
 
 If ANY other axiom appears, the proof is **incomplete**.
+
+---
+
+## How We Avoid “Brick‑Laying”: Castle‑Building Workflow
+
+The objective is **the completed proof**, not “finishing a task ticket”. That means our workflow must enforce that the *global* proof is getting closer to completion.
+
+### 0) Definitions
+- **Proof track**: the transitive dependency cone of `hodge_conjecture'` (as reported by `#print axioms hodge_conjecture'`).
+- **Hole**: any `sorry` or any non-standard `axiom` that appears in `#print axioms hodge_conjecture'`.
+- **Progress**: a merge that **reduces** the set of holes on the proof track, or proves infrastructure without increasing that set.
+
+### 1) Allowed Development Technique: Temporary Sorries (YES, but quarantined)
+Yes, it can be practical to introduce temporary `sorry` **while exploring** a proof. The key is: **temporary means it does not land on the proof track in main**.
+
+Policy:
+- Temporary `sorry`s are allowed **only** in:
+  - a feature branch that is not merged until they are gone, or
+  - modules that are not imported by `Hodge.Kahler.Main` (not on the proof track).
+- Temporary `sorry`s are **never “resolved” by converting them to axioms**.
+- If a proof cannot be completed, the output is a **blocker report** (what lemma/API is missing), not a new axiom.
+
+### 2) Merge Gate: Monotone Proof-Track Progress (No Hole‑Shuffling)
+Every merge must satisfy:
+- **No new proof-track holes** are introduced.
+- For “axiom elimination” work: the *named* axiom must disappear from:
+  - `#print axioms hodge_conjecture'`, and
+  - `grep -rn '^axiom <Name>'` in the relevant file(s),
+  and nothing equivalent reappears as a new axiom/sorry.
+
+### 3) Required Checks (run before merging any PR)
+
+```bash
+cd /Users/jonathanwashburn/Projects/hodge
+
+# 1) Main build
+lake build Hodge.Kahler.Main
+
+# 2) Proof-track hole check (this is the ground truth)
+cat > /tmp/axioms.lean << 'EOF'
+import Hodge.Kahler.Main
+#print axioms hodge_conjecture'
+EOF
+lake env lean /tmp/axioms.lean
+
+# 3) Proof-track “no sorry” check (coarse, but useful)
+grep -rn "sorry" Hodge/Kahler/Main.lean Hodge/Analytic/Forms.lean Hodge/Cohomology/Basic.lean \
+  Hodge/Classical/CycleClass.lean Hodge/Classical/GAGA.lean
+```
+
+### 4) What an Agent Deliverable Looks Like (high-signal)
+An agent’s work is “done” if and only if it results in one of:
+- **(Preferred)** A PR that removes a specific proof-track hole with a real proof, and passes the merge gate above.
+- **(Acceptable)** A blocker report that states:
+  - the exact Lean goal/lemma that is missing,
+  - the minimal Mathlib API gap,
+  - a proposed local development plan (new lemmas/modules) to fill it,
+  - and why this is needed for the global proof.
 
 ---
 
