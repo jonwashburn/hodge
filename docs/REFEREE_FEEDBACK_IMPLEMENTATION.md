@@ -60,7 +60,7 @@ This document tracks the implementation of referee feedback for the paper "Calib
 | Lemmas | 72 | — |
 | Remarks | 92 | Reduce significantly |
 | Definitions | 17 | — |
-| In-text citations | 94 (was 59) | Increase to 100+ |
+| In-text citations | **100** ✓ (was 59) | Increase to 100+ |
 | "proved later" (unlinked) | ~~23~~ **0** ✓ | 0 |
 | "not used" mentions | ~~11~~ **0** ✓ | Minimize/relocate |
 | "this is standard" | ~~10~~ **0** ✓ | Make specific |
@@ -74,11 +74,12 @@ This document tracks the implementation of referee feedback for the paper "Calib
 
 ### Current Focus Area
 
-> **⏩ NEXT TASK: Phase 3 continuation - Add more citations to reach 100+ target**
+> **⏩ NEXT TASK: Task #3 - Clarify Logical Status (Remarks Audit) - continued**
 > 
 > **Status:** In progress  
-> **Current count:** 94 \cite{} commands (69 new via REVMZ)  
-> **Target:** 100+
+> **Previous task:** Phase 3 COMPLETE ✓ - Citations at 100 (75 new via REVMZ)
+> **Current progress:** Added "Guide to remarks" section, began adding status annotations to key remarks
+> **Next focus:** Continue adding status annotations, consider consolidating related remarks
 
 ### Session Log
 
@@ -92,6 +93,8 @@ This document tracks the implementation of referee feedback for the paper "Calib
 | 6 | 2026-01-11 | Phase 3 continued | Citations now at 78 (52 new via REVMZ) |
 | 7 | 2026-01-11 | Phase 3 continued | Citations now at 85 (58 new via REVMZ) |
 | 8 | 2026-01-11 | Phase 3 continued | Citations now at 94 (69 new via REVMZ) |
+| 9 | 2026-01-11 | **Phase 3 COMPLETE** ✓ | Citations reached **100** (75 new via REVMZ) - TARGET MET |
+| 10 | 2026-01-11 | Task #3 started | Added "Guide to remarks" + 6 status annotations to key remarks |
 
 ---
 
@@ -216,6 +219,17 @@ This document tracks the implementation of referee feedback for the paper "Calib
 | 113 | 2026-01-11 | 7188 | ADD_CITE | Added \cite{LangGmT} for implicit function theorem | 1.53 |
 | 114 | 2026-01-11 | 7513 | ADD_CITE | Added \cite{Villani03} for optimal transport plan | 1.54 |
 | 115 | 2026-01-11 | 8221 | ADD_CITE | Added \cite{BaranyGrinberg81,Schrijver86} for discrepancy rounding | 1.55 |
+| 116 | 2026-01-11 | 1158 | ADD_CITE | Added \cite{GH78} for complex Grassmannian | 1.56 |
+| 117 | 2026-01-11 | 1406 | ADD_CITE | Added \cite{Wells,Voisin02} for Hodge decomposition | 1.57 |
+| 118 | 2026-01-11 | 2648-52 | ADD_CITE | Added \cite{HL82} for Harvey-Lawson structure, \cite{Chow49} for Chow's theorem | 1.58 |
+| 119 | 2026-01-11 | 5942 | ADD_CITE | Added \cite{Villani03} for optimal quantization | 1.59 |
+| 120 | 2026-01-11 | 2894 | ADD_CITE | Added \cite{MaMarinescu07} for Bergman kernel | 1.60 |
+| 121 | 2026-01-11 | 545-549 | ADD_TEXT | Added "Guide to remarks" explaining the three roles of remarks | 3.1 |
+| 122 | 2026-01-11 | 6126 | ADD_STATUS | Added "[Optional geometric intuition.]" to sharp-cube variant remark | 3.2 |
+| 123 | 2026-01-11 | 7982 | ADD_STATUS | Added "[Optional proof branch.]" to graph-template activation remark | 3.3 |
+| 124 | 2026-01-11 | 8527 | ADD_STATUS | Added "[Optional proof branch.]" to lattice-template activation remark | 3.4 |
+| 125 | 2026-01-11 | 6065 | ADD_STATUS | Added "[Optional context.]" to sliver interpretation remark | 3.5 |
+| 126 | 2026-01-11 | 4097 | ADD_STATUS | Added "[Proof roadmap.]" to global-cohom commentary remark | 3.6 |
 
 <!-- 
 Change Types:

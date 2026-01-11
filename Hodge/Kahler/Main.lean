@@ -288,37 +288,6 @@ theorem omega_pow_algebraic {p : ℕ} (c : ℚ) (hc : c > 0) :
   -- Finish by rewriting via `hZ_rep`.
   simpa [hclass'] using hZ_rep
 
-/-- **Lefschetz Lift for Signed Cycles** (Voisin, 2002).
-
-    When p > n/2 (codimension exceeds half the dimension), the Hard Lefschetz
-    theorem provides an isomorphism between H^{p,p}(X) and H^{n-p,n-p}(X).
-
-    This theorem states that if η ∈ H^{2(n-p)}(X) is represented by a signed
-    algebraic cycle Z_η, and [γ] = L^k([η]) for k = 2p - n, then γ is also
-    represented by a signed algebraic cycle.
-
-    **Mathematical Content**: The key insight is that the Hard Lefschetz
-    isomorphism is induced by cup product with powers of the Kähler class [ω].
-    Since [ω] is algebraic (represented by hyperplane sections), and algebraic
-    cycles are closed under intersection, we can construct:
-    - Z_γ = Z_η ∩ H₁ ∩ H₂ ∩ ... ∩ H_k (k hyperplane sections)
-    - This represents [γ] = L^k([η]) = [ω]^k ∪ [η]
-
-    Reference: [C. Voisin, "Hodge Theory and Complex Algebraic Geometry",
-    Vol. I, Cambridge University Press, 2002, Chapter 6, Theorem 6.25].
-    Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry",
-    Wiley, 1978, Chapter 0, Section 7]. -/
-theorem lefschetz_lift_signed_cycle {p : ℕ}
-    (γ : SmoothForm n X (2 * p)) (hγ : IsFormClosed γ)
-    (η : SmoothForm n X (2 * (n - p))) (hη : IsFormClosed η)
-    (Z_η : SignedAlgebraicCycle n X)
-    (hp : 2 * p > n)
-    (h_rep : Z_η.RepresentsClass (ofForm η hη))
-    (h_lef : ofForm γ hγ = (lefschetz_degree_eq n p hp) ▸
-             lefschetz_power n X (2 * (n - p)) (p - (n - p)) (ofForm η hη)) :
-    ∃ (Z : SignedAlgebraicCycle n X), Z.RepresentsClass (ofForm γ hγ) :=
-  SignedAlgebraicCycle.lefschetz_lift γ hγ η hη Z_η hp h_rep h_lef
-
 /-! ## The Hodge Conjecture -/
 
 /-- **The Hodge Conjecture** (Hodge, 1950; Millennium Prize Problem).
@@ -460,5 +429,165 @@ theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : Is
                     simpa using hsub'.symm
             _ = ⟦γ, h_closed⟧ := by
                     simpa using hγ_eq.symm
+
+/-- **Lefschetz Lift for Signed Cycles**.
+
+This statement can be derived from the main theorem `hodge_conjecture'` by showing that
+the Lefschetz-lifted class is a rational (p,p)-class, extracting a (p,p)-form representative,
+and then applying `hodge_conjecture'` to that representative. -/
+theorem SignedAlgebraicCycle.lefschetz_lift {p : ℕ}
+    (γ : SmoothForm n X (2 * p)) (hγ : IsFormClosed γ)
+    (η : SmoothForm n X (2 * (n - p))) (hη : IsFormClosed η)
+    (Z_η : SignedAlgebraicCycle n X)
+    (hp : 2 * p > n)
+    (h_rep : Z_η.RepresentsClass (ofForm η hη))
+    (h_lef : ofForm γ hγ = (lefschetz_degree_eq n p hp) ▸
+             lefschetz_power n X (2 * (n - p)) (p - (n - p)) (ofForm η hη)) :
+    ∃ (Z : SignedAlgebraicCycle n X), Z.RepresentsClass (ofForm γ hγ) := by
+  classical
+
+  -- Abbreviations for the lower-degree side.
+  let pη : ℕ := n - p
+  let p_base : ℕ := 2 * pη
+  let k : ℕ := p - pη
+  have h_deg : p_base + 2 * k = 2 * p := by
+    -- expand `p_base` and `k`
+    simpa [p_base, pη, k, Nat.mul_assoc, Nat.mul_left_comm, Nat.mul_comm] using
+      (lefschetz_degree_eq n p hp)
+
+  -- Step 1: η is rational since it is represented by a signed algebraic cycle.
+  have hZη_cycle_rat : isRationalClass (Z_η.cycleClass pη) := by
+    -- Reduce to rationality of fundamental classes of `pos`/`neg`.
+    unfold SignedAlgebraicCycle.cycleClass SignedAlgebraicCycle.fundamentalClass
+
+    have hsub :
+        (⟦FundamentalClassSet n X pη Z_η.pos - FundamentalClassSet n X pη Z_η.neg,
+            isFormClosed_sub
+              (FundamentalClassSet_isClosed (n := n) (X := X) pη Z_η.pos Z_η.pos_alg)
+              (FundamentalClassSet_isClosed (n := n) (X := X) pη Z_η.neg Z_η.neg_alg)⟧ :
+            DeRhamCohomologyClass n X (2 * pη))
+          =
+        ⟦FundamentalClassSet n X pη Z_η.pos,
+            FundamentalClassSet_isClosed (n := n) (X := X) pη Z_η.pos Z_η.pos_alg⟧
+          -
+        ⟦FundamentalClassSet n X pη Z_η.neg,
+            FundamentalClassSet_isClosed (n := n) (X := X) pη Z_η.neg Z_η.neg_alg⟧ := by
+      simpa using (ofForm_sub
+        (FundamentalClassSet n X pη Z_η.pos) (FundamentalClassSet n X pη Z_η.neg)
+        (FundamentalClassSet_isClosed (n := n) (X := X) pη Z_η.pos Z_η.pos_alg)
+        (FundamentalClassSet_isClosed (n := n) (X := X) pη Z_η.neg Z_η.neg_alg))
+
+    have hw :
+        (⟦FundamentalClassSet n X pη Z_η.pos - FundamentalClassSet n X pη Z_η.neg,
+            SignedAlgebraicCycle.fundamentalClass_isClosed (n := n) (X := X) pη Z_η⟧ :
+            DeRhamCohomologyClass n X (2 * pη))
+          =
+        (⟦FundamentalClassSet n X pη Z_η.pos - FundamentalClassSet n X pη Z_η.neg,
+            isFormClosed_sub
+              (FundamentalClassSet_isClosed (n := n) (X := X) pη Z_η.pos Z_η.pos_alg)
+              (FundamentalClassSet_isClosed (n := n) (X := X) pη Z_η.neg Z_η.neg_alg)⟧ :
+            DeRhamCohomologyClass n X (2 * pη)) := by
+      simpa using (ofForm_proof_irrel (n := n) (X := X) (k := 2 * pη)
+        (FundamentalClassSet n X pη Z_η.pos - FundamentalClassSet n X pη Z_η.neg)
+        (SignedAlgebraicCycle.fundamentalClass_isClosed (n := n) (X := X) pη Z_η)
+        (isFormClosed_sub
+          (FundamentalClassSet_isClosed (n := n) (X := X) pη Z_η.pos Z_η.pos_alg)
+          (FundamentalClassSet_isClosed (n := n) (X := X) pη Z_η.neg Z_η.neg_alg)))
+
+    have hpos :
+        isRationalClass
+          (⟦FundamentalClassSet n X pη Z_η.pos,
+              FundamentalClassSet_isClosed (n := n) (X := X) pη Z_η.pos Z_η.pos_alg⟧ :
+            DeRhamCohomologyClass n X (2 * pη)) :=
+      FundamentalClassSet_rational (n := n) (X := X) (p := pη) Z_η.pos Z_η.pos_alg
+
+    have hneg :
+        isRationalClass
+          (⟦FundamentalClassSet n X pη Z_η.neg,
+              FundamentalClassSet_isClosed (n := n) (X := X) pη Z_η.neg Z_η.neg_alg⟧ :
+            DeRhamCohomologyClass n X (2 * pη)) :=
+      FundamentalClassSet_rational (n := n) (X := X) (p := pη) Z_η.neg Z_η.neg_alg
+
+    have hsubclass :
+        isRationalClass
+          (⟦FundamentalClassSet n X pη Z_η.pos - FundamentalClassSet n X pη Z_η.neg,
+              isFormClosed_sub
+                (FundamentalClassSet_isClosed (n := n) (X := X) pη Z_η.pos Z_η.pos_alg)
+                (FundamentalClassSet_isClosed (n := n) (X := X) pη Z_η.neg Z_η.neg_alg)⟧ :
+            DeRhamCohomologyClass n X (2 * pη)) := by
+      have : isRationalClass
+          ((⟦FundamentalClassSet n X pη Z_η.pos,
+                FundamentalClassSet_isClosed (n := n) (X := X) pη Z_η.pos Z_η.pos_alg⟧ :
+              DeRhamCohomologyClass n X (2 * pη))
+            -
+            (⟦FundamentalClassSet n X pη Z_η.neg,
+                FundamentalClassSet_isClosed (n := n) (X := X) pη Z_η.neg Z_η.neg_alg⟧ :
+              DeRhamCohomologyClass n X (2 * pη))) :=
+        isRationalClass_sub _ _ hpos hneg
+      simpa [hsub] using this
+
+    simpa [hw] using hsubclass
+
+  have hη_rat : isRationalClass (ofForm η hη) := by
+    -- rewrite along the representation equality
+    simpa [SignedAlgebraicCycle.RepresentsClass, pη] using (h_rep ▸ hZη_cycle_rat)
+
+  -- Step 2: η is a (pη,pη)-class (since it is represented by a signed algebraic cycle).
+  have hZη_cycle_pp : isPPClass (n := n) (X := X) (k := 2 * pη) (Z_η.cycleClass pη) := by
+    refine ⟨pη, rfl, Z_η.fundamentalClass pη,
+      SignedAlgebraicCycle.fundamentalClass_isClosed (n := n) (X := X) pη Z_η, ?_, ?_⟩
+    · rfl
+    · -- show the representative form is (pη,pη)
+      unfold SignedAlgebraicCycle.fundamentalClass
+      have hpos : isPPForm' n X pη (FundamentalClassSet n X pη Z_η.pos) :=
+        FundamentalClassSet_is_p_p (n := n) (X := X) (p := pη) Z_η.pos Z_η.pos_alg
+      have hneg : isPPForm' n X pη (FundamentalClassSet n X pη Z_η.neg) :=
+        FundamentalClassSet_is_p_p (n := n) (X := X) (p := pη) Z_η.neg Z_η.neg_alg
+      have hneg' : isPPForm' n X pη (-FundamentalClassSet n X pη Z_η.neg) := by
+        -- (-ω) is a scalar multiple with (-1 : ℂ)
+        simpa using (isPPForm'.smul (-1 : ℂ) hneg)
+      simpa [sub_eq_add_neg] using (isPPForm'.add hpos hneg')
+
+  have hη_ppClass : isPPClass (n := n) (X := X) (k := 2 * pη) (ofForm η hη) := by
+    simpa [SignedAlgebraicCycle.RepresentsClass, pη] using (h_rep ▸ hZη_cycle_pp)
+
+  -- Step 3: transport rationality / (p,p)-type along Lefschetz and the degree cast.
+  have hLη_rat : isRationalClass (lefschetz_power n X p_base k (ofForm η hη)) :=
+    (hard_lefschetz_rational_bijective n X p_base k (ofForm η hη)).1 hη_rat
+
+  have hLη_pp : isPPClass (n := n) (X := X) (k := p_base + 2 * k)
+      (lefschetz_power n X p_base k (ofForm η hη)) :=
+    (hard_lefschetz_pp_bijective n X p_base k (ofForm η hη)).1 hη_ppClass
+
+  have hγ_rat : isRationalClass (ofForm γ hγ) := by
+    -- cast the Lefschetz result into degree 2*p, then rewrite via `h_lef`
+    have hcast : isRationalClass ((h_deg) ▸ lefschetz_power n X p_base k (ofForm η hη)) :=
+      isRationalClass_transport (n := n) (X := X) h_deg _ hLη_rat
+    -- now use the given Lefschetz relation
+    simpa [pη, p_base, k, h_deg, h_lef] using hcast
+
+  have hγ_ppClass : isPPClass (n := n) (X := X) (k := 2 * p) (ofForm γ hγ) := by
+    have hcast : isPPClass (n := n) (X := X) (k := 2 * p)
+        (h_deg ▸ lefschetz_power n X p_base k (ofForm η hη)) :=
+      isPPClass_transport (n := n) (X := X) h_deg (lefschetz_power n X p_base k (ofForm η hη)) p hLη_pp
+    simpa [pη, p_base, k, h_deg, h_lef] using hcast
+
+  -- Step 4: extract a (p,p)-form representative for `[γ]`, then apply `hodge_conjecture'`.
+  obtain ⟨γpp, hγpp_closed, hγpp_rep, hγpp_pp⟩ :=
+    isPPClass_index (n := n) (X := X) (k := 2 * p) (p := p) rfl (ofForm γ hγ) hγ_ppClass
+
+  have hγpp_rat : isRationalClass (ofForm γpp hγpp_closed) := by
+    -- rewrite along `hγpp_rep : ofForm γpp = ofForm γ`
+    simpa [hγpp_rep] using hγ_rat
+
+  obtain ⟨Z, hZ_rep⟩ :=
+    hodge_conjecture' (n := n) (X := X) (p := p) γpp hγpp_closed hγpp_rat (by simpa using hγpp_pp)
+
+  refine ⟨Z, ?_⟩
+  -- Transport the representation back to the original class `ofForm γ hγ`.
+  unfold SignedAlgebraicCycle.RepresentsClass at hZ_rep ⊢
+  calc
+    Z.cycleClass p = ofForm γpp hγpp_closed := hZ_rep
+    _ = ofForm γ hγ := hγpp_rep
 
 end

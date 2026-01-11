@@ -528,85 +528,10 @@ theorem SignedAlgebraicCycle.fundamentalClass_empty_zero (p : ℕ)
   simp only [SignedAlgebraicCycle.fundamentalClass, h_pos, h_neg,
              FundamentalClassSet_empty, sub_self]
 
-/-! **Note**: Signed cycle classes are not necessarily zero in the new architecture.
-The fundamental class of a non-empty algebraic set can be non-zero. -/
+/-! ## Lefschetz lift
 
-/-- **Lefschetz Lift for Signed Algebraic Cycles** (Classical Pillar Axiom).
-
-## Mathematical Statement
-
-For `p > n/2`, if a cohomology class η ∈ H^{2(n-p)}(X) is represented by an algebraic
-cycle Z_η, then the Lefschetz-lifted class L^k(η) ∈ H^{2p}(X) is also represented by
-an algebraic cycle, where k = 2p - n.
-
-In symbols: If `[Z_η] = [η]`, then `∃ Z` such that `[Z] = L^k([η]) = [ω]^k ∪ [η]`.
-
-## Mathematical Background
-
-### The Upper-Half Case (p > n/2)
-
-The Hodge conjecture proof splits into two cases based on the codimension p:
-
-1. **Lower-half** (p ≤ n/2): Use Harvey-Lawson calibration directly
-2. **Upper-half** (p > n/2): Use Hard Lefschetz to reduce to lower-half, then lift
-
-This axiom handles the **upper-half case**. The strategy is:
-- Start with a class γ ∈ H^{2p}(X) with p > n/2
-- Use Hard Lefschetz surjectivity to write γ = L^k(η) for some η ∈ H^{2(n-p)}(X)
-- Since n-p < n/2, we can find an algebraic cycle Z_η representing η
-- This axiom asserts that we can "lift" Z_η to get an algebraic cycle representing γ
-
-### Geometric Construction
-
-The Lefschetz operator L = [ω] ∪ (-) corresponds geometrically to intersection
-with a hyperplane. Specifically:
-
-- L^k corresponds to intersecting with k generic hyperplanes
-- If Z_η is an algebraic cycle of dimension n-p, then Z_η ∩ H₁ ∩ ... ∩ H_k is
-  an algebraic cycle of dimension n-p-k = n-2p+n = 2(n-p)-(2p-n) = ... (dimension analysis)
-- The fundamental class of the intersection represents L^k([Z_η])
-
-## Axiomatization Justification
-
-This is axiomatized as a **Classical Pillar** because:
-
-1. **Mathlib Gap**: Full proof requires:
-   - Intersection theory for algebraic cycles
-   - Generic hyperplane section theorems (Bertini)
-   - Compatibility of intersection product with cup product
-   These are not currently in Mathlib.
-
-2. **Standard Mathematics**: This is a classical construction:
-   - Lefschetz (1924): Original hyperplane section arguments
-   - Grothendieck: Algebraic intersection theory
-   - Fulton, "Intersection Theory" (1984): Modern treatment
-
-3. **Sound Axiomatization**: The axiom has strong hypotheses:
-   - Requires p > n/2 (strictly upper-half)
-   - Requires Z_η already represents η (not just exists)
-   - Requires γ = L^k(η) (Lefschetz relation holds)
-
-## Role in Proof
-
-This axiom is **ON THE PROOF TRACK** for `hodge_conjecture'`. It completes the
-upper-half case of the proof by showing that Lefschetz-lifted classes have
-algebraic representatives when the original class does.
-
-## References
-
-- [Lefschetz, "L'analysis situs et la géométrie algébrique", 1924]
-- [Voisin, "Hodge Theory and Complex Algebraic Geometry", Vol. I, Ch. 6, Theorem 6.25]
-- [Griffiths-Harris, "Principles of Algebraic Geometry", Ch. 1, §4]
-- [Fulton, "Intersection Theory", Springer, 1984]
--/
-axiom SignedAlgebraicCycle.lefschetz_lift {p : ℕ}
-    (γ : SmoothForm n X (2 * p)) (hγ : IsFormClosed γ)
-    (η : SmoothForm n X (2 * (n - p))) (hη : IsFormClosed η)
-    (Z_η : SignedAlgebraicCycle n X)
-    (hp : 2 * p > n)
-    (h_rep : Z_η.RepresentsClass (ofForm η hη))
-    (h_lef : ofForm γ hγ = (lefschetz_degree_eq n p hp) ▸
-             lefschetz_power n X (2 * (n - p)) (p - (n - p)) (ofForm η hη)) :
-    ∃ (Z : SignedAlgebraicCycle n X), Z.RepresentsClass (ofForm γ hγ)
+The Lefschetz-lift statement for signed cycles is proved later as a corollary of the
+main theorem (`hodge_conjecture'`) in `Hodge/Kahler/Main.lean`. We keep the algebraic
+cycle infrastructure here (fundamental classes, signed cycles, intersections). -/
 
 end

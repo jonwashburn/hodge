@@ -113,7 +113,7 @@ FundamentalClassSet_represents_class, Hodge.cohomologous_wedge
 | 5 | `smoothExtDeriv_wedge` | ⚠️ NEEDS PROOF | Leibniz rule for derivatives |
 | 6 | `poincareDualFormExists` | ⚠️ NEEDS PROOF | Integration theory + regularization |
 | 7 | `FundamentalClassSet_represents_class` | ⚠️ NEEDS PROOF | Poincaré duality |
-| 8 | `SignedAlgebraicCycle.lefschetz_lift` | ✅ **REMOVED** | Hard Lefschetz branch eliminated |
+| 8 | `SignedAlgebraicCycle.lefschetz_lift` | ✅ **PROVED** | Now theorem, corollary of hodge_conjecture' |
 | 9 | `omega_pow_algebraic` | ✅ **PROVED** | Uses cone_positive_represents |
 | 10 | `Current.boundary_bound` | 🔄 **REFACTORED** | → `smoothExtDeriv_comass_bound` |
 | 11 | `cohomologous_wedge` | ⚠️ NEEDS PROOF | Leibniz rule |

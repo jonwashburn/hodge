@@ -544,6 +544,8 @@ $\Mass(T_\epsilon)-\langle T_\epsilon,\psi\rangle\to 0$ and hence $\Mass(T_\epsi
 \smallskip
 \REVMZ{\textbf{Optional background sections (not required for the main proof):}}
 \REVMZ{Sections~\ref{sec:energy-gap}--\ref{sec:linear-algebra} (Hermitian/PSD linear algebra and $\varepsilon$-nets) and Section~\ref{sec:cal-coercivity} (calibration-coercivity) provide context but are not logically required for the main realization/SYR chain.}
+
+\REVMZ{\textbf{Guide to remarks in this paper:} Remarks serve three roles: (1)~\emph{Intuition/context}---providing geometric motivation or historical background; (2)~\emph{Technical clarifications}---explaining parameter choices or proof-branch status; (3)~\emph{Roadmap}---indicating what is used where. Remarks labeled ``optional'' or ``not required'' lie outside the main proof path. The core logical chain consists of the numbered Theorems, Propositions, and Lemmas; remarks never contain essential proof steps.}
 \end{minipage}}
 \end{center}
 
@@ -2891,7 +2893,7 @@ Otherwise, replace $\lambda_i$ by $\lambda_i/M$ and at the end multiply the resu
 
 Choose normal holomorphic coordinates $z=(z^1,\dots,z^n)$ centered at $x$ on $B_r(x)$ with $r<\operatorname{inj}(X)$ and a local
 unitary frame $e_L$ of $L$ over $B_r(x)$, so that $|e_L|_h^2=e^{-\phi}$ with $\phi(0)=0$ and $d\phi(0)=0$.
-Let $P_{\mhol}(z,z')$ be the Bergman kernel
+Let $P_{\mhol}(z,z')$ be the Bergman kernel \REVMZ{\cite{MaMarinescu07}}
  of $(L^{\mhol},h^{\mhol})$ written in this frame.
 Set rescaled variables $Z=\sqrt{\mhol}\,z$ and $Z'=\sqrt{\mhol}\,z'$.
 
@@ -4093,6 +4095,7 @@ This is the precise sense in which the ``local tangent-plane mass proportions'' 
 \end{theorem}
 
 \begin{remark}[Roadmap and scope of Theorem~\ref{thm:global-cohom}]\label{rem:global-cohom-commentary}
+\REVMZ{\textbf{[Proof roadmap.]}}
 Theorem~\ref{thm:global-cohom} is proved by (i) per-cube integer \emph{mass budgeting} (Substep~4.1), 
 (ii) a \emph{coherent template} and transport--gluing scheme that controls $\mathcal F(\partial T^{\mathrm{raw}})$ (Substep~4.2), and 
 (iii) a final \emph{filling} of the small boundary (Proposition~\ref{prop:glue-gap}) together with cohomology matching (Proposition~\ref{prop:cohomology-match}) and almost-calibration (Proposition~\ref{prop:almost-calibration}) (Substep~4.3).
@@ -6061,6 +6064,7 @@ Combining this with the $W_1(\mu_{\mathrm{flat}},\rho\,d\sigma_r)$ estimate from
 
 
 \begin{remark}[Interpretation]
+\REVMZ{\textbf{[Optional context.]}}
 Proposition~\ref{prop:flat-sliver-local} shows that the \emph{transverse-measure approximation} requirement in the sliver program is achievable
 in a clean flat ball model using exact affine calibrated pieces.
 The remaining nontrivial step in this \emph{sliver program} is the \emph{holomorphic complete-intersection upgrade with uniform $C^1$ control}
@@ -6122,6 +6126,7 @@ see \REVMZ{Proposition~\ref{prop:vertex-template-face-edits}}.
 \subsection*{Sharp-cube variant: corner-exit slivers and global vertex templates (model)}
 
 \begin{remark}[Status of the sharp-cube variant]\label{rem:sharp-cube-variant-status}
+\REVMZ{\textbf{[Optional geometric intuition.]}}
 This subsection is an optional geometric model meant to explain why vertex-anchored templates and corner-exit slivers
 avoid one-sided face population and prefix mismatch.  None of the main proofs should \emph{depend} on this model
 unless a later statement explicitly invokes it.
@@ -7977,6 +7982,7 @@ $\{\mu_{Q,i}\}$, so Proposition~\ref{prop:graph-global-coherence} is a genuine s
 
 %
 \begin{remark}[Activation status for the graph-template branch]\label{rem:graph-activation}
+\REVMZ{\textbf{[Optional proof branch.]}}
 This branch is activated only if the main construction truly achieves the ``whole-cell graph'' checkpoint (Remark~\ref{rem:graph-whole-cell})
 for the required translation net.  Once the restriction maps are fixed as in Definition~\ref{def:graph-restriction-maps}, the remaining steps
 depend only on the discrete measures and the integrality of the chosen transport plans.
@@ -8521,6 +8527,7 @@ transport/gluing/boundary-correction machinery applies unchanged.
 
 %
 \begin{remark}[Activation status for the lattice-template branch]\label{rem:lattice-activation}
+\REVMZ{\textbf{[Optional proof branch.]}}
 This branch is activated only when the manuscript provides an explicit construction of integer template data $(\tau_Q)_Q$ (typically by a
 discrepancy/rounding argument) \emph{and} verifies the geometric restriction maps needed for
 Proposition~\ref{prop:global-coherence-all-labels}.  Otherwise, it remains a conditional wrapper.
