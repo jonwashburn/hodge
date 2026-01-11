@@ -274,4 +274,100 @@ After deeper investigation, the fundamental issue is clear:
 
 ---
 
+## Update: January 11, 2026 (Session 3)
+
+### Proof Track Status
+
+Current axioms in `#print axioms hodge_conjecture'`:
+```
+- FundamentalClassSet_represents_class   (Agent 4)
+- extDerivLinearMap                      (Agent 1 - BLOCKED)
+- isFormClosed_unitForm                  (Agent 1 - BLOCKED)
+- smoothExtDeriv_extDeriv                (Agent 1 - BLOCKED)
+- smoothExtDeriv_wedge                   (Agent 1 - BLOCKED)
+- Current.smoothExtDeriv_comass_bound    (Agent 3)
+- CycleClass.poincareDualFormExists      (Agent 4)
+- Hodge.cohomologous_wedge               (Agent 2)
+```
+
+### Key Dependency Analysis
+
+The main theorem uses:
+1. `omega_pow_IsFormClosed 0` → uses `isFormClosed_unitForm` (**my axiom**)
+2. `omega_pow_IsFormClosed (p+2)` → uses `isFormClosed_wedge` → uses `smoothExtDeriv_wedge` (**my axiom**)
+
+### Combinatorial Lemmas Analysis
+
+Examined `alternatizeUncurryFin_wedge_right` in detail:
+
+```lean
+-- LHS: ∑ i : Fin (k+l+1), (-1)^i • (A(v i) ∧ B)(removeNth i v)
+-- RHS: (∑ j : Fin (k+1), (-1)^j • A(w j)(removeNth j w)) ∧ B (u)
+```
+
+Both sides involve:
+1. Sum over indices (from `alternatizeUncurryFin_apply`)
+2. Sum over shuffle permutations (from `domCoprod_apply`)
+
+To complete the proof:
+- Use `Finset.sum_equiv` or `Finset.sum_bij` for reindexing
+- Carefully track the `finCongr` cast
+- Match up the double sums term by term
+
+This is 8-16 hours of combinatorial work, independent of the `hCharts` issue.
+
+### Updated Recommendations
+
+1. **Immediate**: Complete combinatorial lemmas (unblocks Leibniz rule infrastructure)
+2. **Short-term**: Find workaround for `hCharts` (model space approach or local charts)
+3. **Long-term**: Build proper chart-independent exterior derivative
+
+---
+
+## Update: January 11, 2026 (Session 4)
+
+### Current Proof Track
+
+```
+'hodge_conjecture'' depends on axioms: [
+  FundamentalClassSet_represents_class, extDerivLinearMap, isFormClosed_unitForm,
+  smoothExtDeriv_extDeriv, smoothExtDeriv_wedge, Current.smoothExtDeriv_comass_bound,
+  CycleClass.poincareDualFormExists, Hodge.cohomologous_wedge,
+  propext, Classical.choice, Quot.sound
+]
+```
+
+**8 custom axioms remain**, of which **4 are in my scope**.
+
+### Attempted Work
+
+1. **Combinatorial lemmas** (`alternatizeUncurryFin_wedge_right/left`):
+   - Attempted to prove the k=0, l=0 case
+   - The proof involves matching up domCoprod sums with different index sets
+   - Requires establishing bijection between shuffle permutations
+   - Estimated 8-16 hours to complete
+
+2. **extDerivLinearMap replacement**:
+   - The `hCharts` hypothesis remains the fundamental blocker
+   - Mathlib's `ContMDiffAt.mfderiv_const` proves smoothness in `inTangentCoordinates`, not for raw `mfderiv`
+   - Without chart-independence, cannot define global exterior derivative
+
+### Summary
+
+| Task | Status | Blocker |
+|------|--------|---------|
+| `isSmoothAlternating_wedge` | ✅ PROVED | - |
+| `extDerivLinearMap` | 🔴 BLOCKED | hCharts hypothesis |
+| `isFormClosed_unitForm` | 🔴 BLOCKED | Depends on extDerivLinearMap |
+| `smoothExtDeriv_extDeriv` | 🔴 BLOCKED | Depends on extDerivLinearMap |
+| `smoothExtDeriv_wedge` | 🔴 BLOCKED | extDerivLinearMap + combinatorics |
+
+### Recommended Priority
+
+1. **Complete combinatorial lemmas** (8-16 hours) - unblocks Leibniz rule infrastructure
+2. **Prove chart-independence** (20-40 hours) - unblocks all remaining axioms
+3. **Alternative**: Add `hCharts` as class constraint for Kähler manifolds (10-20 hours)
+
+---
+
 *Report updated by Agent 1 on January 11, 2026*

@@ -29,4 +29,17 @@ structure SmoothForm (n : ℕ) (X : Type u) (k : ℕ)
   as_alternating : X → FiberAlt n k
   is_smooth : IsSmoothAlternating n X k as_alternating
 
+namespace SmoothForm
+
+variable {n : ℕ} {X : Type u} [TopologicalSpace X]
+  [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+  [IsManifold (𝓒_complex n) ⊤ X] {k : ℕ}
+
+/-- The underlying `ContMDiff` smoothness proof from a `SmoothForm`. -/
+theorem smooth (ω : SmoothForm n X k) :
+    ContMDiff (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ⊤ ω.as_alternating :=
+  ω.is_smooth
+
+end SmoothForm
+
 end

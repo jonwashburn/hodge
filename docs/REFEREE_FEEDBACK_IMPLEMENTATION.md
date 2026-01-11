@@ -76,10 +76,10 @@ This document tracks the implementation of referee feedback for the paper "Calib
 
 > **⏩ NEXT TASK: Task #3 - Clarify Logical Status (Remarks Audit) - continued**
 > 
-> **Status:** In progress  
+> **Status:** In progress (49 status annotations added)  
 > **Previous task:** Phase 3 COMPLETE ✓ - Citations at 100 (75 new via REVMZ)
-> **Current progress:** Added "Guide to remarks" section, began adding status annotations to key remarks
-> **Next focus:** Continue adding status annotations, consider consolidating related remarks
+> **Current progress:** Added "Guide to remarks" section + 49 status annotations (~53% of remarks)
+> **Next focus:** Continue adding status annotations to remaining remarks
 
 ### Session Log
 
@@ -95,6 +95,8 @@ This document tracks the implementation of referee feedback for the paper "Calib
 | 8 | 2026-01-11 | Phase 3 continued | Citations now at 94 (69 new via REVMZ) |
 | 9 | 2026-01-11 | **Phase 3 COMPLETE** ✓ | Citations reached **100** (75 new via REVMZ) - TARGET MET |
 | 10 | 2026-01-11 | Task #3 started | Added "Guide to remarks" + 6 status annotations to key remarks |
+| 11 | 2026-01-11 | Task #3 continued | Added 27 more status annotations (33 total, ~35% of remarks) |
+| 12 | 2026-01-11 | Task #3 continued | Added 16 more status annotations (49 total, ~53% of remarks) |
 
 ---
 
@@ -230,6 +232,49 @@ This document tracks the implementation of referee feedback for the paper "Calib
 | 124 | 2026-01-11 | 8527 | ADD_STATUS | Added "[Optional proof branch.]" to lattice-template activation remark | 3.4 |
 | 125 | 2026-01-11 | 6065 | ADD_STATUS | Added "[Optional context.]" to sliver interpretation remark | 3.5 |
 | 126 | 2026-01-11 | 4097 | ADD_STATUS | Added "[Proof roadmap.]" to global-cohom commentary remark | 3.6 |
+| 127 | 2026-01-11 | 3227 | ADD_STATUS | Added "[Geometric intuition.]" to corner-exit intuition remark | 3.7 |
+| 128 | 2026-01-11 | 2735 | ADD_STATUS | Added "[Technical clarification.]" to Carathéodory usage remark | 3.8 |
+| 129 | 2026-01-11 | 3501 | ADD_STATUS | Added "[Technical clarification.]" to sliver stability remark | 3.9 |
+| 130 | 2026-01-11 | 7581 | ADD_STATUS | Added "[Technical clarification.]" to graph geometry remark | 3.10 |
+| 131 | 2026-01-11 | 8468 | ADD_STATUS | Added "[Technical clarification.]" to lattice structure remark | 3.11 |
+| 132 | 2026-01-11 | 7995 | ADD_STATUS | Added "[Optional proof branch summary.]" to graph-template summary | 3.12 |
+| 133 | 2026-01-11 | 8528 | ADD_STATUS | Added "[Optional proof branch summary.]" to lattice summary | 3.13 |
+| 134 | 2026-01-11 | 4191 | ADD_STATUS | Added "[Technical clarification.]" to main quantifiers remark | 3.14 |
+| 135 | 2026-01-11 | 3907 | ADD_STATUS | Added "[Technical clarification.]" to parameter schedule remark | 3.15 |
+| 136 | 2026-01-11 | 9140 | ADD_STATUS | Added "[Key conceptual point.]" to signed decomposition remark | 3.16 |
+| 137 | 2026-01-11 | 6141 | ADD_STATUS | Added "[Geometric intuition.]" to why-corners remark | 3.17 |
+| 138 | 2026-01-11 | 6148 | ADD_STATUS | Added "[Geometric intuition.]" to pan-vertex distribution remark | 3.18 |
+| 139 | 2026-01-11 | 9073 | ADD_STATUS | Added "[Standard background.]" to Chow/GAGA remark | 3.19 |
+| 140 | 2026-01-11 | 9086 | ADD_STATUS | Added "[Proof roadmap.]" to hodge-context remark | 3.20 |
+| 141 | 2026-01-11 | 9113 | ADD_STATUS | Added "[Key conceptual point.]" to main theorem discussion | 3.21 |
+| 142 | 2026-01-11 | 9162 | ADD_STATUS | Added "[Proof summary.]" to conclusion remark | 3.22 |
+| 143 | 2026-01-11 | 2390 | ADD_STATUS | Added "[Proof roadmap.]" to realization usage remark | 3.23 |
+| 144 | 2026-01-11 | 2067 | ADD_STATUS | Added "[Technical clarification.]" to coercivity hypothesis remark | 3.24 |
+| 145 | 2026-01-11 | 4595 | ADD_STATUS | Added "[Technical clarification.]" to W1-auto matching remark | 3.25 |
+| 146 | 2026-01-11 | 8419 | ADD_STATUS | Added "[Technical clarification.]" to lattice template difference remark | 3.26 |
+| 147 | 2026-01-11 | 3106 | ADD_STATUS | Added "[Technical clarification.]" to global coverage note | 3.27 |
+| 148 | 2026-01-11 | 8093 | ADD_STATUS | Added "[Key technical point.]" to quantitative bottleneck remark | 3.28 |
+| 149 | 2026-01-11 | 8764 | ADD_STATUS | Added "[Key technical point.]" to SYR realization comment | 3.29 |
+| 150 | 2026-01-11 | 8772 | ADD_STATUS | Added "[Technical clarification.]" to compactness remark | 3.30 |
+| 151 | 2026-01-11 | 8804 | ADD_STATUS | Added "[Technical clarification.]" to integrality remark | 3.31 |
+| 152 | 2026-01-11 | 8825 | ADD_STATUS | Added "[Technical clarification.]" to density-mass remark | 3.32 |
+| 153 | 2026-01-11 | 8845 | ADD_STATUS | Added "[Key conceptual point.]" to Harvey-Lawson remark | 3.33 |
+| 154 | 2026-01-11 | 1337 | ADD_STATUS | Added "[Geometric intuition.]" to Kähler angle meaning remark | 3.34 |
+| 155 | 2026-01-11 | 3569 | ADD_STATUS | Added "[Geometric intuition.]" to matching cells geometry remark | 3.35 |
+| 156 | 2026-01-11 | 2099 | ADD_STATUS | Added "[Technical clarification.]" to pointwise projection limitation | 3.36 |
+| 157 | 2026-01-11 | 2201 | ADD_STATUS | Added "[Proof roadmap.]" to (H1)-(H2) location remark | 3.37 |
+| 158 | 2026-01-11 | 7168 | ADD_STATUS | Added "[Key technical point.]" to analytic difficulty remark | 3.38 |
+| 159 | 2026-01-11 | 2429 | ADD_STATUS | Added "[Technical clarification.]" to mass equality remark | 3.39 |
+| 160 | 2026-01-11 | 1895 | ADD_STATUS | Added "[Technical clarification.]" to calibrated cone PSD remark | 3.40 |
+| 161 | 2026-01-11 | 4624 | ADD_STATUS | Added "[Technical clarification.]" to sliver regime remark | 3.41 |
+| 162 | 2026-01-11 | 5710 | ADD_STATUS | Added "[Technical clarification.]" to sliver cube templates remark | 3.42 |
+| 163 | 2026-01-11 | 5905 | ADD_STATUS | Added "[Geometric intuition.]" to sliver pieces remark | 3.43 |
+| 164 | 2026-01-11 | 5863 | ADD_STATUS | Added "[Key conceptual point.]" to Hard Lefschetz remark | 3.44 |
+| 165 | 2026-01-11 | 8870 | ADD_STATUS | Added "[Technical clarification.]" to non-integrability remark | 3.45 |
+| 166 | 2026-01-11 | 8672 | ADD_STATUS | Added "[Technical clarification.]" to correction current remark | 3.46 |
+| 167 | 2026-01-11 | 2969 | ADD_STATUS | Added "[Technical clarification.]" to Bergman scale compatibility | 3.47 |
+| 168 | 2026-01-11 | 5421 | ADD_STATUS | Added "[Technical clarification.]" to constant-mass consistency | 3.48 |
+| 169 | 2026-01-11 | 2799 | ADD_STATUS | Added "[Technical clarification.]" to stable direction labeling | 3.49 |
 
 <!-- 
 Change Types:

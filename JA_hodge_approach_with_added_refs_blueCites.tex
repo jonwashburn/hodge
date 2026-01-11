@@ -1335,6 +1335,7 @@ and the K\"ahler angles yields the following quadratic control estimate.
 
 
 \begin{remark}[Geometric meaning of Lemma~\ref{lem:kahler-angle}]
+\REVMZ{\textbf{[Geometric intuition.]}}
 	Lemma~\ref{lem:kahler-angle} shows that, when the K\"ahler angles between two
 	complex $p$--planes are small, the deviation of their calibrated directions is
 	quadratically controlled by the sum of the squared angles.  Since
@@ -1892,6 +1893,7 @@ Thus subtracting $(\operatorname{tr}H_\beta/d)\,I_{\mathcal H}$ corresponds to t
 
 
 \begin{remark}[Calibrated cone in the Hermitian model; not the full PSD cone for $1<p<n-1$]\label{rem:cone-not-full-psd}
+\REVMZ{\textbf{[Technical clarification.]}}
 Let $\mathcal H=\Lambda^{p,0}T_x^*X$ and let $\mathcal I:\Lambda^{p,p}T_x^*X\to\Herm(\mathcal H)$ be the isometry of Lemma~\ref{lem:hermitian-model}.
 Let $\mathsf{Dec}\subset \mathcal H$ denote the set of \emph{decomposable} $p$--vectors.
 Then the calibrated/strongly-positive cone $K_p(x)$ satisfies
@@ -2065,6 +2067,7 @@ Squaring and integrating yields $\Defcone(\alpha)\le \|\alpha-\gharm\|_{L^2}^2$,
 
 
 \begin{remark}[On the coercivity hypothesis]\label{rem:coercivity-hypothesis}
+\REVMZ{\textbf{[Technical clarification.]}}
 The inequality in Theorem~\ref{thm:cal-coercivity} is \emph{purely geometric}: once the energy minimizer $\gharm$ lies in the closed convex cone $K_p(x)$ pointwise,
 the cone distance is trivially controlled by the $L^2$ distance to $\gharm$.
 No Hermitian spectral/projection formula is needed.
@@ -2096,6 +2099,7 @@ Integrating,
 where $(\Pi_K\alpha)(x):=\Pi_{K_p(x)}(\alpha_x)$.
 
 \begin{remark}[Limitation of pointwise projection]
+\REVMZ{\textbf{[Technical clarification.]}}
 While \eqref{eq:projection-identity} is a valid pointwise identity, the
 fiberwise projection $\Pi_K(\alpha)$ does \emph{not} preserve closedness:
 $d(\Pi_K(\alpha)) \neq 0$ in general, so $\Pi_K(\alpha)$ is not a closed
@@ -2196,6 +2200,7 @@ Substituting into (H2) yields $\Mass(G_j)\lesssim c_0^{\frac{k-1}{k}}h_j^{2-\fra
 
 
 \begin{remark}[Where to look for (H1)--(H2) in this manuscript]
+\REVMZ{\textbf{[Proof roadmap.]}}
 In our implementation, (H1) is supplied by the projective tangential approximation / holomorphic patch manufacturing package
 (Bergman/peak-section control and finite-template realization; see Lemma~\ref{lem:bergman-control} and the local sheet construction in Theorem~\ref{thm:local-sheets}).
 The gluing estimate in (H2) is obtained by combining transport-to-filling on faces (Proposition~\ref{prop:transport-flat-glue-weighted}) with the slice boundary shrinkage
@@ -2389,7 +2394,7 @@ Thus $\Mass(T)=\langle T,\psi\rangle$, so $T$ is $\psi$--calibrated.
 
 \begin{remark}[How to use Theorem~\ref{thm:realization-from-almost}]
 \label{rem:cone-closed-what-used}
-	
+\REVMZ{\textbf{[Proof roadmap.]}}
 	Theorem~\ref{thm:realization-from-almost} is an abstract closure principle: once one has a fixed-class sequence of integral cycles whose masses approach the cohomological lower bound $c_0$,
 	the limit is automatically $\psi$--calibrated and hence analytic (Harvey--Lawson).
 	The remainder of this section explains how to build such almost--calibrated integral cycles starting from a smooth closed cone--valued form $\beta$:
@@ -2423,6 +2428,7 @@ Thus the homology class $\mathrm{PD}(m[\gamma])\in H_{2n-2}(X,\Z)$ is represente
 
 
 \begin{remark}[Mass equality in the effective codimension-one case]
+\REVMZ{\textbf{[Technical clarification.]}}
 If in addition $m[\gamma]$ is represented by an \emph{effective} divisor $D$ (so $D$ is a complex hypersurface with positive orientation),
 then the current $[D]$ is $\psi$--calibrated by $\psi=\omega^{n-1}/(n-1)!$ and satisfies the exact mass identity
 \(
@@ -2733,6 +2739,7 @@ Multiplying by $t(x)$ gives the claimed decomposition of $\beta(x)$.
 \end{proof}
 
 \begin{remark}[What is actually used later]\label{rem:caratheodory-quantitative}
+\REVMZ{\textbf{[Technical clarification.]}}
 In the global construction we only require such decompositions at the finitely many cube base points $x_Q$
 (Substep~4.1), so no global measurable selection or continuity-in-$x$ statement is needed for the subsequent arguments.
 
@@ -2790,6 +2797,7 @@ $\|w-w'\|\le (\|A\|_{\mathrm{op}}/\lambda)\,\|b-b'\|$.
 \end{proof}
 
 \begin{remark}[Stable direction labeling via a growing net]\label{rem:direction-net-qp}
+\REVMZ{\textbf{[Technical clarification.]}}
 In a holomorphic chart $U\subset\C^n$, the calibrated directions are precisely the complex $(n-p)$--planes.
 Fix a scale $h$ and choose an $\varepsilon_h$--net $\{P_1,\dots,P_M\}\subset G_{\C}(n-p,n)$ with $\varepsilon_h\ll h$.
 For each $x\in U$, let $\xi_i(x)$ denote the corresponding normalized generator in $K_p(x)$ (so $\langle \xi_i(x),\psi_x\rangle=1$).
@@ -2960,7 +2968,7 @@ Rescaling back by $M$ completes the proof.
 
 
 \begin{remark}[Compatibility of the Bergman scale with footprints and cubes]
-
+\REVMZ{\textbf{[Technical clarification.]}}
 In the local-sheet constructions we do \emph{not} require an entire cubical cell $Q$
 to lie inside a single Bergman-scale ball.
 What we use is only: each local footprint $E\subset Q$ that we realize holomorphically
@@ -3102,6 +3110,7 @@ inside the chosen normal ball.
 \end{proposition}
 
 \begin{remark}[note]
+\REVMZ{\textbf{[Technical clarification.]}}
 {%
 The originally stated ``global coverage'' form (requiring that for every $x\in K$ and every calibrated plane
 $\Pi\subset T_xX$ there exists $j$ with \emph{$x\in Y_j$} and $\dist(T_xY_j,\Pi)<\varepsilon$)
@@ -3225,6 +3234,7 @@ and the slice mass $\mathcal H^k(E(t))\asymp s^k$ is independent of $t$ since th
 Finally, packing a $\delta$--separated family inside a $(2p-1)$--dimensional box is elementary.
 \end{proof}
 \begin{remark}[Corner--exit intuition]\label{rem:corner-exit-intuition}
+\REVMZ{\textbf{[Geometric intuition.]}}
 The ``corner--exit'' template is a calibrated $(n\!-\!p)$--plane piece whose footprint in the base plane is a uniformly
 fat simplex of diameter $\asymp s$ placed near a chosen cube vertex.  The defining inequalities force the footprint to \emph{touch only}
 the designated ``near'' faces and to stay a definite distance from the ``far'' faces, so translating the sheet in transverse directions
@@ -3499,6 +3509,7 @@ $\mathcal N_{\varepsilon h}(P+t_1)$ and $\mathcal N_{\varepsilon h}(P+t_2)$ are 
 
 
 \begin{remark}[Sliver stability: what is used later]\label{rem:sliver-stability-discussion}
+\REVMZ{\textbf{[Technical clarification.]}}
 In later ``sliver'' bookkeeping we only use two consequences of Lemma~\ref{lem:sliver-stability}:
 (i) the mass of a small $C^1$ graph over a calibrated plane is comparable to the plane mass in the same cell,
 and (ii) disjointness of distinct translates persists provided one fixes an \emph{anchor} point on each graph.
@@ -3562,6 +3573,7 @@ implies the corresponding graphs cannot intersect on any common region of defini
 \end{proof}
 
 \begin{remark}[Geometric meaning for matching across adjacent cells]\label{rem:matching-cells-geometry}
+\REVMZ{\textbf{[Geometric intuition.]}}
 In later gluing steps, the translation parameters $t_a$ are encoded by the cell-scale coordinate $w$.
 Because each $Y_a$ is a small-slope graph over the fixed affine plane $P_a$ on $B_{c\mhol^{-1/2}}(x)$,
 the footprint $F_a$ (and its boundary faces) vary Lipschitzly with $t_a$; this is the geometric input needed
@@ -3902,7 +3914,7 @@ we obtain $\|\mathsf{Bar}(S_Q)-\widehat\beta(x_Q)\|_{\mathrm{HS}}\le C\,\delta$,
 %=========================================================
 
 \begin{remark}[Parameter schedule for $\mhol$, $h$, $s$, and $m$]\label{rem:weighted-scaling}
-
+\REVMZ{\textbf{[Technical clarification.]}}
 {
 We use two unrelated integers throughout:
 \begin{itemize}
@@ -4186,6 +4198,7 @@ S_Q:=\sum_{j=1}^{J(Q)} N_{Q,j}\,[Y_{Q,j}]\llcorner Q.
 
 
 \begin{remark}[Main quantifier schedule]\label{rem:main-quantifiers}
+\REVMZ{\textbf{[Technical clarification.]}}
 The order of choices in the construction is: fix the integer $m$ (the desired cohomology multiple) first; then choose the mesh size $h$ and holomorphic scale parameters; then choose the tolerance parameters $\delta,\varepsilon_{\mathrm{temp}},\varepsilon_{\mathrm{hol}},\varepsilon_{\mathrm{edit}}$ as explicit functions of $h$ and the fixed geometric constants. In particular, no step requires re-choosing $m$ after passing to a finer mesh.
 \end{remark}
 
@@ -4588,6 +4601,7 @@ For the second claim, transport each deleted atom to an inserted atom at cost at
 \end{proof}
 
 \begin{remark}[How Lemma~\ref{lem:w1-auto} reduces the remaining matching task]\label{rem:w1-auto}
+\REVMZ{\textbf{[Technical clarification.]}}
 If, for each cube $Q$ and sheet family $(Q,j)$, we choose the translation multiset $\{t_{j,a}\}$ by a \emph{fixed} template in
 $N_{Q,j}^\perp$ (e.g.\ a scaled lattice/low-discrepancy set of diameter $O(h)$), then across a shared face $F=Q\cap Q'$ the two
 induced transverse measures are related by applying two nearby face-slice maps (coming from nearby plane directions and nearby normal-coordinate identifications).
@@ -4611,6 +4625,7 @@ Corollary for the weighted replacement.
 
 
 \begin{remark}[Sliver regime: what changes in the global counting estimate]\label{rem:sliver-vs-template}
+\REVMZ{\textbf{[Technical clarification.]}}
 The global $m\,h$ bound in Remark~\ref{rem:w1-auto} uses an implicit \emph{counting step}: it treats the total face mismatch as scaling like
 ``(per-sheet mismatch) $\times$ (number of sheet pieces meeting faces)''.  In the constant-mass-per-sheet model this count is controlled by total mass,
 because each sheet piece carries $\psi$--mass $\asymp h^{2(n-p)}$ in a cube.
@@ -5405,6 +5420,7 @@ as claimed.
 
 
 \begin{remark}[Consistency with the constant-mass-per-sheet template regime]
+\REVMZ{\textbf{[Technical clarification.]}}
 If every piece in a cell has comparable mass $m_{Q,a}\asymp h^{k}$ (the naive ``one sheet type'' model), then
 $m_{Q,a}^{(k-1)/k}\asymp h^{k-1}$ and $\sum_a m_{Q,a}^{(k-1)/k}\asymp N_Q h^{k-1}\asymp M_Q/h$, where $M_Q=\sum_a m_{Q,a}$ is the total mass in $Q$.
 The corollary then yields $\mathcal F(\partial T^{\mathrm{raw}})\lesssim \varrho\,h^2\sum_Q(M_Q/h)=\varrho\,h\,\sum_Q M_Q\asymp m\,\varrho\,h$,
@@ -5694,6 +5710,7 @@ Thus the ``global activation gate'' is complete in the corner-exit route; the re
 
 
 \begin{remark}[Sliver cube templates]\label{rem:sliver-cube-templates}
+\REVMZ{\textbf{[Technical clarification.]}}
 In the corner-exit regime, each cell $Q$ carries an ordered list of candidate translation sites (a \emph{cube template})
 near its vertex stars.  The template is chosen from a finite net so adjacent cells agree on the shared-face prefix,
 up to an $O(h)$ unmatched tail.
@@ -5846,6 +5863,7 @@ In this way, the proof does not rely on a dense-sheet cancellation principle; th
 
 \end{remark}
 \begin{remark}[Hard Lefschetz reduction to $p\le n/2$]\label{rem:lefschetz-reduction} \cite[Ch.~6]{Voisin02}
+\REVMZ{\textbf{[Key conceptual point.]}}
 Because $X$ is projective, the K\"ahler class $[\omega]=c_1(L)$ is algebraic (hyperplane class).
 By hard Lefschetz, for $p>\frac{n}{2}$ the map
 \[
@@ -5889,6 +5907,7 @@ Therefore the image contains an interval $[0,A_{\max}]$, and the intermediate va
 
 
 \begin{remark}[Sliver pieces and fixed-$m$ microstructure]\label{rem:sliver}
+\REVMZ{\textbf{[Geometric intuition.]}}
 Lemma~\ref{lem:mass-tunable} indicates a potential escape from the dense-vs-gluing tension at fixed $m$:
 one may take \emph{many} parallel calibrated sheets in a cube but choose their translations so that each sheet contributes only a tiny mass
 (``sliver pieces''), with the total mass still matching $m\int_Q\beta\wedge\psi$.
@@ -6135,6 +6154,7 @@ unless a later statement explicitly invokes it.
 
 
 \begin{remark}[Why corners (vertex stars) are the natural anchors]\label{rem:why-corners}
+\REVMZ{\textbf{[Geometric intuition.]}}
 Placing microstructure pieces near vertex stars ensures that every shared face sees comparable populations from both sides,
 so mismatches become an $O(h)$ tail effect rather than an $O(1)$ obstruction.  This is the geometric reason the
 corner-exit route is compatible with global gluing.
@@ -6143,6 +6163,7 @@ corner-exit route is compatible with global gluing.
 
 \begin{remark}[Why templates should live at vertices (pan-vertex distribution)]
 \label{rem:sharp-cube-why}
+\REVMZ{\textbf{[Geometric intuition.]}}
 If one concentrates all slivers in a cube $Q$ near a single vertex, then an interior face $F=Q\cap Q'$ can be populated on one side and essentially empty on the other,
 creating a one-sided mismatch that is not a tail effect.
 Moreover, even if both sides use the same \emph{cellwise} master template, it is not automatic that the pieces that actually meet a given face $F$ are the \emph{early}
@@ -7154,6 +7175,7 @@ This rounding changes only constants and does not change the adjacency graph.
 \end{remark}
 
 \begin{remark}[Where the remaining analytic difficulty really lives]\label{rem:bergman-not-enough}
+\REVMZ{\textbf{[Key technical point.]}}
 It is tempting to argue that Bergman kernel localization or Tian--Yau--Zelditch universality \REVMZ{\cite{Tian90,Zelditch98,Catlin99}} alone forces the desired
 face-incidence and per-face boundary-mass properties of slivers.  However, \emph{pointwise decay of a holomorphic section does not
 localize its exact zero set} in the strong sense needed for gluing.
@@ -7576,6 +7598,7 @@ The cycle $T:=T^{\mathrm{raw}}-U_{\mathrm{glue}}$ is then closed and integral.
 
 %
 \begin{remark}[What is actually used from ``graph'' geometry]\label{rem:graph-flat-remark}
+\REVMZ{\textbf{[Technical clarification.]}}
 All subsequent uses of this package only require: (i) whole-cell graphs exist with a uniform small-slope bound, and
 (ii) the induced transverse measures are atomic on a common net so that integral optimal transport applies.
 No additional holomorphic structure is needed at the transport stage.
@@ -7990,6 +8013,7 @@ depend only on the discrete measures and the integrality of the chosen transport
 
 %
 \begin{remark}[Global summary of the graph-template branch]\label{rem:global-graph-summary}
+\REVMZ{\textbf{[Optional proof branch summary.]}}
 The graph-template branch isolates a particularly clean regime: on each activated cube $Q$ the relevant complete intersection is
 a \emph{single} small-slope sheet on \emph{all} of $Q$ (Remark~\ref{rem:graph-whole-cell}).  In that regime, transport and gluing
 reduce to discrete bookkeeping on atomic face-masses, exactly as in the sliver-template branch.
@@ -8081,6 +8105,7 @@ Proposition~\ref{prop:global-coherence-all-labels} yields the stated bound with
 \end{proof}
 
 \begin{remark}[note: this is the quantitative bottleneck]\label{rem:lean-bottleneck-flatnorm}\label{rem:global-flat-note}
+\REVMZ{\textbf{[Key technical point.]}}
 For the Lean formalization, the nontrivial input encapsulated here is precisely the quantitative estimate delivered by
 Proposition~\ref{prop:transport-flat-glue} and the cited bookkeeping results.
 All subsequent uses of this estimate (Proposition and Proposition~\ref{prop:almost-calibration})
@@ -8408,6 +8433,7 @@ The tuple $(\tau_Q)_Q$ is called \emph{coherent} if all face compatibilities hol
 
 %
 \begin{remark}[How this differs from graph/sliver templates]\label{rem:lattice-template-remark}
+\REVMZ{\textbf{[Technical clarification.]}}
 This package abstracts the only extra feature needed for ``integral quantization'' variants: the template data lives in an \emph{integer lattice}.
 It is intentionally agnostic about the geometric origin of $\tau_Q$ (graph sheet, sliver sheet, etc.).
 In applications, $\tau_Q$ is typically built from a finite set of period integrals or other integer-valued invariants.
@@ -8463,6 +8489,7 @@ each correction piece is integral and $\mathcal I_k(X)$ is closed under finite s
 
 %
 \begin{remark}[What is used from the lattice structure]\label{rem:lattice-flat-remark}
+\REVMZ{\textbf{[Technical clarification.]}}
 Beyond coherence, the only use of ``lattice'' is to enable invoking Proposition~\ref{prop:integer-transport}.  No further arithmetic input is used
 in the flat-norm or boundary-correction steps.
 \end{remark}
@@ -8520,6 +8547,7 @@ The only non-formal work is checking the restriction maps are actually well defi
 
 %
 \begin{remark}[Lattice summary]\label{rem:lattice-summary}
+\REVMZ{\textbf{[Optional proof branch summary.]}}
 The lattice-template branch is a purely arithmetic overlay: once integer-valued coherent template data is produced, the previously established
 transport/gluing/boundary-correction machinery applies unchanged.
 \end{remark}
@@ -8645,6 +8673,7 @@ and (iii) follows by combining (i)--(ii).
 
 
 \begin{remark}[The correction current need not be positive]\label{rem:correction-not-positive}
+\REVMZ{\textbf{[Technical clarification.]}}
 The filling currents $U_\epsilon$ (or $R_{\mathrm{glue}}$ in Substep~4.2) are produced by the flat--norm decomposition and the Federer--Fleming isoperimetric inequality. They are \emph{not required} to be $\psi$--calibrated, nor to have any positivity/type property. This causes no difficulty: the only later input is the vanishing--mass estimate $\Mass(U_\epsilon)\to 0$. In particular, if $S$ is the glued current built from coherent templates, then $T_\epsilon:=S-U_\epsilon$ represents the same homology class as $S$ and satisfies $\Mass(U_\epsilon)\to 0$; together with Proposition~\ref{prop:almost-calibration}\textnormal{(ii)} this implies the calibration defect of $T_\epsilon$ tends to $0$. Any weak limit of $T_\epsilon$ is therefore $\psi$--calibrated, and hence (by King/Harvey--Lawson) a holomorphic chain.
 \end{remark}
 
@@ -8747,6 +8776,7 @@ Thus $\beta$ is SYR-realizable in the sense of Definition~\ref{def:syr}.
 
 
 \begin{remark}[Comment on Theorem~\ref{thm:syr-realization}]\label{rem:syr-realization-comment}
+\REVMZ{\textbf{[Key technical point.]}}
 Theorem~\ref{thm:syr-realization} is the point where the analytic construction is converted into a calibrated limit cycle.
 The main inputs are: uniform mass/boundary control, compactness (as currents/varifolds), and the calibration inequality
 $\Mass(T)\ge \int_T\psi$ with equality characterizing $\psi$--calibrated currents.
@@ -8755,6 +8785,7 @@ $\Mass(T)\ge \int_T\psi$ with equality characterizing $\psi$--calibrated current
 
 
 \begin{remark}[What compactness is used]\label{rem:varifold-compactness-used}
+\REVMZ{\textbf{[Technical clarification.]}}
 In this paper we only use Federer--Fleming compactness for integral currents: uniform mass bounds and $\partial T_k=0$ on the compact manifold $X$
 yield a subsequence converging in the flat norm.
 No stationarity/first-variation hypotheses are required for this step.  \REVMZ{(One may also consider the associated integral varifolds, but this is optional.)}
@@ -8787,6 +8818,7 @@ hence $\Mass(T)=\int_T\psi$ and $T$ is $\psi$--calibrated.
 
 
 \begin{remark}[What about integrality of the limit?]\label{rem:what-about-integrality}
+\REVMZ{\textbf{[Technical clarification.]}}
 Under uniform bounds on $\Mass(T_j)$ and $\Mass(\partial T_j)$, Federer--Fleming compactness \REVMZ{\cite[Thm~4.2.17]{Fed69}} implies that any flat limit of integral
 currents is again an integral current.  Thus integrality is preserved along the approximating sequence in Theorem~\ref{thm:syr-realization}.
 \end{remark}
@@ -8805,6 +8837,7 @@ homology class and whose \emph{calibration defect} tends to zero with respect to
 K\"ahler calibration $\psi$ used throughout.
 
 \begin{remark}[A calibrated limit need not approximate $\beta$ pointwise]\label{rem:density-mass}
+\REVMZ{\textbf{[Technical clarification.]}}
 The construction is not a pointwise approximation of a smooth form by a measure on all of $X$.
 Rather, each $T_k$ is an \emph{integral cycle} (a rectifiable current with integer multiplicity and
 $\partial T_k=0$) in the fixed class $\mathrm{PD}(m[\gamma])$, and the quantitative control is through
@@ -8825,6 +8858,7 @@ $(2n-2p)$--rectifiable set, which is exactly the geometric output used in the fi
 \end{remark}
 
 \begin{remark}[From K\"ahler calibration to analytic cycles]\label{rem:hl-applicable}
+\REVMZ{\textbf{[Key conceptual point.]}}
 Let $T$ be an integral $(2n-2p)$--cycle on a complex manifold $(X,\omega)$ which is calibrated by the
 K\"ahler $(2n-2p)$--form $\psi=\omega^{n-p}/(n-p)!$ (equivalently, $\Def_{\mathrm{cal}}(T)=0$ with respect
 to $\psi$).  Then $T$ is a closed, strongly positive current of bidimension $(p,p)$.
@@ -8838,6 +8872,7 @@ This is the point at which the argument passes from geometric measure theory to 
 \end{remark}
 
 \begin{remark}[Non-integrability does not obstruct the construction]\label{rem:gluing}
+\REVMZ{\textbf{[Technical clarification.]}}
 The local plane decomposition $x\mapsto\beta(x)$ is used only to select, on each sufficiently small cube
 $Q$, finitely many \emph{separate} calibrated model planes (via Carath\'eodory) and then to realize each
 such plane by an algebraic complete intersection inside $Q$ (Bertini-type input).
@@ -9061,6 +9096,7 @@ Since $X$ is projective, each $V_j$ is algebraic by Chow/GAGA
 
 
 \begin{remark}[Chow/GAGA for analytic subvarieties]\label{rem:chow-gaga}
+\REVMZ{\textbf{[Standard background.]}}
 If $X$ is projective, any complex analytic subvariety of $X$ is algebraic.
 \REVMZ{This follows from Chow's theorem \cite{Chow49} for projective space together with Serre's GAGA \cite[Thm~1]{Serre56}; see also \cite[App.~B]{GH78} and \cite[Ch.~I, \S1]{Hartshorne77}.}
 \end{remark}
@@ -9074,6 +9110,7 @@ Let $X$ be a smooth complex projective manifold. For each $p$, every rational co
 \end{conjecture}
 
 \begin{remark}[Context for the main theorem]\label{rem:hodge-context}
+\REVMZ{\textbf{[Proof roadmap.]}}
 The main theorem below proves Conjecture~\ref{conj:hodge-conjecture} by reducing to cone--positive classes via signed decomposition (Lemma~\ref{lem:signed-decomp}) and then applying the SYR/calibrated realization pipeline (Theorems~\ref{thm:automatic-syr} and~\ref{thm:syr}).
 \end{remark}
 \subsection*{Main theorem: Hodge conjecture for rational $(p,p)$ classes}
@@ -9099,6 +9136,7 @@ $\gamma=\gamma^{+}-\gamma^{-}$ is algebraic.
 
 \end{proof}
 \begin{remark}[Discussion of Theorem~\ref{thm:main-hodge}]\label{rem:main-hodge-discussion}
+\REVMZ{\textbf{[Key conceptual point.]}}
 The proof of Theorem~\ref{thm:main-hodge} isolates the analytic realization step: it suffices to construct,
 for a fixed integer $m$, an effective holomorphic chain representing $m[\gamma^{+}]$ with the required calibration and mass
 control.  Once such a holomorphic cycle is obtained, the passage to algebraic cycles on a projective manifold is standard:
@@ -9126,6 +9164,7 @@ class equals $\alpha$.  Hence $\alpha$ is represented by an algebraic cycle.
 \end{proof}
 
 \begin{remark}[Why signed decomposition is the key]
+\REVMZ{\textbf{[Key conceptual point.]}}
 (Invoked after fixing $m$ and choosing $\mhol$ so that the SYR construction is closed and the integral filling is at scale $\ll 1$; no new ``choose small'' parameters are introduced here.)
 The signed decomposition sidesteps the fundamental obstruction that the
 harmonic representative $\gamma_{\mathrm{harm}}$ of a general Hodge class
@@ -9146,6 +9185,7 @@ is strictly positive.
 
 
 \begin{remark}[Conclusion of the proof]\label{rem:hodge-final-remark}
+\REVMZ{\textbf{[Proof summary.]}}
 Fix the auxiliary parameters (in particular $m$ and the holomorphic tensor power $\mhol$) as chosen in Sections~8--9.
 Theorem~\ref{thm:main-hodge} is obtained by combining:
 (i) the signed decomposition $\gamma=\gamma^{+}-\gamma^{-}$ with $\gamma^{-}$ algebraic (a complete intersection);

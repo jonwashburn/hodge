@@ -190,7 +190,14 @@ theorem omega_isPP_via_J : isPPForm' n X 1 ((Nat.two_mul 1).symm ▸ K.omega_for
     fundamental result in algebraic geometry that connects Kähler geometry to
     algebraic cycles.
 
-    ## Proof Outline (Classical)
+    ## Proof (in this repository)
+
+    This is proved as a corollary of `cone_positive_represents`:
+    - `(c : ℝ) • ω^p` is cone-positive for `c > 0`
+    - `[ω^p]` is rational, and scaling by `c ∈ ℚ` preserves rationality
+    - therefore `(c : ℝ) • [ω^p]` has an algebraic representative
+
+    ## Classical background (not formalized here)
 
     1. **Kähler class is algebraic**: The Kähler form ω on a projective variety
        is the curvature form of the restriction of O(1) to X. Thus [ω] = c₁(L)
@@ -204,13 +211,6 @@ theorem omega_isPP_via_J : isPPForm' n X 1 ((Nat.two_mul 1).symm ▸ K.omega_for
        by taking an appropriate linear combination of cycles. More precisely,
        one uses the fact that Chow groups are Q-vector spaces and the cycle
        class map is compatible with scalar multiplication.
-
-    ## Axiomatization Justification
-
-    This is axiomatized as a **Classical Pillar** because:
-    - The full proof requires line bundle theory (O(1), ampleness, Chern classes)
-    - Chow groups and the cycle class map are not available in Mathlib
-    - The statement is classically established and used throughout Hodge theory
 
     ## References
 
@@ -296,11 +296,9 @@ theorem omega_pow_algebraic {p : ℕ} (c : ℚ) (hc : c > 0) :
 
     This theorem provides the final machine-checkable proof structure for the
     Hodge Conjecture in Lean 4, integrating:
-    1. Hard Lefschetz Reduction (Track A.3.1)
-    2. Signed Cycle Decomposition (Track C.4)
-    3. The Automatic SYR Theorem (Track C.6)
-    4. Harvey-Lawson Structure Theorem (Track A.1)
-    5. Serre's GAGA Theorem (Track A.3)
+    1. Signed cycle decomposition (Track C.4)
+    2. Cone-positive ⇒ algebraic representative (Track C.6: microstructure + Harvey–Lawson + GAGA bridge)
+    3. Assembly of a signed algebraic cycle representing γ
 
     Reference: [W.V.D. Hodge, "The Topological Invariants of Algebraic Varieties",
     Proc. Int. Cong. Math. 1950, Vol. 1, 182-191].
