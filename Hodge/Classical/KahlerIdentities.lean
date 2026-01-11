@@ -212,7 +212,7 @@ exterior derivative d.
     **Degree Analysis**:
     - d : Ωᵏ → Ωᵏ⁺¹
     - Λ : Ωᵏ⁺¹ → Ωᵏ⁻¹, so Λ ∘ d : Ωᵏ → Ωᵏ⁻¹
-    - Λ : Ωᵏ → Ωᵏ⁻², 
+    - Λ : Ωᵏ → Ωᵏ⁻²,
     - d : Ωᵏ⁻² → Ωᵏ⁻¹, so d ∘ Λ : Ωᵏ → Ωᵏ⁻¹
 
     Reference: [Griffiths-Harris, Ch. 0, §7, Lemma on p.111] -/
