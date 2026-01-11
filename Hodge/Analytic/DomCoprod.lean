@@ -331,27 +331,186 @@ just its scalar value.
 
 Reference: [Warner, "Foundations of Differentiable Manifolds and Lie Groups", Prop. 2.14] -/
 
+/-! ### Helper lemmas for shuffle quotients
+
+When one of the index types is empty (Fin 0), the shuffle quotient is trivial
+(has exactly one element), making the sum collapse to a single term. -/
+
+private lemma sumCongrHom_surj_empty_left {l : ℕ} :
+    Function.Surjective (Equiv.Perm.sumCongrHom (Fin 0) (Fin l)) := by
+  intro σ
+  have h_pres : ∀ i : Fin l, ∃ j : Fin l, σ (Sum.inr i) = Sum.inr j := by
+    intro i
+    rcases σ (Sum.inr i) with ⟨x⟩ | ⟨j⟩
+    · exact (IsEmpty.false x).elim
+    · exact ⟨j, rfl⟩
+  let q_fun : Fin l → Fin l := fun i => (h_pres i).choose
+  have hq : ∀ i, σ (Sum.inr i) = Sum.inr (q_fun i) := fun i => (h_pres i).choose_spec
+  have q_inj : Function.Injective q_fun := by
+    intros i j hij
+    have : σ (Sum.inr i) = σ (Sum.inr j) := by simp [hq, hij]
+    exact Sum.inr_injective (σ.injective this)
+  have q_surj : Function.Surjective q_fun := by
+    intro j
+    obtain ⟨x, hx⟩ := σ.surjective (Sum.inr j)
+    rcases x with ⟨y⟩ | ⟨i⟩
+    · exact (IsEmpty.false y).elim
+    · use i
+      have h1 : σ (Sum.inr i) = (Sum.inr j : Fin 0 ⊕ Fin l) := hx
+      have h2 : σ (Sum.inr i) = (Sum.inr (q_fun i) : Fin 0 ⊕ Fin l) := hq i
+      exact Sum.inr_injective (by rw [← h2, h1])
+  let q : Equiv.Perm (Fin l) := Equiv.ofBijective q_fun ⟨q_inj, q_surj⟩
+  use (1, q)
+  ext x
+  rcases x with ⟨y⟩ | ⟨i⟩
+  · exact (IsEmpty.false y).elim
+  · simp only [Equiv.Perm.sumCongrHom_apply, Equiv.Perm.sumCongr_apply, Sum.map_inr]
+    exact (hq i).symm
+
+private instance subsingleton_modSumCongr_empty_left {l : ℕ} :
+    Subsingleton (Equiv.Perm.ModSumCongr (Fin 0) (Fin l)) := by
+  constructor
+  intros σ₁ σ₂
+  induction σ₁ using Quotient.inductionOn' with
+  | h s₁ =>
+    induction σ₂ using Quotient.inductionOn' with
+    | h s₂ =>
+      apply Quotient.sound'
+      rw [QuotientGroup.leftRel_apply]
+      obtain ⟨pq, hpq⟩ := sumCongrHom_surj_empty_left (s₁⁻¹ * s₂)
+      exact ⟨pq, hpq⟩
+
+private lemma sumCongrHom_surj_empty_right {k : ℕ} :
+    Function.Surjective (Equiv.Perm.sumCongrHom (Fin k) (Fin 0)) := by
+  intro σ
+  have h_pres : ∀ i : Fin k, ∃ j : Fin k, σ (Sum.inl i) = Sum.inl j := by
+    intro i
+    rcases σ (Sum.inl i) with ⟨j⟩ | ⟨x⟩
+    · exact ⟨j, rfl⟩
+    · exact (IsEmpty.false x).elim
+  let p_fun : Fin k → Fin k := fun i => (h_pres i).choose
+  have hp : ∀ i, σ (Sum.inl i) = Sum.inl (p_fun i) := fun i => (h_pres i).choose_spec
+  have p_inj : Function.Injective p_fun := by
+    intros i j hij
+    have : σ (Sum.inl i) = σ (Sum.inl j) := by simp [hp, hij]
+    exact Sum.inl_injective (σ.injective this)
+  have p_surj : Function.Surjective p_fun := by
+    intro j
+    obtain ⟨x, hx⟩ := σ.surjective (Sum.inl j)
+    rcases x with ⟨i⟩ | ⟨y⟩
+    · use i
+      have h1 : σ (Sum.inl i) = (Sum.inl j : Fin k ⊕ Fin 0) := hx
+      have h2 : σ (Sum.inl i) = (Sum.inl (p_fun i) : Fin k ⊕ Fin 0) := hp i
+      exact Sum.inl_injective (by rw [← h2, h1])
+    · exact (IsEmpty.false y).elim
+  let p : Equiv.Perm (Fin k) := Equiv.ofBijective p_fun ⟨p_inj, p_surj⟩
+  use (p, 1)
+  ext x
+  rcases x with ⟨i⟩ | ⟨y⟩
+  · simp only [Equiv.Perm.sumCongrHom_apply, Equiv.Perm.sumCongr_apply, Sum.map_inl]
+    exact (hp i).symm
+  · exact (IsEmpty.false y).elim
+
+private instance subsingleton_modSumCongr_empty_right {k : ℕ} :
+    Subsingleton (Equiv.Perm.ModSumCongr (Fin k) (Fin 0)) := by
+  constructor
+  intros σ₁ σ₂
+  induction σ₁ using Quotient.inductionOn' with
+  | h s₁ =>
+    induction σ₂ using Quotient.inductionOn' with
+    | h s₂ =>
+      apply Quotient.sound'
+      rw [QuotientGroup.leftRel_apply]
+      obtain ⟨pq, hpq⟩ := sumCongrHom_surj_empty_right (s₁⁻¹ * s₂)
+      exact ⟨pq, hpq⟩
+
+private lemma sum_subsingleton {α : Type*} [Fintype α] [Subsingleton α] {M : Type*} [AddCommMonoid M]
+    (f : α → M) (a : α) : ∑ x : α, f x = f a := by
+  have h : ∀ x : α, x = a := fun x => Subsingleton.elim x a
+  simp only [Finset.sum_eq_single a (fun b _ hb => absurd (h b) hb)
+             (fun ha => absurd (Finset.mem_univ a) ha)]
+
+private lemma finSumFinEquiv_inr_eq_finCongr {l : ℕ} (i : Fin l) :
+    (finSumFinEquiv (Sum.inr i) : Fin (0 + l)) = finCongr (Nat.zero_add l).symm i := by
+  simp only [finSumFinEquiv_apply_right, finCongr_apply]
+  apply Fin.ext
+  simp only [Fin.val_natAdd, Fin.val_cast]
+  omega
+
+private lemma finSumFinEquiv_inl_eq_finCongr {k : ℕ} (i : Fin k) :
+    (finSumFinEquiv (Sum.inl i) : Fin (k + 0)) = finCongr (Nat.add_zero k).symm i := by
+  simp only [finSumFinEquiv_apply_left, finCongr_apply]
+  apply Fin.ext
+  simp only [Fin.val_castAdd, Fin.val_cast]
+
+omit [FiniteDimensional 𝕜 E] [CompleteSpace 𝕜] in
+@[simp]
+private lemma constOfIsEmpty_toMultilinearMap_apply (c : 𝕜) (u : Fin 0 → E) :
+    (constOfIsEmpty 𝕜 E (Fin 0) c).toMultilinearMap u = c := rfl
+
+/-! ### Main wedge identity theorems -/
+
 /-- **Theorem**: Wedge of a constant 0-form with an l-form is scalar multiplication.
 
 A 0-form on `Fin 0` is just a scalar value. When we wedge it with an l-form,
 the result is the l-form scaled by that scalar (with index type `Fin (0 + l) ≃ Fin l`).
 
-This theorem encodes the standard exterior algebra identity: `1 ∧ η = η`.
-The proof requires shuffle combinatorics on `AlternatingMap.domCoprod` that are
-not yet formalized in Mathlib. -/
-axiom wedge_constOfIsEmpty_left {l : ℕ} (c : 𝕜)
+This theorem encodes the standard exterior algebra identity: `1 ∧ η = η`. -/
+theorem wedge_constOfIsEmpty_left {l : ℕ} (c : 𝕜)
     (η : ContinuousAlternatingMap 𝕜 E 𝕜 (Fin l)) :
     wedge (𝕜 := 𝕜) (E := E) (ContinuousAlternatingMap.constOfIsEmpty 𝕜 E (ι := Fin 0) c) η =
-      (c • η).domDomCongr (finCongr (Nat.zero_add l).symm)
+      (c • η).domDomCongr (finCongr (Nat.zero_add l).symm) := by
+  classical
+  ext v
+  simp only [wedge_apply, wedgeAlternating, wedgeAlternatingTensor]
+  simp only [domDomCongr_apply, smul_apply]
+  simp only [AlternatingMap.domDomCongr_apply, LinearMap.compAlternatingMap_apply,
+             AlternatingMap.domCoprod'_apply, AlternatingMap.domCoprod_apply,
+             MultilinearMap.sum_apply]
+  let σ₀ : Equiv.Perm.ModSumCongr (Fin 0) (Fin l) := ⟦1⟧
+  rw [sum_subsingleton _ σ₀]
+  simp only [AlternatingMap.domCoprod.summand]
+  conv_lhs => rw [show σ₀ = ⟦1⟧ from rfl]
+  simp only [Quotient.liftOn'_mk'', MultilinearMap.domDomCongr_apply,
+             MultilinearMap.domCoprod_apply, Equiv.Perm.sign_one, one_smul,
+             LinearMap.mul'_apply, Equiv.Perm.coe_one, id_eq, Function.comp_apply]
+  have h_inputs : (fun i₂ => v (finSumFinEquiv (Sum.inr i₂))) = (v ∘ finCongr (Nat.zero_add l).symm) := by
+    funext i
+    simp only [Function.comp_apply]
+    congr 1
+    exact finSumFinEquiv_inr_eq_finCongr i
+  simp only [h_inputs]
+  rfl
 
-/-- **Axiom (Classical Pillar)**: Wedge of an l-form with a constant 0-form is scalar multiplication.
+/-- **Theorem**: Wedge of an l-form with a constant 0-form is scalar multiplication.
 
 This is the right-handed version of the scalar identity: `η ∧ 1 = η`.
 Combined with wedge_constOfIsEmpty_left, these give the unit laws for the cup product. -/
-axiom wedge_constOfIsEmpty_right {k : ℕ} (c : 𝕜)
+theorem wedge_constOfIsEmpty_right {k : ℕ} (c : 𝕜)
     (ω : ContinuousAlternatingMap 𝕜 E 𝕜 (Fin k)) :
     wedge (𝕜 := 𝕜) (E := E) ω (ContinuousAlternatingMap.constOfIsEmpty 𝕜 E (ι := Fin 0) c) =
-      (c • ω).domDomCongr (finCongr (Nat.add_zero k).symm)
+      (c • ω).domDomCongr (finCongr (Nat.add_zero k).symm) := by
+  classical
+  ext v
+  simp only [wedge_apply, wedgeAlternating, wedgeAlternatingTensor]
+  simp only [domDomCongr_apply, smul_apply]
+  simp only [AlternatingMap.domDomCongr_apply, LinearMap.compAlternatingMap_apply,
+             AlternatingMap.domCoprod'_apply, AlternatingMap.domCoprod_apply,
+             MultilinearMap.sum_apply]
+  let σ₀ : Equiv.Perm.ModSumCongr (Fin k) (Fin 0) := ⟦1⟧
+  rw [sum_subsingleton _ σ₀]
+  simp only [AlternatingMap.domCoprod.summand]
+  conv_lhs => rw [show σ₀ = ⟦1⟧ from rfl]
+  simp only [Quotient.liftOn'_mk'', MultilinearMap.domDomCongr_apply,
+             MultilinearMap.domCoprod_apply, Equiv.Perm.sign_one, one_smul,
+             LinearMap.mul'_apply, Equiv.Perm.coe_one, id_eq, Function.comp_apply]
+  have h_left : (fun i₁ => v (finSumFinEquiv (Sum.inl i₁))) = (v ∘ finCongr (Nat.add_zero k).symm) := by
+    funext i
+    simp only [Function.comp_apply, finSumFinEquiv_inl_eq_finCongr]
+  have h_const : (constOfIsEmpty 𝕜 E (Fin 0) c).toMultilinearMap
+                 (fun i₂ => v (finSumFinEquiv (Sum.inr i₂))) = c := rfl
+  rw [h_left, h_const, smul_eq_mul, mul_comm]
+  rfl
 
 /-! ### Wedge associativity
 

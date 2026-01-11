@@ -302,6 +302,30 @@ lemma domCoprod_summand_smul_sum_left {k l : ℕ} {ι : Type*} [DecidableEq ι] 
   ext i
   rw [domCoprod_summand_smul_left]
 
+/-! ### Helper Lemmas for Alternatization -/
+
+/-- The ℤ-smul by (-1)^i equals ℂ-smul by (-1)^i on ℂ-modules. -/
+private lemma int_smul_eq_complex_smul {k : ℕ}
+    (A : TangentModel n →L[ℂ] Alt n k) (v : Fin (k+1) → TangentModel n) (i : Fin (k+1)) :
+    ((-1 : ℤ)^(i : ℕ)) • (A (v i)) (i.removeNth v) = 
+    ((-1 : ℂ)^(i : ℕ)) • (A (v i)).toAlternatingMap (i.removeNth v) := by
+  convert rfl using 2
+  funext x
+  simp only [zsmul_eq_mul, Int.cast_pow, Int.cast_neg, Int.cast_one, smul_eq_mul]
+
+/-- The `toAlternatingMap` of `alternatizeUncurryFin` equals a sum with ℂ-signs. -/
+lemma alternatizeUncurryFin_toAlternatingMap_apply {k : ℕ}
+    (A : TangentModel n →L[ℂ] Alt n k) (v : Fin (k+1) → TangentModel n) :
+    (ContinuousAlternatingMap.alternatizeUncurryFin A).toAlternatingMap v = 
+    ∑ i : Fin (k+1), (-1 : ℂ)^(i : ℕ) • (A (v i)).toAlternatingMap (i.removeNth v) := by
+  conv_lhs => 
+    rw [show (ContinuousAlternatingMap.alternatizeUncurryFin A).toAlternatingMap v = 
+            (ContinuousAlternatingMap.alternatizeUncurryFin A) v from rfl]
+  rw [ContinuousAlternatingMap.alternatizeUncurryFin_apply]
+  apply Finset.sum_congr rfl
+  intro i _
+  exact int_smul_eq_complex_smul A v i
+
 /-! ### Main Combinatorial Lemmas -/
 
 /-- **Axiom (Combinatorial Pillar)**: Alternatization commutes with wedge (right fixed).
