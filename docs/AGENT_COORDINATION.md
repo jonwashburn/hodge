@@ -45,10 +45,17 @@ hodge_conjecture' depends on:
 
 **Task**: Eliminate all `sorry` statements causing `sorryAx`
 
-**Current Status (2026-01-12)**:
+**Current Status (2026-01-12, updated by Agent 2)**:
 - ✅ Base case `shuffle_bijection_right_l0` (l=0) is PROVED
-- 🔴 `shuffle_bijection_right` general case (l>0) has `sorry` at line 312
-- 🔴 `shuffle_bijection_left` has `sorry` at line 350
+- 🔴 `shuffle_bijection_right` general case (l>0) has `sorry` at line 372
+- 🔴 `shuffle_bijection_left` has `sorry` at line 416
+- ✅ Documentation improved with proof requirements and mathematical references
+- ✅ NEW: Helper lemmas added by Agent 2 (lines 236-274):
+  - `wedge_zero_left'` - wedge with zero on left gives zero
+  - `wedge_sum_left` - wedge distributes over finite sums
+  - `wedge_finsum_left` - Fintype version
+  - `wedge_zsmul_left` - wedge compatible with integer scalar multiplication
+  - `wedge_zsmul_finsum_left` - combined distribution lemma
 
 **Find them**:
 ```bash

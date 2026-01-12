@@ -233,6 +233,51 @@ the theory of graded derivations on exterior algebras.
 graded derivation, meaning `d(ω ∧ η) = dω ∧ η + (-1)^deg(ω) ω ∧ dη`.
 -/
 
+/-! #### Helper lemmas for wedge product distribution -/
+
+/-- Wedge with zero on the left gives zero. -/
+private lemma wedge_zero_left' {k l : ℕ} (B : Alt n l) : (0 : Alt n k).wedge B = 0 := by
+  ext v
+  simp only [ContinuousAlternatingMap.wedge_apply]
+  unfold ContinuousAlternatingMap.wedgeAlternating ContinuousAlternatingMap.wedgeAlternatingTensor
+  simp only [ContinuousAlternatingMap.toAlternatingMap_zero, TensorProduct.zero_tmul]
+  simp
+
+/-- Wedge distributes over finite sums in the left argument. -/
+private lemma wedge_sum_left {k l : ℕ} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (f : ι → Alt n k) (B : Alt n l) (s : Finset ι) :
+    (∑ i ∈ s, f i).wedge B = ∑ i ∈ s, (f i).wedge B := by
+  induction s using Finset.induction_on with
+  | empty => simp [wedge_zero_left']
+  | @insert a s ha ih =>
+    rw [Finset.sum_insert ha, Finset.sum_insert ha]
+    rw [ContinuousAlternatingMap.wedge_add_left]
+    rw [ih]
+
+/-- Wedge distributes over finite sums (Fintype version). -/
+private lemma wedge_finsum_left {k l : ℕ} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (f : ι → Alt n k) (B : Alt n l) :
+    (∑ i, f i).wedge B = ∑ i, (f i).wedge B := by
+  convert wedge_sum_left f B Finset.univ <;> simp
+
+/-- Wedge is compatible with integer scalar multiplication on the left. -/
+private lemma wedge_zsmul_left {k l : ℕ} (c : ℤ) (ω : Alt n k) (B : Alt n l) :
+    (c • ω).wedge B = c • (ω.wedge B) := by
+  rw [← Int.cast_smul_eq_zsmul ℂ c ω]
+  rw [← Int.cast_smul_eq_zsmul ℂ c (ω.wedge B)]
+  exact ContinuousAlternatingMap.wedge_smul_left _ _ _
+
+/-- Wedge distributes over finite sums with integer scalars. -/
+private lemma wedge_zsmul_finsum_left {k l : ℕ} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (c : ι → ℤ) (f : ι → Alt n k) (B : Alt n l) :
+    (∑ i, c i • f i).wedge B = ∑ i, c i • (f i).wedge B := by
+  rw [wedge_finsum_left]
+  congr 1
+  ext i
+  rw [wedge_zsmul_left]
+
+/-! #### Base cases for shuffle bijection lemmas -/
+
 /-- Base case for shuffle bijection right: when l = 0, B is a 0-form (scalar).
 The wedge with a 0-form is just scalar multiplication, making the identity simple. -/
 private lemma shuffle_bijection_right_l0 {k : ℕ}
@@ -305,10 +350,25 @@ private lemma shuffle_bijection_right {k l : ℕ}
   cases l with
   | zero => exact shuffle_bijection_right_l0 v A B
   | succ l' =>
-    -- General case: This is a shuffle bijection identity.
-    -- Both sides compute d(A ∧ B) = dA ∧ B when B is constant.
-    -- The equality follows from the definitions and finite sum commutativity.
-    -- The formal proof requires explicit shuffle bijection construction.
+    -- General case (l > 0): Use linearity of wedge to expand the RHS.
+    --
+    -- Strategy:
+    -- 1. RHS = (alternatizeUncurryFin A ∧ B)(v')
+    --    where v' = v ∘ finCongr : Fin((k+1)+l') → TangentModel n
+    -- 2. We want to show this equals the LHS sum.
+    --
+    -- The key is that both sides compute the exterior derivative d(A ∧ B)
+    -- when viewed as a computation involving derivative indices and shuffles.
+    --
+    -- Both sides are double sums (derivative index × shuffles) that compute
+    -- the same value by Fubini for finite sums + sign matching.
+    --
+    -- Mathematical reference: Bott-Tu GTM 82, Warner GTM 94 Proposition 2.14.
+    --
+    -- TODO: The formal bijection between index sets requires:
+    -- - Explicit construction of the bijection (i, σ) ↔ (τ, j)
+    -- - Proof of sign matching: (-1)^i × sign(σ) = sign(τ) × (-1)^j
+    -- - Application of Finset.sum_bij
     sorry
 
 /-- Main theorem: alternatization commutes with wedge when right factor is constant. -/
@@ -330,7 +390,19 @@ theorem alternatizeUncurryFin_wedge_right {k l : ℕ}
   exact shuffle_bijection_right v A B
 
 /-- Shuffle Bijection Lemma (left case): alternatization commutes with wedge when
-the left factor is constant, with sign (-1)^k. This is d(ω ∧ η) = (-1)^k ω ∧ dη for constant ω. -/
+the left factor is constant, with sign (-1)^k. This is d(ω ∧ η) = (-1)^k ω ∧ dη for constant ω.
+
+**Mathematical Statement**: The sign (-1)^k accounts for moving the derivative index past
+the k indices of the constant k-form A. This is the standard sign in graded commutativity.
+
+**Index structure**:
+- LHS: ∑_{i : Fin(k+l+1)} ∑_{σ : Shuffles(k,l)} (-1)^i × sign(σ) × (...)
+- RHS: (-1)^k × ∑_{τ : Shuffles(k,l+1)} ∑_{j : Fin(l+1)} sign(τ) × (-1)^j × (...)
+
+**Bijection**: (i, σ) ↔ (τ, j) with sign matching:
+  (-1)^i × sign(σ) = (-1)^k × sign(τ) × (-1)^j
+
+**Reference**: Bott-Tu GTM 82, Warner GTM 94 Proposition 2.14. -/
 private lemma shuffle_bijection_left {k l : ℕ}
     (v : Fin ((k+l)+1) → TangentModel n)
     (A : Alt n k)
@@ -338,15 +410,9 @@ private lemma shuffle_bijection_left {k l : ℕ}
     ∑ i : Fin ((k+l)+1), ((-1 : ℤ)^(i : ℕ)) • (A.wedge (B (v i))) (Fin.removeNth i v) =
     ((-1 : ℂ)^k • A.wedge (ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B))
       (v ∘ finCongr (show k+(l+1) = (k+l)+1 by omega)) := by
-  -- The sign (-1)^k accounts for moving the derivative index past k positions.
-  -- Reference: Bott-Tu GTM 82, Warner GTM 94 Proposition 2.14.
-  -- This requires a similar bijection as the right case, but with sign considerations.
-  -- The bijection between index sets is:
-  -- LHS: (i, σ) where i ∈ Fin(n+1), σ ∈ Shuffles(k,l)
-  -- RHS: (τ, j) where τ ∈ Shuffles(k+1,l), j ∈ Fin(k+1)
-  --
-  -- The sign arithmetic is:
-  -- (-1)^i * sign(σ) = (-1)^k * sign(τ) * (-1)^j
+  -- This requires constructing an explicit signed bijection between the index sets.
+  -- The formal proof would use Finset.sum_bij or similar infrastructure.
+  -- Both sides compute the same double sum, organized differently, with signs matching.
   sorry
 
 /-- Main theorem: alternatization commutes with wedge when left factor is constant. -/
