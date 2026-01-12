@@ -101,6 +101,142 @@ private lemma sign_blockSwap (k l : ℕ) :
       simpa [Nat.mul_comm, Nat.add_comm, Nat.add_left_comm, Nat.add_assoc] using hkill
     simp [hkill', mul_assoc, mul_left_comm, mul_comm]
 
+/-! ### A `cycleRange`-based decomposition of `Perm (Fin (n+1))`
+
+`Equiv.Perm.decomposeFin` decomposes a permutation using a single transposition `swap 0 p`,
+so its sign contribution is `-1` (for `p ≠ 0`). For Leibniz-type identities we need the finer
+`(-1)^p` factor, which is exactly the sign of the cycle `(0 1 ... p)` i.e. `Fin.cycleRange p`.
+
+We package the standard trick:
+
+Given `σ : Perm (Fin (n+1))`, let `p := σ 0` and set `σ' := p.cycleRange * σ`.
+Then `σ' 0 = 0`, so `σ'` is determined by its restriction to `Fin n` (via successors).
+Conversely, given `(p, e)` with `e : Perm (Fin n)`, we reconstruct
+`σ := p.cycleRange.symm * decomposeFin.symm (0, e)`.
+
+This normalization yields the clean sign identity
+`sign σ = (-1)^p * sign e`.
+-/
+
+private noncomputable def decomposeFinCycleRange_toFun {n : ℕ} (σ : Equiv.Perm (Fin (n + 1))) :
+    Fin (n + 1) × Equiv.Perm (Fin n) :=
+  let p : Fin (n + 1) := σ 0
+  let σ' : Equiv.Perm (Fin (n + 1)) := p.cycleRange * σ
+  (p, (Equiv.Perm.decomposeFin σ').2)
+
+private noncomputable def decomposeFinCycleRange_invFun {n : ℕ} (pe : Fin (n + 1) × Equiv.Perm (Fin n)) :
+    Equiv.Perm (Fin (n + 1)) :=
+  let p : Fin (n + 1) := pe.1
+  let e : Equiv.Perm (Fin n) := pe.2
+  p.cycleRange.symm * (Equiv.Perm.decomposeFin.symm (0, e))
+
+private lemma decomposeFinCycleRange_left_inv {n : ℕ} (σ : Equiv.Perm (Fin (n + 1))) :
+    decomposeFinCycleRange_invFun (n := n) (decomposeFinCycleRange_toFun (n := n) σ) = σ := by
+  classical
+  -- Set up the normalization.
+  set p : Fin (n + 1) := σ 0
+  set σ' : Equiv.Perm (Fin (n + 1)) := p.cycleRange * σ
+  have hσ'0 : σ' 0 = 0 := by
+    simp [σ', p, Fin.cycleRange_self]
+  -- Let `pe := decomposeFin σ'`. Since `σ' 0 = 0`, we have `pe.1 = 0`.
+  set pe : Fin (n + 1) × Equiv.Perm (Fin n) := Equiv.Perm.decomposeFin σ' with hpe
+  have hpe1 : pe.1 = 0 := by
+    -- Turn `pe = decomposeFin σ'` into `decomposeFin.symm pe = σ'`.
+    have hsymm : Equiv.Perm.decomposeFin.symm pe = σ' := by
+      have := congrArg (Equiv.Perm.decomposeFin.symm) hpe
+      -- RHS simplifies by `symm_apply_apply`.
+      simpa using this
+    have h0 := congrArg (fun τ => τ 0) hsymm
+    -- Compute the LHS using `decomposeFin_symm_apply_zero` (after destructing `pe`).
+    have hL : (Equiv.Perm.decomposeFin.symm pe) 0 = pe.1 := by
+      rcases pe with ⟨p0, e0⟩
+      simp [Equiv.Perm.decomposeFin_symm_apply_zero]
+    -- Now `h0` becomes `pe.1 = σ' 0 = 0`.
+    -- RHS is `σ' 0 = 0`.
+    exact (hL.symm.trans h0).trans hσ'0
+  have hpe0 : pe = (0, pe.2) := by
+    ext <;> simp [hpe1]
+  have hσ' : σ' = Equiv.Perm.decomposeFin.symm (0, pe.2) := by
+    -- First show `decomposeFin σ' = (0, pe.2)`.
+    have hdecomp : Equiv.Perm.decomposeFin σ' = (0, pe.2) := by
+      -- `pe = decomposeFin σ'` by definition, and `pe = (0, pe.2)` from `hpe0`.
+      exact hpe.symm.trans hpe0
+    -- Apply `decomposeFin.symm` to both sides and simplify.
+    have := congrArg (Equiv.Perm.decomposeFin.symm) hdecomp
+    simpa using this
+  -- Now cancel the normalization.
+  -- invFun(toFun σ) = p.cycleRange.symm * σ' = σ.
+  -- since `σ' = p.cycleRange * σ`.
+  -- First rewrite `decomposeFin.symm (0, pe.2)` as `σ'`, then cancel.
+  have hσ'symm : Equiv.Perm.decomposeFin.symm (0, pe.2) = σ' := hσ'.symm
+  -- We avoid `simp` recursion by doing the cancellation explicitly.
+  calc
+    decomposeFinCycleRange_invFun (n := n) (decomposeFinCycleRange_toFun (n := n) σ)
+        = p.cycleRange.symm * Equiv.Perm.decomposeFin.symm (0, pe.2) := by
+            simp [decomposeFinCycleRange_toFun, decomposeFinCycleRange_invFun, p, σ', pe]
+    _ = p.cycleRange.symm * σ' := by simpa [hσ'symm]
+    _ = p.cycleRange.symm * (p.cycleRange * σ) := by simp [σ']
+    _ = (p.cycleRange.symm * p.cycleRange) * σ := by
+          simpa [mul_assoc] using (mul_assoc p.cycleRange.symm p.cycleRange σ).symm
+    _ = σ := by simp
+
+private lemma decomposeFinCycleRange_right_inv {n : ℕ} (pe : Fin (n + 1) × Equiv.Perm (Fin n)) :
+    decomposeFinCycleRange_toFun (n := n) (decomposeFinCycleRange_invFun (n := n) pe) = pe := by
+  classical
+  rcases pe with ⟨p, e⟩
+  -- Compute `toFun (invFun (p,e))`.
+  ext
+  · -- first component
+    -- Unfold `toFun`: the first component is evaluation at `0`.
+    simp [decomposeFinCycleRange_toFun, decomposeFinCycleRange_invFun, Equiv.Perm.mul_apply,
+      Equiv.Perm.decomposeFin_symm_apply_zero, Fin.cycleRange_symm_zero]
+  · -- second component
+    -- The normalized permutation is exactly `decomposeFin.symm (0,e)`.
+    have hnorm :
+        p.cycleRange * (p.cycleRange.symm * Equiv.Perm.decomposeFin.symm (0, e)) =
+          Equiv.Perm.decomposeFin.symm (0, e) := by
+      -- cancel `p.cycleRange` with its inverse
+      calc
+        p.cycleRange * (p.cycleRange.symm * Equiv.Perm.decomposeFin.symm (0, e))
+            = (p.cycleRange * p.cycleRange.symm) * Equiv.Perm.decomposeFin.symm (0, e) := by
+              simpa [mul_assoc] using
+                (mul_assoc p.cycleRange p.cycleRange.symm (Equiv.Perm.decomposeFin.symm (0, e))).symm
+        _ = Equiv.Perm.decomposeFin.symm (0, e) := by simp
+    -- Apply `decomposeFin` to both sides and take `Prod.snd`.
+    have hdecomp :
+        (Equiv.Perm.decomposeFin
+            (p.cycleRange * (p.cycleRange.symm * Equiv.Perm.decomposeFin.symm (0, e)))).2 = e := by
+      -- `decomposeFin (decomposeFin.symm (0,e)) = (0,e)`
+      simpa [hnorm] using congrArg Prod.snd (Equiv.apply_symm_apply (Equiv.Perm.decomposeFin) (0, e))
+    simpa [decomposeFinCycleRange_toFun, decomposeFinCycleRange_invFun, hdecomp]
+
+private noncomputable def decomposeFinCycleRange {n : ℕ} :
+    Equiv.Perm (Fin (n + 1)) ≃ Fin (n + 1) × Equiv.Perm (Fin n) :=
+  ⟨decomposeFinCycleRange_toFun (n := n), decomposeFinCycleRange_invFun (n := n),
+    decomposeFinCycleRange_left_inv (n := n), decomposeFinCycleRange_right_inv (n := n)⟩
+
+private lemma decomposeFinCycleRange_symm_apply_zero {n : ℕ} (p : Fin (n + 1)) (e : Equiv.Perm (Fin n)) :
+    (decomposeFinCycleRange (n := n)).symm (p, e) 0 = p := by
+  classical
+  simp [decomposeFinCycleRange, decomposeFinCycleRange_invFun, Fin.cycleRange_symm_zero]
+
+private lemma decomposeFinCycleRange_symm_apply_succ {n : ℕ} (p : Fin (n + 1)) (e : Equiv.Perm (Fin n))
+    (x : Fin n) :
+    (decomposeFinCycleRange (n := n)).symm (p, e) x.succ = p.succAbove (e x) := by
+  classical
+  -- Use `decomposeFin_symm_apply_succ` with `p = 0`, then `cycleRange_symm_succ`.
+  simp [decomposeFinCycleRange, decomposeFinCycleRange_invFun,
+    Equiv.Perm.decomposeFin_symm_apply_succ, Fin.cycleRange_symm_succ]
+
+private lemma decomposeFinCycleRange_symm_sign {n : ℕ} (p : Fin (n + 1)) (e : Equiv.Perm (Fin n)) :
+    Equiv.Perm.sign ((decomposeFinCycleRange (n := n)).symm (p, e)) =
+      (-1 : ℤˣ) ^ (p : ℕ) * Equiv.Perm.sign e := by
+  classical
+  -- `sign` is a monoid hom; use `sign_mul`, `sign_inv`, `sign_cycleRange`,
+  -- and `decomposeFin.symm_sign` at `p = 0`.
+  simp [decomposeFinCycleRange, decomposeFinCycleRange_invFun,
+    Equiv.Perm.sign_mul, Equiv.Perm.sign_inv, Fin.sign_cycleRange, Equiv.Perm.decomposeFin.symm_sign]
+
 /-! ### Derivative of Wedge Product -/
 
 /-- The wedge product is a bounded bilinear map.
@@ -276,6 +412,441 @@ private lemma wedge_zsmul_finsum_left {k l : ℕ} {ι : Type*} [Fintype ι] [Dec
   ext i
   rw [wedge_zsmul_left]
 
+/-! #### Helper lemma: `domCoprod` as full alternatization
+
+Mathlib relates the shuffle-based `AlternatingMap.domCoprod` to the “full alternatization” of the
+underlying multilinear `MultilinearMap.domCoprod`.  This is sometimes a more convenient form for
+sum-reindexing arguments, because it replaces the quotient over shuffles by a sum over *all*
+permutations (at the cost of a factorial scaling). -/
+
+private lemma domCoprod_smul_factorial_eq_alternatization {k l : ℕ}
+    (ω : Alt n k) (η : Alt n l) :
+    (k.factorial * l.factorial) • (ω.toAlternatingMap.domCoprod η.toAlternatingMap) =
+      MultilinearMap.alternatization
+        ((ω.toAlternatingMap.toMultilinearMap).domCoprod (η.toAlternatingMap.toMultilinearMap)) := by
+  -- This is `MultilinearMap.domCoprod_alternization_eq`, specialized to `Fin k`, `Fin l`, and `ℂ`.
+  -- We write it in the “scaled domCoprod = alternatization” direction.
+  -- Note: the scalar here is an `ℕ`-scalar (`nsmul`), exactly matching Mathlib's statement.
+  simpa using
+    (MultilinearMap.domCoprod_alternization_eq (a := ω.toAlternatingMap) (b := η.toAlternatingMap)).symm
+
+private lemma domCoprod_eq_inv_factorial_smul_alternatization {k l : ℕ}
+    (ω : Alt n k) (η : Alt n l) :
+    ω.toAlternatingMap.domCoprod η.toAlternatingMap =
+      (((k.factorial * l.factorial : ℕ) : ℂ)⁻¹) •
+        MultilinearMap.alternatization
+          ((ω.toAlternatingMap.toMultilinearMap).domCoprod (η.toAlternatingMap.toMultilinearMap)) := by
+  classical
+  -- Start from the `nsmul` (Nat-scalar) identity, then convert it to an `ℂ`-scalar identity and cancel.
+  set m : ℕ := k.factorial * l.factorial
+  have hNat :
+      m • (ω.toAlternatingMap.domCoprod η.toAlternatingMap) =
+        MultilinearMap.alternatization
+          ((ω.toAlternatingMap.toMultilinearMap).domCoprod (η.toAlternatingMap.toMultilinearMap)) := by
+    simpa [m] using
+      (domCoprod_smul_factorial_eq_alternatization (n := n) (k := k) (l := l) ω η)
+  have h :
+      ((m : ℂ) • (ω.toAlternatingMap.domCoprod η.toAlternatingMap)) =
+        MultilinearMap.alternatization
+          ((ω.toAlternatingMap.toMultilinearMap).domCoprod (η.toAlternatingMap.toMultilinearMap)) := by
+    -- Rewrite the Nat action as scalar multiplication by `(m : ℂ)`.
+    -- `Nat.cast_smul_eq_nsmul` has the form `(↑m : ℂ) • x = m • x`.
+    simpa [Nat.cast_smul_eq_nsmul] using hNat
+  have hm : (m : ℂ) ≠ 0 := by
+    -- `m = k! * l!` is a positive natural number.
+    have hmNat : m ≠ 0 := by
+      simp [m, Nat.mul_ne_zero, Nat.factorial_ne_zero]
+    exact_mod_cast hmNat
+  -- Multiply both sides by the inverse scalar and simplify.
+  have h' := congrArg (fun z => ((m : ℂ)⁻¹) • z) h
+  -- LHS simplifies by `inv_mul_cancel₀` + `smul_smul`.
+  have hinv : (m : ℂ)⁻¹ * (m : ℂ) = 1 := inv_mul_cancel₀ hm
+  -- Turn `((m⁻¹) • ((m) • x))` into `((m⁻¹*m) • x)` and cancel.
+  simpa [smul_smul, hinv, one_smul] using h'
+
+private lemma wedge_apply_eq_inv_factorial_smul_alternatization {k l : ℕ}
+    (ω : Alt n k) (η : Alt n l) (v : Fin (k + l) → TangentModel n) :
+    (ω.wedge η) v =
+      (((k.factorial * l.factorial : ℕ) : ℂ)⁻¹) •
+        (LinearMap.mul' ℂ ℂ)
+          ((MultilinearMap.alternatization
+              ((ω.toAlternatingMap.toMultilinearMap).domCoprod (η.toAlternatingMap.toMultilinearMap)))
+            (v ∘ finSumFinEquiv)) := by
+  classical
+  -- Unfold the wedge definition down to `AlternatingMap.domCoprod`, then rewrite using the inverse-factorial lemma.
+  simp only [ContinuousAlternatingMap.wedge_apply,
+    ContinuousAlternatingMap.wedgeAlternating,
+    ContinuousAlternatingMap.wedgeAlternatingTensor]
+  simp only [AlternatingMap.domDomCongr_apply, LinearMap.compAlternatingMap_apply,
+    AlternatingMap.domCoprod'_apply]
+  -- Replace the shuffle-quotient `domCoprod` by the full alternatization sum.
+  -- (We keep the result *before* expanding the alternatization sum.)
+  rw [domCoprod_eq_inv_factorial_smul_alternatization (n := n) (k := k) (l := l) ω η]
+  -- Pull the scalar out through the linear map `LinearMap.mul'`.
+  simp [map_smul, smul_smul]
+
+/-! #### Core reindexing lemma for the right-constant Leibniz identity
+
+This is the combinatorial heart of `shuffle_bijection_right` for `l > 0`, written at the level of
+the “full alternatization” sums over permutations.
+
+It expresses that (after clearing factorial scalars) the alternatization sum for
+`(alternatizeUncurryFin A) ∧ B` can be rewritten as a signed sum over the removed index `x`,
+matching the definition of `alternatizeUncurryFin`.
+-/
+set_option maxHeartbeats 800000
+
+private lemma alternatizeUncurryFin_domCoprod_alternatization_wedge_right_core {k l : ℕ}
+    (v : Fin (k + l + 1) → TangentModel n)
+    (A : TangentModel n →L[ℂ] Alt n k)
+    (B : Alt n l) :
+    (LinearMap.mul' ℂ ℂ)
+        ((MultilinearMap.alternatization
+            ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A).toMultilinearMap.domCoprod
+              B.toMultilinearMap))
+          (((v ∘ finCongr (show (k + 1) + l = (k + l) + 1 by omega)) ∘ finSumFinEquiv))) =
+      (k + 1 : ℂ) *
+        ∑ x : Fin (k + l + 1),
+          ((-1 : ℂ) ^ (x : ℕ)) *
+            (LinearMap.mul' ℂ ℂ)
+              ((MultilinearMap.alternatization
+                  ((A (v x)).toMultilinearMap.domCoprod B.toMultilinearMap))
+                ((Fin.removeNth x v) ∘ finSumFinEquiv)) := by
+  classical
+  -- Abbreviations: put the input vectors on the `(k+1)+l`-index type.
+  let h : (k + 1) + l = (k + l) + 1 := by omega
+  let v' : Fin ((k + 1) + l) → TangentModel n := v ∘ finCongr h
+  let w : (Fin (k + 1) ⊕ Fin l) → TangentModel n := v' ∘ finSumFinEquiv
+
+  -- Expand the outer alternatization sum on the LHS.
+  -- We will reindex the resulting double sum in two stages:
+  -- 1. absorb the inner `alternatizeUncurryFin` sum by reindexing permutations on the left block;
+  -- 2. split permutations by the image of `0` using `decomposeFinCycleRange`.
+  --
+  -- For readability, write the LHS as a finite sum over permutations.
+  -- (We keep everything in `ℂ`, turning all `•` actions into multiplication.)
+  have hLHS :
+      (LinearMap.mul' ℂ ℂ)
+          ((MultilinearMap.alternatization
+              ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A).toMultilinearMap.domCoprod
+                B.toMultilinearMap)) (w)) =
+        ∑ σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l),
+          ((Equiv.Perm.sign σ : ℤ) : ℂ) *
+            ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A)
+                (fun i : Fin (k + 1) => w (σ (Sum.inl i))) *
+              B (fun j : Fin l => w (σ (Sum.inr j)))) := by
+    -- Expand `alternatization_apply`, then push `mul'` through the sum and rewrite sign-scaling.
+    -- Finally, compute `mul'` of a `domCoprod` value.
+    classical
+    -- Set the multilinear map we alternatize.
+    let m :=
+      ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A).toMultilinearMap.domCoprod
+        B.toMultilinearMap)
+    -- Expand alternatization.
+    calc
+      (LinearMap.mul' ℂ ℂ) ((MultilinearMap.alternatization m) w)
+          = (LinearMap.mul' ℂ ℂ)
+              (∑ σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l),
+                Equiv.Perm.sign σ • (MultilinearMap.domDomCongr σ m) w) := by
+                simp [MultilinearMap.alternatization_apply]
+      _ = ∑ σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l),
+            (LinearMap.mul' ℂ ℂ)
+              (Equiv.Perm.sign σ • (MultilinearMap.domDomCongr σ m) w) := by
+            simp [map_sum]
+      _ = ∑ σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l),
+            ((Equiv.Perm.sign σ : ℤ) : ℂ) *
+              (LinearMap.mul' ℂ ℂ) ((MultilinearMap.domDomCongr σ m) w) := by
+            -- Convert the `ℤˣ`-action on the tensor product to `ℤ`-scaling, then use linearity.
+            refine Fintype.sum_congr _ _ ?_
+            intro σ
+            have hsign :
+                Equiv.Perm.sign σ • (MultilinearMap.domDomCongr σ m) w =
+                  ((Equiv.Perm.sign σ : ℤ) • (MultilinearMap.domDomCongr σ m) w) := by
+              simp [Units.smul_def, zsmul_eq_mul]
+            -- push the integer scalar through `mul'`
+            calc
+              (LinearMap.mul' ℂ ℂ) (Equiv.Perm.sign σ • (MultilinearMap.domDomCongr σ m) w)
+                  = (LinearMap.mul' ℂ ℂ)
+                      (((Equiv.Perm.sign σ : ℤ) • (MultilinearMap.domDomCongr σ m) w)) := by
+                        -- Avoid `simp` here: rewrite the argument directly to prevent unfolding the `ℤˣ` action.
+                        simpa using congrArg (LinearMap.mul' ℂ ℂ) hsign
+              _ = (Equiv.Perm.sign σ : ℤ) • (LinearMap.mul' ℂ ℂ) ((MultilinearMap.domDomCongr σ m) w) := by
+                    simpa using (map_zsmul (LinearMap.mul' ℂ ℂ) (Equiv.Perm.sign σ : ℤ)
+                      ((MultilinearMap.domDomCongr σ m) w))
+              _ = ((Equiv.Perm.sign σ : ℤ) : ℂ) *
+                    (LinearMap.mul' ℂ ℂ) ((MultilinearMap.domDomCongr σ m) w) := by
+                    simp [zsmul_eq_mul]
+      _ = ∑ σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l),
+            ((Equiv.Perm.sign σ : ℤ) : ℂ) *
+              ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A)
+                  (fun i : Fin (k + 1) => w (σ (Sum.inl i))) *
+                B (fun j : Fin l => w (σ (Sum.inr j)))) := by
+            -- Compute the `mul'` of the `domCoprod` term.
+            refine Fintype.sum_congr _ _ ?_
+            intro σ
+            simp [m, MultilinearMap.domDomCongr_apply, MultilinearMap.domCoprod_apply, LinearMap.mul'_apply, w]
+
+  -- Replace the LHS by this explicit permutation sum.
+  -- Now we expand `alternatizeUncurryFin` and perform the stage-1 reindexing.
+  rw [hLHS]
+
+  -- Expand `alternatizeUncurryFin` on the left factor and distribute multiplication over the sum.
+  -- This produces a double sum over `(i : Fin (k+1))` and `(σ : Perm (Fin(k+1) ⊕ Fin l))`.
+  -- Stage 1: reindex by cycling the left block so that the removed index is `0`.
+  --
+  -- We will now carry out the combinatorial reindexing in a separate local lemma, to keep the
+  -- main proof readable.
+  --
+  -- Stage 1: pull out the inner `alternatizeUncurryFin` sum by reindexing permutations on the left block.
+  have hStage1 :
+      (∑ σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l),
+          ((Equiv.Perm.sign σ : ℤ) : ℂ) *
+            ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A)
+                (fun i : Fin (k + 1) => w (σ (Sum.inl i))) *
+              B (fun j : Fin l => w (σ (Sum.inr j))))) =
+        (k + 1 : ℂ) *
+          ∑ σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l),
+            ((Equiv.Perm.sign σ : ℤ) : ℂ) *
+              (A (w (σ (Sum.inl 0)))
+                  (fun i : Fin k => w (σ (Sum.inl i.succ))) *
+                B (fun j : Fin l => w (σ (Sum.inr j)))) := by
+    -- Abbreviate left/right tuples.
+    let left (σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l)) : Fin (k + 1) → TangentModel n :=
+      fun i => w (σ (Sum.inl i))
+    let right (σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l)) : Fin l → TangentModel n :=
+      fun j => w (σ (Sum.inr j))
+
+    -- First expand `alternatizeUncurryFin` in the LHS and distribute the multiplication by `B`.
+    have hexpand :
+        (∑ σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l),
+            ((Equiv.Perm.sign σ : ℤ) : ℂ) *
+              ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A) (left σ) * B (right σ))) =
+          ∑ σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l),
+            ∑ i : Fin (k + 1),
+              ((Equiv.Perm.sign σ : ℤ) : ℂ) *
+                ((-1 : ℂ) ^ (i : ℕ)) *
+                  (A (left σ i) (i.removeNth (left σ)) * B (right σ)) := by
+      classical
+      refine Fintype.sum_congr _ _ ?_
+      intro σ
+      -- Expand the left factor and distribute.
+      rw [ContinuousAlternatingMap.alternatizeUncurryFin_apply]
+      simp [left, right, Finset.sum_mul, Finset.mul_sum, mul_assoc, mul_left_comm, mul_comm, w]
+
+    -- Rewrite the LHS using `hexpand`, then swap the two finite sums.
+    -- We then reindex the inner permutation sum for each `i` by right multiplication with the
+    -- block permutation that sends `0 ↦ i` on the left component.
+    rw [hexpand]
+
+    -- Swap the order of summation: `∑ σ, ∑ i` = `∑ i, ∑ σ`.
+    have hswap :
+        (∑ σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l),
+              ∑ i : Fin (k + 1),
+                ((Equiv.Perm.sign σ : ℤ) : ℂ) *
+                  ((-1 : ℂ) ^ (i : ℕ)) *
+                    (A (left σ i) (i.removeNth (left σ)) * B (right σ))) =
+          ∑ i : Fin (k + 1),
+            ∑ σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l),
+              ((Equiv.Perm.sign σ : ℤ) : ℂ) *
+                ((-1 : ℂ) ^ (i : ℕ)) *
+                  (A (left σ i) (i.removeNth (left σ)) * B (right σ)) := by
+      classical
+      -- unfold both Fintype sums to Finset sums and apply `Finset.sum_comm`
+      change (Finset.univ.sum fun σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l) =>
+                Finset.univ.sum fun i : Fin (k + 1) =>
+                  ((Equiv.Perm.sign σ : ℤ) : ℂ) *
+                    ((-1 : ℂ) ^ (i : ℕ)) *
+                      (A (left σ i) (i.removeNth (left σ)) * B (right σ))) =
+            (Finset.univ.sum fun i : Fin (k + 1) =>
+                Finset.univ.sum fun σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l) =>
+                  ((Equiv.Perm.sign σ : ℤ) : ℂ) *
+                    ((-1 : ℂ) ^ (i : ℕ)) *
+                      (A (left σ i) (i.removeNth (left σ)) * B (right σ)))
+      simpa using
+        (Finset.sum_comm (s := (Finset.univ : Finset (Equiv.Perm (Fin (k + 1) ⊕ Fin l))))
+          (t := (Finset.univ : Finset (Fin (k + 1))))
+          (f := fun σ i =>
+            ((Equiv.Perm.sign σ : ℤ) : ℂ) *
+              ((-1 : ℂ) ^ (i : ℕ)) *
+                (A (left σ i) (i.removeNth (left σ)) * B (right σ))))
+
+    rw [hswap]
+
+    -- Now show that for each `i`, the inner sum over permutations is independent of `i`,
+    -- by reindexing with the left-block cycle `i.cycleRange.symm`.
+    have hinner :
+        ∀ i : Fin (k + 1),
+          (∑ σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l),
+              ((Equiv.Perm.sign σ : ℤ) : ℂ) *
+                ((-1 : ℂ) ^ (i : ℕ)) *
+                  (A (left σ i) (i.removeNth (left σ)) * B (right σ))) =
+            ∑ σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l),
+              ((Equiv.Perm.sign σ : ℤ) : ℂ) *
+                (A (left σ 0) ((0 : Fin (k + 1)).removeNth (left σ)) * B (right σ)) := by
+      intro i
+      -- Define the block permutation that moves `i` to the `0`-slot on the left.
+      let τ : Equiv.Perm (Fin (k + 1) ⊕ Fin l) :=
+        Equiv.Perm.sumCongr i.cycleRange.symm (1 : Equiv.Perm (Fin l))
+      -- Reindex the permutation sum by `σ ↦ σ * τ`.
+      -- (This is a bijection on the permutation group.)
+      classical
+      refine (Fintype.sum_equiv (Equiv.mulRight τ)
+        (fun σ =>
+          ((Equiv.Perm.sign σ : ℤ) : ℂ) *
+            ((-1 : ℂ) ^ (i : ℕ)) *
+              (A (left σ i) (i.removeNth (left σ)) * B (right σ)))
+        (fun σ =>
+          ((Equiv.Perm.sign σ : ℤ) : ℂ) *
+            (A (left σ 0) ((0 : Fin (k + 1)).removeNth (left σ)) * B (right σ))) ?_)
+      intro σ
+      -- Compute the effect of right-multiplication by `τ` on the summand.
+      -- Sign: `sign (σ * τ) = sign σ * sign τ`, and `sign τ = (-1)^i`.
+      have hsignτ :
+          ((Equiv.Perm.sign τ : ℤ) : ℂ) = (-1 : ℂ) ^ (i : ℕ) := by
+        simp [τ, Equiv.Perm.sign_sumCongr, Fin.sign_cycleRange]
+      have hsign :
+          ((Equiv.Perm.sign (σ * τ) : ℤ) : ℂ) =
+            ((Equiv.Perm.sign σ : ℤ) : ℂ) * ((Equiv.Perm.sign τ : ℤ) : ℂ) := by
+        -- cast `sign_mul` to `ℂ`
+        simp [Equiv.Perm.sign_mul, Int.cast_mul]
+      -- Values: the left block is cycled so that the `i`th entry becomes the `0`th.
+      have hleft0 : left (σ * τ) 0 = left σ i := by
+        simp [left, τ, Equiv.Perm.mul_apply, Fin.cycleRange_symm_zero]
+      have hremove : (0 : Fin (k + 1)).removeNth (left (σ * τ)) = i.removeNth (left σ) := by
+        funext x
+        -- Both sides are computed via `succAbove`; use `cycleRange_symm_succ`.
+        simp [left, τ, Equiv.Perm.mul_apply, Fin.removeNth_apply, Fin.cycleRange_symm_succ]
+      have hright : right (σ * τ) = right σ := by
+        funext j
+        simp [right, τ, Equiv.Perm.mul_apply]
+      -- Put everything together.
+      dsimp [Equiv.mulRight]
+      rw [hsign, hsignτ, hleft0, hremove, hright]
+
+    -- Use `hinner` to collapse the outer sum over `i` into a scalar multiple.
+    have hcollapse :
+        (∑ i : Fin (k + 1),
+            ∑ σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l),
+              ((Equiv.Perm.sign σ : ℤ) : ℂ) *
+                ((-1 : ℂ) ^ (i : ℕ)) *
+                  (A (left σ i) (i.removeNth (left σ)) * B (right σ))) =
+          (k + 1 : ℂ) *
+            ∑ σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l),
+              ((Equiv.Perm.sign σ : ℤ) : ℂ) *
+                (A (left σ 0) ((0 : Fin (k + 1)).removeNth (left σ)) * B (right σ)) := by
+      -- rewrite each inner sum using `hinner`, then count the outer index set.
+      classical
+      -- Replace the inner sums.
+      have : (∑ i : Fin (k + 1),
+                ∑ σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l),
+                  ((Equiv.Perm.sign σ : ℤ) : ℂ) *
+                    ((-1 : ℂ) ^ (i : ℕ)) *
+                      (A (left σ i) (i.removeNth (left σ)) * B (right σ))) =
+              ∑ i : Fin (k + 1),
+                (∑ σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l),
+                  ((Equiv.Perm.sign σ : ℤ) : ℂ) *
+                    (A (left σ 0) ((0 : Fin (k + 1)).removeNth (left σ)) * B (right σ))) := by
+        refine Fintype.sum_congr _ _ ?_
+        intro i
+        simpa using hinner i
+      -- The RHS is a constant sum over `Fin (k+1)`, so it is `(k+1)` times the value.
+      -- Convert the natural factor to `ℂ`.
+      -- `∑ i : Fin (k+1), C = (k+1) * C`.
+      -- Use `Fintype.card` and `Fintype.sum_const`.
+      -- `simp` handles this counting.
+      --
+      -- NOTE: `Fintype.card (Fin (k+1)) = k+1`.
+      --
+      -- Rewrite and simplify.
+      --
+      -- First apply the replacement.
+      --
+      -- Then use `Finset.sum_const` (since we are on `Finset.univ`) or just `simp`.
+      -- `simp` usually handles `∑ i : Fin n, c = n * c`.
+      simpa [this, Fintype.card_fin, Nat.cast_ofNat, mul_assoc]
+
+    -- Finally, rewrite back `left σ 0` and `0.removeNth (left σ)` into the concrete expressions in the statement.
+    -- `left σ 0 = w (σ (inl 0))`, and `0.removeNth (left σ) i = w (σ (inl i.succ))`.
+    simpa [left, right, Fin.removeNth_apply] using hcollapse
+
+  -- Use stage 1 to simplify the LHS.
+  rw [hStage1]
+
+  -- Stage 2: split the remaining permutation sum by the image of `0` using `decomposeFinCycleRange`.
+  have hStage2 :
+      (∑ σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l),
+          ((Equiv.Perm.sign σ : ℤ) : ℂ) *
+            (A (w (σ (Sum.inl 0)))
+                (fun i : Fin k => w (σ (Sum.inl i.succ))) *
+              B (fun j : Fin l => w (σ (Sum.inr j))))) =
+        ∑ x : Fin (k + l + 1),
+          ((-1 : ℂ) ^ (x : ℕ)) *
+            (LinearMap.mul' ℂ ℂ)
+              ((MultilinearMap.alternatization
+                  ((A (v x)).toMultilinearMap.domCoprod B.toMultilinearMap))
+                ((Fin.removeNth x v) ∘ finSumFinEquiv)) := by
+    classical
+    -- We reindex the sum using `equiv := permCongr (finSumFinEquiv ≫ finCongr h) ≫ decomposeFinCycleRange`.
+    -- The domain is `Perm (Fin (k+1) ⊕ Fin l)`.
+    -- The codomain is `Fin (k+l+1) × Perm (Fin (k+l))`.
+    let equiv := (Equiv.permCongr ((finSumFinEquiv (m := k + 1) (n := l)).trans (finCongr h))).trans (decomposeFinCycleRange (n := k + l))
+    -- Apply the sum equivalence.
+    rw [Fintype.sum_equiv equiv _ _ (fun _ => rfl)]
+    -- The sum splits into `∑ x, ∑ e`.
+    rw [Fintype.sum_prod_type]
+    refine Fintype.sum_congr _ _ ?_
+    intro x
+    -- Simplify the inner sum over `e : Perm (Fin (k+l))`.
+    
+    -- Abbreviate the target multilinear map M
+    let M := ((A (v x)).toMultilinearMap.domCoprod B.toMultilinearMap)
+    
+    -- Pull out `(-1)^x` from the sum.
+    rw [Finset.mul_sum]
+    refine Fintype.sum_congr _ _ ?_
+    intro e
+    
+    -- 1. Match signs.
+    have hsign : ((Equiv.Perm.sign (equiv.symm (x, e)) : ℤ) : ℂ) = 
+                 ((-1 : ℂ) ^ (x : ℕ)) * ((Equiv.Perm.sign e : ℤ) : ℂ) := by
+       simp [equiv, decomposeFinCycleRange_symm_sign, Equiv.Perm.sign_permCongr, mul_comm]
+       
+    -- 2. Match values.
+    let σ' := decomposeFinCycleRange.symm (x, e)
+    have hσ'0 : σ' 0 = x := decomposeFinCycleRange_symm_apply_zero x e
+    
+    have hvalA : ∀ i : Fin k, w (equiv.symm (x, e) (Sum.inl i.succ)) = (Fin.removeNth x v) (e (finSumFinEquiv (Sum.inl i))) := by
+      intro i
+      simp [equiv, w, v', h]
+      rw [decomposeFinCycleRange_symm_apply_succ]
+      simp [Fin.removeNth_apply, finSumFinEquiv_apply_left]
+      
+    have hvalB : ∀ j : Fin l, w (equiv.symm (x, e) (Sum.inr j)) = (Fin.removeNth x v) (e (finSumFinEquiv (Sum.inr j))) := by
+      intro j
+      simp [equiv, w, v', h]
+      rw [decomposeFinCycleRange_symm_apply_succ]
+      simp [Fin.removeNth_apply, finSumFinEquiv_apply_right]
+
+    have hval0 : w (equiv.symm (x, e) (Sum.inl 0)) = v x := by
+       simp [equiv, w, v', h, hσ'0]
+
+    -- Assemble the equality.
+    rw [hsign]
+    -- Use associativity to regroup scalars
+    simp only [mul_assoc]
+    congr 1
+    
+    -- The remaining term matches `sign e * M (u ∘ e)`.
+    -- `M` is `domCoprod`, which splits `u ∘ e` via `inl`/`inr`.
+    simp [M, MultilinearMap.domCoprod_apply]
+    congr 1
+    · funext i
+      rw [hvalA]
+    · funext j
+      rw [hvalB]
+      
+  rw [hStage2]
+
 /-! #### Base cases for shuffle bijection lemmas -/
 
 /-- Base case for shuffle bijection right: when l = 0, B is a 0-form (scalar).
@@ -350,26 +921,169 @@ private lemma shuffle_bijection_right {k l : ℕ}
   cases l with
   | zero => exact shuffle_bijection_right_l0 v A B
   | succ l' =>
-    -- General case (l > 0): Use linearity of wedge to expand the RHS.
-    --
-    -- Strategy:
-    -- 1. RHS = (alternatizeUncurryFin A ∧ B)(v')
-    --    where v' = v ∘ finCongr : Fin((k+1)+l') → TangentModel n
-    -- 2. We want to show this equals the LHS sum.
-    --
-    -- The key is that both sides compute the exterior derivative d(A ∧ B)
-    -- when viewed as a computation involving derivative indices and shuffles.
-    --
-    -- Both sides are double sums (derivative index × shuffles) that compute
-    -- the same value by Fubini for finite sums + sign matching.
-    --
-    -- Mathematical reference: Bott-Tu GTM 82, Warner GTM 94 Proposition 2.14.
-    --
-    -- TODO: The formal bijection between index sets requires:
-    -- - Explicit construction of the bijection (i, σ) ↔ (τ, j)
-    -- - Proof of sign matching: (-1)^i × sign(σ) = sign(τ) × (-1)^j
-    -- - Application of Finset.sum_bij
-    sorry
+    classical
+    -- General case (l = l' + 1 > 0).
+    -- Rewrite the wedge terms using the full alternatization (sum over *all* permutations)
+    -- to avoid working directly with the shuffle quotient `ModSumCongr`.
+    have hw :
+        ∀ i : Fin (k + (l' + 1) + 1),
+          ((A (v i)).wedge B) (Fin.removeNth i v) =
+            (((k.factorial * (l' + 1).factorial : ℕ) : ℂ)⁻¹) •
+              (LinearMap.mul' ℂ ℂ)
+                ((MultilinearMap.alternatization
+                    (((A (v i)).toAlternatingMap.toMultilinearMap).domCoprod
+                      (B.toAlternatingMap.toMultilinearMap)))
+                  ((Fin.removeNth i v) ∘ finSumFinEquiv)) := by
+      intro i
+      simpa using
+        (wedge_apply_eq_inv_factorial_smul_alternatization (n := n) (k := k) (l := l' + 1)
+          (ω := A (v i)) (η := B) (v := Fin.removeNth i v))
+    have hwR :
+        ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A).wedge B)
+            (v ∘ finCongr (show (k + 1) + (l' + 1) = (k + (l' + 1)) + 1 by omega)) =
+          ((((Nat.factorial (k + 1) * (l' + 1).factorial : ℕ) : ℂ)⁻¹)) •
+            (LinearMap.mul' ℂ ℂ)
+              ((MultilinearMap.alternatization
+                  (((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A).toAlternatingMap.toMultilinearMap).domCoprod
+                    (B.toAlternatingMap.toMultilinearMap)))
+                (((v ∘ finCongr (show (k + 1) + (l' + 1) = (k + (l' + 1)) + 1 by omega)) ∘ finSumFinEquiv))) := by
+      -- direct application of the wedge rewrite lemma
+      simpa using
+        (wedge_apply_eq_inv_factorial_smul_alternatization (n := n) (k := k + 1) (l := l' + 1)
+          (ω := ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A) (η := B)
+          (v := (v ∘ finCongr (show (k + 1) + (l' + 1) = (k + (l' + 1)) + 1 by omega))))
+    -- Rewrite both sides.
+    simp only [hw, hwR]
+    -- TODO (Agent 1): finish by expanding `alternatizeUncurryFin_apply` and reindexing the
+    -- resulting finite sums over permutations (Fubini + `Finset.sum_bij`).
+    -- Normalize the scalar weights and clear common factors.
+    -- This reduces the statement to a pure alternatization reindexing identity.
+    classical
+    -- First, rewrite the two factorial inverses so both sides share `(l'+1)!⁻¹ * k!⁻¹`.
+    have hkfac_inv :
+        (↑((k + 1).factorial) : ℂ)⁻¹ = (k + 1 : ℂ)⁻¹ * (↑(k.factorial) : ℂ)⁻¹ := by
+      have hk :
+          (↑((k + 1).factorial) : ℂ) = (k + 1 : ℂ) * (↑(k.factorial) : ℂ) := by
+        simpa [Nat.factorial_succ, Nat.cast_mul] using
+          (congrArg (fun n : ℕ => (n : ℂ)) (Nat.factorial_succ k)).symm
+      calc
+        (↑((k + 1).factorial) : ℂ)⁻¹ = ((k + 1 : ℂ) * (↑(k.factorial) : ℂ))⁻¹ := by simpa [hk]
+        _ = (↑(k.factorial) : ℂ)⁻¹ * (k + 1 : ℂ)⁻¹ := by simp [mul_inv_rev]
+        _ = (k + 1 : ℂ)⁻¹ * (↑(k.factorial) : ℂ)⁻¹ := by ac_rfl
+
+    -- Convert the goal to a form where we can cancel the nonzero common scalar.
+    have hl0 : (↑((l' + 1).factorial) : ℂ) ≠ 0 := by
+      exact_mod_cast Nat.factorial_ne_zero (l' + 1)
+    have hk0 : (↑(k.factorial) : ℂ) ≠ 0 := by
+      exact_mod_cast Nat.factorial_ne_zero k
+    have hk10 : (k + 1 : ℂ) ≠ 0 := by
+      exact_mod_cast Nat.succ_ne_zero k
+    let c : ℂ := (↑((l' + 1).factorial) : ℂ)⁻¹ * (↑(k.factorial) : ℂ)⁻¹
+    have hc : c ≠ 0 := by
+      refine mul_ne_zero (inv_ne_zero hl0) (inv_ne_zero hk0)
+    -- Package the unscaled alternatization terms.
+    let tL (x : Fin (k + (l' + 1) + 1)) : ℂ :=
+      (LinearMap.mul' ℂ ℂ)
+        ((MultilinearMap.alternatization
+            ((A (v x)).toMultilinearMap.domCoprod B.toMultilinearMap))
+          ((Fin.removeNth x v) ∘ finSumFinEquiv))
+    let tR : ℂ :=
+      (LinearMap.mul' ℂ ℂ)
+        ((MultilinearMap.alternatization
+            ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A).toMultilinearMap.domCoprod
+              B.toMultilinearMap))
+          (((v ∘ finCongr (show (k + 1) + (l' + 1) = (k + (l' + 1)) + 1 by omega)) ∘ finSumFinEquiv)))
+
+    -- Rewrite both factorial scalars into the common factor `c`.
+    have hcL :
+        ((↑(k.factorial * (l' + 1).factorial) : ℂ)⁻¹) = c := by
+      simp [c, Nat.cast_mul, mul_inv_rev]
+    have hcR :
+        ((↑((k + 1).factorial * (l' + 1).factorial) : ℂ)⁻¹) = (k + 1 : ℂ)⁻¹ * c := by
+      -- use `hkfac_inv` for `(k+1)!` and commutativity
+      simp [c, hkfac_inv, Nat.cast_mul, mul_inv_rev, mul_assoc, mul_left_comm, mul_comm]
+
+    -- Fold the large alternatization expressions into `tL`/`tR` without unfolding them.
+    have htL' :
+        ∀ x : Fin (k + (l' + 1) + 1),
+          (LinearMap.mul' ℂ ℂ)
+              ((MultilinearMap.alternatization
+                  ((A (v x)).toMultilinearMap.domCoprod B.toMultilinearMap))
+                ((Fin.removeNth x v) ∘ finSumFinEquiv)) =
+            tL x := by
+      intro x; rfl
+    have htR' :
+        (LinearMap.mul' ℂ ℂ)
+            ((MultilinearMap.alternatization
+                ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A).toMultilinearMap.domCoprod
+                  B.toMultilinearMap))
+              (((v ∘ finCongr (show (k + 1) + (l' + 1) = (k + (l' + 1)) + 1 by omega)) ∘ finSumFinEquiv))) =
+          tR := by
+      rfl
+
+    -- Rewrite the goal using the folded expressions and the common scalar `c`.
+    -- We keep `simp` tightly controlled to avoid unfolding the alternatization sums.
+    -- First, fold the big terms and rewrite the factorial scalars via `hcL`/`hcR`.
+    -- Then convert the remaining `•`-actions in `ℂ` into multiplication.
+    simp only [htL', htR']
+    -- Rewrite the factorial inverse scalars.
+    -- (They appear inside the rewritten wedge formulas from `hw`/`hwR`.)
+    simp only [hcL, hcR]
+    -- Finally, normalize `ℂ` scalar actions.
+    simp [smul_smul, mul_assoc, mul_left_comm, mul_comm]
+
+    -- Factor out the common scalar `c` from both sides, cancel it, and clear `(k+1)⁻¹`.
+    have hL :
+        (∑ x : Fin (k + (l' + 1) + 1), (-1) ^ (x : ℕ) * (c * tL x)) =
+          c * (∑ x : Fin (k + (l' + 1) + 1), (-1) ^ (x : ℕ) * tL x) := by
+      -- expand the RHS using `Finset.mul_sum` and rearrange each term
+      classical
+      simpa [Finset.mul_sum, mul_assoc, mul_left_comm, mul_comm]
+        using (Finset.mul_sum (s := (Finset.univ : Finset (Fin (k + (l' + 1) + 1))))
+          (f := fun x => (-1) ^ (x : ℕ) * tL x) c).symm
+
+    have hR :
+        (k + 1 : ℂ)⁻¹ * (c * tR) = c * ((k + 1 : ℂ)⁻¹ * tR) := by
+      -- commutativity in `ℂ`
+      ac_rfl
+
+    -- Use `hL`/`hR` to rewrite the goal as `c * Σ = c * ((k+1)⁻¹ * tR)`.
+    -- Then it suffices to prove `Σ = (k+1)⁻¹ * tR`, which follows from the core lemma.
+    -- (The rewrite may be blocked if simp normalized exponents differently, so we do it by `simp`.)
+    -- Rewrite both sides in place.
+    -- LHS
+    -- (Turn `(-1 : ℂ)^(x:ℕ)` into `(-1 : ℂ)^(x:ℤ)` if necessary, then apply `hL`.)
+    -- RHS similarly.
+    -- We use `rw` and `simp` to match the patterns exactly.
+    -- First, rewrite to the exact `hL`/`hR` patterns.
+    -- (No-op if already in that form.)
+    -- Now apply the rewrites.
+    rw [hL, hR]
+
+    -- Core lemma gives `tR = (k+1) * Σ` (with the Nat-exponent form).
+    have hreindexNat :
+        tR =
+          (k + 1 : ℂ) *
+            ∑ x : Fin (k + (l' + 1) + 1), ((-1 : ℂ) ^ (x : ℕ)) * tL x := by
+      simpa [tL, tR] using
+        (alternatizeUncurryFin_domCoprod_alternatization_wedge_right_core (n := n)
+          (k := k) (l := l' + 1) (v := v) (A := A) (B := B))
+
+    have hsum :
+        (∑ x : Fin (k + (l' + 1) + 1), (-1) ^ (x : ℕ) * tL x) = (k + 1 : ℂ)⁻¹ * tR := by
+      -- Divide by `(k+1)` using the core lemma.
+      have hsumNat :
+          (k + 1 : ℂ)⁻¹ * tR =
+            ∑ x : Fin (k + (l' + 1) + 1), ((-1 : ℂ) ^ (x : ℕ)) * tL x := by
+        -- multiply `hreindexNat` by `(k+1)⁻¹` on the left
+        have := congrArg (fun z : ℂ => (k + 1 : ℂ)⁻¹ * z) hreindexNat
+        -- simplify
+        simpa [mul_assoc, hk10, inv_mul_cancel₀ hk10] using this
+      -- `hsumNat` is exactly the desired statement, up to symmetry.
+      simpa using hsumNat.symm
+
+    -- Multiply `hsum` by `c` to match the rewritten goal.
+    simpa [mul_assoc, mul_left_comm, mul_comm] using congrArg (fun z : ℂ => c * z) hsum
 
 /-- Main theorem: alternatization commutes with wedge when right factor is constant. -/
 theorem alternatizeUncurryFin_wedge_right {k l : ℕ}
@@ -410,9 +1124,21 @@ private lemma shuffle_bijection_left {k l : ℕ}
     ∑ i : Fin ((k+l)+1), ((-1 : ℤ)^(i : ℕ)) • (A.wedge (B (v i))) (Fin.removeNth i v) =
     ((-1 : ℂ)^k • A.wedge (ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B))
       (v ∘ finCongr (show k+(l+1) = (k+l)+1 by omega)) := by
-  -- This requires constructing an explicit signed bijection between the index sets.
-  -- The formal proof would use Finset.sum_bij or similar infrastructure.
-  -- Both sides compute the same double sum, organized differently, with signs matching.
+  classical
+  -- Expand `alternatizeUncurryFin` and the wedge definition into explicit sums.
+  simp only [ContinuousAlternatingMap.alternatizeUncurryFin_apply,
+    ContinuousAlternatingMap.smul_apply]
+  simp only [ContinuousAlternatingMap.wedge_apply,
+    ContinuousAlternatingMap.wedgeAlternating,
+    ContinuousAlternatingMap.wedgeAlternatingTensor,
+    ContinuousAlternatingMap.domDomCongr_apply,
+    AlternatingMap.domDomCongr_apply,
+    LinearMap.compAlternatingMap_apply,
+    AlternatingMap.domCoprod'_apply,
+    AlternatingMap.domCoprod_apply,
+    MultilinearMap.sum_apply]
+  -- The remaining step is the signed reindexing that contributes the graded sign (-1)^k.
+  -- TODO (Agent 1): implement the explicit reindexing/bijection and sign tracking.
   sorry
 
 /-- Main theorem: alternatization commutes with wedge when left factor is constant. -/

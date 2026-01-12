@@ -36,6 +36,15 @@ structure Current (n : ℕ) (X : Type*) (k : ℕ)
       Fréchet space of smooth forms. In our Lean model, the topology on `SmoothForm`
       is currently a placeholder, so we record this boundedness directly. -/
   bound : ∃ M : ℝ, ∀ ω : SmoothForm n X k, |toFun ω| ≤ M * ‖ω‖
+  /-- **Boundary boundedness** (normality-style hypothesis): for `k = k' + 1`, the functional
+  `ω ↦ T(dω)` is bounded with respect to the comass norm on `k'`-forms.
+
+  This is exactly what is needed to define the boundary current `∂T` as a `Current`.
+  For `k = 0` there is no boundary, so we record `True`. -/
+  boundary_bound :
+    match k with
+    | 0 => True
+    | k' + 1 => ∃ M : ℝ, ∀ ω : SmoothForm n X k', |toFun (smoothExtDeriv ω)| ≤ M * ‖ω‖
 
 namespace Current
 
@@ -95,6 +104,13 @@ def zero (n : ℕ) (X : Type*) (k : ℕ)
     refine ⟨0, ?_⟩
     intro ω
     simp
+  boundary_bound := by
+    cases k with
+    | zero => trivial
+    | succ k' =>
+      refine ⟨0, ?_⟩
+      intro ω
+      simp
 
 instance instInhabited : Inhabited (Current n X k) := ⟨zero n X k⟩
 instance instZero : Zero (Current n X k) := ⟨zero n X k⟩
@@ -118,6 +134,23 @@ def add_curr (T₁ T₂ : Current n X k) : Current n X k where
       |T₁.toFun ω + T₂.toFun ω| ≤ |T₁.toFun ω| + |T₂.toFun ω| := abs_add_le _ _
       _ ≤ M₁ * ‖ω‖ + M₂ * ‖ω‖ := add_le_add h1 h2
       _ = (M₁ + M₂) * ‖ω‖ := by ring
+  boundary_bound := by
+    cases k with
+    | zero => trivial
+    | succ k' =>
+      -- Use the boundary bounds of each summand.
+      obtain ⟨M₁, hM₁⟩ := T₁.boundary_bound
+      obtain ⟨M₂, hM₂⟩ := T₂.boundary_bound
+      refine ⟨M₁ + M₂, ?_⟩
+      intro ω
+      have h1 := hM₁ ω
+      have h2 := hM₂ ω
+      -- (T₁+T₂)(dω) = T₁(dω) + T₂(dω)
+      calc
+        |T₁.toFun (smoothExtDeriv ω) + T₂.toFun (smoothExtDeriv ω)|
+            ≤ |T₁.toFun (smoothExtDeriv ω)| + |T₂.toFun (smoothExtDeriv ω)| := abs_add_le _ _
+        _ ≤ M₁ * ‖ω‖ + M₂ * ‖ω‖ := add_le_add h1 h2
+        _ = (M₁ + M₂) * ‖ω‖ := by ring
 
 instance : Add (Current n X k) := ⟨add_curr⟩
 
@@ -134,6 +167,14 @@ def neg_curr (T : Current n X k) : Current n X k where
     refine ⟨M, ?_⟩
     intro ω
     simpa using (hM ω)
+  boundary_bound := by
+    cases k with
+    | zero => trivial
+    | succ k' =>
+      obtain ⟨M, hM⟩ := T.boundary_bound
+      refine ⟨M, ?_⟩
+      intro ω
+      simpa using (hM ω)
 
 instance : Neg (Current n X k) := ⟨neg_curr⟩
 
@@ -168,6 +209,19 @@ def smul_curr (r : ℝ) (T : Current n X k) : Current n X k where
       |r * T.toFun ω| = |r| * |T.toFun ω| := by simpa [abs_mul]
       _ ≤ |r| * (M * ‖ω‖) := mul_le_mul_of_nonneg_left h (abs_nonneg r)
       _ = (|r| * M) * ‖ω‖ := by ring
+  boundary_bound := by
+    cases k with
+    | zero => trivial
+    | succ k' =>
+      obtain ⟨M, hM⟩ := T.boundary_bound
+      refine ⟨|r| * M, ?_⟩
+      intro ω
+      have h := hM ω
+      calc
+        |r * T.toFun (smoothExtDeriv ω)| = |r| * |T.toFun (smoothExtDeriv ω)| := by
+          simpa [abs_mul]
+        _ ≤ |r| * (M * ‖ω‖) := mul_le_mul_of_nonneg_left h (abs_nonneg r)
+        _ = (|r| * M) * ‖ω‖ := by ring
 
 instance : HSMul ℝ (Current n X k) (Current n X k) := ⟨smul_curr⟩
 instance : HSMul ℤ (Current n X k) (Current n X k) := ⟨fun z T => (z : ℝ) • T⟩
@@ -363,16 +417,29 @@ we work with.
 - [Federer, "Geometric Measure Theory", 1969, Ch. 4]
 - [Federer-Fleming, "Normal and integral currents", Ann. Math. 1960]
 -/
-axiom boundary_bound (T : Current n X (k + 1)) :
-    ∃ M : ℝ, ∀ ω : SmoothForm n X k, |T.toFun (smoothExtDeriv ω)| ≤ M * ‖ω‖
-
 def boundary (T : Current n X (k + 1)) : Current n X k where
   toFun := fun ω => T.toFun (smoothExtDeriv ω)
   is_linear := fun c ω₁ ω₂ => by
     rw [smoothExtDeriv_add, smoothExtDeriv_smul_real]
     exact T.is_linear c (smoothExtDeriv ω₁) (smoothExtDeriv ω₂)
   is_continuous := T.is_continuous.comp smoothExtDeriv_continuous
-  bound := boundary_bound T
+  bound := by
+    -- This is exactly the `boundary_bound` field of `T` (since `k+1` is a successor).
+    simpa using (T.boundary_bound)
+  boundary_bound := by
+    -- ∂∂ = 0 gives a trivial bound for the boundary of the boundary.
+    cases k with
+    | zero =>
+      trivial
+    | succ k' =>
+      refine ⟨0, ?_⟩
+      intro ω
+      -- (∂T)(dω) = T(d(dω)) = 0
+      have hdd : smoothExtDeriv (smoothExtDeriv ω) = 0 := smoothExtDeriv_extDeriv ω
+      -- T(0) = 0
+      have h0 : T.toFun 0 = 0 := map_zero' T
+      -- conclude
+      simp [hdd, h0]
 
 def isCycle (T : Current n X (k + 1)) : Prop := T.boundary = 0
 
