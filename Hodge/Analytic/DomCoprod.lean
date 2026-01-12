@@ -534,7 +534,16 @@ which is a substantial combinatorial argument not yet formalized in Mathlib.
 Reference: [Bott & Tu, "Differential Forms in Algebraic Topology", §1.2]
            [Warner, "Foundations of Differentiable Manifolds and Lie Groups", Prop. 2.14] -/
 
+/-!
+═══════════════════════════════════════════════════════════════════════════════
+⚠️  OFF-TRACK AXIOM BELOW ⚠️
+
+`wedge_assoc` is NOT used by `hodge_conjecture'`. Run `./scripts/verify_proof_track.sh`
+═══════════════════════════════════════════════════════════════════════════════
+-/
+
 /-- **Axiom (Classical Pillar)**: Wedge product is associative (up to index equivalence).
+    ⚠️ OFF-TRACK: Not used by hodge_conjecture'
 
 For forms of degrees k, l, m, we have:
 `wedge (wedge ω η) θ = (wedge ω (wedge η θ)).domDomCongr h`

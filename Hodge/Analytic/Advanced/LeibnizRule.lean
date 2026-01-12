@@ -224,26 +224,15 @@ private lemma shuffle_bijection_right {k l : ℕ}
     ∑ i : Fin ((k+l)+1), ((-1 : ℤ)^(i : ℕ)) • ((A (v i)).wedge B) (Fin.removeNth i v) =
     ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A).wedge B)
       (v ∘ finCongr (show (k+1)+l = (k+l)+1 by omega)) := by
-  induction l with
-  | zero =>
-    -- Use the base case lemma (after simplifying k+0 = k)
-    simp only [Nat.add_zero] at *
-    exact shuffle_bijection_right_l0 v A B
-  | succ l' _ =>
-    -- Induction case: l = l' + 1
-    -- The proof uses the bilinearity of wedge to distribute sums.
-    --
-    -- Key insight: The wedge (A w).wedge B evaluated at removeNth i v
-    -- equals the same thing as (alternatizeUncurryFin A).wedge B evaluated at v ∘ finCongr
-    -- after summing over i with signs (-1)^i.
-    --
-    -- This is because:
-    -- 1. alternatizeUncurryFin A = ∑ j, (-1)^j • A(v' j) (removeNth j v')
-    -- 2. (∑ aⱼ).wedge B = ∑ (aⱼ.wedge B) by bilinearity
-    -- 3. The resulting sums match after index reordering via finCongr
-    --
-    -- Reference: Bott-Tu GTM 82, Warner GTM 94 Proposition 2.14.
-    sorry
+  -- This proof requires establishing a bijection between the index sets:
+  -- LHS: (i, σ) where i is derivative index, σ is shuffle
+  -- RHS: (τ, j) where τ is shuffle, j is derivative index
+  -- The bijection is canonical but requires careful construction on quotient types.
+  -- See Bott-Tu GTM 82, Warner GTM 94 Proposition 2.14.
+  --
+  -- The core difficulty is that domCoprod is defined via a sum over shuffle quotients,
+  -- and we need to commute this sum with the derivative sum.
+  sorry
 
 /-- Main theorem: alternatization commutes with wedge when right factor is constant. -/
 theorem alternatizeUncurryFin_wedge_right {k l : ℕ}
@@ -274,6 +263,13 @@ private lemma shuffle_bijection_left {k l : ℕ}
       (v ∘ finCongr (show k+(l+1) = (k+l)+1 by omega)) := by
   -- The sign (-1)^k accounts for moving the derivative index past k positions.
   -- Reference: Bott-Tu GTM 82, Warner GTM 94 Proposition 2.14.
+  -- This requires a similar bijection as the right case, but with sign considerations.
+  -- The bijection between index sets is:
+  -- LHS: (i, σ) where i ∈ Fin(n+1), σ ∈ Shuffles(k,l)
+  -- RHS: (τ, j) where τ ∈ Shuffles(k+1,l), j ∈ Fin(k+1)
+  --
+  -- The sign arithmetic is:
+  -- (-1)^i * sign(σ) = (-1)^k * sign(τ) * (-1)^j
   sorry
 
 /-- Main theorem: alternatization commutes with wedge when left factor is constant. -/

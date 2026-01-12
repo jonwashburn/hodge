@@ -212,6 +212,16 @@ theorem poincareDualForm_empty (n : ℕ) (X : Type u) (p : ℕ)
     poincareDualForm n X p (∅ : Set X) = 0 :=
   (poincareDualFormExists n X p ∅).empty_vanishes rfl
 
+/-!
+═══════════════════════════════════════════════════════════════════════════════
+⚠️  OFF-TRACK AXIOMS BELOW ⚠️
+
+These axioms (poincareDualForm_isPP, _isRational, _additive) are NOT used by 
+`hodge_conjecture'`. The main proof uses `FundamentalClassSet_represents_class` 
+from GAGA.lean instead. Run `./scripts/verify_proof_track.sh`
+═══════════════════════════════════════════════════════════════════════════════
+-/
+
 /-! ## (p,p)-Type Property
 
 On a Kähler manifold, the Poincaré dual form of a complex subvariety is of type (p,p).
@@ -219,7 +229,7 @@ This follows from the fact that complex subvarieties are calibrated by ω^p.
 
 We axiomatize this property for algebraic sets. -/
 
-/-- **Axiom: (p,p)-Type of Fundamental Classes**
+/-- **Axiom: (p,p)-Type of Fundamental Classes** ⚠️ OFF-TRACK
 
     The Poincaré dual form of an algebraic set is of type (p,p).
 

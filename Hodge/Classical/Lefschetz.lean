@@ -65,7 +65,15 @@ def lefschetz_power (n : ℕ) (X : Type u)
     let Lk := lefschetz_power n X p k'
     LinearMap.comp L Lk
 
-/-- Λ preserves closedness on Kähler manifolds.
+/-!
+═══════════════════════════════════════════════════════════════════════════════
+⚠️  OFF-TRACK AXIOMS BELOW ⚠️
+
+These axioms are NOT used by `hodge_conjecture'`. Run `./scripts/verify_proof_track.sh`
+═══════════════════════════════════════════════════════════════════════════════
+-/
+
+/-- Λ preserves closedness on Kähler manifolds. ⚠️ OFF-TRACK: Not used by hodge_conjecture'
     This follows from the Kähler identity [Λ, d] = i(∂̄* - ∂*), which implies
     that if dω = 0 then d(Λω) is controlled. On harmonic forms, Λ preserves harmonicity. -/
 axiom isFormClosed_lefschetzLambda {n : ℕ} {X : Type u}

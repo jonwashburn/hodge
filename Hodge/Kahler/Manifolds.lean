@@ -103,11 +103,23 @@ The construction is equivalent to contraction with the inverse metric tensor.
 **Mathematical Reference**: Griffiths-Harris §0.7, Wells "Differential Analysis" Ch. IV,
 Voisin "Hodge Theory and Complex Algebraic Geometry" Ch. 5-6.
 -/
--- NOTE: This file intentionally axiomatizes the Kähler operators at the level of
--- smooth differential forms. A full construction would require substantial metric
--- and bundle infrastructure from Mathlib.
+/-!
+═══════════════════════════════════════════════════════════════════════════════
+⚠️  OFF-TRACK AXIOMS BELOW ⚠️
 
-/-- **Dual Lefschetz Operator Λ** as a smooth linear map (axiomatized). -/
+The following axioms define Kähler operators (Λ, ⋆, δ, Δ) that are NOT used by
+the main theorem `hodge_conjecture'`. They exist for alternative proof approaches
+and future extensions but do NOT appear in `#print axioms hodge_conjecture'`.
+
+To verify: run `./scripts/verify_proof_track.sh`
+
+These axioms could be removed/archived without affecting the proof, but are kept
+for structural reasons (other modules import this file for types/basic theorems).
+═══════════════════════════════════════════════════════════════════════════════
+-/
+
+/-- **Dual Lefschetz Operator Λ** as a smooth linear map (axiomatized).
+    ⚠️ OFF-TRACK: Not used by hodge_conjecture' -/
 axiom lefschetzLambdaLinearMap (n : ℕ) (X : Type u) [TopologicalSpace X]
     [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] (k : ℕ) :
