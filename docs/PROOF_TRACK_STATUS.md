@@ -102,6 +102,44 @@ kernel proof-track axioms for `hodge_conjecture'`.
 
 ---
 
+## Recent Progress
+
+### Agent 2a: Integration Current Boundary Bounds (2026-01-12)
+
+**Location**: `Hodge/Analytic/Currents.lean` (lines 495-850)
+
+**What was added**:
+
+*Core Infrastructure (lines 495-712)*:
+- `boundaryMass` definition for the mass of a set's boundary
+- `HasStokesPropertyWith` predicate for Stokes-bounded currents
+- Helper theorems: `zero_hasStokesProperty`, `add_hasStokesProperty`, `smul_hasStokesProperty`
+- Main theorems: `integration_current_hasStokesProperty`, `integration_current_boundary_bound`
+- Theorems for combinations: `integration_current_sum_boundary_bound`, `integration_current_smul_boundary_bound`
+
+*Extended Infrastructure (lines 713-850)*:
+- `RectifiableSetData` structure: Bundles a set with its boundary mass
+- Operations: `empty`, `union`, `smul` for composing rectifiable sets
+- `RectifiableSetData.toCurrent`: Convert to integration current
+- `RectifiableSetData.toCurrent_hasStokesProperty`: Stokes property for data-carrying currents
+- `stokes_theorem_blueprint`: Template showing what Stokes theorem provides
+
+**Mathematical Content**:
+The infrastructure formalizes the Stokes theorem approach:
+- Stokes: `[Z](dω) = [∂Z](ω)`
+- Mass-comass duality: `|[∂Z](ω)| ≤ mass(∂Z) · comass(ω)`
+- Therefore `M = boundaryMass(Z)` is the Stokes constant
+
+**Design Pattern**:
+Uses "data-carrying" approach - `RectifiableSetData` bundles a set with precomputed
+boundary mass. This separates algebraic infrastructure (complete) from analytic
+infrastructure (Agent 5 work).
+
+**Status**: Infrastructure complete. Currently trivial proofs because currents are stubs.
+Once Agent 5 provides real integration currents, these theorems provide the boundary bound proofs.
+
+---
+
 ## Remaining Work
 
 ### Agent 1: Eliminate `sorry` in LeibnizRule.lean

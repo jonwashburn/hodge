@@ -913,6 +913,24 @@ private lemma shuffle_bijection_right {k l : ℕ}
     -- Multiply `hsum` by `c` to match the rewritten goal.
     simpa [mul_assoc, mul_left_comm, mul_comm] using congrArg (fun z : ℂ => c * z) hsum
 
+/-- Main theorem: alternatization commutes with wedge when right factor is constant. -/
+theorem alternatizeUncurryFin_wedge_right {k l : ℕ}
+    (A : TangentModel n →L[ℂ] Alt n k) (B : Alt n l) :
+    let wedge_right : TangentModel n →L[ℂ] Alt n (k + l) :=
+      (ContinuousAlternatingMap.wedgeCLM_alt ℂ (TangentModel n) k l).flip B ∘L A
+    ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) wedge_right =
+    ContinuousAlternatingMap.domDomCongr
+      ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A).wedge B)
+      (finCongr (show (k+1)+l = (k+l)+1 by omega)) := by
+  intro wedge_right
+  ext v
+  simp only [ContinuousAlternatingMap.alternatizeUncurryFin_apply,
+             ContinuousAlternatingMap.domDomCongr_apply]
+  -- Use the shuffle bijection lemma
+  have h_wedge_right : ∀ w, wedge_right w = (A w).wedge B := fun _ => rfl
+  simp only [h_wedge_right]
+  exact shuffle_bijection_right v A B
+
 /-- Shuffle Bijection Lemma (left case): alternatization commutes with wedge when
 the left factor is constant, with sign (-1)^k. This is d(ω ∧ η) = (-1)^k ω ∧ dη for constant ω.
 

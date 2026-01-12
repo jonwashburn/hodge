@@ -230,20 +230,143 @@ theorem comass_smul {n : ℕ} {X : Type*}
 
 -- The instances for SeminormedAddCommGroup and NormedSpace are moved to axioms above
 
-/-! ## L2 Inner Product -/
+/-! ## L2 Inner Product (Agent 3 - Riemannian/Kähler Infrastructure)
 
-/-- Pointwise inner product of differential forms. -/
+### Mathematical Background
+
+On a Kähler manifold (X, ω, J), the Kähler form ω and complex structure J induce a
+Riemannian metric g on the tangent bundle:
+
+  g(v, w) = ω(v, Jw)
+
+This metric extends to differential forms via the induced inner product on exterior powers:
+
+  ⟨α, β⟩_x = sum over multi-indices I of g^{i₁j₁}...g^{iₖjₖ} α_I(x) β_J(x)
+
+The global L2 inner product is then:
+
+  ⟨α, β⟩_{L²} = ∫_X ⟨α, β⟩_x · ω^n
+
+### Implementation Strategy (Agent 3, 2026-01-12)
+
+We define a `KahlerMetricData` structure that bundles:
+1. The pointwise inner product function on k-forms
+2. Key properties (positivity, symmetry, bilinearity)
+3. Volume integration for L2 inner product
+
+This allows us to:
+- Keep the proof architecture correct with properties we can use
+- Replace stubs with real implementations once Agent 5 provides integration infrastructure
+
+**References**:
+- [Warner, "Foundations of Differentiable Manifolds", GTM 94, §6.1]
+- [Voisin, "Hodge Theory and Complex Algebraic Geometry I", §5.1-5.2]
+-/
+
+/-- **Kähler Metric Data** (Agent 3).
+
+    Bundles the pointwise inner product on differential forms induced by the Kähler metric,
+    along with key properties needed for Hodge theory.
+
+    The Kähler form ω and complex structure J induce a Riemannian metric g(v,w) = ω(v, Jw).
+    This extends to k-forms via the metric on exterior powers of the cotangent bundle. -/
+structure KahlerMetricData (n : ℕ) (X : Type*) (k : ℕ)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] where
+  /-- Pointwise inner product of two k-forms at a point. -/
+  inner : SmoothForm n X k → SmoothForm n X k → X → ℝ
+  /-- Positivity: ⟨α, α⟩_x ≥ 0 -/
+  inner_self_nonneg : ∀ (α : SmoothForm n X k) (x : X), inner α α x ≥ 0
+  /-- Symmetry: ⟨α, β⟩_x = ⟨β, α⟩_x -/
+  inner_comm : ∀ (α β : SmoothForm n X k) (x : X), inner α β x = inner β α x
+  /-- Left additivity: ⟨α₁ + α₂, β⟩_x = ⟨α₁, β⟩_x + ⟨α₂, β⟩_x -/
+  inner_add_left : ∀ (α₁ α₂ β : SmoothForm n X k) (x : X),
+    inner (α₁ + α₂) β x = inner α₁ β x + inner α₂ β x
+  /-- Scalar linearity: ⟨r • α, β⟩_x = r * ⟨α, β⟩_x -/
+  inner_smul_left : ∀ (r : ℝ) (α β : SmoothForm n X k) (x : X),
+    inner (r • α) β x = r * inner α β x
+  /-- Continuity: the inner product varies continuously in x -/
+  inner_continuous : ∀ (α β : SmoothForm n X k), Continuous (inner α β)
+
+/-- **Default Kähler Metric Data** (placeholder).
+
+    This provides the trivial inner product ⟨α, β⟩_x = 0 which satisfies all the
+    algebraic properties. Once Agent 5 provides real Riemannian metric infrastructure,
+    this can be replaced with the actual Kähler-induced inner product.
+
+    **Note**: The trivial inner product is mathematically consistent but not useful
+    for actual Hodge theory. It will be replaced when the metric infrastructure exists. -/
+noncomputable def KahlerMetricData.trivial (n : ℕ) (X : Type*) (k : ℕ)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] : KahlerMetricData n X k where
+  inner := fun _ _ _ => 0
+  inner_self_nonneg := fun _ _ => le_refl 0
+  inner_comm := fun _ _ _ => rfl
+  inner_add_left := fun _ _ _ _ => by simp
+  inner_smul_left := fun _ _ _ _ => by simp
+  inner_continuous := fun _ _ => continuous_const
+
+/-- **Volume Integration Data** (Agent 3).
+
+    Bundles the volume form integration for L2 inner products.
+    On a Kähler manifold of dimension n, the volume form is ω^n / n!
+
+    The L2 inner product is: ⟨α, β⟩_{L²} = ∫_X ⟨α, β⟩_x dV -/
+structure VolumeIntegrationData (n : ℕ) (X : Type*)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] where
+  /-- Integration of a continuous real-valued function against the volume form. -/
+  integrate : (X → ℝ) → ℝ
+  /-- Linearity: ∫(f + g) = ∫f + ∫g -/
+  integrate_add : ∀ (f g : X → ℝ), integrate (f + g) = integrate f + integrate g
+  /-- Scalar: ∫(c · f) = c · ∫f -/
+  integrate_smul : ∀ (c : ℝ) (f : X → ℝ), integrate (c • f) = c * integrate f
+  /-- Positivity: f ≥ 0 pointwise implies ∫f ≥ 0 -/
+  integrate_nonneg : ∀ (f : X → ℝ), (∀ x, f x ≥ 0) → integrate f ≥ 0
+
+/-- **Default Volume Integration Data** (placeholder).
+
+    Returns 0 for all integrals. This is mathematically consistent but trivial.
+    Will be replaced when Agent 5 provides real Hausdorff measure integration. -/
+noncomputable def VolumeIntegrationData.trivial (n : ℕ) (X : Type*)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] : VolumeIntegrationData n X where
+  integrate := fun _ => 0
+  integrate_add := fun _ _ => by simp
+  integrate_smul := fun _ _ => by simp
+  integrate_nonneg := fun _ _ => le_refl 0
+
+/-! ### Pointwise Inner Product -/
+
+/-- Pointwise inner product of differential forms.
+
+    Uses the Kähler metric to define ⟨α, β⟩_x at each point x.
+    Currently uses trivial data (returns 0) until real metric infrastructure is available.
+
+    **Mathematical Definition**: For a Kähler manifold with metric g induced by ω and J,
+    the pointwise inner product on k-forms is:
+      ⟨α, β⟩_x = sum_{|I|=k} g^{I,J}(x) α_I(x) β_J(x)
+    where g^{I,J} is the induced metric on Λ^k T*_x X.
+
+    **Reference**: [Warner, GTM 94, §6.1], [Voisin, "Hodge Theory I", §5.1] -/
 noncomputable def pointwiseInner {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    {k : ℕ} (_α _β : SmoothForm n X k) (_x : X) : ℝ := 0
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    {k : ℕ} (α β : SmoothForm n X k) (x : X) : ℝ :=
+  (KahlerMetricData.trivial n X k).inner α β x
 
 /-- **Pointwise Inner Product Positivity**. -/
 theorem pointwiseInner_self_nonneg {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α : SmoothForm n X k) (x : X) :
-    pointwiseInner α α x ≥ 0 := by simp [pointwiseInner]
+    pointwiseInner α α x ≥ 0 :=
+  (KahlerMetricData.trivial n X k).inner_self_nonneg α x
 
 /-- Pointwise norm induced by the inner product. -/
 def pointwiseNorm {n : ℕ} {X : Type*}
@@ -252,32 +375,50 @@ def pointwiseNorm {n : ℕ} {X : Type*}
     {k : ℕ} (α : SmoothForm n X k) (x : X) : ℝ :=
   Real.sqrt (pointwiseInner α α x)
 
-/-- Global L2 inner product of two k-forms. -/
+/-! ### Global L2 Inner Product -/
+
+/-- Global L2 inner product of two k-forms.
+
+    Defined as: ⟨α, β⟩_{L²} = ∫_X ⟨α, β⟩_x dV
+
+    where dV = ω^n / n! is the volume form on the Kähler manifold.
+    Currently uses trivial data (returns 0) until real integration infrastructure is available.
+
+    **Reference**: [Voisin, "Hodge Theory I", §5.2] -/
 noncomputable def L2Inner {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    {k : ℕ} (_α _β : SmoothForm n X k) : ℝ := 0
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    {k : ℕ} (α β : SmoothForm n X k) : ℝ :=
+  (VolumeIntegrationData.trivial n X).integrate (pointwiseInner α β)
 
 /-- **L2 Inner Product Left Additivity**. -/
 theorem L2Inner_add_left {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α₁ α₂ β : SmoothForm n X k) :
-    L2Inner (α₁ + α₂) β = L2Inner α₁ β + L2Inner α₂ β := by simp [L2Inner]
+    L2Inner (α₁ + α₂) β = L2Inner α₁ β + L2Inner α₂ β := by
+  simp only [L2Inner, pointwiseInner]
+  -- With trivial data, all values are 0
+  simp [VolumeIntegrationData.trivial]
 
 /-- **L2 Inner Product Scalar Left Linearity**. -/
 theorem L2Inner_smul_left {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (r : ℝ) (α β : SmoothForm n X k) :
-    L2Inner (r • α) β = r * L2Inner α β := by simp [L2Inner]
+    L2Inner (r • α) β = r * L2Inner α β := by
+  simp only [L2Inner, pointwiseInner]
+  simp [VolumeIntegrationData.trivial]
 
 /-- **L2 Inner Product Positivity**. -/
 theorem L2Inner_self_nonneg {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α : SmoothForm n X k) :
-    L2Inner α α ≥ 0 := by simp [L2Inner]
+    L2Inner α α ≥ 0 := by
+  simp only [L2Inner]
+  exact (VolumeIntegrationData.trivial n X).integrate_nonneg _ (pointwiseInner_self_nonneg α)
 
 /-- Global L2 norm of a k-form. -/
 def L2NormForm {n : ℕ} {X : Type*}
@@ -337,13 +478,19 @@ theorem pointwiseInner_comm {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α β : SmoothForm n X k) (x : X) :
-    pointwiseInner α β x = pointwiseInner β α x := by simp [pointwiseInner]
+    pointwiseInner α β x = pointwiseInner β α x :=
+  (KahlerMetricData.trivial n X k).inner_comm α β x
 
 theorem L2Inner_comm {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α β : SmoothForm n X k) :
-    L2Inner α β = L2Inner β α := by simp [L2Inner]
+    L2Inner α β = L2Inner β α := by
+  simp only [L2Inner]
+  -- The pointwise inner product is symmetric
+  congr 1
+  ext x
+  exact pointwiseInner_comm α β x
 
 theorem L2Inner_add_right {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
