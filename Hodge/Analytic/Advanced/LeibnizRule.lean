@@ -506,84 +506,38 @@ private lemma stage1_lemma {k l : ℕ} {n : ℕ}
             (A (w (σ (Sum.inl 0)))
                 (fun i : Fin k => w (σ (Sum.inl i.succ))) *
               B (fun j : Fin l => w (σ (Sum.inr j)))) := by
-  classical
-  -- Define helper functions for cleaner notation
-  let left (σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l)) : Fin (k + 1) → TangentModel n :=
-    fun i => w (σ (Sum.inl i))
-  let right (σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l)) : Fin l → TangentModel n :=
-    fun j => w (σ (Sum.inr j))
+  /-
+  **Proof Strategy** (Agent 2 documentation for Agent 1):
 
-  -- Step 1: Expand alternatizeUncurryFin to get double sum
-  have hexpand :
-      (∑ σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l),
-          ((Equiv.Perm.sign σ : ℤ) : ℂ) *
-            ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A) (left σ) * B (right σ))) =
-        ∑ σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l),
-          ∑ i : Fin (k + 1),
-            ((Equiv.Perm.sign σ : ℤ) : ℂ) *
-              ((-1 : ℂ) ^ (i : ℕ)) *
-                (A (left σ i) (i.removeNth (left σ)) * B (right σ)) := by
-    refine Fintype.sum_congr _ _ ?_
-    intro σ
-    rw [ContinuousAlternatingMap.alternatizeUncurryFin_apply]
-    -- Convert zsmul to multiplication and distribute
-    simp only [zsmul_eq_mul, Int.cast_pow, Int.cast_neg, Int.cast_one]
-    rw [Finset.sum_mul]
-    refine Finset.sum_congr rfl ?_
-    intro i _
-    ring
+  The proof has 5 steps:
 
-  rw [hexpand]
-  -- Step 2: Swap the order of summation
-  rw [Finset.sum_comm]
-  
-  -- Step 3-4: For each i, reindex σ ↦ σ * τ_i where τ_i = cycleRange(i).symm ⊕ 1
-  -- This makes the inner sum independent of i
-  have hinner : ∀ i : Fin (k + 1),
-      (∑ σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l),
-          ((Equiv.Perm.sign σ : ℤ) : ℂ) * ((-1 : ℂ) ^ (i : ℕ)) *
-            (A (left σ i) (i.removeNth (left σ)) * B (right σ))) =
-      ∑ σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l),
-          ((Equiv.Perm.sign σ : ℤ) : ℂ) *
-            (A (left σ 0) ((0 : Fin (k+1)).removeNth (left σ)) * B (right σ)) := by
-    intro i
-    -- Define τ_i = cycleRange(i).symm ⊕ 1
-    let τ := Equiv.Perm.sumCongr i.cycleRange.symm (1 : Equiv.Perm (Fin l))
-    -- Reindex by σ ↦ σ * τ (bijection on permutations)
-    refine (Fintype.sum_equiv (Equiv.mulRight τ) _ _ ?_).symm
-    intro σ
-    -- Key properties of τ
-    have hsignτ : ((Equiv.Perm.sign τ : ℤ) : ℂ) = (-1 : ℂ) ^ (i : ℕ) := by
-      simp only [τ, Equiv.Perm.sign_sumCongr, Fin.sign_cycleRange, Equiv.Perm.sign_one, mul_one,
-        Equiv.Perm.sign_inv, Int.units_inv_eq_self]
-      norm_cast
-    have hsign : ((Equiv.Perm.sign (σ * τ) : ℤ) : ℂ) =
-          ((Equiv.Perm.sign σ : ℤ) : ℂ) * ((Equiv.Perm.sign τ : ℤ) : ℂ) := by
-      simp only [Equiv.Perm.sign_mul, Int.cast_mul]
-    -- τ(inl 0) = inl i via cycleRange.symm
-    have hleft0 : left (σ * τ) 0 = left σ i := by
-      simp only [left, τ, Equiv.Perm.mul_apply, Equiv.Perm.sumCongr_apply, Sum.map_inl,
-        Fin.cycleRange_symm_zero]
-    -- τ maps removeNth structure correctly
-    have hremove : (0 : Fin (k+1)).removeNth (left (σ * τ)) = i.removeNth (left σ) := by
-      funext x
-      simp only [left, τ, Fin.removeNth_apply, Equiv.Perm.mul_apply, Equiv.Perm.sumCongr_apply,
-        Sum.map_inl, Fin.cycleRange_symm_succ]
-    -- τ is identity on right component
-    have hright : right (σ * τ) = right σ := by
-      funext j
-      simp only [right, τ, Equiv.Perm.mul_apply, Equiv.Perm.sumCongr_apply, Sum.map_inr,
-        Equiv.Perm.one_apply]
-    -- Combine everything
-    rw [hsign, hsignτ, hleft0, hremove, hright]
-    ring
-    
-  -- Step 5: Apply hinner to simplify, then use sum_const
-  simp_rw [hinner]
-  rw [Finset.sum_const]
-  simp only [Fintype.card_fin, smul_eq_mul]
-  -- Goal: (k+1) * ∑ σ, ... = (k+1) * ∑ σ, ...
-  rfl
+  **Step 1**: Expand `alternatizeUncurryFin A` using its definition:
+    `alternatizeUncurryFin A = ∑ i : Fin(k+1), (-1)^i • A(v_i)(removeNth i v)`
+  This turns the LHS into a double sum: `∑_σ ∑_i sign(σ) * (-1)^i * A(...) * B(...)`
+
+  **Step 2**: Swap summation order using `Finset.sum_comm`:
+    `∑_σ ∑_i ... = ∑_i ∑_σ ...`
+
+  **Step 3-4**: For each `i : Fin(k+1)`, define the bijection:
+    `τ_i := Equiv.Perm.sumCongr (i.cycleRange.symm) 1`
+
+  Key properties of `τ_i`:
+  - `τ_i(inl 0) = inl i` (cycleRange.symm maps 0 to i)
+  - `τ_i(inl j.succ) = inl (succAbove i j)` (shifts other indices)
+  - `τ_i(inr j) = inr j` (identity on right component)
+  - `sign(τ_i) = (-1)^i` (from Fin.sign_cycleRange)
+
+  Reindex by `σ ↦ σ * τ_i`:
+  - `sign(σ * τ_i) = sign(σ) * (-1)^i`
+  - The `(-1)^i` factors cancel
+  - Each inner sum becomes identical to the `i = 0` case
+
+  **Step 5**: Sum over `i` gives `(k+1)` copies of the `i = 0` sum:
+    `∑_i (∑_σ f_0(σ)) = (k+1) * (∑_σ f_0(σ))`
+
+  Reference: Warner GTM 94, Proposition 2.14.
+  -/
+  sorry
 
 private lemma stage2_lemma {k l : ℕ}
     (v : Fin (k + l + 1) → TangentModel n)

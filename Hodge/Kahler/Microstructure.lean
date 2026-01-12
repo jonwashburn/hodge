@@ -974,11 +974,12 @@ theorem microstructureSequence_hasStokesProperty (p : ℕ) (γ : SmoothForm n X 
     (hk : 2 * (n - p) ≥ 1) :
     ∀ j, HasStokesPropertyWith (n := n) (X := X) (k := 2 * (n - p) - 1)
       (Nat.sub_add_cancel hk ▸ (microstructureSequence p γ hγ ψ j).toFun) 0 := by
-  intro j ω
-  -- All sequence elements are zero currents, so the bound holds trivially
-  -- The transport of zero is zero (up to definitional equality issues)
-  -- TODO: Complete this proof with proper transport handling once type arithmetic is resolved
-  sorry
+  intro j
+  -- All sequence elements are zero currents
+  have h_zero : (microstructureSequence p γ hγ ψ j).toFun = 0 :=
+    microstructureSequence_is_zero p γ hγ ψ j
+  exact hasStokesProperty_of_zero_transport (microstructureSequence p γ hγ ψ j).toFun
+    (Nat.sub_add_cancel hk) h_zero
 
 /-- **Theorem: The flat limit of the microstructure sequence also satisfies Stokes property**.
     Since the limit is zero (all sequence elements are zero), it has Stokes constant 0.
@@ -994,11 +995,10 @@ theorem microstructure_limit_hasStokesProperty (p : ℕ) (γ : SmoothForm n X (2
     (hk : 2 * (n - p) ≥ 1) :
     HasStokesPropertyWith (n := n) (X := X) (k := 2 * (n - p) - 1)
       (Nat.sub_add_cancel hk ▸ T_limit.toFun) 0 := by
-  intro ω
-  -- The limit is zero
-  have _h_limit_zero := microstructureSequence_limit_is_zero p γ hγ ψ T_limit φ hφ h_conv
-  -- TODO: Complete this proof with proper transport handling once type arithmetic is resolved
-  sorry
+  -- The limit is zero (all sequence elements are zero, so limit is zero)
+  have h_limit_zero := microstructureSequence_limit_is_zero p γ hγ ψ T_limit φ hφ h_conv
+  exact hasStokesProperty_of_zero_transport T_limit.toFun
+    (Nat.sub_add_cancel hk) h_limit_zero
 
 /-- **Main Theorem (Agent 4 Task 2d): Microstructure produces Stokes-bounded currents**.
     The entire microstructure construction (sequence + limit) has uniform Stokes bound M = 0.
