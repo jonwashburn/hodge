@@ -12,41 +12,52 @@
 
 ```
 'hodge_conjecture'' depends on axioms: [
-  FundamentalClassSet_represents_class,   -- Custom axiom (GAGA.lean:419)
+  FundamentalClassSet_represents_class,   -- 🔴 Custom axiom (GAGA.lean:419)
   propext,                                 -- ✅ Standard Lean
   sorryAx,                                 -- 🔴 FROM SORRY IN LEIBNIZRULE.LEAN
   Classical.choice,                        -- ✅ Standard Lean
-  Current.smoothExtDeriv_comass_bound,     -- Custom axiom (Currents.lean:345)
+  Current.smoothExtDeriv_comass_bound,     -- 🔴 Custom axiom (Currents.lean:345)
   Quot.sound                               -- ✅ Standard Lean
 ]
 ```
 
-### Axiom Breakdown:
+### ⚠️ IMPORTANT: Only 3 Items to Fix on Proof Track
 
-| Category | Axiom | Location | Status |
-|----------|-------|----------|--------|
-| **🔴 SORRY** | `sorryAx` | LeibnizRule.lean:397, 461 | **MUST FIX** |
-| **Custom** | `smoothExtDeriv_comass_bound` | Currents.lean:345 | Infrastructure axiom |
-| **Custom** | `FundamentalClassSet_represents_class` | GAGA.lean:419 | Deep geometric result |
-| **Custom** | `poincareDualForm_isPP` | CycleClass.lean:231 | (p,p)-type property |
-| **Custom** | `poincareDualForm_isRational` | CycleClass.lean:254 | Rationality property |
-| **Custom** | `poincareDualForm_additive` | CycleClass.lean:275 | Additivity property |
-| **Custom** | 8 Kähler axioms | Manifolds.lean | Hodge star, Λ, δ, etc. |
-| ✅ Standard | `propext`, `Classical.choice`, `Quot.sound` | Lean kernel | Always present |
+The Lean kernel reports **exactly what `hodge_conjecture'` depends on**. Despite ~50 axioms
+existing in the codebase, only **3 non-standard items** appear on the proof track:
+
+| # | Item | Location | Type | Action Required |
+|---|------|----------|------|-----------------|
+| 1 | **`sorryAx`** | LeibnizRule.lean:397, 461 | sorry placeholder | **PROVE** the shuffle lemmas |
+| 2 | **`smoothExtDeriv_comass_bound`** | Currents.lean:345 | axiom | **PROVE** (needs Fréchet topology) |
+| 3 | **`FundamentalClassSet_represents_class`** | GAGA.lean:419 | axiom | **PROVE** (needs GMT/Poincaré duality) |
+
+### What About the Other ~50 Axioms?
+
+The codebase contains ~50 axioms in files like `Manifolds.lean`, `KahlerIdentities.lean`, 
+`PrimitiveDecomposition.lean`, `CycleClass.lean`, etc. These are **NOT on the proof track** 
+because `hodge_conjecture'` doesn't actually use them in its dependency chain.
+
+**These off-track axioms**:
+- May be for alternative proof approaches not currently used
+- May be infrastructure for future extensions
+- May be dead code from earlier development
+
+**Focus**: We only need to eliminate the 3 items above to complete the proof.
 
 ### Priority Actions:
 
-1. **🔴 CRITICAL**: Remove `sorry` from `LeibnizRule.lean` (causes `sorryAx`)
-   - Line 397: `shuffle_bijection_right` (induction case)
-   - Line 461: `shuffle_bijection_left`
+1. **🔴 IMMEDIATE**: Fix `sorry` in `LeibnizRule.lean` → removes `sorryAx`
+   - Line 397: `shuffle_bijection_right` (induction case for l > 0)
+   - Line 461: `shuffle_bijection_left` (full proof)
 
-2. **Phase 2**: Prove Leibniz shuffle lemmas (removes 2 axioms after sorry→axiom)
+2. **🔴 NEXT**: Prove `smoothExtDeriv_comass_bound` → removes 1 axiom
+   - Requires: Fréchet space topology on smooth forms (major Mathlib gap)
+   - Alternative: Restructure to avoid this bound
 
-3. **Phase 3**: Prove CycleClass axioms (3 axioms - needs GMT infrastructure)
-
-4. **Phase 4**: Prove Kähler operator axioms (~8 axioms - hardest)
-
-5. **Phase 5**: Prove `FundamentalClassSet_represents_class` (deepest geometric result)
+3. **🔴 FINAL**: Prove `FundamentalClassSet_represents_class` → removes last axiom
+   - Requires: GMT integration currents, Poincaré duality
+   - This is the deepest geometric content
 
 ---
 
@@ -138,7 +149,7 @@ An agent’s work is “done” if and only if it results in one of:
 
 ## Current Status (Updated 2026-01-11)
 
-### Proof Track Axioms Status
+### Proof Track Status — ONLY 3 ITEMS TO FIX
 
 **Latest `#print axioms hodge_conjecture'` output**:
 ```
@@ -146,41 +157,31 @@ FundamentalClassSet_represents_class, propext, sorryAx, Classical.choice,
 Current.smoothExtDeriv_comass_bound, Quot.sound
 ```
 
-### Immediate Blockers (🔴 CRITICAL)
+**Standard Lean axioms** (always present, acceptable): `propext`, `Classical.choice`, `Quot.sound`
 
-| Issue | Location | Fix |
-|-------|----------|-----|
-| **`sorryAx`** | LeibnizRule.lean:397, 461 | Remove `sorry` from shuffle lemmas |
+**Items that MUST be eliminated**:
 
-### Custom Axioms on Proof Track
+| # | Item | Location | Type | How to Fix |
+|---|------|----------|------|------------|
+| 1 | **`sorryAx`** | LeibnizRule.lean:397, 461 | sorry | PROVE shuffle_bijection lemmas |
+| 2 | **`smoothExtDeriv_comass_bound`** | Currents.lean:345 | axiom | PROVE (Fréchet topology needed) |
+| 3 | **`FundamentalClassSet_represents_class`** | GAGA.lean:419 | axiom | PROVE (GMT/Poincaré duality) |
 
-| # | Axiom | Location | Difficulty | Notes |
-|---|-------|----------|------------|-------|
-| 1 | `smoothExtDeriv_comass_bound` | Currents.lean:345 | 🟡 Infrastructure | Needs Fréchet topology |
-| 2 | `FundamentalClassSet_represents_class` | GAGA.lean:419 | 🔴 Hard | Deep geometric result |
+### Off-Track Axioms (exist but NOT used by hodge_conjecture')
 
-### CycleClass Axioms (contribute to axiom #2 above)
+The codebase contains ~50 axioms that are **not on the proof track**. These include:
 
-| # | Axiom | Location | Difficulty |
-|---|-------|----------|------------|
-| 3 | `poincareDualForm_isPP` | CycleClass.lean:231 | 🟠 Medium |
-| 4 | `poincareDualForm_isRational` | CycleClass.lean:254 | 🟠 Medium |
-| 5 | `poincareDualForm_additive` | CycleClass.lean:275 | 🟠 Medium |
+- **Manifolds.lean**: 10 axioms (Hodge star, Lefschetz Λ, Laplacian, etc.)
+- **KahlerIdentities.lean**: 9 axioms (Kähler identities, sl₂ relations)
+- **PrimitiveDecomposition.lean**: 9 axioms (primitive decomposition, Hard Lefschetz)
+- **HardLefschetz.lean**: 3 axioms
+- **CycleClass.lean**: 3 axioms (poincareDualForm properties)
+- **HodgeDecomposition.lean**: 8 axioms (Dolbeault, Hodge decomposition)
+- **DomCoprod.lean**: 1 axiom (wedge_assoc)
+- **Lefschetz.lean**: 2 axioms
 
-### Kähler/Manifolds Axioms
-
-| # | Axiom | Location | Difficulty |
-|---|-------|----------|------------|
-| 6 | `lefschetzLambdaLinearMap` | Manifolds.lean:111 | 🔴 Hard |
-| 7 | `lefschetzLambda_adjoint` | Manifolds.lean:144 | 🔴 Hard |
-| 8 | `lefschetzLambda_hodgeStar_formula` | Manifolds.lean:168 | 🔴 Hard |
-| 9 | `hodgeStarLinearMap` | Manifolds.lean:218 | 🔴 Hard |
-| 10 | `hodgeStar_hodgeStar` | Manifolds.lean:264 | 🟠 Medium |
-| 11 | `adjointDerivLinearMap` | Manifolds.lean:298 | 🔴 Hard |
-| 12 | `adjointDeriv_squared` | Manifolds.lean:350 | 🟠 Medium |
-| 13 | `laplacianLinearMap` | Manifolds.lean:381 | 🔴 Hard |
-| 14 | `isHarmonic_implies_coclosed` | Manifolds.lean:478 | 🟠 Medium |
-| 15 | `isHarmonic_implies_closed` | Manifolds.lean:487 | 🟠 Medium |
+These are either unused, for alternative approaches, or dead code. They do NOT need to be 
+fixed to complete the proof — only the 3 items above matter.
 
 ### Completed Items ✅
 
