@@ -39,37 +39,45 @@ hodge_conjecture' depends on:
 
 ## Agent Assignments
 
-### Agent 1 — Sorry Statements (LeibnizRule)
+### Agent 1 — Sorry Statements (LeibnizRule) 🔴 IN PROGRESS
 **Owner**: `Hodge/Analytic/Advanced/LeibnizRule.lean`
-**Difficulty**: Medium (finite combinatorics)
+**Difficulty**: High (shuffle bijection combinatorics)
 
 **Task**: Eliminate all `sorry` statements causing `sorryAx`
+
+**Current Status (2026-01-12)**:
+- ✅ Base case `shuffle_bijection_right_l0` (l=0) is PROVED
+- 🔴 `shuffle_bijection_right` general case (l>0) has `sorry` at line 312
+- 🔴 `shuffle_bijection_left` has `sorry` at line 350
 
 **Find them**:
 ```bash
 grep -rn 'sorry' Hodge/ --include='*.lean'
 ```
 
-**Exact locations**:
-```
-Hodge/Analytic/Advanced/LeibnizRule.lean:295  (shuffle_bijection_right)
-Hodge/Analytic/Advanced/LeibnizRule.lean:333  (shuffle_bijection_left)
-```
-
 **What these prove**:
 - `shuffle_bijection_right`: Alternatization commutes with wedge (right constant factor)
-- `shuffle_bijection_left`: Alternatization commutes with wedge (left constant factor, with sign)
+  - `∑_i (-1)^i • (A(v_i) ∧ B)(removeNth i v) = (alternatizeUncurryFin A ∧ B)(v ∘ finCongr)`
+- `shuffle_bijection_left`: Same with left constant factor and sign (-1)^k
+  - `∑_i (-1)^i • (A ∧ B(v_i))(removeNth i v) = (-1)^k • (A ∧ alternatizeUncurryFin B)(v ∘ finCongr)`
 
-These are combinatorial lemmas about shuffle permutations. The math is:
-- LHS sums over (derivative index i, shuffle σ)
-- RHS sums over (extended shuffle τ, position j)
-- Need bijection + sign matching
+These are combinatorial lemmas about shuffle permutations (Leibniz rule identities):
+- LHS sums over (derivative index i, (k,l)-shuffle σ via domCoprod)
+- RHS sums over ((k+1,l)-shuffle τ, derivative position encoded in alternatizeUncurryFin)
+- Need explicit bijection + sign matching
 
-**Approach**:
-1. Read the surrounding context to understand what's being proved
-2. These are typically finite combinatorics over `Fin n` types
-3. Use `decide`, `simp`, `omega`, or explicit construction
-4. Test with `lake build Hodge.Analytic.Advanced.LeibnizRule`
+**Proof Requirements**:
+1. Construct bijection between index sets respecting the shuffle quotient structure
+2. Verify sign matching: `(-1)^i * sign(σ) = sign(τ) * (-1)^j` (right case)
+3. For left case, additional sign `(-1)^k` from moving derivative past k-form
+4. Use `Finset.sum_bij` or similar to reindex the sums
+
+**Mathematical Reference**: Bott-Tu GTM 82, Warner GTM 94 Proposition 2.14
+
+**Test with**:
+```bash
+lake build Hodge.Analytic.Advanced.LeibnizRule
+```
 
 **Success Criteria**:
 ```bash
