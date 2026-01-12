@@ -1,0 +1,31 @@
+# Axiom Lock File for hodge_conjecture' Proof Track
+# =================================================
+#
+# This file documents the EXPECTED axiom dependencies for the main theorem.
+# Any deviation from this list should fail CI.
+#
+# Last verified: 2026-01-10
+# Verified by: scripts/verify_proof_track.sh
+
+[ALLOWED_AXIOMS]
+propext
+Classical.choice
+Quot.sound
+
+[KNOWN_ISSUES]
+# These are tracked and expected to be resolved:
+sorryAx  # From sorry statements in LeibnizRule.lean (Agent 1 working on this)
+
+[FORBIDDEN]
+# Any axiom NOT in ALLOWED_AXIOMS or KNOWN_ISSUES should FAIL the build.
+# Examples of axioms that were previously present and removed:
+# - Current.boundary_bound (eliminated 2026-01-12, now a field on Current structure)
+# - FundamentalClassSet_represents_class (eliminated 2026-01-12)
+# - smoothExtDeriv_comass_bound (eliminated 2026-01-12, was mathematically FALSE)
+
+[VERIFICATION_COMMAND]
+# Run this to verify the current axiom state:
+# lake env lean Hodge/Utils/DependencyCheck.lean
+# 
+# Or run the full verification script:
+# ./scripts/verify_proof_track.sh

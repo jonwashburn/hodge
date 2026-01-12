@@ -1,6 +1,6 @@
 # Hodge Conjecture Lean Proof - Multi-Agent Coordination
 
-**Last Updated**: 2026-01-12 (Agent 1 progress on LeibnizRule.lean)
+**Last Updated**: 2026-01-10 (Added Agents 2-5 boundary_bound assignment + Axiom Guard System)
 **Status**: Active Development
 **Goal**: Unconditional, axiom-free, sorry-free proof of `hodge_conjecture'`
 
@@ -35,6 +35,53 @@ hodge_conjecture' depends on:
 **Verification Command**:
 ```bash
 ./scripts/verify_proof_track.sh
+```
+
+---
+
+## 🔒 Axiom Guard System
+
+The proof track is protected against introducing new axioms or sorries:
+
+### Protection Layers
+
+1. **`Hodge/AxiomGuard.lean`** — Compile-time check
+   - Uses Lean meta-programming to verify `hodge_conjecture'` only uses allowed axioms
+   - **Fails the build** if any custom axiom is introduced
+   - Runs automatically when `Hodge.AxiomGuard` is built
+
+2. **`scripts/verify_proof_track.sh`** — CI gate script
+   - Parses `#print axioms` output and categorizes axioms
+   - **Exit code 1** if custom axioms are found (for CI integration)
+   - Run before any merge to main
+
+3. **`scripts/quick_axiom_check.sh`** — Fast local check
+   - Greps for `^axiom` declarations in the codebase
+   - Works even when build is broken
+   - Catches explicit axiom additions before attempting build
+
+4. **`scripts/pre-commit-axiom-guard`** — Git pre-commit hook
+   - Install: `cp scripts/pre-commit-axiom-guard .git/hooks/pre-commit`
+   - Prevents commits that add new `axiom` declarations
+   - Can be bypassed with `--no-verify` for WIP commits
+
+5. **`AXIOM_LOCK.txt`** — Documentation of expected axioms
+   - Lists the three standard Lean axioms (always present)
+   - Documents known issues (sorryAx from Agent 1's work)
+   - Records eliminated axioms for historical reference
+
+### How to Use
+
+```bash
+# Quick check (no build required)
+./scripts/quick_axiom_check.sh
+
+# Full verification (requires build)
+./scripts/verify_proof_track.sh
+
+# Install pre-commit hook (optional but recommended)
+cp scripts/pre-commit-axiom-guard .git/hooks/pre-commit
+chmod +x .git/hooks/pre-commit
 ```
 
 ---
@@ -228,12 +275,121 @@ The archive preserves the full infrastructure for Lefschetz theory.
 
 ---
 
+### Agent 5 — Clay-Readiness (Semantic Stubs / Real Math) 🟡 NOT STARTED
+**Scope**: Repo-wide (but prioritize proof-track modules)
+**Goal**: Make the development *mathematically faithful*, not just kernel-axiom-clean.
+
+**Why this matters**: Once Agent 1 removes the last `sorry`s, the kernel report will be “clean”,
+but the repo still contains **intentional semantic stubs** (e.g. definitions returning `0`,
+placeholder theorems, “witness” interfaces standing in for comparison/GAGA/regularity theory).
+Those are fine for architecture, but **not Clay-grade**.
+
+**Recommended work breakdown** (pick one thread at a time):
+- **Currents / integration / Stokes**
+  - Replace `integration_current := 0` with an actual integration current and prove Stokes-type bounds.
+  - Replace “normality-style” hypotheses with real theorems for the current types used.
+- **Harvey–Lawson calibrated currents**
+  - Replace semantic stubs in `Hodge/Classical/HarveyLawson.lean` with real statements/proofs
+    (this is a major GMT + complex-analytic regularity project).
+- **GAGA / comparison theory**
+  - Replace “witness” mechanisms (`IsRationalFormWitness`, etc.) with actual comparison theorems.
+- **De Rham + Hodge theory alignment**
+  - Ensure the Lean objects match the TeX definitions (topologies, continuity, norms, etc.).
+
+**Success criteria for Agent 5**: not “no sorries”, but “no placeholders affecting mathematical meaning”
+in the dependency cone of `hodge_conjecture'`.
+
+---
+
+### Agents 2-5 — boundary_bound Proofs (Semantic Strengthening) 🟡 PARTIALLY COMPLETE
+**Scope**: `Hodge/Analytic/Currents.lean` + related modules
+**Difficulty**: 5% relative to full formalization (1-2.5 months)
+**Prerequisites**: Benefits from integration current work (Agent 5)
+
+**Context**: The `Current` structure now has a `boundary_bound` field instead of a global axiom.
+This is cleaner architecturally.
+
+**Current status**:
+- ✅ **Sum/scalar bounds are properly proved** (Agent 4, 2026-01-12)
+- 🔴 Integration current bounds still need real Stokes theorem
+- 🔴 Zero current uses `M := 0` (correct for zero, not a problem)
+
+#### Task Breakdown
+
+| Subtask | Owner | Difficulty | Status |
+|---------|-------|------------|--------|
+| **2a. Integration current bounds** | Agent 2 | 40% | 🔴 Needs Stokes |
+| **2b. Limit current bounds** | Agent 3 | 25% | 🔴 Needs flat norm |
+| **2c. Sum/scalar bounds** | Agent 4 | 15% | ✅ COMPLETE |
+| **2d. Microstructure current bounds** | Agent 5 | 20% | 🔴 Needs 2a+2c |
+
+#### 2a. Integration Current Bounds (Agent 2)
+**File**: `Hodge/Analytic/Currents.lean`
+**Statement to prove**:
+```lean
+-- For integration_current [Z], prove:
+∃ M : ℝ, ∀ ω : SmoothForm n X k, |[Z](dω)| ≤ M * ‖ω‖
+```
+**Proof sketch**: By Stokes' theorem, `[Z](dω) = [∂Z](ω)`, so `|[Z](dω)| ≤ mass(∂Z) · comass(ω)`.
+Take `M = mass(∂Z)`.
+
+**Prerequisites**: Real `integration_current` definition (not `:= 0`), Stokes theorem.
+
+#### 2b. Limit Current Bounds (Agent 3)
+**File**: `Hodge/Analytic/Currents.lean`
+**Statement**: If `Tᵢ → T` in flat norm and each `Tᵢ` satisfies boundary bound with constant `Mᵢ`,
+then `T` satisfies boundary bound (with suitable limit constant).
+
+**Proof sketch**: Flat norm convergence preserves mass bounds. Use `liminf Mᵢ` or similar.
+
+#### 2c. Sum/Scalar Bounds (Agent 4) ✅ COMPLETE
+**File**: `Hodge/Analytic/Currents.lean`
+**Status**: ✅ Properly implemented with mathematically meaningful proofs
+
+The bounds are correctly proved using the triangle inequality:
+
+```lean
+-- add_curr (lines 126-153):
+-- bound: |T₁(ω) + T₂(ω)| ≤ |T₁(ω)| + |T₂(ω)| ≤ M₁ * ‖ω‖ + M₂ * ‖ω‖ = (M₁+M₂) * ‖ω‖
+-- boundary_bound: Same approach for |T₁(dω) + T₂(dω)|
+
+-- smul_curr (lines 202-224):
+-- bound: |r * T(ω)| = |r| * |T(ω)| ≤ |r| * M * ‖ω‖ = (|r|*M) * ‖ω‖
+-- boundary_bound: Same approach for |r * T(dω)|
+
+-- neg_curr (lines 165-177):
+-- bound: |-T(ω)| = |T(ω)| ≤ M * ‖ω‖ (same bound, negation doesn't change absolute value)
+```
+
+These are NOT trivial `⟨0, by simp⟩` witnesses — they properly derive the bound
+from the constituent currents' bounds using standard analysis.
+
+#### 2d. Microstructure Current Bounds (Agent 5)
+**File**: `Hodge/Kahler/Microstructure.lean`
+**Context**: The microstructure construction produces currents via `RawSheetSum.toIntegralCurrent`.
+**Statement**: These currents satisfy `boundary_bound` with explicit constants.
+
+**Proof sketch**: Sheet sums are finite combinations of integration currents over submanifolds.
+By 2a + 2c, the bounds follow.
+
+---
+
+**Success Criteria**:
+- No `⟨0, by simp⟩` witnesses for `boundary_bound` in proof-track currents
+- Explicit `M` values derived from geometric properties (mass, volume, etc.)
+- Proofs reference Stokes/mass bounds, not just `trivial`
+
+**Why this matters**: Currently the field is satisfied vacuously because our currents are `:= 0` stubs.
+Once we have real currents (Agent 5 work), we need real boundedness proofs.
+
+---
+
 ## Priority Order
 
-1. **Agent 1** (sorry statements) — Quickest win, unblocks everything
-2. **Agent 2** (smoothExtDeriv) — Moderate difficulty, single axiom
-3. **Agent 4** (KahlerManifold) — Hardest, but critical for unconditional proof
-4. **Agent 3** — ✅ Done, can assist others
+1. **Agent 1** (remove the 2 `sorry`s in `LeibnizRule.lean`) — *only remaining proof-track blocker*
+2. **Agent 5** (Clay-readiness: remove semantic stubs / placeholder definitions)
+3. **Agents 2-5** (boundary_bound proofs: after integration currents are non-trivial)
+4. Agent 3/4 — ✅ done; **Agent 4's 2c task also complete**
 
 ---
 

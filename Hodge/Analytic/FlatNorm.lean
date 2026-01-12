@@ -535,4 +535,139 @@ theorem flatNorm_eq_zero_iff {k : ℕ} (T : Current n X k) : flatNorm T = 0 ↔ 
     rw [h_T_zero]
     exact flatNorm_zero
 
+/-! ## Flat Norm Convergence and Limit Bounds (Agent 3 - 2b) -/
+
+/-- **Flat norm convergence** (Federer-Fleming 1960).
+    A sequence of currents `Tᵢ` converges to `T` in flat norm if `flatNorm(Tᵢ - T) → 0`. -/
+def FlatNormConverges {k : ℕ} (seq : ℕ → Current n X k) (T : Current n X k) : Prop :=
+  Filter.Tendsto (fun i => flatNorm (seq i - T)) Filter.atTop (nhds 0)
+
+/-- **Pointwise convergence from flat norm convergence** (Federer-Fleming).
+    If `Tᵢ → T` in flat norm, then for each form ψ, `Tᵢ(ψ) → T(ψ)`.
+
+    **Proof**: By `eval_le_flatNorm`, |Tᵢ(ψ) - T(ψ)| = |(Tᵢ - T)(ψ)| ≤ flatNorm(Tᵢ - T) × C
+    where C = max(comass ψ, comass dψ). Since flatNorm(Tᵢ - T) → 0, the RHS → 0. -/
+theorem flatNormConverges_pointwise {k : ℕ} {seq : ℕ → Current n X k} {T : Current n X k}
+    (h_conv : FlatNormConverges seq T) (ψ : SmoothForm n X k) :
+    Filter.Tendsto (fun i => (seq i).toFun ψ) Filter.atTop (nhds (T.toFun ψ)) := by
+  -- The constant C for this form
+  let C := max (comass ψ) (comass (smoothExtDeriv ψ))
+  -- For each i: |seq(i)(ψ) - T(ψ)| ≤ flatNorm(seq i - T) * C
+  have h_bound : ∀ i, |((seq i).toFun ψ) - (T.toFun ψ)| ≤ flatNorm (seq i - T) * C := fun i => by
+    -- (seq i - T).toFun ψ = seq(i)(ψ) - T(ψ)
+    have h_diff : (seq i - T).toFun ψ = (seq i).toFun ψ - T.toFun ψ := rfl
+    have h := eval_le_flatNorm (seq i - T) ψ
+    rwa [h_diff] at h
+  -- flatNorm(seq i - T) → 0 by hypothesis
+  -- So flatNorm(seq i - T) * C → 0 * C = 0
+  have h_prod_tends : Filter.Tendsto (fun i => flatNorm (seq i - T) * C) Filter.atTop (nhds 0) := by
+    have h_mul := Filter.Tendsto.mul h_conv tendsto_const_nhds
+    simp only [MulZeroClass.zero_mul] at h_mul
+    exact h_mul
+  -- By squeeze theorem: |seq(i)(ψ) - T(ψ)| → 0
+  rw [Metric.tendsto_atTop] at h_prod_tends ⊢
+  intro ε hε
+  obtain ⟨N, hN⟩ := h_prod_tends ε hε
+  use N
+  intro i hi
+  have h1 := hN i hi
+  simp only [Real.dist_eq, sub_zero] at h1
+  have h2 := h_bound i
+  have h3 : |flatNorm (seq i - T) * C| = flatNorm (seq i - T) * C := by
+    apply abs_of_nonneg
+    exact mul_nonneg (flatNorm_nonneg _) (le_max_of_le_left (comass_nonneg ψ))
+  rw [h3] at h1
+  rw [Real.dist_eq]
+  linarith
+
+/-- **Boundary bound constant** (extract the M from boundary_bound field).
+    For k > 0, this extracts the bound M such that |T(dω)| ≤ M * ‖ω‖ for all ω. -/
+noncomputable def boundaryBoundConst {k : ℕ} (T : Current n X (k + 1)) : ℝ :=
+  (T.boundary_bound).choose
+
+/-- The boundary bound constant satisfies the bound property. -/
+theorem boundaryBoundConst_spec {k : ℕ} (T : Current n X (k + 1)) :
+    ∀ ω : SmoothForm n X k, |T.toFun (smoothExtDeriv ω)| ≤ boundaryBoundConst T * ‖ω‖ :=
+  (T.boundary_bound).choose_spec
+
+/-- **Limit currents preserve boundary boundedness** (Agent 3 - 2b).
+
+    If a sequence of currents `Tᵢ → T` in flat norm, and all `Tᵢ` have uniformly
+    bounded boundary constants (i.e., `boundaryBoundConst Tᵢ ≤ M` for all i),
+    then the limit current `T` also satisfies boundary boundedness with constant `M`.
+
+    **Proof Sketch**: For any form ω:
+    - |T(dω)| = lim |Tᵢ(dω)| (by pointwise convergence)
+    - |Tᵢ(dω)| ≤ Mᵢ * ‖ω‖ ≤ M * ‖ω‖ (by uniform bound)
+    - Taking limit: |T(dω)| ≤ M * ‖ω‖
+
+    **Mathematical Reference**: [Federer-Fleming, "Normal and integral currents", 1960]
+    Mass bounds are preserved under flat norm limits by compactness. -/
+theorem limit_current_boundary_bound {k : ℕ} {seq : ℕ → Current n X (k + 1)}
+    {T : Current n X (k + 1)} (h_conv : FlatNormConverges seq T)
+    {M : ℝ} (h_unif : ∀ i, boundaryBoundConst (seq i) ≤ M) :
+    ∀ ω : SmoothForm n X k, |T.toFun (smoothExtDeriv ω)| ≤ M * ‖ω‖ := by
+  intro ω
+  -- The sequence Tᵢ(dω) converges to T(dω)
+  have h_pointwise := flatNormConverges_pointwise h_conv (smoothExtDeriv ω)
+  -- For each i: |Tᵢ(dω)| ≤ boundaryBoundConst(Tᵢ) * ‖ω‖ ≤ M * ‖ω‖
+  have h_seq_bound : ∀ i, |(seq i).toFun (smoothExtDeriv ω)| ≤ M * ‖ω‖ := fun i => by
+    have h1 := boundaryBoundConst_spec (seq i) ω
+    have h2 := h_unif i
+    calc |(seq i).toFun (smoothExtDeriv ω)|
+        ≤ boundaryBoundConst (seq i) * ‖ω‖ := h1
+      _ ≤ M * ‖ω‖ := by
+          by_cases h_norm : ‖ω‖ ≥ 0
+          · exact mul_le_mul_of_nonneg_right h2 h_norm
+          · push_neg at h_norm
+            -- ‖ω‖ < 0 is impossible since norms are non-negative
+            have h_norm_nonneg : ‖ω‖ ≥ 0 := norm_nonneg ω
+            linarith
+  -- The limit of a bounded sequence is bounded by the same bound
+  -- Use: if aᵢ → a and |aᵢ| ≤ B for all i, then |a| ≤ B
+  have h_limit_bound : |T.toFun (smoothExtDeriv ω)| ≤ M * ‖ω‖ := by
+    -- The sequence (seq i).toFun (smoothExtDeriv ω) → T.toFun (smoothExtDeriv ω)
+    -- Each term is bounded in absolute value by M * ‖ω‖
+    -- So the limit is also bounded
+    by_contra h_not_le
+    push_neg at h_not_le
+    -- |T(dω)| > M * ‖ω‖, so there exists ε > 0 with |T(dω)| = M * ‖ω‖ + ε
+    set gap := |T.toFun (smoothExtDeriv ω)| - M * ‖ω‖ with hgap_def
+    have hgap_pos : gap > 0 := by linarith
+    -- By convergence, ∃ N such that for i ≥ N, |Tᵢ(dω) - T(dω)| < gap/2
+    rw [Metric.tendsto_atTop] at h_pointwise
+    obtain ⟨N, hN⟩ := h_pointwise (gap / 2) (by linarith)
+    -- For i = N: |T_N(dω) - T(dω)| < gap/2
+    have h_close := hN N (le_refl N)
+    rw [Real.dist_eq] at h_close
+    -- |T_N(dω)| ≤ M * ‖ω‖ by h_seq_bound
+    have h_N_bound := h_seq_bound N
+    -- Triangle inequality: |T(dω)| ≤ |T_N(dω)| + |T_N(dω) - T(dω)|
+    have h_tri : |T.toFun (smoothExtDeriv ω)| ≤
+        |(seq N).toFun (smoothExtDeriv ω)| + |(seq N).toFun (smoothExtDeriv ω) - T.toFun (smoothExtDeriv ω)| := by
+      have h := abs_sub_abs_le_abs_sub ((seq N).toFun (smoothExtDeriv ω)) (T.toFun (smoothExtDeriv ω))
+      linarith [abs_sub_comm ((seq N).toFun (smoothExtDeriv ω)) (T.toFun (smoothExtDeriv ω))]
+    -- |T(dω)| ≤ M * ‖ω‖ + gap/2 < M * ‖ω‖ + gap = |T(dω)|
+    have h_contra : |T.toFun (smoothExtDeriv ω)| < |T.toFun (smoothExtDeriv ω)| := calc
+      |T.toFun (smoothExtDeriv ω)|
+          ≤ |(seq N).toFun (smoothExtDeriv ω)| +
+            |(seq N).toFun (smoothExtDeriv ω) - T.toFun (smoothExtDeriv ω)| := h_tri
+        _ ≤ M * ‖ω‖ + gap / 2 := by linarith
+        _ < M * ‖ω‖ + gap := by linarith
+        _ = |T.toFun (smoothExtDeriv ω)| := by rw [hgap_def]; ring
+    linarith
+  exact h_limit_bound
+
+/-- **Limit current construction** (Agent 3 - 2b).
+
+    Given a sequence of currents converging in flat norm with uniformly bounded
+    properties, we can construct a limit current with the same properties.
+
+    This is a key technical lemma for the Federer-Fleming compactness theorem. -/
+theorem limit_current_exists {k : ℕ} {seq : ℕ → Current n X (k + 1)}
+    {T : Current n X (k + 1)} (h_conv : FlatNormConverges seq T)
+    {M_bound : ℝ} (h_bound_unif : ∀ i, boundaryBoundConst (seq i) ≤ M_bound) :
+    ∃ M : ℝ, ∀ ω : SmoothForm n X k, |T.toFun (smoothExtDeriv ω)| ≤ M * ‖ω‖ :=
+  ⟨M_bound, limit_current_boundary_bound h_conv h_bound_unif⟩
+
 end

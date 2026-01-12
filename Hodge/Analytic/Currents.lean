@@ -490,4 +490,222 @@ noncomputable def integration_current {n : ℕ} {X : Type*} {k : ℕ}
 -- If needed in future, this would be proved from the Stokes theorem once
 -- `integration_current` has a real (non-opaque) definition.
 
+/-! ## Agent 2 Task 2a: Integration Current Boundary Bounds
+
+This section provides infrastructure for integration currents with explicit boundary mass bounds.
+Once we have real integration currents (Agent 5 work), this infrastructure will be used to
+prove the `boundary_bound` field of the `Current` structure.
+
+### Mathematical Background (Stokes Theorem)
+
+For an integration current `[Z]` over a rectifiable set `Z`:
+
+1. **Stokes' Theorem**: `∫_Z dω = ∫_{∂Z} ω`
+   - In current notation: `[Z](dω) = [∂Z](ω)`
+
+2. **Mass Bound**: `|[∂Z](ω)| ≤ mass(∂Z) · comass(ω)`
+   - This is the duality between mass and comass
+
+3. **Boundary Bound Derivation**:
+   ```
+   |[Z](dω)| = |[∂Z](ω)|           (by Stokes)
+             ≤ mass(∂Z) · comass(ω)  (by mass-comass duality)
+             = mass(∂Z) · ‖ω‖       (since comass = ‖·‖ for forms)
+   ```
+   Therefore, `M = mass(∂Z)` is the boundary bound constant.
+
+### References
+
+- [H. Federer, "Geometric Measure Theory", Springer 1969, §4.5]
+- [F. Morgan, "Geometric Measure Theory: A Beginner's Guide", Academic Press 2016, Ch. 4]
+- [H. Federer and W.H. Fleming, "Normal and integral currents", Ann. Math. 72 (1960)]
+-/
+
+/-- **Boundary Mass** (Federer, 1969).
+    The mass of the boundary of a set Z.
+    In a full development, this would be defined via Hausdorff measure.
+    **Status**: Proof-first stub returning 0 for all sets. -/
+noncomputable def boundaryMass {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [Nonempty X]
+    (_Z : Set X) : ℝ :=
+  0
+
+/-- Boundary mass is non-negative. -/
+theorem boundaryMass_nonneg {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [Nonempty X]
+    (Z : Set X) : boundaryMass Z ≥ 0 := by
+  unfold boundaryMass
+  linarith
+
+/-- **Stokes Property for Integration Currents** (Federer, 1969).
+
+    A current `T` satisfies the Stokes property with constant `M` if:
+    `|T(dω)| ≤ M · ‖ω‖` for all smooth forms `ω`.
+
+    This is exactly what is needed for the `boundary_bound` field of `Current`.
+
+    **Mathematical Meaning**: For an integration current `[Z]`, the Stokes property
+    holds with `M = mass(∂Z)`. This follows from:
+    - Stokes: `[Z](dω) = [∂Z](ω)`
+    - Mass-comass duality: `|[∂Z](ω)| ≤ mass(∂Z) · comass(ω)`
+
+    Reference: [H. Federer, "Geometric Measure Theory", 1969, §4.5]. -/
+def HasStokesPropertyWith {n : ℕ} {X : Type*} {k : ℕ}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [Nonempty X]
+    (T : Current n X (k + 1)) (M : ℝ) : Prop :=
+  ∀ ω : SmoothForm n X k, |T.toFun (smoothExtDeriv ω)| ≤ M * ‖ω‖
+
+/-- **Stokes Property Implies Boundary Bound** (Federer, 1969).
+
+    If a current `T` satisfies the Stokes property with constant `M`,
+    then it satisfies the `boundary_bound` hypothesis of the `Current` structure.
+
+    This lemma provides the bridge between the geometric Stokes theorem and
+    the functional-analytic boundedness condition. -/
+theorem stokes_property_implies_boundary_bound {n : ℕ} {X : Type*} {k : ℕ}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [Nonempty X]
+    (T : Current n X (k + 1)) (M : ℝ) (hT : HasStokesPropertyWith T M) :
+    ∃ M' : ℝ, ∀ ω : SmoothForm n X k, |T.toFun (smoothExtDeriv ω)| ≤ M' * ‖ω‖ :=
+  ⟨M, hT⟩
+
+/-- The zero current satisfies the Stokes property with constant 0. -/
+theorem zero_hasStokesProperty {n : ℕ} {X : Type*} {k : ℕ}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [Nonempty X] :
+    HasStokesPropertyWith (0 : Current n X (k + 1)) 0 := by
+  intro ω
+  simp [Current.zero_toFun]
+
+/-- **Sum of Stokes-Bounded Currents**.
+    If `T₁` has Stokes constant `M₁` and `T₂` has Stokes constant `M₂`,
+    then `T₁ + T₂` has Stokes constant `M₁ + M₂`. -/
+theorem add_hasStokesProperty {n : ℕ} {X : Type*} {k : ℕ}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [Nonempty X]
+    (T₁ T₂ : Current n X (k + 1)) (M₁ M₂ : ℝ)
+    (h₁ : HasStokesPropertyWith T₁ M₁) (h₂ : HasStokesPropertyWith T₂ M₂) :
+    HasStokesPropertyWith (T₁ + T₂) (M₁ + M₂) := by
+  intro ω
+  have hT1 := h₁ ω
+  have hT2 := h₂ ω
+  calc
+    |(T₁ + T₂).toFun (smoothExtDeriv ω)|
+      = |T₁.toFun (smoothExtDeriv ω) + T₂.toFun (smoothExtDeriv ω)| := rfl
+    _ ≤ |T₁.toFun (smoothExtDeriv ω)| + |T₂.toFun (smoothExtDeriv ω)| := abs_add_le _ _
+    _ ≤ M₁ * ‖ω‖ + M₂ * ‖ω‖ := add_le_add hT1 hT2
+    _ = (M₁ + M₂) * ‖ω‖ := by ring
+
+/-- **Scalar Multiple of Stokes-Bounded Current**.
+    If `T` has Stokes constant `M`, then `c • T` has Stokes constant `|c| * M`. -/
+theorem smul_hasStokesProperty {n : ℕ} {X : Type*} {k : ℕ}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [Nonempty X]
+    (c : ℝ) (T : Current n X (k + 1)) (M : ℝ)
+    (hT : HasStokesPropertyWith T M) :
+    HasStokesPropertyWith (c • T) (|c| * M) := by
+  intro ω
+  have h := hT ω
+  calc
+    |(c • T).toFun (smoothExtDeriv ω)|
+      = |c * T.toFun (smoothExtDeriv ω)| := rfl
+    _ = |c| * |T.toFun (smoothExtDeriv ω)| := abs_mul c _
+    _ ≤ |c| * (M * ‖ω‖) := mul_le_mul_of_nonneg_left h (abs_nonneg c)
+    _ = (|c| * M) * ‖ω‖ := by ring
+
+/-- **Integration Current Stokes Property** (Stokes Theorem).
+
+    The integration current `[Z]` satisfies the Stokes property with constant `boundaryMass(Z)`.
+
+    **Mathematical Content** (not yet formalized):
+    - By Stokes' theorem: `[Z](dω) = [∂Z](ω)`
+    - By mass-comass duality: `|[∂Z](ω)| ≤ mass(∂Z) · comass(ω)`
+
+    **Current Status**: Since `integration_current` is the zero current and
+    `boundaryMass` is 0, this holds trivially. Once we have real definitions,
+    this theorem would require a proof of Stokes' theorem.
+
+    Reference: [H. Federer, "Geometric Measure Theory", 1969, §4.5]. -/
+theorem integration_current_hasStokesProperty {n : ℕ} {X : Type*} {k : ℕ}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [Nonempty X]
+    (Z : Set X) :
+    HasStokesPropertyWith (integration_current (k := k + 1) Z) (boundaryMass (k := k) Z) := by
+  -- Currently trivial since integration_current = 0 and boundaryMass = 0
+  intro ω
+  unfold integration_current boundaryMass
+  simp [Current.zero_toFun]
+
+/-- **Integration Current Boundary Bound** (Agent 2a).
+
+    The integration current `[Z]` satisfies the `boundary_bound` property
+    with bound `M = boundaryMass(Z)`.
+
+    This is the main theorem for Task 2a: it shows that integration currents
+    automatically satisfy the normality-style hypothesis required by the
+    `Current` structure.
+
+    **Note**: Once we have real integration currents (Agent 5 work), this
+    theorem will provide the concrete boundary bound constant. -/
+theorem integration_current_boundary_bound {n : ℕ} {X : Type*} {k : ℕ}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [Nonempty X]
+    (Z : Set X) :
+    ∃ M : ℝ, ∀ ω : SmoothForm n X k,
+      |(integration_current (k := k + 1) Z).toFun (smoothExtDeriv ω)| ≤ M * ‖ω‖ :=
+  stokes_property_implies_boundary_bound
+    (integration_current (k := k + 1) Z)
+    (boundaryMass (k := k) Z)
+    (integration_current_hasStokesProperty Z)
+
+/-! ## Task 2c Preview: Sum and Scalar Bounds
+
+The following theorems show that sums and scalar multiples of currents with
+explicit Stokes constants have computable Stokes constants. This is relevant
+for Task 2c (Sum/Scalar Bounds).
+
+These results are already proved above (`add_hasStokesProperty`, `smul_hasStokesProperty`).
+-/
+
+/-- Sum of integration currents has bounded boundary.
+    For `[Z₁] + [Z₂]`, the Stokes constant is `boundaryMass(Z₁) + boundaryMass(Z₂)`. -/
+theorem integration_current_sum_boundary_bound {n : ℕ} {X : Type*} {k : ℕ}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [Nonempty X]
+    (Z₁ Z₂ : Set X) :
+    HasStokesPropertyWith
+      ((integration_current (k := k + 1) Z₁) + (integration_current (k := k + 1) Z₂))
+      (boundaryMass (k := k) Z₁ + boundaryMass (k := k) Z₂) :=
+  add_hasStokesProperty
+    (integration_current Z₁) (integration_current Z₂)
+    (boundaryMass Z₁) (boundaryMass Z₂)
+    (integration_current_hasStokesProperty Z₁)
+    (integration_current_hasStokesProperty Z₂)
+
+/-- Scalar multiple of integration current has bounded boundary.
+    For `c • [Z]`, the Stokes constant is `|c| * boundaryMass(Z)`. -/
+theorem integration_current_smul_boundary_bound {n : ℕ} {X : Type*} {k : ℕ}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [Nonempty X]
+    (c : ℝ) (Z : Set X) :
+    HasStokesPropertyWith
+      (c • (integration_current (k := k + 1) Z))
+      (|c| * boundaryMass (k := k) Z) :=
+  smul_hasStokesProperty c (integration_current Z) (boundaryMass Z)
+    (integration_current_hasStokesProperty Z)
+
 end

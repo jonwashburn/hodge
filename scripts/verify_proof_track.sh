@@ -78,13 +78,18 @@ fi
 
 if [ $CUSTOM_COUNT -eq 0 ]; then
     echo ""
-    echo "✅ SUCCESS: Proof is complete! No custom axioms or sorry."
+    echo "✅ SUCCESS: No custom axioms in proof track!"
+    if [ $SORRY_FOUND -eq 0 ]; then
+        echo "✅ COMPLETE: Proof is axiom-free AND sorry-free!"
+    else
+        echo "⚠️  Note: sorryAx present (Agent 1 working on this)"
+    fi
     exit 0
 else
     echo ""
-    echo "⚠️  Proof incomplete: $CUSTOM_COUNT custom axiom(s) remain."
+    echo "❌ AXIOM GUARD FAILURE: $CUSTOM_COUNT custom axiom(s) introduced!"
     echo ""
-    echo "Custom axioms to eliminate:"
+    echo "Custom axioms that must be eliminated before merge:"
     for axiom in $AXIOM_LIST; do
         case "$axiom" in
             propext|Classical.choice|Quot.sound|sorryAx|"")
@@ -100,5 +105,7 @@ else
                 ;;
         esac
     done
-    exit 0
+    echo ""
+    echo "See AXIOM_LOCK.txt for the list of allowed axioms."
+    exit 1  # FAIL the build/CI
 fi

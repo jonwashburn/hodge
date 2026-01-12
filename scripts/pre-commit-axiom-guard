@@ -1,0 +1,47 @@
+#!/bin/bash
+# Git pre-commit hook for axiom guard
+# 
+# To install:
+#   cp scripts/pre-commit-axiom-guard .git/hooks/pre-commit
+#   chmod +x .git/hooks/pre-commit
+#
+# This hook prevents commits that introduce new `axiom` declarations.
+
+echo "🔒 Axiom Guard: Checking for new axiom declarations..."
+
+# Check staged files for new axiom declarations
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep "\.lean$" || true)
+
+if [ -z "$STAGED_FILES" ]; then
+    exit 0  # No Lean files staged
+fi
+
+NEW_AXIOMS=""
+for file in $STAGED_FILES; do
+    if [ -f "$file" ]; then
+        # Check for axiom declarations in staged content
+        AXIOMS=$(git diff --cached "$file" | grep "^+axiom " || true)
+        if [ -n "$AXIOMS" ]; then
+            NEW_AXIOMS="$NEW_AXIOMS\n$file:\n$AXIOMS"
+        fi
+    fi
+done
+
+if [ -n "$NEW_AXIOMS" ]; then
+    echo ""
+    echo "❌ AXIOM GUARD: New axiom declaration(s) detected!"
+    echo ""
+    echo -e "$NEW_AXIOMS"
+    echo ""
+    echo "New axioms break the proof-track integrity."
+    echo ""
+    echo "Options:"
+    echo "  1. Remove the axiom and prove the statement instead"
+    echo "  2. If this is intentional development work, bypass with:"
+    echo "     git commit --no-verify"
+    echo ""
+    exit 1
+fi
+
+echo "✅ Axiom Guard: No new axioms detected"
+exit 0
