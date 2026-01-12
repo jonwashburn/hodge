@@ -810,7 +810,10 @@ lake exe cache get
 # Safe build (uses helper script)
 ./scripts/build.sh
 
-# Check proof track axioms
+# ⭐ VERIFY PROOF TRACK STATUS (recommended before any commit)
+./scripts/verify_proof_track.sh
+
+# Check proof track axioms (raw output)
 lake env lean Hodge/Utils/DependencyCheck.lean
 
 # Run audit script
@@ -818,6 +821,29 @@ lake env lean Hodge/Utils/DependencyCheck.lean
 
 # Full grep for sorry/axiom
 grep -rn "sorry\|^axiom" Hodge/ --include="*.lean"
+```
+
+### verify_proof_track.sh Output
+
+The verification script shows exactly what needs to be proved:
+
+```
+═══════════════════════════════════════════════════════
+AXIOM ANALYSIS
+═══════════════════════════════════════════════════════
+  🔴 FundamentalClassSet_represents_class (CUSTOM AXIOM - must prove)
+  ✅ propext (standard Lean - proposition extensionality)
+  ❌ sorryAx (SORRY STATEMENTS IN CODE!)
+  ✅ Classical.choice (standard Lean - axiom of choice)
+  🔴 Current.smoothExtDeriv_comass_bound (CUSTOM AXIOM - must prove)
+  ✅ Quot.sound (standard Lean - quotient soundness)
+
+═══════════════════════════════════════════════════════
+SUMMARY
+═══════════════════════════════════════════════════════
+   Standard Lean axioms: 3 (always present, acceptable)
+   Custom axioms to prove: 2
+   Sorry statements: FOUND ❌
 ```
 
 ---
