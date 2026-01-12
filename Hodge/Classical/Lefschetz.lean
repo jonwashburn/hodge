@@ -66,75 +66,12 @@ def lefschetz_power (n : ℕ) (X : Type u)
     LinearMap.comp L Lk
 
 /-!
-═══════════════════════════════════════════════════════════════════════════════
-⚠️  OFF-TRACK AXIOMS BELOW ⚠️
-
-These axioms are NOT used by `hodge_conjecture'`. Run `./scripts/verify_proof_track.sh`
-═══════════════════════════════════════════════════════════════════════════════
+══════════════════════════════════════════════════════════════════════════════════════════
+NOTE: The dual Lefschetz operator Λ on cohomology and its axioms (isFormClosed_lefschetzLambda,
+cohomologous_lefschetzLambda) were moved to archive/Hodge/Classical/LefschetzLambda.lean
+because they are NOT on the proof track of hodge_conjecture'.
+══════════════════════════════════════════════════════════════════════════════════════════
 -/
-
-/-- Λ preserves closedness on Kähler manifolds. ⚠️ OFF-TRACK: Not used by hodge_conjecture'
-    This follows from the Kähler identity [Λ, d] = i(∂̄* - ∂*), which implies
-    that if dω = 0 then d(Λω) is controlled. On harmonic forms, Λ preserves harmonicity. -/
-axiom isFormClosed_lefschetzLambda {n : ℕ} {X : Type u}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    {k : ℕ} (ω : SmoothForm n X k) (hω : IsFormClosed ω) :
-    IsFormClosed (lefschetzLambdaLinearMap n X k ω)
-
-/-- Λ preserves cohomology classes (descends to quotient).
-    If ω₁ ~ ω₂ (differ by an exact form), then Λω₁ ~ Λω₂. -/
-axiom cohomologous_lefschetzLambda {n : ℕ} {X : Type u}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    {k : ℕ} (ω₁ ω₂ : SmoothForm n X k) (h₁ : IsFormClosed ω₁) (h₂ : IsFormClosed ω₂)
-    (hcoh : Cohomologous ⟨ω₁, h₁⟩ ⟨ω₂, h₂⟩) :
-    Cohomologous ⟨lefschetzLambdaLinearMap n X k ω₁, isFormClosed_lefschetzLambda ω₁ h₁⟩
-                 ⟨lefschetzLambdaLinearMap n X k ω₂, isFormClosed_lefschetzLambda ω₂ h₂⟩
-
-/-- **The Dual Lefschetz Operator Λ** on cohomology.
-    Λ : H^k(X) → H^{k-2}(X) is induced by the form-level dual Lefschetz operator.
-
-    This descends from `lefschetzLambdaLinearMap` on forms to cohomology classes.
-    The key property is that Λ is the formal adjoint of L:
-    ⟨L(α), β⟩ = ⟨α, Λ(β)⟩
-
-    **Mathematical Background**:
-    - Λ is the contraction with the dual Kähler bivector
-    - On forms: Λ = ⋆⁻¹ ∘ L ∘ ⋆ (via Hodge star)
-    - [L, Λ] = H (sl(2) relation, where H is the weight operator)
-
-    Reference: [Griffiths-Harris, Ch. 0, §7], [Voisin, Ch. 5-6] -/
-noncomputable def lefschetz_lambda_cohomology (n : ℕ) (X : Type u)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    (k : ℕ) (hk : k ≥ 2 := by omega) :
-    DeRhamCohomologyClass n X k →ₗ[ℂ] DeRhamCohomologyClass n X (k - 2) where
-  toFun c := Quotient.liftOn c
-    (fun ⟨ω, hω⟩ =>
-      let Λω := lefschetzLambdaLinearMap n X k ω
-      -- Λ preserves closedness (follows from Λ commuting with d on Kähler manifolds)
-      have hΛω : IsFormClosed Λω := isFormClosed_lefschetzLambda ω hω
-      ⟦Λω, hΛω⟧)
-    (fun ⟨ω₁, h₁⟩ ⟨ω₂, h₂⟩ hcoh => by
-      -- If ω₁ ~ ω₂ (cohomologous), then Λω₁ ~ Λω₂
-      apply Quotient.sound
-      exact cohomologous_lefschetzLambda ω₁ ω₂ h₁ h₂ hcoh)
-  map_add' c₁ c₂ := by
-    obtain ⟨⟨ω₁, h₁⟩, rfl⟩ := Quotient.exists_rep c₁
-    obtain ⟨⟨ω₂, h₂⟩, rfl⟩ := Quotient.exists_rep c₂
-    apply Quotient.sound
-    show Cohomologous _ _
-    -- Λ(ω₁ + ω₂) = Λω₁ + Λω₂ by linearity, and addition preserves cohomology class
-    simp only [map_add]
-    exact cohomologous_refl _
-  map_smul' r c := by
-    obtain ⟨⟨ω, h⟩, rfl⟩ := Quotient.exists_rep c
-    apply Quotient.sound
-    show Cohomologous _ _
-    -- Λ(r • ω) = r • Λω by linearity
-    simp only [map_smul]
-    exact cohomologous_refl _
 
 /-- **The Hard Lefschetz Theorem** (Lefschetz, 1924).
     **STATUS: PROVED from KahlerManifold.lefschetz_bijective**
