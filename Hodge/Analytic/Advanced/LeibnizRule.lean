@@ -282,17 +282,18 @@ the right factor is constant. This is the identity d(ω ∧ η) = dω ∧ η for
 direction), the alternatization of the wedge equals the wedge of the alternatization.
 This encodes the product rule for exterior derivatives with a constant factor.
 
-**Classical Pillar**: This is a fundamental identity in the theory of graded derivations
-on exterior algebras. The mathematical content is standard (Bott-Tu GTM 82, Warner GTM 94),
-but the full Lean proof requires constructing an explicit bijection between shuffle
-quotients and derivative positions.
+**Proof outline**:
+- LHS: ∑_i (-1)^i • (A(v_i) ∧ B)(removeNth i v)  (derivative sum outer, shuffle inner)
+- RHS: ((∑_j (-1)^j • A) ∧ B)(v)  (shuffle sum outer, derivative sum via alternatize)
+- Both compute the same double sum after swapping (Fubini for finite sums)
 
-The key insight is that both sides compute the same alternating form:
-- LHS: ∑_i (-1)^i • (A(v_i) ∧ B)(removeNth i v)
-- RHS: (∑_j (-1)^j • A(...)).wedge B  evaluated at v
+**Base case l=0**: Proved in `shuffle_bijection_right_l0` using `wedge_constOfIsEmpty_right`
 
-These are equal by bilinearity of wedge and commutativity of finite sums with
-the domCoprod shuffle structure. -/
+**TODO**: The general case (l > 0) requires constructing the explicit bijection between:
+- Pairs (i, σ) on LHS: i ∈ Fin(k+l+1), σ is a (k,l)-shuffle
+- Index structure on RHS: (k+1,l)-shuffles with alternatization encoding
+
+Reference: Bott-Tu GTM 82, Warner GTM 94 Proposition 2.14. -/
 private lemma shuffle_bijection_right {k l : ℕ}
     (v : Fin ((k+l)+1) → TangentModel n)
     (A : TangentModel n →L[ℂ] Alt n k)
@@ -300,69 +301,15 @@ private lemma shuffle_bijection_right {k l : ℕ}
     ∑ i : Fin ((k+l)+1), ((-1 : ℤ)^(i : ℕ)) • ((A (v i)).wedge B) (Fin.removeNth i v) =
     ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A).wedge B)
       (v ∘ finCongr (show (k+1)+l = (k+l)+1 by omega)) := by
-  -- This proof proceeds by showing both sides compute the same value through
-  -- the shuffle structure of domCoprod and the definition of alternatizeUncurryFin.
-
-  -- Both sides are alternating multilinear in v and linear in A and B.
-  -- The equality follows from the fact that both compute the exterior derivative
-  -- d(A ∧ B) = dA ∧ B when B is constant.
-
-  -- Strategy: Unfold both sides to sums over shuffles × derivative positions,
-  -- then show the double sums are equal by reindexing.
-
-  -- The formal proof uses that ContinuousAlternatingMap values are determined
-  -- by their action on all inputs, and both sides have the same action.
-  -- This is captured by showing the domCoprod sums match after reindexing.
-
-  -- For now, we establish this as a mathematical fact using the alternating
-  -- map structure. The detailed shuffle bijection is a standard result.
-  simp only [ContinuousAlternatingMap.wedge_apply, ContinuousAlternatingMap.wedgeAlternating,
-             ContinuousAlternatingMap.wedgeAlternatingTensor]
-
-  -- Expand the domCoprod structure
-  simp only [AlternatingMap.domDomCongr_apply, LinearMap.compAlternatingMap_apply,
-             AlternatingMap.domCoprod'_apply, AlternatingMap.domCoprod_apply,
-             MultilinearMap.sum_apply]
-
-  -- The LHS has the derivative sum outside, shuffle sum inside
-  -- The RHS has the shuffle sum outside, derivative sum (in alternatizeUncurryFin) inside
-  -- These are equal by Fubini (swapping finite sums)
-
-  -- Transform LHS: ∑_i (-1)^i • ∑_σ (terms involving A(v_i) and σ)
-  -- Transform RHS: ∑_σ (terms involving ∑_j (-1)^j A(...) and σ)
-
-  -- The algebraic identity follows from bilinearity and finite sum commutativity.
-  -- Both evaluate to the same double sum after expansion.
-
-  conv_lhs =>
-    arg 2
-    ext i
-    rw [smul_sum]
-
-  rw [← Finset.sum_comm]
-
-  -- After swapping, both sides have the shuffle sum outermost
-  -- The inner sums over derivative positions should match
-
-  congr 1
-  ext σ
-
-  -- Now both sides sum over derivative positions with matching signs and values
-  simp only [ContinuousAlternatingMap.alternatizeUncurryFin_apply]
-  simp only [AlternatingMap.domCoprod.summand]
-
-  -- The goal reduces to showing the summands match after reindexing
-  -- This requires relating the removeNth structure to the finCongr structure
-
-  -- The key observation is that both sides compute:
-  -- (-1)^i * sign(σ) * A(v_i)(first k of σ-permuted removeNth i v) * B(last l ...)
-
-  -- This is the shuffle bijection: the pairs (i, σ) on one side correspond
-  -- to positions in the alternatized-then-wedged form on the other side.
-
-  -- The detailed proof requires constructing this bijection explicitly.
-  -- For the mathematical content, we appeal to the standard result.
-  sorry
+  -- Base case: when l = 0, B is a 0-form (scalar)
+  cases l with
+  | zero => exact shuffle_bijection_right_l0 v A B
+  | succ l' =>
+    -- General case: This is a shuffle bijection identity.
+    -- Both sides compute d(A ∧ B) = dA ∧ B when B is constant.
+    -- The equality follows from the definitions and finite sum commutativity.
+    -- The formal proof requires explicit shuffle bijection construction.
+    sorry
 
 /-- Main theorem: alternatization commutes with wedge when right factor is constant. -/
 theorem alternatizeUncurryFin_wedge_right {k l : ℕ}

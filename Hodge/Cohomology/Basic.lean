@@ -904,42 +904,33 @@ class KahlerManifold (n : ℕ) (X : Type u)
   omega_rational_witness : IsRationalFormWitness n X 2 omega_form
   omega_J_invariant : ∀ (x : X) (v w : TangentSpace (𝓒_complex n) x),
     omega_form.as_alternating x ![Complex.I • v, Complex.I • w] = omega_form.as_alternating x ![v, w]
-  /-- **Hard Lefschetz Theorem** (Classical Pillar Axiom).
 
-      The iterated Lefschetz operator L^k : H^p(X) → H^{p+2k}(X) is a bijection.
-      This is the fundamental structural property of Kähler manifolds.
+/-!
+══════════════════════════════════════════════════════════════════════════════════════════
+**NOTE**: The Hard Lefschetz axioms have been REMOVED from the KahlerManifold class.
 
-      **Axiomatization Justification**:
-      This is axiomatized as a typeclass field because:
-      1. The proof requires Kähler identities and sl(2) representation theory
-      2. Full formalization would take 6-12 months
-      3. This is a classical theorem (Lefschetz 1924) with multiple textbook proofs
+The following three fields were previously here but are NOT on the proof track
+for `hodge_conjecture'` and have been moved to `archive/Hodge/Classical/Lefschetz.lean`:
 
-      **Mathematical Status**: CLASSICAL THEOREM (not a conjecture or speculation)
-      **Proof References**:
-      - [Griffiths-Harris, "Principles of Algebraic Geometry", Ch. 0, §7]
-      - [Voisin, "Hodge Theory and Complex Algebraic Geometry I", Ch. 6]
-      - [Wells, "Differential Analysis on Complex Manifolds", Ch. IV] -/
-  lefschetz_bijective : ∀ (p k : ℕ),
-    Function.Bijective (lefschetz_power_of_class ⟦omega_form, omega_closed⟧ p k)
-  /-- **Hard Lefschetz on Rational Classes** (Classical Pillar Axiom).
+- `lefschetz_bijective` : L^k is a bijection (Hard Lefschetz Theorem)
+- `rational_lefschetz_iff` : L^k preserves rationality
+- `pp_lefschetz_iff` : L^k preserves (p,p) type
 
-      The iterated Lefschetz operator L^k preserves rationality:
-      a class c is rational iff L^k(c) is rational.
-      This follows from the Lefschetz isomorphism being defined over ℚ.
+**Why removed?**
+These were "hidden axioms" in the type class that didn't appear in `#print axioms`
+output, but represented assumptions about Kähler manifolds. Since they're not used
+in the proof of `hodge_conjecture'`, removing them makes the proof track cleaner.
 
-      **Axiomatization Justification**: Follows from lefschetz_bijective plus
-      the fact that L is defined by cup product with the rational class [ω]. -/
-  rational_lefschetz_iff : ∀ (p k : ℕ) (c : DeRhamCohomologyClass n X p),
-    isRationalClass c ↔ isRationalClass (lefschetz_power_of_class ⟦omega_form, omega_closed⟧ p k c)
-  /-- **Hard Lefschetz on Hodge Types** (Classical Pillar Axiom).
+**Mathematical status**: The Hard Lefschetz Theorem IS a classical theorem
+(Lefschetz 1924), but proving it requires significant infrastructure:
+- Kähler identities
+- Hodge decomposition
+- sl(2) representation theory
+- Primitive decomposition
 
-      The iterated Lefschetz operator L^k preserves (p,p) type.
-
-      **Axiomatization Justification**: Follows from the Hodge decomposition being
-      compatible with the Lefschetz operator (L maps H^{p,q} to H^{p+1,q+1}). -/
-  pp_lefschetz_iff : ∀ (p k : ℕ) (c : DeRhamCohomologyClass n X p),
-    isPPClass p c ↔ isPPClass (p + 2 * k) (lefschetz_power_of_class ⟦omega_form, omega_closed⟧ p k c)
+If future work needs these, they can be restored from the archive.
+══════════════════════════════════════════════════════════════════════════════════════════
+-/
 
 /-- **Kähler form is rational** (Derived from witness).
     This theorem extracts the rationality of the Kähler form's cohomology class

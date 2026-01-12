@@ -1,7 +1,7 @@
 import Hodge.Classical.HarveyLawson
 import Hodge.Classical.Bergman
 import Hodge.Classical.SerreVanishing
-import Hodge.Classical.Lefschetz
+-- NOTE: Lefschetz.lean moved to archive - not on proof track for hodge_conjecture'
 import Hodge.Classical.CycleClass
 import Hodge.Analytic.Currents
 

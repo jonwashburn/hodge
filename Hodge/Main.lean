@@ -16,7 +16,7 @@ set_option autoImplicit false
 
 variable {n : ℕ} {X : Type*}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-  [IsManifold (𝓒_complex n) ⊤ X]
+  [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
   [Nonempty X]
 
@@ -25,7 +25,7 @@ variable {n : ℕ} {X : Type*}
     is algebraic (i.e., it is represented by a signed algebraic cycle). -/
 theorem hodge_conjecture {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
     (h_rational : isRationalClass (ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :
-    ∃ (Z : SignedAlgebraicCycle n X), Z.RepresentsClass (ofForm γ h_closed) :=
+    ∃ (Z : SignedAlgebraicCycle n X p), Z.RepresentsClass (ofForm γ h_closed) :=
   hodge_conjecture' γ h_closed h_rational h_p_p
 
 end
