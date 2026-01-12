@@ -293,8 +293,8 @@ Hodge/
 │       └── LeibnizRule.lean     # Leibniz rule [AGENT 1]
 ├── Classical/
 │   ├── GAGA.lean                # SignedAlgebraicCycle [AGENT 3 ✅]
-│   ├── CycleClass.lean          # Poincaré duality
-│   └── Lefschetz.lean           # Hard Lefschetz theorem
+│   └── CycleClass.lean          # Poincaré duality
+│   # NOTE: Lefschetz.lean moved to archive/ [AGENT 4 ✅]
 ├── Cohomology/
 │   └── Basic.lean               # de Rham cohomology, KahlerManifold [AGENT 4]
 ├── Kahler/
