@@ -294,53 +294,10 @@ theorem FundamentalClassSet_empty (p : ℕ) :
   simp only [FundamentalClassSet, FundamentalClassSet_impl]
   exact fundamentalClassImpl_empty p
 
-/-- **Theorem: The fundamental class is a (p,p)-form.**
-    On a Kähler manifold, the integration current over a codimension-p analytic
-    subvariety is of type (p,p). This follows from the fact that complex
-    submanifolds are calibrated by powers of the Kähler form.
-
-    **Proof**: Follows from the axiomatized property `fundamentalClassImpl_isPP`,
-    which is a consequence of calibration theory.
-
-    Reference: [Griffiths-Harris, 1978, Chapter 0, Section 7]. -/
-theorem FundamentalClassSet_is_p_p (p : ℕ) (Z : Set X) (_h : isAlgebraicSubvariety n X Z) :
-    isPPForm' n X p (FundamentalClassSet n X p Z) := by
-  simp only [FundamentalClassSet, FundamentalClassSet_impl]
-  exact fundamentalClassImpl_isPP p Z
-
-/-- **Theorem: Additivity of Fundamental Classes.**
-    The fundamental class of a disjoint union is the sum of fundamental classes.
-    This follows from the additivity of integration currents.
-
-    **Proof**: Follows from the axiomatized property `fundamentalClassImpl_additive`,
-    which is a consequence of the additivity of integration.
-
-    Reference: [Federer, "Geometric Measure Theory", 1969]. -/
-theorem FundamentalClassSet_additive (p : ℕ) (Z₁ Z₂ : Set X) (h_disjoint : Disjoint Z₁ Z₂)
-    (_h1 : isAlgebraicSubvariety n X Z₁) (_h2 : isAlgebraicSubvariety n X Z₂) :
-    FundamentalClassSet n X p (Z₁ ∪ Z₂) = FundamentalClassSet n X p Z₁ + FundamentalClassSet n X p Z₂ := by
-  simp only [FundamentalClassSet, FundamentalClassSet_impl]
-  exact fundamentalClassImpl_additive p Z₁ Z₂ h_disjoint
-
-/-- **Theorem: Rationality of Fundamental Classes.**
-    The cohomology class of the fundamental class of an algebraic subvariety
-    lies in H^{2p}(X, ℚ). This is because algebraic cycles define integral
-    homology classes, which map to rational cohomology via Poincaré duality.
-
-    **Proof**: Follows from the axiomatized property `fundamentalClassImpl_isRational`,
-    which is a consequence of algebraic cycles defining integral homology classes.
-
-    Reference: [Voisin, "Hodge Theory and Complex Algebraic Geometry", 2002]. -/
-theorem FundamentalClassSet_rational (p : ℕ) (Z : Set X) (h : isAlgebraicSubvariety n X Z) :
-    isRationalClass (ofForm (FundamentalClassSet n X p Z)
-      (FundamentalClassSet_isClosed p Z h)) := by
-  -- The proof uses the axiomatized rationality property.
-  -- We need to show the cohomology classes are equal via proof irrelevance.
-  have h_eq : ofForm (FundamentalClassSet n X p Z) (FundamentalClassSet_isClosed p Z h) =
-              ofForm (fundamentalClassImpl n X p Z) (fundamentalClassImpl_isClosed p Z) := by
-    simp only [FundamentalClassSet, FundamentalClassSet_impl]
-  rw [h_eq]
-  exact fundamentalClassImpl_isRational p Z
+/-!
+NOTE: FundamentalClassSet_is_p_p, FundamentalClassSet_additive, FundamentalClassSet_rational
+were archived with their underlying axioms. They are NOT needed for hodge_conjecture'.
+-/
 
 /-- **GAGA Fundamental Class Representation** (Classical Pillar Axiom).
 

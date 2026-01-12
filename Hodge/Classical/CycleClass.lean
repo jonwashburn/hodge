@@ -213,82 +213,11 @@ theorem poincareDualForm_empty (n : ℕ) (X : Type u) (p : ℕ)
   (poincareDualFormExists n X p ∅).empty_vanishes rfl
 
 /-!
-═══════════════════════════════════════════════════════════════════════════════
-⚠️  OFF-TRACK AXIOMS BELOW ⚠️
-
-These axioms (poincareDualForm_isPP, _isRational, _additive) are NOT used by 
-`hodge_conjecture'`. The main proof uses `FundamentalClassSet_represents_class` 
-from GAGA.lean instead. Run `./scripts/verify_proof_track.sh`
-═══════════════════════════════════════════════════════════════════════════════
+══════════════════════════════════════════════════════════════════════════════════════════
+NOTE: The off-track axioms (poincareDualForm_isPP, _isRational, _additive) were archived to
+archive/Hodge/Classical/CycleClassAxioms.lean because they are NOT needed for hodge_conjecture'.
+══════════════════════════════════════════════════════════════════════════════════════════
 -/
-
-/-! ## (p,p)-Type Property
-
-On a Kähler manifold, the Poincaré dual form of a complex subvariety is of type (p,p).
-This follows from the fact that complex subvarieties are calibrated by ω^p.
-
-We axiomatize this property for algebraic sets. -/
-
-/-- **Axiom: (p,p)-Type of Fundamental Classes** ⚠️ OFF-TRACK
-
-    The Poincaré dual form of an algebraic set is of type (p,p).
-
-    This is a deep theorem in complex geometry, following from:
-    1. Complex subvarieties are calibrated by powers of the Kähler form
-    2. The calibration implies the Poincaré dual has the correct Hodge type
-
-    Reference: [Griffiths-Harris, 1978, Chapter 0, Section 7]. -/
-axiom poincareDualForm_isPP (n : ℕ) (X : Type u) (p : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    (Z : Set X) : isPPForm' n X p (poincareDualForm n X p Z)
-
-/-! ## Rationality Property
-
-The cohomology class of the Poincaré dual form is rational because
-algebraic subvarieties define integral homology classes.
-
-We axiomatize this for algebraic sets. -/
-
-/-- **Axiom: Rationality of Fundamental Classes**
-
-    The cohomology class of the Poincaré dual form of an algebraic set is rational.
-
-    This follows from:
-    1. Algebraic subvarieties define integral homology classes
-    2. Poincaré duality preserves integrality
-    3. Integral classes embed into rational classes
-
-    Reference: [Voisin, "Hodge Theory and Complex Algebraic Geometry", 2002]. -/
-axiom poincareDualForm_isRational (n : ℕ) (X : Type u) (p : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    (Z : Set X) : isRationalClass (ofForm (poincareDualForm n X p Z)
-                                          (poincareDualForm_isClosed n X p Z))
-
-/-! ## Additivity Property
-
-For disjoint algebraic sets, the Poincaré dual of the union is the sum.
-This follows from the additivity of integration currents. -/
-
-/-- **Axiom: Additivity of Fundamental Classes**
-
-    For disjoint sets Z₁ and Z₂, the Poincaré dual of the union equals
-    the sum of the Poincaré duals.
-
-    This follows from the additivity of integration currents:
-    ∫_{Z₁ ∪ Z₂} ω = ∫_{Z₁} ω + ∫_{Z₂} ω
-
-    Reference: [Federer, "Geometric Measure Theory", 1969]. -/
-axiom poincareDualForm_additive (n : ℕ) (X : Type u) (p : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    (Z₁ Z₂ : Set X) (h_disjoint : Disjoint Z₁ Z₂) :
-    poincareDualForm n X p (Z₁ ∪ Z₂) =
-      poincareDualForm n X p Z₁ + poincareDualForm n X p Z₂
 
 end CycleClass
 
@@ -310,10 +239,7 @@ variable [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
     - For Z ≠ ∅, returns the axiomatized Poincaré dual form
 
     The form satisfies:
-    1. Closedness (by `poincareDualForm_isClosed`)
-    2. (p,p)-type (by `poincareDualForm_isPP`)
-    3. Rationality (by `poincareDualForm_isRational`)
-    4. Additivity (by `poincareDualForm_additive`) -/
+    1. Closedness (by `poincareDualForm_isClosed`) -/
 def fundamentalClassImpl (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
@@ -331,21 +257,7 @@ theorem fundamentalClassImpl_isClosed (p : ℕ) (Z : Set X) :
     IsFormClosed (fundamentalClassImpl n X p Z) :=
   CycleClass.poincareDualForm_isClosed n X p Z
 
-/-- The fundamental class is of (p,p)-type. -/
-theorem fundamentalClassImpl_isPP (p : ℕ) (Z : Set X) :
-    isPPForm' n X p (fundamentalClassImpl n X p Z) :=
-  CycleClass.poincareDualForm_isPP n X p Z
-
-/-- The fundamental class is rational. -/
-theorem fundamentalClassImpl_isRational (p : ℕ) (Z : Set X) :
-    isRationalClass (ofForm (fundamentalClassImpl n X p Z)
-                            (fundamentalClassImpl_isClosed p Z)) :=
-  CycleClass.poincareDualForm_isRational n X p Z
-
-/-- Additivity of fundamental classes for disjoint sets. -/
-theorem fundamentalClassImpl_additive (p : ℕ) (Z₁ Z₂ : Set X)
-    (h_disjoint : Disjoint Z₁ Z₂) :
-    fundamentalClassImpl n X p (Z₁ ∪ Z₂) =
-      fundamentalClassImpl n X p Z₁ + fundamentalClassImpl n X p Z₂ :=
-  CycleClass.poincareDualForm_additive n X p Z₁ Z₂ h_disjoint
+/-!
+NOTE: fundamentalClassImpl_isPP, _isRational, _additive were archived with their axioms.
+-/
 

@@ -577,44 +577,10 @@ The cup product on cohomology is associative: `(a * b) * c = a * (b * c)`.
 Since `(k + l) + m = k + (l + m)` propositionally but not definitionally,
 we need to cast one side. -/
 
-/-- Associativity of cup product on de Rham cohomology.
-
-The cup product is associative up to the natural degree cast:
-`(a * b) * c = cast(a * (b * c))`
-
-where the cast is induced by `Nat.add_assoc k l m : (k + l) + m = k + (l + m)`.
-
-This follows from wedge associativity on differential forms (via the Classical Pillar
-axiom `ContinuousAlternatingMap.wedge_assoc`). -/
-theorem mul_assoc {k l m : ℕ}
-    (a : DeRhamCohomologyClass n X k)
-    (b : DeRhamCohomologyClass n X l)
-    (c : DeRhamCohomologyClass n X m) :
-    (a * b) * c = (Nat.add_assoc k l m).symm ▸ (a * (b * c)) := by
-  refine Quotient.inductionOn₃ a b c ?_
-  intro a b c
-  -- Compute both sides on representatives (note: `ofForm` expands to `Quotient.mk`).
-  simp [instHMulDeRhamCohomologyClass, ofForm]
-  -- Rewrite the explicit degree cast on the RHS into an `ofForm` of the casted form.
-  -- (After the simp step, the RHS is a cast of a `Quotient.mk` of a `ClosedForm`;
-  --  we rewrite it into the `ofForm`-notation expected by `cast_ofForm`.)
-  change
-    (⟦(a.val ⋏ b.val) ⋏ c.val, ?_⟧ : DeRhamCohomologyClass n X ((k + l) + m)) =
-      (Nat.add_assoc k l m).symm ▸ (⟦a.val ⋏ (b.val ⋏ c.val), ?_⟧ : DeRhamCohomologyClass n X (k + (l + m)))
-  rw [DeRhamCohomologyClass.cast_ofForm (n := n) (X := X)
-        (h := (Nat.add_assoc k l m).symm)
-        (ω := a.val ⋏ (b.val ⋏ c.val))]
-  -- Now both sides are `ofForm` of degree-((k+l)+m) forms; use wedge associativity.
-  apply Quotient.sound
-  show Cohomologous _ _
-  unfold Cohomologous
-  have hEq :
-      ((a.val ⋏ b.val) ⋏ c.val) =
-        castForm (n := n) (X := X) (Nat.add_assoc k l m).symm (a.val ⋏ (b.val ⋏ c.val)) := by
-    simpa using
-      (smoothWedge_assoc (n := n) (X := X) (k := k) (l := l) (m := m) a.val b.val c.val)
-  simp [hEq]
-  exact isExact_zero
+/-!
+NOTE: mul_assoc was archived with wedge_assoc because it depends on smoothWedge_assoc,
+which is NOT on the proof track of hodge_conjecture'.
+-/
 
 /-! ### Unit Element for Cup Product
 

@@ -535,33 +535,9 @@ Reference: [Bott & Tu, "Differential Forms in Algebraic Topology", §1.2]
            [Warner, "Foundations of Differentiable Manifolds and Lie Groups", Prop. 2.14] -/
 
 /-!
-═══════════════════════════════════════════════════════════════════════════════
-⚠️  OFF-TRACK AXIOM BELOW ⚠️
-
-`wedge_assoc` is NOT used by `hodge_conjecture'`. Run `./scripts/verify_proof_track.sh`
-═══════════════════════════════════════════════════════════════════════════════
+NOTE: wedge_assoc was archived to archive/Hodge/Analytic/WedgeAssoc.lean because it is
+NOT on the proof track of hodge_conjecture'.
 -/
-
-/-- **Axiom (Classical Pillar)**: Wedge product is associative (up to index equivalence).
-    ⚠️ OFF-TRACK: Not used by hodge_conjecture'
-
-For forms of degrees k, l, m, we have:
-`wedge (wedge ω η) θ = (wedge ω (wedge η θ)).domDomCongr h`
-
-where h is the equivalence `Fin ((k + l) + m) ≃ Fin (k + (l + m))` given by
-natural number associativity.
-
-This axiom encodes the standard exterior algebra associativity:
-`(ω ∧ η) ∧ θ = ω ∧ (η ∧ θ)`.
-
-The proof requires detailed shuffle counting on `AlternatingMap.domCoprod` that
-is not yet formalized in Mathlib. -/
-axiom wedge_assoc {k l m : ℕ}
-    (ω : ContinuousAlternatingMap 𝕜 E 𝕜 (Fin k))
-    (η : ContinuousAlternatingMap 𝕜 E 𝕜 (Fin l))
-    (θ : ContinuousAlternatingMap 𝕜 E 𝕜 (Fin m)) :
-    wedge (𝕜 := 𝕜) (E := E) (wedge ω η) θ =
-      (wedge ω (wedge η θ)).domDomCongr (finCongr (Nat.add_assoc k l m).symm)
 
 end ContinuousAlternatingMap
 

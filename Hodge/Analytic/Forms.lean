@@ -800,25 +800,9 @@ theorem smoothWedge_unitForm_right {k : ℕ} (ω : SmoothForm n X k) :
   simp only [SmoothForm.castForm_as_alternating]
   rw [castAlt_eq_transport_wedge]
 
-/-- Wedge product on smooth forms is associative (up to index equivalence).
-
-The wedge product satisfies: `(ω ∧ η) ∧ θ = ω ∧ (η ∧ θ)`
-with the appropriate degree cast from `(k + l) + m` to `k + (l + m)`.
-
-## References
-
-- [Bott-Tu, "Differential Forms in Algebraic Topology", GTM 82, §1.2]
-- [Warner, "Foundations of Differentiable Manifolds", GTM 94, Prop. 2.14] -/
-theorem smoothWedge_assoc {k l m : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) (θ : SmoothForm n X m) :
-    (ω ⋏ η) ⋏ θ = castForm (Nat.add_assoc k l m).symm (ω ⋏ (η ⋏ θ)) := by
-  apply SmoothForm.ext
-  funext x
-  -- LHS: ((ω ⋏ η) ⋏ θ).as_alternating x = wedge (wedge (ω x) (η x)) (θ x)
-  simp only [SmoothForm.wedge_apply]
-  -- RHS: castForm ... (ω ⋏ (η ⋏ θ)) at x = h ▸ (wedge (ω x) (wedge (η x) (θ x)))
-  simp only [SmoothForm.castForm_as_alternating, SmoothForm.wedge_apply]
-  -- Use wedge_assoc from DomCoprod.lean
-  rw [ContinuousAlternatingMap.wedge_assoc]
-  rw [castAlt_eq_transport_wedge]
+/-!
+NOTE: smoothWedge_assoc was archived with wedge_assoc to archive/Hodge/Analytic/WedgeAssoc.lean
+because it is NOT on the proof track of hodge_conjecture'.
+-/
 
 end
