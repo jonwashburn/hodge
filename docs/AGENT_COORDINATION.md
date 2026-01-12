@@ -319,7 +319,7 @@ This is cleaner architecturally.
 | Subtask | Owner | Difficulty | Status |
 |---------|-------|------------|--------|
 | **2a. Integration current bounds** | Agent 2 | 40% | 🔴 Needs Stokes |
-| **2b. Limit current bounds** | Agent 3 | 25% | 🔴 Needs flat norm |
+| **2b. Limit current bounds** | Agent 3 | 25% | ✅ COMPLETE |
 | **2c. Sum/scalar bounds** | Agent 4 | 15% | ✅ COMPLETE |
 | **2d. Microstructure current bounds** | Agent 5 | 20% | 🔴 Needs 2a+2c |
 
@@ -335,12 +335,33 @@ Take `M = mass(∂Z)`.
 
 **Prerequisites**: Real `integration_current` definition (not `:= 0`), Stokes theorem.
 
-#### 2b. Limit Current Bounds (Agent 3)
-**File**: `Hodge/Analytic/Currents.lean`
-**Statement**: If `Tᵢ → T` in flat norm and each `Tᵢ` satisfies boundary bound with constant `Mᵢ`,
-then `T` satisfies boundary bound (with suitable limit constant).
+#### 2b. Limit Current Bounds (Agent 3) ✅ COMPLETE
+**File**: `Hodge/Analytic/FlatNorm.lean`
+**Status**: ✅ Implemented (2026-01-12)
 
-**Proof sketch**: Flat norm convergence preserves mass bounds. Use `liminf Mᵢ` or similar.
+**What was added**:
+```lean
+-- Flat norm convergence definition
+def FlatNormConverges (seq : ℕ → Current n X k) (T : Current n X k) : Prop :=
+  Filter.Tendsto (fun i => flatNorm (seq i - T)) Filter.atTop (nhds 0)
+
+-- Pointwise convergence from flat norm convergence
+theorem flatNormConverges_pointwise : FlatNormConverges seq T →
+    Filter.Tendsto (fun i => (seq i).toFun ψ) Filter.atTop (nhds (T.toFun ψ))
+
+-- Boundary bound constant extraction
+noncomputable def boundaryBoundConst (T : Current n X (k + 1)) : ℝ
+
+-- Main theorem: limit currents preserve boundary boundedness
+theorem limit_current_boundary_bound {seq : ℕ → Current n X (k + 1)} {T : Current n X (k + 1)}
+    (h_conv : FlatNormConverges seq T) {M : ℝ} (h_unif : ∀ i, boundaryBoundConst (seq i) ≤ M) :
+    ∀ ω, |T.toFun (smoothExtDeriv ω)| ≤ M * comass ω
+```
+
+**Proof approach**: If `Tᵢ → T` in flat norm with uniform boundary bound `M`, then for any ω:
+1. Each `|Tᵢ(dω)| ≤ M * comass(ω)` by the uniform bound
+2. By flat norm convergence, `Tᵢ(dω) → T(dω)` pointwise
+3. The limit of a bounded sequence is bounded: `|T(dω)| ≤ M * comass(ω)`
 
 #### 2c. Sum/Scalar Bounds (Agent 4) ✅ COMPLETE
 **File**: `Hodge/Analytic/Currents.lean`

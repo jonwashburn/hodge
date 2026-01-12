@@ -537,7 +537,7 @@ theorem boundaryMass_nonneg {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [Nonempty X]
-    (Z : Set X) : boundaryMass Z ≥ 0 := by
+    (Z : Set X) : boundaryMass (n := n) (X := X) Z ≥ 0 := by
   unfold boundaryMass
   linarith
 
@@ -641,7 +641,9 @@ theorem integration_current_hasStokesProperty {n : ℕ} {X : Type*} {k : ℕ}
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [Nonempty X]
     (Z : Set X) :
-    HasStokesPropertyWith (integration_current (k := k + 1) Z) (boundaryMass (k := k) Z) := by
+    HasStokesPropertyWith (n := n) (X := X) (k := k)
+      (integration_current (k := k + 1) Z)
+      (boundaryMass (n := n) (X := X) Z) := by
   -- Currently trivial since integration_current = 0 and boundaryMass = 0
   intro ω
   unfold integration_current boundaryMass
@@ -667,8 +669,8 @@ theorem integration_current_boundary_bound {n : ℕ} {X : Type*} {k : ℕ}
       |(integration_current (k := k + 1) Z).toFun (smoothExtDeriv ω)| ≤ M * ‖ω‖ :=
   stokes_property_implies_boundary_bound
     (integration_current (k := k + 1) Z)
-    (boundaryMass (k := k) Z)
-    (integration_current_hasStokesProperty Z)
+    (boundaryMass (n := n) (X := X) Z)
+    (integration_current_hasStokesProperty (n := n) (X := X) (k := k) Z)
 
 /-! ## Task 2c Preview: Sum and Scalar Bounds
 
@@ -686,14 +688,14 @@ theorem integration_current_sum_boundary_bound {n : ℕ} {X : Type*} {k : ℕ}
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [Nonempty X]
     (Z₁ Z₂ : Set X) :
-    HasStokesPropertyWith
+    HasStokesPropertyWith (n := n) (X := X) (k := k)
       ((integration_current (k := k + 1) Z₁) + (integration_current (k := k + 1) Z₂))
-      (boundaryMass (k := k) Z₁ + boundaryMass (k := k) Z₂) :=
+      (boundaryMass (n := n) (X := X) Z₁ + boundaryMass (n := n) (X := X) Z₂) :=
   add_hasStokesProperty
-    (integration_current Z₁) (integration_current Z₂)
-    (boundaryMass Z₁) (boundaryMass Z₂)
-    (integration_current_hasStokesProperty Z₁)
-    (integration_current_hasStokesProperty Z₂)
+    (integration_current (k := k + 1) Z₁) (integration_current (k := k + 1) Z₂)
+    (boundaryMass (n := n) (X := X) Z₁) (boundaryMass (n := n) (X := X) Z₂)
+    (integration_current_hasStokesProperty (n := n) (X := X) (k := k) Z₁)
+    (integration_current_hasStokesProperty (n := n) (X := X) (k := k) Z₂)
 
 /-- Scalar multiple of integration current has bounded boundary.
     For `c • [Z]`, the Stokes constant is `|c| * boundaryMass(Z)`. -/
@@ -702,10 +704,10 @@ theorem integration_current_smul_boundary_bound {n : ℕ} {X : Type*} {k : ℕ}
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [Nonempty X]
     (c : ℝ) (Z : Set X) :
-    HasStokesPropertyWith
+    HasStokesPropertyWith (n := n) (X := X) (k := k)
       (c • (integration_current (k := k + 1) Z))
-      (|c| * boundaryMass (k := k) Z) :=
-  smul_hasStokesProperty c (integration_current Z) (boundaryMass Z)
-    (integration_current_hasStokesProperty Z)
+      (|c| * boundaryMass (n := n) (X := X) Z) :=
+  smul_hasStokesProperty c (integration_current (k := k + 1) Z) (boundaryMass (n := n) (X := X) Z)
+    (integration_current_hasStokesProperty (n := n) (X := X) (k := k) Z)
 
 end
