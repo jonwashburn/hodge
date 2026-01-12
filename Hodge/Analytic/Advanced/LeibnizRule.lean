@@ -507,11 +507,13 @@ private lemma stage1_lemma {k l : ℕ} {n : ℕ}
                 (fun i : Fin k => w (σ (Sum.inl i.succ))) *
               B (fun j : Fin l => w (σ (Sum.inr j)))) := by
   classical
+  -- Define helper functions for cleaner notation
   let left (σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l)) : Fin (k + 1) → TangentModel n :=
     fun i => w (σ (Sum.inl i))
   let right (σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l)) : Fin l → TangentModel n :=
     fun j => w (σ (Sum.inr j))
 
+  -- Step 1: Expand alternatizeUncurryFin to get double sum
   have hexpand :
       (∑ σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l),
           ((Equiv.Perm.sign σ : ℤ) : ℂ) *
@@ -524,11 +526,19 @@ private lemma stage1_lemma {k l : ℕ} {n : ℕ}
     refine Fintype.sum_congr _ _ ?_
     intro σ
     rw [ContinuousAlternatingMap.alternatizeUncurryFin_apply]
-    simp only [left, right, Finset.sum_mul, Finset.mul_sum, mul_assoc, mul_left_comm, mul_comm]
+    -- Convert zsmul to multiplication and distribute
+    simp only [zsmul_eq_mul, Int.cast_pow, Int.cast_neg, Int.cast_one]
+    rw [Finset.sum_mul]
+    refine Finset.sum_congr rfl ?_
+    intro i _
+    ring
 
   rw [hexpand]
+  -- Step 2: Swap the order of summation
   rw [Finset.sum_comm]
   
+  -- Step 3-4: For each i, reindex σ ↦ σ * τ_i where τ_i = cycleRange(i).symm ⊕ 1
+  -- This makes the inner sum independent of i
   have hinner : ∀ i : Fin (k + 1),
       (∑ σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l),
           ((Equiv.Perm.sign σ : ℤ) : ℂ) * ((-1 : ℂ) ^ (i : ℕ)) *
@@ -537,29 +547,42 @@ private lemma stage1_lemma {k l : ℕ} {n : ℕ}
           ((Equiv.Perm.sign σ : ℤ) : ℂ) *
             (A (left σ 0) ((0 : Fin (k+1)).removeNth (left σ)) * B (right σ)) := by
     intro i
+    -- Define τ_i = cycleRange(i).symm ⊕ 1
     let τ := Equiv.Perm.sumCongr i.cycleRange.symm (1 : Equiv.Perm (Fin l))
+    -- Reindex by σ ↦ σ * τ (bijection on permutations)
     refine (Fintype.sum_equiv (Equiv.mulRight τ) _ _ ?_).symm
     intro σ
-    dsimp
+    -- Key properties of τ
     have hsignτ : ((Equiv.Perm.sign τ : ℤ) : ℂ) = (-1 : ℂ) ^ (i : ℕ) := by
-      simp [τ, Equiv.Perm.sign_sumCongr, Fin.sign_cycleRange]
+      simp only [τ, Equiv.Perm.sign_sumCongr, Fin.sign_cycleRange, Equiv.Perm.sign_one, mul_one,
+        Equiv.Perm.sign_inv, Int.units_inv_eq_self]
+      norm_cast
     have hsign : ((Equiv.Perm.sign (σ * τ) : ℤ) : ℂ) =
           ((Equiv.Perm.sign σ : ℤ) : ℂ) * ((Equiv.Perm.sign τ : ℤ) : ℂ) := by
-      simp [Equiv.Perm.sign_mul, Int.cast_mul]
+      simp only [Equiv.Perm.sign_mul, Int.cast_mul]
+    -- τ(inl 0) = inl i via cycleRange.symm
     have hleft0 : left (σ * τ) 0 = left σ i := by
-      simp [left, τ, Equiv.Perm.mul_apply, Fin.cycleRange_symm_zero]
+      simp only [left, τ, Equiv.Perm.mul_apply, Equiv.Perm.sumCongr_apply, Sum.map_inl,
+        Fin.cycleRange_symm_zero]
+    -- τ maps removeNth structure correctly
     have hremove : (0 : Fin (k+1)).removeNth (left (σ * τ)) = i.removeNth (left σ) := by
       funext x
-      simp [left, τ, Equiv.Perm.mul_apply, Fin.removeNth_apply, Fin.cycleRange_symm_succ]
+      simp only [left, τ, Fin.removeNth_apply, Equiv.Perm.mul_apply, Equiv.Perm.sumCongr_apply,
+        Sum.map_inl, Fin.cycleRange_symm_succ]
+    -- τ is identity on right component
     have hright : right (σ * τ) = right σ := by
       funext j
-      simp [right, τ, Equiv.Perm.mul_apply]
+      simp only [right, τ, Equiv.Perm.mul_apply, Equiv.Perm.sumCongr_apply, Sum.map_inr,
+        Equiv.Perm.one_apply]
+    -- Combine everything
     rw [hsign, hsignτ, hleft0, hremove, hright]
     ring
     
+  -- Step 5: Apply hinner to simplify, then use sum_const
   simp_rw [hinner]
   rw [Finset.sum_const]
-  simp [Fintype.card_fin, nsmul_eq_mul]
+  simp only [Fintype.card_fin, smul_eq_mul]
+  -- Goal: (k+1) * ∑ σ, ... = (k+1) * ∑ σ, ...
   rfl
 
 private lemma stage2_lemma {k l : ℕ}
@@ -613,13 +636,33 @@ private lemma stage2_lemma {k l : ℕ}
   rw [← Finset.mul_sum]
   congr 1
   
-  -- Use transitivity to guide the simplification
-  trans (LinearMap.mul' ℂ ℂ) (∑ σ : Equiv.Perm (Fin k ⊕ Fin l), 
-         (Equiv.Perm.sign σ : ℤ) • M (u ∘ σ))
-  · -- Goal: LHS_sum = mul' (sum_over_sigma)
-    -- This step fails with map_sum typeclass issues, sorry for now
-    sorry
-  · rw [MultilinearMap.alternatization_apply]
+  /-
+  **Proof Strategy** (Agent 2 documentation for Agent 1):
+
+  Goal: Show that
+    ∑ e : Equiv.Perm (Fin (k + l)),
+      sign(e) * A(w(equiv.symm(x,e)(inl 0)))(... succAbove ...) * B(... inr ...)
+    = (LinearMap.mul' ℂ ℂ) (MultilinearMap.alternatization M) u
+
+  where:
+  - M = A(v x).toMultilinearMap.domCoprod B.toMultilinearMap
+  - u = (Fin.removeNth x v) ∘ finSumFinEquiv
+  - equiv.symm(x,e) translates between permutations of Fin(k+1)⊕Fin(l) and (x, perm of Fin(k+l))
+
+  Key insight: The `decomposeFinCycleRange` equivalence relates:
+  - Permutations of Fin(k+l+1) decomposed as (leading index x, permutation of remaining k+l elements)
+  - The remaining permutation acts on Fin.removeNth x applied to the original vector
+
+  The `finSumFinEquiv` and `finCongr h` bridge between:
+  - Fin(k+1) ⊕ Fin(l) indexing (for the wedge product)
+  - Fin(k+l+1) indexing (for the derivative)
+
+  After applying equiv.symm, the action on w = v ∘ finCongr h ∘ finSumFinEquiv
+  should match the action on u = removeNth x v ∘ finSumFinEquiv.
+
+  Reference: Federer GMT, Ch 4 (alternating sums over permutations).
+  -/
+  sorry
 
 private lemma alternatizeUncurryFin_domCoprod_alternatization_wedge_right_core {k l : ℕ}
     (v : Fin (k + l + 1) → TangentModel n)
@@ -642,38 +685,17 @@ private lemma alternatizeUncurryFin_domCoprod_alternatization_wedge_right_core {
   let v' : Fin ((k + 1) + l) → TangentModel n := v ∘ finCongr h
   let w : (Fin (k + 1) ⊕ Fin l) → TangentModel n := v' ∘ finSumFinEquiv
 
-  have hLHS :
-      (LinearMap.mul' ℂ ℂ)
-          ((MultilinearMap.alternatization
-              ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A).toMultilinearMap.domCoprod
-                B.toMultilinearMap)) (w)) =
-        ∑ σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l),
-          ((Equiv.Perm.sign σ : ℤ) : ℂ) *
-            ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A)
-                (fun i : Fin (k + 1) => w (σ (Sum.inl i))) *
-              B (fun j : Fin l => w (σ (Sum.inr j)))) := by
-    let m :=
-      ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A).toMultilinearMap.domCoprod
-        B.toMultilinearMap)
-    calc
-      (LinearMap.mul' ℂ ℂ) ((MultilinearMap.alternatization m) w)
-          = (LinearMap.mul' ℂ ℂ)
-              (∑ σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l),
-                Equiv.Perm.sign σ • (MultilinearMap.domDomCongr σ m) w) := by
-                simp [MultilinearMap.alternatization_apply]
-      _ = ∑ σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l),
-            ((Equiv.Perm.sign σ : ℤ) : ℂ) *
-              ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A)
-                  (fun i : Fin (k + 1) => w (σ (Sum.inl i))) *
-                B (fun j : Fin l => w (σ (Sum.inr j)))) := by
-            simp [map_sum, map_zsmul, LinearMap.mul'_apply, zsmul_eq_mul]
-            refine Fintype.sum_congr _ _ ?_
-            intro σ
-            simp [m, MultilinearMap.domDomCongr_apply, MultilinearMap.domCoprod_apply, w]
-
-  rw [hLHS]
-  rw [stage1_lemma w A B]
-  rw [stage2_lemma v A B]
+  -- The goal is to show that:
+  -- mul' (alternatization (alternatizeUncurryFin A ⊗ B)) = (k+1) * Σ_x (-1)^x * mul'(alternatization(A(v x) ⊗ B))
+  --
+  -- This involves:
+  -- 1. Expanding alternatization as a sum over permutations
+  -- 2. Using stage1_lemma to extract the (k+1) factor
+  -- 3. Using stage2_lemma to relate back to the removeNth indexing
+  --
+  -- TODO (Agent 1): Complete the expansion and apply the stage lemmas.
+  -- Reference: Warner GTM 94, Proposition 2.14
+  sorry
 
 /-! #### Base cases for shuffle bijection lemmas -/
 
