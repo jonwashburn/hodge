@@ -524,7 +524,7 @@ private lemma stage1_lemma {k l : ℕ} {n : ℕ}
     refine Fintype.sum_congr _ _ ?_
     intro σ
     rw [ContinuousAlternatingMap.alternatizeUncurryFin_apply]
-    simp [left, right, Finset.sum_mul, Finset.mul_sum, mul_assoc, mul_left_comm, mul_comm, w]
+    simp only [left, right, Finset.sum_mul, Finset.mul_sum, mul_assoc, mul_left_comm, mul_comm]
 
   rw [hexpand]
   rw [Finset.sum_comm]

@@ -138,6 +138,38 @@ infrastructure (Agent 5 work).
 **Status**: Infrastructure complete. Currently trivial proofs because currents are stubs.
 Once Agent 5 provides real integration currents, these theorems provide the boundary bound proofs.
 
+### Agent 2: SmoothForm.pairing Infrastructure (2026-01-12)
+
+**Location**: `Hodge/Kahler/Microstructure.lean` (lines 99-252)
+
+**What was added**:
+
+*Top-form Integration*:
+- `topFormIntegral`: Integration of (2n)-forms over the compact manifold
+- `topFormIntegral_linear`: Linearity proof
+- `topFormIntegral_bound`: Boundedness proof
+
+*Pairing Function*:
+- `SmoothForm.pairing`: `⟨α, β⟩ = ∫_X α ∧ β` for complementary-degree forms
+- Uses wedge product `α ⋏ β` to produce a top form
+- Degree arithmetic: `2p + 2(n-p) = 2n`
+
+*Properties Proved*:
+- `SmoothForm.pairing_linear_left`: Linear in first argument
+- `SmoothForm.pairing_linear_right`: Linear in second argument
+- `SmoothForm.pairing_zero_left`, `SmoothForm.pairing_zero_right`: Zero properties
+
+*Integration Data Connection*:
+- `SmoothForm.pairingData`: Connects to IntegrationData framework
+- bdryMass = 0 (compact manifold without boundary)
+
+**Mathematical Definition**:
+For α ∈ Ω^{2p}(X) and β ∈ Ω^{2(n-p)}(X):
+  `⟨α, β⟩ = ∫_X α ∧ β`
+
+**Status**: Infrastructure complete. `topFormIntegral := 0` is a stub.
+Once Agent 5 provides real volume integration, the pairing will return non-trivial values.
+
 ---
 
 ## Remaining Work
