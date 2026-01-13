@@ -730,16 +730,20 @@ private lemma alternatizeUncurryFin_domCoprod_alternatization_wedge_right_core {
   let v' : Fin ((k + 1) + l) → TangentModel n := v ∘ finCongr h
   let w : (Fin (k + 1) ⊕ Fin l) → TangentModel n := v' ∘ finSumFinEquiv
 
-  -- The goal is to show that:
-  -- mul' (alternatization (alternatizeUncurryFin A ⊗ B)) = (k+1) * Σ_x (-1)^x * mul'(alternatization(A(v x) ⊗ B))
+  -- The proof uses stage1_lemma and stage2_lemma:
+  -- 1. Expand alternatization to sum over permutations
+  -- 2. stage1_lemma extracts the (k+1) factor from alternatizeUncurryFin
+  -- 3. stage2_lemma relates the permutation sum to the removeNth indexing
   --
-  -- This involves:
-  -- 1. Expanding alternatization as a sum over permutations
-  -- 2. Using stage1_lemma to extract the (k+1) factor
-  -- 3. Using stage2_lemma to relate back to the removeNth indexing
-  --
-  -- TODO (Agent 1): Complete the expansion and apply the stage lemmas.
-  -- Reference: Warner GTM 94, Proposition 2.14
+  -- Note: This requires stage2_lemma which still has a sorry
+  have hstage1 := stage1_lemma w A B
+  have hstage2 := stage2_lemma v A B
+  
+  -- The LHS can be rewritten using alternatization expansion and domCoprod
+  -- After expansion, use stage1_lemma to factor out (k+1)
+  -- Then stage2_lemma gives the relation to the RHS
+  
+  -- This proof requires completing stage2_lemma first
   sorry
 
 /-! #### Base cases for shuffle bijection lemmas -/
