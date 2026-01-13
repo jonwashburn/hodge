@@ -506,38 +506,141 @@ private lemma stage1_lemma {k l : ℕ} {n : ℕ}
             (A (w (σ (Sum.inl 0)))
                 (fun i : Fin k => w (σ (Sum.inl i.succ))) *
               B (fun j : Fin l => w (σ (Sum.inr j)))) := by
-  /-
-  **Proof Strategy** (Agent 2 documentation for Agent 1):
+  classical
+  -- Helper abbreviations
+  let left (σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l)) : Fin (k + 1) → TangentModel n :=
+    fun i => w (σ (Sum.inl i))
+  let right (σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l)) : Fin l → TangentModel n :=
+    fun j => w (σ (Sum.inr j))
 
-  The proof has 5 steps:
+  -- Step 1: Expand alternatizeUncurryFin and distribute
+  have hexpand : ∀ σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l),
+      ((Equiv.Perm.sign σ : ℤ) : ℂ) *
+        ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A) (left σ) * B (right σ)) =
+      ∑ i : Fin (k + 1),
+        ((Equiv.Perm.sign σ : ℤ) : ℂ) * ((-1 : ℂ) ^ (i : ℕ)) *
+          (A (left σ i) (i.removeNth (left σ)) * B (right σ)) := by
+    intro σ
+    rw [ContinuousAlternatingMap.alternatizeUncurryFin_apply]
+    -- The apply gives: ∑ i, (-1)^i • A(left σ i)(removeNth i (left σ))
+    -- Convert zsmul to ℂ multiplication
+    have hzsmul : ∀ i : Fin (k + 1),
+        ((-1 : ℤ) ^ (i : ℕ)) • A (left σ i) (i.removeNth (left σ)) =
+        ((-1 : ℂ) ^ (i : ℕ)) * A (left σ i) (i.removeNth (left σ)) := by
+      intro i
+      rw [← Int.cast_smul_eq_zsmul ℂ, smul_eq_mul]
+      simp only [Int.cast_pow, Int.cast_neg, Int.cast_one]
+    simp_rw [hzsmul]
+    rw [Finset.sum_mul, Finset.mul_sum]
+    apply Finset.sum_congr rfl
+    intro i _
+    ring
 
-  **Step 1**: Expand `alternatizeUncurryFin A` using its definition:
-    `alternatizeUncurryFin A = ∑ i : Fin(k+1), (-1)^i • A(v_i)(removeNth i v)`
-  This turns the LHS into a double sum: `∑_σ ∑_i sign(σ) * (-1)^i * A(...) * B(...)`
+  -- Apply expansion
+  conv_lhs =>
+    arg 2
+    ext σ
+    rw [hexpand σ]
+  -- Step 2: Swap order of summation
+  rw [Finset.sum_comm]
 
-  **Step 2**: Swap summation order using `Finset.sum_comm`:
-    `∑_σ ∑_i ... = ∑_i ∑_σ ...`
+  -- Step 3-4: Show each inner sum (over σ) is the same for all i
+  have hinner : ∀ i : Fin (k + 1),
+      ∑ σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l),
+        ((Equiv.Perm.sign σ : ℤ) : ℂ) * ((-1 : ℂ) ^ (i : ℕ)) *
+          (A (left σ i) (i.removeNth (left σ)) * B (right σ)) =
+      ∑ σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l),
+        ((Equiv.Perm.sign σ : ℤ) : ℂ) *
+          (A (left σ 0) ((0 : Fin (k + 1)).removeNth (left σ)) * B (right σ)) := by
+    intro i
+    -- Define τ_i := sumCongr (cycleRange i) 1 (NOT the inverse!)
+    -- Then σ ↦ τ * σ maps: σ(inl 0) → τ(σ(inl 0)), with τ(inl j) = inl (cycleRange i j)
+    -- cycleRange i maps: 0 → 1 → 2 → ... → i → 0 (cycle)
+    -- So τ * σ applied to inl 0 gives σ(inl (cycleRange i 0)) = σ(inl 1) if i ≥ 1
+    -- Actually we want: σ(inl 0) → σ(inl i)
+    -- Use σ ↦ σ * τ with τ = sumCongr (cycleRange i)⁻¹ 1, then
+    -- (σ * τ)(inl 0) = σ(τ(inl 0)) = σ(inl ((cycleRange i)⁻¹ 0)) = σ(inl i)
+    -- because cycleRange⁻¹ sends 0 to i.
+    let τ : Equiv.Perm (Fin (k + 1) ⊕ Fin l) := Equiv.Perm.sumCongr i.cycleRange.symm 1
+    -- sign(τ) = sign(cycleRange⁻¹) = sign(cycleRange) = (-1)^i
+    have hsignτ : Equiv.Perm.sign τ = (-1 : ℤˣ) ^ (i : ℕ) := by
+      simp only [τ, Equiv.Perm.sign_sumCongr, Equiv.Perm.sign_one, mul_one]
+      conv_lhs => rw [show i.cycleRange.symm = i.cycleRange⁻¹ from rfl, Equiv.Perm.sign_inv]
+      exact Fin.sign_cycleRange i
+    have hsignτ' : (Equiv.Perm.sign τ : ℤ) = (-1 : ℤ) ^ (i : ℕ) := by
+      simp only [hsignτ, Units.val_pow_eq_pow_val, Units.val_neg, Units.val_one]
+    -- Fintype.sum_equiv e f g h shows: ∑_σ f(e σ) = ∑_σ g(σ) when h σ : f(e σ) = g σ
+    -- We have:
+    --   f(σ) = source = sign(σ) * (-1)^i * A(left σ i)...
+    --   g(σ) = target = sign(σ) * A(left σ 0)...
+    -- We want ∑ f = ∑ g, but sum_equiv gives ∑ f∘e = ∑ g
+    -- Use symmetry: prove ∑ g = ∑ f, then apply symm
+    -- For this, we need sum_equiv e' g f h' where g(e' σ) = f(σ)
+    -- With e' = mulRight τ⁻¹, we get g(σ * τ⁻¹) = f(σ)
+    -- i.e., sign(σ*τ⁻¹) * A(left(σ*τ⁻¹) 0)... = sign(σ) * (-1)^i * A(left σ i)...
+    -- Using sign(τ⁻¹) = sign(τ) = (-1)^i and left(σ*τ⁻¹) 0 = σ(τ⁻¹(inl 0)) = σ(inl (cycleRange 0))
+    -- cycleRange at 0 is cycleRange i applied to 0 gives... 1 (for i > 0) or 0 (for i = 0)
+    -- This is getting complicated. Let me use the direct approach.
+    -- 
+    -- Direct approach: ∑ f = ∑ g by showing f(σ) = g(σ * τ) for the right τ
+    -- f_i(σ) = sign(σ) * (-1)^i * A(left σ i)...
+    -- g(σ') = sign(σ') * A(left σ' 0)...
+    -- For σ' = σ * τ with τ = sumCongr cycleRange.symm 1:
+    --   left σ' 0 = σ(τ(inl 0)) = σ(inl i) = left σ i
+    --   sign(σ') = sign(σ) * (-1)^i
+    -- So g(σ * τ) = sign(σ) * (-1)^i * A(left σ i)... = f_i(σ)
+    -- Therefore ∑_σ f_i(σ) = ∑_σ g(σ * τ) = ∑_σ' g(σ') by bijection
+    refine Fintype.sum_equiv (Equiv.mulRight τ) _ _ ?_
+    intro σ
+    -- Goal: f(σ) = g((mulRight τ) σ) = g(σ * τ)
+    -- f(σ) = sign(σ) * (-1)^i * A(left σ i)...
+    -- g(σ * τ) = sign(σ * τ) * A(left(σ*τ) 0)...
+    -- Properties:
+    have hsignστ : (Equiv.Perm.sign (σ * τ) : ℤ) =
+          (Equiv.Perm.sign σ : ℤ) * (-1 : ℤ) ^ (i : ℕ) := by
+      simp only [Equiv.Perm.sign_mul, hsignτ', Units.val_mul]
+    -- (σ * τ)(inl 0) = σ(τ(inl 0)) = σ(inl (cycleRange i)⁻¹ 0) = σ(inl i)
+    have hleft_i : left (σ * τ) 0 = left σ i := by
+      simp only [left, τ, Equiv.Perm.mul_apply, Equiv.Perm.sumCongr_apply, Sum.map_inl,
+        Fin.cycleRange_symm_zero]
+    -- For x : Fin k, (σ * τ)(inl (succAbove 0 x)) = σ(τ(inl x.succ))
+    -- τ(inl x.succ) = inl ((cycleRange i)⁻¹ x.succ) = inl (succAbove i ((cycleRange i)⁻¹.predAbove 0 x))
+    -- Actually (cycleRange i)⁻¹ x.succ = succAbove i x (this is the key property!)
+    have hremove : (0 : Fin (k + 1)).removeNth (left (σ * τ)) = i.removeNth (left σ) := by
+      ext x
+      simp only [left, τ, Fin.removeNth, Equiv.Perm.mul_apply, Equiv.Perm.sumCongr_apply,
+        Sum.map_inl, Fin.succAbove_zero, Fin.cycleRange_symm_succ]
+    have hright : right (σ * τ) = right σ := by
+      ext j
+      simp only [right, τ, Equiv.Perm.mul_apply, Equiv.Perm.sumCongr_apply, Sum.map_inr,
+        Equiv.Perm.one_apply]
+    -- Now combine
+    -- The goal is: f(σ) = g((mulRight τ) σ) = g(σ * τ)
+    -- f(σ) = sign(σ) * (-1)^i * A(left σ i)...
+    -- g(σ * τ) = sign(σ * τ) * A(left(σ*τ) 0)...
+    -- Using: sign(σ * τ) = sign(σ) * (-1)^i, left(σ*τ) 0 = left σ i, etc.
+    have hmr : (Equiv.mulRight τ) σ = σ * τ := rfl
+    simp only [hmr]
+    -- Expand sign(σ * τ)
+    rw [hsignστ, Int.cast_mul, Int.cast_pow, Int.cast_neg, Int.cast_one]
+    -- Use the lemmas to show the terms match
+    rw [hleft_i, hremove, hright]
+    -- Goal is now reflexively true
 
-  **Step 3-4**: For each `i : Fin(k+1)`, define the bijection:
-    `τ_i := Equiv.Perm.sumCongr (i.cycleRange.symm) 1`
-
-  Key properties of `τ_i`:
-  - `τ_i(inl 0) = inl i` (cycleRange.symm maps 0 to i)
-  - `τ_i(inl j.succ) = inl (succAbove i j)` (shifts other indices)
-  - `τ_i(inr j) = inr j` (identity on right component)
-  - `sign(τ_i) = (-1)^i` (from Fin.sign_cycleRange)
-
-  Reindex by `σ ↦ σ * τ_i`:
-  - `sign(σ * τ_i) = sign(σ) * (-1)^i`
-  - The `(-1)^i` factors cancel
-  - Each inner sum becomes identical to the `i = 0` case
-
-  **Step 5**: Sum over `i` gives `(k+1)` copies of the `i = 0` sum:
-    `∑_i (∑_σ f_0(σ)) = (k+1) * (∑_σ f_0(σ))`
-
-  Reference: Warner GTM 94, Proposition 2.14.
-  -/
-  sorry
+  simp_rw [hinner]
+  -- Step 5: The sum over i is (k+1) copies of the same thing
+  rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin]
+  simp only [nsmul_eq_mul]
+  -- Convert ↑(k + 1) to (↑k + 1) and unfold `left`, `right`
+  simp only [Nat.cast_add, Nat.cast_one, left, right]
+  -- The remaining difference: Fin.removeNth 0 f vs fun i => f i.succ
+  -- Use: removeNth 0 f = fun i => f (succAbove 0 i) = fun i => f i.succ
+  have hremNth : ∀ (f : Fin (k + 1) → TangentModel n),
+      (Fin.removeNth 0 f) = (fun i : Fin k => f i.succ) := by
+    intro f
+    ext i
+    simp only [Fin.removeNth, Fin.succAbove_zero]
+  simp_rw [hremNth]
 
 private lemma stage2_lemma {k l : ℕ}
     (v : Fin (k + l + 1) → TangentModel n)
@@ -590,32 +693,20 @@ private lemma stage2_lemma {k l : ℕ}
   rw [← Finset.mul_sum]
   congr 1
   
-  /-
-  **Proof Strategy** (Agent 2 documentation for Agent 1):
-
-  Goal: Show that
-    ∑ e : Equiv.Perm (Fin (k + l)),
-      sign(e) * A(w(equiv.symm(x,e)(inl 0)))(... succAbove ...) * B(... inr ...)
-    = (LinearMap.mul' ℂ ℂ) (MultilinearMap.alternatization M) u
-
-  where:
-  - M = A(v x).toMultilinearMap.domCoprod B.toMultilinearMap
-  - u = (Fin.removeNth x v) ∘ finSumFinEquiv
-  - equiv.symm(x,e) translates between permutations of Fin(k+1)⊕Fin(l) and (x, perm of Fin(k+l))
-
-  Key insight: The `decomposeFinCycleRange` equivalence relates:
-  - Permutations of Fin(k+l+1) decomposed as (leading index x, permutation of remaining k+l elements)
-  - The remaining permutation acts on Fin.removeNth x applied to the original vector
-
-  The `finSumFinEquiv` and `finCongr h` bridge between:
-  - Fin(k+1) ⊕ Fin(l) indexing (for the wedge product)
-  - Fin(k+l+1) indexing (for the derivative)
-
-  After applying equiv.symm, the action on w = v ∘ finCongr h ∘ finSumFinEquiv
-  should match the action on u = removeNth x v ∘ finSumFinEquiv.
-
-  Reference: Federer GMT, Ch 4 (alternating sums over permutations).
-  -/
+  -- This requires showing:
+  -- ∑ e, sign(e) * A(w(equiv.symm(x,e)(inl 0)))... * B(...)
+  -- = (LinearMap.mul' ℂ ℂ) (∑ e, sign(e) • M.domDomCongr e u)
+  -- where M = A(v x).domCoprod B and u = removeNth x v ∘ finSumFinEquiv
+  --
+  -- The key identities needed:
+  -- 1. w(equiv.symm(x,e)(inl 0)) = v x  (from decomposeFinCycleRange_symm_apply_zero)
+  -- 2. Index correspondence between (inl i.succ, inr j) and u ∘ e ∘ (inl, inr)
+  --
+  -- The detailed index arithmetic involves:
+  -- - decomposeFinCycleRange.symm reconstructs σ from (x, e) via x.cycleRange.symm
+  -- - The indexing through finSumFinEquiv and finCongr must be traced
+  --
+  -- Reference: Federer GMT Ch 4, Warner GTM 94 Prop 2.14
   sorry
 
 private lemma alternatizeUncurryFin_domCoprod_alternatization_wedge_right_core {k l : ℕ}
