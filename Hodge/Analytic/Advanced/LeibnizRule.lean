@@ -693,20 +693,23 @@ private lemma stage2_lemma {k l : ℕ}
   rw [← Finset.mul_sum]
   congr 1
   
-  -- This requires showing:
-  -- ∑ e, sign(e) * A(w(equiv.symm(x,e)(inl 0)))... * B(...)
-  -- = (LinearMap.mul' ℂ ℂ) (∑ e, sign(e) • M.domDomCongr e u)
+  -- Goal: ∑ e, sign(e) * A(w(equiv.symm(x,e)(inl 0)))(...) * B(...)
+  --     = (LinearMap.mul' ℂ ℂ) (MultilinearMap.alternatization M) u
   -- where M = A(v x).domCoprod B and u = removeNth x v ∘ finSumFinEquiv
   --
-  -- The key identities needed:
-  -- 1. w(equiv.symm(x,e)(inl 0)) = v x  (from decomposeFinCycleRange_symm_apply_zero)
-  -- 2. Index correspondence between (inl i.succ, inr j) and u ∘ e ∘ (inl, inr)
+  -- Strategy:
+  -- 1. Expand alternatization: = ∑ e, sign(e) • M.domDomCongr e u
+  -- 2. Apply mul' and domDomCongr: = ∑ e, sign(e) * M(u ∘ e)
+  -- 3. Expand domCoprod: = ∑ e, sign(e) * A(v x)(u ∘ e ∘ inl) * B(u ∘ e ∘ inr)
+  -- 4. Show index correspondence via equiv.symm properties
   --
-  -- The detailed index arithmetic involves:
-  -- - decomposeFinCycleRange.symm reconstructs σ from (x, e) via x.cycleRange.symm
-  -- - The indexing through finSumFinEquiv and finCongr must be traced
+  -- The detailed proof requires showing:
+  -- - w(equiv.symm(x,e)(inl 0)) = v x
+  -- - (fun i => w(equiv.symm(x,e)(inl i.succ))) = (fun i => (u ∘ e) (inl i))
+  -- - (fun j => w(equiv.symm(x,e)(inr j))) = (fun j => (u ∘ e) (inr j))
   --
-  -- Reference: Federer GMT Ch 4, Warner GTM 94 Prop 2.14
+  -- These follow from decomposeFinCycleRange_symm_apply_* lemmas and the structure of equiv.
+  -- Reference: Warner GTM 94, Proposition 2.14
   sorry
 
 private lemma alternatizeUncurryFin_domCoprod_alternatization_wedge_right_core {k l : ℕ}
