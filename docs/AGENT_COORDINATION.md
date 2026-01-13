@@ -1,6 +1,6 @@
 # Hodge Conjecture Lean Proof - Multi-Agent Coordination
 
-**Last Updated**: 2026-01-10 (Round 2 - Transport issues in Microstructure.lean identified)
+**Last Updated**: 2026-01-10 (Round 3 - Build errors in Norms.lean, 4 sorries in LeibnizRule.lean)
 **Status**: Active Development
 **Goal**: Unconditional, axiom-free, sorry-free proof of `hodge_conjecture'`
 
@@ -15,21 +15,26 @@ hodge_conjecture' depends on:
   ✅ FundamentalClassSet_represents_class (ELIMINATED - Agent 3)
   ✅ KahlerManifold type class axioms (ELIMINATED - Agent 4)
   ❌ sorryAx (sorry statements - see below)
+  ❌ BUILD ERRORS in Norms.lean (blocks downstream modules)
 
-Current sorry locations:
-  🔴 LeibnizRule.lean: lines 657, 690, 984 (Agent 1 - main blockers)
-  🔴 Microstructure.lean: lines 936, 952, 972 (Agent 4 - transport issues)
-  🟡 IntegralCurrents.lean: line 281 (minor - approximation placeholder)
+Current issues:
+  🔴 BUILD ERRORS: Norms.lean lines 728, 734, 750 (Hodge star type mismatches)
+  🔴 LeibnizRule.lean: lines 540, 617, 650, 944 (4 sorries - Agent 1)
+  ✅ Microstructure.lean: Transport issues FIXED
 ```
 
 **Recent Progress**: 
-- ✅ **boundary_bound tasks 2a-2c COMPLETE** (2026-01-10)
+- ✅ **boundary_bound tasks 2a-2d ALL COMPLETE** (2026-01-10)
   - 2a: Stokes infrastructure (`HasStokesPropertyWith`, `RectifiableSetData`) in `Currents.lean`
   - 2b: Limit bounds (`limit_current_boundary_bound`) in `FlatNorm.lean`
   - 2c: Sum/scalar bounds with real triangle inequality proofs
-- 🔴 **Task 2d: 3 new sorries** due to type transport issues (Microstructure.lean:936,952,972)
-  - The theorems are architecturally correct but `Nat.sub_add_cancel hk ▸` transport fails
-  - Need to fix before marking complete
+  - 2d: Microstructure transport issues FIXED ✅
+- ✅ **Agent 5: Real Hausdorff Integration Infrastructure** (Currents.lean)
+  - `OrientingKVector`, `OrientedRectifiableSetData`, `ClosedSubmanifoldData`
+  - `hausdorffIntegrate`, `hausdorffIntegrate_bound` (mass-comass duality)
+- 🔴 **Agent 3: Hodge Star has BUILD ERRORS** (Norms.lean:728,734,750)
+  - Type mismatches with `hodgeStarSign` and `castForm`
+  - Blocks downstream modules
 - ✅ `smoothExtDeriv_comass_bound` REPLACED with `boundary_bound` (Agent 2)
   - Old axiom was mathematically FALSE (d is not bounded on C^0 forms)
   - New axiom is mathematically TRUE for currents used in proof
@@ -323,66 +328,49 @@ grep -rn 'sorry' Hodge/ --include='*.lean'
 
 ---
 
-### Agent 3 — Hodge Star Operator ✅ INFRASTRUCTURE COMPLETE
+### Agent 3 — Hodge Star Operator 🔴 BUILD ERRORS
 **Owner**: `Hodge/Analytic/Norms.lean`
-**Status**: ✅ INFRASTRUCTURE COMPLETE (2026-01-12)
-**Difficulty**: 8% relative to full formalization (2-4 months)
+**Status**: 🔴 BUILD ERRORS (must fix before other modules compile)
+**Difficulty**: Medium (type arithmetic issues)
 
-**Previous Tasks**: ✅ All complete (FundamentalClass, Inner Product infrastructure)
+**Previous Tasks**: ✅ FundamentalClass eliminated, Inner Product infrastructure
 
-**What was implemented** (lines 545-720):
+**Build Errors** (blocking downstream modules):
+```
+error: Norms.lean:728:108: Application type mismatch
+  castForm ⋯ α
+  has type SmoothForm n X k
+  expected type SmoothForm (?m) (?m) (2 * n - (2 * n - k))
 
-1. **`HodgeStarData` structure** (line 590): Bundles Hodge star with properties
-   ```lean
-   structure HodgeStarData (n : ℕ) (X : Type*) (k : ℕ) ... where
-     star : SmoothForm n X k → SmoothForm n X (2 * n - k)
-     star_add : ∀ α β, star (α + β) = star α + star β
-     star_smul : ∀ c α, star (c • α) = c • star α
-     star_zero : star 0 = 0
-     star_neg : ∀ α, star (-α) = -(star α)
-   ```
+error: Norms.lean:734:59: Unknown identifier `HodgeStarInvolutionData`
 
-2. **`hodgeStar` definition** (line 625): The Hodge star operator
-   ```lean
-   noncomputable def hodgeStar {k : ℕ} (α : SmoothForm n X k) : SmoothForm n X (2 * n - k)
-   notation:max "⋆" α:max => hodgeStar α
-   ```
+error: Norms.lean:750:12: Type mismatch
+  hodgeStarSign (2 * n) k
+  has type ℂ
+  expected type ℤ
+```
 
-3. **Basic properties** (lines 640-680):
-   - `hodgeStar_add` : ⋆(α + β) = ⋆α + ⋆β
-   - `hodgeStar_smul` : ⋆(c • α) = c • ⋆α
-   - `hodgeStar_zero` : ⋆0 = 0
-   - `hodgeStar_neg` : ⋆(-α) = -(⋆α)
-   - `hodgeStar_sub` : ⋆(α - β) = ⋆α - ⋆β
+**Root Causes**:
+1. `hodgeStarSign` returns `ℂ` but used where `ℤ` is expected
+2. `castForm` degree arithmetic: `2 * n - (2 * n - k) = k` not matching types
+3. Forward reference to `HodgeStarInvolutionData` before definition
 
-4. **L2 inner product relation** (line 690):
-   ```lean
-   theorem L2Inner_eq_integral_wedge_hodgeStar {k : ℕ} (α β : SmoothForm n X k) (hk : k ≤ 2 * n) :
-       L2Inner α β = ∫_X (α ∧ ⋆β)
-   ```
+**Fix Required**:
+1. Change `hodgeStarSign` return type from `ℂ` to `ℤ`
+2. Fix the `castForm` type by using explicit `SmoothForm n X k` on RHS
+3. Reorder definitions so `HodgeStarInvolutionData` is defined before use
 
-5. **Involution infrastructure** (lines 695-720):
-   - `hodgeStarSign (dim k : ℕ) : ℤ := (-1)^(k * (dim - k))`
-   - `HodgeStarInvolutionData` structure for ⋆⋆α = sign • α
-   - `hodgeStar_hodgeStar` theorem
+**Priority**: 🔴 HIGH - This blocks the entire build chain
 
-6. **Codifferential sign** (line 725):
-   - `codifferentialSign` for δ = (-1)^{nk+n+1} ⋆ d ⋆
+**What was attempted** (needs fixing):
+- `HodgeStarData` structure 
+- `hodgeStar` definition with notation ⋆
+- Basic properties (add, smul, zero, neg)
+- Involution infrastructure
 
-**Mathematical reference**: 
-- Warner GTM 94, §6.1 (Hodge star)
-- Voisin "Hodge Theory I", §5.1 (Kähler identities)
-
-**What remains** (Agent 5 work):
-- Replace `HodgeStarData.trivial` with real Riemannian-induced operator
-- Then all properties become non-trivial
-
-**Success Criteria**: ✅ ACHIEVED (infrastructure level)
-- `hodgeStar` defined with correct type signature ✅
-- Linearity properties proved ✅
-- Involution property formalized ✅
-- L2 inner product relation theorem ✅
-- No axioms, no sorry statements ✅
+**Success Criteria**:
+- `lake build Hodge.Analytic.Norms` compiles without errors
+- No axioms, no sorry statements in Hodge star code
 
 ---
 
@@ -396,7 +384,7 @@ grep -rn 'sorry' Hodge/ --include='*.lean'
 
 **Task 2 (2c)**: ✅ COMPLETED - Sum/scalar bounds (already properly implemented)
 
-**Task 3 (2d)**: 🔴 SORRIES INTRODUCED - Type transport issues (2026-01-10)
+**Task 3 (2d)**: ✅ COMPLETE - Transport issues FIXED (2026-01-10)
 
 **What was added to `Hodge/Kahler/Microstructure.lean`** (lines 917-1033):
 
@@ -463,53 +451,42 @@ but they should be fixed to maintain clean architecture.
 
 ---
 
-### Agent 4 — FIX: Microstructure Transport Sorries 🔴 PRIORITY
-**Owner**: `Hodge/Kahler/Microstructure.lean`
-**Status**: 🔴 3 SORRIES TO FIX
-**Difficulty**: Low-Medium (type arithmetic, not deep math)
+### Agent 4 — Microstructure Transport ✅ FIXED + NEW: Assist Agent 3
+**Owner**: `Hodge/Kahler/Microstructure.lean` (done), `Hodge/Analytic/Norms.lean` (assist)
+**Status**: ✅ Transport FIXED, 🟡 Available to assist Agent 3
+**Difficulty**: Low-Medium
 
-**Previous Tasks**: ✅ KahlerManifold axioms eliminated
+**Task 3 (2d)**: ✅ COMPLETE - Transport issues FIXED
 
-**Current Issue**: The microstructure Stokes property theorems have sorries due to type transport.
-
-**Sorry Locations**:
-- Line 936: `RawSheetSum.hasStokesProperty`
-- Line 952: `microstructureSequence_hasStokesProperty`
-- Line 972: `microstructure_limit_hasStokesProperty`
-
-**The Problem**:
+**What was added** (lines 922-948):
 ```lean
--- This transport creates issues:
-HasStokesPropertyWith (Nat.sub_add_cancel hk ▸ T.toFun) 0
--- Because we need to show (h ▸ 0) = 0, which isn't definitional
+-- Transport lemmas for degree arithmetic
+private theorem transport_current_zero {k k' : ℕ} (h : k' = k) :
+    h ▸ (0 : Current n X k) = (0 : Current n X k') := by subst h; rfl
+
+private theorem transport_toFun_zero {k k' : ℕ} (T : Current n X k)
+    (h : k' = k) (hT : T.toFun = 0) : (h ▸ T).toFun = 0 := by subst h; exact hT
+
+private theorem hasStokesProperty_of_zero_transport {k k' : ℕ}
+    (T : Current n X k) (h : k' + 1 = k) (hT : T.toFun = 0) :
+    HasStokesPropertyWith (n := n) (X := X) (k := k') (h ▸ T) 0
 ```
 
-**Fix Approaches** (pick one):
+**All 3 sorries eliminated** ✅:
+- `RawSheetSum.hasStokesProperty` - FIXED
+- `microstructureSequence_hasStokesProperty` - FIXED
+- `microstructure_limit_hasStokesProperty` - FIXED
 
-**Option A: Avoid transport entirely**
-```lean
--- Restructure HasStokesPropertyWith to work at degree k+1 directly
--- Instead of k and requiring k ≥ 1
-def HasStokesPropertyWith' (T : Current n X (k + 1)) (M : ℝ) : Prop :=
-  ∀ ω : SmoothForm n X k, |T.toFun (smoothExtDeriv ω)| ≤ M * ‖ω‖
-```
+**NEW Assignment**: Assist Agent 3 with Norms.lean build errors
 
-**Option B: Prove transport lemma**
-```lean
-lemma zero_toFun_transport {h : k = k'} :
-    (h ▸ (0 : Current n X k).toFun) = (0 : Current n X k').toFun := by
-  subst h; rfl
-```
-
-**Option C: Use explicit casts**
-```lean
--- Use cast instead of ▸ for better control
-cast (congrArg (fun k => SmoothForm n X k → ℝ) h) T.toFun
-```
+The Hodge star implementation has type errors. Agent 4 can help by:
+1. Fixing `hodgeStarSign` return type (ℂ → ℤ)
+2. Fixing `castForm` type arithmetic
+3. Reordering definitions to avoid forward references
 
 **Success Criteria**:
-- All 3 sorries eliminated
-- `lake build Hodge.Kahler.Microstructure` succeeds with no sorry warnings
+- `lake build Hodge.Analytic.Norms` compiles
+- No regressions in Microstructure.lean
 
 ---
 
@@ -729,32 +706,32 @@ Once we have real currents (Agent 5 work), we need real boundedness proofs.
 
 ---
 
-## Priority Order (Round 2)
+## Priority Order (Round 3)
 
-1. **Agent 1** (LeibnizRule sorries: 657, 690, 984) — *main proof-track blockers*
-2. **Agent 4** (FIX: Microstructure transport sorries: 936, 952, 972) — *quick fix needed*
+1. **Agent 3** (FIX: Norms.lean build errors) — *blocks entire build chain*
+2. **Agent 1** (LeibnizRule sorries: 540, 617, 650, 944) — *main proof-track blockers*
 3. **Agent 2** (Assist Agent 1) — *help with shuffle bijection combinatorics*
-4. **Agent 5** (Clay-readiness: real Hausdorff integration) — *unblocks non-trivial values*
-5. **Agent 3** (Hodge star operator) — *infrastructure work*
+4. **Agent 5** (Clay-readiness: real Hausdorff integration) — *good progress, continue*
+5. **Agent 4** (available for new tasks) — *transport issues FIXED*
 
-**Current Sorry Count**: 7 total
-- LeibnizRule.lean: 3 (proof-track blockers)
-- Microstructure.lean: 3 (transport issues - easy fix)
-- IntegralCurrents.lean: 1 (minor placeholder)
+**Current Status**:
+- BUILD ERRORS: Norms.lean (3 type errors - blocks downstream)
+- Sorries: LeibnizRule.lean (4 - proof-track blockers)
+- FIXED: Microstructure.lean transport issues ✅
 
 **Dependency Graph**:
 ```
-Agent 1 (3 sorries) ─────────────────────────────────► Kernel-clean proof
-        │                                                      ▲
-        └── Agent 2 (assist)                                   │
-                                                               │
-Agent 4 (3 sorries) ─── fix transport ─────────────────────────┘
+Agent 3 (fix build) ─────────────────────────────────► Build compiles
+        │                                                      │
+        ▼                                                      ▼
+Agent 1 (4 sorries) ─────────────────────────────────► Kernel-clean proof
+        │
+        └── Agent 2 (assist)
 
-Agent 5 (real integration) ──┬──► Agent 3 (Hodge ⋆)
-                             └──► Clay-ready proof
+Agent 5 (Hausdorff) ─────────────────────────────────► Clay-ready proof
 ```
 
-**Key Insight**: Agent 4's sorries are NOT on the main proof track but should be fixed for clean architecture. Agent 1's sorries are the ONLY blockers for `hodge_conjecture'`.
+**Key Insight**: Agent 3 must fix the build errors FIRST. Until Norms.lean compiles, we can't verify other modules. Agent 4's transport fixes are complete ✅.
 
 ---
 
