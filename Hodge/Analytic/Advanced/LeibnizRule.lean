@@ -693,23 +693,39 @@ private lemma stage2_lemma {k l : ℕ}
   rw [← Finset.mul_sum]
   congr 1
   
-  -- Goal: ∑ e, sign(e) * A(w(equiv.symm(x,e)(inl 0)))(...) * B(...)
-  --     = (LinearMap.mul' ℂ ℂ) (MultilinearMap.alternatization M) u
-  -- where M = A(v x).domCoprod B and u = removeNth x v ∘ finSumFinEquiv
-  --
-  -- Strategy:
-  -- 1. Expand alternatization: = ∑ e, sign(e) • M.domDomCongr e u
-  -- 2. Apply mul' and domDomCongr: = ∑ e, sign(e) * M(u ∘ e)
-  -- 3. Expand domCoprod: = ∑ e, sign(e) * A(v x)(u ∘ e ∘ inl) * B(u ∘ e ∘ inr)
-  -- 4. Show index correspondence via equiv.symm properties
-  --
-  -- The detailed proof requires showing:
-  -- - w(equiv.symm(x,e)(inl 0)) = v x
-  -- - (fun i => w(equiv.symm(x,e)(inl i.succ))) = (fun i => (u ∘ e) (inl i))
-  -- - (fun j => w(equiv.symm(x,e)(inr j))) = (fun j => (u ∘ e) (inr j))
-  --
-  -- These follow from decomposeFinCycleRange_symm_apply_* lemmas and the structure of equiv.
-  -- Reference: Warner GTM 94, Proposition 2.14
+  -- Expand RHS: (mul' ℂ ℂ) (alternatization M) u
+  simp only [M, u, MultilinearMap.alternatization_apply, LinearMap.mul'_apply]
+  
+  -- Both sides are sums over e : Perm(Fin(k+l))
+  -- LHS: ∑ e, sign(e) * A(w(equiv.symm(x,e)(inl 0)))... * B...
+  -- RHS: (∑ e, sign(e) • M.domDomCongr e u).1 * (∑ e, sign(e) • M.domDomCongr e u).2
+  -- Actually, mul' takes a tensor product and multiplies, so we need to be careful.
+  
+  -- The alternatization produces an AlternatingMap, and when evaluated it gives an element of the tensor.
+  -- Then mul' ℂ ℂ : ℂ ⊗ ℂ → ℂ multiplies the components.
+  
+  -- For domCoprod M, the alternatization gives a sum over shuffles, and we need to match this
+  -- with the LHS sum structure.
+  
+  -- The key insight is that both sides, when fully expanded, sum over the same permutation group
+  -- with matching terms. The index correspondence via equiv.symm makes them equal.
+  
+  -- Due to the complexity of the tensor product expansion and the multi-layered equivalences,
+  -- this requires careful term matching. The mathematical content is:
+  -- - w ∘ equiv.symm(x,e) evaluated at (inl 0, inl i.succ, inr j) matches
+  -- - (v x, u ∘ e) evaluated at (first arg, inl i, inr j)
+  
+  -- The key lemmas are:
+  -- 1. w(equiv.symm(x,e)(inl 0)) = v x
+  -- 2. w(equiv.symm(x,e)(inl i.succ)) = u(e(inl i')) for appropriate i'
+  -- 3. w(equiv.symm(x,e)(inr j)) = u(e(inr j'))
+  
+  -- These follow from:
+  -- - decomposeFinCycleRange_symm_apply_zero
+  -- - decomposeFinCycleRange_symm_apply_succ
+  -- - The structure of permCongr and the finSumFinEquiv bijection
+  
+  -- Reference: Warner GTM 94, Proposition 2.14; Federer GMT Ch 4
   sorry
 
 private lemma alternatizeUncurryFin_domCoprod_alternatization_wedge_right_core {k l : ℕ}
