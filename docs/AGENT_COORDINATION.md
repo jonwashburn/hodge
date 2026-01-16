@@ -1,6 +1,6 @@
 # Hodge Conjecture Lean Proof - Multi-Agent Coordination
 
-**Last Updated**: 2026-01-11 (Round 4 - LeibnizRule stage1_lemma PROVEN)
+**Last Updated**: 2026-01-11 (Round 4 - Build fixed, 4 sorries remaining)
 **Status**: Active Development
 **Goal**: Unconditional, axiom-free, sorry-free proof of `hodge_conjecture'`
 
@@ -18,10 +18,10 @@ hodge_conjecture' depends on:
   ❌ sorryAx (sorry statements - see below)
 
 Current sorry locations:
-  🔴 LeibnizRule.lean: lines 645, 715, 1022 (3 sorries - Agent 1 - MAIN BLOCKERS)
-  🟡 Microstructure.lean: lines 970, 986, 1005 (3 sorries - transport handling)
-  🟡 Currents.lean: lines 840, 847, 902 (3 sorries - Stokes/comass infrastructure)
-  🟡 IntegralCurrents.lean: line 281 (1 sorry - approximation theorem placeholder)
+  🔴 LeibnizRule.lean: line 1362 (1 sorry - shuffle_bijection_left - MAIN BLOCKER)
+  🟡 Microstructure.lean: lines 968, 984, 1002 (3 sorries - transport of zero current)
+
+Total: 4 sorries (down from 11)
 ```
 
 **Recent Progress**: 
@@ -699,17 +699,13 @@ Once we have real currents (Agent 5 work), we need real boundedness proofs.
 
 ## Priority Order (Round 4)
 
-1. **Agent 1** (LeibnizRule sorries: 645, 715, 1022) — *MAIN PROOF-TRACK BLOCKERS* (3 remaining)
-2. **Agent 2** (Assist Agent 1) — *help with shuffle bijection combinatorics*
-3. **Agent 4** (Microstructure transport: 970, 986, 1005) — *3 small sorries*
-4. **Agent 5** (Stokes/comass: Currents 840, 847, 902) — *3 sorries*
-5. **Agent 3** (available) — *Norms.lean FIXED ✅*
+1. **Agent 1** (LeibnizRule sorry: line 1362 - shuffle_bijection_left) — *MAIN BLOCKER*
+2. **Agent 4** (Microstructure transport: 968, 984, 1002) — *3 sorries*
+3. **Agent 2, 3, 5** (available) — *can assist*
 
-**Current Sorry Count**: 11 total
-- LeibnizRule.lean: 4 (MAIN PROOF-TRACK BLOCKERS)
-- Microstructure.lean: 3 (transport handling)
-- Currents.lean: 3 (Stokes/comass infrastructure)
-- IntegralCurrents.lean: 1 (approximation placeholder)
+**Current Sorry Count**: 4 total
+- LeibnizRule.lean: 1 (shuffle_bijection_left - graded sign proof)
+- Microstructure.lean: 3 (transport of zero current through ▸)
 
 **Dependency Graph**:
 ```
