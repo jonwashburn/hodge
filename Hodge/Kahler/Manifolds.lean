@@ -59,12 +59,10 @@ theorem unitForm_isClosed : IsFormClosed (unitForm : SmoothForm n X 0) := isForm
 omit K in
 theorem unitForm_is_rational : isRationalClass (n := n) (X := X) unitClass := isRationalClass_unit
 
-/-! ## Sign Definitions (used by other modules) -/
+/-! ## Sign Definitions
 
-/-- The sign factor for Hodge star involution: `⋆ ⋆ = (-1)^{k(dim-k)} id` -/
-def hodgeStarSign (dim k : ℕ) : ℂ := (-1 : ℂ) ^ (k * (dim - k))
-
-/-- The sign factor for adjoint derivative: `δ = (-1)^{nk+n+1} ⋆ d ⋆` -/
-def adjointDerivSign (dim k : ℕ) : ℂ := (-1 : ℂ) ^ (dim * k + dim + 1)
+Note: The primary sign definitions are now in `Hodge/Analytic/Norms.lean` to avoid
+duplicate definitions. The `hodgeStarSign` there returns `ℤ` which can be coerced
+to `ℂ` when needed for scalar multiplication on `SmoothForm`. -/
 
 end

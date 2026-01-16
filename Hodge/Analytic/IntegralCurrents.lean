@@ -267,20 +267,9 @@ noncomputable def IntegrationData.toIntegralCurrent {n : ℕ} {X : Type*} {k : �
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [Nonempty X]
-    (data : IntegrationData n X k) : IntegralCurrent n X k :=
-  -- Since data.toCurrent is currently the zero current (for IntegrationData.empty),
-  -- it's trivially integral. For real integration currents, this would need
-  -- the Federer-Fleming approximation theorem.
+    (data : IntegrationData n X k) (h_integral : isIntegral data.toCurrent) : IntegralCurrent n X k :=
   { toFun := data.toCurrent
-    is_integral := by
-      -- For the empty set, integrate = 0, so toCurrent = 0
-      -- Zero currents are integral by isIntegral_zero_current
-      have h_eq_zero : data.toCurrent = 0 := by
-        ext ω
-        show data.integrate ω = 0
-        sorry -- Placeholder: for non-trivial integration data, need approximation theorem
-      rw [h_eq_zero]
-      exact isIntegral_zero_current k }
+    is_integral := h_integral }
 
 /-- IntegrationData for closed submanifolds produces integral currents.
     Complex submanifolds of compact Kähler manifolds are automatically integral. -/
@@ -289,7 +278,12 @@ noncomputable def IntegrationData.closedSubmanifold_toIntegralCurrent {n : ℕ} 
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [Nonempty X]
     (Z : Set X) : IntegralCurrent n X k :=
-  (IntegrationData.closedSubmanifold n X k Z).toIntegralCurrent
+  (IntegrationData.closedSubmanifold n X k Z).toIntegralCurrent (by
+    -- closedSubmanifold uses zero integration, so the current is zero
+    have h_eq_zero : (IntegrationData.closedSubmanifold n X k Z).toCurrent = 0 := by
+      ext ω
+      rfl
+    simpa [h_eq_zero] using (isIntegral_zero_current (n := n) (X := X) k))
 
 /-- The integration current from a closed submanifold has zero boundary mass.
     This follows from complex submanifolds being closed. -/
