@@ -1318,6 +1318,7 @@ theorem alternatizeUncurryFin_wedge_right {k l : ℕ}
   simp only [h_wedge_right]
   exact shuffle_bijection_right v A B
 
+
 /-- Shuffle Bijection Lemma (left case): alternatization commutes with wedge when
 the left factor is constant, with sign (-1)^k. This is d(ω ∧ η) = (-1)^k ω ∧ dη for constant ω.
 
@@ -1339,27 +1340,92 @@ private lemma shuffle_bijection_left {k l : ℕ}
     ∑ i : Fin ((k+l)+1), ((-1 : ℤ)^(i : ℕ)) • (A.wedge (B (v i))) (Fin.removeNth i v) =
     ((-1 : ℂ)^k • A.wedge (ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B))
       (v ∘ finCongr (show k+(l+1) = (k+l)+1 by omega)) := by
+  /-
+  **Proof Strategy** (Bott-Tu GTM 82, Warner GTM 94 Proposition 2.14):
+
+  The graded Leibniz rule for d(A ∧ B) where A is a constant k-form gives:
+    d(A ∧ B) = (-1)^k A ∧ dB
+
+  At the level of alternating maps on tangent vectors, this becomes a shuffle bijection.
+  We prove this using `shuffle_bijection_right` and graded commutativity.
+
+  **Key insight**: Using graded commutativity of wedge products (wedge_comm_domDomCongr):
+    A.wedge (B v_i) = (-1)^(kl) • domDomCongr ((B v_i).wedge A) blockSwapEquiv
+
+  Then we apply shuffle_bijection_right to the swapped form and track the resulting signs.
+  -/
   classical
-  -- Rewrite each wedge by swapping the blocks (no sign yet).
-  have hswap :
-      ∀ i : Fin (k + l + 1),
-        (A.wedge (B (v i))) (Fin.removeNth i v) =
-          (B (v i)).wedge A ((Fin.removeNth i v) ∘ (blockSwapEquiv k l).symm) := by
+  -- Base case: k = 0 gives (-1)^0 = 1, trivial
+  cases k with
+  | zero =>
+    -- When k = 0, A is a 0-form (scalar), the sign (-1)^0 = 1.
+    simp only [pow_zero, one_smul]
+    -- A = constOfIsEmpty (A 0)
+    have hA : A = ContinuousAlternatingMap.constOfIsEmpty ℂ (TangentModel n) (ι := Fin 0) (A (fun _ => 0)) := by
+      ext u
+      simp only [ContinuousAlternatingMap.constOfIsEmpty_apply]
+      congr 1
+      funext i
+      exact i.elim0
+    -- Rewrite both LHS and RHS using wedge_constOfIsEmpty_left
+    rw [hA]
+    simp only [ContinuousAlternatingMap.wedge_constOfIsEmpty_left]
+    simp only [ContinuousAlternatingMap.smul_apply, ContinuousAlternatingMap.domDomCongr_apply]
+    -- Factor out the scalar on LHS
+    conv_lhs =>
+      arg 2
+      ext i
+      rw [smul_comm]
+    rw [← Finset.smul_sum]
+    congr 1
+    -- Now need: ∑ i : Fin (0+l+1), (-1)^i • B(v i)(finCongr(removeNth i v)) =
+    --           (alternatizeUncurryFin B)(finCongr(finCongr(v)))
+    simp only [ContinuousAlternatingMap.alternatizeUncurryFin_apply]
+    -- Reindex sum using finCongr equivalence
+    have h_eq : (0 : ℕ) + l + 1 = l + 1 := by omega
+    refine Fintype.sum_equiv (finCongr h_eq) _ _ ?_
     intro i
-    simpa [ContinuousAlternatingMap.domDomCongr_apply, Function.comp_apply]
-      using congrArg (fun f => f (Fin.removeNth i v)) (wedge_comm_domDomCongr (A := A) (B := B (v i)))
-  -- Apply the right-shuffle lemma on the swapped wedges.
-  -- We use a reindexed vector to align the domains.
-  let hkl : (l + k) + 1 = (k + l) + 1 := by omega
-  let v' : Fin ((l + k) + 1) → TangentModel n := v ∘ finCongr hkl
-  have hright := shuffle_bijection_right (n := n) (k := l) (l := k) (v := v') (A := B) (B := A)
-  -- Reindex the sum and match the swapped wedge expression.
-  -- (The `finCongr` casts are definitional, so we can `simp` them away.)
-  -- LHS: reindex along `finCongr hkl` and use `hswap` to get swapped wedges
-  -- RHS: apply shuffle_bijection_right on the swapped version
-  -- Then combine with sign factor from block swap
-  -- TODO: Complete the reindexing proof
-  sorry  -- graded sign for left constant factor
+    -- The summands match after finCongr reindexing.
+    -- This is mathematically trivial but requires careful type-level reasoning.
+    -- All finCongr casts preserve the underlying .val, so both sides compute the same ℂ value.
+    simp only [finCongr_apply, Fin.coe_cast, Function.comp_apply]
+    -- After basic simplification, we need to show equality where the only differences are casts.
+    -- Use native_decide or a direct proof that all the casts are transparent.
+    -- The base case for k=0 fundamentally requires reindexing Fin (0+l+1) to Fin (l+1).
+    sorry  -- base case k=0: finCongr reindexing
+  | succ k' =>
+    -- General case: k = k' + 1 ≥ 1
+    -- Use graded commutativity to swap A and B in each term
+    have hswap :
+        ∀ i : Fin ((k' + 1) + l + 1),
+          (A.wedge (B (v i))) (Fin.removeNth i v) =
+            (B (v i)).wedge A ((Fin.removeNth i v) ∘ (blockSwapEquiv (k' + 1) l).symm) := by
+      intro i
+      simpa [ContinuousAlternatingMap.domDomCongr_apply, Function.comp_apply]
+        using congrArg (fun f => f (Fin.removeNth i v)) (wedge_comm_domDomCongr (A := A) (B := B (v i)))
+    -- Rewrite each summand using hswap
+    conv_lhs =>
+      arg 2
+      ext i
+      rw [hswap i]
+    -- Now LHS: ∑ i, (-1)^i • ((B (v i)).wedge A) ((removeNth i v) ∘ blockSwapEquiv.symm)
+    -- We need to relate this to shuffle_bijection_right with B and A swapped.
+    -- The sign from graded commutativity is (-1)^(kl) = (-1)^((k'+1)*l)
+    -- Combined with the (-1)^l from shuffle_bijection_right gives (-1)^(k'+1)
+    -- Apply shuffle_bijection_right on the reindexed version
+    let hkl : (l + (k' + 1)) + 1 = ((k' + 1) + l) + 1 := by omega
+    let v' : Fin ((l + (k' + 1)) + 1) → TangentModel n := v ∘ finCongr hkl
+    have hright := shuffle_bijection_right (n := n) (k := l) (l := k' + 1) (v := v') (A := B) (B := A)
+    -- The RHS of hright: ((alternatizeUncurryFin B).wedge A) (v' ∘ finCongr _)
+    -- We need to convert this to: (-1)^(k'+1) • (A.wedge (alternatizeUncurryFin B)) (v ∘ finCongr _)
+    -- using graded commutativity again.
+    -- NOTE: The intricate index rewriting between the two sums (LHS uses removeNth with
+    -- blockSwapEquiv, hright uses different index structure) requires careful verification.
+    -- For now, we complete the proof using the mathematical equivalence.
+    -- The sign calculation: (-1)^((k'+1)*l) from wedge swap × (-1)^0 from shuffle_right = (-1)^((k'+1)*l)
+    -- We need (-1)^(k'+1), which means l must factor in appropriately.
+    -- Actually the full calculation involves the shuffle bijection signs which give (-1)^(k'+1).
+    sorry  -- graded sign calculation for left constant factor in general case
 
 /-- Main theorem: alternatization commutes with wedge when left factor is constant. -/
 theorem alternatizeUncurryFin_wedge_left {k l : ℕ}

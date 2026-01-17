@@ -1,6 +1,6 @@
 # Hodge Conjecture Lean Proof - Multi-Agent Coordination
 
-**Last Updated**: 2026-01-11 (Round 4 - Build fixed, 4 sorries remaining)
+**Last Updated**: 2026-01-17 (Round 5 - shuffle_bijection_left refactored, 5 sorries remaining)
 **Status**: Active Development
 **Goal**: Unconditional, axiom-free, sorry-free proof of `hodge_conjecture'`
 
@@ -18,13 +18,21 @@ hodge_conjecture' depends on:
   ❌ sorryAx (sorry statements - see below)
 
 Current sorry locations:
-  🔴 LeibnizRule.lean: line 1362 (1 sorry - shuffle_bijection_left - MAIN BLOCKER)
+  🔴 LeibnizRule.lean: lines 1395, 1428 (2 sorries - shuffle_bijection_left - MAIN BLOCKER)
+     - Line 1395: base case k=0 (finCongr reindexing for Fin (0+l+1) ≃ Fin (l+1))
+     - Line 1428: general case (graded sign calculation for left constant factor)
   🟡 Microstructure.lean: lines 968, 984, 1002 (3 sorries - transport of zero current)
 
-Total: 4 sorries (down from 11)
+Total: 5 sorries
 ```
 
 **Recent Progress**: 
+- 🔄 **shuffle_bijection_left refactored** (2026-01-17)
+  - Added helper lemma `removeNth_blockSwap_finCongr` (attempted, deleted due to complexity)
+  - Split proof into k=0 base case and k≥1 inductive step
+  - Base case k=0: uses `wedge_constOfIsEmpty_left`, but type cast issue remains
+  - General case: uses `wedge_comm_domDomCongr` + `shuffle_bijection_right`, graded sign calculation remains
+  - Both cases now use `sorry` with clear mathematical comments
 - ✅ **stage1_lemma PROVEN** (2026-01-11 - Agent 1)
   - Implemented cycleRange reindexing proof
   - Sign tracking via Fin.sign_cycleRange
@@ -697,14 +705,17 @@ Once we have real currents (Agent 5 work), we need real boundedness proofs.
 
 ---
 
-## Priority Order (Round 4)
+## Priority Order (Round 5)
 
-1. **Agent 1** (LeibnizRule sorry: line 1362 - shuffle_bijection_left) — *MAIN BLOCKER*
+1. **Agent 1** (LeibnizRule: lines 1395, 1428 - shuffle_bijection_left) — *MAIN BLOCKER*
+   - Line 1395: base case k=0 - finCongr reindexing complete except final Fin.cast equality
+   - Line 1428: general case - needs graded sign calculation after applying `shuffle_bijection_right`
 2. **Agent 4** (Microstructure transport: 968, 984, 1002) — *3 sorries*
+   - Transport of zero current: `(h ▸ T) = 0` when `T = 0`
 3. **Agent 2, 3, 5** (available) — *can assist*
 
-**Current Sorry Count**: 4 total
-- LeibnizRule.lean: 1 (shuffle_bijection_left - graded sign proof)
+**Current Sorry Count**: 5 total
+- LeibnizRule.lean: 2 (shuffle_bijection_left - base case + general case)
 - Microstructure.lean: 3 (transport of zero current through ▸)
 
 **Dependency Graph**:
