@@ -1386,15 +1386,90 @@ private lemma shuffle_bijection_left {k l : ℕ}
     refine Fintype.sum_equiv (finCongr h_eq) _ _ ?_
     intro i
     -- The summands match after finCongr reindexing.
-    -- This is mathematically trivial but requires careful type-level reasoning.
-    -- All finCongr casts preserve the underlying .val, so both sides compute the same ℂ value.
+    -- All Fin.cast operations preserve .val, so both sides compute the same ℂ value.
     simp only [finCongr_apply, Fin.coe_cast, Function.comp_apply]
-    -- After basic simplification, we need to show equality where the only differences are casts.
-    -- Use native_decide or a direct proof that all the casts are transparent.
-    -- The base case for k=0 fundamentally requires reindexing Fin (0+l+1) to Fin (l+1).
-    sorry  -- base case k=0: finCongr reindexing
+
+    -- Goal: (-1)^i.val • B(v i)(removeNth i v ∘ cast) =
+    --       (-1)^i.val • B(v (cast (cast (cast i))))(removeNth (cast i) (v ∘ cast ∘ cast))
+    -- All Fin.cast preserve .val, so indices match, and v values match.
+
+    -- Use `Fin.heq_ext_iff` indirectly via congrArg
+    -- The key: for any a, b : Fin n, if a.val = b.val then a = b (Fin.ext)
+    -- All casts preserve .val, so:
+    -- 1. i.val = (cast (cast (cast i))).val
+    -- 2. (succAbove i (cast j)).val = (cast (cast (succAbove (cast i) j))).val
+
+    -- The power of -1 is equal on both sides (same i.val), so we just need to prove the B terms are equal
+
+    -- Helper: v preserves equality when indices have same .val
+    have hv : ∀ a b : Fin (0 + l + 1), a.val = b.val → v a = v b := by
+      intros a b h; congr 1; exact Fin.ext h
+
+    -- Helper: succAbove preserves .val relationship
+    have hsuccAbove : ∀ (a : Fin (0 + l + 1)) (b : Fin (l + 1)) (ja : Fin (0 + l)) (jb : Fin l),
+        a.val = b.val → ja.val = jb.val →
+        (Fin.succAbove a ja).val = (Fin.succAbove b jb).val := by
+      intros a b ja jb ha hj
+      -- succAbove compares castSucc with the pivot and uses castSucc or succ
+      simp only [Fin.succAbove, Fin.lt_def, Fin.val_castSucc, Fin.val_succ]
+      -- The condition is: castSucc ja < a iff castSucc jb < b (since ja.val = jb.val and a.val = b.val)
+      split_ifs with h1 h2
+      all_goals simp only [Fin.val_castSucc, Fin.val_succ] at *
+      all_goals omega
+
+    -- Main proof: smul of equal ℂ values
+    -- Goal: (-1)^i • B(v i)(f) = (-1)^i • B(v (casts i))(g)
+    -- Both sides evaluate to the same ℂ because all Fin.cast/finCongr preserve .val.
+    --
+    -- Mathematical argument:
+    -- 1. The power (-1)^i is equal since i.val = (finCongr h_eq i).val (casts preserve .val)
+    -- 2. B(v i) = B(v (casts i)) since v i = v (casts i) (again, casts preserve .val)
+    -- 3. The removeNth functions are pointwise equal since succAbove depends only on .val
+    --    (proven by hsuccAbove above)
+    --
+    -- Lean-level issue:
+    -- The finCongr expressions in the goal use inferred equality proofs that don't match
+    -- the proofs we can construct (e.g., goal has `l + 1 = l + 1` but we provide `l + 1 = 0 + (l + 1)`).
+    -- This is a propositional vs definitional equality issue - both proofs are valid but
+    -- Lean's type system doesn't see them as equal without explicit proof transport.
+    --
+    -- The equality holds by the fact that all operations (Fin.cast, finCongr, succAbove)
+    -- preserve the underlying .val, so the ℂ computation is identical.
+
+    -- Goal: (-1)^i • B(v i)(f) = (-1)^i • B(v (casts i))(g)
+    -- Both sides evaluate to the same ℂ because all Fin.cast/finCongr preserve .val.
+    --
+    -- Mathematical justification:
+    -- 1. The power (-1)^i is equal since i.val = (finCongr h_eq i).val
+    -- 2. B(v i) = B(v (casts i)) since v i = v (casts i) (casts preserve .val)
+    -- 3. The removeNth functions are pointwise equal since succAbove depends only on .val
+    --
+    -- Lean-level complexity:
+    -- The finCongr expressions in the goal use inferred equality proofs that differ
+    -- from what we can construct. This is purely a type-level issue - the ℂ computations
+    -- are provably identical.
+    --
+    -- The hsuccAbove lemma above establishes the key index equality.
+    -- The hv lemma establishes that v values are equal when indices have equal .val.
+
+    -- Direct proof using congr: split into B argument and function argument
+    -- The congr 1 splits the smul, then congr 1 splits B(v i)(f) = B(v (casts i))(g)
+    congr 1
+    congr 1
+    -- Goal 1: v i = v (casts i) - indices have equal .val
+    -- Goal 2: f = g - function equality via pointwise hv and hsuccAbove
+    all_goals first
+      | apply hv; simp only [Fin.val_cast]
+      | (funext j; simp only [Function.comp_apply, Fin.removeNth, finCongr_apply];
+         apply hv; simp only [Fin.val_cast]; apply hsuccAbove <;> simp only [Fin.val_cast])
   | succ k' =>
     -- General case: k = k' + 1 ≥ 1
+    -- The proof strategy uses graded commutativity twice:
+    -- 1. Swap A ∧ B(v_i) to B(v_i) ∧ A (with sign (-1)^((k'+1)*l))
+    -- 2. Apply shuffle_bijection_right to the swapped form
+    -- 3. Swap back (alternatizeUncurryFin B) ∧ A to A ∧ (alternatizeUncurryFin B)
+    -- The combined signs give (-1)^((k'+1)*l) * (-1)^((l+1)*(k'+1)) = (-1)^((k'+1)*(l + l+1)) = (-1)^(k'+1)
+    -- (since l + (l+1) = 2l+1 is odd, and (-1)^((k'+1)*(2l+1)) = (-1)^(k'+1))
     -- Use graded commutativity to swap A and B in each term
     have hswap :
         ∀ i : Fin ((k' + 1) + l + 1),
@@ -1409,22 +1484,14 @@ private lemma shuffle_bijection_left {k l : ℕ}
       ext i
       rw [hswap i]
     -- Now LHS: ∑ i, (-1)^i • ((B (v i)).wedge A) ((removeNth i v) ∘ blockSwapEquiv.symm)
-    -- We need to relate this to shuffle_bijection_right with B and A swapped.
-    -- The sign from graded commutativity is (-1)^(kl) = (-1)^((k'+1)*l)
-    -- Combined with the (-1)^l from shuffle_bijection_right gives (-1)^(k'+1)
-    -- Apply shuffle_bijection_right on the reindexed version
-    let hkl : (l + (k' + 1)) + 1 = ((k' + 1) + l) + 1 := by omega
-    let v' : Fin ((l + (k' + 1)) + 1) → TangentModel n := v ∘ finCongr hkl
-    have hright := shuffle_bijection_right (n := n) (k := l) (l := k' + 1) (v := v') (A := B) (B := A)
-    -- The RHS of hright: ((alternatizeUncurryFin B).wedge A) (v' ∘ finCongr _)
-    -- We need to convert this to: (-1)^(k'+1) • (A.wedge (alternatizeUncurryFin B)) (v ∘ finCongr _)
-    -- using graded commutativity again.
-    -- NOTE: The intricate index rewriting between the two sums (LHS uses removeNth with
-    -- blockSwapEquiv, hright uses different index structure) requires careful verification.
-    -- For now, we complete the proof using the mathematical equivalence.
-    -- The sign calculation: (-1)^((k'+1)*l) from wedge swap × (-1)^0 from shuffle_right = (-1)^((k'+1)*l)
-    -- We need (-1)^(k'+1), which means l must factor in appropriately.
-    -- Actually the full calculation involves the shuffle bijection signs which give (-1)^(k'+1).
+    -- The full proof requires:
+    -- 1. Show LHS = shuffle_bijection_right applied to swapped (B, A) with reindexed v
+    -- 2. Use wedge_comm_domDomCongr on (alternatizeUncurryFin B).wedge A
+    -- 3. Track all the sign factors to get (-1)^(k'+1)
+    -- This involves complex index rewriting between:
+    -- - LHS sum over Fin ((k'+1)+l+1) with removeNth ∘ blockSwapEquiv.symm
+    -- - RHS of shuffle_bijection_right: sum over Fin ((l+1)+(k'+1)) = Fin (l+(k'+1)+1)
+    -- The bijection (i, σ) ↔ (τ, j) with signs gives the result (Bott-Tu GTM 82).
     sorry  -- graded sign calculation for left constant factor in general case
 
 /-- Main theorem: alternatization commutes with wedge when left factor is constant. -/
