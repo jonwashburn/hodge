@@ -1,6 +1,6 @@
 # Hodge Conjecture Lean Proof - Multi-Agent Coordination
 
-**Last Updated**: 2026-01-17 (Round 5 - shuffle_bijection_left base case COMPLETE, 4 sorries remaining)
+**Last Updated**: 2026-01-17 (Round 5 - shuffle_bijection_left base case COMPLETE, general case structured, 4 sorries remaining)
 **Status**: Active Development
 **Goal**: Unconditional, axiom-free, sorry-free proof of `hodge_conjecture'`
 
@@ -18,8 +18,11 @@ hodge_conjecture' depends on:
   ❌ sorryAx (sorry statements - see below)
 
 Current sorry locations:
-  🔴 LeibnizRule.lean: line 1493 (1 sorry - shuffle_bijection_left general case - MAIN BLOCKER)
-     - Line 1493: general case k≥1 (graded sign calculation after wedge_comm + shuffle_bijection_right)
+  🔴 LeibnizRule.lean: line 1593 (1 sorry - shuffle_bijection_left general case - MAIN BLOCKER)
+     - Line 1593: general case k≥1 - graded Leibniz sign identity (-1)^(k'+1)
+     - Proof structure complete: uses hswap (wedge_comm_domDomCongr), hsbr (shuffle_bijection_right), hcomm
+     - Mathematical identity: d(A ∧ B) = (-1)^k A ∧ dB for constant A (Bott-Tu GTM 82)
+     - Remaining: combinatorial verification of index reindexing + sign factor matching
      - ✅ Base case k=0: COMPLETE (2026-01-17) - uses wedge_constOfIsEmpty_left + Fintype.sum_equiv + congr
   🟡 Microstructure.lean: lines 959, 975, 991 (3 sorries - transport of zero current)
 
