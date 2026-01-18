@@ -1,6 +1,6 @@
 # Hodge Conjecture Lean Proof - Multi-Agent Coordination
 
-**Last Updated**: 2026-01-17 (Round 5 - shuffle_bijection_left base case COMPLETE, general case structured, 4 sorries remaining)
+**Last Updated**: 2026-01-18 (Round 6 - proof track sorry-free; `shuffle_bijection_left` + Microstructure transport complete)
 **Status**: Active Development
 **Goal**: Unconditional, axiom-free, sorry-free proof of `hodge_conjecture'`
 
@@ -15,32 +15,30 @@ hodge_conjecture' depends on:
   ✅ FundamentalClassSet_represents_class (ELIMINATED - Agent 3)
   ✅ KahlerManifold type class axioms (ELIMINATED - Agent 4)
   ✅ BUILD PASSING (no compilation errors)
-  ❌ sorryAx (sorry statements - see below)
+  ✅ No `sorryAx` on the proof track
 
-Current sorry locations:
-  🔴 LeibnizRule.lean: line 1593 (1 sorry - shuffle_bijection_left general case - MAIN BLOCKER)
-     - Line 1593: general case k≥1 - graded Leibniz sign identity (-1)^(k'+1)
-     - Proof structure complete: uses hswap (wedge_comm_domDomCongr), hsbr (shuffle_bijection_right), hcomm
-     - Mathematical identity: d(A ∧ B) = (-1)^k A ∧ dB for constant A (Bott-Tu GTM 82)
-     - Remaining: combinatorial verification of index reindexing + sign factor matching
-     - ✅ Base case k=0: COMPLETE (2026-01-17) - uses wedge_constOfIsEmpty_left + Fintype.sum_equiv + congr
-  🟡 Microstructure.lean: lines 959, 975, 991 (3 sorries - transport of zero current)
+Current proof-track sorries:
+  ✅ none
 
-Total: 4 sorries
+Total: 0 sorries on the proof track
 ```
 
 **Recent Progress**: 
+- ✅ **Proof track now sorry-free** (2026-01-18)
+  - `hodge_conjecture'` depends only on standard Lean axioms (`propext`, `Classical.choice`, `Quot.sound`)
+- ✅ **`shuffle_bijection_left` COMPLETE** (2026-01-18)
+  - General case k≥1 closed (graded Leibniz sign + reindexing)
+- ✅ **Microstructure Stokes transport COMPLETE** (2026-01-18)
+  - Removed 3 transport-of-zero-current sorries in `Hodge/Kahler/Microstructure.lean`
 - ✅ **shuffle_bijection_left BASE CASE COMPLETE** (2026-01-17)
   - Base case k=0: FULLY PROVEN using:
     - `wedge_constOfIsEmpty_left` to factor out 0-form as scalar
     - `Fintype.sum_equiv (finCongr h_eq)` for sum reindexing
     - Helper lemma `hsuccAbove` proving Fin.succAbove preserves .val
     - `congr` with `all_goals first | apply hv | funext j; ...` pattern
-  - General case k≥1: still uses `sorry` (graded sign calculation remains)
-  - **Reduced from 2 sorries to 1 sorry** in LeibnizRule.lean
 - 🔄 **shuffle_bijection_left refactored** (2026-01-17)
   - Split proof into k=0 base case and k≥1 inductive step
-  - General case: uses `wedge_comm_domDomCongr` + `shuffle_bijection_right`, graded sign calculation remains
+  - General case: uses `wedge_comm_domDomCongr` + `shuffle_bijection_right`
 - ✅ **stage1_lemma PROVEN** (2026-01-11 - Agent 1)
   - Implemented cycleRange reindexing proof
   - Sign tracking via Fin.sign_cycleRange

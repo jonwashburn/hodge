@@ -872,7 +872,7 @@ private lemma stage1_lemma {k l : ℕ} {n : ℕ}
     -- Using sign(τ⁻¹) = sign(τ) = (-1)^i and left(σ*τ⁻¹) 0 = σ(τ⁻¹(inl 0)) = σ(inl (cycleRange 0))
     -- cycleRange at 0 is cycleRange i applied to 0 gives... 1 (for i > 0) or 0 (for i = 0)
     -- This is getting complicated. Let me use the direct approach.
-    -- 
+    --
     -- Direct approach: ∑ f = ∑ g by showing f(σ) = g(σ * τ) for the right τ
     -- f_i(σ) = sign(σ) * (-1)^i * A(left σ i)...
     -- g(σ') = sign(σ') * A(left σ' 0)...
@@ -953,7 +953,7 @@ private lemma stage2_lemma {k l : ℕ}
   intro h w
   classical
   let equiv := (Equiv.permCongr ((finSumFinEquiv (m := k + 1) (n := l)).trans (finCongr h))).trans (decomposeFinCycleRange (n := k + l))
-  
+
   let reindexed_term (p : Fin (k + l + 1) × Equiv.Perm (Fin (k + l))) : ℂ :=
     ((Equiv.Perm.sign (equiv.symm p) : ℤ) : ℂ) *
       (A (w (equiv.symm p (Sum.inl 0)))
@@ -969,11 +969,11 @@ private lemma stage2_lemma {k l : ℕ}
   rw [Fintype.sum_prod_type]
   refine Fintype.sum_congr _ _ ?_
   intro x
-  
+
   let M := ((A (v x)).toMultilinearMap.domCoprod B.toMultilinearMap)
   let u := (Fin.removeNth x v) ∘ finSumFinEquiv
-  
-  have hsign : ∀ e, ((Equiv.Perm.sign (equiv.symm (x, e)) : ℤ) : ℂ) = 
+
+  have hsign : ∀ e, ((Equiv.Perm.sign (equiv.symm (x, e)) : ℤ) : ℂ) =
                ((-1 : ℂ) ^ (x : ℕ)) * ((Equiv.Perm.sign e : ℤ) : ℂ) := by
      intro e
      simp [equiv, decomposeFinCycleRange_symm_sign, Equiv.Perm.sign_permCongr, mul_comm]
@@ -983,7 +983,7 @@ private lemma stage2_lemma {k l : ℕ}
   simp_rw [mul_assoc]
   rw [← Finset.mul_sum]
   congr 1
-  
+
   -- Now show the inner reindexed sum agrees with the alternatization expansion.
   -- We rewrite the RHS alternatization sum over `Perm (Fin k ⊕ Fin l)` as a sum over `Perm (Fin (k+l))`
   -- using `finSumFinEquiv`, then match terms using the explicit formulas for `decomposeFinCycleRange.symm`.
@@ -1894,7 +1894,7 @@ private lemma shuffle_bijection_left {k l : ℕ}
     -- LHS has `g w₁`, RHS has `g w₂`.
     -- Replace `g w₁` using `hperm`, then simplify scalar factors.
     -- (All remaining work is commutative ring arithmetic in `ℂ`.)
-    -- 
+    --
     -- Convert both sides from `wedgeAlternating` to `wedge`.
     rw [← (ContinuousAlternatingMap.wedge_apply (ω := altB) (η := A) (v := w₁))]
     -- Unfold `altB` on the LHS so both sides use `alternatizeUncurryFin B`,

@@ -925,20 +925,20 @@ equal degrees. These helper lemmas handle the type arithmetic.
 -/
 
 /-- Transport of zero current is zero. -/
-private theorem transport_current_zero {k k' : ℕ} (h : k' = k) :
+private theorem transport_current_zero {k k' : ℕ} (h : k = k') :
     h ▸ (0 : Current n X k) = (0 : Current n X k') := by
   subst h; rfl
 
 /-- Transport preserves a Current being the zero current. -/
 private theorem transport_current_eq_zero {k k' : ℕ} (T : Current n X k)
-    (h : k' = k) (hT : T = 0) :
+    (h : k = k') (hT : T = 0) :
     (h ▸ T) = 0 := by
   subst h; exact hT
 
 /-- The Stokes property with M = 0 is trivially satisfied by zero currents,
     even after transport between propositionally equal degrees. -/
 private theorem hasStokesProperty_of_zero_current_transport {k k' : ℕ}
-    (T : Current n X k) (h : k' + 1 = k) (hT : T = 0) :
+    (T : Current n X k) (h : k = k' + 1) (hT : T = 0) :
     HasStokesPropertyWith (n := n) (X := X) (k := k') (h ▸ T) 0 := by
   intro ω
   -- After transport, T is still zero
@@ -960,16 +960,18 @@ theorem RawSheetSum.hasStokesProperty {p : ℕ} {hscale : ℝ}
     {C : Cubulation n X hscale} (T_raw : RawSheetSum n X p hscale C)
     (hk : 2 * (n - p) ≥ 1) :
     HasStokesPropertyWith (n := n) (X := X) (k := 2 * (n - p) - 1)
-      (Nat.sub_add_cancel hk ▸ (T_raw.toIntegralCurrent.toFun)) 0 := by
+      ((Nat.sub_add_cancel hk).symm ▸ (T_raw.toIntegralCurrent.toFun)) 0 := by
   have _h_zero : T_raw.toIntegralCurrent.toFun = 0 :=
     RawSheetSum.toIntegralCurrent_toFun_eq_zero T_raw
   -- The current is zero, so Stokes bound is trivially satisfied
   -- Transport handling for `▸` is complex; mathematically this is |0| ≤ 0
   have h0 :
-      (Nat.sub_add_cancel hk ▸ (T_raw.toIntegralCurrent.toFun)) =
+      ((Nat.sub_add_cancel hk).symm ▸ (T_raw.toIntegralCurrent.toFun)) =
         (0 : Current n X (2 * (n - p) - 1 + 1)) :=
-    transport_current_eq_zero (T := T_raw.toIntegralCurrent.toFun)
-      (h := Nat.sub_add_cancel hk) _h_zero
+    by
+      -- Rewrite `T_raw.toIntegralCurrent.toFun` to `0`, then transport.
+      simpa [_h_zero] using
+        (transport_current_zero (n := n) (X := X) (h := (Nat.sub_add_cancel hk).symm))
   intro ω
   rw [h0]
   simp [Current.zero_toFun]
@@ -983,16 +985,17 @@ theorem microstructureSequence_hasStokesProperty (p : ℕ) (γ : SmoothForm n X 
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p)))
     (hk : 2 * (n - p) ≥ 1) :
     ∀ j, HasStokesPropertyWith (n := n) (X := X) (k := 2 * (n - p) - 1)
-      (Nat.sub_add_cancel hk ▸ ((microstructureSequence p γ hγ ψ j).toFun)) 0 := by
+      ((Nat.sub_add_cancel hk).symm ▸ ((microstructureSequence p γ hγ ψ j).toFun)) 0 := by
   intro j
   have _h_zero : (microstructureSequence p γ hγ ψ j).toFun = 0 :=
     microstructureSequence_is_zero p γ hγ ψ j
   -- The current is zero, so Stokes bound is trivially satisfied
   have h0 :
-      (Nat.sub_add_cancel hk ▸ ((microstructureSequence p γ hγ ψ j).toFun)) =
+      ((Nat.sub_add_cancel hk).symm ▸ ((microstructureSequence p γ hγ ψ j).toFun)) =
         (0 : Current n X (2 * (n - p) - 1 + 1)) :=
-    transport_current_eq_zero (T := (microstructureSequence p γ hγ ψ j).toFun)
-      (h := Nat.sub_add_cancel hk) _h_zero
+    by
+      simpa [_h_zero] using
+        (transport_current_zero (n := n) (X := X) (h := (Nat.sub_add_cancel hk).symm))
   intro ω
   rw [h0]
   simp [Current.zero_toFun]
@@ -1010,11 +1013,13 @@ theorem microstructure_limit_hasStokesProperty (p : ℕ) (γ : SmoothForm n X (2
         Filter.atTop (nhds 0))
     (hk : 2 * (n - p) ≥ 1) :
     HasStokesPropertyWith (n := n) (X := X) (k := 2 * (n - p) - 1)
-      (Nat.sub_add_cancel hk ▸ (T_limit.toFun)) 0 := by
+      ((Nat.sub_add_cancel hk).symm ▸ (T_limit.toFun)) 0 := by
   have _h_limit_zero := microstructureSequence_limit_is_zero p γ hγ ψ T_limit φ hφ h_conv
   -- The limit is zero, so Stokes bound is trivially satisfied
-  have h0 : (Nat.sub_add_cancel hk ▸ (T_limit.toFun)) = (0 : Current n X (2 * (n - p) - 1 + 1)) :=
-    transport_current_eq_zero (T := T_limit.toFun) (h := Nat.sub_add_cancel hk) _h_limit_zero
+  have h0 : ((Nat.sub_add_cancel hk).symm ▸ (T_limit.toFun)) = (0 : Current n X (2 * (n - p) - 1 + 1)) :=
+    by
+      simpa [_h_limit_zero] using
+        (transport_current_zero (n := n) (X := X) (h := (Nat.sub_add_cancel hk).symm))
   intro ω
   rw [h0]
   simp [Current.zero_toFun]
@@ -1039,13 +1044,13 @@ theorem microstructure_produces_stokes_bounded_currents (p : ℕ) (γ : SmoothFo
     (hk : 2 * (n - p) ≥ 1) :
     ∃ M : ℝ, M ≥ 0 ∧
       (∀ j, HasStokesPropertyWith (n := n) (X := X) (k := 2 * (n - p) - 1)
-        (Nat.sub_add_cancel hk ▸ ((microstructureSequence p γ hγ ψ j).toFun)) M) ∧
+        ((Nat.sub_add_cancel hk).symm ▸ ((microstructureSequence p γ hγ ψ j).toFun)) M) ∧
       (∀ T_limit : IntegralCurrent n X (2 * (n - p)),
         ∀ φ : ℕ → ℕ, StrictMono φ →
         Filter.Tendsto (fun j => flatNorm ((microstructureSequence p γ hγ ψ (φ j)).toFun - T_limit.toFun))
           Filter.atTop (nhds 0) →
         HasStokesPropertyWith (n := n) (X := X) (k := 2 * (n - p) - 1)
-          (Nat.sub_add_cancel hk ▸ (T_limit.toFun)) M) := by
+          ((Nat.sub_add_cancel hk).symm ▸ (T_limit.toFun)) M) := by
   use 0
   refine ⟨le_refl 0, ?_, ?_⟩
   · intro j

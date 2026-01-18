@@ -598,8 +598,8 @@ def unitClass : DeRhamCohomologyClass n X 0 := ⟦unitForm, isFormClosed_unitFor
 The unit cohomology class acts as a left identity for the cup product.
 The cast is induced by `0 + k = k`.
 
-This follows from the form-level identity `unitForm ⋏ ω = ω` (via the Classical Pillar
-axiom `ContinuousAlternatingMap.wedge_constOfIsEmpty_left`). -/
+This follows from the form-level identity `unitForm ⋏ ω = ω`
+(via `ContinuousAlternatingMap.wedge_constOfIsEmpty_left`). -/
 theorem one_mul {k : ℕ} (a : DeRhamCohomologyClass n X k) :
     (unitClass (n := n) (X := X)) * a = (Nat.zero_add k).symm ▸ a := by
   refine Quotient.inductionOn a ?_
@@ -626,8 +626,8 @@ theorem one_mul {k : ℕ} (a : DeRhamCohomologyClass n X k) :
 The unit cohomology class acts as a right identity for the cup product.
 The cast is induced by `k + 0 = k`.
 
-This follows from the form-level identity `ω ⋏ unitForm = castForm _ ω` (via the Classical Pillar
-axiom `smoothWedge_unitForm_right`). -/
+This follows from the form-level identity `ω ⋏ unitForm = castForm _ ω`
+(via `smoothWedge_unitForm_right`). -/
 theorem mul_one {k : ℕ} (a : DeRhamCohomologyClass n X k) :
     a * (unitClass (n := n) (X := X)) = (Nat.add_zero k).symm ▸ a := by
   refine Quotient.inductionOn a ?_

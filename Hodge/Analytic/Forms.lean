@@ -585,7 +585,7 @@ theorem smoothExtDeriv_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothFor
       castForm (by omega : k + (l + 1) = (k + l) + 1) ((-1 : ℂ)^k • (ω ⋏ smoothExtDeriv η)) := by
   -- This proof uses LeibnizRule.extDerivAt_wedge, which depends on
   -- alternatizeUncurryFin_wedge_right and alternatizeUncurryFin_wedge_left
-  -- (currently marked with sorry in LeibnizRule.lean)
+  -- (now proved in `Hodge/Analytic/Advanced/LeibnizRule.lean`)
   apply SmoothForm.ext
   funext x
   -- Compute LHS using LeibnizRule.extDerivAt_wedge
@@ -772,7 +772,7 @@ theorem smoothWedge_unitForm_left {k : ℕ} (ω : SmoothForm n X k) :
   have h_unit : unitForm.as_alternating x =
       ContinuousAlternatingMap.constOfIsEmpty ℂ (TangentModel n) (ι := Fin 0) 1 := rfl
   rw [h_unit]
-  -- Use the axiom wedge_constOfIsEmpty_left from DomCoprod.lean
+  -- Use the lemma `wedge_constOfIsEmpty_left` from `DomCoprod.lean`.
   rw [ContinuousAlternatingMap.wedge_constOfIsEmpty_left]
   -- Now RHS: (1 • ω.as_alternating x).domDomCongr (finCongr (Nat.zero_add k).symm)
   simp only [one_smul]
