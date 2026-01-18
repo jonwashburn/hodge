@@ -1595,243 +1595,387 @@ private lemma shuffle_bijection_left {k l : ℕ}
       | (funext j; simp only [Function.comp_apply, Fin.removeNth, finCongr_apply];
          apply hv; simp only [Fin.val_cast]; apply hsuccAbove <;> simp only [Fin.val_cast])
   | succ k' =>
-    -- General case: k = k' + 1 ≥ 1
-    -- The proof strategy uses graded commutativity twice:
-    -- 1. Swap A ∧ B(v_i) to B(v_i) ∧ A (with sign (-1)^((k'+1)*l))
-    -- 2. Apply shuffle_bijection_right to the swapped form
-    -- 3. Swap back (alternatizeUncurryFin B) ∧ A to A ∧ (alternatizeUncurryFin B)
-    -- The combined signs give (-1)^((k'+1)*l) * (-1)^((l+1)*(k'+1)) = (-1)^((k'+1)*(l + l+1)) = (-1)^(k'+1)
-    -- (since l + (l+1) = 2l+1 is odd, and (-1)^((k'+1)*(2l+1)) = (-1)^(k'+1))
-    -- Use graded commutativity to swap A and B in each term
+    classical
+    -- Step 1: swap the wedge factors inside each summand.
     have hswap :
         ∀ i : Fin ((k' + 1) + l + 1),
           (A.wedge (B (v i))) (Fin.removeNth i v) =
             (B (v i)).wedge A ((Fin.removeNth i v) ∘ (blockSwapEquiv (k' + 1) l).symm) := by
       intro i
-      simpa [ContinuousAlternatingMap.domDomCongr_apply, Function.comp_apply]
-        using congrArg (fun f => f (Fin.removeNth i v)) (wedge_comm_domDomCongr (A := A) (B := B (v i)))
-    -- Rewrite each summand using hswap
+      simpa [ContinuousAlternatingMap.domDomCongr_apply, Function.comp_apply] using
+        congrArg (fun f => f (Fin.removeNth i v))
+          (wedge_comm_domDomCongr (A := A) (B := B (v i)))
     conv_lhs =>
       arg 2
       ext i
       rw [hswap i]
-    -- Now LHS: ∑ i, (-1)^i • ((B (v i)).wedge A) ((removeNth i v) ∘ blockSwapEquiv.symm)
 
-    -- Step 1: Define v' as v composed with the block swap equivalence
-    -- v' reorders the indices so that the l indices come first, then the (k'+1) indices
-    let blockEq : (k' + 1) + l + 1 = l + (k' + 1) + 1 := by omega
-    let v' : Fin (l + (k' + 1) + 1) → TangentModel n := v ∘ finCongr blockEq.symm
+    -- Step 2: remove the explicit `blockSwapEquiv` from the argument using alternatingness,
+    -- picking up the sign of the block-swap permutation, i.e. `(-1)^((k'+1)*l)`.
+    have hswapArg :
+        ∀ i : Fin ((k' + 1) + l + 1),
+          ((B (v i)).wedge A) ((Fin.removeNth i v) ∘ (blockSwapEquiv (k' + 1) l).symm) =
+            (Equiv.Perm.sign (blockSwapPerm (k' + 1) l)) •
+              ((B (v i)).wedge A)
+                ((Fin.removeNth i v) ∘ finCongr (Nat.add_comm l (k' + 1))) := by
+      intro i
+      let e : Fin ((k' + 1) + l) ≃ Fin (l + (k' + 1)) := finCongr (Nat.add_comm (k' + 1) l)
+      let σ : Equiv.Perm (Fin (l + (k' + 1))) :=
+        e.permCongr (blockSwapPerm (k' + 1) l).symm
+      let w0 : Fin (l + (k' + 1)) → TangentModel n :=
+        (Fin.removeNth i v) ∘ finCongr (Nat.add_comm l (k' + 1))
+      have hw :
+          (Fin.removeNth i v) ∘ (blockSwapEquiv (k' + 1) l).symm = w0 ∘ σ := by
+        funext x
+        -- `σ` is the conjugate of `(blockSwapPerm (k'+1) l)⁻¹` by the cast `e`,
+        -- and `(blockSwapEquiv (k'+1) l).symm` is the corresponding casted map.
+        simp [σ, e, w0, blockSwapPerm, Function.comp_apply, Equiv.permCongr_apply]
+      have hmap :
+          ((B (v i)).wedge A) (w0 ∘ σ) = (Equiv.Perm.sign σ) • ((B (v i)).wedge A) w0 := by
+        simpa [w0, σ] using (((B (v i)).wedge A).toAlternatingMap.map_perm w0 σ)
+      have hsign :
+          Equiv.Perm.sign σ = Equiv.Perm.sign (blockSwapPerm (k' + 1) l) := by
+        have :
+            Equiv.Perm.sign σ =
+              Equiv.Perm.sign ((blockSwapPerm (k' + 1) l).symm) := by
+          simpa [σ] using
+            (Equiv.Perm.sign_permCongr e ((blockSwapPerm (k' + 1) l).symm))
+        simpa using this.trans (by simpa using (Equiv.Perm.sign_inv (blockSwapPerm (k' + 1) l)))
+      calc
+        ((B (v i)).wedge A) ((Fin.removeNth i v) ∘ (blockSwapEquiv (k' + 1) l).symm)
+            = ((B (v i)).wedge A) (w0 ∘ σ) := by simpa [hw]
+        _ = (Equiv.Perm.sign σ) • ((B (v i)).wedge A) w0 := hmap
+        _ = (Equiv.Perm.sign (blockSwapPerm (k' + 1) l)) • ((B (v i)).wedge A) w0 := by
+              simpa [hsign]
+        _ = (Equiv.Perm.sign (blockSwapPerm (k' + 1) l)) •
+              ((B (v i)).wedge A)
+                ((Fin.removeNth i v) ∘ finCongr (Nat.add_comm l (k' + 1))) := rfl
 
-    -- Step 2: Reindex the sum over the block-swapped indices
-    -- The sum over Fin ((k'+1)+l+1) with composition by blockSwapEquiv.symm
-    -- corresponds to a sum over Fin (l+(k'+1)+1) after reindexing
+    conv_lhs =>
+      arg 2
+      ext i
+      rw [hswapArg i]
 
-    -- Helper: apply shuffle_bijection_right to (B, A) with swapped roles
-    -- shuffle_bijection_right gives:
-    -- ∑ j : Fin ((l+(k'+1))+1), (-1)^j • ((B (v' j)).wedge A) (removeNth j v')
-    --   = ((alternatizeUncurryFin B).wedge A) (v' ∘ finCongr ...)
+    -- Pull the constant sign factor out of the sum.
+    have hsign_out :
+        (∑ i : Fin ((k' + 1) + l + 1),
+            ((-1 : ℤ) ^ (i : ℕ)) •
+              ((Equiv.Perm.sign (blockSwapPerm (k' + 1) l)) •
+                ((B (v i)).wedge A)
+                  ((Fin.removeNth i v) ∘ finCongr (Nat.add_comm l (k' + 1))))) =
+          (Equiv.Perm.sign (blockSwapPerm (k' + 1) l)) •
+            (∑ i : Fin ((k' + 1) + l + 1),
+              ((-1 : ℤ) ^ (i : ℕ)) •
+                ((B (v i)).wedge A)
+                  ((Fin.removeNth i v) ∘ finCongr (Nat.add_comm l (k' + 1)))) := by
+      classical
+      -- Convert the `ℤˣ`-action to a `ℤ`-action to commute with `(-1)^i`, then factor out.
+      -- This is safe since `Equiv.Perm.sign σ : ℤˣ` is always `±1`.
+      let u : ℤˣ := Equiv.Perm.sign (blockSwapPerm (k' + 1) l)
+      -- rewrite `u • x` as `(↑u : ℤ) • x`
+      simp [u, Units.smul_def, Finset.smul_sum, smul_smul, mul_assoc, mul_left_comm, mul_comm]
+
+    -- Reindex the inner sum to match `shuffle_bijection_right` for `(B, A)`.
+    have hdim1 : (k' + 1) + l + 1 = l + (k' + 1) + 1 := by omega
+    let v' : Fin (l + (k' + 1) + 1) → TangentModel n := v ∘ finCongr hdim1.symm
+    have hreindex :
+        (∑ i : Fin ((k' + 1) + l + 1),
+            ((-1 : ℤ) ^ (i : ℕ)) •
+              ((B (v i)).wedge A)
+                ((Fin.removeNth i v) ∘ finCongr (Nat.add_comm l (k' + 1)))) =
+          ∑ j : Fin (l + (k' + 1) + 1),
+            ((-1 : ℤ) ^ (j : ℕ)) •
+              ((B (v' j)).wedge A) (Fin.removeNth j v') := by
+      classical
+      -- Reindex by the value-preserving cast `finCongr hdim1`.
+      refine Fintype.sum_equiv (finCongr hdim1)
+        (fun i : Fin ((k' + 1) + l + 1) =>
+          ((-1 : ℤ) ^ (i : ℕ)) •
+            ((B (v i)).wedge A)
+              ((Fin.removeNth i v) ∘ finCongr (Nat.add_comm l (k' + 1))))
+        (fun j : Fin (l + (k' + 1) + 1) =>
+          ((-1 : ℤ) ^ (j : ℕ)) •
+            ((B (v' j)).wedge A) (Fin.removeNth j v'))
+        ?_
+      intro i
+      -- The `finCongr` reindexing preserves `.val`, hence preserves the `(-1)^i` factor.
+      -- It also satisfies `v' (finCongr hdim1 i) = v i`.
+      set j : Fin (l + (k' + 1) + 1) := (finCongr hdim1) i
+      have hjval : (j : ℕ) = (i : ℕ) := by
+        -- `finCongr` is a cast, hence preserves `.val`.
+        simp [j, finCongr_apply, Fin.val_cast]
+      -- Reduce the goal to an equality of the wedge evaluation arguments.
+      -- After rewriting, both sides are multiplied by the same `(-1)^i`.
+      have hvj : v' j = v i := by
+        -- `v' = v ∘ (finCongr hdim1.symm)` and `finCongr` is an equivalence.
+        simp [v', j, Function.comp_apply]
+      -- Rewrite the RHS summand using `hjval` and `hvj`.
+      -- Now it suffices to show the argument functions of the wedge agree.
+      have harg :
+          (Fin.removeNth i v) ∘ finCongr (Nat.add_comm l (k' + 1)) = Fin.removeNth j v' := by
+        funext x
+        -- Unfold `removeNth` via `succAbove`.
+        simp only [Fin.removeNth_apply, Function.comp_apply]
+        -- Expand `v'`.
+        simp only [v', Function.comp_apply]
+        -- Reduce to a statement about the indices given to `v`.
+        -- It suffices to show the indices are equal (they have the same `.val`).
+        apply congrArg v
+        apply Fin.ext
+        -- Compute both sides using a value formula for `succAbove`.
+        have hval_succAbove {m : ℕ} (p : Fin (m + 1)) (y : Fin m) :
+            (p.succAbove y).val = if y.val < p.val then y.val else y.val + 1 := by
+          by_cases h : y.val < p.val
+          · have hcast : y.castSucc < p := by
+              -- `castSucc` preserves `.val`.
+              simpa [Fin.lt_def, Fin.val_castSucc] using h
+            simp [Fin.succAbove, Fin.lt_def, h, hcast, Fin.val_castSucc, Fin.val_succ]
+          · have hcast : ¬ y.castSucc < p := by
+              intro h'
+              exact h (by simpa [Fin.lt_def, Fin.val_castSucc] using h')
+            have hle : p.val ≤ y.val := le_of_not_gt h
+            simp [Fin.succAbove, Fin.lt_def, h, hcast, hle, Fin.val_castSucc, Fin.val_succ]
+        -- Now both sides reduce to the same `if`-expression.
+        simp [j, hjval, finCongr_apply, Fin.val_cast, hval_succAbove]
+      -- Finish by rewriting everything.
+      -- (`hjval` handles the `(-1)^` factor; `hvj` handles the `B` argument.)
+      -- After rewriting, both sides are identical.
+      have hvj' : v' (Fin.cast hdim1 i) = v i := by
+        simpa [j, finCongr_apply] using hvj
+      simp [j, hjval, hvj', harg]
+
+    -- Apply the right-case shuffle bijection to `(B, A)`.
     have hsbr := shuffle_bijection_right v' B A
 
-    -- Step 3: The LHS (after hswap) needs to be related to the LHS of hsbr
-    -- This requires showing the sums are equal after reindexing
-
-    -- Step 4: Use wedge_comm_domDomCongr to relate swapped wedges
-    -- (alternatizeUncurryFin B).wedge A has degree (l+1) + (k'+1)
-    -- A.wedge (alternatizeUncurryFin B) has degree (k'+1) + (l+1)
-    -- wedge_comm_domDomCongr says: A.wedge B = domDomCongr (B.wedge A) (blockSwapEquiv k l).symm
-    -- So: A.wedge (alternatizeUncurryFin B) = domDomCongr ((alternatizeUncurryFin B).wedge A) (blockSwapEquiv (k'+1) (l+1)).symm
-    have hcomm : A.wedge (ContinuousAlternatingMap.alternatizeUncurryFin B) =
-        ContinuousAlternatingMap.domDomCongr
-          ((ContinuousAlternatingMap.alternatizeUncurryFin B).wedge A)
-          (blockSwapEquiv (k' + 1) (l + 1)).symm := by
-      exact wedge_comm_domDomCongr A (ContinuousAlternatingMap.alternatizeUncurryFin B)
-
-    -- Step 5: Complete the proof using the shuffle bijection structure
-    -- The LHS (after hswap) and RHS both compute the same alternating sum.
-
-    -- Key dimension equalities
-    have hdim1 : (k' + 1) + l + 1 = l + (k' + 1) + 1 := by omega
-    have hdim2 : (k' + 1) + (l + 1) = l + 1 + (k' + 1) := by omega
-    have hdim3 : l + (k' + 1) + 1 = (l + (k' + 1)) + 1 := by omega
-
-    -- Apply hcomm to understand the RHS structure
-    simp only [ContinuousAlternatingMap.smul_apply]
-    rw [hcomm]
-    simp only [ContinuousAlternatingMap.domDomCongr_apply, Function.comp_apply, finCongr_apply]
-
-    -- After simp, both sides are sums over signed wedge products
-    -- The LHS has structure: ∑ i, (-1)^i • (B(v_i) ∧ A)(removeNth ∘ blockSwap.symm)
-    -- The RHS has structure: (-1)^(k'+1) • ((alternatizeUncurryFin B) ∧ A)(v ∘ finCongr ∘ blockSwap.symm)
-
-    -- The shuffle_bijection_right for (B, A) gives:
-    -- ∑ j, (-1)^j • (B(v'_j) ∧ A)(removeNth j v') = ((alternatizeUncurryFin B) ∧ A)(v' ∘ finCongr)
-
-    -- The sign (-1)^(k'+1) arises from the index bijection between the LHS and RHS sums.
-    -- Specifically, the reindexing from Fin ((k'+1)+l+1) to Fin (l+(k'+1)+1) via blockSwap
-    -- introduces a sign factor equal to (-1)^((k'+1)*l), and combined with the shuffle signs,
-    -- this gives the total sign (-1)^(k'+1).
-
-    -- The detailed combinatorial verification follows the same pattern as shuffle_bijection_right:
-    -- 1. Both sides expand to sums over permutations
-    -- 2. A bijection between the permutation spaces relates the terms
-    -- 3. The sign factors match after careful tracking
-
-    -- For the Lean formalization, we use the fact that both expressions are well-defined
-    -- alternating sums that represent the same graded Leibniz rule identity.
-    -- The equality is a consequence of the symmetric group action on the wedge product.
-
-    -- The proof follows by showing both sides are equal as alternating sums.
-    -- After the rewrites above, the goal reduces to showing that the LHS sum
-    -- (reindexed appropriately) equals the RHS (with the sign factor).
-
-    -- Key insight: the LHS after hswap is exactly the LHS of shuffle_bijection_right for (B, A)
-    -- when we reindex via the finCongr that relates the two Fin types.
-    -- The RHS after hcomm is the RHS of shuffle_bijection_right composed with blockSwapEquiv.
-    -- The sign (-1)^(k'+1) arises from this composition.
-
-    -- The LHS (after hswap) is:
-    -- ∑ i, (-1)^i • ((B (v i)).wedge A) ((removeNth i v) ∘ blockSwapEquiv.symm)
-
-    -- We want to show this equals:
-    -- (-1)^(k'+1) • (A.wedge (alternatizeUncurryFin B)) (v ∘ finCongr)
-    -- = (-1)^(k'+1) • ((alternatizeUncurryFin B).wedge A) (v ∘ finCongr ∘ blockSwapEquiv.symm)  [by hcomm]
-
-    -- Step A: Define a reindexed vector for shuffle_bijection_right
-    -- v'' will map from Fin (l + (k'+1) + 1) to TangentModel n in a way compatible with
-    -- the shuffle_bijection_right structure
-
-    -- The key is that shuffle_bijection_right for (B, A) with vector w gives:
-    -- ∑ j : Fin ((l + (k'+1)) + 1), (-1)^j • ((B (w j)).wedge A) (removeNth j w)
-    -- = ((alternatizeUncurryFin B).wedge A) (w ∘ finCongr (l+1 + k'+1 = l + k'+1 + 1))
-
-    -- The LHS (after hswap) can be rewritten to match this structure
-    -- by choosing w appropriately to absorb the blockSwapEquiv.symm composition.
-
-    -- For now, complete the proof by observing that both sides are well-defined
-    -- alternating multilinear maps evaluating to the same ℂ value.
-    -- The mathematical content is verified; the Lean type-level details are intricate.
-
-    -- The proof uses the fact that shuffle_bijection_right for (B, A) combined with
-    -- graded commutativity gives the desired identity with sign (-1)^(k'+1).
+    -- Combine everything.
+    -- First rewrite the LHS into the `v'`-indexed form, then use `hsbr`.
+    -- Finally, rewrite the RHS back to the target statement using graded sign arithmetic.
+    have hsign_block :
+        Equiv.Perm.sign (blockSwapPerm (k' + 1) l) = (-1 : ℤˣ) ^ ((k' + 1) * l) :=
+      sign_blockSwapPerm (k := k' + 1) (l := l)
+    -- Rewrite using `hsign_out`, `hreindex`, and `hsbr`.
+    -- The remaining goal is exactly the graded Leibniz sign identity.
+    -- (We convert the `ℤˣ`-action to `ℂ` multiplication and use `wedge_comm_domDomCongr`
+    --  once more to swap back.)
     --
-    -- The combinatorial verification is:
-    -- 1. LHS after hswap: ∑ i, (-1)^i • (B(v_i) ∧ A)(removeNth_i ∘ blockSwap.symm)
-    -- 2. This equals (after reindexing) the LHS of shuffle_bijection_right for (B, A)
-    -- 3. hsbr gives: ∑ j, (-1)^j • (B(v'_j) ∧ A)(removeNth_j v') = (altUncFin B ∧ A)(v' ∘ finCongr)
-    -- 4. RHS is: (-1)^(k'+1) • (altUncFin B ∧ A)(v ∘ finCongr ∘ blockSwap.symm)
-    -- 5. The sign (-1)^(k'+1) arises from relating v' ∘ finCongr to v ∘ finCongr ∘ blockSwap.symm
-    --    via the alternating property of the wedge product.
+    -- Start from the factored-and-reindexed form.
+    -- LHS
+    rw [hsign_out, hreindex, hsbr]
+    -- Convert `ℤˣ`-actions to multiplication in `ℂ`.
+    -- This turns `Equiv.Perm.sign ... • z` into multiplication by `(-1)^(...)`.
+    have hsignC :
+        ((Equiv.Perm.sign (blockSwapPerm (k' + 1) l) : ℤˣ) : ℂ) = (-1 : ℂ) ^ ((k' + 1) * l) := by
+      -- use `hsign_block` then coerce `ℤˣ` → `ℤ` → `ℂ`
+      -- (`(-1 : ℤˣ)` coerces to `(-1 : ℂ)`).
+      simpa [hsign_block]
+    -- Rewrite the `ℤˣ`-smul on `ℂ` as multiplication.
+    simp [Units.smul_def, zsmul_eq_mul, hsignC, mul_assoc, mul_left_comm, mul_comm]
+    -- Now both sides are scalar multiples of wedge evaluations. We finish by graded commutativity:
+    -- `A ∧ altB = domDomCongr (altB ∧ A) (blockSwapEquiv (k'+1) (l+1)).symm`,
+    -- and the resulting permutation has sign `(-1)^((k'+1)*(l+1))`.
     --
-    -- The graded Leibniz sign: d(A ∧ B) = (-1)^k A ∧ dB for constant k-form A.
-    -- Reference: Bott-Tu GTM 82, Warner GTM 94 Proposition 2.14.
+    -- Set `altB := alternatizeUncurryFin B` to shorten notation.
+    set altB : Alt n (l + 1) := ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B
 
-    -- The equality holds by the structure of alternating multilinear maps.
-    -- Both sides represent the same alternating sum, and the sign factor (-1)^(k'+1)
-    -- is exactly the graded commutativity sign for passing d through a (k'+1)-form.
+    -- Convert the remaining goal to one about `wedge`, so that we can use `wedge_comm_domDomCongr`.
+    -- (`wedge_apply` is `wedge = wedgeAlternating` on evaluation.)
+    let w₁ : Fin ((l + 1) + (k' + 1)) → TangentModel n :=
+      v' ∘ (finCongr (show (l + 1) + (k' + 1) = l + (k' + 1) + 1 by omega))
+    rw [← (ContinuousAlternatingMap.wedge_apply (ω := altB) (η := A) (v := w₁))]
+    rw [← (ContinuousAlternatingMap.wedge_apply (ω := A) (η := altB))]
 
-    -- Approach: rewrite both sides using shuffle_bijection_right and track the signs
+    -- Rewrite the RHS wedge using `wedge_comm_domDomCongr`.
+    have hcomm' : A.wedge altB =
+        ContinuousAlternatingMap.domDomCongr (altB.wedge A) (blockSwapEquiv (k' + 1) (l + 1)).symm :=
+      wedge_comm_domDomCongr (A := A) (B := altB)
+    rw [hcomm']
+    -- Evaluate the `domDomCongr`.
+    simp [ContinuousAlternatingMap.domDomCongr_apply, altB, Function.comp_apply]
 
-    -- Step 6: Reindex the LHS using the dimension equality
-    -- LHS sum: ∑ i : Fin ((k'+1)+l+1), (-1)^i • (B(v_i) ∧ A)(removeNth ∘ blockSwap.symm)
-    -- We can reindex via finCongr hdim1 to get a sum over Fin (l+(k'+1)+1)
+    -- Now both sides are evaluations of `(altB ∧ A)` at two vectors related by a permutation.
+    -- Use alternatingness to extract the sign of the block swap of sizes `(l+1)` and `(k'+1)`.
+    let σ : Equiv.Perm (Fin ((l + 1) + (k' + 1))) :=
+      (blockSwapPerm (l + 1) (k' + 1))
+    have hσsign : (Equiv.Perm.sign σ : ℂ) = (-1 : ℂ) ^ ((l + 1) * (k' + 1)) := by
+      -- `sign_blockSwapPerm` works for any `k l`.
+      simpa [σ, sign_blockSwapPerm (k := l + 1) (l := k' + 1)]
 
-    -- The proof uses shuffle_bijection_right for (B, A) combined with graded commutativity.
-    -- After reindexing via finCongr hdim1, the LHS equals the LHS of shuffle_bijection_right.
-    -- The sign (-1)^(k'+1) arises from the blockSwapEquiv permutation sign.
+    -- Relate the two argument vectors by `σ` (a cyclic rotation).
+    have hw :
+        (v ∘ ⇑((blockSwapEquiv (k' + 1) (l + 1)).symm)) =
+          (v' ∘ ⇑(finCongr (show (l + 1) + (k' + 1) = l + (k' + 1) + 1 by omega))) ∘ σ := by
+      funext x
+      have hbs :
+          (blockSwapEquiv (k' + 1) (l + 1)).symm = blockSwapEquiv (l + 1) (k' + 1) := by
+        ext y <;> simp [blockSwapEquiv]
+      -- all casts preserve `.val`; the only nontrivial part is the block swap.
+      -- We discharge this by unfolding `σ`/`blockSwapPerm` and simplifying.
+      simp [σ, blockSwapPerm, Function.comp_apply, Equiv.permCongr_apply, finCongr_apply, v', hdim1,
+        hbs]
 
-    -- Step 6: Apply shuffle_bijection_right to (B, A) with vector v'
-    -- Recall: v' = v ∘ finCongr blockEq.symm where blockEq : (k'+1)+l+1 = l+(k'+1)+1
+    -- Apply `map_perm` for the alternating map `(altB ∧ A).toAlternatingMap`, but in the direction
+    -- that yields `g w₁ = sign σ • g w₂`.
+    have hw' :
+        (v' ∘ ⇑(finCongr (show (l + 1) + (k' + 1) = l + (k' + 1) + 1 by omega))) =
+          (v ∘ ⇑((blockSwapEquiv (k' + 1) (l + 1)).symm)) ∘ σ.symm := by
+      funext x
+      -- Evaluate `hw` at `σ.symm x` and simplify.
+      have hx := congrArg (fun f => f (σ.symm x)) hw
+      simpa [Function.comp_apply] using hx.symm
+    have hperm :
+        (altB.wedge A) (v' ∘ ⇑(finCongr (show (l + 1) + (k' + 1) = l + (k' + 1) + 1 by omega))) =
+          (Equiv.Perm.sign σ : ℤˣ) •
+            (altB.wedge A) (v ∘ ⇑((blockSwapEquiv (k' + 1) (l + 1)).symm)) := by
+      -- Start from `map_perm` with `σ.symm`.
+      have hmap :=
+        ((altB.wedge A).toAlternatingMap.map_perm
+          (v ∘ ⇑((blockSwapEquiv (k' + 1) (l + 1)).symm))
+          (σ.symm))
+      -- `map_perm` gives `g (w₂ ∘ σ⁻¹) = sign σ⁻¹ • g w₂`.
+      -- Rewrite `w₂ ∘ σ⁻¹` as `w₁` using `hw'`, and rewrite `sign σ⁻¹ = sign σ`.
+      have hsignInv : Equiv.Perm.sign (σ.symm) = Equiv.Perm.sign σ := by
+        simpa using (Equiv.Perm.sign_inv σ)
+      -- Finish.
+      simpa [hw', hsignInv, Function.comp_apply] using hmap
 
-    -- hsbr states:
-    -- ∑ j : Fin (l+(k'+1)+1), (-1)^j • ((B (v' j)).wedge A) (removeNth j v')
-    --   = ((alternatizeUncurryFin B).wedge A) (v' ∘ finCongr (l+1+(k'+1) = l+(k'+1)+1))
-
-    -- The LHS (after hswap) with reindexing:
-    -- ∑ i, (-1)^i • ((B (v i)).wedge A) ((removeNth i v) ∘ blockSwapEquiv.symm)
-    -- can be rewritten to match the LHS of hsbr
-
-    -- Key reindexing: define the equivalence between the sum indices
-    let sumEquiv : Fin ((k' + 1) + l + 1) ≃ Fin (l + (k' + 1) + 1) := finCongr hdim1
-
-    -- The LHS sum reindexes to the LHS of hsbr via sumEquiv
-    -- with the blockSwapEquiv composition absorbed into the removeNth
-
-    -- For the RHS, we need to relate:
-    -- ((alternatizeUncurryFin B).wedge A) (v' ∘ finCongr _)
-    -- to
-    -- (-1)^(k'+1) • ((alternatizeUncurryFin B).wedge A) ((v ∘ finCongr _) ∘ blockSwapEquiv.symm)
-
-    -- The sign (-1)^(k'+1) comes from the permutation between v' ∘ finCongr and
-    -- (v ∘ finCongr) ∘ blockSwapEquiv.symm applied to the alternating wedge product.
-
-    -- Since (alternatizeUncurryFin B).wedge A is alternating of degree (l+1) + (k'+1),
-    -- permuting the inputs by blockSwapEquiv introduces sign (-1)^((l+1)*(k'+1)).
-    -- But the relationship is more subtle due to the different finCongr compositions.
-
-    -- The complete proof requires:
-    -- 1. Showing the LHS sum equals the LHS of hsbr after reindexing
-    -- 2. Showing the RHS of hsbr differs from the target RHS by sign (-1)^(k'+1)
-    -- This is verified by the graded Leibniz rule sign calculation.
-
-    -- Step 7: Direct verification using the sum structure
-    -- The LHS sum over i ∈ Fin ((k'+1)+l+1) with blockSwapEquiv composition
-    -- equals the RHS sum structure with sign (-1)^(k'+1).
-
-    -- Key observation: both sides are values in ℂ computed as alternating sums.
-    -- The identity follows from the graded Leibniz rule d(A ∧ B) = (-1)^k A ∧ dB.
-
-    -- Use the fact that the wedge product structure is preserved under the index manipulations
-    simp only [ContinuousAlternatingMap.wedge_apply,
-               ContinuousAlternatingMap.wedgeAlternating,
-               ContinuousAlternatingMap.wedgeAlternatingTensor,
-               Function.comp_apply]
-
-    -- The goal reduces to an equality of finite sums in ℂ
-    -- Both sides sum over permutation quotients (shuffles) with appropriate signs
-
-    -- The sign (-1)^(k'+1) arises from the difference in how the two sides
-    -- traverse the shuffle structure
-
-    -- Goal after simp:
-    -- LHS: ∑ x, (-1)^x • (B(v x) ∧ A)(removeNth x v ∘ blockSwapEquiv.symm)
-    -- RHS: (-1)^(k'+1) • (alternatizeUncurryFin B ∧ A)((v ∘ finCongr) ∘ blockSwapEquiv.symm)
-
-    -- The proof uses the structure of the alternating sums.
-    -- Both sides compute the same value in ℂ, with the sign (-1)^(k'+1)
-    -- arising from the graded Leibniz rule: d(A ∧ B) = (-1)^k A ∧ dB.
-
-    -- The detailed verification requires:
-    -- 1. Reindexing the LHS sum to match hsbr's LHS structure
-    -- 2. Using hsbr to transform to the alternatizeUncurryFin form
-    -- 3. Showing the index compositions differ by a permutation with sign (-1)^(k'+1)
-
-    -- Mathematical reference: Bott-Tu GTM 82, Warner GTM 94 Proposition 2.14
-
-    -- Approach: use hsbr after rewriting the sums to match
-    -- The LHS sum over Fin ((k'+1)+l+1) can be reindexed to Fin (l+(k'+1)+1)
-    -- via finCongr hdim1, and then matches the structure of hsbr.
-
-    -- The key observation is that the finCongr reindexing preserves .val,
-    -- so the (-1)^i signs are unchanged.
-
-    -- Step: Show that after reindexing, the LHS equals the LHS of hsbr
-    -- Then use hsbr to get (alternatizeUncurryFin B).wedge A applied to v' ∘ finCongr
-    -- Finally, show this equals the RHS up to sign (-1)^(k'+1)
-
-    -- The sign (-1)^(k'+1) comes from comparing:
-    -- - v' ∘ finCongr (from hsbr RHS)
-    -- - (v ∘ finCongr) ∘ blockSwapEquiv.symm (from target RHS)
-
-    -- These two functions differ by a permutation with sign (-1)^(k'+1)
-    -- due to how blockSwapEquiv interacts with the finCongr compositions.
-
-    -- The detailed calculation shows that the permutation is the block swap
-    -- of (l+1) and (k'+1), which has sign (-1)^((l+1)*(k'+1)).
-    -- But we need sign (-1)^(k'+1), so there must be additional sign factors
-    -- from the original hswap transformation that combine to give the correct sign.
-
-    -- Complete by sorry for the final sign verification
-    sorry  -- graded Leibniz sign identity
+    -- Substitute `hperm` and use the explicit sign value `hσsign`.
+    -- This is exactly the parity computation:
+    -- `(-1)^(l*(k'+1)) * (-1)^((l+1)*(k'+1)) = (-1)^(k'+1)`.
+    -- Note: `Equiv.Perm.sign σ : ℤˣ` acts on `ℂ` by multiplication by its coercion.
+    -- We convert the unit action and close by `simp`/`omega`.
+    have hpar :
+        (-1 : ℂ) ^ ((k' + 1) * l) * (-1 : ℂ) ^ ((l + 1) * (k' + 1)) = (-1 : ℂ) ^ (k' + 1) := by
+      -- same parity argument as in the comments above.
+      calc
+        (-1 : ℂ) ^ ((k' + 1) * l) * (-1 : ℂ) ^ ((l + 1) * (k' + 1))
+            = (-1 : ℂ) ^ (((k' + 1) * l) + ((l + 1) * (k' + 1))) := by
+                simp [pow_add]
+        _ = (-1 : ℂ) ^ (((k' + 1) * l) + ((k' + 1) * (l + 1))) := by
+                simp [Nat.mul_comm, Nat.mul_left_comm, Nat.mul_assoc]
+        _ = (-1 : ℂ) ^ ((k' + 1) * (l + (l + 1))) := by
+                simp [Nat.mul_add, Nat.mul_assoc, Nat.add_assoc]
+        _ = (-1 : ℂ) ^ ((k' + 1) * (2 * l + 1)) := by
+              -- reduce to equality of exponents
+              have hl : l + (l + 1) = 2 * l + 1 := by
+                calc
+                  l + (l + 1) = (l + l) + 1 := by
+                    simpa using (Nat.add_assoc l l 1).symm
+                  _ = 2 * l + 1 := by
+                    simp [two_mul, Nat.add_assoc]
+              simp [hl]
+        _ = (-1 : ℂ) ^ (k' + 1) := by
+              -- `(-1)^(m*(2*l+1)) = (-1)^m` since `2*l` is even.
+              have hm : (k' + 1) * (2 * l + 1) = (k' + 1) + (k' + 1) * (2 * l) := by
+                calc
+                  (k' + 1) * (2 * l + 1) = (k' + 1) * (2 * l) + (k' + 1) * 1 := by
+                    simpa [Nat.mul_add]
+                  _ = (k' + 1) * (2 * l) + (k' + 1) := by simp
+                  _ = (k' + 1) + (k' + 1) * (2 * l) := by
+                    simpa using (Nat.add_comm ((k' + 1) * (2 * l)) (k' + 1))
+              rw [hm, pow_add]
+              have hkill : (-1 : ℂ) ^ ((k' + 1) * (2 * l)) = 1 := by
+                -- make the even factor `2*l` the left factor, so `pow_mul` reduces to `(-1)^(2*l)=1`
+                rw [Nat.mul_comm (k' + 1) (2 * l)]
+                rw [pow_mul]
+                have h2 : (-1 : ℂ) ^ (2 * l) = 1 := by
+                  -- `(-1)^(2*l) = ((-1)^2)^l = 1`
+                  rw [pow_mul]
+                  simp
+                simp [h2]
+              simp [hkill]
+    -- Final step: rewrite using `hperm`, `hσsign`, and `hpar`.
+    -- (This also folds back the various `pow_mul` normalizations introduced by simp.)
+    -- First convert the `ℤˣ`-smul to multiplication in `ℂ`.
+    -- Then use `hσsign` to identify the unit as a `(-1)^...` power, and apply `hpar`.
+    -- Note: we also use `altB` to rewrite `alternatizeUncurryFin B`.
+    -- `simp` is enough after these rewrites.
+    -- (We keep the simp-set small to avoid looping.)
+    -- Start by rewriting with `hperm`.
+    -- LHS has `g w₁`, RHS has `g w₂`.
+    -- Replace `g w₁` using `hperm`, then simplify scalar factors.
+    -- (All remaining work is commutative ring arithmetic in `ℂ`.)
+    -- 
+    -- Convert both sides from `wedgeAlternating` to `wedge`.
+    rw [← (ContinuousAlternatingMap.wedge_apply (ω := altB) (η := A) (v := w₁))]
+    -- Unfold `altB` on the LHS so both sides use `alternatizeUncurryFin B`,
+    -- without rewriting `wedge` back into `wedgeAlternating`.
+    dsimp [altB]
+    -- Let `w₂` be the RHS argument vector without the redundant `Equiv.refl`.
+    let w₂ : Fin ((l + 1) + (k' + 1)) → TangentModel n :=
+      v ∘ ⇑(blockSwapEquiv (k' + 1) (l + 1)).symm
+    have hw2 :
+        (v ∘ ⇑(Equiv.refl (Fin (k' + 1 + (l + 1))))) ∘
+            ⇑(blockSwapEquiv (k' + 1) (l + 1)).symm =
+          w₂ := by
+      funext x
+      simp [w₂, Function.comp_apply]
+    have hw2_val :
+        ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B).wedgeAlternating A)
+            ((v ∘ ⇑(Equiv.refl (Fin (k' + 1 + (l + 1))))) ∘
+              ⇑(blockSwapEquiv (k' + 1) (l + 1)).symm) =
+          ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B).wedgeAlternating A) w₂ := by
+      simpa using
+        congrArg
+          (fun t =>
+            ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B).wedgeAlternating A) t)
+          hw2
+    have hwedge2 :
+        (ContinuousAlternatingMap.wedge
+              (ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B) A) w₂ =
+          ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B).wedgeAlternating A) w₂ := by
+      simpa [w₂] using
+        (ContinuousAlternatingMap.wedge_apply
+          (ω := ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B) (η := A) (v := w₂))
+    -- Rewrite the LHS using `hperm` (unfolding `altB` and rewriting the vectors to `w₁`/`w₂`).
+    have hperm' :
+        (ContinuousAlternatingMap.wedge
+              (ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B) A) w₁ =
+          (Equiv.Perm.sign σ : ℤˣ) •
+            (ContinuousAlternatingMap.wedge
+                (ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B) A) w₂ := by
+      simpa [altB, w₁, w₂] using hperm
+    -- Use `hperm'` and convert `wedge` at `w₂` to `wedgeAlternating`.
+    rw [hperm']
+    rw [hwedge2]
+    -- Convert the unit action and close using `hσsign`/`hpar`,
+    -- then transport the RHS argument using `hw2_val`.
+    have hpar' :
+        (-1 : ℂ) ^ (l * (k' + 1)) * (-1 : ℂ) ^ ((l + 1) * (k' + 1)) = (-1 : ℂ) ^ (k' + 1) := by
+      -- `hpar` was proved with the factors in the opposite order.
+      simpa [Nat.mul_comm (k' + 1) l] using hpar
+    have hRHS :
+        (-1 : ℂ) ^ (k' + 1) *
+            ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B).wedgeAlternating A) w₂ =
+          (-1 : ℂ) ^ (k' + 1) *
+            ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B).wedgeAlternating A)
+              ((v ∘ ⇑(Equiv.refl (Fin (k' + 1 + (l + 1))))) ∘
+                ⇑(blockSwapEquiv (k' + 1) (l + 1)).symm) := by
+      simpa [mul_assoc] using
+        congrArg (fun z => (-1 : ℂ) ^ (k' + 1) * z) hw2_val.symm
+    have hLHS :
+        (-1 : ℂ) ^ (l * (k' + 1)) *
+            ((Equiv.Perm.sign σ : ℤˣ) •
+              ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B).wedgeAlternating A) w₂) =
+          (-1 : ℂ) ^ (k' + 1) *
+            ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B).wedgeAlternating A) w₂ := by
+      -- Write the common factor as `z` to keep the algebra readable.
+      set z : ℂ :=
+        ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B).wedgeAlternating A) w₂
+      -- Convert the unit action to multiplication, then use `hpar'` to combine the `(-1)^…` factors.
+      calc
+        (-1 : ℂ) ^ (l * (k' + 1)) * ((Equiv.Perm.sign σ : ℤˣ) • z)
+            = (-1 : ℂ) ^ (l * (k' + 1)) * ((-1 : ℂ) ^ ((l + 1) * (k' + 1)) * z) := by
+                -- `hσsign` identifies `sign σ` as a `(-1)`-power in `ℂ`.
+                simp [z, Units.smul_def, zsmul_eq_mul, hσsign, mul_assoc]
+        _ = ((-1 : ℂ) ^ (l * (k' + 1)) * (-1 : ℂ) ^ ((l + 1) * (k' + 1))) * z := by
+              simpa [mul_assoc] using
+                (mul_assoc ((-1 : ℂ) ^ (l * (k' + 1)))
+                  ((-1 : ℂ) ^ ((l + 1) * (k' + 1))) z).symm
+        _ = (-1 : ℂ) ^ (k' + 1) * z := by
+              have := congrArg (fun t => t * z) hpar'
+              simpa [mul_assoc] using this
+      -- `set z := ...` already rewrote the goal, so nothing further to do.
+    exact hLHS.trans hRHS
 
 /-- Main theorem: alternatization commutes with wedge when left factor is constant. -/
 theorem alternatizeUncurryFin_wedge_left {k l : ℕ}
