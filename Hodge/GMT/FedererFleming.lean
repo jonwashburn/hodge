@@ -37,13 +37,16 @@ fundamental to:
 
 **Sprint 6 Status**: This is a research-level theorem.
 
-The theorem statement is provided, but the proof is axiomatized because:
+We provide the theorem statement and a **stub implementation** (via `sorry`) because:
 1. A full proof requires Mathlib infrastructure for:
    - Hausdorff measure on manifolds
    - Polyhedral approximation
    - BV functions and slicing
 2. The proof is ~50 pages in Federer's treatise
-3. Axiomatization is acceptable per operational plan guidelines
+3. Stubbing is acceptable per operational plan guidelines (and this file is off-proof-track).
+
+**Repo policy note**: this project avoids introducing new `axiom` declarations; deep results are
+tracked as documented stubs (`sorry`) in non-proof-track modules.
 
 ## References
 
@@ -81,6 +84,40 @@ def flatNormDist {k : ℕ} (T₁ T₂ : IntegralCurrent n X k) : ENNReal :=
 def FlatNormConverges {k : ℕ} (T : ℕ → IntegralCurrent n X k)
     (T_limit : IntegralCurrent n X k) : Prop :=
   Tendsto (fun j => flatNormDist (T j) T_limit) atTop (nhds 0)
+
+/-! ## Basic helper lemmas (Round 2) -/
+
+/-- Mass is nonnegative (immediate from `Current.mass_nonneg`). -/
+theorem mass_nonneg {k : ℕ} (T : IntegralCurrent n X k) : 0 ≤ Current.mass T.toFun := by
+  simpa using (Current.mass_nonneg T.toFun)
+
+/-- Boundary mass is nonnegative (by definition and `Current.mass_nonneg`). -/
+theorem bdryMass_nonneg {k : ℕ} (T : IntegralCurrent n X k) :
+    0 ≤ bdryMass (n := n) (X := X) k T := by
+  cases k with
+  | zero =>
+    simp [bdryMass]
+  | succ k' =>
+    -- bdryMass = mass(boundary T)
+    simpa [bdryMass] using
+      (Current.mass_nonneg (Current.boundary (k := k') T.toFun))
+
+/-- The set of bounded integral currents is nonempty for any nonnegative bound `M`
+(witnessed by the zero integral current). -/
+theorem bounded_currents_nonempty {k : ℕ} (M : ℝ) (hM : 0 ≤ M) :
+    (BoundedIntegralCurrents (n := n) (X := X) k M).Nonempty := by
+  refine ⟨zero_int n X k, ?_⟩
+  constructor
+  · -- mass(0) = 0 ≤ M
+    simpa [BoundedIntegralCurrents, zero_int, Current.mass_zero] using hM
+  · -- bdryMass(0) = 0 ≤ M
+    cases k with
+    | zero =>
+      -- bdryMass 0 _ = 0
+      simpa [BoundedIntegralCurrents, bdryMass, zero_int] using hM
+    | succ k' =>
+      -- bdryMass (k'+1) 0 = mass(boundary 0) = 0
+      simpa [BoundedIntegralCurrents, bdryMass, zero_int, Current.boundary_zero, Current.mass_zero] using hM
 
 /-! ## Sequential Compactness -/
 
@@ -124,20 +161,6 @@ noncomputable def federer_fleming_compactness {k : ℕ} (M : ℝ) (hM : M > 0)
   -- A full formalization is far beyond current Mathlib infrastructure; we keep a stub proof.
   sorry
 
-/-! ## Corollaries -/
-
-/-- The limit of a Cauchy sequence of integral currents exists.
-
-    This is a direct consequence of Federer-Fleming compactness. -/
-theorem flatNorm_cauchy_complete {k : ℕ} (M : ℝ) (hM : M > 0)
-    (T : ℕ → IntegralCurrent n X k)
-    (hT : ∀ j, T j ∈ BoundedIntegralCurrents (n := n) (X := X) k M)
-    (hCauchy : ∀ ε > 0, ∃ N, ∀ i j, i ≥ N → j ≥ N → flatNormDist (T i) (T j) < ε) :
-    ∃ T_limit : IntegralCurrent n X k, FlatNormConverges T T_limit := by
-  -- Use federer_fleming_compactness to get convergent subsequence
-  -- Then use Cauchy property to show full sequence converges
-  sorry
-
 /-- Mass is lower semicontinuous under flat norm convergence.
 
     This is crucial for showing limits of integral currents are integral. -/
@@ -148,47 +171,21 @@ theorem mass_lsc_flatNorm {k : ℕ} (T : ℕ → IntegralCurrent n X k)
   -- Lower semicontinuity of mass
   sorry
 
-/-! ## Connection to Harvey-Lawson -/
-
-/-- Integral currents arising from calibrated geometry.
-
-    A calibrated current is one where the calibration inequality is equality.
-    The Federer-Fleming compactness theorem applies to sequences of such currents.
-
-    A calibration φ is a closed k-form with comass ≤ 1 (i.e., |φ(v)| ≤ 1 for unit k-vectors v).
-    A current T is calibrated by φ if T(φ) = mass(T). -/
-def IsCalibrated {k : ℕ} (T : IntegralCurrent n X k) (φ : SmoothForm n X k) : Prop :=
-  (∀ x : X, ‖φ.as_alternating x‖ ≤ 1) ∧  -- φ is a calibration (comass ≤ 1)
-    T.toFun.toFun φ = Current.mass T.toFun  -- T is calibrated by φ
-
-/-- Calibrated currents are mass-minimizing in their homology class.
-
-    This is a key consequence used in the Harvey-Lawson structure theorem.
-
-    Note: This requires k ≥ 1 for the boundary to be well-defined. -/
-theorem calibrated_mass_minimizing {k : ℕ} (T : IntegralCurrent n X (k + 1))
-    (φ : SmoothForm n X (k + 1)) (hT : IsCalibrated T φ)
-    (S : IntegralCurrent n X (k + 1))
-    (hS : Current.boundary (k := k) T.toFun = Current.boundary (k := k) S.toFun) :
-    Current.mass T.toFun ≤ Current.mass S.toFun := by
-  -- Standard calibration argument
-  sorry
-
 /-! ## Summary
 
 This file provides the Federer-Fleming compactness theorem infrastructure:
 
 1. **Flat norm convergence**: `FlatNormConverges`, `flatNormDist`
 2. **Sequential compactness**: `HasConvergentSubsequence`
-3. **Main theorem**: `federer_fleming_compactness` (axiomatized)
-4. **Corollaries**: `flatNorm_cauchy_complete`, `mass_lsc_flatNorm`
-5. **Connection to calibrations**: `IsCalibrated`, `calibrated_mass_minimizing`
+3. **Main theorem**: `federer_fleming_compactness` (stubbed)
+4. **Lower semicontinuity**: `mass_lsc_flatNorm` (stubbed)
+5. **Round-2 helper lemmas**: `mass_nonneg`, `bdryMass_nonneg`, `bounded_currents_nonempty`
 
 **Sprint 6 Deliverables** (Agent 2):
-- [x] `federer_fleming_compactness` statement (axiomatized)
+- [x] `federer_fleming_compactness` statement (stubbed)
 - [x] `HasConvergentSubsequence` structure
 - [x] `FlatNormConverges` definition
-- [x] `mass_lsc_flatNorm` statement
+- [x] `mass_lsc_flatNorm` statement (stubbed)
 - [x] Documentation of proof sketch
 
 **Note**: This is a Classical Pillar. Full formalization would require:

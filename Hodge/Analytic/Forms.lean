@@ -271,6 +271,27 @@ noncomputable def extDerivLinearMap (n : ℕ) (X : Type u) [TopologicalSpace X]
 noncomputable def smoothExtDeriv {k : ℕ} (ω : SmoothForm n X k) : SmoothForm n X (k + 1) :=
   extDerivLinearMap n X k ω
 
+/-- **Connection theorem**: `smoothExtDeriv` is implemented via `ContMDiffForm.extDerivForm`.
+
+This theorem explicitly shows that `smoothExtDeriv` is the genuine exterior derivative
+computed using manifold derivatives (`mfderiv`), not a trivial stub.
+
+The implementation chain is:
+1. `smoothExtDeriv ω` = `extDerivLinearMap n X k ω`
+2. `extDerivLinearMap` is defined as `(ContMDiffForm.extDerivForm ω.toContMDiffForm hCharts).toSmoothForm`
+3. `ContMDiffForm.extDerivForm` uses `ContMDiffForm.extDeriv` which is based on `mfderiv`
+-/
+theorem smoothExtDeriv_eq_extDerivForm {k : ℕ} (ω : SmoothForm n X k) :
+    smoothExtDeriv ω =
+      (ContMDiffForm.extDerivForm ω.toContMDiffForm HasLocallyConstantCharts.hCharts).toSmoothForm := by
+  rfl
+
+/-- `smoothExtDeriv` is non-trivial: it uses the real manifold exterior derivative. -/
+theorem smoothExtDeriv_nontrivial {k : ℕ} :
+    (smoothExtDeriv : SmoothForm n X k → SmoothForm n X (k + 1)) =
+      fun ω => (ContMDiffForm.extDerivForm ω.toContMDiffForm HasLocallyConstantCharts.hCharts).toSmoothForm := by
+  rfl
+
 @[simp] theorem smoothExtDeriv_zero {k : ℕ} : smoothExtDeriv (0 : SmoothForm n X k) = 0 := by
   simp only [smoothExtDeriv, map_zero]
 

@@ -19,15 +19,14 @@ on the proof track of `hodge_conjecture'`.
 
 ## What Was Archived (OFF proof track)
 
-The following Kähler operators and their axioms were moved to
-`archive/Hodge/Kahler/HodgeOperators.lean` because they are NOT used
-by `hodge_conjecture'`:
+The following Kähler/Hodge operators are **kept off proof track** because they are not used
+by `hodge_conjecture'` (yet). They live in dedicated analytic modules:
 
-- `lefschetzLambdaLinearMap` (dual Lefschetz Λ)
-- `hodgeStarLinearMap` (Hodge star ⋆)
-- `adjointDerivLinearMap` (codifferential δ)
-- `laplacianLinearMap` (Hodge Laplacian Δ)
-- Various theorems about these operators
+- `Hodge/Analytic/Norms.lean`: placeholder global Hodge star `⋆` (currently trivial)
+- `Hodge/Analytic/Laplacian/Codifferential.lean`: codifferential `δ = ±⋆d⋆` (currently trivial)
+- `Hodge/Analytic/Laplacian/HodgeLaplacian.lean`: Laplacian `Δ = dδ + δd` (structural; currently trivial)
+- `Hodge/Analytic/Laplacian/HarmonicForms.lean`: harmonic predicate/interface (placeholder)
+- `Hodge/Analytic/HodgeStar/*`: fiber-level stubs for future metric-induced ⋆ construction
 
 Run `./scripts/verify_proof_track.sh` to confirm.
 -/

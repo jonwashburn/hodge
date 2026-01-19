@@ -20,16 +20,23 @@ namespace Hodge.GMT
 
 For `k = 0`, we define this as `0` (there is no boundary in negative degree).
 For `k = k' + 1`, this is the mass of the boundary current. -/
-def bdryMass {n : ℕ} {X : Type*} {k : ℕ}
+def bdryMass {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] :
+    (k : ℕ) → IntegralCurrent n X k → ℝ :=
+  fun k T =>
+    match k with
+    | 0 => 0
+    | k' + 1 => Current.mass (Current.boundary (k := k') T.toFun)
+
+/-- Boundary mass with an implicit degree parameter (convenience wrapper). -/
+abbrev bdryMass' {n : ℕ} {X : Type*} {k : ℕ}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
-    (T : IntegralCurrent n X k) : ℝ := by
-  cases k with
-  | zero =>
-    exact 0
-  | succ k' =>
-    exact Current.mass (Current.boundary (k := k') T.toFun)
+    (T : IntegralCurrent n X k) : ℝ :=
+  bdryMass (n := n) (X := X) k T
 
 /-- Integral currents whose mass and boundary mass are bounded by `M`. -/
 def BoundedIntegralCurrents {n : ℕ} {X : Type*} (k : ℕ) (M : ℝ)
@@ -37,6 +44,6 @@ def BoundedIntegralCurrents {n : ℕ} {X : Type*} (k : ℕ) (M : ℝ)
     [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] :
     Set (IntegralCurrent n X k) :=
-  { T | Current.mass T.toFun ≤ M ∧ bdryMass (n := n) (X := X) (k := k) T ≤ M }
+  { T | Current.mass T.toFun ≤ M ∧ bdryMass (n := n) (X := X) k T ≤ M }
 
 end Hodge.GMT

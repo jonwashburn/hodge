@@ -163,6 +163,11 @@ theorem codifferential_squared (ω : SmoothForm n X k) :
     codifferential (codifferential ω) = 0 := by
   simp only [codifferential_eq_zero_trivial]
 
+/-- Alias (naming used in the operational plan): `δ² = 0`. -/
+theorem codifferential_squared_zero (ω : SmoothForm n X k) :
+    codifferential (codifferential ω) = 0 :=
+  codifferential_squared (n := n) (X := X) (k := k) ω
+
 /-!
 ## Relationship to d
 

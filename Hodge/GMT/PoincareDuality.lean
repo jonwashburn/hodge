@@ -25,8 +25,10 @@ abbrev PoincareDualFormData := CycleClass.PoincareDualFormData
 abbrev poincareDualFormExists := CycleClass.poincareDualFormExists
 abbrev poincareDualForm := CycleClass.poincareDualForm
 
-/-- Construct the Poincaré dual form (currently via the CycleClass placeholder). -/
-abbrev poincareDualForm_construct := CycleClass.poincareDualForm
+/-- Construct the Poincaré dual form via the `CycleClass` placeholder interface.
+
+This is the *current* bridge used by the proof-track development. -/
+abbrev poincareDualForm_construct_cycleClass := CycleClass.poincareDualForm
 
 /-- Poincaré dual form constructed from the (integration current) → (regularization) pipeline.
 
@@ -41,5 +43,10 @@ noncomputable def poincareDualForm_construct_fromCurrent {n : ℕ} {X : Type*} {
     (Z : Set X) : SmoothForm n X (2 * p) :=
   regularizeCurrentToForm (n := n) (X := X) (k := 2 * p)
     (integrationCurrent (n := n) (X := X) p Z)
+
+/-- Construct the Poincaré dual form via the “current → regularize” pipeline.
+
+This matches the operational plan naming (`poincareDualForm_construct`). -/
+noncomputable abbrev poincareDualForm_construct := @poincareDualForm_construct_fromCurrent
 
 end Hodge.GMT

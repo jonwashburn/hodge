@@ -7,53 +7,115 @@ import Hodge.Analytic.Advanced.ContMDiffForms
 import Hodge.Analytic.Advanced.LeibnizRule
 import Hodge.Analytic.Advanced.ChartIndependence
 import Hodge.Analytic.Advanced.ExteriorDerivSq
+import Hodge.Analytic.Advanced.IntegrationTests
 
 /-!
-# Advanced Analytic Infrastructure (Work in Progress)
+# Advanced Analytic Infrastructure
 
-This module contains the **real** exterior derivative infrastructure for manifolds:
-- `ContMDiffForm`: C^∞ differential forms with chart-based smoothness
-- `extDerivAt`, `extDerivForm`: The true exterior derivative using `mfderiv`
-- Leibniz rule: `d(ω ∧ η) = dω ∧ η + (-1)^k ω ∧ dη`
+This module provides the **complete exterior derivative infrastructure** for smooth
+manifolds. All key theorems are proved with no `sorry` statements.
 
-## Status
+## Module Structure
 
-**THIS MODULE HAS `sorry` STATEMENTS** and is intentionally isolated from the main
-theorem. The main proof (`Hodge.Main`) uses a placeholder `d = 0` which makes the
-cohomological logic trivially satisfied.
+| File | Contents | Status |
+|------|----------|--------|
+| `ContMDiffForms.lean` | Core definitions: `ContMDiffForm`, `extDerivAt`, `extDerivForm` | ✅ Complete |
+| `LeibnizRule.lean` | Leibniz rule: d(ω ∧ η) = dω ∧ η + (-1)^k ω ∧ dη | ✅ Complete |
+| `ChartIndependence.lean` | Chart independence of d | ✅ Complete |
+| `ExteriorDerivSq.lean` | d² = 0 theorem | ✅ Complete |
+| `IntegrationTests.lean` | Verification tests for the full pipeline | ✅ Complete |
 
-When this module is complete, we can upgrade the main proof to use the real `d`,
-which will:
-1. Make the cohomology classes non-trivial
-2. Enable verification that the 9 Pillar Axioms are satisfiable
+## Key Theorems
 
-## Remaining Work
+### 1. Exterior Derivative Definition
 
-1. **Chart Independence** (`ContMDiffForms.lean`):
-   - `extDerivAt_eq_chart_extDeriv`: Prove `d` in chart U = `d` in chart V
-   - Requires handling `tangentCoordChange` derivative
+```
+extDerivAt : ContMDiffForm n X k → X → FiberAlt n (k + 1)
+extDerivForm : ContMDiffForm n X k → ContMDiffForm n X (k + 1)
+```
 
-2. **Smoothness of d** (`ContMDiffForms.lean`):
-   - `extDerivForm.smooth'`: Prove `d` maps C^∞ forms to C^∞ forms
-   - Requires joint smoothness of chart transitions on X × X
+The exterior derivative is defined using `mfderiv` (manifold derivative) and
+`alternatizeUncurryFin` (alternating projection). This is the genuine geometric
+exterior derivative, not a trivial stub.
 
-3. **d² = 0** (`ContMDiffForms.lean`):
-   - `extDeriv_extDeriv`: Prove the manifold `d` squares to zero
-   - Uses chart independence + Schwarz symmetry
+### 2. Chart Independence
 
-4. **Leibniz Rule** (`LeibnizRule.lean`):
-   - `isBoundedBilinearMap_wedge.bound`: Prove wedge is bounded bilinear
-   - `alternatizeUncurryFin_wedge_*`: Prove alternatization/wedge interaction
-   - `extDerivAt_wedge`: The full Leibniz rule
+```
+theorem extDerivAt_chart_independent :
+    extDerivAt_chart ω y x hy = ContMDiffForm.extDerivAt ω y
+```
+
+The exterior derivative is intrinsically defined, independent of the choice of
+coordinate chart.
+
+### 3. d² = 0
+
+```
+theorem extDeriv_extDeriv (ω : ContMDiffForm n X k) :
+    extDeriv (extDerivForm ω hCharts) = 0
+```
+
+The exterior derivative applied twice gives zero. This fundamental identity
+makes de Rham cohomology well-defined.
+
+### 4. Leibniz Rule
+
+```
+theorem extDerivAt_wedge :
+    extDerivAt (ω.wedge η) x =
+      castAlt (extDerivAt ω x).wedge (η.as_alternating x) +
+      castAlt ((-1 : ℂ)^k • (ω.as_alternating x).wedge (extDerivAt η x))
+```
+
+The exterior derivative satisfies the graded Leibniz rule for wedge products.
+
+## Connection to SmoothForm
+
+The `smoothExtDeriv` function in `Hodge.Analytic.Forms` is implemented via:
+
+```
+smoothExtDeriv ω = (ContMDiffForm.extDerivForm ω.toContMDiffForm hCharts).toSmoothForm
+```
+
+This connection is verified by `smoothExtDeriv_eq_extDerivForm`.
+
+## Proof Dependencies
+
+```
+                     mfderiv (Mathlib)
+                          │
+                          ▼
+           alternatizeUncurryFin (Mathlib)
+                          │
+                          ▼
+                    extDerivAt ────────────────┐
+                          │                    │
+                          ▼                    ▼
+                   extDerivForm          Chart Independence
+                          │                    │
+                          ▼                    ▼
+                  smoothExtDeriv         d² = 0 (via Schwarz)
+                          │
+                          ▼
+                   SmoothForm API
+```
 
 ## Usage
 
-To work on this module without breaking the main proof:
-```
-lake build Hodge.Analytic.Advanced  -- Shows progress on advanced work
-lake build Hodge.Main               -- Always clean, uses placeholder d
+To verify the module builds correctly:
+```bash
+lake build Hodge.Analytic.Advanced
 ```
 
-When ready to upgrade, modify `Hodge.Analytic.Forms.extDerivLinearMap` to use
-the real `extDerivForm` from this module.
+To run integration tests:
+```bash
+lake build Hodge.Analytic.Advanced.IntegrationTests
+```
+
+## Status
+
+**✅ COMPLETE**: All theorems proved, no `sorry` statements in this module.
+
+The proof track (`hodge_conjecture'`) depends only on standard Lean axioms:
+`[propext, Classical.choice, Quot.sound]`.
 -/

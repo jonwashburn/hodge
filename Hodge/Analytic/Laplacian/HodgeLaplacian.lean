@@ -45,6 +45,11 @@ noncomputable def laplacian_construct {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 
   castForm (by omega) (smoothExtDeriv (Codifferential.codifferential (n := n) (X := X) (k := k) ω)) +
     castForm (by omega) (Codifferential.codifferential (n := n) (X := X) (k := k + 1) (smoothExtDeriv ω))
 
+/-- Alias (naming used in the operational plan): the Hodge Laplacian Δ = dδ + δd. -/
+noncomputable abbrev hodgeLaplacian_construct {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+    (ω : SmoothForm n X k) : SmoothForm n X k :=
+  laplacian_construct (n := n) (X := X) (k := k) hk hk' ω
+
 /-- Laplacian as a ℂ-linear map (using the current definition of Δ). -/
 noncomputable def laplacianLinearMap (k : ℕ) (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) :
     SmoothForm n X k →ₗ[ℂ] SmoothForm n X k where
@@ -61,6 +66,11 @@ noncomputable def laplacianLinearMap (k : ℕ) (hk : 1 ≤ k) (hk' : k + 1 ≤ 2
     (ω : SmoothForm n X k) :
     laplacian_construct (n := n) (X := X) (k := k) hk hk' ω = 0 := by
   simp [laplacian_construct]
+
+@[simp] theorem hodgeLaplacian_construct_eq_zero_trivial {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+    (ω : SmoothForm n X k) :
+    hodgeLaplacian_construct (n := n) (X := X) (k := k) hk hk' ω = 0 := by
+  simp [hodgeLaplacian_construct, laplacian_construct_eq_zero_trivial (n := n) (X := X) (k := k) hk hk' ω]
 
 end HodgeLaplacian
 end Hodge

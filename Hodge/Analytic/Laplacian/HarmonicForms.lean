@@ -39,5 +39,20 @@ def IsHarmonic {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) (ω : SmoothForm
   -- With the placeholder Laplacian, `Δω = 0` is always true.
   simp [IsHarmonic]
 
+/-- **Harmonic characterization (stub)**.
+
+In full Hodge theory one proves `Δω = 0 ↔ (dω = 0 ∧ δω = 0)` using the L² inner product.
+
+In our current architecture, `⋆ = 0`, hence `δ = 0`, hence the Laplacian definition
+`Δ = dδ + δd` is identically zero; consequently both “summands” vanish for all ω. This lemma
+records the resulting *formal* characterization that is stable under future upgrades. -/
+theorem isHarmonic_iff_closed_and_coclosed {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+    (ω : SmoothForm n X k) :
+    IsHarmonic (n := n) (X := X) (k := k) hk hk' ω ↔
+      (smoothExtDeriv (Codifferential.codifferential (n := n) (X := X) (k := k) ω) = 0 ∧
+        Codifferential.codifferential (n := n) (X := X) (k := k + 1) (smoothExtDeriv ω) = 0) := by
+  -- Both conjuncts are trivial since `δ = 0`.
+  simp [IsHarmonic, HodgeLaplacian.laplacian_construct]
+
 end HarmonicForms
 end Hodge
