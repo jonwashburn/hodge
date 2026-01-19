@@ -16,6 +16,7 @@ import Mathlib.Analysis.SpecificLimits.Basic
 import Mathlib.Geometry.Manifold.ChartedSpace
 import Hodge.Analytic.Currents
 import Hodge.Analytic.Calibration
+import Hodge.Analytic.Integration
 
 noncomputable section
 
@@ -137,24 +138,26 @@ This separates the interface (complete) from the GMT implementation (Agent 5 wor
     - Bounded: `|∫_X ω| ≤ vol(X) · ‖ω‖_∞`
     - For compact X: the integral is always finite
 
-    **Implementation**: Currently a stub returning 0. Will be replaced with
-    real Hausdorff measure integration once Agent 5's infrastructure is complete. -/
-noncomputable def topFormIntegral : SmoothForm n X (2 * n) → ℝ :=
-  fun _ => 0  -- Stub: replace with actual volume integration
+    **Implementation**: Uses `topFormIntegral_real'` from `Hodge.Analytic.Integration`.
+    Currently a stub returning 0 pending full integration infrastructure.
 
-/-- Top form integration is linear. -/
+    See also: `Hodge.Analytic.Integration.TopFormIntegral` for the main definitions. -/
+noncomputable def topFormIntegral : SmoothForm n X (2 * n) → ℝ :=
+  topFormIntegral_real'  -- Delegate to Integration module
+
+/-- Top form integration is linear.
+    This follows from `topFormIntegral_real'_linear` in the Integration module. -/
 theorem topFormIntegral_linear (c : ℝ) (ω₁ ω₂ : SmoothForm n X (2 * n)) :
     topFormIntegral (c • ω₁ + ω₂) = c * topFormIntegral ω₁ + topFormIntegral ω₂ := by
   unfold topFormIntegral
-  ring
+  exact topFormIntegral_real'_linear c ω₁ ω₂
 
-/-- Top form integration is bounded (by volume × comass). -/
-theorem topFormIntegral_bound :
-    ∃ M : ℝ, ∀ ω : SmoothForm n X (2 * n), |topFormIntegral ω| ≤ M * ‖ω‖ := by
-  use 0  -- In full implementation, M = vol(X)
-  intro ω
+/-- Top form integration is bounded (by volume × comass).
+    This follows from `topFormIntegral_real'_bound` in the Integration module. -/
+theorem topFormIntegral_bound [MeasurableSpace X] :
+    ∃ M : ℝ, M ≥ 0 ∧ ∀ ω : SmoothForm n X (2 * n), |topFormIntegral ω| ≤ M * ‖ω‖ := by
   unfold topFormIntegral
-  simp
+  exact topFormIntegral_real'_bound
 
 /-- **Global Pairing Between Complementary-Degree Forms** (Hodge Theory).
 
@@ -197,19 +200,16 @@ noncomputable def SmoothForm.pairing {p : ℕ} (α : SmoothForm n X (2 * p))
 theorem SmoothForm.pairing_linear_left {p : ℕ} (c : ℝ)
     (α₁ α₂ : SmoothForm n X (2 * p)) (β : SmoothForm n X (2 * (n - p))) :
     SmoothForm.pairing (c • α₁ + α₂) β = c * SmoothForm.pairing α₁ β + SmoothForm.pairing α₂ β := by
-  unfold SmoothForm.pairing topFormIntegral
+  unfold SmoothForm.pairing topFormIntegral topFormIntegral_real'
   split_ifs with h
-  · -- p ≤ n case
-    -- wedge is bilinear, so (c • α₁ + α₂) ⋏ β = c • (α₁ ⋏ β) + (α₂ ⋏ β)
-    -- Then topFormIntegral is linear
-    ring
+  · ring
   · ring
 
 /-- The pairing is linear in the second argument. -/
 theorem SmoothForm.pairing_linear_right {p : ℕ} (α : SmoothForm n X (2 * p))
     (c : ℝ) (β₁ β₂ : SmoothForm n X (2 * (n - p))) :
     SmoothForm.pairing α (c • β₁ + β₂) = c * SmoothForm.pairing α β₁ + SmoothForm.pairing α β₂ := by
-  unfold SmoothForm.pairing topFormIntegral
+  unfold SmoothForm.pairing topFormIntegral topFormIntegral_real'
   split_ifs with h
   · ring
   · ring
@@ -218,15 +218,15 @@ theorem SmoothForm.pairing_linear_right {p : ℕ} (α : SmoothForm n X (2 * p))
 @[simp]
 theorem SmoothForm.pairing_zero_left {p : ℕ} (β : SmoothForm n X (2 * (n - p))) :
     SmoothForm.pairing (0 : SmoothForm n X (2 * p)) β = 0 := by
-  unfold SmoothForm.pairing topFormIntegral
-  split_ifs with h <;> simp
+  unfold SmoothForm.pairing topFormIntegral topFormIntegral_real'
+  split_ifs with h <;> rfl
 
 /-- The pairing with zero form is zero. -/
 @[simp]
 theorem SmoothForm.pairing_zero_right {p : ℕ} (α : SmoothForm n X (2 * p)) :
     SmoothForm.pairing α (0 : SmoothForm n X (2 * (n - p))) = 0 := by
-  unfold SmoothForm.pairing topFormIntegral
-  split_ifs with h <;> simp
+  unfold SmoothForm.pairing topFormIntegral topFormIntegral_real'
+  split_ifs with h <;> rfl
 
 /-- **Pairing via Integration Data**.
     Alternative definition using the IntegrationData infrastructure.

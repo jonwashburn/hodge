@@ -1,0 +1,26 @@
+/-
+Copyright (c) 2025-2026. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Jonathan Washburn
+-/
+import Hodge.Analytic.Laplacian.Codifferential
+import Hodge.Analytic.Laplacian.HodgeLaplacian
+import Hodge.Analytic.Laplacian.HarmonicForms
+
+/-!
+# Laplacian Infrastructure
+
+This module exports the Laplacian infrastructure for Hodge theory.
+
+## Contents
+
+* `Codifferential`: The codifferential δ = ±⋆d⋆
+* `HodgeLaplacian`: The Laplacian Δ (placeholder)
+* `HarmonicForms`: Harmonic form interface (placeholder)
+
+## Note
+
+The Hodge Laplacian Δ = dδ + δd requires the Hodge star to be properly
+defined (currently trivial). This module will be expanded when Agent 3
+provides the real Hodge star construction.
+-/

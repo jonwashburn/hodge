@@ -366,6 +366,10 @@ grep -rn 'sorry' Hodge/ --include='*.lean'
 - `hodgeStar` : k-forms → (2n-k)-forms (currently trivial: returns 0)
 - Basic properties: `hodgeStar_add`, `hodgeStar_smul`, `hodgeStar_zero`, `hodgeStar_neg`, `hodgeStar_sub`
 - `hodgeStar_hodgeStar_trivial`: ⋆(⋆α) = 0 (trivial case)
+- **Operational plan (Sprint 1) file structure** (off proof track):
+  - `Hodge/Analytic/HodgeStar/FiberStar.lean`, `Involution.lean`, `Smoothness.lean`, `Hodge/Analytic/HodgeStar.lean`
+  - Builds with `lake build Hodge.Analytic.HodgeStar`
+  - `fiberHodgeStar_involution` is still a `sorry` pending nontrivial metric/volume-form infrastructure
 
 **What remains** (for Agent 5):
 - Replace `HodgeStarData.trivial` with real Riemannian-induced operator

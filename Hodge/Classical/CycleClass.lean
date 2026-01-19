@@ -23,9 +23,9 @@ For an algebraic subvariety Z ⊂ X of codimension p:
 The cycle class is constructed via the **Poincaré dual form** of the integration current.
 Since Mathlib lacks full Geometric Measure Theory, we currently use a **placeholder interface**:
 
-- `poincareDualFormExists`: **axiomatized** existence of a Poincaré dual form (GMT/PD bridge)
+- `poincareDualFormExists`: **placeholder** construction of Poincaré dual form data (GMT/PD bridge)
 - `poincareDualForm`: the projected form from `poincareDualFormExists`
-- Properties (closedness, (p,p)-type, rationality) are handled separately (some still axiomatized)
+- Properties (closedness, (p,p)-type, rationality) are handled separately (some are still off-track / archived)
 
 This approach:
 1. Keeps the proof pipeline type-correct while the GMT layer is under construction
@@ -60,7 +60,7 @@ satisfying:
 - η_Z is of type (p,p) (because Z is a complex subvariety)
 - The cohomology class [η_Z] is rational (because Z defines an integral homology class)
 
-We axiomatize the existence of such a form with these properties. -/
+We provide a placeholder implementation of the existence of such a form with these properties. -/
 
 /-- **Poincaré Dual Form Data** for an algebraic set `Z`.
 
@@ -89,11 +89,11 @@ variable [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
 
 /-! ## Axiomatized Existence of Poincaré Dual Forms
 
-This is the key axiom: for every algebraic set, there exists a Poincaré dual form
-with the required properties. In a full GMT implementation, this would be a theorem.
+This is the key placeholder: for every algebraic set, we provide Poincaré dual form data.
+In a full GMT implementation, this would be a theorem with a non-trivial construction.
 
 **Documentation for Future Work**:
-To remove this axiom, one would need to:
+To replace this placeholder by a real construction, one would need to:
 1. Define Hausdorff measure on smooth manifolds
 2. Define rectifiable currents and integration currents
 3. Prove the Poincaré dual form exists via de Rham theory
@@ -124,9 +124,10 @@ This induces an isomorphism `PD : H_k(X) → H^{n-k}(X)`.
 Combined with Poincaré duality, this means every homology class (e.g., [Z] for a
 submanifold Z) has a smooth closed form Poincaré dual.
 
-## Axiomatization Justification
+## Placeholder Justification
 
-This is axiomatized as a **Classical Pillar** because:
+In a fully formal development this would be a **Classical Pillar** theorem; here we keep a
+total placeholder so the downstream API is stable while GMT infrastructure is developed.
 
 1. **Mathlib Gap**: Full implementation requires:
    - Geometric measure theory (currents, integration over submanifolds)
@@ -139,7 +140,7 @@ This is axiomatized as a **Classical Pillar** because:
    - [Griffiths-Harris, "Principles of Algebraic Geometry", Ch. 0, §4]
    - [Voisin, "Hodge Theory and Complex Algebraic Geometry I", Ch. 11]
 
-3. **Sound Axiomatization**: The axiom returns a `PoincareDualFormData` structure
+3. **Sound Placeholder**: The placeholder returns a `PoincareDualFormData` structure
    containing both the form and a proof that it is closed. The structure ensures
    we cannot produce inconsistent data.
 
@@ -236,7 +237,7 @@ variable [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
 
     **Key Property**: This is NOT defined as `0` for all inputs.
     - For Z = ∅, returns 0 (via `poincareDualForm_empty`)
-    - For Z ≠ ∅, returns the axiomatized Poincaré dual form
+    - For Z ≠ ∅, returns the placeholder Poincaré dual form
 
     The form satisfies:
     1. Closedness (by `poincareDualForm_isClosed`) -/
@@ -260,4 +261,3 @@ theorem fundamentalClassImpl_isClosed (p : ℕ) (Z : Set X) :
 /-!
 NOTE: fundamentalClassImpl_isPP, _isRational, _additive were archived with their axioms.
 -/
-

@@ -5,6 +5,8 @@ Authors: Jonathan Washburn
 -/
 import Hodge.Analytic.Advanced.ContMDiffForms
 import Hodge.Analytic.Advanced.LeibnizRule
+import Hodge.Analytic.Advanced.ChartIndependence
+import Hodge.Analytic.Advanced.ExteriorDerivSq
 
 /-!
 # Advanced Analytic Infrastructure (Work in Progress)
