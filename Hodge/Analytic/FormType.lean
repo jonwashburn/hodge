@@ -1,5 +1,22 @@
 import Hodge.Basic
 
+/-!
+# Form Type Definitions
+
+This file defines the smoothness condition for differential form sections
+on complex manifolds.
+
+## Main Definitions
+
+* `IsSmoothAlternating`: Predicate for smooth sections of alternating forms
+* `IsSmoothAlternatingBundle`: Bundle version of the smoothness condition
+
+## Implementation Notes
+
+A form section is "smooth" if the alternating map varies smoothly in x,
+as a map into the normed space of continuous alternating maps.
+-/
+
 noncomputable section
 
 open Classical Module Manifold

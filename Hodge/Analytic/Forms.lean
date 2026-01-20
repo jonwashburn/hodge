@@ -6,6 +6,32 @@ import Hodge.Analytic.Advanced.ContMDiffForms
 import Hodge.Analytic.Advanced.LeibnizRule
 import Hodge.Basic
 
+/-!
+# Smooth Differential Forms
+
+This file defines smooth differential forms on complex manifolds and provides
+the core operations: exterior derivative, wedge product, and basic form algebra.
+
+## Main Definitions
+
+* `SmoothForm n X k`: Smooth k-forms on a complex n-dimensional manifold X
+* `smoothExtDeriv`: The exterior derivative d : Ω^k → Ω^{k+1}
+* `wedge` (notation `⋏`): Wedge product of forms
+* `IsFormClosed`, `IsExact`: Closed and exact form predicates
+* `ClosedForm`: The subtype of closed forms
+
+## Main Results
+
+* `smoothExtDeriv_extDeriv`: d² = 0
+* `smoothExtDeriv_wedge`: Leibniz rule for d on wedge products
+* `isFormClosed_wedge`: Wedge of closed forms is closed
+
+## Implementation Notes
+
+The exterior derivative `smoothExtDeriv` is implemented via `ContMDiffForm.extDerivForm`,
+which uses the manifold derivative `mfderiv`. This is verified by the theorem
+`smoothExtDeriv_eq_extDerivForm`.
+-/
 
 noncomputable section
 

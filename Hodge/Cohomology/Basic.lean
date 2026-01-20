@@ -2,6 +2,33 @@ import Hodge.Analytic.Forms
 import Mathlib.Analysis.Complex.Basic
 import Mathlib.Algebra.Module.Basic
 
+/-!
+# De Rham Cohomology
+
+This file defines de Rham cohomology for complex manifolds and establishes
+its algebraic structure (ring structure via wedge product).
+
+## Main Definitions
+
+* `Cohomologous`: The equivalence relation for de Rham cohomology
+* `DeRhamSetoid`: The setoid structure for cohomology classes
+* `DeRhamCohomologyClass`: The quotient type H^k(X) = Z^k(X) / B^k(X)
+* `KahlerManifold`: Type class for compact Kähler manifolds
+
+## Main Results
+
+* Cohomology classes form a ℂ-module
+* Wedge product descends to a ring structure on cohomology
+* Kähler manifolds have additional structure (Kähler form ω)
+
+## Mathematical Background
+
+De Rham cohomology is defined as:
+  H^k(X) = {closed k-forms} / {exact k-forms}
+
+where a form is closed if dω = 0 and exact if ω = dη for some η.
+-/
+
 noncomputable section
 
 open Classical

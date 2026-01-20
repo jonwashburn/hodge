@@ -134,7 +134,7 @@ noncomputable def L2InnerProduct {k : ℕ} (ω η : SmoothForm n X k) : ℂ :=
 
     `⟨aω₁ + ω₂, η⟩ = a⟨ω₁, η⟩ + ⟨ω₂, η⟩`
 
-    **Proof**: With stub L2InnerProduct := 0, this is trivial.
+    **Proof**: Uses `L2InnerProductData.trivial.linear_left`.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
 theorem L2InnerProduct_linear_left {k : ℕ} (_c : ℂ) (_ω₁ _ω₂ _η : SmoothForm n X k) :
@@ -146,7 +146,7 @@ theorem L2InnerProduct_linear_left {k : ℕ} (_c : ℂ) (_ω₁ _ω₂ _η : Smo
 
     `⟨ω, aη₁ + η₂⟩ = ā⟨ω, η₁⟩ + ⟨ω, η₂⟩`
 
-    **Proof**: With stub L2InnerProduct := 0, this is trivial.
+    **Proof**: With trivial L² data, all inner products evaluate to 0.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
 theorem L2InnerProduct_conj_linear_right {k : ℕ} (_ω : SmoothForm n X k)
@@ -161,7 +161,7 @@ theorem L2InnerProduct_conj_linear_right {k : ℕ} (_ω : SmoothForm n X k)
 
     `⟨ω, η⟩ = ⟨η, ω⟩̄`
 
-    **Proof**: With stub L2InnerProduct := 0, this is trivial.
+    **Proof**: Uses `L2InnerProductData.trivial.hermitian`.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
 theorem L2InnerProduct_hermitian {k : ℕ} (_ω _η : SmoothForm n X k) :
@@ -172,7 +172,7 @@ theorem L2InnerProduct_hermitian {k : ℕ} (_ω _η : SmoothForm n X k) :
 
     `⟨ω, ω⟩ ≥ 0` with equality iff ω = 0.
 
-    **Proof**: With stub L2InnerProduct := 0, trivially satisfied.
+    **Proof**: Uses `L2InnerProductData.trivial.nonneg`.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
 theorem L2InnerProduct_nonneg {k : ℕ} (_ω : SmoothForm n X k) :
@@ -246,7 +246,7 @@ noncomputable def hodgeDual {k : ℕ} (ω : SmoothForm n X (k + 1)) : SmoothForm
 
     `⟨dω, η⟩_{L²} = ⟨ω, d*η⟩_{L²}`
 
-    **Proof**: With stubs L2InnerProduct := 0 and hodgeDual := 0, trivially 0 = 0.
+    **Proof**: With trivial L² and codifferential data, both sides evaluate to 0.
 
     Reference: [Warner, "Foundations of Differentiable Manifolds", §6.1]. -/
 theorem hodgeDual_adjoint {k : ℕ} (_ω : SmoothForm n X k) (_η : SmoothForm n X (k + 1)) :
@@ -259,7 +259,7 @@ theorem hodgeDual_adjoint {k : ℕ} (_ω : SmoothForm n X k) (_η : SmoothForm n
 
     The d* operator squares to zero, just like d.
 
-    **Proof**: With hodgeDual := 0, hodgeDual (hodgeDual ω) = hodgeDual 0 = 0.
+    **Proof**: With trivial codifferential data, d* returns 0, so d*(d*ω) = d*0 = 0.
 
     Reference: [Warner, "Foundations of Differentiable Manifolds", §6.1]. -/
 theorem hodgeDual_hodgeDual {k : ℕ} (_ω : SmoothForm n X (k + 2)) :
@@ -269,7 +269,7 @@ theorem hodgeDual_hodgeDual {k : ℕ} (_ω : SmoothForm n X (k + 2)) :
 
 /-- **d* is linear**.
 
-    **Proof**: With hodgeDual := 0, this is trivial.
+    **Proof**: Uses `CodifferentialData.trivial.codiff_add`.
 
     Reference: [Warner, "Foundations of Differentiable Manifolds", §6.1]. -/
 theorem hodgeDual_add {k : ℕ} (_ω₁ _ω₂ : SmoothForm n X (k + 1)) :

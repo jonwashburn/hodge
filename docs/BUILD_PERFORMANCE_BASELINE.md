@@ -30,3 +30,12 @@ cd /Users/jonathanwashburn/Projects/hodge
 - `Hodge.Tests.MasterTests` is intended as a “single entry point” to compile all test files.
 - If a particular module is slow, use `lake build <ModuleName>` to isolate it.
 
+## Sample timing (local machine, after `lake exe cache get`)
+
+Measured on 2026-01-20:
+
+```text
+real 25.45
+user 23.97
+sys  48.51
+```

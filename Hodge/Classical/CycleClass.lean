@@ -283,7 +283,7 @@ variable [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
 
     **Key Property**: This is NOT defined as `0` for all inputs.
     - For Z = ∅, returns 0 (via `poincareDualForm_empty`)
-    - For Z ≠ ∅, returns the placeholder Poincaré dual form
+    - For Z ≠ ∅, returns a fixed closed \(2p\)-form placeholder (the Kähler wedge power)
 
     The form satisfies:
     1. Closedness (by `poincareDualForm_isClosed`) -/

@@ -46,10 +46,8 @@ theorem integrationCurrentK_empty (k : ℕ) :
     integrationCurrentK (n := n) (X := X) k (∅ : Set X) = (0 : DeRhamCurrent n X k) := by
   ext ω
   -- closedSubmanifold uses setIntegral, which unfolds to integrationCurrentValue → submanifoldIntegral = 0
-  simp only [integrationCurrentK, _root_.integration_current, IntegrationData.toCurrent,
-    IntegrationData.closedSubmanifold, setIntegral, integrationCurrentValue, submanifoldIntegral,
-    Current.zero_toFun]
-  split_ifs <;> rfl
+  simp [integrationCurrentK, _root_.integration_current, IntegrationData.toCurrent,
+    IntegrationData.closedSubmanifold, setIntegral, Current.zero_toFun]
 
 /-- Integration current of the empty set is zero (codimension-form). -/
 theorem integrationCurrent_empty (p : ℕ) :

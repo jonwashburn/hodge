@@ -10,6 +10,29 @@ import Mathlib.Topology.Defs.Induced
 
 import Mathlib.Analysis.Normed.Module.Alternating.Basic
 
+/-!
+# Basic Definitions for Hodge Conjecture Formalization
+
+This file contains the foundational type definitions used throughout the
+Hodge conjecture formalization:
+
+## Main Definitions
+
+* `TangentModel n`: The model tangent space `ℂⁿ` (EuclideanSpace ℂ (Fin n))
+* `FiberAlt n k`: Continuous alternating k-linear maps on the tangent space
+* `𝓒_complex n`: The smooth structure for complex n-dimensional manifolds
+* `HasLocallyConstantCharts`: Condition for chart transitions to be locally constant
+
+## Mathematical Background
+
+We work with complex manifolds of dimension n, where the underlying real dimension
+is 2n. The tangent spaces are modeled on ℂⁿ, and differential k-forms are
+represented as sections of alternating multilinear maps on tangent vectors.
+
+## Usage
+
+This file is imported by essentially all other modules in the project.
+-/
 
 noncomputable section
 
