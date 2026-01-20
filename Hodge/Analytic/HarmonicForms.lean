@@ -108,23 +108,27 @@ theorem harmonic_iff_laplacian_zero {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 
     **Sprint 3 Status**: Statement only.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
-theorem harmonic_closed {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤ 2 * n)
-    (_ω : SmoothForm n X k) (_h : IsHarmonic _hk _hk' _ω) :
-    smoothExtDeriv _ω = 0 := by
-  -- With stub smoothExtDeriv := 0, this is immediate
-  simp only [smoothExtDeriv]
+theorem harmonic_closed {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+    (ω : SmoothForm n X k) (h : IsHarmonic hk hk' ω) :
+    smoothExtDeriv ω = 0 := by
+  -- Uses the kernel characterization of harmonic forms
+  -- Δω = 0 ⟹ dω = 0 (from Hodge theory)
+  -- This is a deep result requiring L² theory
+  sorry
 
 /-- **Harmonic forms are coclosed**.
 
     If Δω = 0, then d*ω = 0.
 
-    **Proof**: With hodgeDual := 0, this is immediate.
+    **Proof**: Uses the kernel characterization of harmonic forms.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
-theorem harmonic_coclosed {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤ 2 * n)
-    (_ω : SmoothForm n X k) (_h : IsHarmonic _hk _hk' _ω) :
-    hodgeDual ((by omega : k = (k - 1) + 1).symm ▸ _ω) = 0 := by
-  simp only [hodgeDual]
+theorem harmonic_coclosed {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+    (ω : SmoothForm n X k) (h : IsHarmonic hk hk' ω) :
+    hodgeDual ((by omega : k = (k - 1) + 1).symm ▸ ω) = 0 := by
+  -- Uses the kernel characterization of harmonic forms
+  -- Δω = 0 ⟹ d*ω = 0 (from Hodge theory)
+  sorry
 
 /-- **Harmonic ⟺ closed and coclosed**.
 
@@ -176,15 +180,17 @@ def HarmonicForm (n : ℕ) (X : Type u) (k : ℕ)
     **Sprint 3 Status**: Instance (stub).
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
-instance harmonicForm_addCommGroup {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤ 2 * n) :
-    AddCommGroup (HarmonicForm n X k _hk _hk') := by
-  -- HarmonicForm is a subtype of SmoothForm, which has AddCommGroup
-  -- With stub definitions, all forms are harmonic (Δ := 0 always)
-  infer_instance
+instance harmonicForm_addCommGroup {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) :
+    AddCommGroup (HarmonicForm n X k hk hk') := by
+  -- HarmonicForm is a subtype of SmoothForm
+  -- Need to show closure under addition and negation
+  -- This requires: harmonic_add and harmonic_neg theorems
+  sorry
 
-instance harmonicForm_module {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤ 2 * n) :
-    Module ℂ (HarmonicForm n X k _hk _hk') := by
-  infer_instance
+instance harmonicForm_module {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) :
+    Module ℂ (HarmonicForm n X k hk hk') := by
+  -- Requires AddCommGroup instance and scalar multiplication closure
+  sorry
 
 /-! ## Finite-Dimensionality -/
 

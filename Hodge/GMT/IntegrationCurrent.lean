@@ -47,4 +47,20 @@ theorem integrationCurrent_empty (p : ℕ) :
     integrationCurrent (n := n) (X := X) p (∅ : Set X) = (0 : DeRhamCurrent n X (2 * p)) := by
   simpa [integrationCurrent] using (integrationCurrentK_empty (n := n) (X := X) (k := 2 * p))
 
+/-- Linearity of the integration current evaluation (degree-`k` form). -/
+theorem integrationCurrentK_linear (k : ℕ) (Z : Set X) (c : ℝ)
+    (ω₁ ω₂ : SmoothForm n X k) :
+    (integrationCurrentK (n := n) (X := X) k Z).toFun (c • ω₁ + ω₂) =
+      c * (integrationCurrentK (n := n) (X := X) k Z).toFun ω₁ +
+        (integrationCurrentK (n := n) (X := X) k Z).toFun ω₂ :=
+  (integrationCurrentK (n := n) (X := X) k Z).is_linear c ω₁ ω₂
+
+/-- Linearity of the integration current evaluation (codimension form, degree `2*p`). -/
+theorem integrationCurrent_linear (p : ℕ) (Z : Set X) (c : ℝ)
+    (ω₁ ω₂ : SmoothForm n X (2 * p)) :
+    (integrationCurrent (n := n) (X := X) p Z).toFun (c • ω₁ + ω₂) =
+      c * (integrationCurrent (n := n) (X := X) p Z).toFun ω₁ +
+        (integrationCurrent (n := n) (X := X) p Z).toFun ω₂ :=
+  (integrationCurrent (n := n) (X := X) p Z).is_linear c ω₁ ω₂
+
 end Hodge.GMT

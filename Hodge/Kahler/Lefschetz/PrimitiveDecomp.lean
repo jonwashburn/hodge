@@ -214,7 +214,8 @@ theorem hard_lefschetz_from_sl2 {k : ℕ} (hk : k ≤ n)
     **Sprint 4 Status**: Definition using bijection.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.7]. -/
-noncomputable def hard_lefschetz_equiv {k : ℕ} (hk : k ≤ n) :
+noncomputable def hard_lefschetz_equiv {k : ℕ} (hk : k ≤ n)
+    [HardLefschetzData (n := n) (X := X)] :
     DeRhamCohomologyClass n X k ≃ₗ[ℂ] DeRhamCohomologyClass n X (k + 2 * (n - k)) :=
   LinearEquiv.ofBijective
     (lefschetz_power_cohomology (n - k))
@@ -227,17 +228,20 @@ noncomputable def hard_lefschetz_equiv {k : ℕ} (hk : k ≤ n) :
     **Sprint 4 Status**: Definition.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.7]. -/
-noncomputable def lefschetz_inverse_cohomology {k : ℕ} (hk : k ≤ n) :
+noncomputable def lefschetz_inverse_cohomology {k : ℕ} (hk : k ≤ n)
+    [HardLefschetzData (n := n) (X := X)] :
     DeRhamCohomologyClass n X (k + 2 * (n - k)) →ₗ[ℂ] DeRhamCohomologyClass n X k :=
   (hard_lefschetz_equiv hk).symm.toLinearMap
 
 theorem lefschetz_inverse_left_inv {k : ℕ} (hk : k ≤ n)
+    [HardLefschetzData (n := n) (X := X)]
     (c : DeRhamCohomologyClass n X k) :
     lefschetz_inverse_cohomology hk (lefschetz_power_cohomology (n - k) c) = c := by
   unfold lefschetz_inverse_cohomology
   exact (hard_lefschetz_equiv hk).symm_apply_apply c
 
 theorem lefschetz_inverse_right_inv {k : ℕ} (hk : k ≤ n)
+    [HardLefschetzData (n := n) (X := X)]
     (c : DeRhamCohomologyClass n X (k + 2 * (n - k))) :
     lefschetz_power_cohomology (n - k) (lefschetz_inverse_cohomology hk c) = c := by
   unfold lefschetz_inverse_cohomology

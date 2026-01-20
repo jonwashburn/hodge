@@ -42,4 +42,13 @@ def DeRhamCurrent.boundary {n : ℕ} {X : Type*}
     -- Nat.sub: (k'+1) - 1 = k'
     simpa [DeRhamCurrent, Nat.succ_sub_one] using (Current.boundary (k := k') T)
 
+/-- Linearity of evaluation: `T(c • ω₁ + ω₂) = c*T(ω₁) + T(ω₂)`. -/
+theorem current_eval_linear {n : ℕ} {X : Type*} {k : ℕ}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+    (T : DeRhamCurrent n X k) (c : ℝ) (ω₁ ω₂ : SmoothForm n X k) :
+    T.toFun (c • ω₁ + ω₂) = c * T.toFun ω₁ + T.toFun ω₂ :=
+  T.is_linear c ω₁ ω₂
+
 end Hodge.GMT

@@ -1,13 +1,14 @@
-# Classical Pillars Summary (Round 2)
+# Classical Pillars Summary
 
-This is a short “Round 2” summary for the **Classical Pillars** / **semantic stubs**
-in the Hodge formalization.
+This is a short summary for the **Classical Pillars** / **semantic stubs** in the Hodge
+formalization.
 
-The **authoritative global list** lives in:
-- `docs/notes/CLASSICAL_PILLARS.md`
+The authoritative global list lives in:
+- `docs/notes/CLASSICAL_PILLARS.md` (source of truth)
+- `docs/CLASSICAL_PILLARS.md` (Round‑3/4 “top-level” mirror for checklist tooling)
 
-This document focuses on the *Agent 5 (GMT / classical geometry) surface area* and
-where the remaining deep inputs are represented in the codebase.
+This document focuses on the *GMT / classical geometry* surface area (Agent 5) and where the
+remaining deep inputs are represented in the codebase.
 
 ---
 
@@ -18,22 +19,26 @@ The project is protected by:
 - `scripts/audit_stubs.sh` / `scripts/verify_proof_track.sh`
 
 Deep results are tracked as:
-- documented **stubs** (`sorry`) in off-proof-track modules, and/or
+- documented **stubs** (sometimes `sorry`) in off-proof-track modules, and/or
 - documented **placeholders** (e.g. `:= 0`) where the surrounding API is the focus.
 
 This keeps the **proof track** clean while still allowing infrastructure work to proceed.
 
 ---
 
-## Agent 5: GMT / Classical “Pillars” (current state)
+## GMT / Classical “Pillars” (Agent 5 surface area)
 
 ### Federer–Fleming compactness (GMT)
 
 - **File**: `Hodge/GMT/FedererFleming.lean`
-- **Primary stub**:
-  - `Hodge.GMT.federer_fleming_compactness` (returns a convergent subsequence structure)
-- **Related stub**:
-  - `Hodge.GMT.mass_lsc_flatNorm` (mass lower semicontinuity under flat convergence)
+- **Key theorems**:
+  - `Hodge.GMT.federer_fleming_compactness`
+  - `Hodge.GMT.mass_lsc_flatNorm`
+- **Status note**:
+  - In the current repo stub regime, the `IntegralPolyhedralChain'` predicate has no nonzero
+    generators, so the “integral currents” API collapses to `0`.  Consequently these theorems are
+    provable in a *vacuous* way (and the file has 0 `:= sorry` stubs), while still serving as the
+    correct API surface for the intended GMT development.
 - **References**:
   - Federer–Fleming, *Normal and Integral Currents*, Annals of Math. (1960)
   - Federer, *Geometric Measure Theory* (1969), Ch. 4
@@ -58,11 +63,10 @@ This keeps the **proof track** clean while still allowing infrastructure work to
 
 ---
 
-## What “done” means for Round 2
+## What “done” means for the GMT pillar layer
 
-For this round, Agent 5 aims to:
 - keep the proof track axiom list unchanged (`propext`, `Classical.choice`, `Quot.sound`)
-- avoid `axiom` declarations
+- avoid introducing new `axiom` declarations
 - keep Classical Pillars isolated + clearly documented
-- reduce the number of stubs where routine lemmas are provable (e.g. nonnegativity, nonemptiness)
+- prove routine helper lemmas where possible, even in the stub regime
 

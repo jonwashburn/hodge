@@ -49,4 +49,24 @@ noncomputable def poincareDualForm_construct_fromCurrent {n : ℕ} {X : Type*} {
 This matches the operational plan naming (`poincareDualForm_construct`). -/
 noncomputable abbrev poincareDualForm_construct := @poincareDualForm_construct_fromCurrent
 
+/-! ## Connection to cohomology (documentation-level) -/
+
+universe u
+
+variable {n : ℕ} {X : Type u}
+  [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+  [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+  [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+
+/-- A cohomology class associated to a set `Z`, using the *current proof-track* PD-form interface.
+
+This uses the `CycleClass.poincareDualForm` placeholder (which provides closedness), so it
+produces a well-typed de Rham class.
+
+**Gap (documented)**: relating this class to the “integration current → regularize” pipeline
+requires real integration currents and a regularization theorem. -/
+noncomputable def gmt_cycle_to_cohomology_path (p : ℕ) (Z : Set X) :
+    DeRhamCohomologyClass n X (2 * p) :=
+  Hodge.ofForm (CycleClass.poincareDualForm n X p Z) (CycleClass.poincareDualForm_isClosed n X p Z)
+
 end Hodge.GMT
