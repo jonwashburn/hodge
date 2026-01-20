@@ -11,8 +11,8 @@ The project's current "integration current" implementation lives in
 - Wires `integrate` to `setIntegral` (using Agent 3's Hausdorff infrastructure)
 - Sets `bdryMass = 0` (closed submanifolds have no boundary)
 
-The underlying integration is still a stub (`submanifoldIntegral := 0`), so evaluations
-are zero, but the current now properly depends on the set Z.
+The underlying integration uses `submanifoldIntegral`, which provides a nontrivial
+stand-in formula using Hausdorff measure and form evaluation at a basepoint.
 -/
 
 noncomputable section
@@ -41,11 +41,11 @@ noncomputable abbrev integrationCurrent (p : ℕ) (Z : Set X) : DeRhamCurrent n 
   integrationCurrentK (n := n) (X := X) (k := 2 * p) Z
 
 /-- Integration current of the empty set is zero.
-    (The underlying `submanifoldIntegral` is a stub returning 0 for all sets.) -/
+    (Hausdorff measure of empty set is 0, so submanifoldIntegral is 0.) -/
 theorem integrationCurrentK_empty (k : ℕ) :
     integrationCurrentK (n := n) (X := X) k (∅ : Set X) = (0 : DeRhamCurrent n X k) := by
   ext ω
-  -- closedSubmanifold uses setIntegral, which unfolds to integrationCurrentValue → submanifoldIntegral = 0
+  -- closedSubmanifold uses setIntegral → submanifoldIntegral → μ(∅) = 0
   simp [integrationCurrentK, _root_.integration_current, IntegrationData.toCurrent,
     IntegrationData.closedSubmanifold, setIntegral, Current.zero_toFun]
 

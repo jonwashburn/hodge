@@ -26,13 +26,15 @@ lake env lean Hodge/Utils/DependencyCheck.lean
 
 ---
 
-## Current kernel report (2026-01-18)
+## Current kernel report (2026-01-20)
 
 Lean prints:
 
 ```
 'hodge_conjecture'' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
+
+**Last verified**: 2026-01-20 by Agent 4 (R6-A4-PROOFTRACK task)
 
 ### Interpretation
 
