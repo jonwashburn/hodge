@@ -1181,10 +1181,10 @@ theorem RawSheetSum.stokes_bound_from_integrationData {p : ℕ} {hscale : ℝ}
     ∀ ω : SmoothForm n X (2 * (n - p)),
       |T_raw.toIntegrationData.integrate ω| ≤ 0 * ‖ω‖ := by
   intro ω
-  -- T_raw.toIntegrationData.integrate = fun _ => 0
+  -- T_raw.toIntegrationData uses closedSubmanifold which uses setIntegral
+  -- setIntegral checks if degree is even (2 * p' form); here k = 2 * (n - p) is even
   unfold RawSheetSum.toIntegrationData IntegrationData.closedSubmanifold
-  simp only [MulZeroClass.zero_mul, abs_zero]
-  -- Goal: 0 ≤ 0
-  linarith
+  -- `setIntegral` is currently the constant-0 stub, so the Stokes bound is trivial.
+  simp [setIntegral]
 
 end

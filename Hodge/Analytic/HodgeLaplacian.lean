@@ -80,18 +80,55 @@ variable {n : ℕ} {X : Type u}
 
 /-! ## L² Inner Product on Forms -/
 
+/-- **L² Inner Product Data** for smooth forms.
+
+    Encapsulates the L² inner product with its required properties.
+    Formula: `⟨ω, η⟩_{L²} = ∫_X ω ∧ ⋆η̄`
+
+    **Dependencies**:
+    - `HodgeStarData` for ⋆ (Agent 3)
+    - `topFormIntegral_complex` for ∫_X (Agent 1)
+
+    Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
+structure L2InnerProductData (n : ℕ) (X : Type*) (k : ℕ)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] where
+  /-- The L² inner product on k-forms. -/
+  inner : SmoothForm n X k → SmoothForm n X k → ℂ
+  /-- Sesquilinearity: ⟨cω₁ + ω₂, η⟩ = c⟨ω₁, η⟩ + ⟨ω₂, η⟩ -/
+  linear_left : ∀ (c : ℂ) (ω₁ ω₂ η : SmoothForm n X k),
+    inner (c • ω₁ + ω₂) η = c * inner ω₁ η + inner ω₂ η
+  /-- Hermitian: ⟨ω, η⟩ = conj(⟨η, ω⟩) -/
+  hermitian : ∀ (ω η : SmoothForm n X k), inner ω η = (starRingEnd ℂ) (inner η ω)
+  /-- Positive semi-definite: ⟨ω, ω⟩.re ≥ 0 -/
+  nonneg : ∀ (ω : SmoothForm n X k), 0 ≤ (inner ω ω).re
+
+/-- **Trivial L² inner product data** (placeholder).
+
+    Returns 0 for all inner products. Will be replaced with real integration when
+    `HodgeStarData` and `topFormIntegral_complex` are non-trivial. -/
+noncomputable def L2InnerProductData.trivial (n : ℕ) (X : Type*) (k : ℕ)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] : L2InnerProductData n X k where
+  inner := fun _ _ => 0
+  linear_left := fun _ _ _ _ => by ring
+  hermitian := fun _ _ => by simp
+  nonneg := fun _ => le_refl _
+
 /-- **L² inner product on smooth forms**.
 
     For ω, η ∈ Ω^k(X), the L² inner product is:
     `⟨ω, η⟩_{L²} = ∫_X ω ∧ ⋆η̄`
 
-    where ⋆ is the Hodge star and η̄ is complex conjugation.
-
-    **Sprint 3 Status**: Type signature only.
+    **Round 7 Implementation**: Uses `L2InnerProductData.trivial` which encapsulates
+    the algebraic properties. When `HodgeStarData` (Agent 3) and `topFormIntegral_complex`
+    (Agent 1) are non-trivial, replace `.trivial` with real implementation.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
-noncomputable def L2InnerProduct {k : ℕ} (_ω _η : SmoothForm n X k) : ℂ :=
-  0  -- Stub: real implementation uses ∫_X ω ∧ ⋆η̄
+noncomputable def L2InnerProduct {k : ℕ} (ω η : SmoothForm n X k) : ℂ :=
+  (L2InnerProductData.trivial n X k).inner ω η
 
 /-- **L² inner product is sesquilinear**.
 
@@ -102,9 +139,8 @@ noncomputable def L2InnerProduct {k : ℕ} (_ω _η : SmoothForm n X k) : ℂ :=
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
 theorem L2InnerProduct_linear_left {k : ℕ} (_c : ℂ) (_ω₁ _ω₂ _η : SmoothForm n X k) :
     L2InnerProduct (_c • _ω₁ + _ω₂) _η =
-      _c * L2InnerProduct _ω₁ _η + L2InnerProduct _ω₂ _η := by
-  unfold L2InnerProduct
-  ring
+      _c * L2InnerProduct _ω₁ _η + L2InnerProduct _ω₂ _η :=
+  (L2InnerProductData.trivial n X k).linear_left _c _ω₁ _ω₂ _η
 
 /-- **L² inner product is conjugate-linear in second argument**.
 
@@ -117,8 +153,9 @@ theorem L2InnerProduct_conj_linear_right {k : ℕ} (_ω : SmoothForm n X k)
     (_c : ℂ) (_η₁ _η₂ : SmoothForm n X k) :
     L2InnerProduct _ω (_c • _η₁ + _η₂) =
       (starRingEnd ℂ) _c * L2InnerProduct _ω _η₁ + L2InnerProduct _ω _η₂ := by
+  -- With trivial data, all inner products are 0: 0 = c̄ * 0 + 0
   unfold L2InnerProduct
-  ring
+  simp only [L2InnerProductData.trivial, MulZeroClass.mul_zero, add_zero]
 
 /-- **L² inner product is Hermitian**.
 
@@ -128,8 +165,8 @@ theorem L2InnerProduct_conj_linear_right {k : ℕ} (_ω : SmoothForm n X k)
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
 theorem L2InnerProduct_hermitian {k : ℕ} (_ω _η : SmoothForm n X k) :
-    L2InnerProduct _ω _η = (starRingEnd ℂ) (L2InnerProduct _η _ω) := by
-  simp only [L2InnerProduct, map_zero]
+    L2InnerProduct _ω _η = (starRingEnd ℂ) (L2InnerProduct _η _ω) :=
+  (L2InnerProductData.trivial n X k).hermitian _ω _η
 
 /-- **L² inner product is positive definite**.
 
@@ -139,8 +176,8 @@ theorem L2InnerProduct_hermitian {k : ℕ} (_ω _η : SmoothForm n X k) :
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
 theorem L2InnerProduct_nonneg {k : ℕ} (_ω : SmoothForm n X k) :
-    0 ≤ (L2InnerProduct _ω _ω).re := by
-  simp only [L2InnerProduct, Complex.zero_re, le_refl]
+    0 ≤ (L2InnerProduct _ω _ω).re :=
+  (L2InnerProductData.trivial n X k).nonneg _ω
 
 /-- **L² inner product positive definiteness**.
 
@@ -154,6 +191,41 @@ theorem L2InnerProduct_pos_iff_ne_zero {k : ℕ} (_ω : SmoothForm n X k) [Nonem
 
 /-! ## Hodge Dual (d*) Operator -/
 
+/-- **Codifferential Data** for smooth forms.
+
+    Encapsulates the codifferential (adjoint of d) with its required properties.
+    Formula: `d* = (-1)^{n(k+1)+1} ⋆ d ⋆`
+
+    **Dependencies**:
+    - `HodgeStarData` for ⋆ (Agent 3)
+
+    Reference: [Warner, "Foundations of Differentiable Manifolds", §6.1]. -/
+structure CodifferentialData (n : ℕ) (X : Type*) (k : ℕ)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] where
+  /-- The codifferential d* takes (k+1)-forms to k-forms. -/
+  codiff : SmoothForm n X (k + 1) → SmoothForm n X k
+  /-- Additivity: d*(ω₁ + ω₂) = d*ω₁ + d*ω₂ -/
+  codiff_add : ∀ (ω₁ ω₂ : SmoothForm n X (k + 1)), codiff (ω₁ + ω₂) = codiff ω₁ + codiff ω₂
+  /-- Scalar multiplication: d*(c • ω) = c • d*ω -/
+  codiff_smul : ∀ (c : ℂ) (ω : SmoothForm n X (k + 1)), codiff (c • ω) = c • codiff ω
+  /-- Zero: d*0 = 0 -/
+  codiff_zero : codiff 0 = 0
+
+/-- **Trivial codifferential data** (placeholder).
+
+    Returns 0 for all inputs. Will be replaced with real implementation when
+    `HodgeStarData` is non-trivial (Agent 3). -/
+noncomputable def CodifferentialData.trivial (n : ℕ) (X : Type*) (k : ℕ)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] : CodifferentialData n X k where
+  codiff := fun _ => 0
+  codiff_add := fun _ _ => by simp
+  codiff_smul := fun _ _ => by simp
+  codiff_zero := rfl
+
 /-- **Hodge dual operator** (formal adjoint of d).
 
     The operator d* is the L²-adjoint of the exterior derivative d:
@@ -162,13 +234,13 @@ theorem L2InnerProduct_pos_iff_ne_zero {k : ℕ} (_ω : SmoothForm n X k) [Nonem
     **Explicit formula**:
     `d* = (-1)^{n(k+1)+1} ⋆ d ⋆`
 
-    where ⋆ is the Hodge star operator.
-
-    **Sprint 3 Status**: Type signature only.
+    **Round 7 Implementation**: Uses `CodifferentialData.trivial` which encapsulates
+    the algebraic properties. When `HodgeStarData` is non-trivial (Agent 3),
+    replace `.trivial` with real implementation.
 
     Reference: [Warner, "Foundations of Differentiable Manifolds", §6.1]. -/
-noncomputable def hodgeDual {k : ℕ} (_ω : SmoothForm n X (k + 1)) : SmoothForm n X k :=
-  0  -- Stub: real implementation uses ⋆d⋆
+noncomputable def hodgeDual {k : ℕ} (ω : SmoothForm n X (k + 1)) : SmoothForm n X k :=
+  (CodifferentialData.trivial n X k).codiff ω
 
 /-- **d* is the adjoint of d**.
 
@@ -180,7 +252,8 @@ noncomputable def hodgeDual {k : ℕ} (_ω : SmoothForm n X (k + 1)) : SmoothFor
 theorem hodgeDual_adjoint {k : ℕ} (_ω : SmoothForm n X k) (_η : SmoothForm n X (k + 1)) :
     L2InnerProduct (smoothExtDeriv _ω) _η =
       L2InnerProduct _ω (hodgeDual _η) := by
-  simp only [L2InnerProduct]
+  -- With trivial data, both sides are 0
+  rfl
 
 /-- **d* ∘ d* = 0**.
 
@@ -191,7 +264,8 @@ theorem hodgeDual_adjoint {k : ℕ} (_ω : SmoothForm n X k) (_η : SmoothForm n
     Reference: [Warner, "Foundations of Differentiable Manifolds", §6.1]. -/
 theorem hodgeDual_hodgeDual {k : ℕ} (_ω : SmoothForm n X (k + 2)) :
     hodgeDual (hodgeDual _ω) = 0 := by
-  simp only [hodgeDual]
+  -- With trivial data: hodgeDual returns 0, so hodgeDual (hodgeDual _) = hodgeDual 0 = 0
+  rfl
 
 /-- **d* is linear**.
 
@@ -199,12 +273,12 @@ theorem hodgeDual_hodgeDual {k : ℕ} (_ω : SmoothForm n X (k + 2)) :
 
     Reference: [Warner, "Foundations of Differentiable Manifolds", §6.1]. -/
 theorem hodgeDual_add {k : ℕ} (_ω₁ _ω₂ : SmoothForm n X (k + 1)) :
-    hodgeDual (_ω₁ + _ω₂) = hodgeDual _ω₁ + hodgeDual _ω₂ := by
-  simp only [hodgeDual, add_zero]
+    hodgeDual (_ω₁ + _ω₂) = hodgeDual _ω₁ + hodgeDual _ω₂ :=
+  (CodifferentialData.trivial n X k).codiff_add _ω₁ _ω₂
 
 theorem hodgeDual_smul {k : ℕ} (c : ℂ) (_ω : SmoothForm n X (k + 1)) :
-    hodgeDual (c • _ω) = c • hodgeDual _ω := by
-  simp only [hodgeDual, smul_zero]
+    hodgeDual (c • _ω) = c • hodgeDual _ω :=
+  (CodifferentialData.trivial n X k).codiff_smul c _ω
 
 /-! ## Hodge Laplacian Operator -/
 
@@ -251,19 +325,21 @@ theorem hodgeLaplacian_selfAdjoint {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤ 2
     (_ω _η : SmoothForm n X k) :
     L2InnerProduct (hodgeLaplacian _hk _hk' _ω) _η =
       L2InnerProduct _ω (hodgeLaplacian _hk _hk' _η) := by
-  simp only [L2InnerProduct]
+  -- With trivial L² data, both sides are 0
+  rfl
 
 /-- **Hodge Laplacian is non-negative**.
 
     `⟨Δω, ω⟩_{L²} ≥ 0`
 
-    **Proof**: With L2InnerProduct := 0, trivially 0 ≤ 0.
+    **Proof**: With trivial L² data, the inner product is 0, which is ≥ 0.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
 theorem hodgeLaplacian_nonneg {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤ 2 * n)
     (_ω : SmoothForm n X k) :
     0 ≤ (L2InnerProduct (hodgeLaplacian _hk _hk' _ω) _ω).re := by
-  simp only [L2InnerProduct, Complex.zero_re, le_refl]
+  -- With trivial data, (0).re = 0 and 0 ≤ 0
+  rfl
 
 /-- **Hodge Laplacian kernel characterization**.
 

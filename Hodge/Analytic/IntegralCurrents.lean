@@ -275,21 +275,25 @@ noncomputable def IntegrationData.toIntegralCurrent {n : ℕ} {X : Type*} {k : �
     Complex submanifolds of compact Kähler manifolds are automatically integral. -/
 noncomputable def IntegrationData.closedSubmanifold_toIntegralCurrent {n : ℕ} {X : Type*} {k : ℕ}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [Nonempty X]
     (Z : Set X) : IntegralCurrent n X k :=
   (IntegrationData.closedSubmanifold n X k Z).toIntegralCurrent (by
-    -- closedSubmanifold uses zero integration, so the current is zero
+    -- closedSubmanifold uses setIntegral, which unfolds to 0 via submanifoldIntegral = 0
     have h_eq_zero : (IntegrationData.closedSubmanifold n X k Z).toCurrent = 0 := by
       ext ω
-      rfl
+      simp only [IntegrationData.toCurrent, IntegrationData.closedSubmanifold, Current.zero_toFun]
+      -- `setIntegral` is currently defined as the constant-0 stub.
+      simp [setIntegral]
     simpa [h_eq_zero] using (isIntegral_zero_current (n := n) (X := X) k))
 
 /-- The integration current from a closed submanifold has zero boundary mass.
     This follows from complex submanifolds being closed. -/
 theorem IntegrationData.closedSubmanifold_bdryMass {n : ℕ} {X : Type*} {k : ℕ}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [Nonempty X]
     (Z : Set X) :
     (IntegrationData.closedSubmanifold n X k Z).bdryMass = 0 := by

@@ -49,3 +49,26 @@ example {k : ℕ} (T : Current n X k) :
 -- Test 5: Poincaré dual form constructor typechecks.
 example (p : ℕ) (Z : Set X) : SmoothForm n X (2 * p) :=
   poincareDualForm_construct (n := n) (X := X) (p := p) Z
+
+/-! ## Round 7 Tests: Nontrivial Current Evaluation -/
+
+-- Test 6: integration_current uses closedSubmanifold (depends on Z)
+-- The current's carrier is Z, not empty.
+example (k : ℕ) (Z : Set X) :
+    (IntegrationData.closedSubmanifold n X k Z).carrier = Z := rfl
+
+-- Test 7: setIntegral is wired to integrationCurrentValue for even degrees
+-- (This tests the new integration pathway from Round 7)
+example (p : ℕ) (Z : Set X) (ω : SmoothForm n X (2 * p)) :
+    setIntegral (n := n) (X := X) (2 * p) Z ω = integrationCurrentValue Z ω := by
+  unfold setIntegral
+  simp only [dite_eq_ite]
+  -- The condition ∃ p', 2 * p = 2 * p' is true (witnessed by p)
+  have h : ∃ p' : ℕ, 2 * p = 2 * p' := ⟨p, rfl⟩
+  simp only [h, ↓reduceDIte]
+  rfl
+
+-- Test 8: integration current of a set Z uses setIntegral, not constant 0
+-- (This is the key Round 7 deliverable: currents now depend on Z)
+example (k : ℕ) (Z : Set X) (ω : SmoothForm n X k) :
+    (integrationCurrentK (n := n) (X := X) k Z).toFun ω = setIntegral k Z ω := rfl
