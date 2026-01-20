@@ -861,7 +861,7 @@ def lefschetz_power_of_class {n : ℕ} {X : Type u}
 /-! ## Kähler Manifold -/
 
 /-!
-### Classical Pillar: Hard Lefschetz Theorem
+### (Off-track) Classical Pillar: Hard Lefschetz Theorem
 
 The **Hard Lefschetz Theorem** (Lefschetz, 1924) states that for a compact Kähler
 manifold X of complex dimension n, the iterated Lefschetz operator
@@ -870,8 +870,13 @@ manifold X of complex dimension n, the iterated Lefschetz operator
 ```
 defined by `L^k(α) = [ω]^k ∪ α` is an isomorphism.
 
-**Axiomatization Status**: This is a Classical Pillar axiom in the KahlerManifold
-typeclass. A full proof from first principles requires:
+**Status in this repository**: Hard Lefschetz is intentionally **not** a field of the
+`KahlerManifold` structure on the main proof track. If you want to work with Hard Lefschetz
+off-track, use the interface in:
+- `Hodge/Kahler/Lefschetz/Sl2Representation.lean` (assumption packaged as `Hodge.HardLefschetzData`)
+- `Hodge/Classical/Lefschetz.lean` (builds the inverse via `LinearEquiv.ofBijective`)
+
+A full proof from first principles would require:
 1. **Kähler identities**: `[Λ, d] = i∂̄*`, `[L, d*] = -i∂̄`
 2. **Hodge decomposition**: H^k = ⊕_{p+q=k} H^{p,q}
 3. **Primitive decomposition**: H^k = ⊕_r L^r(P^{k-2r})
@@ -907,10 +912,10 @@ class KahlerManifold (n : ℕ) (X : Type u)
 
 /-!
 ══════════════════════════════════════════════════════════════════════════════════════════
-**NOTE**: The Hard Lefschetz axioms have been REMOVED from the KahlerManifold class.
+**NOTE**: The Hard Lefschetz fields have been REMOVED from the `KahlerManifold` class.
 
 The following three fields were previously here but are NOT on the proof track
-for `hodge_conjecture'` and have been moved to `archive/Hodge/Classical/Lefschetz.lean`:
+for `hodge_conjecture'` and have been moved off-track.
 
 - `lefschetz_bijective` : L^k is a bijection (Hard Lefschetz Theorem)
 - `rational_lefschetz_iff` : L^k preserves rationality

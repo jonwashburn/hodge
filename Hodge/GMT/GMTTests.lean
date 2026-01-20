@@ -1,4 +1,7 @@
-import Hodge.GMT
+import Hodge.GMT.Current
+import Hodge.GMT.IntegrationCurrent
+import Hodge.GMT.FlatNormTopology
+import Hodge.GMT.PoincareDuality
 
 /-!
 # GMT Tests (Round 3)

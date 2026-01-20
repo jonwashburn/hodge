@@ -26,6 +26,8 @@ variable {n : ℕ} {X : Type u}
   [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
   [ProjectiveComplexManifold n X] [KahlerManifold n X]
 
+namespace KahlerIdentities
+
 /-!
 ## Placeholder operators
 
@@ -73,5 +75,7 @@ theorem kahler_identity_Lambda_d (k : ℕ) :
         (dolbeaultBarStar (n := n) (X := X) k - dolbeaultStar (n := n) (X := X) k) := by
   ext ω
   simp [commutator_Lambda_d, lefschetzLambda, dolbeaultBarStar, dolbeaultStar]
+
+end KahlerIdentities
 
 end

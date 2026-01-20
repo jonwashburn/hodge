@@ -106,6 +106,9 @@ private theorem polyhedralChain_eq_zero {k : ℕ} {P : Current n X k}
     subst ihT
     -- c • 0 = 0
     ext ω
+    -- The `ℤ`-action on currents is defined via the `ℝ`-action: `(c : ℤ) • T = (c : ℝ) • T`.
+    change ((Current.smul_curr (n := n) (X := X) (k := k) (r := (c : ℝ)) (T := (0 : Current n X k))).toFun ω) = 0
+    -- Unfold the `ℝ`-action (`Current.smul_curr`) and evaluate on the zero current.
     simp [Current.smul_curr, Current.zero_toFun]
 
 /-- In the current stub development, `isIntegral` forces the current to be `0`. -/
@@ -238,24 +241,30 @@ noncomputable def federer_fleming_compactness {k : ℕ} (M : ℝ) (hM : M > 0)
     unfold FlatNormConverges
     -- Show each term of the distance sequence is 0.
     have hconst :
-        (fun j => flatNormDist (n := n) (X := X) (k := k) (T (id j)) (zero_int n X k)) =
+        (fun j => flatNormDist (n := n) (X := X) (k := k) ((T ∘ id) j) (zero_int n X k)) =
           fun _ : ℕ => (0 : ENNReal) := by
       funext j
-      have hj : (T j).toFun = (0 : Current n X k) :=
-        integralCurrent_toFun_eq_zero (n := n) (X := X) (k := k) (T j)
+      have hj : ((T ∘ id) j).toFun = (0 : Current n X k) := by
+        simpa [Function.comp] using
+          (integralCurrent_toFun_eq_zero (n := n) (X := X) (k := k) (T j))
       -- Compute the distance using the fact both currents are 0.
       unfold flatNormDist
-      have hdiff : (T j).toFun - (zero_int n X k).toFun = (0 : Current n X k) := by
+      have hdiff : ((T ∘ id) j).toFun - (zero_int n X k).toFun = (0 : Current n X k) := by
         -- both sides are 0 currents
-        subst hj
-        -- 0 - 0 = 0
-        show (0 : Current n X k) + -(0 : Current n X k) = 0
-        rw [Current.neg_zero_current (n := n) (X := X) (k := k)]
-        exact Current.add_zero (T := (0 : Current n X k))
+        rw [hj]
+        -- `zero_int.toFun` is definitionally `0`, so this is `0 - 0 = 0`.
+        change (0 : Current n X k) - (0 : Current n X k) = 0
+        calc
+          (0 : Current n X k) - (0 : Current n X k) = -(0 : Current n X k) := by
+            simpa using (Current.zero_sub (n := n) (X := X) (k := k) (T := (0 : Current n X k)))
+          _ = 0 := Current.neg_zero_current (n := n) (X := X) (k := k)
       -- now flatNorm(0) = 0
-      simp [hdiff, Hodge.GMT.flatNorm, Hodge.GMT.flatNormReal, _root_.flatNorm_zero]
+      have hdiff' : (T j).toFun - (zero_int n X k).toFun = (0 : Current n X k) := by
+        simpa using hdiff
+      simp [hdiff', Hodge.GMT.flatNorm, Hodge.GMT.flatNormReal, _root_.flatNorm_zero]
     -- constant 0 tends to 0
-    simpa [hconst] using (tendsto_const_nhds : Tendsto (fun _ : ℕ => (0 : ENNReal)) atTop (nhds 0))
+    rw [hconst]
+    exact (tendsto_const_nhds : Tendsto (fun _ : ℕ => (0 : ENNReal)) atTop (nhds (0 : ENNReal)))
 
 /-- Mass is lower semicontinuous under flat norm convergence.
 

@@ -128,10 +128,11 @@ theorem sl2_H_L (k : ℕ) (ω : SmoothForm n X k) :
 
 This says that Λ lowers the weight by 2. -/
 theorem sl2_H_Lambda (k : ℕ) (ω : SmoothForm n X k) :
-    weightOperator (k - 2) (lefschetzLambda k ω) - lefschetzLambda k (weightOperator k ω)
-    = (-2 : ℂ) • lefschetzLambda k ω := by
+    weightOperator (k - 2) (KahlerIdentities.lefschetzLambda (n := n) (X := X) k ω) -
+        KahlerIdentities.lefschetzLambda (n := n) (X := X) k (weightOperator k ω)
+      = (-2 : ℂ) • KahlerIdentities.lefschetzLambda (n := n) (X := X) k ω := by
   -- With Λ = 0: both sides are 0
-  simp only [lefschetzLambda, LinearMap.zero_apply, smul_zero, sub_zero,
+  simp only [KahlerIdentities.lefschetzLambda, LinearMap.zero_apply, smul_zero, sub_zero,
              weightOperator, LinearMap.smul_apply, LinearMap.id_apply]
 
 /-!
