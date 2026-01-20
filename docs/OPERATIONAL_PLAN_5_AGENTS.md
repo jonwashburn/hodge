@@ -210,6 +210,147 @@ lake build Hodge.Classical.CycleClass
 
 ---
 
+# ROUND 8 ASSIGNMENTS (Current - SEMANTIC STUB ELIMINATION PHASE 2)
+
+## Updated rigorous status (2026-01-20)
+
+- ✅ `lake build` succeeds
+- ✅ 0 `sorry` / `admit` in `Hodge/`
+- ✅ `hodge_conjecture'` axioms: `[propext, Classical.choice, Quot.sound]`
+- ✅ Round 7 partial completion:
+  - Agent 3 ✅ (HausdorffMeasure stand-in is non-degenerate)
+  - Agent 5 ✅ (CycleClass PD form no longer silently `form := 0`)
+- ⚠ Remaining work is **semantic**: eliminate “always-0” functional definitions that still trivialize evaluation/inner products.
+
+## Round 8 Goal
+
+Eliminate the remaining “always-0” stubs that block meaningful integration/L²:
+
+- `topFormIntegral_real' := 0` and `topFormIntegral_complex := 0` (`Hodge/Analytic/Integration/TopFormIntegral.lean`)
+- `setIntegral := 0` (`Hodge/Analytic/Currents.lean`) so currents actually evaluate forms
+- `L2InnerProductData.trivial.inner := 0` (`Hodge/Analytic/HodgeLaplacian.lean`)
+- `integrationCurrentHL` still `toFun := 0` (`Hodge/Classical/HarveyLawson.lean`)
+
+## Round 8 Success Criteria
+
+- [ ] `./scripts/audit_stubs.sh --full` no longer flags TopFormIntegral’s `:= 0` integrals
+- [ ] `./scripts/audit_stubs.sh --full` no longer flags Currents’ `setIntegral := 0`
+- [ ] `lake build` still succeeds
+- [ ] Proof track remains unchanged/clean (same axiom list)
+
+---
+
+## Agent 1: Make top-form integration nontrivial
+
+### Task ID: `R8-A1-TOPFORM`
+
+### Owns
+- `Hodge/Analytic/Integration/TopFormIntegral.lean`
+
+### Deliverables
+- Replace `topFormIntegral_real'` with a nontrivial definition (Phase 1 is acceptable):
+  - Option A (fast, proxy): define `topFormIntegral_real' η := submanifoldIntegral (p := n) η Set.univ`
+  - Option B (better): integrate an ℝ-valued density against a nontrivial measure (Agent 3’s `hausdorffMeasure2p`)
+- Define `topFormIntegral_complex` consistently (e.g. `Complex.ofReal` of the real integral, until a complex density exists)
+
+### Verification
+
+```bash
+lake build Hodge.Analytic.Integration.TopFormIntegral
+./scripts/audit_stubs.sh --full | rg "TopFormIntegral\\.lean"
+```
+
+---
+
+## Agent 2: Make L² inner product nontrivial
+
+### Task ID: `R8-A2-L2`
+
+### Owns
+- `Hodge/Analytic/HodgeLaplacian.lean` (`L2InnerProductData.trivial`, `L2InnerProduct`)
+
+### Deliverables
+- Replace `L2InnerProductData.trivial.inner := fun _ _ => 0` with a nontrivial `inner` using Agent 1’s `topFormIntegral_complex`
+- Update at least:
+  - `L2InnerProduct_conj_linear_right`
+  - `L2InnerProduct_hermitian`
+  - `L2InnerProduct_nonneg`
+  so they no longer rely on “everything is 0” proofs (it’s OK to keep some properties off-track as `True`, but the core `inner` must not be identically 0)
+
+### Verification
+
+```bash
+lake build Hodge.Analytic.HodgeLaplacian
+./scripts/audit_stubs.sh --full | rg "HodgeLaplacian\\.lean"
+```
+
+---
+
+## Agent 3: Provide the integration plumbing used by currents
+
+### Task ID: `R8-A3-PLUMBING`
+
+### Owns
+- `Hodge/Analytic/Integration/HausdorffMeasure.lean`
+
+### Deliverables
+- Add/strengthen helper lemmas so Agent 4 can implement `setIntegral` by degree-dispatch without fragile `unfold`:
+  - a lemma that packages `submanifoldIntegral_linear` in a reusable form
+  - any needed cast/degree helper lemmas (e.g. `castForm` support)
+
+### Verification
+
+```bash
+lake build Hodge.Analytic.Integration.HausdorffMeasure
+```
+
+---
+
+## Agent 4: Kill `setIntegral := 0` (currents actually evaluate)
+
+### Task ID: `R8-A4-SETINTEGRAL`
+
+### Owns
+- `Hodge/Analytic/Currents.lean` (`setIntegral`, `IntegrationData.closedSubmanifold`)
+- `Hodge/GMT/IntegrationCurrent.lean` and `Hodge/GMT/GMTTests.lean` (wrapper + tests)
+
+### Deliverables
+- Implement `setIntegral` by parity/degree:
+  - if `k = 2*p`, set `setIntegral k Z ω := integrationCurrentValue (p := p) Z (castForm (by simpa [two_mul] using ...) ω)`
+  - else `0`
+- Update `IntegrationData.closedSubmanifold.integrate_continuous`/`integrate_bound` accordingly (it’s fine to keep continuity as trivial if topology is discrete, but the **value must be nontrivial** for even degrees)
+- Add a GMT test showing evaluation differs when `Z = ∅` vs `Z = Set.univ` (using the proxy measure)
+
+### Verification
+
+```bash
+lake build Hodge.Analytic.Currents
+lake build Hodge.GMT.GMTTests
+./scripts/audit_stubs.sh --full | rg "Currents\\.lean"
+```
+
+---
+
+## Agent 5: Remove remaining classical “toFun := 0” in Harvey–Lawson
+
+### Task ID: `R8-A5-HARVEYLAWSON`
+
+### Owns
+- `Hodge/Classical/HarveyLawson.lean`
+
+### Deliverables
+- Replace `integrationCurrentHL`’s `toFun := 0` by wiring to `integration_current` / `IntegrationData.closedSubmanifold_toIntegralCurrent`
+- Ensure the docstring clearly states what remains proxy vs genuine
+
+### Verification
+
+```bash
+lake build Hodge.Classical.HarveyLawson
+./scripts/audit_stubs.sh --full | rg "HarveyLawson\\.lean"
+```
+
+---
+
 # ROUND 2 ASSIGNMENTS (Completed)
 
 ## Overview
