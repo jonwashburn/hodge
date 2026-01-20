@@ -23,7 +23,8 @@ universe u
 variable {n : ℕ} {X : Type u}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-  [ProjectiveComplexManifold n X] [K : KahlerManifold n X] [Nonempty X]
+  [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
+  [MeasurableSpace X] [Nonempty X]
 
 /-! ## Automatic SYR Theorem -/
 
@@ -312,4 +313,3 @@ represents [γ] in cohomology by construction.
 SignedAlgebraicCycle.lefschetz_lift was moved to archive/Hodge/Kahler/LefschetzLift.lean.
 ══════════════════════════════════════════════════════════════════════════════════════════
 -/
-

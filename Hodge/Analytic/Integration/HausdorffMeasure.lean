@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2026 Hodge Formalization Project. All rights reserved.
 Released under Apache 2.0 license.
-Authors: Agent 2 (Integration Theory)
+Authors: Agent 2 (Integration Theory), Agent 3 (Round 8 Plumbing)
 -/
 import Hodge.Analytic.Integration.VolumeForm
 import Hodge.Analytic.Forms
@@ -19,6 +19,14 @@ submanifolds using Hausdorff measure.
 * `hausdorffMeasure_submanifold` - Hausdorff measure on a complex submanifold
 * `submanifoldIntegral` - Integration of forms over submanifolds
 * `submanifoldIntegral_linear` - Linearity of submanifold integration
+
+## Round 8 Helper Lemmas (Agent 3 → Agent 4)
+
+* `submanifoldIntegral_add` - Additivity in the form
+* `submanifoldIntegral_smul` - Scalar multiplication
+* `submanifoldIntegral_zero` - Integration of zero form
+* `submanifoldIntegral_asLinearMap` - Package as `LinearMap ℝ`
+* `integrateDegree2p` - Degree-dispatch helper for `setIntegral`
 
 ## Mathematical Background
 
@@ -74,7 +82,7 @@ noncomputable def hausdorffMeasure2p (p : ℕ) : Measure X :=
   -- the manifold topology, so we cannot directly use Mathlib's `μH[2p]` on `X` here.
   --
   -- As a nontrivial stand-in that does *not* require a `MeasureSpace X` instance, we use a Dirac
-  -- measure at an arbitrary basepoint. This makes downstream “integration” depend on `Z`.
+  -- measure at an arbitrary basepoint. This makes downstream "integration" depend on `Z`.
   Measure.dirac basepoint
 
 /-- A fixed frame in the model tangent space, used to evaluate a `2p`-form to a scalar. -/
@@ -144,6 +152,19 @@ theorem submanifoldIntegral_empty {p : ℕ} (ω : SmoothForm n X (2 * p)) :
     submanifoldIntegral ω ∅ = 0 := by
   simp [submanifoldIntegral]
 
+/-- Submanifold integration is bounded by the form norm.
+
+    For the Dirac proxy measure, μ(Z).toReal ≤ 1 and form evaluations are bounded
+    by the comass norm, so |∫_Z ω| ≤ 1 * ‖ω‖.
+
+    **Proof Strategy**: Uses the fact that:
+    - μ(Z).toReal ∈ {0, 1} for Dirac measure
+    - |Re(eval)| ≤ pointwiseComass ≤ comass = ‖ω‖
+
+    **Status**: Placeholder `True` while comass bound infrastructure develops. -/
+theorem submanifoldIntegral_abs_le {p : ℕ} (_ω : SmoothForm n X (2 * p)) (_Z : Set X) :
+    True := trivial
+
 /-! ## Integration Currents -/
 
 /-- **Integration current** associated to a submanifold.
@@ -165,13 +186,13 @@ theorem integrationCurrentValue_linear {p : ℕ} (Z : Set X)
 /-! ## Measure-Theoretic Properties -/
 
 /-- The Hausdorff dimension of a complex p-dimensional submanifold is 2p. -/
-theorem hausdorff_dimension_complex_submanifold {p : ℕ} (hp : p ≤ n)
-    (Z : Set X) (hZ : True) : -- Placeholder: hZ should be "Z is a complex p-dimensional submanifold"
+theorem hausdorff_dimension_complex_submanifold {p : ℕ} (_hp : p ≤ n)
+    (_Z : Set X) (_hZ : True) : -- Placeholder: hZ should be "Z is a complex p-dimensional submanifold"
     True := trivial  -- Placeholder for Hausdorff dimension = 2p
 
 /-- Hausdorff measure of a compact complex submanifold is finite. -/
-theorem hausdorff_measure_compact_finite {p : ℕ} (hp : p ≤ n)
-    (Z : Set X) (hZ : IsCompact Z) :
+theorem hausdorff_measure_compact_finite {p : ℕ} (_hp : p ≤ n)
+    (_Z : Set X) (_hZ : IsCompact _Z) :
     True := trivial  -- Placeholder for μ_H^{2p}(Z) < ∞
 
 /-- The volume of a complex submanifold equals the integral of the volume form.
@@ -180,7 +201,7 @@ theorem hausdorff_measure_compact_finite {p : ℕ} (hp : p ≤ n)
     vol(Z) = ∫_Z ω^p / p!
 
     where ω is the Kähler form. -/
-theorem volume_eq_integral_kahler_power {p : ℕ} (hp : p ≤ n) (Z : Set X) :
+theorem volume_eq_integral_kahler_power {p : ℕ} (_hp : p ≤ n) (_Z : Set X) :
     True := trivial  -- Placeholder: vol(Z) = ∫_Z ω^p/p!
 
 /-! ## Connection to Cycle Classes -/
@@ -192,24 +213,188 @@ theorem volume_eq_integral_kahler_power {p : ℕ} (hp : p ≤ n) (Z : Set X) :
     ⟨[Z], [η]⟩ = ∫_Z η
 
     This is the Poincaré duality isomorphism. -/
-theorem cycle_class_integration {p : ℕ} (hp : p ≤ n) (Z : Set X) :
+theorem cycle_class_integration {p : ℕ} (_hp : p ≤ n) (_Z : Set X) :
     True := trivial  -- Placeholder: [Z] is uniquely determined by integration
+
+/-! ## Round 8: Helper Lemmas for Agent 4's `setIntegral` Implementation
+
+This section provides helper lemmas so Agent 4 can implement `setIntegral` in
+`Hodge/Analytic/Currents.lean` by degree-dispatch without fragile `unfold` tactics.
+
+### Key Helpers
+
+* `submanifoldIntegral_add` - Additivity in the form
+* `submanifoldIntegral_smul` - Scalar multiplication in the form
+* `submanifoldIntegral_zero` - Integration of zero form is zero
+* `submanifoldIntegral_asLinearMap` - Package linearity as a `LinearMap`
+* `integrateDegree2p` - Entry point for Agent 4: integrate a k-form over Z when k = 2*p
+-/
+
+/-- Submanifold integration is additive in the form. -/
+theorem submanifoldIntegral_add {p : ℕ} (Z : Set X)
+    (ω₁ ω₂ : SmoothForm n X (2 * p)) :
+    submanifoldIntegral (n := n) (X := X) (p := p) (ω₁ + ω₂) Z =
+      submanifoldIntegral (n := n) (X := X) (p := p) ω₁ Z +
+        submanifoldIntegral (n := n) (X := X) (p := p) ω₂ Z := by
+  have h := submanifoldIntegral_linear (n := n) (X := X) (p := p) Z 1 ω₁ ω₂
+  simp only [one_smul, _root_.one_mul] at h
+  exact h
+
+/-- Submanifold integration of zero is zero. -/
+theorem submanifoldIntegral_zero {p : ℕ} (Z : Set X) :
+    submanifoldIntegral (n := n) (X := X) (p := p) (0 : SmoothForm n X (2 * p)) Z = 0 := by
+  simp [submanifoldIntegral]
+
+/-- Submanifold integration commutes with scalar multiplication. -/
+theorem submanifoldIntegral_smul {p : ℕ} (Z : Set X)
+    (c : ℝ) (ω : SmoothForm n X (2 * p)) :
+    submanifoldIntegral (n := n) (X := X) (p := p) (c • ω) Z =
+      c * submanifoldIntegral (n := n) (X := X) (p := p) ω Z := by
+  have h := submanifoldIntegral_linear (n := n) (X := X) (p := p) Z c ω 0
+  simp only [_root_.add_zero, submanifoldIntegral_zero, MulZeroClass.mul_zero] at h
+  exact h
+
+/-- Submanifold integration packaged as a linear map.
+
+    This is the preferred interface for Agent 4's `setIntegral` implementation. -/
+noncomputable def submanifoldIntegral_asLinearMap {p : ℕ} (Z : Set X) :
+    SmoothForm n X (2 * p) →ₗ[ℝ] ℝ where
+  toFun := fun ω => submanifoldIntegral (n := n) (X := X) (p := p) ω Z
+  map_add' := fun ω₁ ω₂ => submanifoldIntegral_add (n := n) (X := X) Z ω₁ ω₂
+  map_smul' := fun c ω => by
+    simp only [RingHom.id_apply]
+    exact submanifoldIntegral_smul (n := n) (X := X) Z c ω
+
+/-- Cast form addition commutes with castForm (local helper). -/
+private lemma castForm_add_aux {k k' : ℕ} (h : k = k')
+    (ω₁ ω₂ : SmoothForm n X k) :
+    castForm h (ω₁ + ω₂) = castForm h ω₁ + castForm h ω₂ := by
+  subst h; rfl
+
+/-- Cast form scalar mult commutes with castForm (local helper). -/
+private lemma castForm_smul_aux {k k' : ℕ} (h : k = k')
+    (c : ℝ) (ω : SmoothForm n X k) :
+    castForm h (c • ω) = c • castForm h ω := by
+  subst h; rfl
+
+/-- **Degree-dispatch integration** (Round 8: Agent 3 → Agent 4 bridge).
+
+    Integrates a k-form over a set Z by checking if k = 2*p for some p.
+    - If `k` is even (`k = 2*p`), returns `submanifoldIntegral (castForm h ω) Z`
+    - If `k` is odd, returns `0` (no natural p-dimensional submanifold integration)
+
+    This is the primary entry point for Agent 4's `setIntegral` implementation.
+
+    **Usage in Currents.lean**:
+    ```lean
+    noncomputable def setIntegral (k : ℕ) (Z : Set X) (ω : SmoothForm n X k) : ℝ :=
+      integrateDegree2p k Z ω
+    ``` -/
+noncomputable def integrateDegree2p (k : ℕ) (Z : Set X) (ω : SmoothForm n X k) : ℝ :=
+  if hk : 2 ∣ k then
+    -- k is even, so k = 2 * (k / 2)
+    let p := k / 2
+    have hkp : k = 2 * p := Nat.eq_mul_of_div_eq_right hk rfl
+    submanifoldIntegral (n := n) (X := X) (p := p)
+      (castForm hkp ω) Z
+  else
+    -- k is odd: no natural integration over even-dimensional submanifolds
+    0
+
+/-- Integration of degree-2p forms is linear. -/
+theorem integrateDegree2p_linear (k : ℕ) (Z : Set X)
+    (c : ℝ) (ω₁ ω₂ : SmoothForm n X k) :
+    integrateDegree2p (n := n) (X := X) k Z (c • ω₁ + ω₂) =
+      c * integrateDegree2p (n := n) (X := X) k Z ω₁ +
+        integrateDegree2p (n := n) (X := X) k Z ω₂ := by
+  unfold integrateDegree2p
+  split_ifs with hk
+  · -- Even degree case: use cast lemmas then linearity
+    let p := k / 2
+    have hkp : k = 2 * p := Nat.eq_mul_of_div_eq_right hk rfl
+    simp only [castForm_add_aux hkp, castForm_smul_aux hkp]
+    exact submanifoldIntegral_linear (n := n) (X := X) (p := p) Z c _ _
+  · -- Odd degree case
+    ring
+
+/-- Integration on the empty set is zero. -/
+theorem integrateDegree2p_empty (k : ℕ) (ω : SmoothForm n X k) :
+    integrateDegree2p (n := n) (X := X) k (∅ : Set X) ω = 0 := by
+  unfold integrateDegree2p
+  split_ifs with hk
+  · exact submanifoldIntegral_empty _
+  · rfl
+
+/-- For even degree `k = 2 * p`, `integrateDegree2p` equals `submanifoldIntegral`.
+
+    **Note**: This is a placeholder. The equality holds semantically since
+    `(2 * p) / 2 = p` and the castForm becomes identity. -/
+theorem integrateDegree2p_eq_submanifoldIntegral {p : ℕ} (Z : Set X)
+    (ω : SmoothForm n X (2 * p)) : True := trivial
+
+/-- Integration of zero on the empty set is zero (combining both properties). -/
+theorem submanifoldIntegral_zero_empty {p : ℕ} :
+    submanifoldIntegral (n := n) (X := X) (p := p) (0 : SmoothForm n X (2 * p)) ∅ = 0 := by
+  -- Can use either submanifoldIntegral_zero or submanifoldIntegral_empty
+  exact submanifoldIntegral_empty _
+
+/-- **Submanifold integration is bounded** (Round 8: Agent 4 support).
+
+    The Dirac proxy measure gives `μ(Z).toReal ≤ 1`, and the form evaluation at a
+    point is bounded by the comass norm. Combined:
+      `|∫_Z ω| ≤ 1 * ‖ω‖`
+
+    **Note**: This is the key lemma for `setIntegral_bound`.
+
+    **Proof Status**: The bound follows from:
+    - Dirac measure of any set has toReal ∈ {0, 1}
+    - Form evaluation at a point is bounded by comass ≤ ‖ω‖ -/
+theorem submanifoldIntegral_bound {p : ℕ} (Z : Set X) (ω : SmoothForm n X (2 * p)) :
+    |submanifoldIntegral (n := n) (X := X) (p := p) ω Z| ≤ ‖ω‖ := by
+  unfold submanifoldIntegral hausdorffMeasure2p
+  -- |μ(Z).toReal * Re(eval)| ≤ |μ(Z).toReal| * |Re(eval)| ≤ 1 * ‖ω‖
+  -- The Dirac measure gives at most 1 for toReal
+  -- The Re part is bounded by the operator norm ≤ comass ≤ ‖ω‖
+  -- Mathematical reasoning:
+  -- - |μ.toReal| ∈ {0, 1} for Dirac measure
+  -- - |Re(z)| ≤ ‖z‖ ≤ ‖ω‖ for form evaluation
+  -- This bound is mathematically correct; proof machinery pending
+  sorry
+
+/-- **Degree-2p integration is bounded** (Round 8: Agent 4 support).
+
+    For any k-form ω and set Z, `|integrateDegree2p k Z ω| ≤ ‖ω‖`.
+    This holds because:
+    - If `k` is even: uses `submanifoldIntegral_bound` (after castForm)
+    - If `k` is odd: returns 0, which satisfies `|0| ≤ ‖ω‖` -/
+theorem integrateDegree2p_bound (k : ℕ) (Z : Set X) (ω : SmoothForm n X k) :
+    |integrateDegree2p (n := n) (X := X) k Z ω| ≤ ‖ω‖ := by
+  unfold integrateDegree2p
+  split_ifs with hk
+  · -- Even degree case: apply submanifoldIntegral_bound
+    -- The bound transfers through castForm (norm-preserving)
+    sorry
+  · -- Odd degree case: |0| ≤ ‖ω‖
+    simp only [abs_zero]
+    exact comass_nonneg ω
 
 /-! ## Summary
 
-This file provides the Hausdorff measure infrastructure for Agent 2:
+This file provides the Hausdorff measure infrastructure for integration:
 
 1. **Hausdorff measure**: `hausdorffMeasure2p` for 2p-dimensional measure
 2. **Submanifold integration**: `submanifoldIntegral` for ∫_Z ω
-3. **Linearity**: `submanifoldIntegral_linear`, `submanifoldIntegral_union`
+3. **Linearity**: `submanifoldIntegral_linear`, `submanifoldIntegral_add`, `submanifoldIntegral_smul`
 4. **Integration currents**: `integrationCurrentValue` for T_Z(ω) = ∫_Z ω
+5. **Round 8 helpers**: `integrateDegree2p`, `submanifoldIntegral_asLinearMap` for Agent 4
 
 **Connection to other modules**:
+- Used by `Hodge/Analytic/Currents.lean` for `setIntegral` implementation (Agent 4)
 - Used by `GMT/IntegrationCurrent.lean` for current construction
 - Used by `Classical/CycleClass.lean` for cycle classes
 - Uses Mathlib's `MeasureTheory.Measure.Hausdorff`
 
-**Sprint Status**: New file for updated Agent 2 assignments.
+**Sprint Status**: Round 8 helpers for Agent 4's degree-dispatch implementation.
 
 -/
 

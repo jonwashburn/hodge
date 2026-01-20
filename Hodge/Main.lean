@@ -18,7 +18,7 @@ variable {n : ℕ} {X : Type*}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
-  [Nonempty X]
+  [MeasurableSpace X] [Nonempty X]
 
 /-- **The Hodge Conjecture** (Hodge, 1950; Millennium Prize Problem).
     For a smooth projective complex algebraic variety X, every rational Hodge class

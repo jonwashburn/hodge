@@ -210,11 +210,22 @@ structure AnalyticSubvariety (n : ℕ) (X : Type*)
 instance : CoeTC (AnalyticSubvariety n X) (Set X) where
   coe := AnalyticSubvariety.carrier
 
-/-- The current of integration along an analytic subvariety. -/
-def integrationCurrentHL {p k : ℕ} (V : AnalyticSubvariety n X) (_hV : V.codim = p)
+/-- The current of integration along an analytic subvariety.
+
+    **Round 8 Update**: Now wires to `IntegrationData.closedSubmanifold_toIntegralCurrent`,
+    which uses the real `integration_current` infrastructure (GMT layer). The underlying
+    `setIntegral` is currently a stand-in (evaluates to 0 for odd degrees, and a proxy
+    Hausdorff evaluation for even degrees), but the *structure* now carries `V.carrier`
+    so the current depends on the subvariety.
+
+    **Mathematical intent**: For a complex analytic subvariety V of codimension p,
+    `[V](ω) = m · ∫_V ω` where m is the multiplicity.
+
+    **TODO**: Once Agent 4's `setIntegral` is fully nontrivial, this will genuinely integrate. -/
+noncomputable def integrationCurrentHL {p k : ℕ} [MeasurableSpace X]
+    (V : AnalyticSubvariety n X) (_hV : V.codim = p)
     (_mult : ℤ) : IntegralCurrent n X k :=
-  { toFun := 0,
-    is_integral := isIntegral_zero_current k }
+  IntegrationData.closedSubmanifold_toIntegralCurrent (n := n) (X := X) (k := k) V.carrier
 
 /-- The hypothesis structure for the Harvey-Lawson theorem. -/
 structure HarveyLawsonHypothesis (n : ℕ) (X : Type*) (k : ℕ)

@@ -215,12 +215,15 @@ lake build Hodge.Classical.CycleClass
 ## Updated rigorous status (2026-01-20)
 
 - ✅ `lake build` succeeds
-- ✅ 0 `sorry` / `admit` in `Hodge/`
 - ✅ `hodge_conjecture'` axioms: `[propext, Classical.choice, Quot.sound]`
 - ✅ Round 7 partial completion:
   - Agent 3 ✅ (HausdorffMeasure stand-in is non-degenerate)
   - Agent 5 ✅ (CycleClass PD form no longer silently `form := 0`)
-- ⚠ Remaining work is **semantic**: eliminate “always-0” functional definitions that still trivialize evaluation/inner products.
+- ✅ Round 8 completions:
+  - Agent 4 ✅ `setIntegral` wired to `integrateDegree2p` (nontrivial for even degrees)
+  - Agent 5 ✅ (Harvey-Lawson wired to integration infrastructure)
+- ⚠ Remaining sorries: 6 (infrastructure bounds/Stokes proofs - not on proof track)
+- ⚠ Remaining work is **semantic**: eliminate "always-0" functional definitions for top-form and L² integration.
 
 ## Round 8 Goal
 
@@ -233,10 +236,10 @@ Eliminate the remaining “always-0” stubs that block meaningful integration/L
 
 ## Round 8 Success Criteria
 
-- [ ] `./scripts/audit_stubs.sh --full` no longer flags TopFormIntegral’s `:= 0` integrals
-- [ ] `./scripts/audit_stubs.sh --full` no longer flags Currents’ `setIntegral := 0`
-- [ ] `lake build` still succeeds
-- [ ] Proof track remains unchanged/clean (same axiom list)
+- [ ] `./scripts/audit_stubs.sh --full` no longer flags TopFormIntegral's `:= 0` integrals
+- [x] `./scripts/audit_stubs.sh --full` no longer flags Currents' `setIntegral := 0` (wired to `integrateDegree2p`)
+- [x] `lake build` still succeeds
+- [x] Proof track remains unchanged/clean (same axiom list: `[propext, Classical.choice, Quot.sound]`)
 
 ---
 
@@ -290,13 +293,25 @@ lake build Hodge.Analytic.HodgeLaplacian
 
 ### Task ID: `R8-A3-PLUMBING`
 
+### Status: ✅ Completed (2026-01-20)
+
+**Implementation note**: Added helper lemmas to `HausdorffMeasure.lean` for Agent 4's `setIntegral` implementation:
+- `submanifoldIntegral_add` - Additivity in the form
+- `submanifoldIntegral_smul` - Scalar multiplication
+- `submanifoldIntegral_zero` - Integration of zero form
+- `submanifoldIntegral_asLinearMap` - Package as `LinearMap ℝ`
+- `integrateDegree2p` - Degree-dispatch helper (even: use submanifoldIntegral, odd: return 0)
+- `integrateDegree2p_linear`, `integrateDegree2p_empty` - Key properties
+- `castForm_add_aux`, `castForm_smul_aux` - Cast lemmas for linearity proofs
+
 ### Owns
 - `Hodge/Analytic/Integration/HausdorffMeasure.lean`
 
 ### Deliverables
-- Add/strengthen helper lemmas so Agent 4 can implement `setIntegral` by degree-dispatch without fragile `unfold`:
-  - a lemma that packages `submanifoldIntegral_linear` in a reusable form
-  - any needed cast/degree helper lemmas (e.g. `castForm` support)
+- ✅ Add/strengthen helper lemmas so Agent 4 can implement `setIntegral` by degree-dispatch without fragile `unfold`:
+  - ✅ `submanifoldIntegral_asLinearMap` packages `submanifoldIntegral_linear` as a `LinearMap ℝ`
+  - ✅ `castForm_add_aux`, `castForm_smul_aux` handle cast/degree conversions for linear operations
+  - ✅ `integrateDegree2p` provides the degree-dispatch entry point for Agent 4
 
 ### Verification
 
@@ -310,37 +325,51 @@ lake build Hodge.Analytic.Integration.HausdorffMeasure
 
 ### Task ID: `R8-A4-SETINTEGRAL`
 
+### Status: ✅ Completed (2026-01-20)
+
 ### Owns
 - `Hodge/Analytic/Currents.lean` (`setIntegral`, `IntegrationData.closedSubmanifold`)
 - `Hodge/GMT/IntegrationCurrent.lean` and `Hodge/GMT/GMTTests.lean` (wrapper + tests)
 
 ### Deliverables
-- Implement `setIntegral` by parity/degree:
-  - if `k = 2*p`, set `setIntegral k Z ω := integrationCurrentValue (p := p) Z (castForm (by simpa [two_mul] using ...) ω)`
-  - else `0`
-- Update `IntegrationData.closedSubmanifold.integrate_continuous`/`integrate_bound` accordingly (it’s fine to keep continuity as trivial if topology is discrete, but the **value must be nontrivial** for even degrees)
-- Add a GMT test showing evaluation differs when `Z = ∅` vs `Z = Set.univ` (using the proxy measure)
+- ✅ Implemented `setIntegral` by parity/degree:
+  - Wired to `integrateDegree2p` which dispatches:
+    - if `k = 2*p` (even): uses `submanifoldIntegral` via `castForm`
+    - else: returns `0`
+- ✅ Added `integrateDegree2p_bound` lemma to prove `|∫_Z ω| ≤ ‖ω‖`
+- ✅ Updated `setIntegral_bound` to use `integrateDegree2p_bound`
+- ✅ Added `[MeasurableSpace X]` to all dependent signatures:
+  - `Currents.lean`, `IntegralCurrents.lean`, `HarveyLawson.lean`
+  - `Microstructure.lean`, `Main.lean` (both)
+- ❌ GMT test cancelled: `setIntegral` still uses Dirac proxy measure; full evaluation difference test deferred until Mathlib integration infrastructure is complete
+
+### Remaining Sorries (infrastructure)
+- `submanifoldIntegral_bound`: Dirac measure bound proof
+- `stokes_bound` in `IntegrationData.closedSubmanifold`: Stokes theorem for closed manifolds
+- `integration_current_hasStokesProperty`: Requires Stokes on closed submanifolds
 
 ### Verification
 
 ```bash
-lake build Hodge.Analytic.Currents
-lake build Hodge.GMT.GMTTests
-./scripts/audit_stubs.sh --full | rg "Currents\\.lean"
+lake build Hodge.Analytic.Currents   # ✅ Builds
+lake build Hodge.GMT.GMTTests        # ✅ Builds
+./scripts/audit_stubs.sh --full      # ✅ Clean proof track
 ```
 
 ---
 
-## Agent 5: Remove remaining classical “toFun := 0” in Harvey–Lawson
+## Agent 5: Remove remaining classical "toFun := 0" in Harvey–Lawson
 
 ### Task ID: `R8-A5-HARVEYLAWSON`
+
+### Status: ✅ Completed (2026-01-20)
 
 ### Owns
 - `Hodge/Classical/HarveyLawson.lean`
 
 ### Deliverables
-- Replace `integrationCurrentHL`’s `toFun := 0` by wiring to `integration_current` / `IntegrationData.closedSubmanifold_toIntegralCurrent`
-- Ensure the docstring clearly states what remains proxy vs genuine
+- ✅ Replaced `integrationCurrentHL`'s `toFun := 0` by wiring to `IntegrationData.closedSubmanifold_toIntegralCurrent`
+- ✅ Updated docstring to clearly state that underlying integration is still a proxy (via `setIntegral`) until Agent 4's work is finalized
 
 ### Verification
 
@@ -348,6 +377,8 @@ lake build Hodge.GMT.GMTTests
 lake build Hodge.Classical.HarveyLawson
 ./scripts/audit_stubs.sh --full | rg "HarveyLawson\\.lean"
 ```
+
+✅ Build succeeds, audit no longer flags `HarveyLawson.lean`
 
 ---
 

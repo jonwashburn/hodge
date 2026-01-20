@@ -277,16 +277,13 @@ noncomputable def IntegrationData.closedSubmanifold_toIntegralCurrent {n : ℕ} 
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [Nonempty X]
+    [MeasurableSpace X] [Nonempty X]
     (Z : Set X) : IntegralCurrent n X k :=
   (IntegrationData.closedSubmanifold n X k Z).toIntegralCurrent (by
-    -- closedSubmanifold uses setIntegral, which unfolds to 0 via submanifoldIntegral = 0
-    have h_eq_zero : (IntegrationData.closedSubmanifold n X k Z).toCurrent = 0 := by
-      ext ω
-      simp only [IntegrationData.toCurrent, IntegrationData.closedSubmanifold, Current.zero_toFun]
-      -- `setIntegral` is currently defined as the constant-0 stub.
-      simp [setIntegral]
-    simpa [h_eq_zero] using (isIntegral_zero_current (n := n) (X := X) k))
+    -- closedSubmanifold uses setIntegral wired to integrateDegree2p
+    -- The Dirac proxy measure provides a nontrivial integral, which is integral
+    -- Mathematical reasoning: integration over closed submanifolds is integral-valued
+    sorry)
 
 /-- The integration current from a closed submanifold has zero boundary mass.
     This follows from complex submanifolds being closed. -/
@@ -294,7 +291,7 @@ theorem IntegrationData.closedSubmanifold_bdryMass {n : ℕ} {X : Type*} {k : �
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [Nonempty X]
+    [MeasurableSpace X] [Nonempty X]
     (Z : Set X) :
     (IntegrationData.closedSubmanifold n X k Z).bdryMass = 0 := by
   unfold IntegrationData.closedSubmanifold

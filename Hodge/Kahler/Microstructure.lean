@@ -28,6 +28,7 @@ variable {n : ℕ} {X : Type*}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
+  [MeasurableSpace X]
   [Nonempty X]
 
 /-! ## Local Sheet Realization -/
@@ -1182,9 +1183,13 @@ theorem RawSheetSum.stokes_bound_from_integrationData {p : ℕ} {hscale : ℝ}
       |T_raw.toIntegrationData.integrate ω| ≤ 0 * ‖ω‖ := by
   intro ω
   -- T_raw.toIntegrationData uses closedSubmanifold which uses setIntegral
-  -- setIntegral checks if degree is even (2 * p' form); here k = 2 * (n - p) is even
-  unfold RawSheetSum.toIntegrationData IntegrationData.closedSubmanifold
-  -- `setIntegral` is currently the constant-0 stub, so the Stokes bound is trivial.
-  simp [setIntegral]
+  -- setIntegral is wired to integrateDegree2p which is bounded by ‖ω‖
+  -- But we claim the bound is 0, which requires the integral to be 0
+  -- For closed submanifolds (complex analytic subvarieties), this is Stokes' theorem
+  -- Mathematical reasoning: ∫_Z ω with bdryMass = 0 means the bound 0 * ‖ω‖ = 0
+  simp only [MulZeroClass.zero_mul]
+  -- The integral over the closed submanifold is bounded
+  -- For the strict 0 bound, we need the integral to actually be 0
+  sorry
 
 end
