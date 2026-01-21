@@ -26,7 +26,8 @@ namespace Hodge.GMT
 variable {n : ℕ} {X : Type*}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-  [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+  [ProjectiveComplexManifold n X] [KahlerManifold n X]
+  [MeasurableSpace X] [Nonempty X]
 
 /-- Integration current in degree `k` over a set `Z`.
 
@@ -45,9 +46,13 @@ noncomputable abbrev integrationCurrent (p : ℕ) (Z : Set X) : DeRhamCurrent n 
 theorem integrationCurrentK_empty (k : ℕ) :
     integrationCurrentK (n := n) (X := X) k (∅ : Set X) = (0 : DeRhamCurrent n X k) := by
   ext ω
-  -- closedSubmanifold uses setIntegral → submanifoldIntegral → μ(∅) = 0
-  simp [integrationCurrentK, _root_.integration_current, IntegrationData.toCurrent,
-    IntegrationData.closedSubmanifold, setIntegral, Current.zero_toFun]
+  -- closedSubmanifold uses setIntegral → integrateDegree2p → submanifoldIntegral → μ(∅) = 0
+  unfold integrationCurrentK _root_.integration_current IntegrationData.toCurrent
+    IntegrationData.closedSubmanifold
+  simp only [Current.zero_toFun]
+  -- Goal: setIntegral k ∅ ω = 0
+  unfold setIntegral
+  exact integrateDegree2p_empty k ω
 
 /-- Integration current of the empty set is zero (codimension-form). -/
 theorem integrationCurrent_empty (p : ℕ) :

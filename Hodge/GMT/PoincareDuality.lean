@@ -39,7 +39,8 @@ At the moment both stages are placeholders, so this returns `0`. -/
 noncomputable def poincareDualForm_construct_fromCurrent {n : ℕ} {X : Type*} {p : ℕ}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [Nonempty X]
     (Z : Set X) : SmoothForm n X (2 * p) :=
   regularizeCurrentToForm (n := n) (X := X) (k := 2 * p)
     (integrationCurrent (n := n) (X := X) p Z)

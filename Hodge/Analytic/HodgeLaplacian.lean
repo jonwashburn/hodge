@@ -5,6 +5,7 @@ Authors: Agent 2 (Integration Theory)
 -/
 import Hodge.Analytic.Forms
 import Hodge.Analytic.Norms
+import Hodge.Analytic.Integration.HausdorffMeasure
 import Hodge.Basic
 import Hodge.Cohomology.Basic
 

@@ -1,8 +1,20 @@
 # Remaining Work for a Full Hodge Proof (No Stubs)
 
-**Last Updated**: 2026-01-10  
+**Last Updated**: 2026-01-21 (by Agent 3, R10-A3-VERIFY)  
 **Status**: The proof-track for `hodge_conjecture'` is currently **sorry-free and axiom-free** (only depends on `propext`, `Classical.choice`, `Quot.sound`).  
 **Goal**: Replace all stub definitions with real mathematical implementations.
+
+## Current Verification (2026-01-21)
+
+```bash
+$ lake env lean Hodge/Utils/DependencyCheck.lean
+'hodge_conjecture' depends on axioms: [propext, Classical.choice, Quot.sound]
+'hodge_conjecture'' depends on axioms: [propext, Classical.choice, Quot.sound]
+```
+
+**Quarantined Sorries** (off proof-track):
+- `Hodge/Analytic/Currents.lean:1007` - Stokes theorem classical pillar
+- `Hodge/Kahler/Microstructure.lean:1206` - Integration current mass bound
 
 ---
 

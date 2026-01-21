@@ -21,7 +21,8 @@ universe u
 variable {n : ℕ} {X : Type u}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-  [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+  [ProjectiveComplexManifold n X] [KahlerManifold n X]
+  [MeasurableSpace X] [Nonempty X]
 
 /-! ## Basic smoke tests -/
 
@@ -57,10 +58,10 @@ example (p : ℕ) (Z : Set X) : SmoothForm n X (2 * p) :=
 example (k : ℕ) (Z : Set X) :
     (IntegrationData.closedSubmanifold n X k Z).carrier = Z := rfl
 
--- Test 7: setIntegral is currently the constant-0 stub
--- (Agent 4 owns upgrading this once measure layer is non-degenerate)
+-- Test 7: setIntegral is now wired to integrateDegree2p (Round 8)
+-- For odd k, integrateDegree2p returns 0; for even k, it integrates via submanifoldIntegral
 example (k : ℕ) (Z : Set X) (ω : SmoothForm n X k) :
-    setIntegral (n := n) (X := X) k Z ω = 0 := rfl
+    setIntegral (n := n) (X := X) k Z ω = integrateDegree2p (n := n) (X := X) k Z ω := rfl
 
 -- Test 8: integration current of a set Z uses setIntegral
 -- (This is the key Round 7 deliverable: currents now depend on Z via closedSubmanifold)
