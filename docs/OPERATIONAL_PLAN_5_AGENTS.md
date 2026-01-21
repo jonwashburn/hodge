@@ -895,13 +895,29 @@ Complete remaining stub eliminations and polish the codebase:
 2. `KählerCalibration.form := 0` → use `kahlerPow` (Wirtinger form)
 3. Clean up any remaining `:= 0` stubs in secondary files
 
+## Round 11 Progress
+
+| Agent | Task | Status |
+|-------|------|--------|
+| Agent 1 | R11-A1-CALIBRATION | ⏳ Pending |
+| Agent 2 | R11-A2-L2 | ⏳ Pending |
+| Agent 3 | R11-A3-SHEAF | ✅ Complete - NOT a stub |
+| Agent 4 | R11-A4-MANIFOLDFORMS | ✅ Complete - Documented |
+| Agent 5 | R11-A5-INTEGRALCURRENTS | ✅ Complete - NOT a stub |
+
+### Key Finding
+
+Agents 3, 4, 5 discovered that most `:= 0` patterns are **correct mathematical definitions**:
+- Zero forms, zero currents, zero morphisms are genuine mathematical objects
+- Only `L2InnerProduct` and `KählerCalibration.form` are actual semantic stubs
+
 ## Round 11 Success Criteria
 
 - [ ] `L2InnerProduct` is NOT definitionally 0
 - [ ] `KählerCalibration.form` is NOT definitionally 0
-- [ ] `lake build` still succeeds
-- [ ] Proof track axioms unchanged
-- [ ] All tests pass
+- [x] `lake build` still succeeds
+- [x] Proof track axioms unchanged
+- [x] All tests pass
 
 ---
 
@@ -1057,6 +1073,87 @@ $ lake env lean Hodge/Utils/DependencyCheck.lean
 
 The `toFun := 0` in `zero_int` is **not a stub** - it's the correct definition of the
 zero current. The docstring now explicitly clarifies this distinction.
+
+---
+
+# ROUND 12 ASSIGNMENTS (Current - EXPANSION & POLISH)
+
+## Round 12 Goal
+
+With core proof complete and most "stubs" identified as correct definitions:
+1. Complete remaining actual stubs (Agent 1: Calibration, Agent 2: L2)
+2. Expand test coverage
+3. Add more docstrings and mathematical commentary
+4. Performance optimization review
+
+---
+
+## Agent 3: Expand Test Coverage
+
+### Task ID: `R12-A3-TESTS`
+
+### Status: ⏳ Pending
+
+### Owns
+- `Hodge/Tests/` directory
+
+### Deliverables
+1. Add tests for `KählerCalibration` when Agent 1 completes
+2. Add tests for edge cases in integration infrastructure
+3. Add negative tests (ensure invalid inputs are rejected)
+4. Document test coverage in `docs/TEST_COVERAGE.md`
+
+### Verification
+
+```bash
+lake build Hodge.Tests.MasterTests
+```
+
+---
+
+## Agent 4: Mathematical Commentary
+
+### Task ID: `R12-A4-COMMENTARY`
+
+### Status: ⏳ Pending
+
+### Owns
+- Docstrings across all major files
+
+### Deliverables
+1. Review and enhance docstrings in key files:
+   - `Hodge/Kahler/Main.lean` (main theorem)
+   - `Hodge/Kahler/Microstructure.lean` (SYR construction)
+   - `Hodge/Classical/HarveyLawson.lean`
+2. Add references to mathematical literature
+3. Explain proof strategy in comments
+
+### Verification
+
+All key theorems have comprehensive docstrings with references.
+
+---
+
+## Agent 5: Build Performance
+
+### Task ID: `R12-A5-PERF`
+
+### Status: ⏳ Pending
+
+### Owns
+- Build system configuration
+
+### Deliverables
+1. Profile `lake build` to identify slow files
+2. Document build times in `docs/BUILD_PERFORMANCE.md`
+3. Identify opportunities for parallelization
+4. Consider splitting large files if beneficial
+
+### Verification
+
+```bash
+time lake build
+```
 
 ---
 
