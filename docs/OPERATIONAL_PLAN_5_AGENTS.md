@@ -1242,7 +1242,7 @@ The proof is complete. All major work is done. Round 13 focuses on:
 |-------|------|--------|
 | Agent 1 | R11-A1-CALIBRATION (continued) | ⏳ Pending |
 | Agent 2 | R11-A2-L2 (continued) | ⏳ Pending |
-| Agent 3 | R13-A3-REVIEW | ⏳ Pending |
+| Agent 3 | R13-A3-REVIEW | ✅ Complete (2026-01-21) |
 | Agent 4 | R13-A4-RELEASE | ✅ Complete |
 | Agent 5 | R13-A5-CLEANUP | ⏳ Pending |
 
@@ -1252,16 +1252,16 @@ The proof is complete. All major work is done. Round 13 focuses on:
 
 ### Task ID: `R13-A3-REVIEW`
 
-### Status: ⏳ Pending
+### Status: ✅ Complete (2026-01-21)
 
 ### Owns
 - Overall code quality
 
 ### Deliverables
-1. Review all files modified in Round 10-12
-2. Check for any remaining TODO comments
-3. Verify all docstrings are complete
-4. Report any issues found
+1. ✅ Review all files modified in Round 10-12
+2. ✅ Check for any remaining TODO comments
+3. ✅ Verify all docstrings are complete
+4. ✅ Report any issues found (`docs/CODE_REVIEW_R13.md`)
 
 ### Verification
 
@@ -1287,7 +1287,7 @@ grep -rn "TODO\|FIXME\|XXX" Hodge/ --include="*.lean" | wc -l
    - Test suite
    - Documentation completeness
 2. ✅ Verify all checklist items pass
-3. ⏳ Tag release candidate (pending build fix)
+3. ⏳ Tag release candidate (unblocked; pending tag decision)
 
 ### Implementation Notes
 
@@ -1301,9 +1301,13 @@ Created comprehensive `docs/RELEASE_CHECKLIST.md` with 44 verification items cov
 - Version control checks
 - Final verification commands
 
-**Build Issue Noted**: `LeibnizRule.lean` has a pre-existing compilation error
-(`unknown constant 'LeibnizRule.mfderiv_wedge_apply'`). This blocks full build
-verification but is not related to round 13 changes.
+**Build Issue Resolved**: `Hodge/Analytic/Advanced/LeibnizRule.lean` now compiles again.
+The earlier failure was caused by a heartbeat timeout preventing `mfderiv_wedge_apply` from
+being defined, which then surfaced downstream as an “unknown constant” error.
+
+Fix applied:
+- Increased local heartbeat budget around `mfderiv_wedge_apply`
+- Inlined the derivative calculation inside `extDerivAt_wedge` to avoid fragile dependency
 
 ### Verification
 
@@ -1326,7 +1330,7 @@ ls docs/RELEASE_CHECKLIST.md  # File exists ✅
 1. Remove any unused imports
 2. Clean up any temporary/debug code
 3. Verify .gitignore is complete
-4. Archive old session files if needed
+4. ✅ Archive old session files if needed (`archive/sessions/`)
 
 ### Verification
 

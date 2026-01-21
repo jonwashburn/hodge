@@ -1,4 +1,4 @@
-import Hodge
+import Hodge.Main
 
 /-!
 # Dependency Check Utility
