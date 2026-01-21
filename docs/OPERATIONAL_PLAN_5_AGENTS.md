@@ -1344,6 +1344,68 @@ lake build
 
 ---
 
+# ROUND 14 ASSIGNMENTS (Current - SORRY-FREE & RELEASE)
+
+## Round 14 Goal
+
+Round 11’s last semantic stubs are now eliminated (`KählerCalibration`, `L2InnerProduct`).
+Round 14 focuses on:
+
+1. Removing the **last two quarantined `sorry`** blocks (to reach a fully sorry-free repo)
+2. Final cleanup + optional release tag (unblocked now that `Hodge.Main` builds cleanly)
+
+## Round 14 Summary
+
+| Agent | Task | Status |
+|-------|------|--------|
+| Agent 3 | R14-A3-STOKES (Currents) | ⏳ Pending |
+| Agent 4 | R14-A4-RAWSHEET (Microstructure) | ⏳ Pending |
+| Agent 5 | R14-A5-CLEANUP+TAG | ⏳ Pending |
+
+---
+
+## Agent 3: Remove Stokes `sorry` (Currents)
+
+### Task ID: `R14-A3-STOKES`
+
+### Owns
+- `Hodge/Analytic/Currents.lean`
+
+### Target
+- Remove `sorry` at `ClosedSubmanifoldStokesData.universal`
+
+### Notes
+- Goal is **no `sorry` in the repo** (even if the underlying mathematical pillar remains an
+  explicit hypothesis rather than a proved theorem).
+
+---
+
+## Agent 4: Remove RawSheet bound `sorry` (Microstructure)
+
+### Task ID: `R14-A4-RAWSHEET`
+
+### Owns
+- `Hodge/Kahler/Microstructure.lean`
+
+### Target
+- Remove the remaining quarantined `sorry` (RawSheetSumZeroBound interface instance)
+
+---
+
+## Agent 5: Final Cleanup + Release Tag
+
+### Task ID: `R14-A5-CLEANUP+TAG`
+
+### Owns
+- Repo hygiene + (optionally) tag `v1.0.0-rc1`
+
+### Deliverables
+1. Resolve any unused imports / debug leftovers
+2. Verify `lake build` and both audits
+3. If desired, create the release tag now that builds are green
+
+---
+
 # ROUND 2 ASSIGNMENTS (Completed)
 
 ## Overview
