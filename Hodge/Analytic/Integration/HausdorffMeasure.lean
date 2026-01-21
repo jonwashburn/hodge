@@ -152,18 +152,71 @@ theorem submanifoldIntegral_empty {p : ℕ} (ω : SmoothForm n X (2 * p)) :
     submanifoldIntegral ω ∅ = 0 := by
   simp [submanifoldIntegral]
 
+/-- **Dirac measure toReal is bounded by 1**.
+
+    For any set Z, `(Measure.dirac x Z).toReal ∈ {0, 1}`:
+    - If `x ∈ Z`: `(Measure.dirac x Z) = 1`, so `.toReal = 1`
+    - If `x ∉ Z`: `(Measure.dirac x Z) = 0`, so `.toReal = 0` -/
+private lemma dirac_toReal_le_one (x : X) (Z : Set X) :
+    (Measure.dirac x Z).toReal ≤ 1 := by
+  -- Dirac measure of any set is ≤ 1 (it's either 0 or 1)
+  -- Key fact: (Measure.dirac x Z) ≤ 1 as ENNReal (it's ≤ dirac x univ = 1)
+  have h : (Measure.dirac x Z) ≤ 1 := by
+    calc (Measure.dirac x Z) ≤ (Measure.dirac x Set.univ) :=
+          MeasureTheory.measure_mono (Set.subset_univ Z)
+      _ = 1 := Measure.dirac_apply_of_mem (Set.mem_univ x)
+  calc (Measure.dirac x Z).toReal ≤ (1 : ℝ≥0∞).toReal := ENNReal.toReal_mono (by simp) h
+    _ = 1 := by simp
+
+/-- **Pointwise comass at basepoint bounded by global comass**. -/
+private lemma pointwiseComass_le_norm {k : ℕ} (ω : SmoothForm n X k) :
+    pointwiseComass ω basepoint ≤ ‖ω‖ := by
+  apply le_csSup (comass_bddAbove ω)
+  exact Set.mem_range_self basepoint
+
 /-- Submanifold integration is bounded by the form norm.
 
-    For the Dirac proxy measure, μ(Z).toReal ≤ 1 and form evaluations are bounded
-    by the comass norm, so |∫_Z ω| ≤ 1 * ‖ω‖.
+    For the Dirac proxy measure, `|(μ Z).toReal| ≤ 1` and form evaluations are
+    bounded by the comass norm, so `|∫_Z ω| ≤ ‖ω‖`.
 
-    **Proof Strategy**: Uses the fact that:
-    - μ(Z).toReal ∈ {0, 1} for Dirac measure
-    - |Re(eval)| ≤ pointwiseComass ≤ comass = ‖ω‖
-
-    **Status**: Placeholder `True` while comass bound infrastructure develops. -/
-theorem submanifoldIntegral_abs_le {p : ℕ} (_ω : SmoothForm n X (2 * p)) (_Z : Set X) :
-    True := trivial
+    **Proof**: Uses `|a * b| ≤ |a| * |b| ≤ 1 * ‖ω‖ = ‖ω‖`. -/
+theorem submanifoldIntegral_abs_le {p : ℕ} (ω : SmoothForm n X (2 * p)) (Z : Set X) :
+    |submanifoldIntegral (n := n) (X := X) ω Z| ≤ ‖ω‖ := by
+  unfold submanifoldIntegral hausdorffMeasure2p
+  rw [abs_mul]
+  -- Bound 1: |(Dirac measure).toReal| ≤ 1
+  have h_dirac : |(Measure.dirac basepoint Z).toReal| ≤ 1 := by
+    rw [abs_of_nonneg ENNReal.toReal_nonneg]
+    exact dirac_toReal_le_one basepoint Z
+  -- Bound 2: |Re(eval)| ≤ pointwiseComass ≤ ‖ω‖
+  have h_eval : |Complex.reCLM ((ω.as_alternating basepoint) (standardFrame (2 * p)))| ≤ ‖ω‖ := by
+    have h1 : |Complex.reCLM ((ω.as_alternating basepoint) (standardFrame (2 * p)))| ≤
+        ‖(ω.as_alternating basepoint) (standardFrame (2 * p))‖ := by
+      simp only [Complex.reCLM_apply]
+      exact Complex.abs_re_le_norm _
+    have h2 : ‖(ω.as_alternating basepoint) (standardFrame (2 * p))‖ ≤
+        ‖ω.as_alternating basepoint‖ * ∏ i : Fin (2 * p), ‖standardFrame (n := n) (k := 2 * p) i‖ :=
+      ContinuousMultilinearMap.le_opNorm _ _
+    have h3 : ‖ω.as_alternating basepoint‖ ≤ ‖ω‖ := pointwiseComass_le_norm ω
+    have h_prod_le : ∏ i : Fin (2 * p), ‖standardFrame (n := n) (k := 2 * p) i‖ ≤ 1 := by
+      apply Finset.prod_le_one (fun i _ => norm_nonneg _)
+      intro i _
+      unfold standardFrame
+      split_ifs with hn
+      · simp
+      · simp [EuclideanSpace.norm_single]
+    calc |Complex.reCLM ((ω.as_alternating basepoint) (standardFrame (2 * p)))|
+        ≤ ‖(ω.as_alternating basepoint) (standardFrame (2 * p))‖ := h1
+      _ ≤ ‖ω.as_alternating basepoint‖ * ∏ i : Fin (2 * p), ‖standardFrame (n := n) (k := 2 * p) i‖ := h2
+      _ ≤ ‖ω‖ * ∏ i : Fin (2 * p), ‖standardFrame (n := n) (k := 2 * p) i‖ := by
+          apply mul_le_mul_of_nonneg_right h3 (Finset.prod_nonneg (fun i _ => norm_nonneg _))
+      _ ≤ ‖ω‖ * 1 := by apply mul_le_mul_of_nonneg_left h_prod_le (comass_nonneg _)
+      _ = ‖ω‖ := mul_one _
+  -- Combine
+  calc |(Measure.dirac basepoint Z).toReal| *
+        |Complex.reCLM ((ω.as_alternating basepoint) (standardFrame (2 * p)))|
+      ≤ 1 * ‖ω‖ := mul_le_mul h_dirac h_eval (abs_nonneg _) zero_le_one
+    _ = ‖ω‖ := one_mul _
 
 /-! ## Integration Currents -/
 
@@ -277,6 +330,12 @@ private lemma castForm_smul_aux {k k' : ℕ} (h : k = k')
     castForm h (c • ω) = c • castForm h ω := by
   subst h; rfl
 
+/-- Cast form preserves norm (local helper). -/
+private lemma castForm_norm_eq {k k' : ℕ} (h : k = k')
+    (ω : SmoothForm n X k) :
+    ‖castForm h ω‖ = ‖ω‖ := by
+  subst h; rfl
+
 /-- **Degree-dispatch integration** (Round 8: Agent 3 → Agent 4 bridge).
 
     Integrates a k-form over a set Z by checking if k = 2*p for some p.
@@ -338,43 +397,30 @@ theorem submanifoldIntegral_zero_empty {p : ℕ} :
   -- Can use either submanifoldIntegral_zero or submanifoldIntegral_empty
   exact submanifoldIntegral_empty _
 
-/-- **Submanifold integration is bounded** (Round 8: Agent 4 support).
+/-- **Submanifold integration is bounded** (Round 9: Agent 3).
 
     The Dirac proxy measure gives `μ(Z).toReal ≤ 1`, and the form evaluation at a
-    point is bounded by the comass norm. Combined:
-      `|∫_Z ω| ≤ 1 * ‖ω‖`
+    point is bounded by the comass norm. Combined: `|∫_Z ω| ≤ 1 * ‖ω‖`
 
-    **Note**: This is the key lemma for `setIntegral_bound`.
-
-    **Proof Status**: The bound follows from:
-    - Dirac measure of any set has toReal ∈ {0, 1}
-    - Form evaluation at a point is bounded by comass ≤ ‖ω‖ -/
+    **Mathematical reasoning**:
+    - `|μ.toReal| ∈ {0, 1}` for Dirac measure
+    - `|Re(z)| ≤ ‖z‖ ≤ pointwiseComass ≤ comass = ‖ω‖` -/
 theorem submanifoldIntegral_bound {p : ℕ} (Z : Set X) (ω : SmoothForm n X (2 * p)) :
-    |submanifoldIntegral (n := n) (X := X) (p := p) ω Z| ≤ ‖ω‖ := by
-  unfold submanifoldIntegral hausdorffMeasure2p
-  -- |μ(Z).toReal * Re(eval)| ≤ |μ(Z).toReal| * |Re(eval)| ≤ 1 * ‖ω‖
-  -- The Dirac measure gives at most 1 for toReal
-  -- The Re part is bounded by the operator norm ≤ comass ≤ ‖ω‖
-  -- Mathematical reasoning:
-  -- - |μ.toReal| ∈ {0, 1} for Dirac measure
-  -- - |Re(z)| ≤ ‖z‖ ≤ ‖ω‖ for form evaluation
-  -- This bound is mathematically correct; proof machinery pending
-  sorry
+    |submanifoldIntegral (n := n) (X := X) ω Z| ≤ ‖ω‖ :=
+  submanifoldIntegral_abs_le ω Z
 
-/-- **Degree-2p integration is bounded** (Round 8: Agent 4 support).
-
-    For any k-form ω and set Z, `|integrateDegree2p k Z ω| ≤ ‖ω‖`.
-    This holds because:
-    - If `k` is even: uses `submanifoldIntegral_bound` (after castForm)
-    - If `k` is odd: returns 0, which satisfies `|0| ≤ ‖ω‖` -/
+/-- **Degree-2p integration is bounded** (Round 9).
+    For any k-form ω and set Z, `|integrateDegree2p k Z ω| ≤ ‖ω‖`. -/
 theorem integrateDegree2p_bound (k : ℕ) (Z : Set X) (ω : SmoothForm n X k) :
     |integrateDegree2p (n := n) (X := X) k Z ω| ≤ ‖ω‖ := by
   unfold integrateDegree2p
   split_ifs with hk
-  · -- Even degree case: apply submanifoldIntegral_bound
-    -- The bound transfers through castForm (norm-preserving)
-    sorry
-  · -- Odd degree case: |0| ≤ ‖ω‖
+  · -- Even degree: bound transfers through castForm (norm-preserving)
+    have hkp := Nat.eq_mul_of_div_eq_right hk rfl
+    calc |submanifoldIntegral (n := n) (X := X) (castForm hkp ω) Z|
+        ≤ ‖castForm hkp ω‖ := submanifoldIntegral_bound (n := n) (X := X) Z (castForm hkp ω)
+      _ = ‖ω‖ := castForm_norm_eq hkp ω
+  · -- Odd degree: |0| ≤ ‖ω‖
     simp only [abs_zero]
     exact comass_nonneg ω
 

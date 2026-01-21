@@ -271,19 +271,39 @@ noncomputable def IntegrationData.toIntegralCurrent {n : ℕ} {X : Type*} {k : �
   { toFun := data.toCurrent
     is_integral := h_integral }
 
-/-- IntegrationData for closed submanifolds produces integral currents.
-    Complex submanifolds of compact Kähler manifolds are automatically integral. -/
+/-- **Closed Submanifold Integral Data** (explicit interface).
+
+    This structure bundles the proof that integration currents over closed submanifolds
+    are integral. This is a deep result in geometric measure theory (Federer-Fleming, 1960)
+    that depends on the approximation of rectifiable currents by polyhedral chains.
+
+    **Usage**: Instead of using `sorry` to assert integrality, callers must provide
+    an instance of this structure, making the mathematical assumption explicit.
+
+    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 1960]. -/
+structure ClosedSubmanifoldIntegralData (n : ℕ) (X : Type*) (k : ℕ) (Z : Set X)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [Nonempty X] where
+  /-- The current over Z is integral (can be approximated by polyhedral chains). -/
+  is_integral : isIntegral (IntegrationData.closedSubmanifold n X k Z).toCurrent
+
+/-- IntegrationData for closed submanifolds produces integral currents,
+    given explicit integrality data.
+
+    **Round 9 Update**: Now requires an explicit `ClosedSubmanifoldIntegralData` instance
+    instead of using `sorry`. This makes the deep mathematical assumption explicit.
+
+    Complex submanifolds of compact Kähler manifolds are automatically integral
+    (Federer-Fleming approximation theorem), but this requires substantial GMT machinery. -/
 noncomputable def IntegrationData.closedSubmanifold_toIntegralCurrent {n : ℕ} {X : Type*} {k : ℕ}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [MeasurableSpace X] [Nonempty X]
-    (Z : Set X) : IntegralCurrent n X k :=
-  (IntegrationData.closedSubmanifold n X k Z).toIntegralCurrent (by
-    -- closedSubmanifold uses setIntegral wired to integrateDegree2p
-    -- The Dirac proxy measure provides a nontrivial integral, which is integral
-    -- Mathematical reasoning: integration over closed submanifolds is integral-valued
-    sorry)
+    (Z : Set X) (data : ClosedSubmanifoldIntegralData n X k Z) : IntegralCurrent n X k :=
+  (IntegrationData.closedSubmanifold n X k Z).toIntegralCurrent data.is_integral
 
 /-- The integration current from a closed submanifold has zero boundary mass.
     This follows from complex submanifolds being closed. -/

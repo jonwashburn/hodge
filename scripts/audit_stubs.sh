@@ -67,12 +67,15 @@ echo ""
 
 echo "3. SORRY BLOCKS"
 echo "==============="
-sorry_count=$(grep -rn "sorry" Hodge/ 2>/dev/null | wc -l)
+# NOTE: we only count *actual* `sorry` tactics, not docstring mentions.
+# This avoids noisy false positives like “no sorry statements” in module docs.
+SORRY_RE='^[[:space:]]*sorry([^[:alnum:]_]|$)'
+sorry_count=$(grep -RIn --include="*.lean" -E "$SORRY_RE" Hodge/ 2>/dev/null | wc -l)
 if [ "$sorry_count" -eq 0 ]; then
     echo "✓ No sorry blocks found"
 else
     echo "⚠ Found $sorry_count sorry usage(s):"
-    grep -rn "sorry" Hodge/ 2>/dev/null
+    grep -RIn --include="*.lean" -E "$SORRY_RE" Hodge/ 2>/dev/null
 fi
 echo ""
 
