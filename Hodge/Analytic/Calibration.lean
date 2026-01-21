@@ -37,7 +37,7 @@ In a full development this would be the Wirtinger form \( \omega^p / p! \) toget
 the Wirtinger inequality (comass ≤ 1).
 
 In this repository’s current setup we avoid importing a dedicated Wirtinger inequality
-axiom by **normalizing** the Kähler power by its global comass:
+assumption by **normalizing** the Kähler power by its global comass:
 
   \( \psi_p := \frac{1}{\max(1,\operatorname{comass}(\omega^p))}\,\omega^p \)
 
