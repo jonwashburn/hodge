@@ -232,7 +232,19 @@ structure IntegralCurrent (n : ℕ) (X : Type*) (k : ℕ)
   toFun : Current n X k
   is_integral : isIntegral toFun
 
-/-- The zero integral current. -/
+/-- **The zero integral current** (identity element).
+
+    This is the zero element of the integral current space `IntegralCurrent n X k`.
+    The `toFun := 0` here is **intentionally correct** - it represents the actual
+    zero current, not a placeholder stub.
+
+    **Mathematical Content**:
+    - The zero current evaluates every test form to 0: `[0](ω) = 0`
+    - It is trivially integral (can be approximated by the empty polyhedral chain)
+    - It serves as the identity for addition of currents
+
+    **Note**: This should NOT be confused with placeholder `:= 0` stubs elsewhere
+    in the codebase. This is a genuine mathematical definition. -/
 def zero_int (n : ℕ) (X : Type*) (k : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]

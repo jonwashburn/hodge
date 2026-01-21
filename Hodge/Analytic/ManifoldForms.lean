@@ -11,6 +11,39 @@ import Mathlib.Analysis.InnerProductSpace.PiL2
 import Mathlib.LinearAlgebra.Alternating.DomCoprod
 import Mathlib.LinearAlgebra.TensorProduct.Basic
 
+/-!
+# Smooth Differential Forms on Manifolds (Off Critical Path)
+
+This file provides infrastructure for smooth differential forms on general manifolds,
+using Mathlib's manifold machinery.
+
+## Status: OFF CRITICAL PATH
+
+**This file is NOT on the Hodge proof critical path.**
+
+The main Hodge Conjecture formalization uses `SmoothForm n X k` from `Hodge.Analytic.Forms`,
+which is specialized to complex projective manifolds. This file provides a more general
+manifold-theoretic approach that is kept for reference and future development.
+
+## Intentional Placeholders
+
+Two definitions use `toFun := 0` as placeholders:
+
+1. **`zero`** (line ~44): The zero differential form. This is the **correct** definition
+   of the zero form, not a placeholder.
+
+2. **`smoothExtDeriv`** (line ~135): The exterior derivative. This is an **intentional
+   placeholder** returning `d = 0`. A genuine exterior derivative requires substantial
+   manifold infrastructure (mfderiv-in-charts, Schwarz theorem, etc.) that is not needed
+   for the Hodge proof track.
+
+## Round 11 Documentation (Agent 4)
+
+These stubs have been reviewed and documented as intentional. They do not affect
+the Hodge proof track, which uses `Hodge.Analytic.Forms.smoothExtDeriv` instead.
+
+-/
+
 noncomputable section
 
 open ContinuousAlternatingMap Manifold TensorProduct
@@ -41,6 +74,14 @@ theorem ext {k : ℕ} {ω₁ ω₂ : SmoothDifferentialForm I M k} (h : ∀ x v,
   ext x v
   exact h x v
 
+/-- **The zero differential form**.
+
+    This is the **correct** definition of the zero k-form: it maps every point to
+    the zero alternating map. The `toFun := 0` here is NOT a placeholder - it is
+    the mathematically correct definition.
+
+    **Note**: This is distinct from placeholder stubs like `smoothExtDeriv.toFun := 0`,
+    which represents a "not yet implemented" exterior derivative. -/
 def zero (k : ℕ) : SmoothDifferentialForm I M k where
   toFun := 0
   smooth' := contMDiff_const
@@ -130,6 +171,20 @@ substantial manifold infrastructure (mfderiv-in-charts, Schwarz theorem, etc.).
 For the current project, this file is **not on the critical path** of the Hodge proof, so we use
 the standard placeholder convention: **take `d = 0`**.
 -/
+
+/-- **Exterior derivative (INTENTIONAL PLACEHOLDER)**.
+
+    This definition returns `d ω = 0` for all forms ω. This is an **intentional placeholder**,
+    NOT the correct mathematical definition.
+
+    **Why this is off-path**:
+    - A genuine exterior derivative requires substantial manifold infrastructure
+    - The Hodge proof uses `Hodge.Analytic.Forms.smoothExtDeriv` instead
+    - This file is kept for reference and future development
+
+    **Status**: Documented as intentional placeholder (Round 11, Agent 4).
+
+    See `Hodge.Analytic.Forms.smoothExtDeriv` for the version used in the proof track. -/
 def smoothExtDeriv {k : ℕ} (ω : SmoothDifferentialForm I M k) :
     SmoothDifferentialForm I M (k + 1) where
   toFun := 0

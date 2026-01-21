@@ -955,15 +955,33 @@ grep -n "fun _ _ => 0" Hodge/Analytic/HodgeLaplacian.lean
 
 ### Task ID: `R11-A3-SHEAF`
 
-### Status: ⏳ Pending
+### Status: ✅ Complete (2026-01-21)
 
 ### Owns
 - `Hodge/Analytic/SheafTheory.lean`
 
 ### Deliverables
-1. Review `map _ := 0` stub in SheafTheory.lean
-2. Either implement nontrivially or document as intentional placeholder
-3. Ensure no impact on proof track
+1. ✅ Review `map _ := 0` stub in SheafTheory.lean
+2. ✅ Either implement nontrivially or document as intentional placeholder
+3. ✅ Ensure no impact on proof track
+
+### Implementation Notes
+
+**Finding**: The `map _ := 0` in `trivialModulePresheaf` is **NOT a semantic stub** - it is mathematically correct:
+- The trivial presheaf assigns `PUnit` (zero module) to every open set
+- The zero morphism is the unique module homomorphism between zero modules
+- This satisfies the functor laws (identity and composition)
+- This satisfies the sheaf condition (trivially, since PUnit is terminal)
+
+**Action Taken**: Enhanced the docstring in `trivialModulePresheaf` to clearly document:
+- The `map _ := 0` is intentionally zero, not a placeholder
+- This file is NOT on the proof track for `hodge_conjecture'`
+- No modifications required for stub elimination
+
+**Verification Results**:
+- `lake build Hodge.Analytic.SheafTheory`: ✅ Success
+- `lake env lean Hodge/Utils/DependencyCheck.lean`: ✅ Clean (only standard axioms)
+- `./scripts/audit_stubs.sh --full`: ✅ No new issues
 
 ### Verification
 
@@ -977,20 +995,32 @@ lake build Hodge.Analytic.SheafTheory
 
 ### Task ID: `R11-A4-MANIFOLDFORMS`
 
-### Status: ⏳ Pending
+### Status: ✅ COMPLETE (2026-01-21)
 
 ### Owns
 - `Hodge/Analytic/ManifoldForms.lean`
 
 ### Deliverables
-1. Review `toFun := 0` stubs (lines 45, 135)
-2. Document as intentional placeholders (off critical path)
-3. Add docstrings explaining the stub status
+1. ✅ Reviewed `toFun := 0` stubs (lines 45, 135):
+   - **Line 77 (`zero`)**: This is the **correct definition** of the zero form, NOT a placeholder
+   - **Line 174 (`smoothExtDeriv`)**: This is an **intentional placeholder** (d = 0)
+   
+2. ✅ Documented as intentional placeholders (off critical path):
+   - Added module-level docstring explaining the file is OFF the Hodge proof critical path
+   - Clarified that `Hodge.Analytic.Forms.smoothExtDeriv` is used in the proof track instead
+
+3. ✅ Added docstrings explaining the stub status:
+   - `zero`: Docstring clarifying it's the correct definition, not a placeholder
+   - `smoothExtDeriv`: Docstring marked as "INTENTIONAL PLACEHOLDER" with explanation
 
 ### Verification
 
 ```bash
-lake build Hodge.Analytic.ManifoldForms
+$ lake build Hodge.Analytic.ManifoldForms
+Build completed successfully (2489 jobs).
+
+$ lake env lean Hodge/Utils/DependencyCheck.lean
+'hodge_conjecture' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
 ---
@@ -999,21 +1029,34 @@ lake build Hodge.Analytic.ManifoldForms
 
 ### Task ID: `R11-A5-INTEGRALCURRENTS`
 
-### Status: ⏳ Pending
+### Status: ✅ Completed (2026-01-21)
 
 ### Owns
 - `Hodge/Analytic/IntegralCurrents.lean`
 
 ### Deliverables
-1. Review `toFun := 0` stub (line 241)
-2. This is the zero integral current - verify it's intentional
-3. Add clarifying docstring if needed
+1. ✅ Reviewed `toFun := 0` stub at line 241 (`zero_int` definition)
+2. ✅ Verified: This is the **zero integral current** - the identity element of the current space
+   - Not a placeholder - this is genuine mathematical content
+   - The zero current evaluates every test form to 0
+   - It is trivially integral (empty polyhedral chain approximation)
+3. ✅ Enhanced docstring to clarify this is intentional, not a stub
 
-### Verification
+### Verification Results
 
 ```bash
-lake build Hodge.Analytic.IntegralCurrents
+$ lake build Hodge.Analytic.IntegralCurrents
+Build completed successfully (2664 jobs).
+
+$ lake env lean Hodge/Utils/DependencyCheck.lean
+'hodge_conjecture' depends on axioms: [propext, Classical.choice, Quot.sound]
+'hodge_conjecture'' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
+
+### Conclusion
+
+The `toFun := 0` in `zero_int` is **not a stub** - it's the correct definition of the
+zero current. The docstring now explicitly clarifies this distinction.
 
 ---
 
