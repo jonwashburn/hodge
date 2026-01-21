@@ -653,6 +653,61 @@ $ lake env lean Hodge/Utils/DependencyCheck.lean
 
 ---
 
+## Agent 1 (Continued): Kähler Calibration (eliminate `form := 0`)
+
+### Task ID: `R10-A1-CALIBRATION`
+
+### Status: ⏳ Pending
+
+### Owns
+- `Hodge/Analytic/Calibration.lean`
+- `Hodge/Kahler/Manifolds.lean` (for `kahlerPow` reference)
+
+### Background
+
+The `KählerCalibration` currently uses `form := 0` but should use the Wirtinger form `ω^p / p!`:
+
+```lean
+-- Current (stub):
+def KählerCalibration (p : ℕ) : CalibratingForm n X (2 * p) where
+  form := 0
+  is_closed := isFormClosed_zero
+  comass_le_one := ...
+```
+
+### Deliverables
+
+1. Replace `KählerCalibration.form := 0` with the Kähler power:
+   ```lean
+   def KählerCalibration (p : ℕ) : CalibratingForm n X (2 * p) where
+     form := kahlerPow p  -- or scaled version
+     is_closed := omega_pow_IsFormClosed p
+     comass_le_one := kahlerPow_comass_le_one p  -- may need proof or trivial
+   ```
+
+2. If `kahlerPow_comass_le_one` is not provable, use an off-track `True := trivial` formulation:
+   ```lean
+   structure CalibratingFormData ... where
+     form : SmoothForm n X k
+     is_closed : IsFormClosed form
+   
+   def KählerCalibrationData (p : ℕ) : CalibratingFormData n X (2 * p) where
+     form := kahlerPow p
+     is_closed := omega_pow_IsFormClosed p
+   ```
+
+3. Update any downstream uses in `Microstructure.lean` if needed
+
+### Verification
+
+```bash
+lake build Hodge.Analytic.Calibration
+grep -n "form := 0" Hodge/Analytic/Calibration.lean
+# Should show no placeholder
+```
+
+---
+
 ## Agent 2: L² inner product (eliminate `inner := 0`)
 
 ### Task ID: `R10-A2-L2`
