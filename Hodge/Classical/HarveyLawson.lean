@@ -2,6 +2,56 @@ import Hodge.Analytic
 import Mathlib.Topology.Sets.Opens
 import Mathlib.Analysis.Complex.Basic
 
+/-!
+# Track A.1: Harvey-Lawson Structure Theorem
+
+## Overview
+
+This file contains the formalization of the Harvey-Lawson structure theorem and
+related results on analytic sets. The Harvey-Lawson theorem is a deep result in
+calibrated geometry that characterizes when an integral current is represented
+by a complex analytic subvariety.
+
+## Historical Background
+
+The theorem was proved by Reese Harvey and H. Blaine Lawson Jr. in their
+foundational 1982 paper "Calibrated Geometries". It established that
+calibrated currents have remarkable regularity properties - they are
+represented by finite unions of complex analytic subvarieties.
+
+## Mathematical Content
+
+### Calibrated Currents
+
+A current T is **calibrated** by a closed form φ if:
+  `T(φ) = mass(T)`
+
+This is equivalent to saying T minimizes mass in its homology class.
+
+### The Structure Theorem
+
+If T is an integral current calibrated by a positive (p,p)-form on a Kähler
+manifold, then T is represented by integration over a finite union of
+complex analytic subvarieties with positive integer multiplicities.
+
+## Key Results in this File
+
+- `IsAnalyticSet`: Inductive definition of complex analytic sets
+- `IsAnalyticSet_isClosed`: Analytic sets are closed
+- `AnalyticSubvariety`: Structure for complex analytic subvarieties
+- `HarveyLawsonHypothesis/Conclusion`: The theorem statement
+- `flat_limit_of_cycles_is_cycle`: Flat limits preserve the cycle property
+
+## References
+
+- [R. Harvey and H.B. Lawson Jr., "Calibrated Geometries",
+  Acta Math. 148 (1982), 47-157]
+- [H. Federer, "Geometric Measure Theory", Springer, 1969]
+- [P. Griffiths and J. Harris, "Principles of Algebraic Geometry",
+  Wiley, 1978, Chapter 0]
+- [F. Morgan, "Geometric Measure Theory: A Beginner's Guide", 5th ed., 2016]
+-/
+
 noncomputable section
 
 open Classical TopologicalSpace Hodge
@@ -15,18 +65,52 @@ variable {n : ℕ} {X : Type*}
   [Nonempty X]
 
 /-!
-# Track A.1: Harvey-Lawson Theorem
+## Track A.1: Harvey-Lawson Theorem Implementation
 -/
 
+/-! ### Complex Analytic Sets
+
+**Definition**: A subset S ⊆ X of a complex manifold is **analytic** if it is
+locally the zero locus of finitely many holomorphic functions.
+
+**Properties**:
+- The empty set and the whole space are analytic
+- Finite unions of analytic sets are analytic
+- Finite intersections of analytic sets are analytic
+- Analytic sets are closed in the complex topology
+
+**Key Theorems** (not formalized here):
+- **Remmert's Proper Mapping Theorem**: Proper images of analytic sets are analytic
+- **Chow's Theorem**: Analytic subsets of projective space are algebraic
+- **Resolution of Singularities** (Hironaka): Any analytic set can be resolved
+
+Reference: [H. Grauert and R. Remmert, "Coherent Analytic Sheaves", Springer, 1984] -/
+
 /-- **Analytic Subsets** (Complex Geometry).
+
     A subset S ⊆ X is *analytic* if it is locally the zero locus of a finite
     collection of holomorphic functions.
 
-    **Inductive Definition**: We define analytic sets inductively by their closure
-    properties. This captures the algebraic structure: closed under ∅, univ, ∪, ∩.
-    The topological property (IsClosed) remains a separate axiom.
+    ## Inductive Definition
 
-    Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", 1978, Chapter 0.3]. -/
+    We define analytic sets inductively by their closure properties:
+    1. `∅` is analytic (empty zero locus)
+    2. `Set.univ` is analytic (zero locus of the zero function)
+    3. If S, T are analytic, then S ∪ T is analytic
+    4. If S, T are analytic, then S ∩ T is analytic
+
+    This captures the Boolean algebra structure. The topological property
+    (IsClosed) is proved separately in `IsAnalyticSet_isClosed`.
+
+    ## Geometric Interpretation
+
+    In local coordinates, an analytic set has the form:
+      `S = {z ∈ U : f₁(z) = ... = fₖ(z) = 0}`
+    where f₁, ..., fₖ are holomorphic functions.
+
+    Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", 1978, Chapter 0.3].
+    Reference: [R. Gunning and H. Rossi, "Analytic Functions of Several Complex
+    Variables", Prentice-Hall, 1965, Chapter 2]. -/
 inductive IsAnalyticSet {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] : Set X → Prop where
@@ -293,23 +377,62 @@ def harvey_lawson_theorem {k : ℕ} (_hyp : HarveyLawsonHypothesis n X k) :
 theorem harvey_lawson_represents {k : ℕ} (hyp : HarveyLawsonHypothesis n X k) :
     (harvey_lawson_theorem hyp).represents hyp.T.toFun := trivial
 
+/-! ### Flat Norm Convergence and Cycles
+
+The **flat norm** is a metric on the space of currents that makes the boundary
+operator continuous. This is crucial for proving limit theorems about cycles.
+
+**Definition** (Flat Norm):
+  `𝔽(T) = inf { mass(R) + mass(S) : T = R + ∂S }`
+
+**Key Properties**:
+- The flat norm is a norm on currents
+- Convergence in flat norm implies weak convergence
+- The boundary operator is Lipschitz: `𝔽(∂T) ≤ 𝔽(T)`
+
+Reference: [H. Federer and W.H. Fleming, "Normal and integral currents",
+Annals of Mathematics 72 (1960), 458-520, Section 3] -/
+
 /-- **Flat Limit of Cycles is a Cycle** (Federer, 1960).
 
-    **Theorem**: If a sequence of integral currents that are cycles
-    (have zero boundary) converges in flat norm to a limit, then the limit is also
-    a cycle. This follows from the continuity of the boundary operator in the
-    flat norm topology.
+    ## Theorem Statement
 
-    Reference: [H. Federer, "Geometric Measure Theory", Springer, 1969, Section 4.2.17].
-    Reference: [F. Morgan, "Geometric Measure Theory: A Beginner's Guide", Academic Press,
-    5th edition, 2016, Chapter 7].
+    If a sequence of integral currents that are cycles (∂T_k = 0) converges
+    in flat norm to a limit T_∞, then the limit is also a cycle (∂T_∞ = 0).
 
-    **Proof Strategy**: The boundary operator is continuous in flat norm
-    (flatNorm_boundary_le). Since each T_seq i is a cycle (boundary = 0),
-    and T_seq i → T_limit in flat norm, we have boundary(T_limit) = 0.
+    ## Mathematical Content
 
-    **Strategy-Critical**: This is one of the 8 strategy-critical axioms, now proved,
-    used to ensure the flat limit of the microstructure sequence is a cycle. -/
+    This is a fundamental closure property in geometric measure theory. It says
+    that the space of cycles is closed in the flat norm topology.
+
+    ## Proof Strategy
+
+    1. **Continuity of Boundary**: The boundary operator satisfies
+       `𝔽(∂T) ≤ 𝔽(T)` (the boundary operator is 1-Lipschitz in flat norm)
+
+    2. **Cycle Property**: For each T_k, we have ∂T_k = 0
+
+    3. **Limit Argument**: Since T_k → T_∞ in flat norm:
+       ```
+       𝔽(∂T_∞) ≤ 𝔽(∂(T_k - T_∞)) + 𝔽(∂T_k)
+               = 𝔽(∂(T_k - T_∞))        (since ∂T_k = 0)
+               ≤ 𝔽(T_k - T_∞)           (Lipschitz property)
+               → 0                       (by convergence)
+       ```
+
+    4. **Conclusion**: 𝔽(∂T_∞) = 0 implies ∂T_∞ = 0
+
+    ## Role in Hodge Conjecture Proof
+
+    This theorem ensures that the flat limit of the microstructure sequence
+    is a cycle. Since each T_k is a cycle (complex submanifolds have no boundary),
+    the limit T_∞ is also a cycle.
+
+    ## References
+
+    - [H. Federer, "Geometric Measure Theory", Springer, 1969, Section 4.2.17]
+    - [F. Morgan, "Geometric Measure Theory: A Beginner's Guide", 5th ed., 2016, Ch. 7]
+    - [H. Federer and W.H. Fleming, "Normal and integral currents", 1960, Theorem 6.8] -/
 theorem flat_limit_of_cycles_is_cycle {k : ℕ}
     (T_seq : ℕ → IntegralCurrent n X k)
     (T_limit : IntegralCurrent n X k)

@@ -4,10 +4,12 @@ import Hodge.Kahler.Lefschetz.LefschetzTests
 import Hodge.GMT.GMTTests
 import Hodge.Classical.CycleClass
 import Hodge.Analytic.Integration.TopFormIntegral
+import Hodge.Analytic.Integration.HausdorffMeasure
 import Hodge.Analytic.HodgeLaplacian
+import Hodge.Analytic.Calibration
 
 /-!
-# Master Tests (Round 6, updated Round 10)
+# Master Tests (Round 6, updated Round 12)
 
 This file is a small "integration test harness" that imports all per-agent test files and
 adds a few cross-module typechecking checks.
@@ -18,6 +20,13 @@ It is intended for **build verification**, not for the main proof track.
 - Added tests for `topFormIntegral_real'` being nontrivial
 - Added tests for `L2InnerProduct` status
 - Verified cross-module imports still work
+
+## Round 12 Updates (Agent 3: R12-A3-TESTS)
+- Added tests for integration infrastructure edge cases
+- Added tests for `integrateDegree2p` degree dispatch (even/odd)
+- Added tests for `submanifoldIntegral` linearity and bounds
+- Added tests for CalibratingForm and calibration inequality
+- Added negative tests ensuring proper error handling
 -/
 
 noncomputable section
@@ -108,3 +117,151 @@ example (k : ℕ) (Z : Set X) : Current n X k :=
 -- From HodgeLaplacian: hodgeLaplacian is accessible
 example (hk : 1 ≤ 2) (hk' : 2 + 1 ≤ 2 * n) (ω : SmoothForm n X 2) : SmoothForm n X 2 :=
   hodgeLaplacian hk hk' ω
+
+/-! ## Round 12: Integration Infrastructure Edge Cases (Agent 3: R12-A3-TESTS) -/
+
+section IntegrationEdgeCases
+
+/-! ### Test Suite 1: integrateDegree2p degree dispatch -/
+
+-- Test 9: integrateDegree2p returns 0 for odd degree (no p-dim submanifold integration)
+example (Z : Set X) (ω : SmoothForm n X 3) :
+    integrateDegree2p (n := n) (X := X) 3 Z ω = 0 := by
+  unfold integrateDegree2p
+  split_ifs with h
+  · exfalso; exact (by decide : ¬(2 ∣ 3)) h
+  · rfl
+
+-- Test 10: integrateDegree2p for even degree is defined (type check)
+example (Z : Set X) (ω : SmoothForm n X 4) : ℝ :=
+  integrateDegree2p (n := n) (X := X) 4 Z ω
+
+-- Test 11: integrateDegree2p linearity (Round 8 plumbing)
+example (k : ℕ) (Z : Set X) (c : ℝ) (ω₁ ω₂ : SmoothForm n X k) :
+    integrateDegree2p (n := n) (X := X) k Z (c • ω₁ + ω₂) =
+      c * integrateDegree2p (n := n) (X := X) k Z ω₁ +
+        integrateDegree2p (n := n) (X := X) k Z ω₂ :=
+  integrateDegree2p_linear k Z c ω₁ ω₂
+
+-- Test 12: integrateDegree2p on empty set is zero
+example (k : ℕ) (ω : SmoothForm n X k) :
+    integrateDegree2p (n := n) (X := X) k ∅ ω = 0 :=
+  integrateDegree2p_empty k ω
+
+-- Test 13: integrateDegree2p is bounded by form norm
+example (k : ℕ) (Z : Set X) (ω : SmoothForm n X k) :
+    |integrateDegree2p (n := n) (X := X) k Z ω| ≤ ‖ω‖ :=
+  integrateDegree2p_bound k Z ω
+
+/-! ### Test Suite 2: submanifoldIntegral properties -/
+
+-- Test 14: submanifoldIntegral is additive
+example (p : ℕ) (Z : Set X) (ω₁ ω₂ : SmoothForm n X (2 * p)) :
+    submanifoldIntegral (n := n) (X := X) (ω₁ + ω₂) Z =
+      submanifoldIntegral (n := n) (X := X) ω₁ Z +
+        submanifoldIntegral (n := n) (X := X) ω₂ Z :=
+  submanifoldIntegral_add (n := n) (X := X) Z ω₁ ω₂
+
+-- Test 15: submanifoldIntegral of zero is zero
+example (p : ℕ) (Z : Set X) :
+    submanifoldIntegral (n := n) (X := X) (p := p) (0 : SmoothForm n X (2 * p)) Z = 0 :=
+  submanifoldIntegral_zero Z
+
+-- Test 16: submanifoldIntegral commutes with scalar mult
+example (p : ℕ) (Z : Set X) (c : ℝ) (ω : SmoothForm n X (2 * p)) :
+    submanifoldIntegral (n := n) (X := X) (c • ω) Z =
+      c * submanifoldIntegral (n := n) (X := X) ω Z :=
+  submanifoldIntegral_smul (n := n) (X := X) Z c ω
+
+-- Test 17: submanifoldIntegral is bounded by form norm
+example (p : ℕ) (Z : Set X) (ω : SmoothForm n X (2 * p)) :
+    |submanifoldIntegral (n := n) (X := X) ω Z| ≤ ‖ω‖ :=
+  submanifoldIntegral_bound (n := n) (X := X) Z ω
+
+-- Test 18: submanifoldIntegral_asLinearMap provides a LinearMap interface
+example (p : ℕ) (Z : Set X) :
+    (submanifoldIntegral_asLinearMap (n := n) (X := X) (p := p) Z : SmoothForm n X (2 * p) →ₗ[ℝ] ℝ) =
+      submanifoldIntegral_asLinearMap Z := rfl
+
+/-! ### Test Suite 3: CalibratingForm and Calibration Inequality -/
+
+-- Test 19: KählerCalibration is a CalibratingForm (structure test)
+example (p : ℕ) : CalibratingForm n X (2 * p) :=
+  KählerCalibration p
+
+-- Test 20: KählerCalibration form is closed
+example (p : ℕ) : IsFormClosed (KählerCalibration (n := n) (X := X) p).form :=
+  (KählerCalibration p).is_closed
+
+-- Test 21: KählerCalibration comass ≤ 1
+example (p : ℕ) : comass (KählerCalibration (n := n) (X := X) p).form ≤ 1 :=
+  (KählerCalibration p).comass_le_one
+
+-- Test 22: Calibration inequality: T(ψ) ≤ mass(T) (evaluation is bounded by mass)
+example (k : ℕ) (T : Current n X k) (ψ : CalibratingForm n X k) :
+    T.toFun ψ.form ≤ T.mass :=
+  calibration_inequality T ψ
+
+-- Test 23: Calibration defect is non-negative
+example (k : ℕ) (T : Current n X k) (ψ : CalibratingForm n X k) :
+    calibrationDefect T ψ ≥ 0 :=
+  calibrationDefect_nonneg T ψ
+
+-- Test 24: isCalibrated iff defect is zero
+example (k : ℕ) (T : Current n X k) (ψ : CalibratingForm n X k) :
+    isCalibrated T ψ ↔ calibrationDefect T ψ = 0 :=
+  isCalibrated_iff_defect_zero T ψ
+
+/-! ### Test Suite 4: Negative Tests (Invalid Input Handling) -/
+
+-- Test 25: Odd degree integration returns 0 (not an error)
+-- This is the correct behavior: 2k+1 forms can't integrate over k-dim submanifolds
+example (Z : Set X) (ω : SmoothForm n X 1) :
+    integrateDegree2p (n := n) (X := X) 1 Z ω = 0 := by
+  unfold integrateDegree2p
+  split_ifs with h
+  · exfalso; exact (by decide : ¬(2 ∣ 1)) h
+  · rfl
+
+example (Z : Set X) (ω : SmoothForm n X 5) :
+    integrateDegree2p (n := n) (X := X) 5 Z ω = 0 := by
+  unfold integrateDegree2p
+  split_ifs with h
+  · exfalso; exact (by decide : ¬(2 ∣ 5)) h
+  · rfl
+
+-- Test 26: Integration on empty set always returns 0
+example (p : ℕ) (ω : SmoothForm n X (2 * p)) :
+    submanifoldIntegral (n := n) (X := X) ω ∅ = 0 :=
+  submanifoldIntegral_empty ω
+
+-- Test 27: Zero form integrates to zero (edge case)
+example (p : ℕ) :
+    submanifoldIntegral (n := n) (X := X) (p := p) (0 : SmoothForm n X (2 * p)) ∅ = 0 :=
+  submanifoldIntegral_zero_empty
+
+end IntegrationEdgeCases
+
+/-! ## Round 12: Test Coverage Summary
+
+### Integration Infrastructure (Agent 3)
+- ✅ `integrateDegree2p` degree dispatch (odd → 0, even → submanifoldIntegral)
+- ✅ `integrateDegree2p` linearity, empty set, bounds
+- ✅ `submanifoldIntegral` add, smul, zero, bounds
+- ✅ `submanifoldIntegral_asLinearMap` interface
+
+### Calibration Theory
+- ✅ `KählerCalibration` structure, closedness, comass bound
+- ✅ `calibration_inequality`, `calibrationDefect_nonneg`
+- ✅ `isCalibrated_iff_defect_zero`
+
+### Negative Tests
+- ✅ Odd degree integration returns 0 (correct behavior)
+- ✅ Empty set integration returns 0
+- ✅ Zero form integration returns 0
+
+### Cross-Module
+- ✅ `topFormIntegral_real'` nontriviality
+- ✅ `L2InnerProduct` sesquilinearity
+- ✅ Module imports and type compatibility
+-/
