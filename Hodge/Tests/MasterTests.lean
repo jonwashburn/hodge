@@ -81,10 +81,10 @@ example (η : SmoothForm n X (2 * n)) :
 /-! ## Round 10: L2InnerProduct status tests -/
 
 -- Test 5: L2InnerProduct is defined (structure check)
--- Currently uses L2InnerProductData.trivial (pending Agent 2's R10-A2-L2 task)
+-- Currently uses L2InnerProductData.basepoint (nontrivial proxy)
 example (ω η : SmoothForm n X 2) :
     L2InnerProduct (n := n) (X := X) ω η =
-    (L2InnerProductData.trivial n X 2).inner ω η := rfl
+    (L2InnerProductData.basepoint n X 2).inner ω η := rfl
 
 -- Test 6: L2InnerProduct satisfies sesquilinearity (left-linear)
 example (c : ℂ) (ω₁ ω₂ η : SmoothForm n X 2) :
