@@ -899,7 +899,7 @@ Complete remaining stub eliminations and polish the codebase:
 
 | Agent | Task | Status |
 |-------|------|--------|
-| Agent 1 | R11-A1-CALIBRATION | ⏳ Pending |
+| Agent 1 | R11-A1-CALIBRATION | ✅ Complete (2026-01-21) |
 | Agent 2 | R11-A2-L2 | ⏳ Pending |
 | Agent 3 | R11-A3-SHEAF | ✅ Complete - NOT a stub |
 | Agent 4 | R11-A4-MANIFOLDFORMS | ✅ Complete - Documented |
@@ -914,7 +914,7 @@ Agents 3, 4, 5 discovered that most `:= 0` patterns are **correct mathematical d
 ## Round 11 Success Criteria
 
 - [ ] `L2InnerProduct` is NOT definitionally 0
-- [ ] `KählerCalibration.form` is NOT definitionally 0
+- [x] `KählerCalibration.form` is NOT definitionally 0
 - [x] `lake build` still succeeds
 - [x] Proof track axioms unchanged
 - [x] All tests pass
@@ -925,15 +925,17 @@ Agents 3, 4, 5 discovered that most `:= 0` patterns are **correct mathematical d
 
 ### Task ID: `R11-A1-CALIBRATION`
 
-### Status: ⏳ Pending
+### Status: ✅ Complete (2026-01-21)
 
 ### Owns
 - `Hodge/Analytic/Calibration.lean`
 
 ### Deliverables
-1. Replace `KählerCalibration.form := 0` with `kahlerPow p`
-2. Use `omega_pow_IsFormClosed p` for closedness
-3. For comass bound, either prove or use off-track `True := trivial`
+1. ✅ Replaced `KählerCalibration.form := 0` with a **normalized** Kähler power:
+   - `ψ_p := (1 / max 1 (comass (kahlerPow p))) • kahlerPow p`
+   - This is nontrivial while avoiding a dedicated Wirtinger inequality axiom
+2. ✅ Closedness uses `omega_pow_IsFormClosed p` + `isFormClosed_smul_real`
+3. ✅ Comass bound is proved **by construction** using `comass_smul`
 
 ### Verification
 
@@ -1240,7 +1242,7 @@ The proof is complete. All major work is done. Round 13 focuses on:
 
 | Agent | Task | Status |
 |-------|------|--------|
-| Agent 1 | R11-A1-CALIBRATION (continued) | ⏳ Pending |
+| Agent 1 | R11-A1-CALIBRATION (continued) | ✅ Complete (2026-01-21) |
 | Agent 2 | R11-A2-L2 (continued) | ⏳ Pending |
 | Agent 3 | R13-A3-REVIEW | ✅ Complete (2026-01-21) |
 | Agent 4 | R13-A4-RELEASE | ✅ Complete |

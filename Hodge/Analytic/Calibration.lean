@@ -34,15 +34,58 @@ structure CalibratingForm (n : ℕ) (X : Type*) (k : ℕ)
 /-- The Kähler calibration as a 2p-form.
 
 In a full development this would be the Wirtinger form \( \omega^p / p! \) together with
-the Wirtinger inequality (comass ≤ 1). In this repository’s current stubbed setup, the
-microstructure pipeline is independent of the specific calibrating form, so we use the
-zero form as a minimal calibrating form and avoid keeping a dedicated Wirtinger axiom. -/
+the Wirtinger inequality (comass ≤ 1).
+
+In this repository’s current setup we avoid importing a dedicated Wirtinger inequality
+axiom by **normalizing** the Kähler power by its global comass:
+
+  \( \psi_p := \frac{1}{\max(1,\operatorname{comass}(\omega^p))}\,\omega^p \)
+
+Then `comass ψ_p ≤ 1` holds by construction (using `comass_smul`), and `ψ_p` is closed
+because it is a scalar multiple of a closed form (`omega_pow_IsFormClosed`). -/
 def KählerCalibration (p : ℕ) : CalibratingForm n X (2 * p) where
-  form := 0
-  is_closed := isFormClosed_zero
+  form :=
+    (1 / max 1 (comass (kahlerPow (n := n) (X := X) p))) •
+      kahlerPow (n := n) (X := X) p
+  is_closed := by
+    -- scalar multiples of closed forms are closed
+    apply isFormClosed_smul_real
+    exact omega_pow_IsFormClosed (n := n) (X := X) p
   comass_le_one := by
-    -- comass(0) = 0 ≤ 1
-    simp [comass_zero, zero_le_one]
+    classical
+    -- Let M := max 1 (comass ω^p). Then 0 < M and scaling by 1/M gives comass ≤ 1.
+    set ωp : SmoothForm n X (2 * p) := kahlerPow (n := n) (X := X) p
+    set M : ℝ := max 1 (comass ωp)
+    have hM_nonneg : 0 ≤ M := by
+      -- M ≥ 1 ≥ 0
+      have : (1 : ℝ) ≤ M := by simpa [M] using (le_max_left 1 (comass ωp))
+      linarith
+    have hM_pos : 0 < M := by
+      -- M ≥ 1 > 0
+      have : (1 : ℝ) ≤ M := by simpa [M] using (le_max_left 1 (comass ωp))
+      linarith
+    have hM_ne : M ≠ 0 := ne_of_gt hM_pos
+    have hc_nonneg : 0 ≤ (1 / M) := one_div_nonneg.mpr hM_nonneg
+    -- Also, comass ωp ≤ M by definition of max.
+    have hωp_le : comass ωp ≤ M := by
+      simpa [M] using (le_max_right 1 (comass ωp))
+    -- Prove the bound in ωp/M notation, then rewrite back to the original goal.
+    have hnorm : comass ((1 / M) • ωp) ≤ 1 := by
+      -- Start from comass_smul, then bound by the definition of M = max 1 (comass ωp).
+      calc
+        comass ((1 / M) • ωp)
+            = |(1 / M)| * comass ωp := by
+                simpa using (comass_smul (n := n) (X := X) (k := 2 * p) (c := (1 / M)) ωp)
+        _ = (1 / M) * comass ωp := by
+                -- avoid `simp` side-goals: we already have `0 ≤ 1/M`
+                simpa using congrArg (fun t => t * comass ωp) (abs_of_nonneg hc_nonneg)
+        _ ≤ (1 / M) * M := by
+                exact mul_le_mul_of_nonneg_left hωp_le hc_nonneg
+        _ = 1 := by
+                simpa using (one_div_mul_cancel hM_ne)
+        _ ≤ (1 : ℝ) := le_rfl
+    -- Rewrite the goal’s form into (1/M) • ωp.
+    simpa [ωp, M] using hnorm
 
 /-! ## Calibration and Mass -/
 
