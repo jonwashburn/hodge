@@ -1,4 +1,5 @@
 import Hodge.GMT.Current
+import Hodge.Analytic.Currents
 
 /-!
 # GMT: Integration Currents (wrapper)
@@ -13,6 +14,12 @@ The project's current "integration current" implementation lives in
 
 The underlying integration uses `submanifoldIntegral`, which provides a nontrivial
 stand-in formula using Hausdorff measure and form evaluation at a basepoint.
+
+## Stokes Data Interface
+
+For sets Z where `ClosedSubmanifoldStokesData n X k Z` is available, use
+`realIntegrationCurrentK` to get the actual nontrivial integration current.
+The empty set has a canonical instance: `ClosedSubmanifoldStokesData.empty`.
 -/
 
 noncomputable section
@@ -71,5 +78,43 @@ theorem integrationCurrent_linear (p : ℕ) (Z : Set X) (c : ℝ)
       c * (integrationCurrent (n := n) (X := X) p Z).toFun ω₁ +
         (integrationCurrent (n := n) (X := X) p Z).toFun ω₂ :=
   (integrationCurrent (n := n) (X := X) p Z).is_linear c ω₁ ω₂
+
+/-! ## Real Integration Currents with Stokes Data
+
+These use the actual integration current from `Hodge.Analytic.Currents` when
+the Stokes data is available. The empty set has a canonical instance.
+-/
+
+/-- **Real integration current** using the nontrivial integration infrastructure.
+
+    This requires a `ClosedSubmanifoldStokesData` instance to ensure Stokes' theorem
+    holds for the set Z. The empty set has a canonical instance.
+
+    **Degree**: Returns a current of degree `k + 1` (matching `integration_current`).
+
+    Reference: [Federer, "Geometric Measure Theory", 1969, §4.1.7]. -/
+noncomputable def realIntegrationCurrentK (k : ℕ) (Z : Set X)
+    [ClosedSubmanifoldStokesData n X k Z] : Current n X (Nat.succ k) :=
+  _root_.integration_current (n := n) (X := X) (k := k) Z
+
+/-- Real integration current for the empty set.
+
+    This uses the canonical `ClosedSubmanifoldStokesData.empty` instance. -/
+noncomputable def realIntegrationCurrentK_empty (k : ℕ) : Current n X (Nat.succ k) :=
+  realIntegrationCurrentK (n := n) (X := X) k (∅ : Set X)
+
+/-- The real integration current over the empty set has boundary mass 0. -/
+theorem realIntegrationCurrentK_empty_bdryMass_zero (k : ℕ) :
+    (IntegrationData.closedSubmanifold n X k (∅ : Set X)).bdryMass = 0 := by
+  rfl
+
+/-- Real integration current satisfies Stokes with constant 0. -/
+theorem realIntegrationCurrentK_hasStokesProperty (k : ℕ) (Z : Set X)
+    [hZ : ClosedSubmanifoldStokesData n X k Z] :
+    HasStokesPropertyWith
+      (realIntegrationCurrentK (n := n) (X := X) k Z)
+      0 := by
+  unfold realIntegrationCurrentK
+  exact integration_current_hasStokesProperty (n := n) (X := X) (k := k) Z
 
 end Hodge.GMT
