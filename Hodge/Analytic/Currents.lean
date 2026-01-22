@@ -915,6 +915,28 @@ theorem setIntegral_linear {n : ℕ} {X : Type*} (k : ℕ)
   unfold setIntegral
   exact integrateDegree2p_linear (n := n) (X := X) k Z c ω₁ ω₂
 
+/-- Set integration over the empty set is zero. -/
+@[simp]
+theorem setIntegral_empty {n : ℕ} {X : Type*} (k : ℕ)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [Nonempty X]
+    (ω : SmoothForm n X k) : setIntegral k (∅ : Set X) ω = 0 := by
+  unfold setIntegral
+  exact integrateDegree2p_empty k ω
+
+/-- **Stokes for the empty set**: ∫_∅ dω = 0.
+
+    This is trivially true because any integral over the empty set is zero. -/
+theorem stokes_empty_set {n : ℕ} {X : Type*} (k : ℕ)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [Nonempty X]
+    (ω : SmoothForm n X k) : setIntegral (k + 1) (∅ : Set X) (smoothExtDeriv ω) = 0 :=
+  setIntegral_empty (k + 1) (smoothExtDeriv ω)
+
 /-- Set integration is bounded.
 
     **Round 8 Note**: The bound M=1 works for the Dirac proxy measure:
@@ -934,6 +956,44 @@ theorem setIntegral_bound {n : ℕ} {X : Type*} (k : ℕ)
   calc |integrateDegree2p (n := n) (X := X) k Z ω|
       ≤ ‖ω‖ := integrateDegree2p_bound k Z ω
     _ = 1 * ‖ω‖ := (_root_.one_mul _).symm
+
+/-- **Set integration is continuous** in the product topology.
+
+    Set integration evaluates the form at fixed points and frames, which is
+    continuous in the induced topology from `formWithDeriv`.
+
+    **Proof**: The integration is a composition of:
+    1. ω ↦ ω.as_alternating (continuous by SmoothForm.continuous_as_alternating)
+    2. f ↦ f basepoint (continuous by continuous_apply)
+    3. alt ↦ alt frame (continuous by continuous_apply)
+    4. Continuous linear maps and scalar multiplication -/
+theorem setIntegral_continuous {n : ℕ} {X : Type*} (k : ℕ)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [Nonempty X]
+    (Z : Set X) : Continuous (setIntegral k Z) := by
+  unfold setIntegral integrateDegree2p
+  split_ifs with hk
+  · -- Even degree case: k = 2 * (k / 2)
+    simp only [submanifoldIntegral]
+    apply Continuous.mul continuous_const
+    apply Complex.reCLM.continuous.comp
+    -- Show: Continuous (ω ↦ (castForm _ ω).as_alternating basepoint (standardFrame ...))
+    have h1 : Continuous (fun ω : SmoothForm n X k => ω.as_alternating) :=
+      SmoothForm.continuous_as_alternating
+    have h2 : Continuous (fun f : X → FiberAlt n k => f basepoint) :=
+      continuous_apply basepoint
+    have h3 : Continuous (fun alt : FiberAlt n k => alt (standardFrame (n := n) (k := k))) :=
+      continuous_apply (standardFrame (n := n) (k := k))
+    -- castForm just changes the type annotation
+    have h_cast : ∀ ω : SmoothForm n X k,
+      (castForm (Nat.eq_mul_of_div_eq_right hk rfl) ω).as_alternating = ω.as_alternating := fun ω => by
+        simp only [castForm_as_alternating_eq]
+    simp only [h_cast]
+    exact h3.comp (h2.comp h1)
+  · -- Odd degree case: constant 0
+    exact continuous_const
 
 /-! ## Stokes Property for Closed Submanifolds (Round 9: Agent 4)
 
@@ -974,11 +1034,24 @@ theorem stokes_bound_of_ClosedSubmanifoldStokesData {n : ℕ} {X : Type*} {k : �
   rw [h.stokes_integral_exact_zero ω]
   simp only [abs_zero, le_refl]
 
-/- NOTE (sorry-free): We intentionally do **not** provide a universal instance of
-`ClosedSubmanifoldStokesData`.
+/-- **Stokes instance for the empty set** (proved).
 
-Any development that needs Stokes on a given closed submanifold \(Z\) should assume an
-instance `[ClosedSubmanifoldStokesData n X k Z]`. -/
+    The empty set trivially satisfies the Stokes property because any integral
+    over the empty set is zero. This allows constructing integration currents
+    over the empty set without manual Stokes assumptions. -/
+instance ClosedSubmanifoldStokesData.empty {n : ℕ} {X : Type*} (k : ℕ)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [Nonempty X] :
+    ClosedSubmanifoldStokesData n X k (∅ : Set X) where
+  stokes_integral_exact_zero := stokes_empty_set k
+
+/- NOTE (sorry-free): For non-empty sets, we intentionally do **not** provide a universal
+instance of `ClosedSubmanifoldStokesData` because that would require the full Stokes theorem.
+
+Any development that needs Stokes on a given non-empty closed submanifold \(Z\) should
+assume an instance `[ClosedSubmanifoldStokesData n X k Z]`. -/
 
 /- **Integration Data for Closed Submanifolds**.
     Complex submanifolds of Kähler manifolds have no boundary, so bdryMass = 0.

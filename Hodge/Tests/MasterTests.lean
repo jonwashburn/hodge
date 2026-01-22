@@ -118,6 +118,20 @@ example (k : ℕ) (Z : Set X) [ClosedSubmanifoldStokesData n X k Z] : Current n 
 example (hk : 1 ≤ 2) (hk' : 2 + 1 ≤ 2 * n) (ω : SmoothForm n X 2) : SmoothForm n X 2 :=
   hodgeLaplacian hk hk' ω
 
+/-! ## Stokes Theorem Tests -/
+
+-- Stokes for empty set: ∫_∅ dω = 0 (genuinely proven from definitions)
+example (k : ℕ) (ω : SmoothForm n X k) :
+    setIntegral (n := n) (X := X) (k + 1) ∅ (smoothExtDeriv ω) = 0 :=
+  stokes_empty_set k ω
+
+-- Empty set has canonical Stokes instance (no manual plumbing needed)
+example (k : ℕ) : ClosedSubmanifoldStokesData n X k (∅ : Set X) := inferInstance
+
+-- Integration current for empty set can be constructed automatically
+example (k : ℕ) : Current n X (Nat.succ k) :=
+  _root_.integration_current (n := n) (X := X) (k := k) (∅ : Set X)
+
 /-! ## Round 12: Integration Infrastructure Edge Cases (Agent 3: R12-A3-TESTS) -/
 
 section IntegrationEdgeCases
