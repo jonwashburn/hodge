@@ -71,6 +71,16 @@ without yet having the full restriction-to-submanifold infrastructure. -/
 noncomputable def basepoint : X :=
   Classical.choice (inferInstance : Nonempty X)
 
+/-- Evaluation point for integration over a set Z.
+
+When Z is nonempty, returns a point FROM Z (making integration set-dependent).
+When Z is empty, returns the global basepoint.
+
+This is a key improvement over pure basepoint evaluation: the integral now
+samples the form at a point in the actual integration domain. -/
+noncomputable def evalPointForSet (Z : Set X) : X :=
+  if hZ : Z.Nonempty then hZ.some else basepoint
+
 /-- Hausdorff measure of dimension 2p on X.
 
     This is the correct measure for integrating 2p-forms over p-dimensional
@@ -114,9 +124,10 @@ noncomputable def standardFrame (k : ℕ) : Fin k → TangentModel n :=
 noncomputable def submanifoldIntegral {p : ℕ}
     (ω : SmoothForm n X (2 * p)) (Z : Set X) : ℝ :=
   -- Stand-in for the genuine integral `∫ x ∈ Z, ω|_Z x d(μH[2p])`.
-  -- Takes: (measure of Z) × (evaluation of ω at a fixed basepoint and fixed frame).
+  -- Evaluates ω at a point FROM Z (when Z is nonempty), making integration set-dependent.
+  let evalPt := evalPointForSet Z
   ((hausdorffMeasure2p (X := X) p) Z).toReal *
-    Complex.reCLM ((ω.as_alternating basepoint) (standardFrame (n := n) (k := 2 * p)))
+    Complex.reCLM ((ω.as_alternating evalPt) (standardFrame (n := n) (k := 2 * p)))
 
 /-- Submanifold integration is linear in the form. -/
 theorem submanifoldIntegral_linear {p : ℕ} (Z : Set X)
@@ -129,23 +140,10 @@ theorem submanifoldIntegral_linear {p : ℕ} (Z : Set X)
   simp [submanifoldIntegral, _root_.mul_add, _root_.add_mul]
   ring
 
-/-- Submanifold integration is additive in the set for disjoint sets. -/
-theorem submanifoldIntegral_union {p : ℕ} (ω : SmoothForm n X (2 * p))
-    (Z₁ Z₂ : Set X) (hZ : Disjoint Z₁ Z₂) (hZ₂ : MeasurableSet Z₂)
-    (hμ₁ : (hausdorffMeasure2p (X := X) p) Z₁ ≠ ∞)
-    (hμ₂ : (hausdorffMeasure2p (X := X) p) Z₂ ≠ ∞) :
-    submanifoldIntegral ω (Z₁ ∪ Z₂) =
-      submanifoldIntegral ω Z₁ + submanifoldIntegral ω Z₂ := by
-  classical
-  -- The proxy definition factors through the measure of `Z` and a fixed evaluation of `ω`,
-  -- so additivity reduces to additivity of the measure on disjoint measurable sets.
-  set μ : Measure X := hausdorffMeasure2p (X := X) p
-  have hμ_union : μ (Z₁ ∪ Z₂) = μ Z₁ + μ Z₂ := by
-    -- `measure_union` only needs measurability of the second set.
-    simpa [μ] using (measure_union (μ := μ) hZ hZ₂)
-  -- Rewrite the union measure and finish by ring arithmetic.
-  simp [submanifoldIntegral, μ, hμ_union, ENNReal.toReal_add hμ₁ hμ₂, _root_.mul_add, _root_.add_mul, add_assoc,
-    add_left_comm, add_comm]
+/-! Note: Set additivity (`∫_{Z₁∪Z₂} = ∫_{Z₁} + ∫_{Z₂}`) does NOT hold with set-dependent
+evaluation because `evalPointForSet (Z₁ ∪ Z₂)` may differ from `evalPointForSet Z₁`.
+For genuine Hausdorff integration, additivity would hold via linearity of the integral,
+but the current proxy uses pointwise evaluation which breaks set-additivity. -/
 
 /-- Integration over the empty set is zero. -/
 theorem submanifoldIntegral_empty {p : ℕ} (ω : SmoothForm n X (2 * p)) :
@@ -168,11 +166,16 @@ private lemma dirac_toReal_le_one (x : X) (Z : Set X) :
   calc (Measure.dirac x Z).toReal ≤ (1 : ℝ≥0∞).toReal := ENNReal.toReal_mono (by simp) h
     _ = 1 := by simp
 
+/-- **Pointwise comass at any point bounded by global comass**. -/
+private lemma pointwiseComass_le_norm_at {k : ℕ} (ω : SmoothForm n X k) (x : X) :
+    pointwiseComass ω x ≤ ‖ω‖ := by
+  apply le_csSup (comass_bddAbove ω)
+  exact Set.mem_range_self x
+
 /-- **Pointwise comass at basepoint bounded by global comass**. -/
 private lemma pointwiseComass_le_norm {k : ℕ} (ω : SmoothForm n X k) :
-    pointwiseComass ω basepoint ≤ ‖ω‖ := by
-  apply le_csSup (comass_bddAbove ω)
-  exact Set.mem_range_self basepoint
+    pointwiseComass ω basepoint ≤ ‖ω‖ :=
+  pointwiseComass_le_norm_at ω basepoint
 
 /-- Submanifold integration is bounded by the form norm.
 
@@ -183,21 +186,24 @@ private lemma pointwiseComass_le_norm {k : ℕ} (ω : SmoothForm n X k) :
 theorem submanifoldIntegral_abs_le {p : ℕ} (ω : SmoothForm n X (2 * p)) (Z : Set X) :
     |submanifoldIntegral (n := n) (X := X) ω Z| ≤ ‖ω‖ := by
   unfold submanifoldIntegral hausdorffMeasure2p
+  simp only []  -- Unfold the let binding for evalPt
   rw [abs_mul]
+  -- Let evalPt be the evaluation point for set Z
+  set evalPt : X := evalPointForSet Z with h_evalPt
   -- Bound 1: |(Dirac measure).toReal| ≤ 1
   have h_dirac : |(Measure.dirac basepoint Z).toReal| ≤ 1 := by
     rw [abs_of_nonneg ENNReal.toReal_nonneg]
     exact dirac_toReal_le_one basepoint Z
-  -- Bound 2: |Re(eval)| ≤ pointwiseComass ≤ ‖ω‖
-  have h_eval : |Complex.reCLM ((ω.as_alternating basepoint) (standardFrame (2 * p)))| ≤ ‖ω‖ := by
-    have h1 : |Complex.reCLM ((ω.as_alternating basepoint) (standardFrame (2 * p)))| ≤
-        ‖(ω.as_alternating basepoint) (standardFrame (2 * p))‖ := by
+  -- Bound 2: |Re(eval)| ≤ pointwiseComass ≤ ‖ω‖ (works for ANY point, including evalPt)
+  have h_eval : |Complex.reCLM ((ω.as_alternating evalPt) (standardFrame (2 * p)))| ≤ ‖ω‖ := by
+    have h1 : |Complex.reCLM ((ω.as_alternating evalPt) (standardFrame (2 * p)))| ≤
+        ‖(ω.as_alternating evalPt) (standardFrame (2 * p))‖ := by
       simp only [Complex.reCLM_apply]
       exact Complex.abs_re_le_norm _
-    have h2 : ‖(ω.as_alternating basepoint) (standardFrame (2 * p))‖ ≤
-        ‖ω.as_alternating basepoint‖ * ∏ i : Fin (2 * p), ‖standardFrame (n := n) (k := 2 * p) i‖ :=
+    have h2 : ‖(ω.as_alternating evalPt) (standardFrame (2 * p))‖ ≤
+        ‖ω.as_alternating evalPt‖ * ∏ i : Fin (2 * p), ‖standardFrame (n := n) (k := 2 * p) i‖ :=
       ContinuousMultilinearMap.le_opNorm _ _
-    have h3 : ‖ω.as_alternating basepoint‖ ≤ ‖ω‖ := pointwiseComass_le_norm ω
+    have h3 : ‖ω.as_alternating evalPt‖ ≤ ‖ω‖ := pointwiseComass_le_norm_at ω evalPt
     have h_prod_le : ∏ i : Fin (2 * p), ‖standardFrame (n := n) (k := 2 * p) i‖ ≤ 1 := by
       apply Finset.prod_le_one (fun i _ => norm_nonneg _)
       intro i _
@@ -205,16 +211,16 @@ theorem submanifoldIntegral_abs_le {p : ℕ} (ω : SmoothForm n X (2 * p)) (Z : 
       split_ifs with hn
       · simp
       · simp [EuclideanSpace.norm_single]
-    calc |Complex.reCLM ((ω.as_alternating basepoint) (standardFrame (2 * p)))|
-        ≤ ‖(ω.as_alternating basepoint) (standardFrame (2 * p))‖ := h1
-      _ ≤ ‖ω.as_alternating basepoint‖ * ∏ i : Fin (2 * p), ‖standardFrame (n := n) (k := 2 * p) i‖ := h2
+    calc |Complex.reCLM ((ω.as_alternating evalPt) (standardFrame (2 * p)))|
+        ≤ ‖(ω.as_alternating evalPt) (standardFrame (2 * p))‖ := h1
+      _ ≤ ‖ω.as_alternating evalPt‖ * ∏ i : Fin (2 * p), ‖standardFrame (n := n) (k := 2 * p) i‖ := h2
       _ ≤ ‖ω‖ * ∏ i : Fin (2 * p), ‖standardFrame (n := n) (k := 2 * p) i‖ := by
           apply mul_le_mul_of_nonneg_right h3 (Finset.prod_nonneg (fun i _ => norm_nonneg _))
       _ ≤ ‖ω‖ * 1 := by apply mul_le_mul_of_nonneg_left h_prod_le (comass_nonneg _)
       _ = ‖ω‖ := mul_one _
   -- Combine
   calc |(Measure.dirac basepoint Z).toReal| *
-        |Complex.reCLM ((ω.as_alternating basepoint) (standardFrame (2 * p)))|
+        |Complex.reCLM ((ω.as_alternating evalPt) (standardFrame (2 * p)))|
       ≤ 1 * ‖ω‖ := mul_le_mul h_dirac h_eval (abs_nonneg _) zero_le_one
     _ = ‖ω‖ := one_mul _
 
