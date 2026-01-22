@@ -114,6 +114,16 @@ example (k : ℕ) (Z : Set X) (ω : SmoothForm n X k) : ℝ :=
 example (k : ℕ) (Z : Set X) [ClosedSubmanifoldStokesData n X k Z] : Current n X (Nat.succ k) :=
   _root_.integration_current (n := n) (X := X) (k := k) Z
 
+-- Test: Empty set has canonical ClosedSubmanifoldStokesData instance
+-- (No manual Stokes plumbing needed for ∅!)
+example (k : ℕ) : Current n X (Nat.succ k) :=
+  _root_.integration_current (n := n) (X := X) (k := k) (∅ : Set X)
+
+-- Test: stokes_empty_set proves ∫_∅ dω = 0
+example (k : ℕ) (ω : SmoothForm n X k) :
+    setIntegral (n := n) (X := X) (k + 1) ∅ (smoothExtDeriv ω) = 0 :=
+  stokes_empty_set ω
+
 -- From HodgeLaplacian: hodgeLaplacian is accessible
 example (hk : 1 ≤ 2) (hk' : 2 + 1 ≤ 2 * n) (ω : SmoothForm n X 2) : SmoothForm n X 2 :=
   hodgeLaplacian hk hk' ω
