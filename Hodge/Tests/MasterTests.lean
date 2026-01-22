@@ -110,8 +110,8 @@ example (ω : SmoothForm n X 2) :
 example (k : ℕ) (Z : Set X) (ω : SmoothForm n X k) : ℝ :=
   integrateDegree2p (n := n) (X := X) k Z ω
 
--- From Currents: integration_current is accessible (requires MeasurableSpace)
-example (k : ℕ) (Z : Set X) : Current n X k :=
+-- From Currents: integration_current is accessible (requires explicit Stokes data)
+example (k : ℕ) (Z : Set X) [ClosedSubmanifoldStokesData n X k Z] : Current n X (Nat.succ k) :=
   _root_.integration_current (n := n) (X := X) (k := k) Z
 
 -- From HodgeLaplacian: hodgeLaplacian is accessible

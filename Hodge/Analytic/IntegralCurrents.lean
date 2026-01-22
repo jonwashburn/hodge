@@ -297,7 +297,8 @@ structure ClosedSubmanifoldIntegralData (n : ℕ) (X : Type*) (k : ℕ) (Z : Set
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [Nonempty X] where
+    [MeasurableSpace X] [Nonempty X]
+    [ClosedSubmanifoldStokesData n X k Z] where
   /-- The current over Z is integral (can be approximated by polyhedral chains). -/
   is_integral : isIntegral (IntegrationData.closedSubmanifold n X k Z).toCurrent
 
@@ -314,7 +315,8 @@ noncomputable def IntegrationData.closedSubmanifold_toIntegralCurrent {n : ℕ} 
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [MeasurableSpace X] [Nonempty X]
-    (Z : Set X) (data : ClosedSubmanifoldIntegralData n X k Z) : IntegralCurrent n X k :=
+    (Z : Set X) [ClosedSubmanifoldStokesData n X k Z]
+    (data : ClosedSubmanifoldIntegralData n X k Z) : IntegralCurrent n X (Nat.succ k) :=
   (IntegrationData.closedSubmanifold n X k Z).toIntegralCurrent data.is_integral
 
 /-- The integration current from a closed submanifold has zero boundary mass.
@@ -324,7 +326,7 @@ theorem IntegrationData.closedSubmanifold_bdryMass {n : ℕ} {X : Type*} {k : �
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [MeasurableSpace X] [Nonempty X]
-    (Z : Set X) :
+    (Z : Set X) [ClosedSubmanifoldStokesData n X k Z] :
     (IntegrationData.closedSubmanifold n X k Z).bdryMass = 0 := by
   unfold IntegrationData.closedSubmanifold
   rfl

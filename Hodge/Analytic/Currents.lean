@@ -974,37 +974,54 @@ theorem stokes_bound_of_ClosedSubmanifoldStokesData {n : ℕ} {X : Type*} {k : �
   rw [h.stokes_integral_exact_zero ω]
   simp only [abs_zero, le_refl]
 
-/-- **Universal Stokes Data Instance**.
+/- NOTE (sorry-free): We intentionally do **not** provide a universal instance of
+`ClosedSubmanifoldStokesData`.
 
-    For this formalization, we assume all closed submanifolds satisfy Stokes' theorem.
-    This is mathematically true for:
-    - Complex analytic subvarieties of projective manifolds
-    - Compact submanifolds without boundary
+Any development that needs Stokes on a given closed submanifold \(Z\) should assume an
+instance `[ClosedSubmanifoldStokesData n X k Z]`. -/
 
-    This instance makes the Stokes property available globally without explicit proofs,
-    converting what was previously a `sorry` into an honest assumption.
+/- **Integration Data for Closed Submanifolds**.
+    Complex submanifolds of Kähler manifolds have no boundary, so bdryMass = 0.
+    This gives the Stokes bound |∫_Z dω| ≤ 0 · ‖ω‖ = 0 for free.
 
-    **Note**: This is a "classical pillar" assumption encoded as an instance. -/
-instance ClosedSubmanifoldStokesData.universal {n : ℕ} {X : Type*} {k : ℕ}
+    **Round 8 Implementation**: Wires `integrate` to `setIntegral` which uses
+    `integrateDegree2p` for nontrivial integration on even-degree forms.
+
+    Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", Ch. 0]. -/
+/-- Helper for degree 0 case (no Stokes data needed). -/
+noncomputable def IntegrationData.closedSubmanifold_zero (n : ℕ) (X : Type*)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [MeasurableSpace X] [Nonempty X]
-    (Z : Set X) : ClosedSubmanifoldStokesData n X k Z where
-  stokes_integral_exact_zero := fun ω => by
-    -- This is the mathematical content: ∫_Z dω = 0 for closed Z
-    -- By Stokes' theorem: ∫_Z dω = ∫_∂Z ω = 0 since ∂Z = ∅
-    --
-    -- **Mathematical justification**:
-    -- For closed submanifolds (complex analytic subvarieties of projective manifolds),
-    -- the integral of an exact form vanishes. This is Stokes' theorem.
-    --
-    -- In our Dirac proxy measure model, this corresponds to the fact that
-    -- the pointwise evaluation of dω on a cycle class gives 0.
-    --
-    -- This is a deep geometric fact that we encode as an interface assumption.
-    -- The sorry here represents the "classical pillar" of Stokes' theorem.
-    sorry
+    (Z : Set X) : IntegrationData n X 0 :=
+  { carrier := Z
+    integrate := setIntegral 0 Z
+    integrate_linear := fun c ω₁ ω₂ => setIntegral_linear 0 Z c ω₁ ω₂
+    integrate_continuous := by exact continuous_of_discreteTopology
+    integrate_bound := setIntegral_bound 0 Z
+    bdryMass := 0
+    bdryMass_nonneg := le_refl 0
+    stokes_bound := trivial }
+
+/-- Helper for degree k+1 case (Stokes data required for degree k). -/
+noncomputable def IntegrationData.closedSubmanifold_succ (n : ℕ) (X : Type*) (k : ℕ)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [Nonempty X]
+    (Z : Set X) [hZ : ClosedSubmanifoldStokesData n X k Z] : IntegrationData n X (Nat.succ k) :=
+  { carrier := Z
+    integrate := setIntegral (Nat.succ k) Z
+    integrate_linear := fun c ω₁ ω₂ => setIntegral_linear (Nat.succ k) Z c ω₁ ω₂
+    integrate_continuous := by exact continuous_of_discreteTopology
+    integrate_bound := setIntegral_bound (Nat.succ k) Z
+    bdryMass := 0
+    bdryMass_nonneg := le_refl 0
+    stokes_bound := by
+      intro ω
+      simp only [MulZeroClass.zero_mul]
+      exact stokes_bound_of_ClosedSubmanifoldStokesData (n := n) (X := X) (k := k) Z ω }
 
 /-- **Integration Data for Closed Submanifolds**.
     Complex submanifolds of Kähler manifolds have no boundary, so bdryMass = 0.
@@ -1019,28 +1036,8 @@ noncomputable def IntegrationData.closedSubmanifold (n : ℕ) (X : Type*) (k : �
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [MeasurableSpace X] [Nonempty X]
-    (Z : Set X) : IntegrationData n X k :=
-  -- For closed submanifolds, boundary mass is 0
-  -- Integration uses setIntegral which wires to integrateDegree2p
-  { carrier := Z
-    integrate := setIntegral k Z
-    integrate_linear := fun c ω₁ ω₂ => setIntegral_linear k Z c ω₁ ω₂
-    integrate_continuous := by
-      -- setIntegral = integrateDegree2p which is composition of continuous functions
-      -- For now, accept this as continuous (pending full topology)
-      exact continuous_of_discreteTopology
-    integrate_bound := setIntegral_bound k Z
-    bdryMass := 0  -- Closed submanifolds have no boundary
-    bdryMass_nonneg := le_refl 0
-    stokes_bound := by
-      cases k with
-      | zero => trivial
-      | succ k' =>
-        intro ω
-        -- For closed submanifolds: ∫_Z dω = 0 by Stokes (∂Z = ∅)
-        simp only [MulZeroClass.zero_mul]
-        -- Use the ClosedSubmanifoldStokesData interface (Round 9: Agent 4)
-        exact stokes_bound_of_ClosedSubmanifoldStokesData Z ω }
+    (Z : Set X) [ClosedSubmanifoldStokesData n X k Z] : IntegrationData n X (Nat.succ k) :=
+  IntegrationData.closedSubmanifold_succ n X k Z
 
 /-- The integration current over a closed submanifold has boundary bound 0. -/
 theorem integration_current_closedSubmanifold_bdryMass_zero {n : ℕ} {X : Type*} {k : ℕ}
@@ -1048,9 +1045,8 @@ theorem integration_current_closedSubmanifold_bdryMass_zero {n : ℕ} {X : Type*
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [MeasurableSpace X] [Nonempty X]
-    (Z : Set X) :
+    (Z : Set X) [ClosedSubmanifoldStokesData n X k Z] :
     (IntegrationData.closedSubmanifold n X k Z).bdryMass = 0 := by
-  unfold IntegrationData.closedSubmanifold
   rfl
 
 /-- **Integration Current** (Federer, 1969).
@@ -1072,7 +1068,7 @@ noncomputable def integration_current {n : ℕ} {X : Type*} {k : ℕ}
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [MeasurableSpace X] [Nonempty X]
-    (Z : Set X) : Current n X k :=
+    (Z : Set X) [ClosedSubmanifoldStokesData n X k Z] : Current n X (Nat.succ k) :=
   (IntegrationData.closedSubmanifold n X k Z).toCurrent
 
 /-- Integration current from IntegrationData.
@@ -1169,7 +1165,7 @@ def HasStokesPropertyWith {n : ℕ} {X : Type*} {k : ℕ}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [Nonempty X]
-    (T : Current n X (k + 1)) (M : ℝ) : Prop :=
+    (T : Current n X (Nat.succ k)) (M : ℝ) : Prop :=
   ∀ ω : SmoothForm n X k, |T.toFun (smoothExtDeriv ω)| ≤ M * ‖ω‖
 
 /-- **Stokes Property Implies Boundary Bound** (Federer, 1969).
@@ -1183,7 +1179,7 @@ theorem stokes_property_implies_boundary_bound {n : ℕ} {X : Type*} {k : ℕ}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [Nonempty X]
-    (T : Current n X (k + 1)) (M : ℝ) (hT : HasStokesPropertyWith T M) :
+    (T : Current n X (Nat.succ k)) (M : ℝ) (hT : HasStokesPropertyWith T M) :
     ∃ M' : ℝ, ∀ ω : SmoothForm n X k, |T.toFun (smoothExtDeriv ω)| ≤ M' * ‖ω‖ :=
   ⟨M, hT⟩
 
@@ -1192,7 +1188,7 @@ theorem zero_hasStokesProperty {n : ℕ} {X : Type*} {k : ℕ}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [Nonempty X] :
-    HasStokesPropertyWith (0 : Current n X (k + 1)) 0 := by
+    HasStokesPropertyWith (0 : Current n X (Nat.succ k)) 0 := by
   intro ω
   simp [Current.zero_toFun]
 
@@ -1203,7 +1199,7 @@ theorem add_hasStokesProperty {n : ℕ} {X : Type*} {k : ℕ}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [Nonempty X]
-    (T₁ T₂ : Current n X (k + 1)) (M₁ M₂ : ℝ)
+    (T₁ T₂ : Current n X (Nat.succ k)) (M₁ M₂ : ℝ)
     (h₁ : HasStokesPropertyWith T₁ M₁) (h₂ : HasStokesPropertyWith T₂ M₂) :
     HasStokesPropertyWith (T₁ + T₂) (M₁ + M₂) := by
   intro ω
@@ -1222,7 +1218,7 @@ theorem smul_hasStokesProperty {n : ℕ} {X : Type*} {k : ℕ}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [Nonempty X]
-    (c : ℝ) (T : Current n X (k + 1)) (M : ℝ)
+    (c : ℝ) (T : Current n X (Nat.succ k)) (M : ℝ)
     (hT : HasStokesPropertyWith T M) :
     HasStokesPropertyWith (c • T) (|c| * M) := by
   intro ω
@@ -1253,9 +1249,9 @@ theorem integration_current_hasStokesProperty {n : ℕ} {X : Type*} {k : ℕ}
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [MeasurableSpace X] [Nonempty X]
-    (Z : Set X) :
+    (Z : Set X) [hZ : ClosedSubmanifoldStokesData n X k Z] :
     HasStokesPropertyWith (n := n) (X := X) (k := k)
-      (integration_current (k := k + 1) Z)
+      (integration_current (n := n) (X := X) (k := k) Z)
       (boundaryMass (n := n) (X := X) Z) := by
   -- integration_current uses closedSubmanifold, which has:
   --   integrate = setIntegral (wired to integrateDegree2p)
@@ -1264,9 +1260,11 @@ theorem integration_current_hasStokesProperty {n : ℕ} {X : Type*} {k : ℕ}
   simp only [boundaryMass, MulZeroClass.zero_mul]
   -- Use the ClosedSubmanifoldStokesData interface (Round 9: Agent 4)
   -- integration_current evaluates as setIntegral, so the bound follows from Stokes
-  unfold integration_current IntegrationData.toCurrent IntegrationData.closedSubmanifold
-  simp only
-  exact stokes_bound_of_ClosedSubmanifoldStokesData Z ω
+  -- `integration_current` is `IntegrationData.closedSubmanifold.toCurrent`, so this
+  -- is exactly the `stokes_bound` field of `IntegrationData.closedSubmanifold`.
+  simpa [integration_current, IntegrationData.toCurrent,
+    IntegrationData.closedSubmanifold, IntegrationData.closedSubmanifold_succ]
+    using (IntegrationData.closedSubmanifold (n := n) (X := X) (k := k) Z).stokes_bound ω
 
 /-- **Integration Current Boundary Bound** (Agent 2a).
 
@@ -1284,11 +1282,11 @@ theorem integration_current_boundary_bound {n : ℕ} {X : Type*} {k : ℕ}
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [MeasurableSpace X] [Nonempty X]
-    (Z : Set X) :
+    (Z : Set X) [hZ : ClosedSubmanifoldStokesData n X k Z] :
     ∃ M : ℝ, ∀ ω : SmoothForm n X k,
-      |(integration_current (k := k + 1) Z).toFun (smoothExtDeriv ω)| ≤ M * ‖ω‖ :=
+      |(integration_current (n := n) (X := X) (k := k) Z).toFun (smoothExtDeriv ω)| ≤ M * ‖ω‖ :=
   stokes_property_implies_boundary_bound
-    (integration_current (k := k + 1) Z)
+    (integration_current (n := n) (X := X) (k := k) Z)
     (boundaryMass (n := n) (X := X) Z)
     (integration_current_hasStokesProperty (n := n) (X := X) (k := k) Z)
 
@@ -1308,12 +1306,15 @@ theorem integration_current_sum_boundary_bound {n : ℕ} {X : Type*} {k : ℕ}
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [MeasurableSpace X] [Nonempty X]
-    (Z₁ Z₂ : Set X) :
+    (Z₁ Z₂ : Set X)
+    [hZ₁ : ClosedSubmanifoldStokesData n X k Z₁] [hZ₂ : ClosedSubmanifoldStokesData n X k Z₂] :
     HasStokesPropertyWith (n := n) (X := X) (k := k)
-      ((integration_current (k := k + 1) Z₁) + (integration_current (k := k + 1) Z₂))
+      ((integration_current (n := n) (X := X) (k := k) Z₁) +
+       (integration_current (n := n) (X := X) (k := k) Z₂))
       (boundaryMass (n := n) (X := X) Z₁ + boundaryMass (n := n) (X := X) Z₂) :=
   add_hasStokesProperty
-    (integration_current (k := k + 1) Z₁) (integration_current (k := k + 1) Z₂)
+    (integration_current (n := n) (X := X) (k := k) Z₁)
+    (integration_current (n := n) (X := X) (k := k) Z₂)
     (boundaryMass (n := n) (X := X) Z₁) (boundaryMass (n := n) (X := X) Z₂)
     (integration_current_hasStokesProperty (n := n) (X := X) (k := k) Z₁)
     (integration_current_hasStokesProperty (n := n) (X := X) (k := k) Z₂)
@@ -1325,11 +1326,12 @@ theorem integration_current_smul_boundary_bound {n : ℕ} {X : Type*} {k : ℕ}
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [MeasurableSpace X] [Nonempty X]
-    (c : ℝ) (Z : Set X) :
+    (c : ℝ) (Z : Set X) [hZ : ClosedSubmanifoldStokesData n X k Z] :
     HasStokesPropertyWith (n := n) (X := X) (k := k)
-      (c • (integration_current (k := k + 1) Z))
+      (c • (integration_current (n := n) (X := X) (k := k) Z))
       (|c| * boundaryMass (n := n) (X := X) Z) :=
-  smul_hasStokesProperty c (integration_current (k := k + 1) Z) (boundaryMass (n := n) (X := X) Z)
+  smul_hasStokesProperty c (integration_current (n := n) (X := X) (k := k) Z)
+    (boundaryMass (n := n) (X := X) Z)
     (integration_current_hasStokesProperty (n := n) (X := X) (k := k) Z)
 
 /-! ## Agent 2a Extended: Rectifiable Sets with Boundary Data
