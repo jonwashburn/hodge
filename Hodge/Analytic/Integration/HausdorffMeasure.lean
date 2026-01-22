@@ -71,6 +71,16 @@ without yet having the full restriction-to-submanifold infrastructure. -/
 noncomputable def basepoint : X :=
   Classical.choice (inferInstance : Nonempty X)
 
+/-- Evaluation point for integration over a set Z.
+
+**Key abstraction for proper integration**: When Z is nonempty, returns a point FROM Z
+(using Classical choice). When Z is empty, returns the global basepoint.
+
+This replaces the previous approach of always evaluating at a fixed basepoint,
+making integration more dependent on the actual integration domain Z. -/
+noncomputable def evalPointForSet (Z : Set X) : X :=
+  if hZ : Z.Nonempty then Classical.choice hZ else basepoint
+
 /-- Hausdorff measure of dimension 2p on X.
 
     This is the correct measure for integrating 2p-forms over p-dimensional
