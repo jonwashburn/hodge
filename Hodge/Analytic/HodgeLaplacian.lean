@@ -418,6 +418,16 @@ noncomputable def hodgeLaplacian {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n
   let d_star_d : SmoothForm n X k := hodgeDual d_omega
   exact dd_star + d_star_d
 
+/-- **d* returns 0 for any input (with trivial data)**.
+
+    With trivial codifferential data, `hodgeDual ω = 0` for ANY ω.
+    This is because `CodifferentialData.trivial.codiff := fun _ => 0`.
+
+    Reference: [Warner, "Foundations of Differentiable Manifolds", §6.1]. -/
+@[simp]
+theorem hodgeDual_eq_zero {k : ℕ} (ω : SmoothForm n X (k + 1)) :
+    hodgeDual ω = 0 := rfl
+
 /-- **Hodge Laplacian is self-adjoint**.
 
     `⟨Δω, η⟩_{L²} = ⟨ω, Δη⟩_{L²}`
