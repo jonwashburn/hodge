@@ -118,6 +118,32 @@ example (k : ℕ) (Z : Set X) [ClosedSubmanifoldStokesData n X k Z] : Current n 
 example (hk : 1 ≤ 2) (hk' : 2 + 1 ≤ 2 * n) (ω : SmoothForm n X 2) : SmoothForm n X 2 :=
   hodgeLaplacian hk hk' ω
 
+/-! ## Round 15: Hodge Operator Tests -/
+
+-- Test: hodgeDual_zero - d*(0) = 0
+example (k : ℕ) : hodgeDual (0 : SmoothForm n X (k + 1)) = 0 :=
+  hodgeDual_zero
+
+-- Test: hodgeDual_add - d*(ω₁ + ω₂) = d*ω₁ + d*ω₂
+example (k : ℕ) (ω₁ ω₂ : SmoothForm n X (k + 1)) :
+    hodgeDual (ω₁ + ω₂) = hodgeDual ω₁ + hodgeDual ω₂ :=
+  hodgeDual_add ω₁ ω₂
+
+-- Test: hodgeDual_smul - d*(c • ω) = c • d*ω
+example (k : ℕ) (c : ℂ) (ω : SmoothForm n X (k + 1)) :
+    hodgeDual (c • ω) = c • hodgeDual ω :=
+  hodgeDual_smul c ω
+
+-- Test: hodgeDual_neg - d*(-ω) = -d*ω
+example (k : ℕ) (ω : SmoothForm n X (k + 1)) :
+    hodgeDual (-ω) = -hodgeDual ω :=
+  hodgeDual_neg ω
+
+-- Test: hodgeDual_hodgeDual - d* ∘ d* = 0
+example (k : ℕ) (ω : SmoothForm n X (k + 2)) :
+    hodgeDual (hodgeDual ω) = 0 :=
+  hodgeDual_hodgeDual ω
+
 /-! ## Round 12: Integration Infrastructure Edge Cases (Agent 3: R12-A3-TESTS) -/
 
 section IntegrationEdgeCases
