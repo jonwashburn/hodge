@@ -118,6 +118,16 @@ example (k : ℕ) (Z : Set X) [ClosedSubmanifoldStokesData n X k Z] : Current n 
 example (hk : 1 ≤ 2) (hk' : 2 + 1 ≤ 2 * n) (ω : SmoothForm n X 2) : SmoothForm n X 2 :=
   hodgeLaplacian hk hk' ω
 
+/-! ## Round 14: Hodge Theory Improvements -/
+
+-- Test: hodgeDual of zero is zero (Round 14: genuinely proven)
+example (k : ℕ) : hodgeDual (0 : SmoothForm n X (k + 1)) = 0 :=
+  hodgeDual_zero
+
+-- Test: hodgeDual is negation-compatible (Round 14: genuinely proven)
+example (k : ℕ) (ω : SmoothForm n X (k + 1)) : hodgeDual (-ω) = -hodgeDual ω :=
+  hodgeDual_neg ω
+
 /-! ## Round 12: Integration Infrastructure Edge Cases (Agent 3: R12-A3-TESTS) -/
 
 section IntegrationEdgeCases

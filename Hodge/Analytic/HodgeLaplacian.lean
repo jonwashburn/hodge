@@ -369,6 +369,23 @@ theorem hodgeDual_smul {k : ℕ} (c : ℂ) (_ω : SmoothForm n X (k + 1)) :
     hodgeDual (c • _ω) = c • hodgeDual _ω :=
   (CodifferentialData.trivial n X k).codiff_smul c _ω
 
+/-- **d* of zero is zero**. -/
+@[simp]
+theorem hodgeDual_zero {k : ℕ} :
+    hodgeDual (0 : SmoothForm n X (k + 1)) = 0 :=
+  (CodifferentialData.trivial n X k).codiff_zero
+
+/-- **d* is negation-compatible**.
+
+    d*(-ω) = -d*ω
+
+    Reference: [Warner, "Foundations of Differentiable Manifolds", §6.1]. -/
+theorem hodgeDual_neg {k : ℕ} (ω : SmoothForm n X (k + 1)) :
+    hodgeDual (-ω) = -hodgeDual ω := by
+  have h : -ω = (-1 : ℂ) • ω := by simp
+  rw [h, hodgeDual_smul]
+  simp
+
 /-! ## Hodge Laplacian Operator -/
 
 /-- **Hodge Laplacian operator**.
