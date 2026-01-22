@@ -142,12 +142,23 @@ theorem harmonic_iff_closed_coclosed {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤
 
 /-- **The zero form is harmonic**.
 
-    Δ(0) = 0 trivially.
+    Δ(0) = 0.
+
+    **Proof**: The hodgeDual (d*) returns 0 for all inputs with trivial codifferential data,
+    and smoothExtDeriv 0 = 0 by `smoothExtDeriv_zero`. Thus both terms dd*0 and d*d0 vanish.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
-theorem zero_isHarmonic {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤ 2 * n) :
-    True := trivial
-  -- Off proof track: Δ(0) = 0 (requires linearity of Laplacian)
+theorem zero_isHarmonic {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) :
+    IsHarmonic hk hk' (0 : SmoothForm n X k) := by
+  unfold IsHarmonic hodgeLaplacian hodgeDual
+  simp only [CodifferentialData.trivial, smoothExtDeriv_zero, add_zero]
+  apply SmoothForm.ext
+  funext x
+  simp only [SmoothForm.zero_apply]
+  match k with
+  | 0 => omega  -- contradiction: 1 ≤ 0
+  | k' + 1 =>
+    simp only [smoothExtDeriv_zero, SmoothForm.zero_apply]
 
 /-! ## Harmonic Space -/
 

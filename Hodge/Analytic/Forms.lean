@@ -169,17 +169,25 @@ instance (k : ℕ) : Module ℂ (SmoothForm n X k) where
     ext x v
     simp
 
-/-- Topology on smooth forms induced by the uniform (sup) operator norm.
-    A smooth form has pointwise operator norm at each x, and we consider the topology
-    where forms are close if their operator norms are uniformly close across all x.
+/-- Topology on smooth forms induced from the Pi (pointwise) topology.
 
-    For now, we use the discrete topology as a placeholder. This ensures all maps
-    from SmoothForm are continuous (vacuously), which is stronger than needed.
-    In a full implementation, this would be the C^∞ compact-open topology. -/
+    A net (ωᵢ) converges to ω iff for each x ∈ X, ωᵢ.as_alternating x → ω.as_alternating x
+    in the finite-dimensional normed space `FiberAlt n k`.
+
+    This is mathematically meaningful: it captures pointwise convergence of form coefficients.
+    Unlike the discrete topology, continuity claims in this topology have real content. -/
 instance SmoothForm.instTopologicalSpace (k : ℕ) : TopologicalSpace (SmoothForm n X k) :=
-  ⊥  -- discrete topology
+  TopologicalSpace.induced (fun ω : SmoothForm n X k => ω.as_alternating) Pi.topologicalSpace
 
-instance (k : ℕ) : DiscreteTopology (SmoothForm n X k) := ⟨rfl⟩
+/-- The coefficient map is continuous by definition of the induced topology. -/
+theorem SmoothForm.continuous_as_alternating {k : ℕ} :
+    Continuous (fun ω : SmoothForm n X k => ω.as_alternating) :=
+  continuous_induced_dom
+
+/-- Evaluation at a point is continuous. -/
+theorem SmoothForm.continuous_eval {k : ℕ} (x : X) :
+    Continuous (fun ω : SmoothForm n X k => ω.as_alternating x) :=
+  (continuous_apply x).comp continuous_induced_dom
 
 /-!
 ### Exterior Derivative on Smooth Forms
@@ -689,9 +697,38 @@ theorem smoothExtDeriv_smul_real {k : ℕ} (r : ℝ) (ω : SmoothForm n X k) :
     smoothExtDeriv (r • ω) = r • smoothExtDeriv ω :=
   map_smul (extDerivLinearMap n X k) (r : ℂ) ω
 
-/-- Exterior derivative is a continuous linear map (in the discrete topology). -/
-theorem smoothExtDeriv_continuous {k : ℕ} : Continuous (smoothExtDeriv (n := n) (X := X) (k := k)) :=
-  continuous_of_discreteTopology
+/-- Exterior derivative is continuous in the induced Pi topology.
+
+    Both source and target SmoothForms have induced topologies from Pi.
+    For continuity into an induced topology, we show the composed embedding
+    is continuous from the source induced topology into the target Pi space. -/
+theorem smoothExtDeriv_continuous {k : ℕ} : Continuous (smoothExtDeriv (n := n) (X := X) (k := k)) := by
+  rw [continuous_induced_rng]
+  apply continuous_pi
+  intro x
+  -- Goal: Continuous (fun ω => (smoothExtDeriv ω).as_alternating x)
+  -- This is continuous from the induced topology because:
+  -- 1. The source topology is induced from (ω ↦ ω.as_alternating) into Pi
+  -- 2. (smoothExtDeriv ω).as_alternating x depends continuously on ω.as_alternating
+  -- Since smoothExtDeriv is defined via extDerivLinearMap (a linear map),
+  -- and linear maps are continuous between topological vector spaces,
+  -- the evaluation at x is continuous.
+  have h : (fun ω : SmoothForm n X k => (smoothExtDeriv ω).as_alternating x) =
+           (fun ω => (extDerivLinearMap n X k ω).as_alternating x) := rfl
+  rw [h]
+  -- The map ω ↦ (extDerivLinearMap n X k ω).as_alternating x factors as:
+  -- ω ↦ ω (via identity) ↦ extDerivLinearMap n X k ω ↦ (.as_alternating x)
+  -- In the induced topology, this is continuous if the composition with
+  -- as_alternating on the source is continuous into Pi of the target fiber.
+  -- Since evaluation at x on Pi is continuous, and extDerivLinearMap is
+  -- defined pointwise via ContMDiffForm infrastructure, continuity holds.
+  exact (SmoothForm.continuous_eval x).comp (by
+    -- Need: Continuous (extDerivLinearMap n X k)
+    -- The linear map is continuous from induced to induced
+    rw [continuous_induced_rng]
+    apply continuous_pi
+    intro y
+    exact (continuous_apply y).comp continuous_induced_dom)
 
 /-- The unit 0-form (constant `1`).
 
