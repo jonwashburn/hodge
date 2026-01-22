@@ -980,6 +980,34 @@ theorem stokes_bound_of_ClosedSubmanifoldStokesData {n : ℕ} {X : Type*} {k : �
 Any development that needs Stokes on a given closed submanifold \(Z\) should assume an
 instance `[ClosedSubmanifoldStokesData n X k Z]`. -/
 
+/-! ### Canonical Instances of ClosedSubmanifoldStokesData
+
+We provide instances for specific cases where Stokes can be proved from first principles.
+-/
+
+/-- **Stokes for the empty set**: ∫_∅ dω = 0.
+    This holds because ∫_∅ anything = 0 (the measure is zero).
+    Reference: [Federer, "Geometric Measure Theory", 1969, §4.1]. -/
+theorem stokes_empty_set {n : ℕ} {X : Type*} {k : ℕ}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [Nonempty X]
+    (ω : SmoothForm n X k) :
+    setIntegral (n := n) (X := X) (k + 1) ∅ (smoothExtDeriv ω) = 0 := by
+  unfold setIntegral
+  exact integrateDegree2p_empty (n := n) (X := X) (k + 1) (smoothExtDeriv ω)
+
+/-- **Instance**: The empty set satisfies `ClosedSubmanifoldStokesData`.
+    This is provable from first principles since ∫_∅ = 0. -/
+instance ClosedSubmanifoldStokesData.empty {n : ℕ} {X : Type*} {k : ℕ}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [Nonempty X] :
+    ClosedSubmanifoldStokesData n X k (∅ : Set X) where
+  stokes_integral_exact_zero := fun ω => stokes_empty_set ω
+
 /- **Integration Data for Closed Submanifolds**.
     Complex submanifolds of Kähler manifolds have no boundary, so bdryMass = 0.
     This gives the Stokes bound |∫_Z dω| ≤ 0 · ‖ω‖ = 0 for free.
