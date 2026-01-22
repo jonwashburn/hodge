@@ -935,6 +935,29 @@ theorem setIntegral_bound {n : ℕ} {X : Type*} (k : ℕ)
       ≤ ‖ω‖ := integrateDegree2p_bound k Z ω
     _ = 1 * ‖ω‖ := (_root_.one_mul _).symm
 
+/-- **Set integration over the empty set is zero** (proved from `integrateDegree2p_empty`). -/
+@[simp]
+theorem setIntegral_empty {n : ℕ} {X : Type*} (k : ℕ)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [Nonempty X]
+    (ω : SmoothForm n X k) : setIntegral k (∅ : Set X) ω = 0 := by
+  unfold setIntegral
+  exact integrateDegree2p_empty k ω
+
+/-- **Stokes' theorem for the empty set**: `∫_∅ dω = 0`.
+
+    This is the canonical example of Stokes' theorem: any integral over ∅ vanishes.
+    It provides an automatic instance of `ClosedSubmanifoldStokesData` for ∅. -/
+theorem stokes_empty_set {n : ℕ} {X : Type*} (k : ℕ)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [Nonempty X]
+    (ω : SmoothForm n X k) : setIntegral (k + 1) (∅ : Set X) (smoothExtDeriv ω) = 0 :=
+  setIntegral_empty (k + 1) (smoothExtDeriv ω)
+
 /-! ## Stokes Property for Closed Submanifolds (Round 9: Agent 4)
 
 The following interface encodes the mathematical fact that for closed submanifolds,
@@ -974,11 +997,23 @@ theorem stokes_bound_of_ClosedSubmanifoldStokesData {n : ℕ} {X : Type*} {k : �
   rw [h.stokes_integral_exact_zero ω]
   simp only [abs_zero, le_refl]
 
-/- NOTE (sorry-free): We intentionally do **not** provide a universal instance of
-`ClosedSubmanifoldStokesData`.
+/-- **Stokes instance for the empty set** (proved from `stokes_empty_set`).
 
-Any development that needs Stokes on a given closed submanifold \(Z\) should assume an
-instance `[ClosedSubmanifoldStokesData n X k Z]`. -/
+    The empty set trivially satisfies Stokes' property since any integral over ∅ is zero.
+    This allows constructing `integration_current` for ∅ without manual assumptions. -/
+instance ClosedSubmanifoldStokesData.empty {n : ℕ} {X : Type*} (k : ℕ)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [Nonempty X] :
+    ClosedSubmanifoldStokesData n X k (∅ : Set X) where
+  stokes_integral_exact_zero := stokes_empty_set k
+
+/- NOTE (sorry-free): For non-empty sets, we intentionally do **not** provide a universal
+instance of `ClosedSubmanifoldStokesData` because that would require the full Stokes theorem.
+
+Any development that needs Stokes on a given non-empty closed submanifold \(Z\) should
+assume an instance `[ClosedSubmanifoldStokesData n X k Z]`. -/
 
 /- **Integration Data for Closed Submanifolds**.
     Complex submanifolds of Kähler manifolds have no boundary, so bdryMass = 0.
