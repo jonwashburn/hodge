@@ -974,11 +974,43 @@ theorem stokes_bound_of_ClosedSubmanifoldStokesData {n : ℕ} {X : Type*} {k : �
   rw [h.stokes_integral_exact_zero ω]
   simp only [abs_zero, le_refl]
 
-/- NOTE (sorry-free): We intentionally do **not** provide a universal instance of
-`ClosedSubmanifoldStokesData`.
+/-- **Stokes for the Empty Set** (Trivial Case).
 
-Any development that needs Stokes on a given closed submanifold \(Z\) should assume an
-instance `[ClosedSubmanifoldStokesData n X k Z]`. -/
+    For the empty set, the integral of any form vanishes because the underlying
+    measure is zero. This is proved from `integrateDegree2p_empty`.
+
+    **Mathematical content**: ∫_∅ dω = 0 for any ω. -/
+theorem stokes_empty_set {n : ℕ} {X : Type*} {k : ℕ}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [Nonempty X]
+    (ω : SmoothForm n X k) :
+    setIntegral (n := n) (X := X) (k + 1) ∅ (smoothExtDeriv ω) = 0 := by
+  unfold setIntegral
+  exact integrateDegree2p_empty (k + 1) (smoothExtDeriv ω)
+
+/-- **Canonical Instance**: Empty Set Satisfies Stokes.
+
+    The empty set trivially satisfies `ClosedSubmanifoldStokesData` because
+    the integral over the empty set is always zero. This allows
+    `integration_current` to be used with ∅ without manual Stokes plumbing.
+
+    **Reference**: This is the trivial case of Stokes' theorem. -/
+instance ClosedSubmanifoldStokesData.empty (n : ℕ) (X : Type*) (k : ℕ)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [Nonempty X] :
+    ClosedSubmanifoldStokesData n X k (∅ : Set X) where
+  stokes_integral_exact_zero := fun ω => stokes_empty_set ω
+
+/- NOTE (sorry-free): We provide a canonical instance for the empty set (above),
+but we intentionally do **not** provide a universal instance of
+`ClosedSubmanifoldStokesData` for arbitrary sets.
+
+Any development that needs Stokes on a given non-empty closed submanifold \(Z\)
+should assume an instance `[ClosedSubmanifoldStokesData n X k Z]`. -/
 
 /- **Integration Data for Closed Submanifolds**.
     Complex submanifolds of Kähler manifolds have no boundary, so bdryMass = 0.
