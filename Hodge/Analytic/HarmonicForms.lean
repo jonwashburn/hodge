@@ -144,10 +144,15 @@ theorem harmonic_iff_closed_coclosed {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤
 
     Δ(0) = 0 trivially.
 
+    **Proof**: With the current trivial codifferential, hodgeLaplacian of any form
+    simplifies to a sum where d* returns 0, giving Δ(0) = 0 + 0 = 0.
+
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
-theorem zero_isHarmonic {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤ 2 * n) :
-    True := trivial
-  -- Off proof track: Δ(0) = 0 (requires linearity of Laplacian)
+theorem zero_isHarmonic {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) :
+    IsHarmonic hk hk' (0 : SmoothForm n X k) := by
+  unfold IsHarmonic hodgeLaplacian
+  simp only [hodgeDual, CodifferentialData.trivial, smoothExtDeriv_zero, add_zero]
+  rfl
 
 /-! ## Harmonic Space -/
 
