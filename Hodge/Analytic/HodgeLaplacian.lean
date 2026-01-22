@@ -369,6 +369,43 @@ theorem hodgeDual_smul {k : ℕ} (c : ℂ) (_ω : SmoothForm n X (k + 1)) :
     hodgeDual (c • _ω) = c • hodgeDual _ω :=
   (CodifferentialData.trivial n X k).codiff_smul c _ω
 
+/-- **d* of zero is zero**.
+
+    This follows directly from the linearity of the codifferential.
+
+    Reference: [Warner, "Foundations of Differentiable Manifolds", §6.1]. -/
+@[simp]
+theorem hodgeDual_zero {k : ℕ} :
+    hodgeDual (0 : SmoothForm n X (k + 1)) = 0 :=
+  (CodifferentialData.trivial n X k).codiff_zero
+
+/-- **d* is negation-compatible**.
+
+    `d*(-ω) = -d*ω`
+
+    **Proof**: Uses linearity: `-ω = (-1) • ω`.
+
+    Reference: [Warner, "Foundations of Differentiable Manifolds", §6.1]. -/
+@[simp]
+theorem hodgeDual_neg {k : ℕ} (ω : SmoothForm n X (k + 1)) :
+    hodgeDual (-ω) = -hodgeDual ω := by
+  have h : -ω = (-1 : ℂ) • ω := by simp
+  rw [h, hodgeDual_smul]
+  simp
+
+/-- **d* returns 0 for any input (with trivial codifferential data)**.
+
+    With the current `CodifferentialData.trivial`, `hodgeDual ω = 0` for ALL ω.
+    This is because `CodifferentialData.trivial.codiff := fun _ => 0`.
+
+    **Note**: This theorem is specific to the trivial implementation.
+    When a real Hodge star is implemented, this will no longer hold.
+
+    Reference: [Warner, "Foundations of Differentiable Manifolds", §6.1]. -/
+@[simp]
+theorem hodgeDual_eq_zero {k : ℕ} (ω : SmoothForm n X (k + 1)) :
+    hodgeDual ω = 0 := rfl
+
 /-! ## Hodge Laplacian Operator -/
 
 /-- **Hodge Laplacian operator**.
