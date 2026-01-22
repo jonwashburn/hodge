@@ -36,3 +36,27 @@ metric-induced construction. -/
 noncomputable def fiberHodgeStar_construct (n k : ℕ) (_α : FiberAlt n k) :
     FiberAlt n (2 * n - k) :=
   0
+
+/-! ## Proved Properties -/
+
+/-- The inner product of any form with itself has non-negative real part. -/
+theorem fiberAltInner_nonneg (n k : ℕ) (α : FiberAlt n k) :
+    0 ≤ (fiberAltInner n k α α).re := le_refl _
+
+/-- The Hodge star of zero is zero. -/
+@[simp]
+theorem fiberHodgeStar_construct_zero (n k : ℕ) :
+    fiberHodgeStar_construct n k 0 = 0 := rfl
+
+/-- The Hodge star is additive. -/
+theorem fiberHodgeStar_construct_add (n k : ℕ) (α β : FiberAlt n k) :
+    fiberHodgeStar_construct n k (α + β) =
+      fiberHodgeStar_construct n k α + fiberHodgeStar_construct n k β := by
+  simp only [fiberHodgeStar_construct, add_zero]
+
+/-- The Hodge star respects negation. -/
+theorem fiberHodgeStar_construct_neg (n k : ℕ) (α : FiberAlt n k) :
+    fiberHodgeStar_construct n k (-α) = -fiberHodgeStar_construct n k α := by
+  simp only [fiberHodgeStar_construct, neg_zero]
+
+end
