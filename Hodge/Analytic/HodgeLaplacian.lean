@@ -404,20 +404,26 @@ noncomputable def hodgeLaplacian {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n
 /-! ### Linearity of Hodge Laplacian -/
 
 /-- **Hodge Laplacian of zero is zero**. -/
-theorem hodgeLaplacian_zero {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) :
-    hodgeLaplacian (n := n) (X := X) hk hk' 0 = 0 := by
-  simp only [hodgeLaplacian, hodgeDual, CodifferentialData.trivial, smoothExtDeriv_zero, add_zero]
+theorem hodgeLaplacian_zero {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤ 2 * n) :
+    hodgeLaplacian (n := n) (X := X) _hk _hk' 0 = 0 := by
+  -- With trivial hodgeDual, the result is 0 + 0 = 0
+  -- hodgeDual uses CodifferentialData.trivial which has codiff := fun _ => 0
+  rfl
 
 /-- **Hodge Laplacian is additive**. -/
 theorem hodgeLaplacian_add {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
     (ω η : SmoothForm n X k) :
     hodgeLaplacian hk hk' (ω + η) = hodgeLaplacian hk hk' ω + hodgeLaplacian hk hk' η := by
-  simp only [hodgeLaplacian, hodgeDual, CodifferentialData.trivial, add_zero]
+  -- Both sides equal 0 with trivial codifferential
+  show _ = _
+  rfl
 
 /-- **Hodge Laplacian respects scalar multiplication**. -/
 theorem hodgeLaplacian_smul {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
     (c : ℂ) (ω : SmoothForm n X k) :
     hodgeLaplacian hk hk' (c • ω) = c • hodgeLaplacian hk hk' ω := by
+  -- Both sides equal 0 with trivial codifferential
+  show _ = c • _
   simp only [hodgeLaplacian, hodgeDual, CodifferentialData.trivial, smul_zero, add_zero]
 
 /-- **Hodge Laplacian as a ℂ-linear map**. -/
