@@ -68,6 +68,16 @@ theorem signFactor_eq (n k : ℕ) :
   simp only [signFactor, codifferentialSign]
   norm_cast
 
+/-- The sign factor squares to 1.
+    **Proof**: (-1)^m * (-1)^m = (-1)^{2m} = 1 for any m. -/
+theorem signFactor_sq (n k : ℕ) : signFactor n k * signFactor n k = 1 := by
+  simp only [signFactor]
+  rw [← pow_add]
+  have h : (2 * n * k + 2 * n + 1) + (2 * n * k + 2 * n + 1) =
+           2 * (2 * n * k + 2 * n + 1) := by ring
+  rw [h, pow_mul]
+  simp only [neg_one_sq, one_pow]
+
 /-!
 ## Codifferential Definition
 -/
@@ -123,6 +133,14 @@ theorem codifferential_add (α β : SmoothForm n X k) :
     codifferential (α + β) = codifferential α + codifferential β := by
   simp only [codifferential_eq_zero_trivial, add_zero]
 
+/-- Codifferential respects ℝ-scalar multiplication.
+    **Structural proof**: Uses `hodgeStar_smul` and `smoothExtDeriv_smul_real`. -/
+theorem codifferential_smul_real (r : ℝ) (α : SmoothForm n X k) :
+    codifferential (r • α) = r • codifferential α := by
+  simp only [codifferential]
+  rw [hodgeStar_smul, smoothExtDeriv_smul_real, hodgeStar_smul]
+  rw [smul_comm (signFactor n k) r _]
+
 /-- Codifferential respects ℂ-scalar multiplication. -/
 theorem codifferential_smul (c : ℂ) (α : SmoothForm n X k) :
     codifferential (c • α) = c • codifferential α := by
@@ -139,6 +157,20 @@ theorem codifferential_sub (α β : SmoothForm n X k) :
   rw [codifferential_eq_zero_trivial, codifferential_eq_zero_trivial,
       codifferential_eq_zero_trivial]
   simp only [sub_zero]
+
+/-!
+## Linear Map Structure
+-/
+
+/-- The codifferential as an ℝ-linear map.
+    This packages δ with its proved linearity properties. -/
+noncomputable def codifferentialLinearMapReal :
+    SmoothForm n X k →ₗ[ℝ] SmoothForm n X (2 * n - (2 * n - k + 1)) where
+  toFun := codifferential
+  map_add' := by
+    intro a b
+    simp only [codifferential_eq_zero_trivial, add_zero]
+  map_smul' := codifferential_smul_real
 
 /-!
 ## δ² = 0
