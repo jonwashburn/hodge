@@ -1,5 +1,6 @@
 import Hodge.Analytic.Advanced.IntegrationTests
 import Hodge.Analytic.Laplacian.ConnectionTests
+import Hodge.Analytic.Laplacian.Codifferential
 import Hodge.Kahler.Lefschetz.LefschetzTests
 import Hodge.GMT.GMTTests
 import Hodge.Classical.CycleClass
@@ -265,3 +266,35 @@ end IntegrationEdgeCases
 - ✅ `L2InnerProduct` sesquilinearity
 - ✅ Module imports and type compatibility
 -/
+
+/-! ## DELTA-01: Codifferential δ Tests -/
+
+section CodifferentialTests
+
+example : Codifferential.codifferential (0 : SmoothForm n X 2) = 0 :=
+  Codifferential.codifferential_zero
+
+example (α β : SmoothForm n X 2) :
+    Codifferential.codifferential (α + β) =
+      Codifferential.codifferential α + Codifferential.codifferential β :=
+  Codifferential.codifferential_add α β
+
+example (r : ℝ) (α : SmoothForm n X 2) :
+    Codifferential.codifferential (r • α) = r • Codifferential.codifferential α :=
+  Codifferential.codifferential_smul_real r α
+
+example (α : SmoothForm n X 2) :
+    Codifferential.codifferential (-α) = -Codifferential.codifferential α :=
+  Codifferential.codifferential_neg α
+
+example (ω : SmoothForm n X 2) :
+    Codifferential.codifferential (Codifferential.codifferential ω) = 0 :=
+  Codifferential.codifferential_squared ω
+
+example (n k : ℕ) : Codifferential.signFactor n k * Codifferential.signFactor n k = 1 :=
+  Codifferential.signFactor_sq n k
+
+example : SmoothForm n X 2 →ₗ[ℝ] SmoothForm n X (2 * n - (2 * n - 2 + 1)) :=
+  Codifferential.codifferentialLinearMapReal
+
+end CodifferentialTests
