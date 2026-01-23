@@ -140,14 +140,23 @@ theorem harmonic_iff_closed_coclosed {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤
 
 /-! ## Zero Form is Harmonic -/
 
-/-- **The zero form is harmonic**.
+/-- **The zero form is harmonic**. -/
+theorem zero_isHarmonic {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) :
+    IsHarmonic hk hk' (0 : SmoothForm n X k) := hodgeLaplacian_zero hk hk'
 
-    Δ(0) = 0 trivially.
+/-- **Sum of harmonic forms is harmonic**. -/
+theorem isHarmonic_add {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+    {ω₁ ω₂ : SmoothForm n X k} (h₁ : IsHarmonic hk hk' ω₁) (h₂ : IsHarmonic hk hk' ω₂) :
+    IsHarmonic hk hk' (ω₁ + ω₂) := by
+  unfold IsHarmonic at *
+  rw [hodgeLaplacian_add, h₁, h₂, add_zero]
 
-    Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
-theorem zero_isHarmonic {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤ 2 * n) :
-    True := trivial
-  -- Off proof track: Δ(0) = 0 (requires linearity of Laplacian)
+/-- **Scalar multiple of harmonic form is harmonic**. -/
+theorem isHarmonic_smul {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+    (c : ℂ) {ω : SmoothForm n X k} (h : IsHarmonic hk hk' ω) :
+    IsHarmonic hk hk' (c • ω) := by
+  unfold IsHarmonic at *
+  rw [hodgeLaplacian_smul, h, smul_zero]
 
 /-! ## Harmonic Space -/
 
@@ -163,26 +172,22 @@ def HarmonicForm (n : ℕ) (X : Type u) (k : ℕ)
     (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) :=
   { ω : SmoothForm n X k // IsHarmonic hk hk' ω }
 
-/-! ### Vector Space Structure (Off Proof Track)
+/-! ### Vector Space Structure
 
-The space of harmonic k-forms ℋ^k(X) is a ℂ-vector space.
-The full construction requires showing closure under addition, negation,
-and scalar multiplication. This is off the main proof track.
--/
+The kernel of a linear map is always a submodule. -/
 
-/-- **Harmonic forms have AddCommGroup structure** (placeholder).
+/-- **Harmonic forms as a submodule** (kernel of Δ). -/
+noncomputable def harmonicSubmodule {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) :
+    Submodule ℂ (SmoothForm n X k) :=
+  LinearMap.ker (hodgeLaplacianLinearMap (n := n) (X := X) hk hk')
 
-    Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
-theorem harmonicForm_has_addCommGroup {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤ 2 * n) :
-    True := trivial
-  -- Off proof track: HarmonicForm has AddCommGroup structure
+/-- **Harmonic forms form an additive subgroup**. -/
+noncomputable instance harmonicSubmodule_addCommGroup {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) :
+    AddCommGroup (harmonicSubmodule (n := n) (X := X) hk hk') := Submodule.addCommGroup _
 
-/-- **Harmonic forms have Module ℂ structure** (placeholder).
-
-    Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
-theorem harmonicForm_has_module {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤ 2 * n) :
-    True := trivial
-  -- Off proof track: HarmonicForm has Module ℂ structure
+/-- **Harmonic forms form a ℂ-module**. -/
+noncomputable instance harmonicSubmodule_module {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) :
+    Module ℂ (harmonicSubmodule (n := n) (X := X) hk hk') := Submodule.module _
 
 /-! ## Finite-Dimensionality -/
 

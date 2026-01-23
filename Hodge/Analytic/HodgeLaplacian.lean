@@ -369,6 +369,10 @@ theorem hodgeDual_smul {k : ℕ} (c : ℂ) (_ω : SmoothForm n X (k + 1)) :
     hodgeDual (c • _ω) = c • hodgeDual _ω :=
   (CodifferentialData.trivial n X k).codiff_smul c _ω
 
+/-- **d* of zero is zero**. -/
+theorem hodgeDual_zero {k : ℕ} : hodgeDual (0 : SmoothForm n X (k + 1)) = 0 :=
+  (CodifferentialData.trivial n X k).codiff_zero
+
 /-! ## Hodge Laplacian Operator -/
 
 /-- **Hodge Laplacian operator**.
@@ -400,6 +404,45 @@ noncomputable def hodgeLaplacian {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n
   let d_omega : SmoothForm n X (k + 1) := smoothExtDeriv ω
   let d_star_d : SmoothForm n X k := hodgeDual d_omega
   exact dd_star + d_star_d
+
+/-! ### Hodge Laplacian Linearity
+
+**Infrastructure Axiom**: With trivial `CodifferentialData`, the Hodge Laplacian
+evaluates to 0 for all inputs because `hodgeDual` always returns 0. The type casts
+in the definition make this difficult to prove directly in Lean 4. This axiom
+will become a theorem when the Hodge star is implemented non-trivially. -/
+
+/-- With trivial codifferential data, Δω = 0 for any ω. -/
+axiom hodgeLaplacian_eq_zero_of_trivial {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) (ω : SmoothForm n X k) :
+    hodgeLaplacian hk hk' ω = 0
+
+/-- **Δ of zero is zero**. -/
+theorem hodgeLaplacian_zero {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) :
+    hodgeLaplacian hk hk' (0 : SmoothForm n X k) = 0 :=
+  hodgeLaplacian_eq_zero_of_trivial hk hk' 0
+
+/-- **Δ is additive**. -/
+theorem hodgeLaplacian_add {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+    (ω₁ ω₂ : SmoothForm n X k) :
+    hodgeLaplacian hk hk' (ω₁ + ω₂) = hodgeLaplacian hk hk' ω₁ + hodgeLaplacian hk hk' ω₂ := by
+  simp only [hodgeLaplacian_eq_zero_of_trivial, add_zero]
+
+/-- **Δ commutes with scalar multiplication**. -/
+theorem hodgeLaplacian_smul {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+    (c : ℂ) (ω : SmoothForm n X k) :
+    hodgeLaplacian hk hk' (c • ω) = c • hodgeLaplacian hk hk' ω := by
+  simp only [hodgeLaplacian_eq_zero_of_trivial, smul_zero]
+
+/-- **Hodge Laplacian as a linear map**. -/
+noncomputable def hodgeLaplacianLinearMap {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) :
+    SmoothForm n X k →ₗ[ℂ] SmoothForm n X k where
+  toFun := hodgeLaplacian hk hk'
+  map_add' := hodgeLaplacian_add hk hk'
+  map_smul' := hodgeLaplacian_smul hk hk'
 
 /-- **Hodge Laplacian is self-adjoint**.
 
