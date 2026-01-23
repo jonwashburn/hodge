@@ -144,10 +144,40 @@ theorem harmonic_iff_closed_coclosed {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤
 
     Δ(0) = 0 trivially.
 
+    **Structural proof**: Uses `hodgeLaplacian_zero`.
+
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
-theorem zero_isHarmonic {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤ 2 * n) :
-    True := trivial
-  -- Off proof track: Δ(0) = 0 (requires linearity of Laplacian)
+theorem zero_isHarmonic {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) :
+    IsHarmonic hk hk' (0 : SmoothForm n X k) := by
+  simp only [IsHarmonic, hodgeLaplacian_zero]
+
+/-- **Sum of harmonic forms is harmonic**.
+
+    **Structural proof**: Uses `hodgeLaplacian_add`. -/
+theorem isHarmonic_add {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+    (ω₁ ω₂ : SmoothForm n X k)
+    (h₁ : IsHarmonic hk hk' ω₁) (h₂ : IsHarmonic hk hk' ω₂) :
+    IsHarmonic hk hk' (ω₁ + ω₂) := by
+  simp only [IsHarmonic] at h₁ h₂ ⊢
+  rw [hodgeLaplacian_add, h₁, h₂, add_zero]
+
+/-- **Scalar multiple of harmonic form is harmonic**.
+
+    **Structural proof**: Uses `hodgeLaplacian_smul`. -/
+theorem isHarmonic_smul {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+    (c : ℂ) (ω : SmoothForm n X k) (hω : IsHarmonic hk hk' ω) :
+    IsHarmonic hk hk' (c • ω) := by
+  simp only [IsHarmonic] at hω ⊢
+  rw [hodgeLaplacian_smul, hω, smul_zero]
+
+/-- **Negation of harmonic form is harmonic**.
+
+    **Structural proof**: Uses `hodgeLaplacian_neg`. -/
+theorem isHarmonic_neg {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+    (ω : SmoothForm n X k) (hω : IsHarmonic hk hk' ω) :
+    IsHarmonic hk hk' (-ω) := by
+  rw [SmoothForm.neg_eq_neg_one_smul]
+  exact isHarmonic_smul hk hk' (-1) ω hω
 
 /-! ## Harmonic Space -/
 
