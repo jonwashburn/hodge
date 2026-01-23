@@ -369,6 +369,24 @@ theorem hodgeDual_smul {k : ℕ} (c : ℂ) (_ω : SmoothForm n X (k + 1)) :
     hodgeDual (c • _ω) = c • hodgeDual _ω :=
   (CodifferentialData.trivial n X k).codiff_smul c _ω
 
+/-- **d* of zero is zero**. -/
+theorem hodgeDual_zero {k : ℕ} : hodgeDual (0 : SmoothForm n X (k + 1)) = 0 :=
+  (CodifferentialData.trivial n X k).codiff_zero
+
+/-! ### Type Cast Lemmas for SmoothForm -/
+
+/-- Cast of zero SmoothForm is zero. -/
+private theorem smoothForm_cast_zero {k k' : ℕ} (h : k = k') :
+    (h ▸ (0 : SmoothForm n X k') : SmoothForm n X k) = 0 := by
+  subst h
+  rfl
+
+/-- Cast preserves smoothExtDeriv of zero. -/
+private theorem smoothForm_cast_extDeriv_zero {k k' : ℕ} (h : k + 1 = k') :
+    (h ▸ smoothExtDeriv (0 : SmoothForm n X k) : SmoothForm n X k') = 0 := by
+  subst h
+  exact smoothExtDeriv_zero
+
 /-! ## Hodge Laplacian Operator -/
 
 /-- **Hodge Laplacian operator**.
@@ -400,6 +418,67 @@ noncomputable def hodgeLaplacian {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n
   let d_omega : SmoothForm n X (k + 1) := smoothExtDeriv ω
   let d_star_d : SmoothForm n X k := hodgeDual d_omega
   exact dd_star + d_star_d
+
+/-! ### Hodge Laplacian Linearity
+
+With trivial `CodifferentialData`, the `hodgeDual` returns 0 for all inputs.
+This means Δω = d(d*ω) + d*(dω) = d(0) + 0 = 0 + 0 = 0.
+The linearity proofs follow from this fact.
+-/
+
+/-- With trivial codifferential, Δω = 0 for all ω.
+
+**Proof**: hodgeDual returns 0, so d*(dω) = 0 and d(d*ω) = d(0) = 0. -/
+theorem hodgeLaplacian_eq_zero_of_trivial {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+    (ω : SmoothForm n X k) : hodgeLaplacian hk hk' ω = 0 := by
+  -- Unfold the definition and simplify with trivial data
+  simp only [hodgeLaplacian, hodgeDual, CodifferentialData.trivial]
+  -- d*(dω) = 0, so only dd* term remains (which involves casts of 0)
+  simp only [smoothExtDeriv_zero, add_zero]
+  -- Goal: h.symm ▸ smoothExtDeriv (h ▸ 0) = 0
+  -- Use induction on k to handle the cast
+  cases k with
+  | zero => omega  -- k ≥ 1 so this case is impossible
+  | succ k' =>
+    -- Now k = k' + 1, and the cast h : k = (k - 1) + 1 becomes k' + 1 = k' + 1
+    -- which is rfl, so the casts disappear
+    simp only [Nat.succ_sub_succ_eq_sub, Nat.sub_zero, smoothExtDeriv_zero]
+
+/-- **Δ of zero is zero**. -/
+theorem hodgeLaplacian_zero {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) :
+    hodgeLaplacian hk hk' (0 : SmoothForm n X k) = 0 :=
+  hodgeLaplacian_eq_zero_of_trivial hk hk' 0
+
+/-- **Δ is additive**. -/
+theorem hodgeLaplacian_add {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+    (ω₁ ω₂ : SmoothForm n X k) :
+    hodgeLaplacian hk hk' (ω₁ + ω₂) = hodgeLaplacian hk hk' ω₁ + hodgeLaplacian hk hk' ω₂ := by
+  simp only [hodgeLaplacian_eq_zero_of_trivial, add_zero]
+
+/-- **Δ commutes with scalar multiplication**. -/
+theorem hodgeLaplacian_smul {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+    (c : ℂ) (ω : SmoothForm n X k) :
+    hodgeLaplacian hk hk' (c • ω) = c • hodgeLaplacian hk hk' ω := by
+  simp only [hodgeLaplacian_eq_zero_of_trivial, smul_zero]
+
+/-- **Δ negation**. -/
+theorem hodgeLaplacian_neg {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+    (ω : SmoothForm n X k) :
+    hodgeLaplacian hk hk' (-ω) = -hodgeLaplacian hk hk' ω := by
+  simp only [hodgeLaplacian_eq_zero_of_trivial, neg_zero]
+
+/-- **Δ subtraction**. -/
+theorem hodgeLaplacian_sub {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+    (ω₁ ω₂ : SmoothForm n X k) :
+    hodgeLaplacian hk hk' (ω₁ - ω₂) = hodgeLaplacian hk hk' ω₁ - hodgeLaplacian hk hk' ω₂ := by
+  simp only [hodgeLaplacian_eq_zero_of_trivial, sub_zero]
+
+/-- **Hodge Laplacian as a linear map**. -/
+noncomputable def hodgeLaplacianLinearMap {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) :
+    SmoothForm n X k →ₗ[ℂ] SmoothForm n X k where
+  toFun := hodgeLaplacian hk hk'
+  map_add' := hodgeLaplacian_add hk hk'
+  map_smul' := hodgeLaplacian_smul hk hk'
 
 /-- **Hodge Laplacian is self-adjoint**.
 
