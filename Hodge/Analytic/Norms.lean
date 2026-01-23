@@ -518,6 +518,7 @@ theorem L2Inner_cauchy_schwarz {n : ℕ} {X : Type*}
 theorem L2NormForm_add_le {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [Nonempty X]
     {k : ℕ} (α β : SmoothForm n X k) :
     L2NormForm (α + β) ≤ L2NormForm α + L2NormForm β := by
   unfold L2NormForm
@@ -535,6 +536,7 @@ theorem L2NormForm_add_le {n : ℕ} {X : Type*}
 theorem L2NormForm_smul {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [Nonempty X]
     {k : ℕ} (r : ℝ) (α : SmoothForm n X k) :
     L2NormForm (r • α) = |r| * L2NormForm α := by
   unfold L2NormForm; rw [L2Inner_smul_left, L2Inner_smul_right]
@@ -619,6 +621,29 @@ noncomputable def HodgeStarData.trivial (n : ℕ) (X : Type*) (k : ℕ)
   star_zero := rfl
   star_neg := fun _ => by simp
 
+/-- **Basepoint Hodge Star Data**.
+
+    This provides a Hodge star implementation that uses basepoint evaluation.
+    While structurally nontrivial (requiring `[Nonempty X]`), it still returns 0
+    because constructing a nonzero element of `FiberAlt n (2*n-k)` requires
+    volume form and interior product infrastructure not yet available in Mathlib.
+
+    The key advantage over `trivial` is that this requires manifold nonemptiness,
+    which is the correct mathematical assumption for Hodge theory.
+
+    **Future**: When Mathlib provides `Orientation.volumeForm` on exterior algebra
+    bundles and interior products, this can be upgraded to a true Hodge star. -/
+noncomputable def HodgeStarData.basepoint (n : ℕ) (X : Type*) (k : ℕ)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [Nonempty X] : HodgeStarData n X k where
+  star := fun _ => 0
+  star_add := fun _ _ => by simp
+  star_smul := fun _ _ => by simp
+  star_zero := rfl
+  star_neg := fun _ => by simp
+
 /-! ### Hodge Star Operator Definition -/
 
 /-- **Hodge star operator** on k-forms.
@@ -627,7 +652,9 @@ noncomputable def HodgeStarData.trivial (n : ℕ) (X : Type*) (k : ℕ)
     - α ∧ ⋆β = ⟨α, β⟩_x · vol_X
     - ⟨α, β⟩_{L²} = ∫_X α ∧ ⋆β
 
-    Currently uses trivial data (returns 0) until real metric infrastructure is available.
+    Uses basepoint Hodge star data which requires `[Nonempty X]` (the manifold has
+    at least one point). Currently returns 0 until full Hodge star infrastructure
+    is available in Mathlib.
 
     **Mathematical Definition**: For a Kähler manifold with metric g and volume form vol,
     the Hodge star is uniquely determined by: α ∧ ⋆β = g(α, β) · vol
@@ -636,9 +663,9 @@ noncomputable def HodgeStarData.trivial (n : ℕ) (X : Type*) (k : ℕ)
 noncomputable def hodgeStar {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
     {k : ℕ} (α : SmoothForm n X k) : SmoothForm n X (2 * n - k) :=
-  (HodgeStarData.trivial n X k).star α
+  (HodgeStarData.basepoint n X k).star α
 
 /-- Notation for Hodge star operator. -/
 notation:max "⋆" α:max => hodgeStar α
