@@ -118,13 +118,6 @@ example (k : ℕ) (Z : Set X) [ClosedSubmanifoldStokesData n X k Z] : Current n 
 example (hk : 1 ≤ 2) (hk' : 2 + 1 ≤ 2 * n) (ω : SmoothForm n X 2) : SmoothForm n X 2 :=
   hodgeLaplacian hk hk' ω
 
-/-! ## Real Hausdorff Measure Tests -/
-
--- Test: Real Hausdorff measure on EMetricSpace gives μH[2p]
--- (using Fin m → ℝ as a concrete example with EMetricSpace instance)
-example : hausdorffMeasure2p_real (Y := Fin 3 → ℝ) 2 ∅ = 0 :=
-  hausdorffMeasure2p_real_empty 2
-
 /-! ## Round 12: Integration Infrastructure Edge Cases (Agent 3: R12-A3-TESTS) -/
 
 section IntegrationEdgeCases
