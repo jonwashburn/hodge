@@ -317,4 +317,81 @@ theorem intersectionPairing_closed_exact_zero {p : ℕ} (_hp : p ≤ n)
     True := trivial
   -- Off proof track: uses Stokes' theorem
 
+/-! ## L² Inner Product for Middle-Degree Forms
+
+For middle-degree forms (degree n on a 2n-dimensional manifold), we can define a
+real L² inner product using integration directly without the Hodge star:
+
+  ⟨α, β⟩ = ∫_X α ∧ β
+
+Since α, β ∈ Ω^n(X) and n + n = 2n, the wedge product α ∧ β is a top-form
+that can be integrated.
+
+This is a special case of the general L² inner product formula
+⟨α, β⟩_{L²} = ∫_X α ∧ ⋆β, noting that for middle-degree forms on
+Kähler manifolds, the Hodge star has special properties.
+-/
+
+/-- **L² inner product for middle-degree forms** (degree n).
+
+    For α, β ∈ Ω^n(X), define:
+    `⟨α, β⟩_{L²} = ∫_X α ∧ β`
+
+    This uses real integration via `topFormIntegral_real'`.
+
+    **Mathematical Note**: On a Kähler manifold, this differs from the standard
+    Hermitian L² inner product by factors involving the Hodge star. For real-valued
+    forms or special cases, this gives the correct pairing.
+
+    Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
+noncomputable def L2InnerMiddle (α β : SmoothForm n X n) : ℝ :=
+  have hdeg : n + n = 2 * n := by ring
+  topFormIntegral_real' (castForm hdeg (α ⋏ β))
+
+/-- **L² inner product for middle-degree forms is additive in first argument**. -/
+theorem L2InnerMiddle_add_left (α₁ α₂ β : SmoothForm n X n) :
+    L2InnerMiddle (α₁ + α₂) β = L2InnerMiddle α₁ β + L2InnerMiddle α₂ β := by
+  simp only [L2InnerMiddle, smoothWedge_add_left]
+  rw [castForm_add, topFormIntegral_real'_add]
+
+/-- **L² inner product for middle-degree forms respects scalar multiplication**. -/
+theorem L2InnerMiddle_smul_left (c : ℝ) (α β : SmoothForm n X n) :
+    L2InnerMiddle (c • α) β = c * L2InnerMiddle α β := by
+  simp only [L2InnerMiddle]
+  -- Convert ℝ-smul to ℂ-smul
+  rw [SmoothForm.real_smul_eq_complex_smul n c α]
+  rw [smoothWedge_smul_left]
+  simp only [castForm_smul]
+  -- Convert back from ℂ-smul to ℝ-smul
+  rw [← SmoothForm.real_smul_eq_complex_smul (2 * n) c]
+  exact topFormIntegral_real'_smul c _
+
+/-- **L² inner product for middle-degree forms is additive in second argument**. -/
+theorem L2InnerMiddle_add_right (α β₁ β₂ : SmoothForm n X n) :
+    L2InnerMiddle α (β₁ + β₂) = L2InnerMiddle α β₁ + L2InnerMiddle α β₂ := by
+  simp only [L2InnerMiddle, smoothWedge_add_right]
+  rw [castForm_add, topFormIntegral_real'_add]
+
+/-- **L² inner product for middle-degree forms respects scalar multiplication in second argument**. -/
+theorem L2InnerMiddle_smul_right (c : ℝ) (α β : SmoothForm n X n) :
+    L2InnerMiddle α (c • β) = c * L2InnerMiddle α β := by
+  simp only [L2InnerMiddle]
+  rw [SmoothForm.real_smul_eq_complex_smul n c β]
+  rw [smoothWedge_smul_right]
+  simp only [castForm_smul]
+  rw [← SmoothForm.real_smul_eq_complex_smul (2 * n) c]
+  exact topFormIntegral_real'_smul c _
+
+/-- **L² inner product for middle-degree forms of zero is zero (left)**. -/
+theorem L2InnerMiddle_zero_left (β : SmoothForm n X n) :
+    L2InnerMiddle 0 β = 0 := by
+  unfold L2InnerMiddle
+  simp only [smoothWedge_zero_left, castForm_zero, topFormIntegral_real'_zero]
+
+/-- **L² inner product for middle-degree forms of zero is zero (right)**. -/
+theorem L2InnerMiddle_zero_right (α : SmoothForm n X n) :
+    L2InnerMiddle α 0 = 0 := by
+  unfold L2InnerMiddle
+  simp only [smoothWedge_zero_right, castForm_zero, topFormIntegral_real'_zero]
+
 end

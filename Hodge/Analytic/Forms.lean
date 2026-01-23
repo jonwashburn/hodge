@@ -125,6 +125,26 @@ def castForm {k k' : ℕ} (h : k = k') (ω : SmoothForm n X k) : SmoothForm n X 
 @[simp] lemma castForm_zero {k k' : ℕ} (h : k = k') : castForm h (0 : SmoothForm n X k) = 0 := by
   subst h; rfl
 
+@[simp] lemma castForm_add {k k' : ℕ} (h : k = k') (ω₁ ω₂ : SmoothForm n X k) :
+    castForm h (ω₁ + ω₂) = castForm h ω₁ + castForm h ω₂ := by
+  subst h; rfl
+
+@[simp] lemma castForm_smul {k k' : ℕ} (h : k = k') (c : ℂ) (ω : SmoothForm n X k) :
+    castForm h (c • ω) = c • castForm h ω := by
+  subst h; rfl
+
+@[simp] lemma castForm_smul_real {k k' : ℕ} (h : k = k') (r : ℝ) (ω : SmoothForm n X k) :
+    castForm h (r • ω) = r • castForm h ω := by
+  subst h; rfl
+
+/-- Real scalar multiplication equals complex scalar multiplication via coercion. -/
+lemma SmoothForm.real_smul_eq_complex_smul (k : ℕ) (r : ℝ) (ω : SmoothForm n X k) :
+    r • ω = (r : ℂ) • ω := by
+  apply SmoothForm.ext
+  funext x
+  simp only [smul_real_apply, smul_apply]
+  exact (RCLike.real_smul_eq_coe_smul r (ω.as_alternating x)).symm
+
 @[simp] lemma SmoothForm.castForm_as_alternating {k k' : ℕ} (h : k = k') (ω : SmoothForm n X k) (x : X) :
     (castForm h ω).as_alternating x = h ▸ ω.as_alternating x := by
   subst h; rfl
