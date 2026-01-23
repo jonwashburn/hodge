@@ -517,7 +517,8 @@ theorem L2Inner_cauchy_schwarz {n : ℕ} {X : Type*}
 
 theorem L2NormForm_add_le {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
     {k : ℕ} (α β : SmoothForm n X k) :
     L2NormForm (α + β) ≤ L2NormForm α + L2NormForm β := by
   unfold L2NormForm
@@ -534,7 +535,8 @@ theorem L2NormForm_add_le {n : ℕ} {X : Type*}
 
 theorem L2NormForm_smul {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
     {k : ℕ} (r : ℝ) (α : SmoothForm n X k) :
     L2NormForm (r • α) = |r| * L2NormForm α := by
   unfold L2NormForm; rw [L2Inner_smul_left, L2Inner_smul_right]
