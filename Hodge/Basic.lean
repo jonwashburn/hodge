@@ -88,7 +88,7 @@ theorem HasLocallyConstantCharts.hCharts {n : ℕ} {X : Type u}
 
 class ProjectiveComplexManifold (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    extends IsManifold (𝓒_complex n) ⊤ X, CompactSpace X, HasLocallyConstantCharts n X where
+    extends IsManifold (𝓒_complex n) ⊤ X, CompactSpace X, HasLocallyConstantCharts n X, T2Space X where
   embedding_dim : ℕ
 
 -- exists_not_isClosed_set was unused and has been removed

@@ -150,7 +150,8 @@ example (k : ℕ) (ω : SmoothForm n X k) :
 
 -- Test 13: integrateDegree2p is bounded by form norm
 example (k : ℕ) (Z : Set X) (ω : SmoothForm n X k) :
-    |integrateDegree2p (n := n) (X := X) k Z ω| ≤ ‖ω‖ :=
+    |integrateDegree2p (n := n) (X := X) k Z ω| ≤
+      (if hk : 2 ∣ k then ((hausdorffMeasure2p (n := n) (X := X) (k / 2)) Z).toReal else 0) * ‖ω‖ :=
   integrateDegree2p_bound k Z ω
 
 /-! ### Test Suite 2: submanifoldIntegral properties -/
@@ -175,7 +176,8 @@ example (p : ℕ) (Z : Set X) (c : ℝ) (ω : SmoothForm n X (2 * p)) :
 
 -- Test 17: submanifoldIntegral is bounded by form norm
 example (p : ℕ) (Z : Set X) (ω : SmoothForm n X (2 * p)) :
-    |submanifoldIntegral (n := n) (X := X) ω Z| ≤ ‖ω‖ :=
+    |submanifoldIntegral (n := n) (X := X) ω Z| ≤
+      ((hausdorffMeasure2p (n := n) (X := X) p) Z).toReal * ‖ω‖ :=
   submanifoldIntegral_bound (n := n) (X := X) Z ω
 
 -- Test 18: submanifoldIntegral_asLinearMap provides a LinearMap interface

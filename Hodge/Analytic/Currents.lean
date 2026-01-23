@@ -917,23 +917,24 @@ theorem setIntegral_linear {n : ℕ} {X : Type*} (k : ℕ)
 
 /-- Set integration is bounded.
 
-    **Round 8 Note**: The bound M=1 works for the Dirac proxy measure:
-    - μ(Z).toReal ∈ {0, 1}
-    - |Re(form eval)| ≤ comass = ‖ω‖
+    **Round 14 Note**: With real Hausdorff measure, the natural bound depends on the set `Z`.
+    Our proxy definition has the form `μ(Z).toReal * eval(ω)`, so:
+    `|∫_Z ω| ≤ μ(Z).toReal * ‖ω‖`.
 
-    **Proof**: Uses `integrateDegree2p_bound` which shows `|∫_Z ω| ≤ ‖ω‖`. -/
+    **Proof**: Uses `integrateDegree2p_bound`. -/
 theorem setIntegral_bound {n : ℕ} {X : Type*} (k : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [MeasurableSpace X] [Nonempty X]
     (Z : Set X) : ∃ M : ℝ, ∀ ω : SmoothForm n X k, |setIntegral k Z ω| ≤ M * ‖ω‖ := by
-  -- setIntegral = integrateDegree2p, which is bounded by ‖ω‖
-  refine ⟨1, fun ω => ?_⟩
+  -- setIntegral = integrateDegree2p, which is bounded by a constant depending on the Hausdorff measure of Z.
+  classical
+  let M : ℝ :=
+    (if hk : 2 ∣ k then ((hausdorffMeasure2p (n := n) (X := X) (k / 2)) Z).toReal else 0)
+  refine ⟨M, fun ω => ?_⟩
   unfold setIntegral
-  calc |integrateDegree2p (n := n) (X := X) k Z ω|
-      ≤ ‖ω‖ := integrateDegree2p_bound k Z ω
-    _ = 1 * ‖ω‖ := (_root_.one_mul _).symm
+  simpa [M, _root_.mul_assoc] using (integrateDegree2p_bound (n := n) (X := X) k Z ω)
 
 /-- **Set integration over the empty set is zero** (proved from `integrateDegree2p_empty`). -/
 @[simp]

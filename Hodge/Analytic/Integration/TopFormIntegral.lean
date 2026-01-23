@@ -136,18 +136,25 @@ theorem topFormIntegral_real'_smul (c : ℝ) (η : SmoothForm n X (2 * n)) :
 
     This is the fundamental estimate for integration.
 
-    **Proof Status**: Proved via `integrateDegree2p_bound` with M=1.
+    **Proof Status**: Proved via `integrateDegree2p_bound` (the bound constant depends on the
+    Hausdorff measure of `Set.univ` in degree `2n`).
 
     Reference: [Federer, "Geometric Measure Theory", §4.1.7]. -/
 theorem topFormIntegral_real'_bound :
     ∃ M : ℝ, M ≥ 0 ∧ ∀ η : SmoothForm n X (2 * n), |topFormIntegral_real' η| ≤ M * ‖η‖ := by
-  use 1
-  constructor
-  · linarith
+  classical
+  -- Use the degree-dispatch bound with Z = univ.
+  let M : ℝ :=
+    (if hk : 2 ∣ (2 * n) then ((hausdorffMeasure2p (n := n) (X := X) ((2 * n) / 2)) Set.univ).toReal else 0)
+  refine ⟨M, ?_, ?_⟩
+  · -- M ≥ 0
+    by_cases hk : 2 ∣ (2 * n)
+    · simp [M, hk, ENNReal.toReal_nonneg]
+    · simp [M, hk]
   · intro η
     unfold topFormIntegral_real'
-    have h := integrateDegree2p_bound (n := n) (X := X) (k := 2 * n) Set.univ η
-    linarith [comass_nonneg η, h]
+    -- Apply the generic bound.
+    simpa [M, _root_.mul_assoc] using (integrateDegree2p_bound (n := n) (X := X) (k := 2 * n) Set.univ η)
 
 /-! ## Complex-Valued Integration -/
 

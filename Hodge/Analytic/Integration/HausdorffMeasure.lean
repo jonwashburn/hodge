@@ -7,6 +7,9 @@ import Hodge.Analytic.Integration.VolumeForm
 import Hodge.Analytic.Forms
 import Mathlib.MeasureTheory.Measure.Hausdorff
 import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.Geometry.Manifold.Metrizable
+import Mathlib.Topology.Metrizable.Uniformity
+import Mathlib.MeasureTheory.Constructions.BorelSpace.Basic
 
 /-!
 # Hausdorff Measure and Integration on Submanifolds
@@ -57,7 +60,11 @@ variable {n : ℕ} {X : Type u}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
-  [MeasurableSpace X] [Nonempty X]
+  [Nonempty X]
+
+-- Use the Borel σ-algebra induced by the manifold topology.
+local instance : MeasurableSpace X := borel X
+local instance : BorelSpace X := ⟨rfl⟩
 
 /-! ## Hausdorff Measure on Submanifolds -/
 
@@ -76,14 +83,13 @@ noncomputable def basepoint : X :=
     This is the correct measure for integrating 2p-forms over p-dimensional
     complex submanifolds. -/
 noncomputable def hausdorffMeasure2p (p : ℕ) : Measure X :=
-  -- Round 7: eliminate the degenerate `Measure.comap (fun _ => 0) volume` placeholder.
-  --
-  -- In the current project, we do not yet have a canonical metric/measure on `X` compatible with
-  -- the manifold topology, so we cannot directly use Mathlib's `μH[2p]` on `X` here.
-  --
-  -- As a nontrivial stand-in that does *not* require a `MeasureSpace X` instance, we use a Dirac
-  -- measure at an arbitrary basepoint. This makes downstream "integration" depend on `Z`.
-  Measure.dirac basepoint
+by
+  classical
+  -- Equip `X` with a compatible (non-canonical) metric so that `μH[2p]` is available.
+  letI : TopologicalSpace.MetrizableSpace X :=
+    Manifold.metrizableSpace (I := modelWithCornersSelf ℝ (EuclideanSpace ℂ (Fin n))) X
+  letI : MetricSpace X := TopologicalSpace.metrizableSpaceMetric X
+  exact MeasureTheory.Measure.hausdorffMeasure (X := X) (d := (2 * p : ℝ))
 
 /-- A fixed frame in the model tangent space, used to evaluate a `2p`-form to a scalar. -/
 noncomputable def standardFrame (k : ℕ) : Fin k → TangentModel n :=
@@ -115,7 +121,7 @@ noncomputable def submanifoldIntegral {p : ℕ}
     (ω : SmoothForm n X (2 * p)) (Z : Set X) : ℝ :=
   -- Stand-in for the genuine integral `∫ x ∈ Z, ω|_Z x d(μH[2p])`.
   -- Takes: (measure of Z) × (evaluation of ω at a fixed basepoint and fixed frame).
-  ((hausdorffMeasure2p (X := X) p) Z).toReal *
+  ((hausdorffMeasure2p (n := n) (X := X) p) Z).toReal *
     Complex.reCLM ((ω.as_alternating basepoint) (standardFrame (n := n) (k := 2 * p)))
 
 /-- Submanifold integration is linear in the form. -/
@@ -132,14 +138,14 @@ theorem submanifoldIntegral_linear {p : ℕ} (Z : Set X)
 /-- Submanifold integration is additive in the set for disjoint sets. -/
 theorem submanifoldIntegral_union {p : ℕ} (ω : SmoothForm n X (2 * p))
     (Z₁ Z₂ : Set X) (hZ : Disjoint Z₁ Z₂) (hZ₂ : MeasurableSet Z₂)
-    (hμ₁ : (hausdorffMeasure2p (X := X) p) Z₁ ≠ ∞)
-    (hμ₂ : (hausdorffMeasure2p (X := X) p) Z₂ ≠ ∞) :
+    (hμ₁ : (hausdorffMeasure2p (n := n) (X := X) p) Z₁ ≠ ∞)
+    (hμ₂ : (hausdorffMeasure2p (n := n) (X := X) p) Z₂ ≠ ∞) :
     submanifoldIntegral ω (Z₁ ∪ Z₂) =
       submanifoldIntegral ω Z₁ + submanifoldIntegral ω Z₂ := by
   classical
   -- The proxy definition factors through the measure of `Z` and a fixed evaluation of `ω`,
   -- so additivity reduces to additivity of the measure on disjoint measurable sets.
-  set μ : Measure X := hausdorffMeasure2p (X := X) p
+  set μ : Measure X := hausdorffMeasure2p (n := n) (X := X) p
   have hμ_union : μ (Z₁ ∪ Z₂) = μ Z₁ + μ Z₂ := by
     -- `measure_union` only needs measurability of the second set.
     simpa [μ] using (measure_union (μ := μ) hZ hZ₂)
@@ -152,22 +158,6 @@ theorem submanifoldIntegral_empty {p : ℕ} (ω : SmoothForm n X (2 * p)) :
     submanifoldIntegral ω ∅ = 0 := by
   simp [submanifoldIntegral]
 
-/-- **Dirac measure toReal is bounded by 1**.
-
-    For any set Z, `(Measure.dirac x Z).toReal ∈ {0, 1}`:
-    - If `x ∈ Z`: `(Measure.dirac x Z) = 1`, so `.toReal = 1`
-    - If `x ∉ Z`: `(Measure.dirac x Z) = 0`, so `.toReal = 0` -/
-private lemma dirac_toReal_le_one (x : X) (Z : Set X) :
-    (Measure.dirac x Z).toReal ≤ 1 := by
-  -- Dirac measure of any set is ≤ 1 (it's either 0 or 1)
-  -- Key fact: (Measure.dirac x Z) ≤ 1 as ENNReal (it's ≤ dirac x univ = 1)
-  have h : (Measure.dirac x Z) ≤ 1 := by
-    calc (Measure.dirac x Z) ≤ (Measure.dirac x Set.univ) :=
-          MeasureTheory.measure_mono (Set.subset_univ Z)
-      _ = 1 := Measure.dirac_apply_of_mem (Set.mem_univ x)
-  calc (Measure.dirac x Z).toReal ≤ (1 : ℝ≥0∞).toReal := ENNReal.toReal_mono (by simp) h
-    _ = 1 := by simp
-
 /-- **Pointwise comass at basepoint bounded by global comass**. -/
 private lemma pointwiseComass_le_norm {k : ℕ} (ω : SmoothForm n X k) :
     pointwiseComass ω basepoint ≤ ‖ω‖ := by
@@ -176,18 +166,14 @@ private lemma pointwiseComass_le_norm {k : ℕ} (ω : SmoothForm n X k) :
 
 /-- Submanifold integration is bounded by the form norm.
 
-    For the Dirac proxy measure, `|(μ Z).toReal| ≤ 1` and form evaluations are
-    bounded by the comass norm, so `|∫_Z ω| ≤ ‖ω‖`.
-
-    **Proof**: Uses `|a * b| ≤ |a| * |b| ≤ 1 * ‖ω‖ = ‖ω‖`. -/
+    Since the implementation is `μ(Z).toReal * eval(ω)`, we have:
+    `|∫_Z ω| ≤ μ(Z).toReal * ‖ω‖` using `μ(Z).toReal ≥ 0` and the comass bound. -/
 theorem submanifoldIntegral_abs_le {p : ℕ} (ω : SmoothForm n X (2 * p)) (Z : Set X) :
-    |submanifoldIntegral (n := n) (X := X) ω Z| ≤ ‖ω‖ := by
-  unfold submanifoldIntegral hausdorffMeasure2p
+    |submanifoldIntegral (n := n) (X := X) ω Z| ≤
+      ((hausdorffMeasure2p (n := n) (X := X) p) Z).toReal * ‖ω‖ := by
+  unfold submanifoldIntegral
   rw [abs_mul]
-  -- Bound 1: |(Dirac measure).toReal| ≤ 1
-  have h_dirac : |(Measure.dirac basepoint Z).toReal| ≤ 1 := by
-    rw [abs_of_nonneg ENNReal.toReal_nonneg]
-    exact dirac_toReal_le_one basepoint Z
+  have hμ_nonneg : 0 ≤ ((hausdorffMeasure2p (n := n) (X := X) p) Z).toReal := ENNReal.toReal_nonneg
   -- Bound 2: |Re(eval)| ≤ pointwiseComass ≤ ‖ω‖
   have h_eval : |Complex.reCLM ((ω.as_alternating basepoint) (standardFrame (2 * p)))| ≤ ‖ω‖ := by
     have h1 : |Complex.reCLM ((ω.as_alternating basepoint) (standardFrame (2 * p)))| ≤
@@ -213,10 +199,13 @@ theorem submanifoldIntegral_abs_le {p : ℕ} (ω : SmoothForm n X (2 * p)) (Z : 
       _ ≤ ‖ω‖ * 1 := by apply mul_le_mul_of_nonneg_left h_prod_le (comass_nonneg _)
       _ = ‖ω‖ := mul_one _
   -- Combine
-  calc |(Measure.dirac basepoint Z).toReal| *
+  calc |((hausdorffMeasure2p (n := n) (X := X) p) Z).toReal| *
         |Complex.reCLM ((ω.as_alternating basepoint) (standardFrame (2 * p)))|
-      ≤ 1 * ‖ω‖ := mul_le_mul h_dirac h_eval (abs_nonneg _) zero_le_one
-    _ = ‖ω‖ := one_mul _
+      = ((hausdorffMeasure2p (n := n) (X := X) p) Z).toReal *
+          |Complex.reCLM ((ω.as_alternating basepoint) (standardFrame (2 * p)))| := by
+          simp [abs_of_nonneg hμ_nonneg]
+    _ ≤ ((hausdorffMeasure2p (n := n) (X := X) p) Z).toReal * ‖ω‖ := by
+          exact mul_le_mul_of_nonneg_left h_eval hμ_nonneg
 
 /-! ## Integration Currents -/
 
@@ -399,30 +388,30 @@ theorem submanifoldIntegral_zero_empty {p : ℕ} :
 
 /-- **Submanifold integration is bounded** (Round 9: Agent 3).
 
-    The Dirac proxy measure gives `μ(Z).toReal ≤ 1`, and the form evaluation at a
-    point is bounded by the comass norm. Combined: `|∫_Z ω| ≤ 1 * ‖ω‖`
-
-    **Mathematical reasoning**:
-    - `|μ.toReal| ∈ {0, 1}` for Dirac measure
-    - `|Re(z)| ≤ ‖z‖ ≤ pointwiseComass ≤ comass = ‖ω‖` -/
+    With real Hausdorff measure, the natural bound is:
+    `|∫_Z ω| ≤ μ(Z).toReal * ‖ω‖` (since the implementation is `μ(Z).toReal * eval(ω)`). -/
 theorem submanifoldIntegral_bound {p : ℕ} (Z : Set X) (ω : SmoothForm n X (2 * p)) :
-    |submanifoldIntegral (n := n) (X := X) ω Z| ≤ ‖ω‖ :=
+    |submanifoldIntegral (n := n) (X := X) ω Z| ≤
+      ((hausdorffMeasure2p (n := n) (X := X) p) Z).toReal * ‖ω‖ :=
   submanifoldIntegral_abs_le ω Z
 
 /-- **Degree-2p integration is bounded** (Round 9).
-    For any k-form ω and set Z, `|integrateDegree2p k Z ω| ≤ ‖ω‖`. -/
+    For any k-form ω and set Z:
+    - if k is even, the bound involves the corresponding Hausdorff measure `μ(Z).toReal`
+    - if k is odd, `integrateDegree2p` returns 0. -/
 theorem integrateDegree2p_bound (k : ℕ) (Z : Set X) (ω : SmoothForm n X k) :
-    |integrateDegree2p (n := n) (X := X) k Z ω| ≤ ‖ω‖ := by
+    |integrateDegree2p (n := n) (X := X) k Z ω| ≤
+      (if hk : 2 ∣ k then ((hausdorffMeasure2p (n := n) (X := X) (k / 2)) Z).toReal else 0) * ‖ω‖ := by
   unfold integrateDegree2p
   split_ifs with hk
   · -- Even degree: bound transfers through castForm (norm-preserving)
-    have hkp := Nat.eq_mul_of_div_eq_right hk rfl
-    calc |submanifoldIntegral (n := n) (X := X) (castForm hkp ω) Z|
-        ≤ ‖castForm hkp ω‖ := submanifoldIntegral_bound (n := n) (X := X) Z (castForm hkp ω)
-      _ = ‖ω‖ := castForm_norm_eq hkp ω
-  · -- Odd degree: |0| ≤ ‖ω‖
-    simp only [abs_zero]
-    exact comass_nonneg ω
+    let p := k / 2
+    have hkp : k = 2 * p := Nat.eq_mul_of_div_eq_right hk rfl
+    have h := submanifoldIntegral_bound (n := n) (X := X) (p := p) Z (castForm hkp ω)
+    -- Avoid simp loops: only rewrite the cast norm and the local definition of p.
+    simpa [p, castForm_norm_eq hkp ω] using h
+  · -- Odd degree: integrateDegree2p = 0, RHS = 0
+    simp
 
 /-! ## Summary
 
