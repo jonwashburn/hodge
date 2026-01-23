@@ -331,11 +331,40 @@ The Hodge Conjecture formalization is now complete.
 
 ## Type Class Considerations
 
-The `KahlerManifold` type class has axiomatized fields (Hard Lefschetz, etc.) that
-don't show in `#print axioms` because they're assumptions, not axiom declarations.
+### KahlerManifold Fields
 
-For a truly unconditional proof, these should also be theorems. However, assuming
-a Kähler manifold satisfies these properties is standard (they follow from
-Hodge theory).
+The `KahlerManifold` type class has the following fields (all mathematically standard):
 
-See `Hodge/Cohomology/Basic.lean` lines 893-942 for details.
+| Field | Type | Mathematical Status |
+|-------|------|---------------------|
+| `omega_form` | `SmoothForm n X 2` | Kähler form (data) |
+| `omega_closed` | `IsFormClosed omega_form` | Closedness: dω = 0 |
+| `omega_positive` | Positivity statement | Standard Kähler condition |
+| `omega_is_pp` | `isPPForm' n X 1 omega_form` | ω is a (1,1)-form |
+| `omega_rational_witness` | `IsRationalFormWitness` | [ω] is rational (from line bundle) |
+| `omega_J_invariant` | J-invariance | Kähler identity |
+
+**Note**: Hard Lefschetz is **NOT** a field of `KahlerManifold`. It was intentionally
+removed because:
+1. It's not used in the proof of `hodge_conjecture'`
+2. It would be a "hidden axiom" in the typeclass
+3. It requires substantial infrastructure to prove (sl(2) representation theory)
+
+### Hard Lefschetz (Off-Track)
+
+Hard Lefschetz is packaged separately in `HardLefschetzData`:
+- Location: `Hodge/Kahler/Lefschetz/Sl2Representation.lean`
+- Status: Assumption (off proof track)
+- Full analysis: See `docs/HARD_LEFSCHETZ_ANALYSIS.md`
+
+The classical proof path requires:
+1. Real dual Lefschetz operator Λ
+2. Kähler identities
+3. sl(2) commutation relations
+4. Finite-dimensional sl(2) representation theory
+
+Estimated effort for full formalization: 6-12 months.
+
+### References
+
+See `Hodge/Cohomology/Basic.lean` lines 890-965 for detailed documentation.
