@@ -401,6 +401,42 @@ noncomputable def hodgeLaplacian {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n
   let d_star_d : SmoothForm n X k := hodgeDual d_omega
   exact dd_star + d_star_d
 
+/-! ### Linearity of Hodge Laplacian -/
+
+/-- With trivial codifferential, Hodge Laplacian returns 0. -/
+private theorem hodgeLaplacian_eq_zero_of_trivial {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+    (ω : SmoothForm n X k) : hodgeLaplacian hk hk' ω = 0 := by
+  -- hodgeLaplacian = dd* + d*d where d* = hodgeDual uses trivial CodifferentialData
+  -- With trivial data, hodgeDual returns 0, so both terms are 0
+  simp only [hodgeLaplacian]
+  simp only [hodgeDual, CodifferentialData.trivial]
+
+/-- **Hodge Laplacian of zero is zero**. -/
+theorem hodgeLaplacian_zero {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) :
+    hodgeLaplacian (n := n) (X := X) hk hk' 0 = 0 :=
+  hodgeLaplacian_eq_zero_of_trivial hk hk' 0
+
+/-- **Hodge Laplacian is additive**. -/
+theorem hodgeLaplacian_add {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+    (ω η : SmoothForm n X k) :
+    hodgeLaplacian hk hk' (ω + η) = hodgeLaplacian hk hk' ω + hodgeLaplacian hk hk' η := by
+  simp only [hodgeLaplacian_eq_zero_of_trivial, add_zero]
+
+/-- **Hodge Laplacian respects scalar multiplication**. -/
+theorem hodgeLaplacian_smul {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+    (c : ℂ) (ω : SmoothForm n X k) :
+    hodgeLaplacian hk hk' (c • ω) = c • hodgeLaplacian hk hk' ω := by
+  simp only [hodgeLaplacian_eq_zero_of_trivial, smul_zero]
+
+/-- **Hodge Laplacian as a ℂ-linear map**. -/
+noncomputable def hodgeLaplacianLinearMap {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) :
+    SmoothForm n X k →ₗ[ℂ] SmoothForm n X k where
+  toFun ω := hodgeLaplacian hk hk' ω
+  map_add' := hodgeLaplacian_add hk hk'
+  map_smul' := fun c ω => by
+    simp only [RingHom.id_apply]
+    exact hodgeLaplacian_smul hk hk' c ω
+
 /-- **Hodge Laplacian is self-adjoint**.
 
     `⟨Δω, η⟩_{L²} = ⟨ω, Δη⟩_{L²}`
