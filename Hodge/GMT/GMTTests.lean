@@ -53,9 +53,10 @@ example (p : ℕ) (Z : Set X) : SmoothForm n X (2 * p) :=
 
 /-! ## Round 7 Tests: Current Architecture -/
 
--- Test 6: IntegrationData.closedSubmanifold_zero carries the set Z
-example (Z : Set X) :
-    (IntegrationData.closedSubmanifold_zero n X Z).carrier = Z := rfl
+-- Test 6: integration_current uses closedSubmanifold (depends on Z)
+-- The current's carrier is Z, not empty.
+example (k : ℕ) (Z : Set X) :
+    (IntegrationData.closedSubmanifold n X k Z).carrier = Z := rfl
 
 -- Test 7: setIntegral is now wired to integrateDegree2p (Round 8)
 -- For odd k, integrateDegree2p returns 0; for even k, it integrates via submanifoldIntegral
@@ -65,11 +66,11 @@ example (k : ℕ) (Z : Set X) (ω : SmoothForm n X k) :
 -- Test 8: integration current of a set Z uses setIntegral
 -- (This is the key Round 7 deliverable: currents now depend on Z via closedSubmanifold)
 example (k : ℕ) (Z : Set X) (ω : SmoothForm n X k) :
-    (integrationCurrentK (n := n) (X := X) k Z).toFun ω = 0 := by
-  rfl
+    (integrationCurrentK (n := n) (X := X) k Z).toFun ω = setIntegral k Z ω := rfl
 
 -- Test 9: The carrier of a closedSubmanifold IntegrationData is the set itself
 example (k : ℕ) (Z₁ Z₂ : Set X) (hne : Z₁ ≠ Z₂) :
-    (IntegrationData.closedSubmanifold_zero n X Z₁).carrier ≠
-    (IntegrationData.closedSubmanifold_zero n X Z₂).carrier := by
-  simpa [IntegrationData.closedSubmanifold_zero] using hne
+    (IntegrationData.closedSubmanifold n X k Z₁).carrier ≠
+    (IntegrationData.closedSubmanifold n X k Z₂).carrier := by
+  simp only [IntegrationData.closedSubmanifold]
+  exact hne

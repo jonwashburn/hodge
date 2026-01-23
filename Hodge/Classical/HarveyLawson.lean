@@ -311,7 +311,7 @@ instance : CoeTC (AnalyticSubvariety n X) (Set X) where
 noncomputable def integrationCurrentHL {p k : ℕ} [MeasurableSpace X]
     (V : AnalyticSubvariety n X) (_hV : V.codim = p)
     (_mult : ℤ) : Current n X k :=
-  0
+  integration_current (n := n) (X := X) (k := k) V.carrier
 
 /-- The hypothesis structure for the Harvey-Lawson theorem. -/
 structure HarveyLawsonHypothesis (n : ℕ) (X : Type*) (k : ℕ)
