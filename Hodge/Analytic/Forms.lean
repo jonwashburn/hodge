@@ -129,6 +129,21 @@ def castForm {k k' : ℕ} (h : k = k') (ω : SmoothForm n X k) : SmoothForm n X 
     (castForm h ω).as_alternating x = h ▸ ω.as_alternating x := by
   subst h; rfl
 
+/-- Cast form is additive. -/
+@[simp] lemma castForm_add {k k' : ℕ} (h : k = k') (ω₁ ω₂ : SmoothForm n X k) :
+    castForm h (ω₁ + ω₂) = castForm h ω₁ + castForm h ω₂ := by
+  subst h; rfl
+
+/-- Cast form respects ℂ-scalar multiplication. -/
+@[simp] lemma castForm_smul {k k' : ℕ} (h : k = k') (c : ℂ) (ω : SmoothForm n X k) :
+    castForm h (c • ω) = c • castForm h ω := by
+  subst h; rfl
+
+/-- Cast form respects ℝ-scalar multiplication. -/
+@[simp] lemma castForm_smul_real {k k' : ℕ} (h : k = k') (r : ℝ) (ω : SmoothForm n X k) :
+    castForm h (r • ω) = r • castForm h ω := by
+  subst h; rfl
+
 instance (k : ℕ) : AddCommGroup (SmoothForm n X k) where
   add := (· + ·)
   zero := 0
