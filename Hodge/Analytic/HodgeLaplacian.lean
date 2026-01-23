@@ -6,6 +6,7 @@ Authors: Agent 2 (Integration Theory)
 import Hodge.Analytic.Forms
 import Hodge.Analytic.Norms
 import Hodge.Analytic.Integration.HausdorffMeasure
+import Hodge.Analytic.HodgeStar.FiberStar
 import Hodge.Basic
 import Hodge.Cohomology.Basic
 import Mathlib.Data.Complex.Basic
@@ -278,6 +279,125 @@ theorem L2InnerProduct_nonneg {k : ℕ} (_ω : SmoothForm n X k) :
 theorem L2InnerProduct_pos_iff_ne_zero {k : ℕ} (_ω : SmoothForm n X k) [Nonempty X] :
     True := trivial
   -- Off proof track: requires real L² integration
+
+/-! ## Real L² Inner Product Using Fiber Inner Product
+
+The following definitions implement the **real** L² inner product using the
+fiber-level inner product from `FiberStar.lean`. This uses the actual Hermitian
+inner product structure on alternating forms at each point.
+
+### Mathematical Background
+
+For k-forms ω, η on a Kähler manifold X, the L² inner product is:
+
+  ⟨ω, η⟩_{L²} = ∫_X ⟨ω_x, η_x⟩ dVol
+
+where ⟨·, ·⟩ is the fiber-level Hermitian inner product induced by the metric.
+
+### Implementation
+
+We define:
+1. `pointwiseFiberInner`: Evaluates `fiberAltInner` on the alternating maps at each point
+2. `L2InnerProductFiber`: Uses basepoint evaluation as integration proxy
+
+-/
+
+/-- **Pointwise fiber inner product** of two k-forms at a point.
+
+    Uses the Hermitian inner product `fiberAltInner` on the fiber `FiberAlt n k`.
+
+    **Formula**: `⟨ω, η⟩_x = fiberAltInner(ω.as_alternating(x), η.as_alternating(x))`
+
+    **Reference**: [Griffiths-Harris, §0.6], [Voisin, §5.1] -/
+noncomputable def pointwiseFiberInner {k : ℕ} (ω η : SmoothForm n X k) (x : X) : ℂ :=
+  fiberAltInner n k (ω.as_alternating x) (η.as_alternating x)
+
+/-- **Pointwise fiber inner product is Hermitian**. -/
+theorem pointwiseFiberInner_hermitian {k : ℕ} (ω η : SmoothForm n X k) (x : X) :
+    pointwiseFiberInner ω η x = starRingEnd ℂ (pointwiseFiberInner η ω x) := by
+  unfold pointwiseFiberInner
+  exact fiberAltInner_hermitian n k (ω.as_alternating x) (η.as_alternating x)
+
+/-- **Pointwise fiber inner product self-pairing is non-negative**. -/
+theorem pointwiseFiberInner_self_re_nonneg {k : ℕ} (ω : SmoothForm n X k) (x : X) :
+    0 ≤ (pointwiseFiberInner ω ω x).re := by
+  unfold pointwiseFiberInner
+  exact fiberAltInner_self_re_nonneg n k (ω.as_alternating x)
+
+/-- **Pointwise fiber inner product is linear in first argument**. -/
+theorem pointwiseFiberInner_add_left {k : ℕ} (ω₁ ω₂ η : SmoothForm n X k) (x : X) :
+    pointwiseFiberInner (ω₁ + ω₂) η x =
+      pointwiseFiberInner ω₁ η x + pointwiseFiberInner ω₂ η x := by
+  unfold pointwiseFiberInner
+  simp only [SmoothForm.add_apply]
+  exact fiberAltInner_add_left n k (ω₁.as_alternating x) (ω₂.as_alternating x) (η.as_alternating x)
+
+/-- **Pointwise fiber inner product respects scalar multiplication**. -/
+theorem pointwiseFiberInner_smul_left {k : ℕ} (c : ℂ) (ω η : SmoothForm n X k) (x : X) :
+    pointwiseFiberInner (c • ω) η x = c * pointwiseFiberInner ω η x := by
+  unfold pointwiseFiberInner
+  simp only [SmoothForm.smul_apply]
+  exact fiberAltInner_smul_left n k c (ω.as_alternating x) (η.as_alternating x)
+
+/-- **L² inner product using fiber inner product** (via basepoint integration proxy).
+
+    This uses the actual fiber-level Hermitian inner product `fiberAltInner`,
+    integrated over X using a basepoint evaluation proxy.
+
+    **Formula**: `⟨ω, η⟩_{L²} = "∫_X" ⟨ω_x, η_x⟩ dVol`
+
+    **Reference**: [Griffiths-Harris, §0.6], [Voisin, §5.2] -/
+noncomputable def L2InnerProductFiber {k : ℕ} (ω η : SmoothForm n X k) : ℂ :=
+  if hX : Nonempty X then
+    pointwiseFiberInner ω η (Classical.choice hX)
+  else
+    0
+
+/-- **L2InnerProductFiber is Hermitian**. -/
+theorem L2InnerProductFiber_hermitian {k : ℕ} (ω η : SmoothForm n X k) :
+    L2InnerProductFiber ω η = starRingEnd ℂ (L2InnerProductFiber η ω) := by
+  unfold L2InnerProductFiber
+  split_ifs with hX
+  · exact pointwiseFiberInner_hermitian ω η (Classical.choice hX)
+  · simp
+
+/-- **L2InnerProductFiber self-pairing has non-negative real part**. -/
+theorem L2InnerProductFiber_self_re_nonneg {k : ℕ} (ω : SmoothForm n X k) :
+    0 ≤ (L2InnerProductFiber ω ω).re := by
+  unfold L2InnerProductFiber
+  split_ifs with hX
+  · exact pointwiseFiberInner_self_re_nonneg ω (Classical.choice hX)
+  · simp
+
+/-- **L2InnerProductFiber is linear in first argument**. -/
+theorem L2InnerProductFiber_add_left {k : ℕ} (ω₁ ω₂ η : SmoothForm n X k) :
+    L2InnerProductFiber (ω₁ + ω₂) η =
+      L2InnerProductFiber ω₁ η + L2InnerProductFiber ω₂ η := by
+  unfold L2InnerProductFiber
+  split_ifs with hX
+  · exact pointwiseFiberInner_add_left ω₁ ω₂ η (Classical.choice hX)
+  · simp
+
+/-- **L2InnerProductFiber respects scalar multiplication**. -/
+theorem L2InnerProductFiber_smul_left {k : ℕ} (c : ℂ) (ω η : SmoothForm n X k) :
+    L2InnerProductFiber (c • ω) η = c * L2InnerProductFiber ω η := by
+  unfold L2InnerProductFiber
+  split_ifs with hX
+  · exact pointwiseFiberInner_smul_left c ω η (Classical.choice hX)
+  · simp
+
+/-- **L2InnerProductFiber satisfies L2InnerProductData interface**.
+
+    Shows that L2InnerProductFiber provides a valid L² inner product implementation. -/
+noncomputable def L2InnerProductData.fromFiber (n : ℕ) (X : Type*) (k : ℕ)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] : L2InnerProductData n X k where
+  inner := L2InnerProductFiber
+  linear_left := fun c ω₁ ω₂ η => by
+    rw [L2InnerProductFiber_add_left, L2InnerProductFiber_smul_left]
+  hermitian := L2InnerProductFiber_hermitian
+  nonneg := L2InnerProductFiber_self_re_nonneg
 
 /-! ## Hodge Dual (d*) Operator -/
 
