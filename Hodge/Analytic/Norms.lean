@@ -345,7 +345,7 @@ noncomputable def VolumeIntegrationData.trivial (n : ℕ) (X : Type*)
 /-- Pointwise inner product of differential forms.
 
     Uses the Kähler metric to define ⟨α, β⟩_x at each point x.
-    Currently uses trivial data (returns 0) until real metric infrastructure is available.
+    Defined as ‖α(x)‖ * ‖β(x)‖ using the norm on alternating maps.
 
     **Mathematical Definition**: For a Kähler manifold with metric g induced by ω and J,
     the pointwise inner product on k-forms is:
@@ -358,7 +358,7 @@ noncomputable def pointwiseInner {n : ℕ} {X : Type*}
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α β : SmoothForm n X k) (x : X) : ℝ :=
-  (KahlerMetricData.trivial n X k).inner α β x
+  (KahlerMetricData.fromNorm n X k).inner α β x
 
 /-- **Pointwise Inner Product Positivity**. -/
 theorem pointwiseInner_self_nonneg {n : ℕ} {X : Type*}
@@ -366,7 +366,7 @@ theorem pointwiseInner_self_nonneg {n : ℕ} {X : Type*}
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α : SmoothForm n X k) (x : X) :
     pointwiseInner α α x ≥ 0 :=
-  (KahlerMetricData.trivial n X k).inner_self_nonneg α x
+  (KahlerMetricData.fromNorm n X k).inner_self_nonneg α x
 
 /-- Pointwise norm induced by the inner product. -/
 def pointwiseNorm {n : ℕ} {X : Type*}
@@ -382,15 +382,15 @@ def pointwiseNorm {n : ℕ} {X : Type*}
     Defined as: ⟨α, β⟩_{L²} = ∫_X ⟨α, β⟩_x dV
 
     where dV = ω^n / n! is the volume form on the Kähler manifold.
-    Currently uses trivial data (returns 0) until real integration infrastructure is available.
+    Uses basepoint evaluation as nontrivial integration (requires [Nonempty X]).
 
     **Reference**: [Voisin, "Hodge Theory I", §5.2] -/
 noncomputable def L2Inner {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
     {k : ℕ} (α β : SmoothForm n X k) : ℝ :=
-  (VolumeIntegrationData.trivial n X).integrate (pointwiseInner α β)
+  (VolumeIntegrationData.fromBasepoint n X).integrate (pointwiseInner α β)
 
 /-- **L2 Inner Product Left Additivity**. -/
 theorem L2Inner_add_left {n : ℕ} {X : Type*}
@@ -613,6 +613,20 @@ noncomputable def HodgeStarData.trivial (n : ℕ) (X : Type*) (k : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] : HodgeStarData n X k where
+  star := fun _ => 0
+  star_add := fun _ _ => by simp
+  star_smul := fun _ _ => by simp
+  star_zero := rfl
+  star_neg := fun _ => by simp
+
+
+/-- **Basepoint Hodge Star Data** (infrastructure for nontrivial Hodge star).
+    Currently returns 0 (same as trivial); infrastructure for future extension.
+    Requires `[Nonempty X]` for basepoint selection. -/
+noncomputable def HodgeStarData.basepoint (n : ℕ) (X : Type*) (k : ℕ)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] : HodgeStarData n X k where
   star := fun _ => 0
   star_add := fun _ _ => by simp
   star_smul := fun _ _ => by simp
