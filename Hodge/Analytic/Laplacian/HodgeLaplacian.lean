@@ -50,27 +50,59 @@ noncomputable abbrev hodgeLaplacian_construct {k : ℕ} (hk : 1 ≤ k) (hk' : k 
     (ω : SmoothForm n X k) : SmoothForm n X k :=
   laplacian_construct (n := n) (X := X) (k := k) hk hk' ω
 
-/-- Laplacian as a ℂ-linear map (using the current definition of Δ). -/
+/-! ### Linearity of laplacian_construct -/
+
+/-- Laplacian of zero is zero. -/
+theorem laplacian_construct_zero {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) :
+    laplacian_construct (n := n) (X := X) (k := k) hk hk' 0 = 0 := by
+  simp only [laplacian_construct, Codifferential.codifferential_zero,
+             smoothExtDeriv_zero, castForm_zero, add_zero]
+
+/-- Laplacian is additive. -/
+theorem laplacian_construct_add {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+    (α β : SmoothForm n X k) :
+    laplacian_construct hk hk' (α + β) =
+    laplacian_construct hk hk' α + laplacian_construct hk hk' β := by
+  simp only [laplacian_construct]
+  rw [Codifferential.codifferential_add, smoothExtDeriv_add]
+  rw [smoothExtDeriv_add, Codifferential.codifferential_add]
+  rw [castForm_add, castForm_add]
+  ring
+
+/-- Laplacian respects ℂ-scalar multiplication. -/
+theorem laplacian_construct_smul {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+    (c : ℂ) (α : SmoothForm n X k) :
+    laplacian_construct hk hk' (c • α) = c • laplacian_construct hk hk' α := by
+  simp only [laplacian_construct]
+  rw [Codifferential.codifferential_smul, smoothExtDeriv_smul_complex]
+  rw [smoothExtDeriv_smul_complex, Codifferential.codifferential_smul]
+  rw [castForm_smul, castForm_smul]
+  rw [smul_add]
+
+/-- Laplacian as a ℂ-linear map (using the current definition of Δ).
+
+Linearity is proved structurally from linearity of d and δ. -/
 noncomputable def laplacianLinearMap (k : ℕ) (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) :
     SmoothForm n X k →ₗ[ℂ] SmoothForm n X k where
   toFun ω := laplacian_construct (n := n) (X := X) (k := k) hk hk' ω
-  map_add' := by
-    intro ω η
-    -- `δ` is currently trivial, so Δ is trivial; this keeps the build stable until ⋆ is real.
-    simp [laplacian_construct, add_assoc, add_left_comm, add_comm]
-  map_smul' := by
-    intro c ω
-    simp [laplacian_construct, mul_add]
+  map_add' := laplacian_construct_add hk hk'
+  map_smul' := fun c ω => by
+    simp only [RingHom.id_apply]
+    exact laplacian_construct_smul hk hk' c ω
 
-@[simp] theorem laplacian_construct_eq_zero_trivial {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+/-- With trivial Hodge star (hence trivial δ), the Laplacian returns 0.
+
+**Note**: This is NOT marked `@[simp]` to preserve the algebraic structure of proofs. -/
+theorem laplacian_construct_eq_zero_of_trivial_star {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
     (ω : SmoothForm n X k) :
     laplacian_construct (n := n) (X := X) (k := k) hk hk' ω = 0 := by
-  simp [laplacian_construct]
+  simp [laplacian_construct, Codifferential.codifferential_eq_zero_of_trivial_star]
 
-@[simp] theorem hodgeLaplacian_construct_eq_zero_trivial {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+/-- With trivial Hodge star, the Hodge Laplacian returns 0. -/
+theorem hodgeLaplacian_construct_eq_zero_of_trivial_star {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
     (ω : SmoothForm n X k) :
-    hodgeLaplacian_construct (n := n) (X := X) (k := k) hk hk' ω = 0 := by
-  simp [hodgeLaplacian_construct, laplacian_construct_eq_zero_trivial (n := n) (X := X) (k := k) hk hk' ω]
+    hodgeLaplacian_construct (n := n) (X := X) (k := k) hk hk' ω = 0 :=
+  laplacian_construct_eq_zero_of_trivial_star hk hk' ω
 
 end HodgeLaplacian
 end Hodge

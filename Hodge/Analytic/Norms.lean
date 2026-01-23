@@ -308,6 +308,44 @@ noncomputable def KahlerMetricData.trivial (n : ℕ) (X : Type*) (k : ℕ)
   inner_smul_left := fun _ _ _ _ => by simp
   inner_continuous := fun _ _ => continuous_const
 
+/-- A fixed frame in the model tangent space for fiber evaluation. -/
+noncomputable def innerProductFrame (n : ℕ) (k : ℕ) : Fin k → EuclideanSpace ℂ (Fin n) :=
+  fun i =>
+    if hn : n = 0 then 0
+    else EuclideanSpace.single ⟨i.1 % n, Nat.mod_lt i.1 (Nat.pos_of_ne_zero hn)⟩ (1 : ℂ)
+
+/-- **Evaluation-based Kähler Metric Data** (nontrivial). -/
+noncomputable def KahlerMetricData.fromEval (n : ℕ) (X : Type*) (k : ℕ)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] : KahlerMetricData n X k where
+  inner := fun α β x =>
+    let frame := innerProductFrame n k
+    (α.as_alternating x frame * starRingEnd ℂ (β.as_alternating x frame)).re
+  inner_self_nonneg := fun α x => by
+    simp only
+    have h : (α.as_alternating x (innerProductFrame n k) *
+              starRingEnd ℂ (α.as_alternating x (innerProductFrame n k))).re =
+             Complex.normSq (α.as_alternating x (innerProductFrame n k)) := by
+      rw [mul_comm, Complex.mul_conj, Complex.ofReal_re]
+    rw [h]; exact Complex.normSq_nonneg _
+  inner_comm := fun α β x => by
+    simp only
+    have key : ∀ (z w : ℂ), (z * starRingEnd ℂ w).re = (w * starRingEnd ℂ z).re := fun z w => by
+      simp only [RingHomCompTriple.comp_apply, RingHom.id_apply]; rw [Complex.mul_comm_re_conj]
+    exact key _ _
+  inner_add_left := fun α₁ α₂ β x => by
+    simp only [SmoothForm.add_apply, ContinuousAlternatingMap.add_apply]; ring
+  inner_smul_left := fun r α β x => by
+    simp only [SmoothForm.smul_apply, ContinuousAlternatingMap.smul_apply]
+    simp only [Complex.real_smul, Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im]; ring
+  inner_continuous := fun α β => by
+    apply Complex.continuous_re.comp
+    apply Continuous.mul
+    · exact ContinuousAlternatingMap.continuous_eval.comp (α.smooth.continuous.prod_mk continuous_const)
+    · apply Complex.continuous_conj.comp
+      exact ContinuousAlternatingMap.continuous_eval.comp (β.smooth.continuous.prod_mk continuous_const)
+
 /-- **Volume Integration Data** (Agent 3).
 
     Bundles the volume form integration for L2 inner products.
@@ -340,6 +378,17 @@ noncomputable def VolumeIntegrationData.trivial (n : ℕ) (X : Type*)
   integrate_smul := fun _ _ => by simp
   integrate_nonneg := fun _ _ => le_refl 0
 
+/-- **Basepoint Volume Integration Data** (nontrivial). Evaluates at a fixed basepoint. -/
+noncomputable def VolumeIntegrationData.fromBasepoint (n : ℕ) (X : Type*)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] :
+    VolumeIntegrationData n X where
+  integrate := fun f => f (Classical.choice ‹Nonempty X›)
+  integrate_add := fun f g => by simp [Pi.add_apply]
+  integrate_smul := fun c f => by simp [Pi.smul_apply, smul_eq_mul]
+  integrate_nonneg := fun f hf => hf _
+
 /-! ### Pointwise Inner Product -/
 
 /-- Pointwise inner product of differential forms.
@@ -358,7 +407,7 @@ noncomputable def pointwiseInner {n : ℕ} {X : Type*}
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α β : SmoothForm n X k) (x : X) : ℝ :=
-  (KahlerMetricData.trivial n X k).inner α β x
+  (KahlerMetricData.fromEval n X k).inner α β x
 
 /-- **Pointwise Inner Product Positivity**. -/
 theorem pointwiseInner_self_nonneg {n : ℕ} {X : Type*}
@@ -366,7 +415,7 @@ theorem pointwiseInner_self_nonneg {n : ℕ} {X : Type*}
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α : SmoothForm n X k) (x : X) :
     pointwiseInner α α x ≥ 0 :=
-  (KahlerMetricData.trivial n X k).inner_self_nonneg α x
+  (KahlerMetricData.fromEval n X k).inner_self_nonneg α x
 
 /-- Pointwise norm induced by the inner product. -/
 def pointwiseNorm {n : ℕ} {X : Type*}

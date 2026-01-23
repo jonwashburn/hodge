@@ -17,11 +17,14 @@ exterior derivative d.
 
 * `codifferential`: The codifferential δ : Ω^k → Ω^{k-1}
 * `codifferentialSign`: The sign factor (-1)^{nk+n+1}
+* `codifferentialLinearMap`: δ packaged as a ℂ-linear map
 
 ## Main Results
 
-* `codifferential_add`: δ is additive
-* `codifferential_smul`: δ respects scalar multiplication
+* `codifferential_add`: δ is additive (structural proof)
+* `codifferential_smul`: δ respects ℂ-scalar multiplication
+* `codifferential_smul_real`: δ respects ℝ-scalar multiplication (structural proof)
+* `codifferential_squared`: δ² = 0
 
 ## Mathematical Background
 
@@ -33,6 +36,14 @@ where n is the complex dimension (so real dimension is 2n), k is the form degree
 
 Key property: δ is the formal L²-adjoint of d:
   ⟨dα, β⟩_{L²} = ⟨α, δβ⟩_{L²}
+
+## Proof Strategy
+
+The linearity proofs use **structural arguments** based on the algebraic
+properties of ⋆ (`hodgeStar_add`, `hodgeStar_smul`, etc.) and d
+(`smoothExtDeriv_add`, `smoothExtDeriv_smul`, etc.).
+
+This means the proofs will remain valid when ⋆ becomes non-trivial.
 
 ## References
 
@@ -109,36 +120,62 @@ scoped notation:max "δ" α:max => codifferential α
 /-!
 ## Basic Properties
 
-Note: The Hodge star is currently trivial (⋆ = 0), so many properties are
-trivially true. When Agent 3 provides a real Hodge star construction, these
-proofs will need to be updated.
+The linearity proofs below use **structural arguments** based on the algebraic
+properties of ⋆ and d. This ensures they remain valid when ⋆ becomes non-trivial.
 -/
 
-/-- Codifferential of zero is zero. -/
-theorem codifferential_zero : codifferential (0 : SmoothForm n X k) = 0 :=
-  codifferential_eq_zero_trivial 0
+/-- Codifferential of zero is zero.
+    **Structural proof**: Uses `hodgeStar_zero` and `smoothExtDeriv_zero`. -/
+theorem codifferential_zero : codifferential (0 : SmoothForm n X k) = 0 := by
+  simp only [codifferential, hodgeStar_zero, smoothExtDeriv_zero, smul_zero]
 
-/-- Codifferential is additive. -/
+/-- Codifferential is additive.
+    **Structural proof**: Uses `hodgeStar_add` and `smoothExtDeriv_add`. -/
 theorem codifferential_add (α β : SmoothForm n X k) :
     codifferential (α + β) = codifferential α + codifferential β := by
-  simp only [codifferential_eq_zero_trivial, add_zero]
+  simp only [codifferential]
+  rw [hodgeStar_add, smoothExtDeriv_add, hodgeStar_add, smul_add]
 
-/-- Codifferential respects ℂ-scalar multiplication. -/
+/-- Codifferential respects ℝ-scalar multiplication.
+    **Structural proof**: Uses `hodgeStar_smul` and `smoothExtDeriv_smul_real`. -/
+theorem codifferential_smul_real (r : ℝ) (α : SmoothForm n X k) :
+    codifferential (r • α) = r • codifferential α := by
+  simp only [codifferential]
+  rw [hodgeStar_smul, smoothExtDeriv_smul_real, hodgeStar_smul]
+  -- Goal: signFactor n k • (r • ⋆...) = r • (signFactor n k • ⋆...)
+  -- Use smul_comm for ℝ acting on a ℂ-module
+  conv_lhs => rw [smul_comm]
+
+/-- Codifferential respects ℂ-scalar multiplication.
+    With current trivial ⋆, this uses the trivial-star lemma.
+    When ⋆ becomes non-trivial with ℂ-linearity, this can be structural. -/
 theorem codifferential_smul (c : ℂ) (α : SmoothForm n X k) :
     codifferential (c • α) = c • codifferential α := by
   simp only [codifferential_eq_zero_trivial, smul_zero]
 
-/-- Codifferential respects negation. -/
+/-- Codifferential respects negation.
+    **Structural proof**: Uses `hodgeStar_neg` and `smoothExtDeriv_neg`. -/
 theorem codifferential_neg (α : SmoothForm n X k) :
     codifferential (-α) = -codifferential α := by
-  simp only [codifferential_eq_zero_trivial, neg_zero]
+  simp only [codifferential]
+  rw [hodgeStar_neg, smoothExtDeriv_neg, hodgeStar_neg, smul_neg]
 
-/-- Codifferential respects subtraction. -/
+/-- Codifferential respects subtraction.
+    **Structural proof**: Uses `codifferential_add` and `codifferential_neg`. -/
 theorem codifferential_sub (α β : SmoothForm n X k) :
     codifferential (α - β) = codifferential α - codifferential β := by
-  rw [codifferential_eq_zero_trivial, codifferential_eq_zero_trivial,
-      codifferential_eq_zero_trivial]
-  simp only [sub_zero]
+  rw [sub_eq_add_neg, codifferential_add, codifferential_neg, ← sub_eq_add_neg]
+
+/-!
+## Linear Map Packaging
+-/
+
+/-- The codifferential as a ℂ-linear map. -/
+noncomputable def codifferentialLinearMap :
+    SmoothForm n X k →ₗ[ℂ] SmoothForm n X (2 * n - (2 * n - k + 1)) where
+  toFun := codifferential
+  map_add' := codifferential_add
+  map_smul' := fun c ω => by simp only [RingHom.id_apply]; exact codifferential_smul c ω
 
 /-!
 ## δ² = 0
@@ -161,7 +198,8 @@ This is analogous to d² = 0 for the exterior derivative.
 The proof follows from d² = 0 and the involution property of ⋆. -/
 theorem codifferential_squared (ω : SmoothForm n X k) :
     codifferential (codifferential ω) = 0 := by
-  simp only [codifferential_eq_zero_trivial]
+  -- With trivial ⋆, the inner ⋆ω = 0, so d(⋆ω) = d0 = 0, etc.
+  simp only [codifferential, hodgeStar, HodgeStarData.trivial, smoothExtDeriv_zero, smul_zero]
 
 /-- Alias (naming used in the operational plan): `δ² = 0`. -/
 theorem codifferential_squared_zero (ω : SmoothForm n X k) :
@@ -193,19 +231,20 @@ theorem codifferential_adjoint_statement :
 
 ### Definitions:
 - `codifferential`: δ = (-1)^{nk+n+1} ⋆ d ⋆
+- `codifferentialLinearMap`: δ packaged as a ℂ-linear map
 
-### Theorems (all proved):
-- `codifferential_add`: δ(α + β) = δα + δβ
-- `codifferential_smul`: δ(cα) = c δα
-- `codifferential_zero`: δ0 = 0
-- `codifferential_neg`: δ(-α) = -δα
-- `codifferential_sub`: δ(α - β) = δα - δβ
-- `codifferential_squared`: δ² = 0
+### Theorems (with proof strategy):
+- `codifferential_zero`: δ0 = 0 (structural)
+- `codifferential_add`: δ(α + β) = δα + δβ (structural)
+- `codifferential_smul_real`: δ(rα) = r δα (structural, ℝ-linearity)
+- `codifferential_smul`: δ(cα) = c δα (trivial-star, ℂ-linearity)
+- `codifferential_neg`: δ(-α) = -δα (structural)
+- `codifferential_sub`: δ(α - β) = δα - δβ (structural)
+- `codifferential_squared`: δ² = 0 (trivial-star)
 
-### Note on Current Status:
-The Hodge star is currently trivial (⋆ = 0), so δ = 0 as well.
-When Agent 3 provides a real Hodge star construction, these proofs
-will need to be updated to use the actual ⋆ involution property.
+### Current Hodge Star Status:
+The Hodge star is currently trivial (⋆ = 0), so δ = 0 numerically.
+The structural proofs ensure correctness once ⋆ is implemented.
 -/
 
 end Codifferential
