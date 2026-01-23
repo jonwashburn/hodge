@@ -619,6 +619,19 @@ noncomputable def HodgeStarData.trivial (n : ℕ) (X : Type*) (k : ℕ)
   star_zero := rfl
   star_neg := fun _ => by simp
 
+/-- **Basepoint Hodge Star Data** (infrastructure for nontrivial Hodge star).
+    Currently returns 0 (same as trivial); infrastructure for future extension.
+    Requires `[Nonempty X]` for basepoint selection. -/
+noncomputable def HodgeStarData.basepoint (n : ℕ) (X : Type*) (k : ℕ)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] : HodgeStarData n X k where
+  star := fun _ => 0
+  star_add := fun _ _ => by simp
+  star_smul := fun _ _ => by simp
+  star_zero := rfl
+  star_neg := fun _ => by simp
+
 /-! ### Hodge Star Operator Definition -/
 
 /-- **Hodge star operator** on k-forms.
