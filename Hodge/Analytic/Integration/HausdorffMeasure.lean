@@ -38,6 +38,37 @@ This is the foundation for:
 2. Cycle class: [Z] ↦ ∫_Z ω defines a cohomology class
 3. Poincaré duality: ⟨[Z], [W]⟩ = intersection number
 
+## Implementation Status: Hausdorff Measure Proxy
+
+**Why we use a Dirac measure proxy instead of Mathlib's `μH[2p]`:**
+
+Mathlib's `MeasureTheory.Measure.hausdorffMeasure` (notation `μH[d]`) requires:
+1. `[EMetricSpace X]` - to define the extended diameter `ediam` used in the Hausdorff construction
+2. `[BorelSpace X]` - to ensure the measure is Borel-measurable
+
+Our abstract manifold type `X` (with `[ChartedSpace (EuclideanSpace ℂ (Fin n)) X]`)
+does NOT have a canonical `EMetricSpace` instance. While:
+
+- The **model space** `EuclideanSpace ℂ (Fin n)` has `EMetricSpace` (finite-dimensional normed space)
+- **Kähler manifolds** have a natural Riemannian metric induced by the Kähler form
+
+...there is currently no Mathlib infrastructure to derive `EMetricSpace X` from:
+- The charted space structure
+- The Kähler form / Hermitian metric
+- Mathlib's `IsRiemannianManifold` (only for real manifolds)
+
+**Current workaround**: We use `Measure.dirac basepoint` as a stand-in measure.
+This is mathematically degenerate but:
+- Preserves type-correctness
+- Allows downstream code to compile
+- The key theorems (e.g., `submanifoldIntegral_empty`) are still provable
+
+**Future work**: When Mathlib provides:
+1. `EMetricSpace` instances for complex/Kähler manifolds, OR
+2. A way to integrate using Hausdorff measure in charts
+
+...this file should be updated to use real Hausdorff measure.
+
 ## References
 
 * [Federer, "Geometric Measure Theory", Chapter 2.10]
@@ -71,18 +102,26 @@ without yet having the full restriction-to-submanifold infrastructure. -/
 noncomputable def basepoint : X :=
   Classical.choice (inferInstance : Nonempty X)
 
-/-- Hausdorff measure of dimension 2p on X.
+/-- **Hausdorff measure of dimension 2p on X** (Dirac proxy).
 
-    This is the correct measure for integrating 2p-forms over p-dimensional
-    complex submanifolds. -/
+    Mathematically, for a 2p-dimensional submanifold Z ⊂ X, we want:
+    `μ_Z = H^{2p} ⌊ Z` (2p-dimensional Hausdorff measure restricted to Z)
+
+    **Current implementation**: `Measure.dirac basepoint`
+
+    This is a proxy because Mathlib's `μH[2p]` requires `[EMetricSpace X]`,
+    which our abstract manifold lacks. The Dirac measure at a fixed basepoint:
+    - Evaluates to 1 if `basepoint ∈ Z`, else 0
+    - Is mathematically degenerate but type-correct
+    - Allows key lemmas (empty set, linearity) to be proven
+
+    See the module docstring for details on why real Hausdorff measure isn't available.
+
+    **Ideal replacement** (when infrastructure exists):
+    ```
+    MeasureTheory.Measure.hausdorffMeasure (2 * p : ℝ)
+    ``` -/
 noncomputable def hausdorffMeasure2p (p : ℕ) : Measure X :=
-  -- Round 7: eliminate the degenerate `Measure.comap (fun _ => 0) volume` placeholder.
-  --
-  -- In the current project, we do not yet have a canonical metric/measure on `X` compatible with
-  -- the manifold topology, so we cannot directly use Mathlib's `μH[2p]` on `X` here.
-  --
-  -- As a nontrivial stand-in that does *not* require a `MeasureSpace X` instance, we use a Dirac
-  -- measure at an arbitrary basepoint. This makes downstream "integration" depend on `Z`.
   Measure.dirac basepoint
 
 /-- A fixed frame in the model tangent space, used to evaluate a `2p`-form to a scalar. -/
