@@ -74,16 +74,47 @@ noncomputable def basepoint : X :=
 /-- Hausdorff measure of dimension 2p on X.
 
     This is the correct measure for integrating 2p-forms over p-dimensional
-    complex submanifolds. -/
+    complex submanifolds.
+
+    **Implementation note**: The ideal definition uses Mathlib's `μH[2p]` (Hausdorff measure),
+    but this requires `EMetricSpace X`. Since our abstract manifold `X` doesn't have a
+    canonical metric structure, we use a Dirac proxy measure as a stand-in.
+
+    When an `EMetricSpace X` instance is available, use `hausdorffMeasure2p_real` instead. -/
 noncomputable def hausdorffMeasure2p (p : ℕ) : Measure X :=
-  -- Round 7: eliminate the degenerate `Measure.comap (fun _ => 0) volume` placeholder.
-  --
   -- In the current project, we do not yet have a canonical metric/measure on `X` compatible with
   -- the manifold topology, so we cannot directly use Mathlib's `μH[2p]` on `X` here.
   --
   -- As a nontrivial stand-in that does *not* require a `MeasureSpace X` instance, we use a Dirac
   -- measure at an arbitrary basepoint. This makes downstream "integration" depend on `Z`.
   Measure.dirac basepoint
+
+/-! ### Real Hausdorff Measure (requires EMetricSpace)
+
+When a space has an `EMetricSpace` structure (e.g., a Riemannian manifold with its induced
+metric), we can use Mathlib's genuine Hausdorff measure `μH[2p]`.
+
+For projective Kähler manifolds, this would use the metric induced by the Fubini-Study
+metric on the ambient projective space.
+
+The definitions below are parameterized by a separate type variable `Y` with the required
+instances, to avoid polluting the main variable context with `EMetricSpace X`. -/
+
+/-- **Real Hausdorff measure** of dimension 2p using Mathlib's `μH[d]`.
+
+    This uses Mathlib's `MeasureTheory.Measure.hausdorffMeasure` when the space has an
+    `EMetricSpace` structure.
+
+    Reference: [Federer, "Geometric Measure Theory", §2.10] -/
+noncomputable def hausdorffMeasure2p_real {Y : Type*} [EMetricSpace Y] [MeasurableSpace Y]
+    [BorelSpace Y] (p : ℕ) : Measure Y :=
+  MeasureTheory.Measure.hausdorffMeasure (2 * p : ℝ)
+
+/-- The real Hausdorff measure of the empty set is zero. -/
+theorem hausdorffMeasure2p_real_empty {Y : Type*} [EMetricSpace Y] [MeasurableSpace Y]
+    [BorelSpace Y] (p : ℕ) :
+    hausdorffMeasure2p_real (Y := Y) p ∅ = 0 :=
+  MeasureTheory.measure_empty
 
 /-- A fixed frame in the model tangent space, used to evaluate a `2p`-form to a scalar. -/
 noncomputable def standardFrame (k : ℕ) : Fin k → TangentModel n :=
