@@ -563,4 +563,42 @@ This file establishes the Hodge Laplacian infrastructure:
 
 -/
 
+/-! ## API Tests
+
+These tests verify that the Hodge Laplacian integrates correctly with Lean's
+typeclass infrastructure and can be used with standard algebraic reasoning. -/
+
+section APITests
+
+variable {n : ℕ} {X : Type*}
+  [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+  [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+  [ProjectiveComplexManifold n X] [KahlerManifold n X]
+
+/-- Test: hodgeLaplacianLinearMap is a valid ℂ-linear map. -/
+example {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) :
+    (hodgeLaplacianLinearMap hk hk' : SmoothForm n X k →ₗ[ℂ] SmoothForm n X k).toFun =
+    hodgeLaplacian hk hk' := rfl
+
+/-- Test: Δ respects addition via LinearMap. -/
+example {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+    (ω₁ ω₂ : SmoothForm n X k) :
+    hodgeLaplacianLinearMap hk hk' (ω₁ + ω₂) =
+    hodgeLaplacianLinearMap hk hk' ω₁ + hodgeLaplacianLinearMap hk hk' ω₂ :=
+  (hodgeLaplacianLinearMap hk hk').map_add ω₁ ω₂
+
+/-- Test: Δ respects scalar multiplication via LinearMap. -/
+example {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+    (c : ℂ) (ω : SmoothForm n X k) :
+    hodgeLaplacianLinearMap hk hk' (c • ω) =
+    c • hodgeLaplacianLinearMap hk hk' ω :=
+  (hodgeLaplacianLinearMap hk hk').map_smul c ω
+
+/-- Test: Δ(0) = 0 via LinearMap. -/
+example {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) :
+    hodgeLaplacianLinearMap hk hk' (0 : SmoothForm n X k) = 0 :=
+  (hodgeLaplacianLinearMap hk hk').map_zero
+
+end APITests
+
 end
