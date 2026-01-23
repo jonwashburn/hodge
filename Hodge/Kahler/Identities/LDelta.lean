@@ -66,6 +66,6 @@ theorem kahler_identity_L_delta (k : ℕ) :
       (-Complex.I) •
         (dolbeaultBar (n := n) (X := X) k - dolbeault (n := n) (X := X) k) := by
   ext ω
-  simp [commutator_L_delta, lefschetz, adjointDeriv]
+  simp [commutator_L_delta]
 
 end
