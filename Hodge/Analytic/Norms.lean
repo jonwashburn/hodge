@@ -755,6 +755,50 @@ noncomputable def HodgeStarData.trivial (n : ℕ) (X : Type*) (k : ℕ)
   star_zero := rfl
   star_neg := fun _ => by simp
 
+/-- **Hodge Star Data from Fiber-level Construction**.
+
+    Uses the fiber-level Hodge star `fiberHodgeStar_construct` to define the
+    pointwise Hodge star on forms.
+
+    **Implementation**: At each point x, applies the fiber Hodge star to α(x).
+
+    **Status**: Currently uses the fiber-level construction which returns 0.
+    Once `fiberHodgeStar_construct` is upgraded to use basis decomposition,
+    this will automatically return non-trivial values. -/
+noncomputable def HodgeStarData.fromFiber (n : ℕ) (X : Type*) (k : ℕ)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] : HodgeStarData n X k where
+  star := fun α => {
+    as_alternating := fun x => fiberHodgeStar_construct n k (α.as_alternating x)
+    is_smooth := by
+      -- The fiber Hodge star is a linear map on finite-dimensional spaces
+      -- Smoothness follows from smoothness of α and continuity of the fiber map
+      sorry  -- Infrastructure: smoothness of fiber-level Hodge star application
+  }
+  star_add := fun α β => by
+    ext x v
+    simp only [SmoothForm.add_apply, ContinuousAlternatingMap.add_apply]
+    have h := fiberHodgeStar_add n k (α.as_alternating x) (β.as_alternating x)
+    exact congrFun (congrArg DFunLike.coe h) v
+  star_smul := fun r α => by
+    ext x
+    simp only [SmoothForm.smul_real_apply]
+    -- Need: fiberHodgeStar_construct n k (r • α x) = r • fiberHodgeStar_construct n k (α x)
+    -- The fiber Hodge star is ℝ-linear
+    have h := fiberHodgeStar_smul n k (r : ℂ) (α.as_alternating x)
+    -- Convert ℝ-smul to ℂ-smul
+    simp only [fiberHodgeStar_construct] at h ⊢
+    simp
+  star_zero := by
+    ext x v
+    simp only [SmoothForm.zero_apply]
+    simp [fiberHodgeStar_construct]
+  star_neg := fun α => by
+    ext x v
+    simp only [SmoothForm.neg_apply]
+    simp [fiberHodgeStar_construct]
+
 /-! ### Hodge Star Operator Definition -/
 
 /-- **Hodge star operator** on k-forms.
@@ -768,13 +812,17 @@ noncomputable def HodgeStarData.trivial (n : ℕ) (X : Type*) (k : ℕ)
     **Mathematical Definition**: For a Kähler manifold with metric g and volume form vol,
     the Hodge star is uniquely determined by: α ∧ ⋆β = g(α, β) · vol
 
+    **Implementation**: Uses `HodgeStarData.fromFiber` which applies the fiber-level
+    Hodge star `fiberHodgeStar_construct` at each point. Once the fiber-level Hodge star
+    is upgraded to use real basis decomposition, this will return non-trivial values.
+
     **Reference**: [Warner, GTM 94, §6.1], [Voisin, "Hodge Theory I", §5.1] -/
 noncomputable def hodgeStar {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α : SmoothForm n X k) : SmoothForm n X (2 * n - k) :=
-  (HodgeStarData.trivial n X k).star α
+  (HodgeStarData.fromFiber n X k).star α
 
 /-- Notation for Hodge star operator. -/
 notation:max "⋆" α:max => hodgeStar α
@@ -856,15 +904,24 @@ The infrastructure below is provided for when Agent 5 implements the real Hodge 
     On a 2n-dimensional manifold, ⋆⋆α = (-1)^{k(2n-k)} α for a k-form α. -/
 def hodgeStarSignℂ (dim k : ℕ) : ℂ := (hodgeStarSign dim k : ℤ)
 
-/-- **Hodge star applied twice on trivial data gives zero**.
-    With the trivial Hodge star (⋆ = 0), we have ⋆(⋆α) = ⋆0 = 0. -/
+/-- **Hodge star applied twice gives zero (with current fiber implementation)**.
+
+    With the current fiber-level Hodge star returning 0, we have ⋆(⋆α) = ⋆0 = 0.
+
+    **Note**: Once `fiberHodgeStar_construct` is upgraded to return real values,
+    this theorem should be replaced with the proper involution identity:
+      ⋆(⋆α) = (-1)^{k(2n-k)} α -/
 theorem hodgeStar_hodgeStar_trivial {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α : SmoothForm n X k) :
     ⋆(⋆α) = 0 := by
-  simp only [hodgeStar, HodgeStarData.trivial]
+  simp only [hodgeStar, HodgeStarData.fromFiber]
+  ext x v
+  simp only [SmoothForm.zero_apply]
+  -- fiberHodgeStar_construct returns 0
+  simp [fiberHodgeStar_construct]
 
 /-! ### Codifferential (Adjoint of Exterior Derivative) -/
 
