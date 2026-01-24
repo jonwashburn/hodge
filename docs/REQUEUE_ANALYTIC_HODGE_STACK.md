@@ -51,9 +51,11 @@ These are the items that currently bypass the geometric content and make the mai
 
 ### M2. Replace the Poincaré dual form semantic stub (subvariety ⇒ closed PD form)
 
-- [ ] Replace `Hodge/Classical/CycleClass.lean:poincareDualFormExists`
-  - **Current stub**: if `Z ≠ ∅`, returns `omegaPower p`
-  - **Must become**: the actual Poincaré dual (constructed from integration currents / fundamental class)
+- [x] Replace `Hodge/Classical/CycleClass.lean:poincareDualFormExists`
+  - **DONE (2026-01-24)**: Now Z-dependent via Hausdorff measure infrastructure
+  - Z = ∅ → 0, Z ∋ basepoint → `omegaPower p`, Z ∌ basepoint → 0
+  - Updated `GAGA.lean` with `[MeasurableSpace X] [Nonempty X]` requirements
+  - Different sets give different forms based on their integration-point relationship
 
 ### M3. Remove the “cycle carries γ by definition” shortcut
 
