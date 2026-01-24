@@ -36,3 +36,28 @@ metric-induced construction. -/
 noncomputable def fiberHodgeStar_construct (n k : ℕ) (_α : FiberAlt n k) :
     FiberAlt n (2 * n - k) :=
   0
+
+/-! ### Fiber Hodge Star Properties -/
+
+/-- The fiber Hodge star is additive. -/
+theorem fiberHodgeStar_construct_add (n k : ℕ) (α β : FiberAlt n k) :
+    fiberHodgeStar_construct n k (α + β) = fiberHodgeStar_construct n k α + fiberHodgeStar_construct n k β := by
+  simp only [fiberHodgeStar_construct, add_zero]
+
+/-- The fiber Hodge star respects scalar multiplication. -/
+theorem fiberHodgeStar_construct_smul (n k : ℕ) (c : ℂ) (α : FiberAlt n k) :
+    fiberHodgeStar_construct n k (c • α) = c • fiberHodgeStar_construct n k α := by
+  unfold fiberHodgeStar_construct
+  rw [eq_comm]
+  exact @smul_zero ℂ (FiberAlt n (2 * n - k)) _ _ c
+
+/-- The fiber Hodge star of zero is zero. -/
+@[simp]
+theorem fiberHodgeStar_construct_zero (n k : ℕ) : fiberHodgeStar_construct n k 0 = 0 := rfl
+
+/-- The fiber Hodge star respects negation. -/
+theorem fiberHodgeStar_construct_neg (n k : ℕ) (α : FiberAlt n k) :
+    fiberHodgeStar_construct n k (-α) = -fiberHodgeStar_construct n k α := by
+  unfold fiberHodgeStar_construct
+  rw [eq_comm]
+  exact @neg_zero (FiberAlt n (2 * n - k)) _
