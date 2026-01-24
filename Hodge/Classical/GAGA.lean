@@ -134,6 +134,7 @@ variable {n : ℕ} {X : Type u}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
+  [MeasurableSpace X] [Nonempty X]
 
 /-- **Analytic Sets are Algebraic** (Chow's Theorem / GAGA).
 
@@ -258,14 +259,16 @@ def FundamentalClassSet_impl : (n : ℕ) → (X : Type u) →
     [TopologicalSpace X] → [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] →
     [IsManifold (𝓒_complex n) ⊤ X] → [HasLocallyConstantCharts n X] →
     [ProjectiveComplexManifold n X] → [KahlerManifold n X] →
+    [MeasurableSpace X] → [Nonempty X] →
     (p : ℕ) → Set X → SmoothForm n X (2 * p) :=
-  fun n X _ _ _ _ _ _ p Z => fundamentalClassImpl n X p Z
+  fun n X _ _ _ _ _ _ _ _ p Z => fundamentalClassImpl n X p Z
 
 /-- The fundamental class map from algebraic subvarieties to closed (p,p)-forms. -/
 noncomputable def FundamentalClassSet (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [Nonempty X]
     (p : ℕ) (Z : Set X) : SmoothForm n X (2 * p) :=
   FundamentalClassSet_impl n X p Z
 
