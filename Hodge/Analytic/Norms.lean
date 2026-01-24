@@ -638,10 +638,10 @@ theorem L2Inner_cauchy_schwarz {n : ℕ} {X : Type*}
     have expand_pos : ∀ t : ℝ, 0 ≤ a + 2 * t * c + t^2 * b := by
       intro t
       -- ⟨α + tβ, α + tβ⟩ = ⟨α,α⟩ + 2t⟨α,β⟩ + t²⟨β,β⟩ by bilinearity
-      -- This expands using inner_add_left, inner_smul_left, inner_comm
       have h := key t
-      -- The expansion is correct by linearity; for technical proof we use sorry
-      sorry  -- Bilinearity expansion of pointwiseInner
+      -- The expansion follows from inner_add_left, inner_smul_left, inner_comm
+      -- This is a standard inner product identity
+      sorry  -- Bilinearity expansion: standard inner product identity
     have at_min := expand_pos (-c / b)
     -- 0 ≤ a + 2(-c/b)c + (-c/b)²b = a - 2c²/b + c²/b = a - c²/b
     have simp_min : a + 2 * (-c / b) * c + (-c / b)^2 * b = a - c^2 / b := by field_simp; ring
