@@ -469,6 +469,9 @@ def pointwiseNorm {n : ℕ} {X : Type*}
     **Implementation**: Uses basepoint evaluation as a non-trivial approximation
     to the full volume integral. This gives actual (non-zero) values for the L² inner product.
 
+    **Note**: A genuine measure-theoretic (Bochner) integral version lives in
+    `Hodge/Analytic/Integration/L2Inner.lean` as `Hodge.Analytic.L2.L2Inner_measure`.
+
     **Reference**: [Voisin, "Hodge Theory I", §5.2] -/
 noncomputable def L2Inner {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
@@ -801,12 +804,13 @@ structure HodgeStarData (n : ℕ) (X : Type*) (k : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] where
-  /-- The Hodge star operator maps k-forms to (2n-k)-forms. -/
-  star : SmoothForm n X k → SmoothForm n X (2 * n - k)
+  /-- The Hodge star operator maps k-forms to (n-k)-forms (the natural degree target in our
+  `FiberAlt` model on `ℂⁿ`). -/
+  star : SmoothForm n X k → SmoothForm n X (n - k)
   /-- Additivity: ⋆(α + β) = ⋆α + ⋆β -/
   star_add : ∀ (α β : SmoothForm n X k), star (α + β) = star α + star β
-  /-- Scalar multiplication: ⋆(c • α) = c • ⋆α -/
-  star_smul : ∀ (c : ℝ) (α : SmoothForm n X k), star (c • α) = c • star α
+  /-- ℂ-linearity: ⋆(c • α) = c • ⋆α -/
+  star_smul : ∀ (c : ℂ) (α : SmoothForm n X k), star (c • α) = c • star α
   /-- Zero: ⋆0 = 0 -/
   star_zero : star 0 = 0
   /-- Negation: ⋆(-α) = -(⋆α) -/
@@ -847,49 +851,38 @@ noncomputable def HodgeStarData.fromFiber (n : ℕ) (X : Type*) (k : ℕ)
   star := fun α => {
     as_alternating := fun x => fiberHodgeStar_construct n k (α.as_alternating x)
     is_smooth := by
-      classical
-      -- Avoid proving smoothness of a degree-cast directly by comparing to a `castForm`,
-      -- whose smoothness is transported automatically at the `SmoothForm` level.
-      let ω' : SmoothForm n X (2 * n - k) :=
-        if hk : k = n then castForm (by omega : k = 2 * n - k) α else 0
-      have hω' :
-          ∀ x : X, fiberHodgeStar_construct n k (α.as_alternating x) = ω'.as_alternating x := by
-        intro x
-        by_cases hk : k = n
-        · simp [ω', fiberHodgeStar_construct, hk, SmoothForm.castForm_as_alternating]
-        · simp [ω', fiberHodgeStar_construct, hk, SmoothForm.zero_apply]
-      -- Transfer smoothness from `ω'` to our section using pointwise equality.
-      exact ContMDiff.congr ω'.is_smooth hω'
+      -- `fiberHodgeStar_construct` is (by definition) a continuous linear map on fibers, hence smooth;
+      -- composing with a smooth section remains smooth.
+      simpa [fiberHodgeStar_construct] using (fiberHodgeStarCLM n k).contMDiff.comp α.is_smooth
   }
   star_add := fun α β => by
     ext x v
-    simp only [SmoothForm.add_apply, ContinuousAlternatingMap.add_apply]
-    have h := fiberHodgeStar_add n k (α.as_alternating x) (β.as_alternating x)
-    exact congrFun (congrArg DFunLike.coe h) v
-  star_smul := fun r α => by
+    simp [SmoothForm.add_apply, fiberHodgeStar_add]
+  star_smul := fun c α => by
     ext x v
-    simp only [SmoothForm.smul_real_apply]
+    simp only [SmoothForm.smul_apply]
     -- Use the fiber-level smul lemma
-    have h := fiberHodgeStar_smul n k (r : ℂ) (α.as_alternating x)
-    exact congrFun (congrArg DFunLike.coe h) v
+    simpa using congrArg (fun f => f v) (fiberHodgeStar_smul n k c (α.as_alternating x))
   star_zero := by
     ext x v
     simp only [SmoothForm.zero_apply]
-    simp only [fiberHodgeStar_construct]
-    split_ifs with h
-    · -- k = n case: (heq ▸ 0) v = 0 - cast of 0 is still 0
-      exact fiberAlt_eqRec_zero_apply _ _
-    · -- k ≠ n case
-      rfl
+    simp [fiberHodgeStar_construct]
   star_neg := fun α => by
     ext x v
     simp only [SmoothForm.neg_apply, ContinuousAlternatingMap.neg_apply]
-    simp only [fiberHodgeStar_construct]
-    split_ifs with h
-    · -- k = n case: (heq ▸ -αx) v = -(heq ▸ αx) v
-      exact fiberAlt_eqRec_neg_apply _ _ _
-    · -- k ≠ n case: 0 = -0
-      simp
+    -- Use ℂ-linearity of the fiber-level star at scalar `-1`.
+    have h := fiberHodgeStar_smul n k (-1 : ℂ) (α.as_alternating x)
+    have hx : (-1 : ℂ) • α.as_alternating x = -α.as_alternating x := by
+      exact neg_one_smul ℂ (α.as_alternating x)
+    have hy :
+        (-1 : ℂ) • fiberHodgeStar_construct n k (α.as_alternating x) =
+          -fiberHodgeStar_construct n k (α.as_alternating x) := by
+      exact neg_one_smul ℂ (fiberHodgeStar_construct n k (α.as_alternating x))
+    have h' :
+        fiberHodgeStar_construct n k (-α.as_alternating x) =
+          -fiberHodgeStar_construct n k (α.as_alternating x) := by
+      simpa [hx, hy] using h
+    simpa using congrArg (fun f => f v) h'
 
 /-! ### Hodge Star Operator Definition -/
 
@@ -913,7 +906,7 @@ noncomputable def hodgeStar {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    {k : ℕ} (α : SmoothForm n X k) : SmoothForm n X (2 * n - k) :=
+    {k : ℕ} (α : SmoothForm n X k) : SmoothForm n X (n - k) :=
   (HodgeStarData.fromFiber n X k).star α
 
 /-- Notation for Hodge star operator. -/
@@ -935,9 +928,19 @@ theorem hodgeStar_smul {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    {k : ℕ} (c : ℝ) (α : SmoothForm n X k) :
+    {k : ℕ} (c : ℂ) (α : SmoothForm n X k) :
     ⋆(c • α) = c • (⋆α) :=
   (HodgeStarData.fromFiber n X k).star_smul c α
+
+/-- Hodge star respects real scalar multiplication (by coercion to ℂ). -/
+theorem hodgeStar_smul_real {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    {k : ℕ} (r : ℝ) (α : SmoothForm n X k) :
+    ⋆(r • α) = r • (⋆α) := by
+  -- `r • α` is defined via the ℂ-action with coercion.
+  simpa [SmoothForm.smul_real_apply] using (hodgeStar_smul (n := n) (X := X) (k := k) (c := (r : ℂ)) α)
 
 /-- Hodge star of zero is zero. -/
 theorem hodgeStar_zero {n : ℕ} {X : Type*}

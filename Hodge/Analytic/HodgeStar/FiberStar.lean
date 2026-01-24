@@ -1,6 +1,9 @@
 import Hodge.Basic
+import Hodge.Analytic.DomCoprod
 import Mathlib.Analysis.InnerProductSpace.Basic
 import Mathlib.Data.Finset.Powerset
+import Mathlib.Data.Finset.Sort
+import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 
 /-!
 # Fiber-level Hodge star
@@ -196,7 +199,7 @@ noncomputable def frameMatchCoeff (n k : ℕ) (s : Finset (Fin n)) (v : Fin k �
 
 /-! ## Fiber Hodge Star -/
 
-/-- Fiber-level Hodge star on the model tangent space.
+/-! Fiber-level Hodge star on the model tangent space.
 
 The Hodge star ⋆ : Λ^k → Λ^{2n-k} is defined by the relation:
   β ∧ ⋆α = ⟨α, β⟩ · vol
@@ -225,21 +228,96 @@ where δ(v, e_{Iᶜ}) is 1 if v matches the frame for Iᶜ, 0 otherwise.
 - The Hodge star maps k → (2n-k), so target is non-trivial when 2n-k ≤ n, i.e., k ≥ n
 - The only case where both source and target are non-trivial is k = n
 
-**Implementation**:
-For k = n (middle dimension): Returns α cast to FiberAlt n n (identity up to sign).
-For k ≠ n: Returns 0 (source or target is trivial anyway). -/
+**Implementation (Round 11 upgrade)**:
+
+In this repo, `FiberAlt n k` models **complex-linear** alternating `k`-forms on `ℂⁿ`.
+Accordingly, the natural fiber-level Hodge star maps
+
+`⋆ : Λ^k → Λ^{n-k}`.
+
+We implement this by expanding `α` in the standard coordinate basis and sending each
+basis element to its complementary basis element with the appropriate shuffle sign.
+
+This makes `⋆` **non-degenerate** on all degrees `k ≤ n` in this model (unlike the old
+`2n-k`-targeted placeholder, which was forced to be degenerate).
+-/
+
+/-!
+### Coordinate-basis k-forms
+
+We define, for a `k`-subset `s ⊆ Fin n`, a canonical basis `k`-form `fiberBasisForm n k s`
+as the determinant of the `k×k` matrix of the selected coordinates. Concretely, it is
+the wedge of the coordinate covectors indexed by `s`.
+-/
+
+/-- The coordinate map `ℂⁿ → (Fin n → ℂ)` as a linear map. -/
+noncomputable def coordLM (n : ℕ) : TangentModel n →ₗ[ℂ] (Fin n → ℂ) :=
+  (EuclideanSpace.equiv (ι := Fin n) (𝕜 := ℂ)).toLinearEquiv.toLinearMap
+
+/-- Project `ℂⁿ` to the `k` coordinates indexed by a finset `s`.
+
+If `s` has fewer than `k` elements, we pad with zero coordinates (so the result is still a
+`Fin k → ℂ`). This keeps the definition non-dependent (no `s.card = k` argument).
+-/
+noncomputable def projCoords (n k : ℕ) (s : Finset (Fin n)) :
+    TangentModel n →ₗ[ℂ] (Fin k → ℂ) := by
+  classical
+  let coord : TangentModel n →ₗ[ℂ] (Fin n → ℂ) := coordLM n
+  let l : List (Fin n) := s.sort (· ≤ ·)
+  refine LinearMap.pi (fun i : Fin k => by
+    classical
+    by_cases h : i.1 < l.length
+    · -- x ↦ (coord x) (l.get i)
+      exact (LinearMap.proj (R := ℂ) (ι := Fin n) (φ := fun _ => ℂ)
+        (l.get ⟨i.1, h⟩)).comp coord
+    · -- padding coordinate
+      exact 0)
+
+/-- The coordinate-basis `k`-form corresponding to a finset `s`.
+
+If `s` does not have exactly `k` elements, this still returns a well-typed alternating map (built
+from the first `k` sorted indices, padded by zeros as needed). In the intended uses below, we apply
+it to `s ∈ powersetCard k univ`, so it agrees with the usual basis form indexed by `s`.
+-/
+noncomputable def fiberBasisForm (n k : ℕ) (s : Finset (Fin n)) : FiberAlt n k := by
+  classical
+  let det : (Fin k → ℂ) [⋀^Fin k]→ₗ[ℂ] ℂ := Matrix.detRowAlternating
+  let lin : (TangentModel n) [⋀^Fin k]→ₗ[ℂ] ℂ := det.compLinearMap (projCoords n k s)
+  -- Make it continuous using the finite-dimensional bound lemma from `DomCoprod.lean`.
+  have h_ex :
+      ∃ C : ℝ, ∀ v : Fin k → TangentModel n, ‖lin v‖ ≤ C * ∏ i, ‖v i‖ :=
+    AlternatingMap.exists_bound_fin_dim (𝕜 := ℂ) (E := TangentModel n) (F := ℂ) (ι := Fin k) lin
+  let C : ℝ := Classical.choose h_ex
+  have hC : ∀ v : Fin k → TangentModel n, ‖lin v‖ ≤ C * ∏ i, ‖v i‖ :=
+    Classical.choose_spec h_ex
+  exact lin.mkContinuous C hC
+
+/-- Evaluation at a fixed frame, as a continuous linear functional on `FiberAlt`. -/
+noncomputable def fiberEvalCLM (n k : ℕ) (v : Fin k → TangentModel n) : FiberAlt n k →L[ℂ] ℂ := by
+  classical
+  refine
+    { toFun := fun f => f v
+      cont := ?_
+      map_add' := by intro f g; rfl
+      map_smul' := by intro c f; rfl }
+  simpa using (continuous_eval_const v)
+
+/-- Fiber-level Hodge star as a bundled continuous linear map. -/
+noncomputable def fiberHodgeStarCLM (n k : ℕ) :
+    FiberAlt n k →L[ℂ] FiberAlt n (n - k) := by
+  classical
+  let S : Finset (Finset (Fin n)) := powersetCard k (univ : Finset (Fin n))
+  -- Sum the rank-1 operators `α ↦ (shuffleSign*s * α(e_s)) • e_{sᶜ}`.
+  refine S.sum (fun s => ?_)
+  let ev : FiberAlt n k →L[ℂ] ℂ := fiberEvalCLM n k (fiberFrame n k s)
+  let coeff : FiberAlt n k →L[ℂ] ℂ := (shuffleSign n s : ℂ) • ev
+  exact ContinuousLinearMap.smulRight coeff (fiberBasisForm n (n - k) (finsetComplement n s))
+
+/-- Fiber-level Hodge star in the `ℂⁿ`-model: `k`-forms to `(n-k)`-forms. -/
 noncomputable def fiberHodgeStar_construct (n k : ℕ) (α : FiberAlt n k) :
-    FiberAlt n (2 * n - k) :=
-  -- For k = n (middle dimension): ⋆α = α (identity on middle forms, up to sign)
-  -- We use decidable equality to branch
-  if h : k = n then
-    -- Cast α from FiberAlt n k to FiberAlt n (2*n - k)
-    -- Since k = n, we have 2*n - k = n = k
-    have heq : k = 2 * n - k := by omega
-    heq ▸ α
-  else
-    -- For k ≠ n, return 0
-    0
+    FiberAlt n (n - k) := by
+  classical
+  exact fiberHodgeStarCLM n k α
 
 /-- Helper: eqRec distributes over add for FiberAlt -/
 theorem fiberAlt_eqRec_add {n k k' : ℕ} (h : k = k') (α β : FiberAlt n k) :
@@ -276,24 +354,13 @@ theorem fiberAlt_eqRec_neg_apply {n k k' : ℕ} (h : k = k') (α : FiberAlt n k)
 theorem fiberHodgeStar_add (n k : ℕ) (α β : FiberAlt n k) :
     fiberHodgeStar_construct n k (α + β) =
     fiberHodgeStar_construct n k α + fiberHodgeStar_construct n k β := by
-  unfold fiberHodgeStar_construct
-  split_ifs with h
-  · -- Case k = n: heq ▸ (α + β) = (heq ▸ α) + (heq ▸ β)
-    exact fiberAlt_eqRec_add _ _ _
-  · -- Case k ≠ n: 0 = 0 + 0
-    simp only [add_zero]
+  classical
+  simpa [fiberHodgeStar_construct] using (fiberHodgeStarCLM n k).map_add α β
 
 /-- The Hodge star respects scalar multiplication. -/
 theorem fiberHodgeStar_smul (n k : ℕ) (c : ℂ) (α : FiberAlt n k) :
     fiberHodgeStar_construct n k (c • α) = c • fiberHodgeStar_construct n k α := by
-  unfold fiberHodgeStar_construct
-  split_ifs with h
-  · -- Case k = n: heq ▸ (c • α) = c • (heq ▸ α)
-    exact fiberAlt_eqRec_smul _ _ _
-  · -- Case k ≠ n: 0 = c • 0
-    ext v
-    simp only [ContinuousAlternatingMap.smul_apply, smul_eq_mul]
-    rw [show (0 : FiberAlt n (2 * n - k)) v = (0 : ℂ) from rfl]
-    ring
+  classical
+  simpa [fiberHodgeStar_construct] using (fiberHodgeStarCLM n k).map_smul c α
 
 end

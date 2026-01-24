@@ -1,5 +1,6 @@
 import Hodge.Analytic.Integration.VolumeForm
 import Hodge.Analytic.Integration.TopFormIntegral
+import Hodge.Analytic.Integration.L2Inner
 import Hodge.Analytic.Integration.ExtDerivCohomology
 import Hodge.Analytic.Integration.StokesTheorem
 import Hodge.Analytic.Integration.PairingConnection

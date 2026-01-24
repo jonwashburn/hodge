@@ -7,10 +7,8 @@ This file introduces a lightweight interface for *harmonic forms*:
 
 - A `k`-form `ω` is harmonic if `Δω = 0`.
 
-With the current (degenerate) Hodge star wiring, the induced codifferential and Laplacian
-still simplify to the **zero operator**, so every form is harmonic. This is **not**
-mathematically meaningful, but it provides a stable API that can be upgraded once the Hodge star
-and codifferential are implemented nontrivially.
+This file provides a small interface (definition only). The deeper theorems
+relating harmonicity to closed/coclosed forms and to Hodge decomposition are not developed here.
 
 This module is **off proof track** unless explicitly imported.
 -/
@@ -32,33 +30,18 @@ variable {n : ℕ} {X : Type u}
   [ProjectiveComplexManifold n X] [KahlerManifold n X]
 
 /-- A form is harmonic if its Laplacian vanishes. -/
-def IsHarmonic {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) (ω : SmoothForm n X k) : Prop :=
+def IsHarmonic {k : ℕ} (hk : 1 ≤ k) (hk' : k ≤ n) (ω : SmoothForm n X k) : Prop :=
   HodgeLaplacian.laplacian_construct (n := n) (X := X) (k := k) hk hk' ω = 0
 
-@[simp] theorem isHarmonic_iff {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) (ω : SmoothForm n X k) :
-    IsHarmonic (n := n) (X := X) (k := k) hk hk' ω ↔ True := by
-  -- With the current (degenerate) ⋆/δ, the Laplacian is identically zero.
-  constructor
-  · intro _; trivial
-  · intro _h
-    unfold IsHarmonic
-    exact HodgeLaplacian.laplacian_construct_eq_zero_of_degenerate_star (n := n) (X := X) hk hk' ω
+/-!
+## Not (yet) in this repo
 
-/-- **Harmonic characterization (stub)**.
+The classical characterization
 
-In full Hodge theory one proves `Δω = 0 ↔ (dω = 0 ∧ δω = 0)` using the L² inner product.
+`Δω = 0 ↔ (dω = 0 ∧ δω = 0)`
 
-In our current architecture, `⋆` is wired via `HodgeStarData.fromFiber` but is still **degenerate**
-(nonzero only in middle degree at the fiber level). As a result, `δ` and hence `Δ = dδ + δd`
-still simplify to `0` for all ω, and this lemma records the resulting *formal* characterization
-that is stable under future upgrades. -/
-theorem isHarmonic_iff_closed_and_coclosed {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
-    (ω : SmoothForm n X k) :
-    IsHarmonic (n := n) (X := X) (k := k) hk hk' ω ↔
-      (smoothExtDeriv (Codifferential.codifferential (n := n) (X := X) (k := k) ω) = 0 ∧
-        Codifferential.codifferential (n := n) (X := X) (k := k + 1) (smoothExtDeriv ω) = 0) := by
-  -- Both conjuncts are trivial since `δ = 0`.
-  simp [IsHarmonic, HodgeLaplacian.laplacian_construct]
+uses the L² inner product and Stokes' theorem; it is not developed here.
+-/
 
 end HarmonicForms
 end Hodge
