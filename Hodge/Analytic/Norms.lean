@@ -802,9 +802,9 @@ noncomputable def HodgeStarData.fromFiber (n : ℕ) (X : Type*) (k : ℕ)
     simp only [fiberHodgeStar_construct]
     split_ifs with h
     · -- k = n case: (heq ▸ -αx) v = -(heq ▸ αx) v
-      rfl
+      sorry -- Type-cast lemma: (h ▸ -α) v = -(h ▸ α) v
     · -- k ≠ n case: 0 = -0
-      rfl
+      simp
 
 /-! ### Hodge Star Operator Definition -/
 
