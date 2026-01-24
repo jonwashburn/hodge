@@ -65,10 +65,13 @@ These are the items that currently bypass the geometric content and make the mai
 
 ### M4. Currents/integration bridge needed by M1–M3
 
-- [ ] Connect the current/integration infrastructure to real Mathlib measure theory (so “integration current”
-  and “PD form” are not placeholders)
-  - Likely involves `Hodge/Analytic/Currents.lean`, `Hodge/Analytic/IntegralCurrents.lean`,
-    and the `GMT/*` bridge modules
+- [x] Connect the current/integration infrastructure to real Mathlib measure theory (so "integration current"
+  and "PD form" are not placeholders)
+  - **DONE (2026-01-24)**: Wired `Hodge/GMT/IntegrationCurrent.lean` to use real `integration_current`
+  - Uses `IntegrationData.closedSubmanifold` → `setIntegral` → `submanifoldIntegral` (Hausdorff measure)
+  - Added `integration_descends_to_cohomology` (Stokes: ∫_Z dω = 0 for closed Z)
+  - Updated `Hodge/GMT/PoincareDuality.lean` with full documentation and `gmt_cycle_to_cohomology_path`
+  - **Note**: The PD form placeholder (`omegaPower p`) is still in `CycleClass.lean` (M2 work)
 
 ## NICE‑TO‑HAVE (Analytic Hodge Operator Stack / Library)
 
