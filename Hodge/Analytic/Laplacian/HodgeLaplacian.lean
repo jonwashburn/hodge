@@ -8,8 +8,9 @@ This module introduces a compile-stable interface for the **Hodge Laplacian**
 
 In the current repository architecture:
 - `d` is implemented as `smoothExtDeriv` in `Hodge/Analytic/Forms.lean`.
-- `⋆` is currently a **trivial placeholder** (see `Hodge/Analytic/Norms.lean`),
-  hence `δ` is also trivial in `Hodge/Analytic/Laplacian/Codifferential.lean`.
+- `⋆` is wired via `HodgeStarData.fromFiber` (see `Hodge/Analytic/Norms.lean`).
+  The current fiber-level construction is **degenerate** (nonzero only in middle degree),
+  so the induced `δ`/`Δ` still simplify to `0` in this model.
 
 Because the real Hodge star construction is not yet available, we provide a **placeholder**
 Laplacian operator. This file is **off proof track** unless explicitly imported.
@@ -37,9 +38,10 @@ In a full implementation this should be:
 
 `Δω = d(δω) + δ(dω)`.
 
-At the moment, the repository’s Hodge star (hence codifferential) is still a semantic stub
-(`⋆ = 0`, so `δ = 0`). With that stub, the definition below simplifies to `0`, but we keep the
-*structurally correct* formula for Δ so downstream files can be written against the intended API. -/
+At the moment, the repository’s Hodge star is wired but still **degenerate**
+(`fiberHodgeStar_construct` is only nonzero for `k = n`), so the induced codifferential and
+Laplacian simplify to `0`. We still keep the *structurally correct* formula for Δ so downstream
+files can be written against the intended API. -/
 noncomputable def laplacian_construct {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
     (ω : SmoothForm n X k) : SmoothForm n X k :=
   castForm (by omega) (smoothExtDeriv (Codifferential.codifferential (n := n) (X := X) (k := k) ω)) +

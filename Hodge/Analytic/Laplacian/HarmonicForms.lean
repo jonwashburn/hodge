@@ -43,9 +43,10 @@ def IsHarmonic {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) (ω : SmoothForm
 
 In full Hodge theory one proves `Δω = 0 ↔ (dω = 0 ∧ δω = 0)` using the L² inner product.
 
-In our current architecture, `⋆ = 0`, hence `δ = 0`, hence the Laplacian definition
-`Δ = dδ + δd` is identically zero; consequently both “summands” vanish for all ω. This lemma
-records the resulting *formal* characterization that is stable under future upgrades. -/
+In our current architecture, `⋆` is wired via `HodgeStarData.fromFiber` but is still **degenerate**
+(nonzero only in middle degree at the fiber level). As a result, `δ` and hence `Δ = dδ + δd`
+still simplify to `0` for all ω, and this lemma records the resulting *formal* characterization
+that is stable under future upgrades. -/
 theorem isHarmonic_iff_closed_and_coclosed {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
     (ω : SmoothForm n X k) :
     IsHarmonic (n := n) (X := X) (k := k) hk hk' ω ↔

@@ -22,11 +22,12 @@ on the proof track of `hodge_conjecture'`.
 The following Kähler/Hodge operators are **kept off proof track** because they are not used
 by `hodge_conjecture'` (yet). They live in dedicated analytic modules:
 
-- `Hodge/Analytic/Norms.lean`: placeholder global Hodge star `⋆` (currently trivial)
-- `Hodge/Analytic/Laplacian/Codifferential.lean`: codifferential `δ = ±⋆d⋆` (currently trivial)
-- `Hodge/Analytic/Laplacian/HodgeLaplacian.lean`: Laplacian `Δ = dδ + δd` (structural; currently trivial)
-- `Hodge/Analytic/Laplacian/HarmonicForms.lean`: harmonic predicate/interface (placeholder)
-- `Hodge/Analytic/HodgeStar/*`: fiber-level stubs for future metric-induced ⋆ construction
+- `Hodge/Analytic/Norms.lean`: `pointwiseInner`/`L2Inner` implemented; `⋆` wired via `HodgeStarData.fromFiber`
+  (currently degenerate: nonzero only in middle degree at the fiber level)
+- `Hodge/Analytic/Laplacian/Codifferential.lean`: codifferential `δ = ±⋆d⋆` (currently simplifies to 0 with the current ⋆)
+- `Hodge/Analytic/Laplacian/HodgeLaplacian.lean`: Laplacian `Δ = dδ + δd` (currently simplifies to 0 with the current δ)
+- `Hodge/Analytic/Laplacian/HarmonicForms.lean`: harmonic predicate/interface (`IsHarmonic := Δω = 0`; currently everything with the current Δ)
+- `Hodge/Analytic/HodgeStar/*`: fiber-level infrastructure for future genuine metric-induced ⋆ construction
 
 Run `./scripts/verify_proof_track.sh` to confirm.
 -/

@@ -21,6 +21,7 @@ This module exports the Laplacian infrastructure for Hodge theory.
 ## Note
 
 The Hodge Laplacian Δ = dδ + δd requires the Hodge star to be properly
-defined (currently trivial). This module will be expanded when Agent 3
-provides the real Hodge star construction.
+defined. In this repo it is wired via `HodgeStarData.fromFiber` but still degenerate, so δ/Δ
+often simplify to 0. This module can be expanded once a genuine metric/volume-form based ⋆
+construction is available.
 -/

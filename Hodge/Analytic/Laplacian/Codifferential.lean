@@ -189,7 +189,9 @@ noncomputable def codifferentialLinearMap :
       = ±±± ⋆ d d (⋆ω)
       = 0  (since d² = 0)
 
-With trivial Hodge star (⋆ = 0): δω = 0 for all ω, so δ(δω) = δ0 = 0.
+With the current fiber-level Hodge star construction (nonzero only in middle degree),
+`δ` still evaluates to `0` for degree reasons (the intervening `d` shifts degree away from the
+nontrivial case), hence δ(δω) = 0.
 -/
 
 /-- **δ² = 0**: The codifferential applied twice gives zero.
@@ -198,7 +200,7 @@ This is analogous to d² = 0 for the exterior derivative.
 The proof follows from d² = 0 and the involution property of ⋆. -/
 theorem codifferential_squared (ω : SmoothForm n X k) :
     codifferential (codifferential ω) = 0 := by
-  -- With trivial ⋆, the inner ⋆ω = 0, so d(⋆ω) = d0 = 0, etc.
+  -- With the current (degenerate) ⋆, δ is identically 0, so δ² = 0.
   simp only [codifferential, hodgeStar, HodgeStarData.trivial, smoothExtDeriv_zero, smul_zero]
 
 /-- Alias (naming used in the operational plan): `δ² = 0`. -/
@@ -243,7 +245,8 @@ theorem codifferential_adjoint_statement :
 - `codifferential_squared`: δ² = 0 (trivial-star)
 
 ### Current Hodge Star Status:
-The Hodge star is currently trivial (⋆ = 0), so δ = 0 numerically.
+The Hodge star is wired via `HodgeStarData.fromFiber` (see `Hodge/Analytic/Norms.lean`).
+With the current degenerate fiber-level construction, δ still simplifies to 0 numerically.
 The structural proofs ensure correctness once ⋆ is implemented.
 -/
 
