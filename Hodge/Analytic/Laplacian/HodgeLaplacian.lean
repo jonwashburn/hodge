@@ -69,12 +69,17 @@ noncomputable def laplacian_construct {k : ℕ} (hk : 1 ≤ k) (hk' : k ≤ n)
         have hnk : n - (k + 1) + 1 = n - k := by
           -- `n - (k+1) = n - k - 1`, and `(n-k)-1+1 = n-k` since `n-k ≥ 1`.
           calc
-            n - (k + 1) + 1 = (n - k - 1) + 1 := by simp [Nat.sub_succ]
+            n - (k + 1) + 1 = (n - Nat.succ k) + 1 := by
+              -- Avoid `simp` loops on `Nat.add_one`/`Nat.succ_eq_add_one`.
+              rw [Nat.add_one k]
+            _ = (n - k - 1) + 1 := by
+              -- `Nat.sub_succ : n - Nat.succ k = n - k - 1`
+              exact congrArg (fun t => t + 1) (Nat.sub_succ n k)
             _ = n - k := by simpa using (Nat.sub_add_cancel hk1)
         -- Now finish by rewriting to `n - (n - k) = k`.
         calc
           n - (n - (k + 1) + 1) = n - (n - k) := by simpa [hnk]
-          _ = k := Nat.sub_sub_cancel hk')
+          _ = k := Nat.sub_sub_self hk')
         (Codifferential.codifferential (n := n) (X := X) (k := k + 1) (smoothExtDeriv ω)))
 
 /-- Alias (naming used in the operational plan): the Hodge Laplacian Δ = dδ + δd. -/

@@ -115,7 +115,7 @@ example (k : ℕ) (Z : Set X) [ClosedSubmanifoldStokesData n X k Z] : Current n 
   _root_.integration_current (n := n) (X := X) (k := k) Z
 
 -- From HodgeLaplacian: hodgeLaplacian is accessible
-example (hk : 1 ≤ 2) (hk' : 2 + 1 ≤ 2 * n) (ω : SmoothForm n X 2) : SmoothForm n X 2 :=
+example (hk : 1 ≤ 2) (hk' : 2 ≤ n) (ω : SmoothForm n X 2) : SmoothForm n X 2 :=
   hodgeLaplacian hk hk' ω
 
 /-! ## Round 12: Integration Infrastructure Edge Cases (Agent 3: R12-A3-TESTS) -/

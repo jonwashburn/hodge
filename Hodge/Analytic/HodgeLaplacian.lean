@@ -5,6 +5,7 @@ Authors: Agent 2 (Integration Theory)
 -/
 import Hodge.Analytic.Forms
 import Hodge.Analytic.Norms
+import Hodge.Analytic.Laplacian.HodgeLaplacian
 import Hodge.Analytic.Integration.HausdorffMeasure
 import Hodge.Basic
 import Hodge.Cohomology.Basic
@@ -14,13 +15,12 @@ import Mathlib.Analysis.Complex.Basic
 /-!
 # Hodge Laplacian Operator
 
-This file defines the Hodge Laplacian operator Δ = dd* + d*d on differential forms
-over Kähler manifolds.
+This file defines a compile-stable interface for the Hodge Laplacian operator
+\(\Delta = d\delta + \delta d\) on differential forms over Kähler manifolds.
 
 ## Main Definitions
 
-* `hodgeDual`: The L²-adjoint of the exterior derivative d (often denoted d*)
-* `hodgeLaplacian`: The Hodge Laplacian Δ = dd* + d*d
+* `hodgeLaplacian`: The Hodge Laplacian Δ = dδ + δd (wired to `Hodge/Analytic/Laplacian/*`)
 
 ## Main Theorems
 
@@ -41,14 +41,10 @@ the Kähler metric. The Hodge Laplacian has the following key properties:
 
 ## Implementation Notes
 
-The d* operator is defined as the formal adjoint of d with respect to the
-L² inner product induced by the Kähler metric:
-  ⟨dω, η⟩_{L²} = ⟨ω, d*η⟩_{L²}
-
-For explicit formulas, d* can be computed via the Hodge star:
-  d* = (-1)^{n(k+1)+1} ⋆ d ⋆
-
-where ⋆ is the Hodge star operator.
+This repo currently keeps the full analytic theory (adjointness of δ, elliptic regularity,
+Hodge decomposition) off the main proof track.  What *is* wired here is the **non-degenerate**
+operator stack built in `Hodge/Analytic/Laplacian/*`, which uses the repo’s current `⋆`
+(`k ↦ n-k` in the complex-linear `FiberAlt` model).
 
 ## References
 
@@ -385,12 +381,12 @@ theorem hodgeDual_sub {k : ℕ} (ω₁ ω₂ : SmoothForm n X (k + 1)) :
     hodgeDual (ω₁ - ω₂) = hodgeDual ω₁ - hodgeDual ω₂ := by
   rw [sub_eq_add_neg, hodgeDual_add, hodgeDual_neg, sub_eq_add_neg]
 
-/-! ## Hodge Laplacian Operator -/
+/-! ## Hodge Laplacian Operator (Δ = dδ + δd) -/
 
 /-- **Hodge Laplacian operator**.
 
     The Hodge Laplacian is defined as:
-    `Δ = dd* + d*d`
+    `Δ = dδ + δd`
 
     This is a second-order elliptic operator on differential forms.
 
@@ -399,73 +395,55 @@ theorem hodgeDual_sub {k : ℕ} (ω₁ ω₂ : SmoothForm n X (k + 1)) :
     2. Non-negative: ⟨Δω, ω⟩ ≥ 0
     3. Kernel: Δω = 0 ⟺ dω = 0 ∧ d*ω = 0
 
-    **Sprint 3 Status**: Type signature only.
+    **Implementation**: This is `Hodge.HodgeLaplacian.laplacian_construct` from
+    `Hodge/Analytic/Laplacian/HodgeLaplacian.lean`.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
-noncomputable def hodgeLaplacian {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
-    (ω : SmoothForm n X k) : SmoothForm n X k := by
-  -- Δω = dd*ω + d*dω
-  -- d*ω has degree k-1, dd*ω has degree k
-  -- dω has degree k+1, d*dω has degree k
-  have h1 : k = (k - 1) + 1 := by omega
-  have h2 : k + 1 = k + 1 := rfl
-  -- For dd*: need to cast degrees
-  let omega_dual : SmoothForm n X (k - 1) := h1 ▸ hodgeDual (h1.symm ▸ ω)
-  let dd_star : SmoothForm n X k := h1.symm ▸ smoothExtDeriv omega_dual
-  -- For d*d: need to cast degrees
-  let d_omega : SmoothForm n X (k + 1) := smoothExtDeriv ω
-  let d_star_d : SmoothForm n X k := hodgeDual d_omega
-  exact dd_star + d_star_d
+noncomputable def hodgeLaplacian {k : ℕ} (hk : 1 ≤ k) (hk' : k ≤ n)
+    (ω : SmoothForm n X k) : SmoothForm n X k :=
+  Hodge.HodgeLaplacian.laplacian_construct (n := n) (X := X) (k := k) hk hk' ω
 
-/-! ### Hodge Laplacian Linearity
-
-With trivial `CodifferentialData`, the `hodgeDual` returns 0 for all inputs.
-This means Δω = d(d*ω) + d*(dω) = d(0) + 0 = 0 + 0 = 0.
-The linearity proofs follow from this fact.
--/
-
-/-- With trivial codifferential, Δω = 0 for all ω.
-
-**Proof**: hodgeDual returns 0, so d*(dω) = 0 and d(d*ω) = d(0) = 0. -/
-theorem hodgeLaplacian_eq_zero_of_trivial {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
-    (ω : SmoothForm n X k) : hodgeLaplacian hk hk' ω = 0 := by
-  simp only [hodgeLaplacian, hodgeDual, CodifferentialData.trivial]
-  simp only [smoothExtDeriv_zero, add_zero]
-  cases k with
-  | zero => omega
-  | succ k' => simp only [Nat.succ_sub_succ_eq_sub, Nat.sub_zero, smoothExtDeriv_zero]
+/-! ### Basic algebraic properties (structural) -/
 
 /-- **Δ of zero is zero**. -/
-theorem hodgeLaplacian_zero {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) :
+theorem hodgeLaplacian_zero {k : ℕ} (hk : 1 ≤ k) (hk' : k ≤ n) :
     hodgeLaplacian hk hk' (0 : SmoothForm n X k) = 0 :=
-  hodgeLaplacian_eq_zero_of_trivial hk hk' 0
+by
+  simpa [hodgeLaplacian] using
+    Hodge.HodgeLaplacian.laplacian_construct_zero (n := n) (X := X) (k := k) hk hk'
 
 /-- **Δ is additive**. -/
-theorem hodgeLaplacian_add {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+theorem hodgeLaplacian_add {k : ℕ} (hk : 1 ≤ k) (hk' : k ≤ n)
     (ω₁ ω₂ : SmoothForm n X k) :
     hodgeLaplacian hk hk' (ω₁ + ω₂) = hodgeLaplacian hk hk' ω₁ + hodgeLaplacian hk hk' ω₂ := by
-  simp only [hodgeLaplacian_eq_zero_of_trivial, add_zero]
+  simpa [hodgeLaplacian] using
+    Hodge.HodgeLaplacian.laplacian_construct_add (n := n) (X := X) (k := k) hk hk' ω₁ ω₂
 
 /-- **Δ commutes with scalar multiplication**. -/
-theorem hodgeLaplacian_smul {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+theorem hodgeLaplacian_smul {k : ℕ} (hk : 1 ≤ k) (hk' : k ≤ n)
     (c : ℂ) (ω : SmoothForm n X k) :
     hodgeLaplacian hk hk' (c • ω) = c • hodgeLaplacian hk hk' ω := by
-  simp only [hodgeLaplacian_eq_zero_of_trivial, smul_zero]
+  simpa [hodgeLaplacian] using
+    Hodge.HodgeLaplacian.laplacian_construct_smul (n := n) (X := X) (k := k) hk hk' c ω
 
 /-- **Δ negation**. -/
-theorem hodgeLaplacian_neg {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+theorem hodgeLaplacian_neg {k : ℕ} (hk : 1 ≤ k) (hk' : k ≤ n)
     (ω : SmoothForm n X k) :
     hodgeLaplacian hk hk' (-ω) = -hodgeLaplacian hk hk' ω := by
-  simp only [hodgeLaplacian_eq_zero_of_trivial, neg_zero]
+  -- Use smul with c = -1: Δ((-1)•ω) = (-1)•Δ(ω), and (-1)•x = -x.
+  have h := hodgeLaplacian_smul hk hk' (-1 : ℂ) ω
+  simp only [neg_one_smul] at h ⊢
+  exact h
 
 /-- **Δ subtraction**. -/
-theorem hodgeLaplacian_sub {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+theorem hodgeLaplacian_sub {k : ℕ} (hk : 1 ≤ k) (hk' : k ≤ n)
     (ω₁ ω₂ : SmoothForm n X k) :
     hodgeLaplacian hk hk' (ω₁ - ω₂) = hodgeLaplacian hk hk' ω₁ - hodgeLaplacian hk hk' ω₂ := by
-  simp only [hodgeLaplacian_eq_zero_of_trivial, sub_zero]
+  -- Structural: use add + neg.
+  simp [sub_eq_add_neg, hodgeLaplacian_add, hodgeLaplacian_neg]
 
 /-- **Hodge Laplacian as a linear map**. -/
-noncomputable def hodgeLaplacianLinearMap {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) :
+noncomputable def hodgeLaplacianLinearMap {k : ℕ} (hk : 1 ≤ k) (hk' : k ≤ n) :
     SmoothForm n X k →ₗ[ℂ] SmoothForm n X k where
   toFun := hodgeLaplacian hk hk'
   map_add' := hodgeLaplacian_add hk hk'
@@ -480,7 +458,7 @@ noncomputable def hodgeLaplacianLinearMap {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 
     **Sprint 3 Status**: Statement only.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
-theorem hodgeLaplacian_selfAdjoint {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤ 2 * n)
+theorem hodgeLaplacian_selfAdjoint {k : ℕ} (_hk : 1 ≤ k) (_hk' : k ≤ n)
     (_ω _η : SmoothForm n X k) :
     True := trivial
 
@@ -491,7 +469,7 @@ theorem hodgeLaplacian_selfAdjoint {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤ 2
     **Proof**: With trivial L² data, the inner product is 0, which is ≥ 0.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
-theorem hodgeLaplacian_nonneg {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤ 2 * n)
+theorem hodgeLaplacian_nonneg {k : ℕ} (_hk : 1 ≤ k) (_hk' : k ≤ n)
     (_ω : SmoothForm n X k) :
     True := trivial
 
@@ -508,7 +486,7 @@ theorem hodgeLaplacian_nonneg {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤ 2 * n)
     The full proof requires L² analysis.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
-theorem hodgeLaplacian_ker_iff {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤ 2 * n)
+theorem hodgeLaplacian_ker_iff {k : ℕ} (_hk : 1 ≤ k) (_hk' : k ≤ n)
     (_ω : SmoothForm n X k) :
     True := trivial
   -- Off proof track: requires L² theory to prove the equivalence
@@ -528,7 +506,7 @@ theorem hodgeLaplacian_ker_iff {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤ 2 * n
     This will be connected to Agent 3's Dolbeault theory.
 
     Reference: [Voisin, "Hodge Theory and Complex Algebraic Geometry I", §6.1]. -/
-theorem kahler_laplacian_identity {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+theorem kahler_laplacian_identity {k : ℕ} (hk : 1 ≤ k) (hk' : k ≤ n)
     (ω : SmoothForm n X k) :
     True := trivial  -- Placeholder: Δ = 2Δ_∂ = 2Δ_∂̄
 
@@ -538,7 +516,7 @@ This file establishes the Hodge Laplacian infrastructure:
 
 1. **L² Inner Product**: `L2InnerProduct` with sesquilinearity and Hermitian properties
 2. **Hodge Dual (d*)**: `hodgeDual` as the formal adjoint of d
-3. **Hodge Laplacian**: `hodgeLaplacian = dd* + d*d`
+3. **Hodge Laplacian**: `hodgeLaplacian = dδ + δd`
 4. **Key Properties**: Self-adjointness, non-negativity, kernel characterization
 
 **Connection to other agents**:

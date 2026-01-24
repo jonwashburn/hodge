@@ -89,7 +89,7 @@ variable {n : ℕ} {X : Type u}
     **Sprint 3 Status**: Definition.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
-def IsHarmonic {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) (ω : SmoothForm n X k) : Prop :=
+def IsHarmonic {k : ℕ} (hk : 1 ≤ k) (hk' : k ≤ n) (ω : SmoothForm n X k) : Prop :=
   hodgeLaplacian hk hk' ω = 0
 
 /-- **Harmonic ⟺ Laplacian is zero**.
@@ -97,7 +97,7 @@ def IsHarmonic {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) (ω : SmoothForm
     **Sprint 3 Status**: Trivial by definition.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
-theorem harmonic_iff_laplacian_zero {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+theorem harmonic_iff_laplacian_zero {k : ℕ} (hk : 1 ≤ k) (hk' : k ≤ n)
     (ω : SmoothForm n X k) :
     IsHarmonic hk hk' ω ↔ hodgeLaplacian hk hk' ω = 0 := Iff.rfl
 
@@ -108,7 +108,7 @@ theorem harmonic_iff_laplacian_zero {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 
     **Sprint 3 Status**: Statement only.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
-theorem harmonic_closed {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤ 2 * n)
+theorem harmonic_closed {k : ℕ} (_hk : 1 ≤ k) (_hk' : k ≤ n)
     (_ω : SmoothForm n X k) (_h : IsHarmonic _hk _hk' _ω) :
     True := trivial
   -- Off proof track: Δω = 0 ⟹ dω = 0 (from Hodge theory)
@@ -120,7 +120,7 @@ theorem harmonic_closed {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤ 2 * n)
     **Proof**: Uses the kernel characterization of harmonic forms.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
-theorem harmonic_coclosed {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤ 2 * n)
+theorem harmonic_coclosed {k : ℕ} (_hk : 1 ≤ k) (_hk' : k ≤ n)
     (_ω : SmoothForm n X k) (_h : IsHarmonic _hk _hk' _ω) :
     hodgeDual ((by omega : k = (k - 1) + 1).symm ▸ _ω) = 0 := by
   -- With trivial codifferential data, hodgeDual returns 0
@@ -133,7 +133,7 @@ theorem harmonic_coclosed {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤ 2 * n)
     **Off Proof Track**: Reformulated as `True` for infrastructure.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
-theorem harmonic_iff_closed_coclosed {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤ 2 * n)
+theorem harmonic_iff_closed_coclosed {k : ℕ} (_hk : 1 ≤ k) (_hk' : k ≤ n)
     (_ω : SmoothForm n X k) :
     True := trivial
   -- Off proof track: equivalent to hodgeLaplacian_ker_iff
@@ -145,33 +145,33 @@ theorem harmonic_iff_closed_coclosed {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤
     Δ(0) = 0 trivially.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
-theorem zero_isHarmonic {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) :
+theorem zero_isHarmonic {k : ℕ} (hk : 1 ≤ k) (hk' : k ≤ n) :
     IsHarmonic hk hk' (0 : SmoothForm n X k) :=
   hodgeLaplacian_zero hk hk'
 
 /-- **Sum of harmonic forms is harmonic**. -/
-theorem isHarmonic_add {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+theorem isHarmonic_add {k : ℕ} (hk : 1 ≤ k) (hk' : k ≤ n)
     (ω₁ ω₂ : SmoothForm n X k) (h₁ : IsHarmonic hk hk' ω₁) (h₂ : IsHarmonic hk hk' ω₂) :
     IsHarmonic hk hk' (ω₁ + ω₂) := by
   unfold IsHarmonic at *
   rw [hodgeLaplacian_add, h₁, h₂, add_zero]
 
 /-- **Scalar multiple of harmonic form is harmonic**. -/
-theorem isHarmonic_smul {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+theorem isHarmonic_smul {k : ℕ} (hk : 1 ≤ k) (hk' : k ≤ n)
     (c : ℂ) (ω : SmoothForm n X k) (h : IsHarmonic hk hk' ω) :
     IsHarmonic hk hk' (c • ω) := by
   unfold IsHarmonic at *
   rw [hodgeLaplacian_smul, h, smul_zero]
 
 /-- **Negation of harmonic form is harmonic**. -/
-theorem isHarmonic_neg {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+theorem isHarmonic_neg {k : ℕ} (hk : 1 ≤ k) (hk' : k ≤ n)
     (ω : SmoothForm n X k) (h : IsHarmonic hk hk' ω) :
     IsHarmonic hk hk' (-ω) := by
   unfold IsHarmonic at *
   rw [hodgeLaplacian_neg, h, neg_zero]
 
 /-- **Difference of harmonic forms is harmonic**. -/
-theorem isHarmonic_sub {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+theorem isHarmonic_sub {k : ℕ} (hk : 1 ≤ k) (hk' : k ≤ n)
     (ω₁ ω₂ : SmoothForm n X k) (h₁ : IsHarmonic hk hk' ω₁) (h₂ : IsHarmonic hk hk' ω₂) :
     IsHarmonic hk hk' (ω₁ - ω₂) := by
   unfold IsHarmonic at *
@@ -188,7 +188,7 @@ def HarmonicForm (n : ℕ) (X : Type u) (k : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) :=
+    (hk : 1 ≤ k) (hk' : k ≤ n) :=
   { ω : SmoothForm n X k // IsHarmonic hk hk' ω }
 
 /-! ### Vector Space Structure (Off Proof Track)
@@ -201,14 +201,14 @@ and scalar multiplication. This is off the main proof track.
 /-- **Harmonic forms have AddCommGroup structure** (placeholder).
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
-theorem harmonicForm_has_addCommGroup {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤ 2 * n) :
+theorem harmonicForm_has_addCommGroup {k : ℕ} (_hk : 1 ≤ k) (_hk' : k ≤ n) :
     True := trivial
   -- Off proof track: HarmonicForm has AddCommGroup structure
 
 /-- **Harmonic forms have Module ℂ structure** (placeholder).
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
-theorem harmonicForm_has_module {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤ 2 * n) :
+theorem harmonicForm_has_module {k : ℕ} (_hk : 1 ≤ k) (_hk' : k ≤ n) :
     True := trivial
   -- Off proof track: HarmonicForm has Module ℂ structure
 
@@ -221,7 +221,7 @@ theorem harmonicForm_has_module {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤ 2 * 
     **Sprint 3 Status**: Statement only.
 
     Reference: [Voisin, "Hodge Theory and Complex Algebraic Geometry I", §5.3]. -/
-theorem harmonic_finDim {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤ 2 * n) :
+theorem harmonic_finDim {k : ℕ} (_hk : 1 ≤ k) (_hk' : k ≤ n) :
     True := trivial
   -- Off proof track: finite-dimensionality requires elliptic theory
 
@@ -232,7 +232,7 @@ theorem harmonic_finDim {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤ 2 * n) :
     **Sprint 3 Status**: Definition (stub).
 
     Reference: [Voisin, "Hodge Theory and Complex Algebraic Geometry I", §5.3]. -/
-noncomputable def bettiNumber (_k : ℕ) (_hk : 1 ≤ _k) (_hk' : _k + 1 ≤ 2 * n) : ℕ :=
+noncomputable def bettiNumber (_k : ℕ) (_hk : 1 ≤ _k) (_hk' : _k ≤ n) : ℕ :=
   0  -- Stub: real implementation uses FiniteDimensional.finrank
 
 /-! ## Hodge Decomposition -/
@@ -248,7 +248,7 @@ noncomputable def bettiNumber (_k : ℕ) (_hk : 1 ≤ _k) (_hk' : _k + 1 ≤ 2 *
     The full proof requires elliptic theory and Fredholm analysis.
 
     Reference: [Voisin, "Hodge Theory and Complex Algebraic Geometry I", §5.3]. -/
-theorem hodge_decomposition {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤ 2 * n)
+theorem hodge_decomposition {k : ℕ} (_hk : 1 ≤ k) (_hk' : k ≤ n)
     (_ω : SmoothForm n X k) :
     True := trivial
   -- Off proof track: Hodge decomposition requires elliptic PDE theory
@@ -260,7 +260,7 @@ theorem hodge_decomposition {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤ 2 * n)
     **Off Proof Track**: Reformulated as `True` for infrastructure.
 
     Reference: [Voisin, "Hodge Theory and Complex Algebraic Geometry I", §5.3]. -/
-theorem unique_harmonic_representative {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤ 2 * n)
+theorem unique_harmonic_representative {k : ℕ} (_hk : 1 ≤ k) (_hk' : k ≤ n)
     (_ω : SmoothForm n X k) (_hω : smoothExtDeriv _ω = 0) :
     True := trivial
   -- Off proof track: uniqueness follows from Hodge decomposition
@@ -276,7 +276,7 @@ theorem unique_harmonic_representative {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 �
     **Sprint 3 Status**: Statement only.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
-theorem harmonic_orthog_exact {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤ 2 * n)
+theorem harmonic_orthog_exact {k : ℕ} (_hk : 1 ≤ k) (_hk' : k ≤ n)
     (_ω : SmoothForm n X k) (_h : IsHarmonic _hk _hk' _ω)
     (_α : SmoothForm n X (k - 1)) :
     True := trivial
@@ -289,7 +289,7 @@ theorem harmonic_orthog_exact {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤ 2 * n)
     **Proof**: With trivial L² inner product data, this is trivial.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
-theorem harmonic_orthog_coexact {k : ℕ} (_hk : 1 ≤ k) (_hk' : k + 1 ≤ 2 * n)
+theorem harmonic_orthog_coexact {k : ℕ} (_hk : 1 ≤ k) (_hk' : k ≤ n)
     (_ω : SmoothForm n X k) (_h : IsHarmonic _hk _hk' _ω)
     (_β : SmoothForm n X (k + 1)) :
     True := trivial
