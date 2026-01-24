@@ -86,26 +86,24 @@ but they’re valuable for a real Hodge theory library and for future refactors.
 
 ### Current implementation status (definitions) ✅
 
-- [x] **pointwiseInner** implemented (fiber basis evaluation)
-  - Files: `Hodge/Analytic/HodgeStar/FiberStar.lean`, `Hodge/Analytic/Norms.lean`
-- [x] **L2Inner** implemented as a genuine measure integral `L2Inner_measure`
-  - File: `Hodge/Analytic/Integration/L2Inner.lean`
-- [x] **hodgeStar** implemented as a non-degenerate fiber CLM `fiberHodgeStarCLM : k → (n-k)`
-  - File: `Hodge/Analytic/HodgeStar/FiberStar.lean`
-- [x] **codifferential** wired as `δ = signFactor • ⋆ d ⋆`
-  - File: `Hodge/Analytic/Laplacian/Codifferential.lean`
-- [x] **laplacian** wired as `Δ = dδ + δd` (with degree casts)
-  - File: `Hodge/Analytic/Laplacian/HodgeLaplacian.lean`
-- [x] **harmonic predicate** wired as `IsHarmonic := (Δω = 0)`
-  - File: `Hodge/Analytic/Laplacian/HarmonicForms.lean`
+**In main tree (on-track):**
+- [x] **pointwiseInner** — `Hodge/Analytic/HodgeStar/FiberStar.lean`, `Hodge/Analytic/Norms.lean`
+- [x] **L2Inner** — `Hodge/Analytic/Integration/L2Inner.lean`
+- [x] **hodgeStar** — `Hodge/Analytic/HodgeStar/FiberStar.lean`
 
-### Remaining work (analytic theorems + cleanup)
+**Archived (off-track, not needed for `hodge_conjecture'`):**
+- [x] codifferential, laplacian, harmonic predicate — `archive/Hodge/Analytic/Laplacian/*`
 
-#### A. Make “harmonic = ker(Δ)” literal (small, structural)
+### Remaining work (analytic theorems — all ARCHIVED / off-track)
 
-- [x] Define `HarmonicSubmodule := LinearMap.ker (laplacianLinearMap ...)`
-- [x] Prove `IsHarmonic hk hk' ω ↔ ω ∈ HarmonicSubmodule hk hk'`
-  - File: `Hodge/Analytic/Laplacian/HarmonicForms.lean`
+> ⚠️ **Note**: The Laplacian/HarmonicForms files were moved to `archive/` and are NOT
+> imported by the main build. The items below are only relevant if you want to restore
+> and develop the analytic library further.
+
+#### A. Make "harmonic = ker(Δ)" literal ✅ (done, in archive)
+
+- [x] `HarmonicSubmodule := LinearMap.ker (laplacianLinearMap ...)`
+- [x] `IsHarmonic hk hk' ω ↔ ω ∈ HarmonicSubmodule hk hk'`
 
 #### B. Fiber-level `⋆` theorems (core algebra/combinatorics)
 
@@ -135,17 +133,21 @@ but they’re valuable for a real Hodge theory library and for future refactors.
 
 #### F. Cleanup (reduce duplicate/legacy skeleton APIs)
 
-- [ ] Decide whether to keep or deprecate the older “interface” files:
-  - `Hodge/Analytic/HodgeLaplacian.lean`
-  - `Hodge/Analytic/HarmonicForms.lean`
+- [x] Laplacian/HarmonicForms files moved to `archive/` (done 2026-01-24)
 - [ ] Address known stubs that are still `:= 0` in off-track modules (e.g. Kähler identity skeletons)
 
 ## DELETE‑LATER (Not needed at all; handle in another session)
 
-- [ ] Decide which legacy/skeleton APIs to delete (after MUST‑HAVE is done):
-  - `Hodge/Analytic/ManifoldForms.lean` (has a separate wedge stub `ContinuousAlternatingMap.wedge := 0`)
-  - `Hodge/Kahler/Identities/LDelta.lean` (placeholder `lefschetz := 0`, `adjointDeriv := 0`)
-  - Other “skeleton” Kähler identity modules with `:= 0` placeholder operators
+Already archived (no longer in main tree):
+- `archive/Hodge/Analytic/Laplacian/*` — codifferential, Laplacian, harmonic forms
+- `archive/Hodge/Analytic/HodgeLaplacian.lean`, `archive/Hodge/Analytic/HarmonicForms.lean`
+- `archive/Hodge/Kahler/Lefschetz/*` — Lefschetz/primitive decomposition modules
+- `archive/Hodge/Tests/MasterTests.lean`
+
+Still in main tree but could be deleted later:
+- [ ] `Hodge/Analytic/ManifoldForms.lean` (has a separate wedge stub `ContinuousAlternatingMap.wedge := 0`)
+- [ ] `Hodge/Kahler/Identities/LDelta.lean` (placeholder `lefschetz := 0`, `adjointDeriv := 0`)
+- [ ] Other "skeleton" Kähler identity modules with `:= 0` placeholder operators
 
 ## Notes / re-queue cadence
 
