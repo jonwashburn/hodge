@@ -112,10 +112,45 @@ noncomputable def codifferential (ω : SmoothForm n X k) :
 /-- Notation for codifferential. -/
 scoped notation:max "δ" α:max => codifferential α
 
-/-- With trivial Hodge star, the codifferential always returns 0. -/
-@[simp] theorem codifferential_eq_zero_trivial (ω : SmoothForm n X k) :
+/-!
+### The current codifferential is identically zero (degree reasons)
+
+With the current fiber-level Hodge star construction in `Hodge/Analytic/Norms.lean`,
+`⋆` is nonzero only in middle degree. Since `d` shifts degree by `+1`, the composite
+`⋆ d ⋆` always lands in a degree where `⋆ = 0`, hence `δ = 0` numerically.
+
+This lemma is **not** on the proof track; it will be removed once a genuine (non-degenerate)
+Hodge star is implemented.
+-/
+private theorem hodgeStar_eq_zero_of_ne {n : ℕ} {X : Type u}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    {k : ℕ} (hk : k ≠ n) (ω : SmoothForm n X k) :
+    hodgeStar (n := n) (X := X) (k := k) ω = 0 := by
+  ext x v
+  simp [hodgeStar, HodgeStarData.fromFiber, fiberHodgeStar_construct, hk]
+
+/-- With the current (degenerate) Hodge star wiring, the codifferential always returns `0`. -/
+@[simp] theorem codifferential_eq_zero (ω : SmoothForm n X k) :
     codifferential ω = 0 := by
-  simp only [codifferential, hodgeStar, HodgeStarData.trivial, smoothExtDeriv_zero, smul_zero]
+  classical
+  by_cases hk : k = n
+  · cases hk
+    -- Now `⋆ω` is (a cast of) ω, but `d(⋆ω)` has degree `n+1`, so the outer ⋆ vanishes.
+    have hk' : (2 * n - n + 1) ≠ n := by omega
+    have houter :
+        hodgeStar (n := n) (X := X) (k := 2 * n - n + 1) (smoothExtDeriv (hodgeStar ω)) = 0 :=
+      hodgeStar_eq_zero_of_ne (n := n) (X := X) hk' _
+    unfold codifferential
+    rw [houter]
+    simp
+  · -- If k ≠ n, the inner ⋆ is already 0.
+    have hinner : hodgeStar (n := n) (X := X) (k := k) ω = 0 :=
+      hodgeStar_eq_zero_of_ne (n := n) (X := X) hk ω
+    unfold codifferential
+    rw [hinner]
+    simp [hodgeStar_zero, smoothExtDeriv_zero]
 
 /-!
 ## Basic Properties
@@ -151,7 +186,7 @@ theorem codifferential_smul_real (r : ℝ) (α : SmoothForm n X k) :
     When ⋆ becomes non-trivial with ℂ-linearity, this can be structural. -/
 theorem codifferential_smul (c : ℂ) (α : SmoothForm n X k) :
     codifferential (c • α) = c • codifferential α := by
-  simp only [codifferential_eq_zero_trivial, smul_zero]
+  simp only [codifferential_eq_zero, smul_zero]
 
 /-- Codifferential respects negation.
     **Structural proof**: Uses `hodgeStar_neg` and `smoothExtDeriv_neg`. -/
@@ -201,7 +236,7 @@ The proof follows from d² = 0 and the involution property of ⋆. -/
 theorem codifferential_squared (ω : SmoothForm n X k) :
     codifferential (codifferential ω) = 0 := by
   -- With the current (degenerate) ⋆, δ is identically 0, so δ² = 0.
-  simp only [codifferential, hodgeStar, HodgeStarData.trivial, smoothExtDeriv_zero, smul_zero]
+  simp
 
 /-- Alias (naming used in the operational plan): `δ² = 0`. -/
 theorem codifferential_squared_zero (ω : SmoothForm n X k) :

@@ -32,6 +32,18 @@ variable {n : ℕ} {X : Type u}
   [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
   [ProjectiveComplexManifold n X] [KahlerManifold n X]
 
+/-! Local cast helpers (distribute `castForm` over algebraic operations). -/
+
+private lemma castForm_add {k k' : ℕ} (h : k = k') (ω η : SmoothForm n X k) :
+    castForm (n := n) (X := X) h (ω + η) =
+      castForm (n := n) (X := X) h ω + castForm (n := n) (X := X) h η := by
+  subst h; rfl
+
+private lemma castForm_smul {k k' : ℕ} (h : k = k') (c : ℂ) (ω : SmoothForm n X k) :
+    castForm (n := n) (X := X) h (c • ω) =
+      c • castForm (n := n) (X := X) h ω := by
+  subst h; rfl
+
 /-- **Hodge Laplacian** Δ on `k`-forms.
 
 In a full implementation this should be:
@@ -68,18 +80,19 @@ theorem laplacian_construct_add {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
   simp only [laplacian_construct]
   rw [Codifferential.codifferential_add, smoothExtDeriv_add]
   rw [smoothExtDeriv_add, Codifferential.codifferential_add]
-  rw [castForm_add, castForm_add]
-  ring
+  -- Distribute `castForm` over sums, then finish by commutative-additive normalization.
+  simp only [castForm_add, add_assoc, add_left_comm, add_comm]
 
 /-- Laplacian respects ℂ-scalar multiplication. -/
 theorem laplacian_construct_smul {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
     (c : ℂ) (α : SmoothForm n X k) :
     laplacian_construct hk hk' (c • α) = c • laplacian_construct hk hk' α := by
   simp only [laplacian_construct]
-  rw [Codifferential.codifferential_smul, smoothExtDeriv_smul_complex]
-  rw [smoothExtDeriv_smul_complex, Codifferential.codifferential_smul]
-  rw [castForm_smul, castForm_smul]
-  rw [smul_add]
+  rw [Codifferential.codifferential_smul, smoothExtDeriv_smul]
+  rw [smoothExtDeriv_smul, Codifferential.codifferential_smul]
+  -- Pull scalar through casts and sums.
+  simp only [castForm_smul]
+  simp
 
 /-- Laplacian as a ℂ-linear map (using the current definition of Δ).
 
@@ -92,19 +105,20 @@ noncomputable def laplacianLinearMap (k : ℕ) (hk : 1 ≤ k) (hk' : k + 1 ≤ 2
     simp only [RingHom.id_apply]
     exact laplacian_construct_smul hk hk' c ω
 
-/-- With trivial Hodge star (hence trivial δ), the Laplacian returns 0.
+/-- With the current (degenerate) Hodge star wiring (hence δ = 0), the Laplacian returns 0.
 
 **Note**: This is NOT marked `@[simp]` to preserve the algebraic structure of proofs. -/
-theorem laplacian_construct_eq_zero_of_trivial_star {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+theorem laplacian_construct_eq_zero_of_degenerate_star {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
     (ω : SmoothForm n X k) :
     laplacian_construct (n := n) (X := X) (k := k) hk hk' ω = 0 := by
-  simp [laplacian_construct, Codifferential.codifferential_eq_zero_of_trivial_star]
+  -- `Codifferential.codifferential_eq_zero` is a simp lemma under the current ⋆.
+  simp [laplacian_construct]
 
-/-- With trivial Hodge star, the Hodge Laplacian returns 0. -/
-theorem hodgeLaplacian_construct_eq_zero_of_trivial_star {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+/-- With the current (degenerate) Hodge star wiring, the Hodge Laplacian returns 0. -/
+theorem hodgeLaplacian_construct_eq_zero_of_degenerate_star {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
     (ω : SmoothForm n X k) :
     hodgeLaplacian_construct (n := n) (X := X) (k := k) hk hk' ω = 0 :=
-  laplacian_construct_eq_zero_of_trivial_star hk hk' ω
+  laplacian_construct_eq_zero_of_degenerate_star hk hk' ω
 
 end HodgeLaplacian
 end Hodge

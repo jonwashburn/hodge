@@ -7,7 +7,8 @@ This file introduces a lightweight interface for *harmonic forms*:
 
 - A `k`-form `ω` is harmonic if `Δω = 0`.
 
-With the current placeholder Laplacian (zero operator), every form is harmonic. This is **not**
+With the current (degenerate) Hodge star wiring, the induced codifferential and Laplacian
+still simplify to the **zero operator**, so every form is harmonic. This is **not**
 mathematically meaningful, but it provides a stable API that can be upgraded once the Hodge star
 and codifferential are implemented nontrivially.
 
@@ -36,8 +37,12 @@ def IsHarmonic {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) (ω : SmoothForm
 
 @[simp] theorem isHarmonic_iff {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) (ω : SmoothForm n X k) :
     IsHarmonic (n := n) (X := X) (k := k) hk hk' ω ↔ True := by
-  -- With the placeholder Laplacian, `Δω = 0` is always true.
-  simp [IsHarmonic]
+  -- With the current (degenerate) ⋆/δ, the Laplacian is identically zero.
+  constructor
+  · intro _; trivial
+  · intro _h
+    unfold IsHarmonic
+    exact HodgeLaplacian.laplacian_construct_eq_zero_of_degenerate_star (n := n) (X := X) hk hk' ω
 
 /-- **Harmonic characterization (stub)**.
 
