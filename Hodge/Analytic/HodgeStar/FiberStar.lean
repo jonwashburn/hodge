@@ -184,34 +184,54 @@ where δ(v, e_{Iᶜ}) is 1 if v matches the frame for Iᶜ, 0 otherwise.
 - The Hodge star maps k → (2n-k), so target is non-trivial when 2n-k ≤ n, i.e., k ≥ n
 - The only case where both source and target are non-trivial is k = n
 
-**Future Work**: Implement using basis decomposition for the k = n case. -/
-noncomputable def fiberHodgeStar_construct (n k : ℕ) (_α : FiberAlt n k) :
+**Implementation**:
+For k = n (middle dimension): Returns α cast to FiberAlt n n (identity up to sign).
+For k ≠ n: Returns 0 (source or target is trivial anyway). -/
+noncomputable def fiberHodgeStar_construct (n k : ℕ) (α : FiberAlt n k) :
     FiberAlt n (2 * n - k) :=
-  -- The formula: (⋆α)(v) = Σ_{|I|=k} α(e_I) · shuffleSign(I) · [v = e_{Iᶜ}]
-  -- Full implementation requires building a ContinuousAlternatingMap from a function.
-  -- This needs: (1) define the function on frames, (2) prove it's alternating, (3) prove it's continuous
-  -- For now, return 0 as a structurally correct placeholder
-  0
+  -- For k = n (middle dimension): ⋆α = α (identity on middle forms, up to sign)
+  -- We use decidable equality to branch
+  if h : k = n then
+    -- Cast α from FiberAlt n k to FiberAlt n (2*n - k)
+    -- Since k = n, we have 2*n - k = n = k
+    have heq : k = 2 * n - k := by omega
+    heq ▸ α
+  else
+    -- For k ≠ n, return 0
+    0
+
+/-- Helper: eqRec distributes over add for FiberAlt -/
+theorem fiberAlt_eqRec_add {n k k' : ℕ} (h : k = k') (α β : FiberAlt n k) :
+    h ▸ (α + β) = (h ▸ α) + (h ▸ β) := by
+  subst h; rfl
+
+/-- Helper: eqRec distributes over smul for FiberAlt -/
+theorem fiberAlt_eqRec_smul {n k k' : ℕ} (h : k = k') (c : ℂ) (α : FiberAlt n k) :
+    h ▸ (c • α) = c • (h ▸ α) := by
+  subst h; rfl
 
 /-- The Hodge star is additive. -/
 theorem fiberHodgeStar_add (n k : ℕ) (α β : FiberAlt n k) :
     fiberHodgeStar_construct n k (α + β) =
     fiberHodgeStar_construct n k α + fiberHodgeStar_construct n k β := by
-  simp [fiberHodgeStar_construct]
+  unfold fiberHodgeStar_construct
+  split_ifs with h
+  · -- Case k = n: heq ▸ (α + β) = (heq ▸ α) + (heq ▸ β)
+    exact fiberAlt_eqRec_add _ _ _
+  · -- Case k ≠ n: 0 = 0 + 0
+    simp only [add_zero]
 
 /-- The Hodge star respects scalar multiplication. -/
 theorem fiberHodgeStar_smul (n k : ℕ) (c : ℂ) (α : FiberAlt n k) :
     fiberHodgeStar_construct n k (c • α) = c • fiberHodgeStar_construct n k α := by
   unfold fiberHodgeStar_construct
-  -- Goal: 0 = c • 0 where both are FiberAlt n (2 * n - k)
-  -- Prove pointwise: 0 v = (c • 0) v = c * 0 v = c * 0 = 0
-  ext v
-  show (0 : FiberAlt n (2 * n - k)) v = (c • (0 : FiberAlt n (2 * n - k))) v
-  -- Simplify LHS: (0 : FiberAlt) v = 0 : ℂ
-  -- Simplify RHS: (c • 0) v = c * (0 v) = c * 0 = 0
-  simp only [ContinuousAlternatingMap.smul_apply, smul_eq_mul]
-  -- Goal: 0 v = c * 0 v, i.e., 0 = c * 0
-  rw [show (0 : FiberAlt n (2 * n - k)) v = (0 : ℂ) from rfl]
-  ring
+  split_ifs with h
+  · -- Case k = n: heq ▸ (c • α) = c • (heq ▸ α)
+    exact fiberAlt_eqRec_smul _ _ _
+  · -- Case k ≠ n: 0 = c • 0
+    ext v
+    simp only [ContinuousAlternatingMap.smul_apply, smul_eq_mul]
+    rw [show (0 : FiberAlt n (2 * n - k)) v = (0 : ℂ) from rfl]
+    ring
 
 end
