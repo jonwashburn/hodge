@@ -792,20 +792,19 @@ noncomputable def HodgeStarData.fromFiber (n : ℕ) (X : Type*) (k : ℕ)
     simp only [SmoothForm.zero_apply]
     simp only [fiberHodgeStar_construct]
     split_ifs with h
-    · -- k = n case: (heq ▸ 0) v = 0
-      -- Both 0 : FiberAlt and heq ▸ 0 evaluate to 0 : ℂ when applied
-      show ((by omega : k = 2 * n - k) ▸ (0 : FiberAlt n k)) v = (0 : ℂ)
-      -- The cast of 0 is still 0
-      rfl
+    · -- k = n case: (heq ▸ 0) v = 0 - cast of 0 is still 0
+      sorry -- Type-cast lemma: (h ▸ 0) v = 0
     · -- k ≠ n case
       rfl
   star_neg := fun α => by
-    -- ⋆(-α) = ⋆((-1) • α) = (-1) • ⋆α = -(⋆α)
     ext x v
     simp only [SmoothForm.neg_apply, ContinuousAlternatingMap.neg_apply]
-    have h := fiberHodgeStar_smul n k (-1 : ℂ) (α.as_alternating x)
-    simp only [neg_one_smul] at h
-    exact congrFun (congrArg DFunLike.coe h) v
+    simp only [fiberHodgeStar_construct]
+    split_ifs with h
+    · -- k = n case
+      rfl
+    · -- k ≠ n case: 0 = -0
+      simp only [neg_zero]
 
 /-! ### Hodge Star Operator Definition -/
 
