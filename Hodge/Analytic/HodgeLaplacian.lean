@@ -369,16 +369,16 @@ theorem hodgeDual_smul {k : ℕ} (c : ℂ) (_ω : SmoothForm n X (k + 1)) :
     hodgeDual (c • _ω) = c • hodgeDual _ω :=
   (CodifferentialData.trivial n X k).codiff_smul c _ω
 
-/-- **d* of zero is zero**.
-
-    Reference: [Warner, "Foundations of Differentiable Manifolds", §6.1]. -/
+/-- **d* of zero is zero**. -/
 theorem hodgeDual_zero {k : ℕ} : hodgeDual (0 : SmoothForm n X (k + 1)) = 0 :=
   (CodifferentialData.trivial n X k).codiff_zero
 
 /-- **d* respects negation**. -/
 theorem hodgeDual_neg {k : ℕ} (ω : SmoothForm n X (k + 1)) :
     hodgeDual (-ω) = -hodgeDual ω := by
-  rw [neg_eq_neg_one_smul, hodgeDual_smul, neg_eq_neg_one_smul]
+  have h : -ω = (-1 : ℂ) • ω := by simp
+  rw [h, hodgeDual_smul]
+  simp
 
 /-- **d* respects subtraction**. -/
 theorem hodgeDual_sub {k : ℕ} (ω₁ ω₂ : SmoothForm n X (k + 1)) :
@@ -417,55 +417,59 @@ noncomputable def hodgeLaplacian {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n
   let d_star_d : SmoothForm n X k := hodgeDual d_omega
   exact dd_star + d_star_d
 
-/-! ### Linearity of Hodge Laplacian -/
+/-! ### Hodge Laplacian Linearity
 
-/-- **Hodge Laplacian of zero is zero**.
+With trivial `CodifferentialData`, the `hodgeDual` returns 0 for all inputs.
+This means Δω = d(d*ω) + d*(dω) = d(0) + 0 = 0 + 0 = 0.
+The linearity proofs follow from this fact.
+-/
 
-This is a structural proof using linearity of d and d*. -/
+/-- With trivial codifferential, Δω = 0 for all ω.
+
+**Proof**: hodgeDual returns 0, so d*(dω) = 0 and d(d*ω) = d(0) = 0. -/
+theorem hodgeLaplacian_eq_zero_of_trivial {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
+    (ω : SmoothForm n X k) : hodgeLaplacian hk hk' ω = 0 := by
+  simp only [hodgeLaplacian, hodgeDual, CodifferentialData.trivial]
+  simp only [smoothExtDeriv_zero, add_zero]
+  cases k with
+  | zero => omega
+  | succ k' => simp only [Nat.succ_sub_succ_eq_sub, Nat.sub_zero, smoothExtDeriv_zero]
+
+/-- **Δ of zero is zero**. -/
 theorem hodgeLaplacian_zero {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) :
-    hodgeLaplacian (n := n) (X := X) hk hk' 0 = 0 := by
-  -- With trivial hodgeDual, both components are 0
-  simp only [hodgeLaplacian, hodgeDual, CodifferentialData.trivial, smoothExtDeriv_zero, add_zero]
+    hodgeLaplacian hk hk' (0 : SmoothForm n X k) = 0 :=
+  hodgeLaplacian_eq_zero_of_trivial hk hk' 0
 
-/-- **Hodge Laplacian is additive**.
-
-Structural proof using linearity of d and d*. -/
+/-- **Δ is additive**. -/
 theorem hodgeLaplacian_add {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
-    (ω η : SmoothForm n X k) :
-    hodgeLaplacian hk hk' (ω + η) = hodgeLaplacian hk hk' ω + hodgeLaplacian hk hk' η := by
-  -- With trivial hodgeDual, both sides simplify to 0
-  simp only [hodgeLaplacian, hodgeDual, CodifferentialData.trivial, smoothExtDeriv_add, add_zero]
+    (ω₁ ω₂ : SmoothForm n X k) :
+    hodgeLaplacian hk hk' (ω₁ + ω₂) = hodgeLaplacian hk hk' ω₁ + hodgeLaplacian hk hk' ω₂ := by
+  simp only [hodgeLaplacian_eq_zero_of_trivial, add_zero]
 
-/-- **Hodge Laplacian respects scalar multiplication**.
-
-Structural proof using linearity of d and d*. -/
+/-- **Δ commutes with scalar multiplication**. -/
 theorem hodgeLaplacian_smul {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
     (c : ℂ) (ω : SmoothForm n X k) :
     hodgeLaplacian hk hk' (c • ω) = c • hodgeLaplacian hk hk' ω := by
-  -- With trivial hodgeDual, both sides simplify to 0
-  simp only [hodgeLaplacian, hodgeDual, CodifferentialData.trivial, smoothExtDeriv_smul_complex,
-             smul_zero, add_zero]
+  simp only [hodgeLaplacian_eq_zero_of_trivial, smul_zero]
 
-/-- **Hodge Laplacian respects negation**. -/
+/-- **Δ negation**. -/
 theorem hodgeLaplacian_neg {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
     (ω : SmoothForm n X k) :
     hodgeLaplacian hk hk' (-ω) = -hodgeLaplacian hk hk' ω := by
-  rw [neg_eq_neg_one_smul, hodgeLaplacian_smul, neg_eq_neg_one_smul]
+  simp only [hodgeLaplacian_eq_zero_of_trivial, neg_zero]
 
-/-- **Hodge Laplacian respects subtraction**. -/
+/-- **Δ subtraction**. -/
 theorem hodgeLaplacian_sub {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n)
-    (ω η : SmoothForm n X k) :
-    hodgeLaplacian hk hk' (ω - η) = hodgeLaplacian hk hk' ω - hodgeLaplacian hk hk' η := by
-  rw [sub_eq_add_neg, hodgeLaplacian_add, hodgeLaplacian_neg, sub_eq_add_neg]
+    (ω₁ ω₂ : SmoothForm n X k) :
+    hodgeLaplacian hk hk' (ω₁ - ω₂) = hodgeLaplacian hk hk' ω₁ - hodgeLaplacian hk hk' ω₂ := by
+  simp only [hodgeLaplacian_eq_zero_of_trivial, sub_zero]
 
-/-- **Hodge Laplacian as a ℂ-linear map**. -/
+/-- **Hodge Laplacian as a linear map**. -/
 noncomputable def hodgeLaplacianLinearMap {k : ℕ} (hk : 1 ≤ k) (hk' : k + 1 ≤ 2 * n) :
     SmoothForm n X k →ₗ[ℂ] SmoothForm n X k where
-  toFun ω := hodgeLaplacian hk hk' ω
+  toFun := hodgeLaplacian hk hk'
   map_add' := hodgeLaplacian_add hk hk'
-  map_smul' := fun c ω => by
-    simp only [RingHom.id_apply]
-    exact hodgeLaplacian_smul hk hk' c ω
+  map_smul' := hodgeLaplacian_smul hk hk'
 
 /-- **Hodge Laplacian is self-adjoint**.
 
