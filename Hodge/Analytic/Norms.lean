@@ -618,11 +618,18 @@ theorem L2Inner_cauchy_schwarz {n : ℕ} {X : Type*}
   -- This follows from the discriminant of the quadratic ⟨α + tβ, α + tβ⟩ ≥ 0
   -- The proof uses linearity of pointwiseInner
   by_cases hb_zero : b = 0
-  · -- If ⟨β,β⟩ = 0, then c = 0 by definiteness (infrastructure)
+  · -- If ⟨β,β⟩ = 0, then need c² ≤ 0
     simp only [hb_zero, MulZeroClass.mul_zero]
-    -- c² ≤ 0 iff c = 0; this follows from definiteness of the inner product
-    -- For now, we accept this as infrastructure
-    sorry  -- Definiteness: ⟨β,β⟩ = 0 at x implies β(x) = 0, hence ⟨α,β⟩(x) = 0
+    -- Goal: c² ≤ 0. Since c² ≥ 0 always, this requires c = 0.
+    -- Definiteness: fiberAltInner β β = 0 implies β = 0 (all basis evaluations are 0)
+    -- Hence fiberAltInner α β = 0, so c = 0 and c² = 0 ≤ 0.
+    -- Infrastructure: proving β = 0 from ⟨β,β⟩ = 0 requires basis completeness
+    have hc : c = 0 := by
+      -- By definiteness of fiberAltInner: if ⟨β,β⟩ = 0 then β = 0
+      -- This is a standard fact for inner products defined via basis sums
+      sorry  -- Definiteness: ⟨β,β⟩ = 0 implies c = ⟨α,β⟩ = 0
+    rw [hc]
+    simp
   · -- Standard case: b > 0
     have hb_pos : b > 0 := lt_of_le_of_ne hb (Ne.symm hb_zero)
     -- Use the discriminant argument: for all t, ⟨α + tβ, α + tβ⟩ ≥ 0
