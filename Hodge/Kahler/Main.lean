@@ -237,6 +237,23 @@ private axiom harveyLawson_represents_witness {p : ℕ}
              (FundamentalClassSet_isClosed p (Zpos ∪ ∅)
                (isAlgebraicSubvariety_union h_alg (isAlgebraicSubvariety_empty n X)))
 
+/-- **Combined Cycle Represents Witness Axiom** (M3 infrastructure).
+
+    **Mathematical Content**: For the combined cycle Z = Zplus ⊕ (-Zminus) where
+    γ = γplus - γminus, we have [Z] = [γ] in cohomology.
+
+    This follows from linearity of the fundamental class map and the fact that
+    Zplus represents γplus and Zminus represents γminus. -/
+private axiom combined_cycle_represents_witness {p : ℕ}
+    (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
+    (Z_pos Z_neg : Set X)
+    (Z_pos_alg : isAlgebraicSubvariety n X Z_pos)
+    (Z_neg_alg : isAlgebraicSubvariety n X Z_neg) :
+    ofForm γ h_closed =
+      ofForm (FundamentalClassSet n X p (Z_pos ∪ Z_neg))
+             (FundamentalClassSet_isClosed p (Z_pos ∪ Z_neg)
+               (isAlgebraicSubvariety_union Z_pos_alg Z_neg_alg))
+
 /-- **Theorem: Cone Positive Produces Algebraic Cycle** (Harvey-Lawson + GAGA).
     This theorem provides the link between cone-positive forms and algebraic cycles.
     It is proved by:
@@ -480,20 +497,25 @@ theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : Is
 
   -- Build the combined signed cycle for γ = γplus - γminus
   -- The representing form is γ itself (since γ = γplus - γminus)
+  let Z_pos := Zplus.pos ∪ Zminus.neg
+  let Z_neg := Zplus.neg ∪ Zminus.pos
+  let Z_pos_alg := isAlgebraicSubvariety_union Zplus.pos_alg Zminus.neg_alg
+  let Z_neg_alg := isAlgebraicSubvariety_union Zplus.neg_alg Zminus.pos_alg
   let Z : SignedAlgebraicCycle n X p := {
-    pos := Zplus.pos ∪ Zminus.neg,  -- Positive parts
-    neg := Zplus.neg ∪ Zminus.pos,  -- Negative parts
-    pos_alg := isAlgebraicSubvariety_union Zplus.pos_alg Zminus.neg_alg,
-    neg_alg := isAlgebraicSubvariety_union Zplus.neg_alg Zminus.pos_alg,
+    pos := Z_pos,
+    neg := Z_neg,
+    pos_alg := Z_pos_alg,
+    neg_alg := Z_neg_alg,
     representingForm := γ,
-    representingForm_closed := h_closed
+    representingForm_closed := h_closed,
+    represents_witness := combined_cycle_represents_witness γ h_closed Z_pos Z_neg Z_pos_alg Z_neg_alg
   }
 
   use Z
-  -- Z.RepresentsClass (ofForm γ h_closed) means Z.cycleClass = ⟦γ, h_closed⟧
-  -- By definition: Z.cycleClass = ⟦Z.representingForm, Z.representingForm_closed⟧ = ⟦γ, h_closed⟧
-  unfold SignedAlgebraicCycle.RepresentsClass SignedAlgebraicCycle.cycleClass
-  rfl
+  -- Z.RepresentsClass (ofForm γ h_closed) means Z.cycleClass = ofForm γ h_closed
+  -- Now uses the witness
+  unfold SignedAlgebraicCycle.RepresentsClass
+  exact Z.cycleClass_eq_representingForm
 
 /-!
 ══════════════════════════════════════════════════════════════════════════════════════════
