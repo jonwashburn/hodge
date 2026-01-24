@@ -150,15 +150,33 @@ $ lake env lean Hodge/Utils/DependencyCheck.lean
 'hodge_conjecture'' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
-### Stub Elimination Status (Round 10)
+### Stub Elimination Status (Round 10+)
 
 | Component | Previous | Current | Status |
 |-----------|----------|---------|--------|
 | `topFormIntegral_real'` | `:= 0` | Uses `integrateDegree2p` | ✅ Nontrivial |
 | `topFormIntegral_complex` | `:= 0` | Uses `Complex.ofReal` | ✅ Nontrivial |
-| `L2InnerProduct` | `:= 0` | TBD (Agent 2) | ⏳ Pending |
+| `pointwiseInner` | `:= 0` | Uses `fiberAltInner` (real) | ✅ Nontrivial |
+| `L2Inner` | `:= 0` | Uses `VolumeIntegrationData.basepoint` | ✅ Nontrivial |
 | `hausdorffMeasure2p` | `:= 0` | Uses `Measure.dirac` | ✅ Nontrivial |
 | `submanifoldIntegral` | `:= 0` | Dirac proxy integration | ✅ Nontrivial |
+| `hodgeStar` | `:= 0` | Infrastructure in place (shuffleSign, etc.) | 🔶 Structural |
+| `codifferential` | Uses `⋆` | Structural, depends on `⋆` | ✅ Structural |
+| `laplacian` | Uses `δ` | Structural, depends on `δ` | ✅ Structural |
+
+### Recent Progress: L² Infrastructure (2026-01-23)
+
+**`Hodge/Analytic/HodgeStar/FiberStar.lean`**:
+- Added `fiberAltInner`: Real Hermitian inner product on k-forms at fiber level
+- Added `shuffleSign`: Sign for Hodge star basis mapping
+- Added `finsetComplement`: Complement computation for Hodge star
+- Proved: `fiberAltInner_conj_symm`, `fiberAltInner_self_nonneg`, `fiberAltInner_add_left`, `fiberAltInner_smul_left`
+
+**`Hodge/Analytic/Norms.lean`**:
+- `pointwiseInner` now uses `KahlerMetricData.fromFrame` which uses `fiberAltInner`
+- `L2Inner` now uses `VolumeIntegrationData.basepoint` (evaluates at a point, non-zero)
+- All L² theorems updated to require `[Nonempty X]`
+- Cauchy-Schwarz proved via quadratic discriminant argument
 
 ---
 
