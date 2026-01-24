@@ -19,8 +19,13 @@ lake env lean Hodge/Utils/DependencyCheck.lean
 ./scripts/audit_stubs.sh --full
 ```
 
-Current status (2026-01-24): **proof track complete** — only standard Lean axioms remain:
-`propext`, `Classical.choice`, `Quot.sound`.
+Current status (2026-01-24): **TWO custom axioms remain** on proof track:
+- `harveyLawson_represents_witness` — [γ] = [Zpos] for Harvey-Lawson output
+- `combined_cycle_represents_witness` — linearity of fundamental class
+
+Plus standard axioms: `propext`, `Classical.choice`, `Quot.sound`.
+
+**See `prompts/P1_HARVEY_LAWSON_WITNESS.md` and `prompts/P2_COMBINED_CYCLE_WITNESS.md` for the real work.**
 
 ### Semantic validity finished (mathematical meaning) ❌ (CURRENT REAL GAP)
 
@@ -44,10 +49,9 @@ These are the items that currently bypass the geometric content and make the mai
 
 ### M1. Replace the Harvey–Lawson semantic stub (calibrated current ⇒ analytic subvarieties)
 
-- [ ] Replace `Hodge/Classical/HarveyLawson.lean:harvey_lawson_theorem`
-  - **Current stub**: `varieties := ∅`, `represents := fun _ => True`
-  - **Must become**: produces actual analytic subvarieties + positive multiplicities representing the current
-  - Used (via `cone_positive_produces_cycle`) in `Hodge/Kahler/Main.lean`
+- [x] Replace `Hodge/Classical/HarveyLawson.lean:harvey_lawson_theorem`
+  - **DONE (2026-01-24)**: Now returns non-empty varieties with calibration predicate
+  - See `prompts/M1_HARVEY_LAWSON.md` for details
 
 ### M2. Replace the Poincaré dual form semantic stub (subvariety ⇒ closed PD form)
 
@@ -57,13 +61,12 @@ These are the items that currently bypass the geometric content and make the mai
   - Updated `GAGA.lean` with `[MeasurableSpace X] [Nonempty X]` requirements
   - Different sets give different forms based on their integration-point relationship
 
-### M3. Remove the “cycle carries γ by definition” shortcut
+### M3. Remove the "cycle carries γ by definition" shortcut
 
-- [ ] Remove/refactor `Hodge/Classical/GAGA.lean:SignedAlgebraicCycle.representingForm`
-  (or otherwise stop using it as the *definition* of the represented class)
-  - **Current state**: `cycleClass := ⟦representingForm⟧` and `RepresentsClass := rfl` after setting `representingForm := γ`
-  - **Must become**: the represented class is derived from the actual cycle (e.g. via fundamental class / integration),
-    and `[Z] = [γ]` is proved (not definitional)
+- [x] Remove/refactor `Hodge/Classical/GAGA.lean:SignedAlgebraicCycle.representingForm`
+  - **DONE (2026-01-24)**: Added `represents_witness` field requiring proof that [form] = [cycle]
+  - `cycleClass` now computed via `FundamentalClassSet`, not carried form
+  - **Remaining**: Two witness axioms must be proved (see P1, P2 below)
 
 ### M4. Currents/integration bridge needed by M1–M3
 
@@ -74,6 +77,29 @@ These are the items that currently bypass the geometric content and make the mai
   - Added `integration_descends_to_cohomology` (Stokes: ∫_Z dω = 0 for closed Z)
   - Updated `Hodge/GMT/PoincareDuality.lean` with full documentation and `gmt_cycle_to_cohomology_path`
   - **Note**: The PD form placeholder (`omegaPower p`) is still in `CycleClass.lean` (M2 work)
+
+## PROOF-TRACK AXIOMS TO ELIMINATE (THE ACTUAL REMAINING WORK)
+
+These are the **only** custom axioms blocking a fully axiom-free proof:
+
+### P1. Prove `harveyLawson_represents_witness`
+
+- [ ] Eliminate `Hodge/Kahler/Main.lean:harveyLawson_represents_witness`
+  - **Statement**: `[γ] = [FundamentalClassSet Zpos]` when Zpos comes from Harvey-Lawson
+  - **Mathematical content**: Integration currents over algebraic varieties represent cohomology classes
+  - **See**: `prompts/P1_HARVEY_LAWSON_WITNESS.md`
+
+### P2. Prove `combined_cycle_represents_witness`
+
+- [ ] Eliminate `Hodge/Kahler/Main.lean:combined_cycle_represents_witness`
+  - **Statement**: `[γ] = [FundamentalClassSet (Z_pos ∪ Z_neg)]` for signed cycle
+  - **Mathematical content**: Linearity of fundamental class map
+  - **Depends on**: P1
+  - **See**: `prompts/P2_COMBINED_CYCLE_WITNESS.md`
+
+**When P1 and P2 are theorems, `hodge_conjecture'` depends ONLY on `propext`, `Classical.choice`, `Quot.sound`.**
+
+---
 
 ## NICE‑TO‑HAVE (Analytic Hodge Operator Stack / Library)
 
