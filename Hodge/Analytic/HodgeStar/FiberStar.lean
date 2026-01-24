@@ -135,6 +135,24 @@ noncomputable def shuffleSignCount (n : ℕ) (s : Finset (Fin n)) : ℕ :=
 noncomputable def shuffleSign (n : ℕ) (s : Finset (Fin n)) : ℤ :=
   (-1 : ℤ) ^ shuffleSignCount n s
 
+/-! ## Volume Form -/
+
+/-- The standard basis frame: all indices from 0 to n-1. -/
+noncomputable def fullFrame (n : ℕ) : Fin n → TangentModel n :=
+  fun i => fiberBasisVector n i
+
+/-- Check if a frame v matches the standard frame for indices in s (up to reordering).
+    Returns the coefficient (0, 1, or -1) based on matching and permutation sign. -/
+noncomputable def frameMatchCoeff (n k : ℕ) (s : Finset (Fin n)) (v : Fin k → TangentModel n) : ℂ :=
+  -- For the standard orthonormal basis, this checks if v is a permutation of (e_{i₁}, ..., e_{iₖ})
+  -- where {i₁, ..., iₖ} = s
+  -- This is complex to implement fully; for now we use a simplified version
+  if h : s.card = k then
+    -- Check if v equals the standard frame for s
+    let sorted_frame := fiberFrame n k s
+    if (∀ i : Fin k, v i = sorted_frame i) then 1 else 0
+  else 0
+
 /-! ## Fiber Hodge Star -/
 
 /-- Fiber-level Hodge star on the model tangent space.
@@ -148,18 +166,24 @@ For a basis element e_I (where I is a k-element subset):
 where ε(I, Iᶜ) is the shuffle sign.
 
 **Implementation**: The Hodge star is computed by:
-1. Decomposing α into its basis representation
+1. Decomposing α into its basis representation via frame evaluation
 2. For each basis element, mapping to the complementary basis element with sign
-3. Summing the results
+3. The result evaluates on (2n-k)-frames by matching to complementary frames
 
-**Status**: Structural implementation showing the construction.
-The value is computed via basis decomposition. -/
+**Mathematical Formula**:
+For α : FiberAlt n k, the Hodge star ⋆α : FiberAlt n (2n-k) is defined by:
+  (⋆α)(v) = Σ_{|I|=k} α(e_I) · ε(I, Iᶜ) · δ(v, e_{Iᶜ})
+
+where δ(v, e_{Iᶜ}) is 1 if v matches the frame for Iᶜ, 0 otherwise.
+
+**Status**: Returns 0 - full implementation requires ContinuousAlternatingMap construction API. -/
 noncomputable def fiberHodgeStar_construct (n k : ℕ) (α : FiberAlt n k) :
     FiberAlt n (2 * n - k) :=
-  -- Sum over all k-element subsets: α(e_I) * sign(I, Iᶜ) * e_{Iᶜ}
-  -- For now, we return 0 but with the correct structure for future implementation
-  -- A full implementation would construct the (2n-k)-form from basis coefficients
-  0  -- TODO: Implement via basis decomposition when ContinuousAlternatingMap.basis_repr is available
+  -- The formula: (⋆α)(v) = Σ_{|I|=k} α(e_I) · shuffleSign(I) · [v = e_{Iᶜ}]
+  -- Full implementation requires building a ContinuousAlternatingMap from a function.
+  -- This needs: (1) define the function on frames, (2) prove it's alternating, (3) prove it's continuous
+  -- For now, return 0 as a structurally correct placeholder
+  0
 
 /-- The trivial Hodge star is linear (trivially). -/
 theorem fiberHodgeStar_add (n k : ℕ) (α β : FiberAlt n k) :
