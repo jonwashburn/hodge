@@ -801,10 +801,10 @@ noncomputable def HodgeStarData.fromFiber (n : ℕ) (X : Type*) (k : ℕ)
     simp only [SmoothForm.neg_apply, ContinuousAlternatingMap.neg_apply]
     simp only [fiberHodgeStar_construct]
     split_ifs with h
-    · -- k = n case
+    · -- k = n case: (heq ▸ -αx) v = -(heq ▸ αx) v
       rfl
     · -- k ≠ n case: 0 = -0
-      simp only [neg_zero]
+      rfl
 
 /-! ### Hodge Star Operator Definition -/
 
