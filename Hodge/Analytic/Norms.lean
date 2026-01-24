@@ -1,4 +1,5 @@
 import Hodge.Kahler.Manifolds
+import Hodge.Analytic.HodgeStar.FiberStar
 import Mathlib.Topology.Compactness.Compact
 import Mathlib.Analysis.InnerProductSpace.Basic
 import Mathlib.Analysis.InnerProductSpace.PiL2
@@ -319,24 +320,59 @@ noncomputable def innerProdFrame (n k : ℕ) : Fin k → TangentModel n :=
     if hn : n = 0 then 0
     else innerProdBasisVector n ⟨i.val % n, Nat.mod_lt i.val (Nat.pos_of_ne_zero hn)⟩
 
-/-- **Real Kähler Metric Data** via frame evaluation.
+/-- **Real Kähler Metric Data** via fiber inner product.
 
-    Evaluates k-forms at a standard frame and computes the Hermitian inner product.
-    This gives a genuine (non-trivial) inner product on forms.
+    Uses the fiber-level inner product `fiberAltInner` to define pointwise inner
+    products on k-forms. For forms α, β, at point x:
 
-    **Mathematical Justification**: For forms α, β, the inner product
-      ⟨α, β⟩_x = Re(α(e₁,...,eₖ) · conj(β(e₁,...,eₖ)))
-    is positive-definite when the frame spans the relevant exterior power.
+      ⟨α, β⟩_x = Re(fiberAltInner n k (α x) (β x))
 
-    **Implementation Status**: Currently uses trivial metric while proof infrastructure
-    for the frame-based inner product is developed. The definition structure is correct;
-    only the proof obligations need to be filled in. -/
+    **Mathematical Justification**: The fiber inner product sums over all k-element
+    subsets I of {0,...,n-1}:
+      fiberAltInner(α, β) = Σ_{|I|=k} α(e_I) * conj(β(e_I))
+
+    This is the standard L² inner product on Λ^k induced by the Euclidean metric.
+
+    **Reference**: [Warner, GTM 94, §6.1], [Voisin, "Hodge Theory I", §5.1] -/
 noncomputable def KahlerMetricData.fromFrame (n : ℕ) (X : Type*) (k : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] : KahlerMetricData n X k :=
-  -- Use trivial for now; the frame-based implementation needs proof infrastructure
-  KahlerMetricData.trivial n X k
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] : KahlerMetricData n X k where
+  inner := fun α β x => (fiberAltInner n k (α.as_alternating x) (β.as_alternating x)).re
+  inner_self_nonneg := fun α x => fiberAltInner_self_nonneg n k (α.as_alternating x)
+  inner_comm := fun α β x => by
+    have h := fiberAltInner_conj_symm n k (α.as_alternating x) (β.as_alternating x)
+    -- fiberAltInner α β = conj(fiberAltInner β α)
+    -- So Re(fiberAltInner α β) = Re(conj(fiberAltInner β α)) = Re(fiberAltInner β α)
+    calc (fiberAltInner n k (α.as_alternating x) (β.as_alternating x)).re
+      _ = (starRingEnd ℂ (fiberAltInner n k (β.as_alternating x) (α.as_alternating x))).re := by rw [h]
+      _ = (star (fiberAltInner n k (β.as_alternating x) (α.as_alternating x))).re := by rfl
+      _ = (fiberAltInner n k (β.as_alternating x) (α.as_alternating x)).re := Complex.conj_re _
+  inner_add_left := fun α₁ α₂ β x => by
+    show (fiberAltInner n k ((α₁ + α₂).as_alternating x) (β.as_alternating x)).re = _
+    rw [SmoothForm.add_apply, fiberAltInner_add_left, Complex.add_re]
+  inner_smul_left := fun r α β x => by
+    show (fiberAltInner n k ((r • α).as_alternating x) (β.as_alternating x)).re = _
+    -- r • α at fiber level becomes (↑r : ℂ) • (α x)
+    have eq1 : (r • α).as_alternating x = (r : ℂ) • α.as_alternating x := by
+      rw [SmoothForm.smul_real_apply]; rfl
+    rw [eq1, fiberAltInner_smul_left]
+    simp only [Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im, MulZeroClass.zero_mul]
+    ring
+  inner_continuous := fun α β => by
+    -- The inner product at x is Re(fiberAltInner (α x) (β x))
+    -- This is continuous because α and β are smooth (hence continuous)
+    -- and fiberAltInner is a finite sum of products of continuous functions
+    apply Complex.continuous_re.comp
+    apply continuous_finset_sum
+    intro s _
+    apply Continuous.mul
+    -- α.as_alternating : X → FiberAlt n k is continuous, and evaluation is continuous
+    · have hα : Continuous α.as_alternating := α.is_smooth.continuous
+      exact (continuous_eval_const (fiberFrame n k s)).comp hα
+    · apply Complex.continuous_conj.comp
+      have hβ : Continuous β.as_alternating := β.is_smooth.continuous
+      exact (continuous_eval_const (fiberFrame n k s)).comp hβ
 
 /-- **Volume Integration Data** (Agent 3).
 
