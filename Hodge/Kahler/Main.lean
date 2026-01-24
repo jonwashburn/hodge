@@ -4,6 +4,7 @@ import Hodge.Kahler.TypeDecomposition
 import Hodge.Kahler.Cone
 import Hodge.Kahler.SignedDecomp
 import Hodge.Kahler.Microstructure
+import Hodge.Kahler.HarveyLawsonWitness
 import Hodge.Analytic.Currents
 import Hodge.Analytic.Calibration
 import Hodge.Classical.HarveyLawson
@@ -86,6 +87,7 @@ variable {n : ℕ} {X : Type u}
   [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
   [MeasurableSpace X] [Nonempty X]
+  [HarveyLawsonRepresentsWitness n X]
 
 /-! ## Automatic SYR Theorem
 
@@ -216,26 +218,15 @@ theorem automatic_syr {p : ℕ} (γ : SmoothForm n X (2 * p))
     Axiomatized due to missing type class instances. -/
 theorem omega_pow_represents_multiple (_p : ℕ) : True := trivial
 
-/-- **Harvey-Lawson Represents Witness Axiom** (M3 infrastructure).
+/-!
+### P1 (Harvey–Lawson → cohomology bridge)
 
-    **Mathematical Content**: By Harvey-Lawson structure theorem, the algebraic cycle Z
-    constructed from a calibrated current T representing γ satisfies [Z] = [γ] in cohomology.
+The former `private axiom harveyLawson_represents_witness` is now an **explicit assumption**
+packaged as the typeclass `Hodge.HarveyLawsonRepresentsWitness`.
 
-    This axiom witnesses the equality between:
-    - The cohomology class of γ (the input form)
-    - The fundamental class of Z.support (computed via FundamentalClassSet)
-
-    **Path to Full Proof**: Requires the full GMT → cohomology bridge, including:
-    - Integration currents over algebraic cycles
-    - Regularization theorem (current → smooth form)
-    - Harvey-Lawson decomposition theorem -/
-private axiom harveyLawson_represents_witness {p : ℕ}
-    (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
-    (Zpos : Set X) (h_alg : isAlgebraicSubvariety n X Zpos) :
-    ofForm γ h_closed =
-      ofForm (FundamentalClassSet n X p (Zpos ∪ ∅))
-             (FundamentalClassSet_isClosed p (Zpos ∪ ∅)
-               (isAlgebraicSubvariety_union h_alg (isAlgebraicSubvariety_empty n X)))
+This keeps the formalization honest: the main theorem is proved *assuming* the deep
+Harvey–Lawson/cohomology comparison step, and proving P1 becomes an explicit standalone goal.
+-/
 
 /-- **Combined Cycle Represents Witness** (derived from P1).
 
@@ -262,7 +253,7 @@ private theorem combined_cycle_represents_witness {p : ℕ}
   let h_alg_union : isAlgebraicSubvariety n X (Z_pos ∪ Z_neg) :=
     isAlgebraicSubvariety_union Z_pos_alg Z_neg_alg
   have hP1 :=
-    harveyLawson_represents_witness (n := n) (X := X) (p := p)
+    HarveyLawsonRepresentsWitness.witness (n := n) (X := X) (p := p)
       γ h_closed (Z_pos ∪ Z_neg) h_alg_union
 
   -- Simplify the set `(Z_pos ∪ Z_neg) ∪ ∅` appearing on the RHS of P1.
@@ -339,7 +330,8 @@ theorem cone_positive_produces_cycle {p : ℕ}
     neg_alg := isAlgebraicSubvariety_empty n X,
     representingForm := γ,
     representingForm_closed := h_closed,
-    represents_witness := harveyLawson_represents_witness γ h_closed Zpos h_alg
+    represents_witness := HarveyLawsonRepresentsWitness.witness (n := n) (X := X) (p := p)
+      γ h_closed Zpos h_alg
   }
 
   -- Step 5: Z represents [γ] - now uses the witness

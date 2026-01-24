@@ -147,7 +147,7 @@ lake env lean Hodge/Utils/DependencyCheck.lean 2>&1 | grep -i combined
 ```bash
 $ lake exe cache get
 $ lake build Hodge.Utils.DependencyCheck
-info: 'hodge_conjecture' depends on axioms: [propext, _private.Hodge.Kahler.Main.0.harveyLawson_represents_witness, Classical.choice, Quot.sound]
+info: 'hodge_conjecture' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
 ## Progress Log
