@@ -793,7 +793,7 @@ noncomputable def HodgeStarData.fromFiber (n : ℕ) (X : Type*) (k : ℕ)
     simp only [fiberHodgeStar_construct]
     split_ifs with h
     · -- k = n case: (heq ▸ 0) v = 0 - cast of 0 is still 0
-      sorry -- Type-cast lemma: (h ▸ 0) v = 0
+      exact fiberAlt_eqRec_zero_apply _ _
     · -- k ≠ n case
       rfl
   star_neg := fun α => by
@@ -802,7 +802,7 @@ noncomputable def HodgeStarData.fromFiber (n : ℕ) (X : Type*) (k : ℕ)
     simp only [fiberHodgeStar_construct]
     split_ifs with h
     · -- k = n case: (heq ▸ -αx) v = -(heq ▸ αx) v
-      sorry -- Type-cast lemma: (h ▸ -α) v = -(h ▸ α) v
+      exact fiberAlt_eqRec_neg_apply _ _ _
     · -- k ≠ n case: 0 = -0
       simp
 

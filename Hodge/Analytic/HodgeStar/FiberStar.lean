@@ -210,6 +210,27 @@ theorem fiberAlt_eqRec_smul {n k k' : ℕ} (h : k = k') (c : ℂ) (α : FiberAlt
     h ▸ (c • α) = c • (h ▸ α) := by
   subst h; rfl
 
+/-- Helper: eqRec preserves zero for FiberAlt -/
+theorem fiberAlt_eqRec_zero {n k k' : ℕ} (h : k = k') :
+    h ▸ (0 : FiberAlt n k) = (0 : FiberAlt n k') := by
+  subst h; rfl
+
+/-- Helper: eqRec distributes over neg for FiberAlt -/
+theorem fiberAlt_eqRec_neg {n k k' : ℕ} (h : k = k') (α : FiberAlt n k) :
+    h ▸ (-α) = -(h ▸ α) := by
+  subst h; rfl
+
+/-- Helper: Applying eqRec-transported zero gives zero -/
+theorem fiberAlt_eqRec_zero_apply {n k k' : ℕ} (h : k = k') (v : Fin k' → TangentModel n) :
+    (h ▸ (0 : FiberAlt n k)) v = 0 := by
+  subst h; rfl
+
+/-- Helper: Applying eqRec-transported neg distributes -/
+theorem fiberAlt_eqRec_neg_apply {n k k' : ℕ} (h : k = k') (α : FiberAlt n k)
+    (v : Fin k' → TangentModel n) :
+    (h ▸ (-α)) v = -((h ▸ α) v) := by
+  subst h; rfl
+
 /-- The Hodge star is additive. -/
 theorem fiberHodgeStar_add (n k : ℕ) (α β : FiberAlt n k) :
     fiberHodgeStar_construct n k (α + β) =
