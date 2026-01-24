@@ -147,4 +147,5 @@ Should return nothing when complete.
 - [ ] Verified axiom is eliminated
 
 ---
-**This is one of the TWO remaining custom axioms on the proof track.**
+**Status (2026-01-24)**: P2 was eliminated as an independent axiom (it is now a theorem derived
+from P1). **P1 is now the ONLY remaining proof-track custom axiom.**

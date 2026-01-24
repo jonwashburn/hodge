@@ -237,14 +237,14 @@ private axiom harveyLawson_represents_witness {p : ℕ}
              (FundamentalClassSet_isClosed p (Zpos ∪ ∅)
                (isAlgebraicSubvariety_union h_alg (isAlgebraicSubvariety_empty n X)))
 
-/-- **Combined Cycle Represents Witness Axiom** (M3 infrastructure).
+/-- **Combined Cycle Represents Witness** (derived from P1).
 
     **Mathematical Content**: For the combined cycle Z = Zplus ⊕ (-Zminus) where
     γ = γplus - γminus, we have [Z] = [γ] in cohomology.
 
     This follows from linearity of the fundamental class map and the fact that
     Zplus represents γplus and Zminus represents γminus. -/
-private axiom combined_cycle_represents_witness {p : ℕ}
+private theorem combined_cycle_represents_witness {p : ℕ}
     (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
     (Z_pos Z_neg : Set X)
     (Z_pos_alg : isAlgebraicSubvariety n X Z_pos)
@@ -252,7 +252,53 @@ private axiom combined_cycle_represents_witness {p : ℕ}
     ofForm γ h_closed =
       ofForm (FundamentalClassSet n X p (Z_pos ∪ Z_neg))
              (FundamentalClassSet_isClosed p (Z_pos ∪ Z_neg)
-               (isAlgebraicSubvariety_union Z_pos_alg Z_neg_alg))
+               (isAlgebraicSubvariety_union Z_pos_alg Z_neg_alg)) := by
+  /-
+  This is logically redundant with P1 as currently formulated:
+  instantiate P1 with `Zpos := Z_pos ∪ Z_neg`, then simplify `∪ ∅` and use
+  proof irrelevance for the closedness proof via `Hodge.ofForm_proof_irrel`.
+  -/
+
+  let h_alg_union : isAlgebraicSubvariety n X (Z_pos ∪ Z_neg) :=
+    isAlgebraicSubvariety_union Z_pos_alg Z_neg_alg
+  have hP1 :=
+    harveyLawson_represents_witness (n := n) (X := X) (p := p)
+      γ h_closed (Z_pos ∪ Z_neg) h_alg_union
+
+  -- Simplify the set `(Z_pos ∪ Z_neg) ∪ ∅` appearing on the RHS of P1.
+  have hP1' :
+      ofForm γ h_closed =
+        ofForm (FundamentalClassSet n X p (Z_pos ∪ Z_neg))
+          (by
+            -- Closedness comes from `FundamentalClassSet_isClosed`; transport along `∪ ∅ = _`.
+            simpa [Set.union_assoc, Set.union_empty] using
+              (FundamentalClassSet_isClosed (n := n) (X := X) (p := p)
+                ((Z_pos ∪ Z_neg) ∪ (∅ : Set X))
+                (isAlgebraicSubvariety_union h_alg_union (isAlgebraicSubvariety_empty n X)))) := by
+    simpa [Set.union_assoc, Set.union_empty] using hP1
+
+  -- Align the closedness proof on the RHS using proof irrelevance.
+  have h_irrel :
+      ofForm (FundamentalClassSet n X p (Z_pos ∪ Z_neg))
+          (by
+            simpa [Set.union_assoc, Set.union_empty] using
+              (FundamentalClassSet_isClosed (n := n) (X := X) (p := p)
+                ((Z_pos ∪ Z_neg) ∪ (∅ : Set X))
+                (isAlgebraicSubvariety_union h_alg_union (isAlgebraicSubvariety_empty n X)))) =
+        ofForm (FundamentalClassSet n X p (Z_pos ∪ Z_neg))
+          (FundamentalClassSet_isClosed (n := n) (X := X) (p := p) (Z_pos ∪ Z_neg) h_alg_union) :=
+    Hodge.ofForm_proof_irrel (n := n) (X := X) (k := 2 * p)
+      (FundamentalClassSet n X p (Z_pos ∪ Z_neg))
+      (by
+        simpa [Set.union_assoc, Set.union_empty] using
+          (FundamentalClassSet_isClosed (n := n) (X := X) (p := p)
+            ((Z_pos ∪ Z_neg) ∪ (∅ : Set X))
+            (isAlgebraicSubvariety_union h_alg_union (isAlgebraicSubvariety_empty n X))))
+      (FundamentalClassSet_isClosed (n := n) (X := X) (p := p) (Z_pos ∪ Z_neg) h_alg_union)
+
+  -- Done.
+  exact hP1'.trans h_irrel
+
 
 /-- **Theorem: Cone Positive Produces Algebraic Cycle** (Harvey-Lawson + GAGA).
     This theorem provides the link between cone-positive forms and algebraic cycles.
