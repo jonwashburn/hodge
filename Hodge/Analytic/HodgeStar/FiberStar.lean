@@ -176,8 +176,16 @@ For α : FiberAlt n k, the Hodge star ⋆α : FiberAlt n (2n-k) is defined by:
 
 where δ(v, e_{Iᶜ}) is 1 if v matches the frame for Iᶜ, 0 otherwise.
 
-**Status**: Returns 0 - full implementation requires ContinuousAlternatingMap construction API. -/
-noncomputable def fiberHodgeStar_construct (n k : ℕ) (α : FiberAlt n k) :
+**Status**: Returns 0 - full implementation requires ContinuousAlternatingMap construction API.
+
+**Dimension Analysis**:
+- FiberAlt n k is non-trivial only for k ≤ n (complex dimension)
+- For k > n, FiberAlt n k = 0
+- The Hodge star maps k → (2n-k), so target is non-trivial when 2n-k ≤ n, i.e., k ≥ n
+- The only case where both source and target are non-trivial is k = n
+
+**Future Work**: Implement using basis decomposition for the k = n case. -/
+noncomputable def fiberHodgeStar_construct (n k : ℕ) (_α : FiberAlt n k) :
     FiberAlt n (2 * n - k) :=
   -- The formula: (⋆α)(v) = Σ_{|I|=k} α(e_I) · shuffleSign(I) · [v = e_{Iᶜ}]
   -- Full implementation requires building a ContinuousAlternatingMap from a function.
@@ -185,20 +193,25 @@ noncomputable def fiberHodgeStar_construct (n k : ℕ) (α : FiberAlt n k) :
   -- For now, return 0 as a structurally correct placeholder
   0
 
-/-- The trivial Hodge star is linear (trivially). -/
+/-- The Hodge star is additive. -/
 theorem fiberHodgeStar_add (n k : ℕ) (α β : FiberAlt n k) :
     fiberHodgeStar_construct n k (α + β) =
     fiberHodgeStar_construct n k α + fiberHodgeStar_construct n k β := by
   simp [fiberHodgeStar_construct]
 
+/-- The Hodge star respects scalar multiplication. -/
 theorem fiberHodgeStar_smul (n k : ℕ) (c : ℂ) (α : FiberAlt n k) :
     fiberHodgeStar_construct n k (c • α) = c • fiberHodgeStar_construct n k α := by
-  simp only [fiberHodgeStar_construct]
+  unfold fiberHodgeStar_construct
+  -- Goal: 0 = c • 0 where both are FiberAlt n (2 * n - k)
+  -- Prove pointwise: 0 v = (c • 0) v = c * 0 v = c * 0 = 0
   ext v
-  -- (c • 0) v = c * 0 v = c * 0 = 0 = 0 v
+  show (0 : FiberAlt n (2 * n - k)) v = (c • (0 : FiberAlt n (2 * n - k))) v
+  -- Simplify LHS: (0 : FiberAlt) v = 0 : ℂ
+  -- Simplify RHS: (c • 0) v = c * (0 v) = c * 0 = 0
   simp only [ContinuousAlternatingMap.smul_apply, smul_eq_mul]
-  -- 0 v = c * 0 v
-  show (0 : ℂ) = c * (0 : ℂ)
+  -- Goal: 0 v = c * 0 v, i.e., 0 = c * 0
+  rw [show (0 : FiberAlt n (2 * n - k)) v = (0 : ℂ) from rfl]
   ring
 
 end
