@@ -33,6 +33,19 @@ variable {n : ℕ} {X : Type u}
 def IsHarmonic {k : ℕ} (hk : 1 ≤ k) (hk' : k ≤ n) (ω : SmoothForm n X k) : Prop :=
   HodgeLaplacian.laplacian_construct (n := n) (X := X) (k := k) hk hk' ω = 0
 
+/-- The space of harmonic `k`-forms as the kernel of the Laplacian linear map. -/
+noncomputable def HarmonicSubmodule (k : ℕ) (hk : 1 ≤ k) (hk' : k ≤ n) :
+    Submodule ℂ (SmoothForm n X k) :=
+  (HodgeLaplacian.laplacianLinearMap (n := n) (X := X) k hk hk').ker
+
+/-- `IsHarmonic` is literally membership in `ker(Δ)` (the kernel submodule). -/
+theorem isHarmonic_iff_mem_harmonicSubmodule {k : ℕ} (hk : 1 ≤ k) (hk' : k ≤ n)
+    (ω : SmoothForm n X k) :
+    IsHarmonic (n := n) (X := X) hk hk' ω ↔
+      ω ∈ HarmonicSubmodule (n := n) (X := X) k hk hk' := by
+  -- `x ∈ ker(f)` is definitionally `f x = 0`.
+  simp [IsHarmonic, HarmonicSubmodule, HodgeLaplacian.laplacianLinearMap]
+
 /-!
 ## Not (yet) in this repo
 

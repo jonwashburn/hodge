@@ -1,4 +1,15 @@
-# Remaining `sorry` Report
+# Remaining `sorry` Report (OBSOLETE)
+
+**OBSOLETE as of 2026-01-24.**
+
+This file described an older repo state where `hodge_conjecture'` depended on `sorryAx`.
+That is no longer true.
+
+Use these as the ground-truth replacements:
+
+- `docs/PROOF_TRACK_STATUS.md`
+- `lake env lean Hodge/Utils/DependencyCheck.lean`
+- `./scripts/audit_stubs.sh --full`
 
 ## Summary (2026-01-10)
 
