@@ -105,6 +105,47 @@ theorem fiberAltInner_self_nonneg (n k : ℕ) (α : FiberAlt n k) :
   rw [h]
   exact Complex.normSq_nonneg _
 
+/-- For the self-inner-product, the real part is the sum of squared norms of the basis coefficients. -/
+theorem fiberAltInner_self_re_eq_sum_normSq (n k : ℕ) (α : FiberAlt n k) :
+    (fiberAltInner n k α α).re =
+      ∑ s ∈ powersetCard k (univ : Finset (Fin n)),
+        Complex.normSq (α (fiberFrame n k s)) := by
+  simp only [fiberAltInner]
+  -- Move `re` inside the finite sum.
+  rw [Complex.re_sum]
+  refine Finset.sum_congr rfl ?_
+  intro s hs
+  -- Each term is `z * conj z`, whose real part is `normSq z`.
+  simpa using congrArg Complex.re (Complex.mul_conj (α (fiberFrame n k s)))
+
+/-- Definiteness on basis coefficients: if `Re ⟨α,α⟩ = 0`, then all basis evaluations vanish. -/
+theorem fiberAltInner_self_re_eq_zero_iff (n k : ℕ) (α : FiberAlt n k) :
+    (fiberAltInner n k α α).re = 0 ↔
+      ∀ s ∈ powersetCard k (univ : Finset (Fin n)),
+        α (fiberFrame n k s) = 0 := by
+  -- Rewrite in terms of a sum of nonnegative real terms.
+  rw [fiberAltInner_self_re_eq_sum_normSq (n := n) (k := k) (α := α)]
+  constructor
+  · intro hsum
+    have hnorm :
+        ∀ s ∈ powersetCard k (univ : Finset (Fin n)),
+          Complex.normSq (α (fiberFrame n k s)) = 0 := by
+      have h :=
+        (Finset.sum_eq_zero_iff_of_nonneg (s := powersetCard k (univ : Finset (Fin n)))
+            (f := fun s => Complex.normSq (α (fiberFrame n k s)))
+            (by
+              intro s hs
+              exact Complex.normSq_nonneg _)).1 hsum
+      exact h
+    intro s hs
+    exact (Complex.normSq_eq_zero).1 (hnorm s hs)
+  · intro hcoeff
+    -- All summands are zero, hence the sum is zero.
+    apply Finset.sum_eq_zero
+    intro s hs
+    have : α (fiberFrame n k s) = 0 := hcoeff s hs
+    simpa [this]
+
 /-- The fiber inner product is additive in the first argument. -/
 theorem fiberAltInner_add_left (n k : ℕ) (α₁ α₂ β : FiberAlt n k) :
     fiberAltInner n k (α₁ + α₂) β = fiberAltInner n k α₁ β + fiberAltInner n k α₂ β := by

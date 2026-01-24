@@ -194,11 +194,8 @@ $ lake env lean Hodge/Utils/DependencyCheck.lean
 - Cauchy-Schwarz proved via quadratic discriminant argument
 - All L² theorems require `[Nonempty X]`
 
-**Remaining infrastructure sorries (NOT on proof track)**:
-- `inner_continuous`: Continuity of fiber inner product (infrastructure)
-- Definiteness: `⟨β,β⟩ = 0 ⟹ β = 0` (for C-S corner case)
-- Bilinearity expansion: `⟨α+tβ, α+tβ⟩ = a + 2tc + t²b` (for C-S)
-- `is_smooth`: Smoothness of fiber Hodge star application (infrastructure)
+**Infrastructure sorries in this pipeline (NOT on proof track)**:
+- ✅ None remaining in `Hodge/Analytic/Norms.lean` or `Hodge/Analytic/HodgeStar/FiberStar.lean` (as of 2026-01-24).
 
 ---
 

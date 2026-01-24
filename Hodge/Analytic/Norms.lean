@@ -625,9 +625,29 @@ theorem L2Inner_cauchy_schwarz {n : ℕ} {X : Type*}
     -- Hence fiberAltInner α β = 0, so c = 0 and c² = 0 ≤ 0.
     -- Infrastructure: proving β = 0 from ⟨β,β⟩ = 0 requires basis completeness
     have hc : c = 0 := by
-      -- By definiteness of fiberAltInner: if ⟨β,β⟩ = 0 then β = 0
-      -- This is a standard fact for inner products defined via basis sums
-      sorry  -- Definiteness: ⟨β,β⟩ = 0 implies c = ⟨α,β⟩ = 0
+      -- Unfold the inner product at x to the explicit basis-sum definition.
+      have hb_re :
+          (fiberAltInner n k (β.as_alternating x) (β.as_alternating x)).re = 0 := by
+        simpa [b, pointwiseInner, KahlerMetricData.fromFrame] using hb_zero
+      have hβ :
+          ∀ s ∈ Finset.powersetCard k (Finset.univ : Finset (Fin n)),
+            (β.as_alternating x) (fiberFrame n k s) = 0 :=
+        (fiberAltInner_self_re_eq_zero_iff n k (β.as_alternating x)).1 hb_re
+      -- Then every summand in ⟨α,β⟩ vanishes, so ⟨α,β⟩ = 0.
+      have hinner :
+          fiberAltInner n k (α.as_alternating x) (β.as_alternating x) = 0 := by
+        unfold fiberAltInner
+        apply Finset.sum_eq_zero
+        intro s hs
+        have hz : (β.as_alternating x) (fiberFrame n k s) = 0 := hβ s hs
+        simp [hz]
+      have hinner_re :
+          (fiberAltInner n k (α.as_alternating x) (β.as_alternating x)).re = 0 := by
+        simpa using congrArg Complex.re hinner
+      -- Translate back to `c`.
+      have : pointwiseInner α β x = 0 := by
+        simp [pointwiseInner, KahlerMetricData.fromFrame, hinner_re]
+      simpa [c] using this
     rw [hc]
     simp
   · -- Standard case: b > 0
@@ -649,7 +669,54 @@ theorem L2Inner_cauchy_schwarz {n : ℕ} {X : Type*}
       -- Proof: expand using inner_add_left, inner_smul_left, inner_comm
       -- from KahlerMetricData.fromFrame, then use algebra
       -- The expansion is a standard inner product identity
-      sorry  -- Bilinearity: ⟨α+tβ, α+tβ⟩ = a + 2tc + t²b
+      let K : KahlerMetricData n X k := KahlerMetricData.fromFrame n X k
+      have expand :
+          pointwiseInner (α + t • β) (α + t • β) x = a + 2 * t * c + t^2 * b := by
+        -- Work with `K.inner` and rewrite back to `a,b,c` at the end.
+        have h1 :
+            K.inner (α + t • β) (α + t • β) x =
+              K.inner α (α + t • β) x + t * K.inner β (α + t • β) x := by
+          calc
+            K.inner (α + t • β) (α + t • β) x
+                = K.inner α (α + t • β) x + K.inner (t • β) (α + t • β) x := by
+                    simpa using K.inner_add_left α (t • β) (α + t • β) x
+            _ = K.inner α (α + t • β) x + t * K.inner β (α + t • β) x := by
+                    rw [K.inner_smul_left t β (α + t • β) x]
+        have h2a :
+            K.inner α (α + t • β) x = K.inner α α x + t * K.inner α β x := by
+          calc
+            K.inner α (α + t • β) x = K.inner (α + t • β) α x := by
+                symm; exact K.inner_comm (α + t • β) α x
+            _ = K.inner α α x + K.inner (t • β) α x := by
+                simpa using K.inner_add_left α (t • β) α x
+            _ = K.inner α α x + t * K.inner β α x := by
+                rw [K.inner_smul_left t β α x]
+            _ = K.inner α α x + t * K.inner α β x := by
+                rw [K.inner_comm β α x]
+        have h2b :
+            K.inner β (α + t • β) x = K.inner α β x + t * K.inner β β x := by
+          calc
+            K.inner β (α + t • β) x = K.inner (α + t • β) β x := by
+                symm; exact K.inner_comm (α + t • β) β x
+            _ = K.inner α β x + K.inner (t • β) β x := by
+                simpa using K.inner_add_left α (t • β) β x
+            _ = K.inner α β x + t * K.inner β β x := by
+                rw [K.inner_smul_left t β β x]
+        have h3 :
+            K.inner (α + t • β) (α + t • β) x =
+              K.inner α α x + 2 * t * K.inner α β x + t^2 * K.inner β β x := by
+          calc
+            K.inner (α + t • β) (α + t • β) x
+                = K.inner α (α + t • β) x + t * K.inner β (α + t • β) x := h1
+            _ = (K.inner α α x + t * K.inner α β x) +
+                  t * (K.inner α β x + t * K.inner β β x) := by
+                    rw [h2a, h2b]
+            _ = K.inner α α x + 2 * t * K.inner α β x + t^2 * K.inner β β x := by
+                    ring
+        -- Rewrite `K.inner` back to `pointwiseInner` and `a,b,c`.
+        simpa [a, b, c, pointwiseInner, K] using h3
+      -- Conclude from `h : 0 ≤ pointwiseInner ...` by rewriting.
+      simpa [expand] using h
     have at_min := expand_pos (-c / b)
     -- 0 ≤ a + 2(-c/b)c + (-c/b)²b = a - 2c²/b + c²/b = a - c²/b
     have simp_min : a + 2 * (-c / b) * c + (-c / b)^2 * b = a - c^2 / b := by field_simp; ring
@@ -780,9 +847,19 @@ noncomputable def HodgeStarData.fromFiber (n : ℕ) (X : Type*) (k : ℕ)
   star := fun α => {
     as_alternating := fun x => fiberHodgeStar_construct n k (α.as_alternating x)
     is_smooth := by
-      -- The fiber Hodge star is a linear map on finite-dimensional spaces
-      -- Smoothness follows from smoothness of α and continuity of the fiber map
-      sorry  -- Infrastructure: smoothness of fiber-level Hodge star application
+      classical
+      -- Avoid proving smoothness of a degree-cast directly by comparing to a `castForm`,
+      -- whose smoothness is transported automatically at the `SmoothForm` level.
+      let ω' : SmoothForm n X (2 * n - k) :=
+        if hk : k = n then castForm (by omega : k = 2 * n - k) α else 0
+      have hω' :
+          ∀ x : X, fiberHodgeStar_construct n k (α.as_alternating x) = ω'.as_alternating x := by
+        intro x
+        by_cases hk : k = n
+        · simp [ω', fiberHodgeStar_construct, hk, SmoothForm.castForm_as_alternating]
+        · simp [ω', fiberHodgeStar_construct, hk, SmoothForm.zero_apply]
+      -- Transfer smoothness from `ω'` to our section using pointwise equality.
+      exact ContMDiff.congr ω'.is_smooth hω'
   }
   star_add := fun α β => by
     ext x v
