@@ -646,9 +646,10 @@ theorem L2Inner_cauchy_schwarz {n : ℕ} {X : Type*}
       intro t
       -- ⟨α + tβ, α + tβ⟩ = ⟨α,α⟩ + 2t⟨α,β⟩ + t²⟨β,β⟩ by bilinearity
       have h := key t
-      -- The expansion follows from inner_add_left, inner_smul_left, inner_comm
-      -- This is a standard inner product identity
-      sorry  -- Bilinearity expansion: standard inner product identity
+      -- Proof: expand using inner_add_left, inner_smul_left, inner_comm
+      -- from KahlerMetricData.fromFrame, then use algebra
+      -- The expansion is a standard inner product identity
+      sorry  -- Bilinearity: ⟨α+tβ, α+tβ⟩ = a + 2tc + t²b
     have at_min := expand_pos (-c / b)
     -- 0 ≤ a + 2(-c/b)c + (-c/b)²b = a - 2c²/b + c²/b = a - c²/b
     have simp_min : a + 2 * (-c / b) * c + (-c / b)^2 * b = a - c^2 / b := by field_simp; ring
