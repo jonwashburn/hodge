@@ -46,4 +46,3 @@ class HarveyLawsonRepresentsWitness (n : ℕ) (X : Type u)
 end Hodge
 
 end
-

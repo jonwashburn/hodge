@@ -165,3 +165,10 @@ info: 'hodge_conjecture' depends on axioms: [propext, Classical.choice, Quot.sou
 
 ---
 **P1 is the remaining *mathematical* gap. It is no longer hidden as a proof-track axiom.**
+
+## ✅ Status (2026-01-24)
+
+- P1 is an explicit assumption (`[HarveyLawsonRepresentsWitness n X]`).
+- P2 is a theorem derived from P1.
+- `hodge_conjecture` is proved conditional on P1.
+- No custom axioms remain in the dependency closure (P1 is a hypothesis, not an axiom).

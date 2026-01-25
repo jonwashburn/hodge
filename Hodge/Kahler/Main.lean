@@ -9,6 +9,7 @@ import Hodge.Analytic.Currents
 import Hodge.Analytic.Calibration
 import Hodge.Classical.HarveyLawson
 import Hodge.Classical.GAGA
+import Hodge.GMT.PoincareDuality
 -- NOTE: Lefschetz.lean moved to archive - not on proof track for hodge_conjecture'
 
 /-!
@@ -198,9 +199,11 @@ theorem automatic_syr {p : ℕ} (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ)
     (ψ : CalibratingForm n X (2 * (n - p))) :
     ∃ (T : IntegralCurrent n X (2 * (n - p))),
+      T.isCycleAt ∧
       isCalibrated T.toFun ψ := by
-  obtain ⟨_, T_limit, _, _, h_calib⟩ := microstructure_approximation γ hγ ψ
-  exact ⟨T_limit, h_calib⟩
+  obtain ⟨T_seq, T_limit, h_cycles, h_flat_conv, h_calib⟩ := microstructure_approximation γ hγ ψ
+  have h_cycle : T_limit.isCycleAt := calibrated_limit_is_cycle T_limit ψ h_calib ⟨T_seq, h_cycles, h_flat_conv⟩
+  exact ⟨T_limit, h_cycle, h_calib⟩
 
 /-! ## Cone-Positive Classes are Algebraic -/
 
@@ -306,13 +309,13 @@ theorem cone_positive_produces_cycle {p : ℕ}
     ∃ (Z : SignedAlgebraicCycle n X p), Z.RepresentsClass (ofForm γ h_closed) := by
   -- Step 1: Use the Automatic SYR Theorem to find a calibrated current
   let ψ := KählerCalibration (n := n) (X := X) (p := n - p)
-  obtain ⟨T_seq, T_limit, h_cycles, h_flat_conv, h_calib⟩ := microstructure_approximation γ h_cone ψ
+  obtain ⟨T_limit, h_cycle, h_calib⟩ := automatic_syr γ h_cone ψ
 
   -- Step 2: Use Harvey-Lawson Structure Theorem to represent the limit as analytic varieties
   let hyp : HarveyLawsonHypothesis n X (2 * (n - p)) := {
     T := T_limit,
     ψ := ψ,
-    is_cycle := flat_limit_of_cycles_is_cycle T_seq T_limit h_cycles h_flat_conv,
+    is_cycle := h_cycle,
     is_calibrated := h_calib
   }
   let hl_concl := harvey_lawson_theorem hyp

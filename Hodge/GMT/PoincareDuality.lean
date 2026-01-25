@@ -119,6 +119,7 @@ variable {n : ℕ} {X : Type u}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
   [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+  [MeasurableSpace X]
 
 /-- A cohomology class associated to a set `Z`, using the *current proof-track* PD-form interface.
 

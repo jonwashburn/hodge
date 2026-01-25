@@ -161,4 +161,4 @@ info: 'hodge_conjecture' depends on axioms: [propext, Classical.choice, Quot.sou
 - [x] Verified axiom is eliminated
 
 ---
-**P2 COMPLETE. The only remaining proof-track custom axiom is P1.**
+**P2 COMPLETE. The only remaining proof-track custom axiom is P1 (now an explicit assumption).**

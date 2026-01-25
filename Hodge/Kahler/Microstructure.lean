@@ -17,6 +17,8 @@ import Mathlib.Geometry.Manifold.ChartedSpace
 import Hodge.Analytic.Currents
 import Hodge.Analytic.Calibration
 import Hodge.Analytic.Integration
+import Hodge.Cohomology.Basic
+import Hodge.GMT.PoincareDuality
 
 /-!
 # Microstructure Construction (SYR = Sheet-by-sheet Yoga Refinement)
