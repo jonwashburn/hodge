@@ -921,19 +921,17 @@ theorem setIntegral_linear {n : ℕ} {X : Type*} (k : ℕ)
     - μ(Z).toReal ∈ {0, 1}
     - |Re(form eval)| ≤ comass = ‖ω‖
 
-    **Proof**: Uses `integrateDegree2p_bound` which shows `|∫_Z ω| ≤ ‖ω‖`. -/
+    **Proof**: Uses `integrateDegree2p_bound`. -/
 theorem setIntegral_bound {n : ℕ} {X : Type*} (k : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [MeasurableSpace X] [Nonempty X]
     (Z : Set X) : ∃ M : ℝ, ∀ ω : SmoothForm n X k, |setIntegral k Z ω| ≤ M * ‖ω‖ := by
-  -- setIntegral = integrateDegree2p, which is bounded by ‖ω‖
-  refine ⟨1, fun ω => ?_⟩
+  -- setIntegral = integrateDegree2p, which is bounded by (hausdorffMeasure2p (k/2) Z).toReal * ‖ω‖
+  refine ⟨(hausdorffMeasure2p (k / 2) Z).toReal, fun ω => ?_⟩
   unfold setIntegral
-  calc |integrateDegree2p (n := n) (X := X) k Z ω|
-      ≤ ‖ω‖ := integrateDegree2p_bound k Z ω
-    _ = 1 * ‖ω‖ := (_root_.one_mul _).symm
+  exact integrateDegree2p_bound k Z ω
 
 /-- **Set integration over the empty set is zero** (proved from `integrateDegree2p_empty`). -/
 @[simp]

@@ -139,7 +139,7 @@ theorem topFormIntegral_real'_smul (c : ℝ) (η : SmoothForm n X (2 * n)) :
     **Proof Status**: Proved via `integrateDegree2p_bound`.
 
     Reference: [Federer, "Geometric Measure Theory", §4.1.7]. -/
-theorem topFormIntegral_real'_bound :
+theorem topFormIntegral_real'_bound (η : SmoothForm n X (2 * n)) :
     |topFormIntegral_real' (n := n) (X := X) η| ≤ (kahlerMeasure (X := X) Set.univ).toReal * ‖η‖ := by
   unfold topFormIntegral_real'
   have h := integrateDegree2p_bound (n := n) (X := X) (k := 2 * n) Set.univ η

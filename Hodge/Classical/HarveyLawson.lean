@@ -306,15 +306,16 @@ noncomputable def integrationCurrentHL {p k : ℕ} [MeasurableSpace X]
     (mult : ℤ) : Current n X k where
   toFun := fun ω => (mult : ℝ) * setIntegral k V.carrier ω
   is_linear := fun c ω₁ ω₂ => by
-    rw [setIntegral_linear, mul_add, mul_assoc, mul_comm (mult : ℝ) c, ← mul_assoc]
+    rw [setIntegral_linear, _root_.mul_add, _root_.mul_assoc]
+    congr 1
+    rw [mul_comm]
   is_continuous := continuous_const.mul continuous_of_discreteTopology
   bound := by
     obtain ⟨M, hM⟩ := setIntegral_bound k V.carrier
     use |(mult : ℝ)| * M
     intro ω
-    rw [abs_mul, abs_of_nonneg (by exact_mod_cast Int.cast_nonneg.mpr (by omega) : (mult : ℝ) ≥ 0)]
-    -- mult is usually positive in HL decomposition
-    sorry
+    rw [abs_mul, mul_assoc]
+    apply mul_le_mul_of_nonneg_left (hM ω) (abs_nonneg _)
   boundary_bound := by
     cases k with
     | zero => trivial
