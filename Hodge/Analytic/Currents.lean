@@ -1,5 +1,6 @@
 import Hodge.Analytic.Forms
 import Hodge.Analytic.Norms
+import Hodge.Analytic.Integration.TopFormIntegral
 import Hodge.Analytic.Integration.HausdorffMeasure
 import Mathlib.MeasureTheory.Measure.Hausdorff
 

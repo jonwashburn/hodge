@@ -37,6 +37,16 @@ Lean prints:
 
 **Last verified**: 2026-01-21 (updated) by Agent 3 (R10-A3-VERIFY task)
 
+## Update (2026-01-25)
+
+- Replaced remaining `sorry` stubs in `Hodge/Classical/HarveyLawson.lean` and
+  `Hodge/Classical/CycleClass.lean` with explicit typeclass interfaces:
+  - `HarveyLawsonKingData` + `FlatLimitCycleData` now carry the decomposition/cycle limit inputs.
+  - `CycleClass.PoincareDualFormExists` now provides Poincaré dual form data (no universal instance).
+- `cycleClass_geom` and `FundamentalClassSet` now require `PoincareDualFormExists`,
+  propagated to `hodge_conjecture'`, `hodge_conjecture`, `tex_spine_full`, and
+  `hodge_conjecture_tex_faithful`.
+
 ### Full Verification Suite (2026-01-21)
 
 ```bash

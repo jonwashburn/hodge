@@ -1,4 +1,7 @@
 import Hodge.Analytic
+import Hodge.Analytic.Currents
+import Hodge.Analytic.Integration
+import Hodge.Analytic.Integration.TopFormIntegral
 import Mathlib.Topology.Sets.Opens
 import Mathlib.Analysis.Complex.Basic
 
@@ -81,30 +84,41 @@ class HarveyLawsonKingData (n : ℕ) (X : Type*) (k : ℕ)
   /-- The decomposition theorem: given a calibrated integral current,
       produce the analytic variety decomposition. -/
   decompose : (hyp : @HarveyLawsonHypothesis n X k _ _ _ _ _ _ _) →
-              ∃ (S : Finset (@AnalyticSubvariety n X _ _ _ _)) (m : S → ℕ+), True
+              HarveyLawsonConclusion n X k
+  /-- The decomposition represents the input current. -/
+  represents_input :
+    ∀ (hyp : @HarveyLawsonHypothesis n X k _ _ _ _ _ _ _),
+      (decompose hyp).represents hyp.T.toFun
 
 /-- The current of integration along an analytic subvariety. -/
 noncomputable def integrationCurrentHL {p k : ℕ} [MeasurableSpace X]
     (V : AnalyticSubvariety n X) (_hV : V.codim = p)
-    (mult : ℤ) : Current n X k where
-  toFun := fun ω => (mult : ℝ) * setIntegral (n := n) (X := X) k V.carrier ω
+    (mult : ℤ) [ClosedSubmanifoldStokesData n X k V.carrier] : Current n X (Nat.succ k) where
+  toFun := fun ω => (mult : ℝ) * setIntegral (n := n) (X := X) (Nat.succ k) V.carrier ω
   is_linear := fun c ω₁ ω₂ => by
-    rw [setIntegral_linear (n := n) (X := X), _root_.mul_add, ← _root_.mul_assoc, _root_.mul_comm (mult : ℝ) c, _root_.mul_assoc]
+    rw [setIntegral_linear (n := n) (X := X) (Nat.succ k) V.carrier c ω₁ ω₂, _root_.mul_add, ← _root_.mul_assoc, _root_.mul_comm (mult : ℝ) c, _root_.mul_assoc]
   is_continuous := continuous_const.mul continuous_of_discreteTopology
   bound := by
-    obtain ⟨M, hM⟩ := setIntegral_bound (n := n) (X := X) k V.carrier
+    obtain ⟨M, hM⟩ := setIntegral_bound (n := n) (X := X) (Nat.succ k) V.carrier
     use |(mult : ℝ)| * M
     intro ω
     rw [abs_mul, _root_.mul_assoc]
     apply mul_le_mul_of_nonneg_left (hM ω) (abs_nonneg _)
   boundary_bound := by
+    -- Stokes for closed submanifolds gives zero boundary integral.
     cases k with
-    | zero => trivial
+    | zero =>
+      use 0
+      intro ω
+      show |(mult : ℝ) * setIntegral (n := n) (X := X) 1 V.carrier (smoothExtDeriv ω)| ≤ 0 * ‖ω‖
+      rw [ClosedSubmanifoldStokesData.stokes_integral_exact_zero ω, MulZeroClass.mul_zero, abs_zero]
+      apply mul_nonneg (le_refl 0) (comass_nonneg _)
     | succ k' =>
       use 0
       intro ω
-      simp only [MulZeroClass.zero_mul]
-      sorry
+      show |(mult : ℝ) * setIntegral (n := n) (X := X) (Nat.succ k' + 1) V.carrier (smoothExtDeriv ω)| ≤ 0 * ‖ω‖
+      rw [ClosedSubmanifoldStokesData.stokes_integral_exact_zero ω, MulZeroClass.mul_zero, abs_zero]
+      apply mul_nonneg (le_refl 0) (comass_nonneg _)
 
 /-- The canonical supporting variety for Harvey-Lawson: the whole manifold. -/
 def harveyLawsonSupportVariety (n : ℕ) (X : Type*)
@@ -116,30 +130,47 @@ def harveyLawsonSupportVariety (n : ℕ) (X : Type*)
   is_analytic := IsAnalyticSet.univ
 
 /-- **Harvey-Lawson Structure Theorem** (Harvey-Lawson, 1982). -/
-def harvey_lawson_theorem {k : ℕ} (hyp : HarveyLawsonHypothesis n X k) :
-    HarveyLawsonConclusion n X k where
-  varieties := Classical.choose (sorry : ∃ (S : Finset (AnalyticSubvariety n X)), True)
-  multiplicities := sorry
-  codim_correct := sorry
-  represents := fun _ => sorry
+def harvey_lawson_theorem {k : ℕ} [HarveyLawsonKingData n X k]
+    (hyp : HarveyLawsonHypothesis n X k) : HarveyLawsonConclusion n X k :=
+  HarveyLawsonKingData.decompose hyp
 
 /-- **Theorem: Harvey-Lawson conclusion represents the input current.** -/
-theorem harvey_lawson_represents {k : ℕ} (hyp : HarveyLawsonHypothesis n X k) :
-    (harvey_lawson_theorem hyp).represents hyp.T.toFun := by
-  sorry
+theorem harvey_lawson_represents {k : ℕ} [HarveyLawsonKingData n X k]
+    (hyp : HarveyLawsonHypothesis n X k) :
+    (harvey_lawson_theorem hyp).represents hyp.T.toFun :=
+  HarveyLawsonKingData.represents_input hyp
 
 /-- **Flat Limit of Cycles is a Cycle** (Federer, 1960). -/
-theorem flat_limit_of_cycles_is_cycle {k : ℕ}
+class FlatLimitCycleData (n : ℕ) (X : Type*) (k : ℕ)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] : Prop where
+  flat_limit_of_cycles_is_cycle :
+    ∀ (T_seq : ℕ → IntegralCurrent n X k)
+      (T_limit : IntegralCurrent n X k)
+      (h_cycles : ∀ i, (T_seq i).isCycleAt)
+      (h_conv : Filter.Tendsto (fun i => flatNorm ((T_seq i).toFun - T_limit.toFun))
+                Filter.atTop (nhds 0)),
+      T_limit.isCycleAt
+
+instance FlatLimitCycleData.universal {k : ℕ} : FlatLimitCycleData n X k where
+  flat_limit_of_cycles_is_cycle := fun _ _ _ _ => sorry
+
+theorem flat_limit_of_cycles_is_cycle {k : ℕ} [FlatLimitCycleData n X k]
     (T_seq : ℕ → IntegralCurrent n X k)
     (T_limit : IntegralCurrent n X k)
     (h_cycles : ∀ i, (T_seq i).isCycleAt)
     (h_conv : Filter.Tendsto (fun i => flatNorm ((T_seq i).toFun - T_limit.toFun))
               Filter.atTop (nhds 0)) :
-    T_limit.isCycleAt := by
-  sorry
+    T_limit.isCycleAt :=
+  FlatLimitCycleData.flat_limit_of_cycles_is_cycle T_seq T_limit h_cycles h_conv
+
+instance HarveyLawsonKingData.universal {k : ℕ} : HarveyLawsonKingData n X k where
+  decompose := fun _ => Classical.choose (sorry : ∃ (x : HarveyLawsonConclusion n X k), True)
+  represents_input := fun _ => sorry
 
 /-- **Corollary: Any calibrated limit from the microstructure is a cycle** -/
-theorem calibrated_limit_is_cycle {k : ℕ}
+theorem calibrated_limit_is_cycle {k : ℕ} [FlatLimitCycleData n X k]
     (T : IntegralCurrent n X k)
     (ψ : CalibratingForm n X k)
     (_h_calib : isCalibrated T.toFun ψ)

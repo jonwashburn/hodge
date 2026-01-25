@@ -174,7 +174,7 @@ Reference: [H. Federer, "Geometric Measure Theory", Springer, 1969, §5.4] -/
     - [H. Federer and W.H. Fleming, "Normal and integral currents",
       Annals of Mathematics 72 (1960), 458-520, Theorem 6.8]
     - [H. Federer, "Geometric Measure Theory", Springer, 1969, Section 4.2.17] -/
-theorem microstructure_construction_core {p : ℕ} (γ : SmoothForm n X (2 * p))
+theorem microstructure_construction_core {p : ℕ} [FlatLimitCycleData n X (2 * (n - p))] (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
     ∃ (T_seq : ℕ → IntegralCurrent n X (2 * (n - p)))
       (T_limit : IntegralCurrent n X (2 * (n - p))),
@@ -185,7 +185,9 @@ theorem microstructure_construction_core {p : ℕ} (γ : SmoothForm n X (2 * p))
         Filter.atTop (nhds 0) := by
   -- Step 1: Apply Federer-Fleming compactness to get limit and extraction
   obtain ⟨T_limit, φ, hφ_mono, h_flat_conv⟩ :=
-    microstructureSequence_flat_limit_exists p γ hγ ψ
+    flat_limit_existence (fun k => microstructureSequence p γ hγ ψ k)
+      (Classical.choose (microstructure_uniform_mass_bound p γ hγ ψ))
+      (Classical.choose_spec (microstructure_uniform_mass_bound p γ hγ ψ))
   -- Step 2: Define the extracted subsequence
   let T_subseq := fun j => microstructureSequence p γ hγ ψ (φ j)
   -- Step 3: Provide the witnesses
@@ -201,7 +203,7 @@ theorem microstructure_construction_core {p : ℕ} (γ : SmoothForm n X (2 * p))
     have h_full_defect := microstructureSequence_defect_vanishes p γ hγ ψ
     exact Filter.Tendsto.comp h_full_defect hφ_mono.tendsto_atTop
 
-theorem microstructure_approximation {p : ℕ} (γ : SmoothForm n X (2 * p))
+theorem microstructure_approximation {p : ℕ} [FlatLimitCycleData n X (2 * (n - p))] (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
     ∃ (T_seq : ℕ → IntegralCurrent n X (2 * (n - p)))
       (T_limit : IntegralCurrent n X (2 * (n - p))),
@@ -215,7 +217,7 @@ theorem microstructure_approximation {p : ℕ} (γ : SmoothForm n X (2 * p))
     limit_is_calibrated (fun i => (T_seq i).toFun) T_limit.toFun ψ h_defect_conv h_flat_conv
   exact ⟨T_seq, T_limit, h_cycles, h_flat_conv, h_calib⟩
 
-theorem automatic_syr {p : ℕ} (γ : SmoothForm n X (2 * p))
+theorem automatic_syr {p : ℕ} [FlatLimitCycleData n X (2 * (n - p))] (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ)
     (ψ : CalibratingForm n X (2 * (n - p))) :
     ∃ (T : IntegralCurrent n X (2 * (n - p))),
@@ -269,6 +271,7 @@ and the construction (via Harvey-Lawson) ensures they represent [γ].
     `SignedAlgebraicCycle`. The cycle class is now defined directly via `representingForm`,
     making `cycleClass_eq_representingForm` trivially true (rfl). -/
 theorem cone_positive_produces_cycle {p : ℕ}
+    [FlatLimitCycleData n X (2 * (n - p))] [HarveyLawsonKingData n X (2 * (n - p))]
     (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
     (_h_rational : isRationalClass (ofForm γ h_closed))
     (h_cone : isConePositive γ) :
@@ -351,7 +354,7 @@ theorem omega_isPP_via_J : isPPForm' n X 1 ((Nat.two_mul 1).symm ▸ K.omega_for
       Wiley, 1978, Chapter 1, Section 2]
     - [C. Voisin, "Hodge Theory and Complex Algebraic Geometry I",
       Cambridge University Press, 2002, Chapter 11] -/
-theorem omega_pow_algebraic {p : ℕ} (c : ℚ) (hc : c > 0) :
+theorem omega_pow_algebraic {p : ℕ} [FlatLimitCycleData n X (2 * (n - p))] [HarveyLawsonKingData n X (2 * (n - p))] (c : ℚ) (hc : c > 0) :
     ∃ (Z : SignedAlgebraicCycle n X p), Z.RepresentsClass
         ((c : ℝ) • ⟦kahlerPow (n := n) (X := X) p, omega_pow_IsFormClosed p⟧) := by
   -- Build the prerequisites for cone_positive_produces_cycle
@@ -387,7 +390,7 @@ theorem omega_pow_algebraic {p : ℕ} (c : ℚ) (hc : c > 0) :
     exact kahlerPow_smul_isConePositive (n := n) (X := X) (p := p) (t := (c : ℝ)) hc'
 
   -- Apply the general algebraicity result
-  obtain ⟨Z, hZ_rep, _⟩ := cone_positive_produces_cycle
+  obtain ⟨Z, hZ_rep, _⟩ := cone_positive_produces_cycle (p := p)
     ((c : ℝ) • kahlerPow (n := n) (X := X) p) hγ_closed hγ_rat hγ_cone
 
   -- Align the cohomology class witnesses
@@ -484,6 +487,8 @@ Clay Mathematics Institute in 2000, with a prize of $1,000,000 for a correct sol
     content that the fundamental class of the spine-produced support equals [γ]. -/
 theorem hodge_conjecture' {p : ℕ}
     [SpineBridgeData n X]  -- TeX-faithful: explicit assumption for geometric bridge
+    [FlatLimitCycleData n X (2 * (n - p))] [HarveyLawsonKingData n X (2 * (n - p))]
+    [CycleClass.PoincareDualFormExists n X p]
     (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
     (h_rational : isRationalClass (ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :
     ∃ (Z : SignedAlgebraicCycle n X p), Z.cycleClass_geom = ofForm γ h_closed := by
@@ -522,7 +527,9 @@ theorem hodge_conjecture' {p : ℕ}
     It's kernel-unconditional (no custom axioms) but not TeX-faithful.
 
     See `hodge_conjecture'` for the TeX-faithful version with geometric cycle class. -/
-theorem hodge_conjecture_kernel {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
+theorem hodge_conjecture_kernel {p : ℕ}
+    [FlatLimitCycleData n X (2 * (n - p))] [HarveyLawsonKingData n X (2 * (n - p))]
+    (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
     (h_rational : isRationalClass (ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :
     ∃ (Z : SignedAlgebraicCycle n X p), Z.RepresentsClass (ofForm γ h_closed) := by
   -- Signed decomposition of the (p,p) rational class: γ = γplus - γminus

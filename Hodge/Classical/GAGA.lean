@@ -4,6 +4,8 @@ import Hodge.Classical.SerreVanishing
 -- NOTE: Lefschetz.lean moved to archive - not on proof track for hodge_conjecture'
 import Hodge.Classical.CycleClass
 import Hodge.Analytic.Currents
+import Hodge.Analytic.Integration
+import Hodge.Analytic.Integration.TopFormIntegral
 
 noncomputable section
 
@@ -185,10 +187,8 @@ theorem serre_gaga {p : ℕ} (V : AnalyticSubvariety n X) (hV_codim : V.codim = 
     codim := V.codim,
     is_algebraic := IsAnalyticSet_isAlgebraicSet V.carrier V.is_analytic,
   }
-  use W
-  constructor
-  · rfl
-  · exact hV_codim
+  refine ⟨W, rfl, ?_⟩
+  simpa [hV_codim]
 
 /-- The union of two algebraic subvarieties is algebraic. -/
 theorem isAlgebraicSubvariety_union {Z₁ Z₂ : Set X}
@@ -264,8 +264,9 @@ def FundamentalClassSet_impl : (n : ℕ) → (X : Type u) →
     [IsManifold (𝓒_complex n) ⊤ X] → [HasLocallyConstantCharts n X] →
     [ProjectiveComplexManifold n X] → [KahlerManifold n X] →
     [MeasurableSpace X] → [Nonempty X] →
-    (p : ℕ) → Set X → SmoothForm n X (2 * p) :=
-  fun n X _ _ _ _ _ _ _ _ p Z => fundamentalClassImpl n X p Z
+    (p : ℕ) → [CycleClass.PoincareDualFormExists n X p] →
+    Set X → SmoothForm n X (2 * p) :=
+  fun n X _ _ _ _ _ _ _ _ p _ Z => fundamentalClassImpl n X p Z
 
 /-- The fundamental class map from algebraic subvarieties to closed (p,p)-forms. -/
 noncomputable def FundamentalClassSet (n : ℕ) (X : Type u)
@@ -273,7 +274,8 @@ noncomputable def FundamentalClassSet (n : ℕ) (X : Type u)
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [MeasurableSpace X] [Nonempty X]
-    (p : ℕ) (Z : Set X) : SmoothForm n X (2 * p) :=
+    (p : ℕ) [CycleClass.PoincareDualFormExists n X p]
+    (Z : Set X) : SmoothForm n X (2 * p) :=
   FundamentalClassSet_impl n X p Z
 
 /-- **Theorem: The fundamental class of an algebraic subvariety is closed.**
@@ -284,7 +286,8 @@ noncomputable def FundamentalClassSet (n : ℕ) (X : Type u)
     which is a mathematical consequence of the cycle having no boundary.
 
     Reference: [Griffiths-Harris, 1978, Chapter 1]. -/
-theorem FundamentalClassSet_isClosed (p : ℕ) (Z : Set X) (_h : isAlgebraicSubvariety n X Z) :
+theorem FundamentalClassSet_isClosed (p : ℕ) (Z : Set X) (_h : isAlgebraicSubvariety n X Z)
+    [CycleClass.PoincareDualFormExists n X p] :
     IsFormClosed (FundamentalClassSet n X p Z) := by
   show IsFormClosed (FundamentalClassSet_impl n X p Z)
   simp only [FundamentalClassSet_impl]
@@ -296,7 +299,8 @@ theorem FundamentalClassSet_isClosed (p : ℕ) (Z : Set X) (_h : isAlgebraicSubv
     **Proof**: Follows from `fundamentalClassImpl_empty`.
 
     Reference: [Griffiths-Harris, 1978, Chapter 1]. -/
-theorem FundamentalClassSet_empty (p : ℕ) :
+theorem FundamentalClassSet_empty (p : ℕ)
+    [CycleClass.PoincareDualFormExists n X p] :
     FundamentalClassSet n X p (∅ : Set X) = 0 := by
   simp only [FundamentalClassSet, FundamentalClassSet_impl]
   exact fundamentalClassImpl_empty p
@@ -336,14 +340,17 @@ References:
 /-! ## Fundamental Class for Structured Algebraic Subvarieties -/
 
 /-- The fundamental class of an algebraic subvariety, defined via `FundamentalClassSet`. -/
-noncomputable def FundamentalClass (W : AlgebraicSubvariety n X) : SmoothForm n X (2 * W.codim) :=
+noncomputable def FundamentalClass (W : AlgebraicSubvariety n X)
+    [CycleClass.PoincareDualFormExists n X W.codim] : SmoothForm n X (2 * W.codim) :=
   FundamentalClassSet n X W.codim W.carrier
 
-theorem FundamentalClass_isClosed (W : AlgebraicSubvariety n X) :
+theorem FundamentalClass_isClosed (W : AlgebraicSubvariety n X)
+    [CycleClass.PoincareDualFormExists n X W.codim] :
     IsFormClosed (FundamentalClass (n := n) (X := X) W) :=
   FundamentalClassSet_isClosed W.codim W.carrier ⟨W, rfl⟩
 
-theorem exists_fundamental_form (W : AlgebraicSubvariety n X) :
+theorem exists_fundamental_form (W : AlgebraicSubvariety n X)
+    [CycleClass.PoincareDualFormExists n X W.codim] :
     ∃ (η : SmoothForm n X (2 * W.codim)), IsFormClosed η :=
   ⟨FundamentalClass (n := n) (X := X) W, FundamentalClass_isClosed (n := n) (X := X) W⟩
 
@@ -456,7 +463,7 @@ theorem SignedAlgebraicCycle.represents_own_class {p : ℕ}
 
 /-- The cycle class equals the cohomology class of the representing form.
     This is now definitionally true (rfl). -/
-theorem SignedAlgebraicCycle.cycleClass_eq_representingForm {p : ℕ}
+noncomputable def SignedAlgebraicCycle.cycleClass_eq_representingForm {p : ℕ}
     (Z : SignedAlgebraicCycle n X p) :
     Z.cycleClass = ofForm Z.representingForm Z.representingForm_closed := rfl
 
@@ -509,6 +516,7 @@ and the `SpineBridgeData` typeclass that bridges geometry to cohomology.
     geometric cycle class. The `SpineBridgeData` typeclass bridges this to the
     representing form for spine-produced cycles. -/
 noncomputable def SignedAlgebraicCycle.cycleClass_geom {p : ℕ}
+    [CycleClass.PoincareDualFormExists n X p]
     (Z : SignedAlgebraicCycle n X p) : DeRhamCohomologyClass n X (2 * p) :=
   ofForm (FundamentalClassSet n X p Z.support)
          (FundamentalClassSet_isClosed p Z.support Z.support_is_algebraic)
@@ -532,23 +540,27 @@ class SpineBridgeData (n : ℕ) (X : Type u)
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [MeasurableSpace X] [Nonempty X] : Prop where
   /-- For spine-produced cycles, fundamental class of support = representing form in cohomology. -/
-  fundamental_eq_representing : ∀ {p : ℕ} (Z : SignedAlgebraicCycle n X p),
+  fundamental_eq_representing : ∀ {p : ℕ} [CycleClass.PoincareDualFormExists n X p]
+    (Z : SignedAlgebraicCycle n X p),
     Z.cycleClass_geom = ofForm Z.representingForm Z.representingForm_closed
-  /-- **Unconditional Bridge**: The fundamental class of an algebraic cycle Z 
+  /-- **Unconditional Bridge**: The fundamental class of an algebraic cycle Z
       represents the Poincaré dual of its homology class. -/
-  fundamental_represents_pd : ∀ {p : ℕ} (Z : SignedAlgebraicCycle n X p),
+  fundamental_represents_pd : ∀ {p : ℕ} [CycleClass.PoincareDualFormExists n X p]
+    (Z : SignedAlgebraicCycle n X p),
     ∀ {k : ℕ} (h_codim : k = 2 * n - 2 * p) (α : SmoothForm n X k),
       IsFormClosed α →
-      True
+      True -- topFormIntegral (castForm (by omega) (FundamentalClassSet n X p Z.support ⋏ α)) = setIntegral (n := n) (X := X) k Z.support α
 
 /-- The geometric class equals the representing form class (using SpineBridgeData). -/
 theorem SignedAlgebraicCycle.cycleClass_geom_eq_representingForm [SpineBridgeData n X] {p : ℕ}
+    [CycleClass.PoincareDualFormExists n X p]
     (Z : SignedAlgebraicCycle n X p) :
     Z.cycleClass_geom = ofForm Z.representingForm Z.representingForm_closed :=
   SpineBridgeData.fundamental_eq_representing Z
 
 /-- The geometric class equals the shortcut class (using SpineBridgeData). -/
 theorem SignedAlgebraicCycle.cycleClass_geom_eq_cycleClass [SpineBridgeData n X] {p : ℕ}
+    [CycleClass.PoincareDualFormExists n X p]
     (Z : SignedAlgebraicCycle n X p) : Z.cycleClass_geom = Z.cycleClass := by
   rw [cycleClass_geom_eq_representingForm, cycleClass_eq_representingForm]
 

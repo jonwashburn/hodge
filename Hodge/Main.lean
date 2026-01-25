@@ -45,6 +45,7 @@ variable {n : ℕ} {X : Type*}
     See `hodge_conjecture_kernel` for the kernel-only version without typeclasses. -/
 theorem hodge_conjecture {p : ℕ}
     [SpineBridgeData n X]  -- Explicit assumption for Poincaré duality bridge
+    [CycleClass.PoincareDualFormExists n X p]
     (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
     (h_rational : isRationalClass (ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :
     ∃ (Z : SignedAlgebraicCycle n X p), Z.cycleClass_geom = ofForm γ h_closed :=

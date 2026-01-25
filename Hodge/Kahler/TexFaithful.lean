@@ -96,6 +96,7 @@ theorem hodge_conjecture_tex_faithful {p : ℕ}
     -- Deep typeclass assumptions
     [ChowGAGAData n X]
     [SpineBridgeData n X]
+    [CycleClass.PoincareDualFormExists n X p]
     -- Input form and hypotheses
     (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
     (h_rational : isRationalClass (ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :

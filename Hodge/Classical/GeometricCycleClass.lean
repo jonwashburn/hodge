@@ -92,7 +92,8 @@ theorem support'_alg {p : ℕ} (Z : SignedAlgebraicCycle n X p) :
 
     **Current Implementation**: Uses `FundamentalClassSet` which is a placeholder.
     Eventually should use the real Poincaré dual form infrastructure. -/
-def cycleClass_geom {p : ℕ} (Z : SignedAlgebraicCycle n X p) :
+def cycleClass_geom {p : ℕ} [CycleClass.PoincareDualFormExists n X p]
+    (Z : SignedAlgebraicCycle n X p) :
     DeRhamCohomologyClass n X (2 * p) :=
   -- The geometric class should be [Z.pos] - [Z.neg]
   -- For now, we use the fundamental class of the support
@@ -100,7 +101,7 @@ def cycleClass_geom {p : ℕ} (Z : SignedAlgebraicCycle n X p) :
          (FundamentalClassSet_isClosed p (support' Z) (support'_alg Z))
 
 /-- The geometric class equals zero for trivial cycles. -/
-theorem cycleClass_geom_empty {p : ℕ} :
+theorem cycleClass_geom_empty {p : ℕ} [CycleClass.PoincareDualFormExists n X p] :
     cycleClass_geom (⟨∅, ∅, isAlgebraicSubvariety_empty n X, isAlgebraicSubvariety_empty n X,
                       0, isFormClosed_zero⟩ : SignedAlgebraicCycle n X p) = 0 := by
   -- For trivial cycle, support = ∅ ∪ ∅ = ∅
@@ -143,7 +144,8 @@ class SpineBridgeData (n : ℕ) (X : Type u)
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [MeasurableSpace X] [Nonempty X] where
   /-- For spine-produced cycles, fundamental class of support = representing form in cohomology. -/
-  fundamental_eq_representing : ∀ {p : ℕ} (Z : SignedAlgebraicCycle n X p),
+  fundamental_eq_representing : ∀ {p : ℕ} [CycleClass.PoincareDualFormExists n X p]
+    (Z : SignedAlgebraicCycle n X p),
     ofForm (FundamentalClassSet n X p (support' Z)) (FundamentalClassSet_isClosed p (support' Z) (support'_alg Z)) =
     ofForm Z.representingForm Z.representingForm_closed
 
@@ -154,6 +156,7 @@ class SpineBridgeData (n : ℕ) (X : Type u)
     **Proof Strategy**: Uses `SpineBridgeData.fundamental_eq_representing` which states
     that the fundamental class of the support equals the representing form in cohomology. -/
 theorem spine_bridge [ChowGAGA.ChowGAGAData n X] [SpineBridgeData n X] {p : ℕ}
+    [CycleClass.PoincareDualFormExists n X p]
     (γ : SmoothForm n X (2 * p)) (hγ_closed : IsFormClosed γ)
     (_hγ_cone : isConePositive γ)
     (Z : SignedAlgebraicCycle n X p)
@@ -178,6 +181,7 @@ theorem spine_bridge [ChowGAGA.ChowGAGAData n X] [SpineBridgeData n X] {p : ℕ}
     - `cycleClass_geom Z = ofForm γ` (by `spine_bridge`)
     - Therefore `Z.cycleClass = cycleClass_geom Z` (by transitivity) -/
 theorem cycleClass_eq_geom_for_spine [ChowGAGA.ChowGAGAData n X] [SpineBridgeData n X] {p : ℕ}
+    [CycleClass.PoincareDualFormExists n X p]
     (γ : SmoothForm n X (2 * p)) (hγ_closed : IsFormClosed γ)
     (hγ_cone : isConePositive γ)
     (Z : SignedAlgebraicCycle n X p)
@@ -211,6 +215,7 @@ Putting it all together: the complete TeX spine proof.
     **Assumptions**: Requires `SpineBridgeData` which encapsulates the deep Poincaré
     duality content: `[FundamentalClassSet(support)] = [representingForm]` in cohomology. -/
 theorem tex_spine_full [ChowGAGA.ChowGAGAData n X] [SpineBridgeData n X] {p : ℕ}
+    [CycleClass.PoincareDualFormExists n X p]
     (γ : SmoothForm n X (2 * p)) (hγ_closed : IsFormClosed γ)
     (hγ_rational : isRationalClass (ofForm γ hγ_closed))
     (hγ_cone : isConePositive γ) :

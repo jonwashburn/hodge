@@ -129,12 +129,12 @@ produces a well-typed de Rham class.
 **Mathematical Content**: This is the cycle class `[Z] ∈ H^{2p}(X, ℝ)`.
 
 **Implementation**: Uses `ofForm` with the PD form and its closedness proof. -/
-noncomputable def gmt_cycle_to_cohomology_path (p : ℕ) (Z : Set X) :
+noncomputable def gmt_cycle_to_cohomology_path (p : ℕ) [CycleClass.PoincareDualFormExists n X p] (Z : Set X) :
     DeRhamCohomologyClass n X (2 * p) :=
   Hodge.ofForm (CycleClass.poincareDualForm n X p Z) (CycleClass.poincareDualForm_isClosed n X p Z)
 
 /-- The cycle class of the empty set is the zero cohomology class. -/
-theorem gmt_cycle_to_cohomology_empty (p : ℕ) :
+theorem gmt_cycle_to_cohomology_empty (p : ℕ) [CycleClass.PoincareDualFormExists n X p] :
     gmt_cycle_to_cohomology_path (n := n) (X := X) p ∅ =
       Hodge.ofForm 0 (isFormClosed_zero (n := n) (X := X) (k := 2 * p)) := by
   unfold gmt_cycle_to_cohomology_path
