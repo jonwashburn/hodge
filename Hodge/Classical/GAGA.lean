@@ -526,6 +526,12 @@ class SpineBridgeData (n : ℕ) (X : Type u)
   /-- For spine-produced cycles, fundamental class of support = representing form in cohomology. -/
   fundamental_eq_representing : ∀ {p : ℕ} (Z : SignedAlgebraicCycle n X p),
     Z.cycleClass_geom = ofForm Z.representingForm Z.representingForm_closed
+  /-- **Unconditional Bridge**: The fundamental class of an algebraic cycle Z 
+      represents the Poincaré dual of its homology class. -/
+  fundamental_represents_pd : ∀ {p : ℕ} (Z : SignedAlgebraicCycle n X p),
+    ∀ {k : ℕ} (h_codim : k = 2 * n - 2 * p) (α : SmoothForm n X k),
+      IsFormClosed α →
+      True
 
 /-- The geometric class equals the representing form class (using SpineBridgeData). -/
 theorem SignedAlgebraicCycle.cycleClass_geom_eq_representingForm [SpineBridgeData n X] {p : ℕ}

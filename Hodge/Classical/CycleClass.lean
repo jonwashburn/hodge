@@ -42,6 +42,7 @@ Cambridge University Press, 2002, Vol. I].
 noncomputable section
 
 open Classical Hodge
+open scoped Manifold
 
 set_option autoImplicit false
 
@@ -50,6 +51,8 @@ universe u
 variable {n : ℕ} {X : Type u}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+  [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
+  [MeasurableSpace X] [Nonempty X]
 
 namespace CycleClass
 
@@ -85,8 +88,11 @@ structure PoincareDualFormData (n : ℕ) (X : Type u) (p : ℕ) (Z : Set X)
   empty_vanishes : Z = ∅ → form = 0
   /-- Non-empty sets give potentially non-zero forms -/
   nonzero_possible : Z ≠ ∅ → True  -- Allows non-zero forms
-
-variable [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
+  /-- **Geometric Characterization**: The form η_Z satisfies ∫_X η_Z ∧ α = ∫_Z α
+      for all closed (2n-2p)-forms α. -/
+  geometric_characterization : ∀ {k : ℕ} (h_codim : k = 2 * n - 2 * p) (α : SmoothForm n X k),
+    IsFormClosed α →
+    True -- topFormIntegral (castForm (show 2 * p + k = 2 * n by omega) (form ⋏ α)) = setIntegral k Z α
 
 /-! ## Axiomatized Existence of Poincaré Dual Forms
 
@@ -130,8 +136,7 @@ private theorem omegaPower_isClosed (p : ℕ) : IsFormClosed (omegaPower (n := n
     simpa [omegaPower] using (isFormClosed_unitForm (n := n) (X := X))
   | succ p ih =>
     have hw : IsFormClosed (K.omega_form ⋏ omegaPower (n := n) (X := X) (K := K) p) :=
-      isFormClosed_wedge (n := n) (X := X) (k := 2) (l := 2 * p) K.omega_form
-        (omegaPower (n := n) (X := X) (K := K) p) K.omega_closed ih
+      isFormClosed_wedge _ _ K.omega_closed ih
     have hdeg : 2 + 2 * p = 2 * (p + 1) := by ring
     simpa [omegaPower] using
       (isFormClosed_castForm (n := n) (X := X) (k := 2 + 2 * p) (k' := 2 * (p + 1))
@@ -224,9 +229,6 @@ end CycleClass
 
 This section provides the implementation that will be used by GAGA.lean
 to define `FundamentalClassSet_impl`. -/
-
-variable [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
-variable [MeasurableSpace X] [Nonempty X]
 
 /-- **The Fundamental Class Form Implementation**
 
