@@ -1,5 +1,6 @@
 import Hodge.Analytic.IntegralCurrents
 import Hodge.Analytic.FlatNorm
+import Hodge.Analytic.Currents
 import Mathlib.Topology.MetricSpace.Basic
 import Mathlib.Order.Filter.Basic
 
@@ -46,7 +47,24 @@ structure FFCompactnessConclusion (n : ℕ) (X : Type*) (k : ℕ)
   φ_strict_mono : StrictMono φ
   converges : Tendsto (fun j => flatNorm ((hyp.T (φ j) : Current n X (k + 1)) - T_limit.toFun)) atTop (nhds 0)
 
--- Note: the Federer–Fleming compactness theorem is not used anywhere in the project at present.
--- We therefore omit it here (removing an unused axiom from the codebase).
+/-- Boundary operator for currents of arbitrary degree (HL-style). -/
+noncomputable def boundaryHL {k : ℕ} (T : Current n X k) : Current n X (k - 1) :=
+  match k with
+  | 0 => 0
+  | k' + 1 => Current.boundary T
+
+/-- **Federer-Fleming Compactness Theorem** (Federer-Fleming, 1960).
+    Any sequence of integral currents with uniformly bounded mass and boundary mass
+    has a subsequence converging in flat norm to an integral current.
+
+    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 1960]. -/
+theorem flat_limit_existence {k : ℕ}
+    (T_seq : ℕ → IntegralCurrent n X k)
+    (M : ℝ) (hM : ∀ j, (T_seq j : Current n X k).mass + (boundaryHL (T_seq j : Current n X k)).mass ≤ M) :
+    ∃ (T_limit : IntegralCurrent n X k) (φ : ℕ → ℕ),
+      StrictMono φ ∧
+      Tendsto (fun j => flatNorm ((T_seq (φ j) : Current n X k) - T_limit.toFun)) atTop (nhds 0) := by
+  -- In the real track, this is the Federer-Fleming compactness theorem.
+  sorry
 
 end

@@ -540,7 +540,8 @@ theorem RawSheetSum.stokes_bound_from_integrationData {p : ℕ} {hscale : ℝ}
 /-- **Uniform mass bound for the microstructure sequence**. -/
 theorem microstructure_uniform_mass_bound (p : ℕ) (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
-    ∃ M : ℝ, ∀ j, flatNorm (microstructureSequence p γ hγ ψ j).toFun ≤ M := by
+    ∃ M : ℝ, ∀ j, (microstructureSequence p γ hγ ψ j : Current n X (2 * (n - p))).mass +
+                  (boundaryHL (microstructureSequence p γ hγ ψ j : Current n X (2 * (n - p)))).mass ≤ M := by
   -- In the real track, this follows from the local mass estimates of sheets.
   sorry
 
@@ -551,5 +552,16 @@ theorem microstructureSequence_defect_vanishes (p : ℕ) (γ : SmoothForm n X (2
       Filter.atTop (nhds 0) := by
   -- In the real track, this is the main convergence theorem.
   sorry
+
+/-- **The flat limit of the microstructure sequence exists**.
+    This is the Federer-Fleming compactness theorem applied to the sequence. -/
+theorem microstructureSequence_flat_limit_exists (p : ℕ) (γ : SmoothForm n X (2 * p))
+    (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
+    ∃ (T_limit : IntegralCurrent n X (2 * (n - p))) (φ : ℕ → ℕ),
+      StrictMono φ ∧
+      Filter.Tendsto (fun j => flatNorm ((microstructureSequence p γ hγ ψ (φ j)).toFun - T_limit.toFun))
+        Filter.atTop (nhds 0) := by
+  obtain ⟨M, hM⟩ := microstructure_uniform_mass_bound p γ hγ ψ
+  apply flat_limit_existence (fun k => microstructureSequence p γ hγ ψ k) M hM
 
 end
