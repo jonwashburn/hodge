@@ -191,24 +191,22 @@ theorem kahlerVolumeForm_positive [Nonempty X] (_x : X) :
     - μ(X) = ∫_X vol < ∞ (since X is compact)
     - μ is the same as Hausdorff measure H^{2n} on the Riemannian manifold
 
-    **Implementation**: Uses `volume` from MeasureTheory which gives
-    the canonical measure on a metric space. For a compact Kähler manifold,
-    this agrees with the Riemannian volume measure induced by the Kähler metric.
+    **Implementation**: For a compact Kähler manifold, this agrees with the
+    Riemannian volume measure induced by the Kähler metric.
 
     Reference: [Voisin, "Hodge Theory and Complex Algebraic Geometry I", §5.2]. -/
 noncomputable def kahlerMeasure [MeasurableSpace X] : Measure X :=
-  MeasureTheory.Measure.comap (fun _ => (0 : ℝ)) volume  -- Placeholder: use constant function to avoid type issues
+  -- In the real track, we assume the existence of the volume measure
+  -- coming from the Kähler metric.
+  sorry
 
 /-- **The Kähler measure is finite** (since X is compact).
 
-    **Proof**: X is compact (from `ProjectiveComplexManifold`), hence has finite measure.
-
-    **Off Proof Track**: Reformulated as `True` for infrastructure.
-
-    Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.2]. -/
-theorem kahlerMeasure_finite [MeasurableSpace X] :
-    True := trivial
-  -- Off proof track: follows from compactness of X
+    **Proof**: X is compact (from `ProjectiveComplexManifold`), hence has finite measure. -/
+theorem kahlerMeasure_finite [MeasurableSpace X] [CompactSpace X] :
+    IsFiniteMeasure (kahlerMeasure (X := X)) := by
+  -- In the real track, the volume measure of a compact manifold is finite.
+  sorry
 
 /-- **Total volume of X** (the Kähler volume).
 

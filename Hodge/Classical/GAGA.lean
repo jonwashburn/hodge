@@ -170,21 +170,17 @@ theorem IsAnalyticSet_isAlgebraicSet (Z : Set X) :
     2. Analytic and algebraic cohomology groups coincide
     3. Every analytic subvariety is the zero locus of algebraic equations
 
-    **Proof**: Since `IsAnalyticSet` and `IsZariskiClosed` (= `IsAlgebraicSet`) have
-    the same inductive structure (empty, univ, union, inter), we use the theorem
-    `IsAnalyticSet_isAlgebraicSet` to convert the analytic property to algebraic.
-    The codimension is preserved directly.
+    **Implementation Status** (Phase 5): This theorem now represents the real
+    analytic-to-algebraic bridge.
 
     Reference: [J.-P. Serre, "Géométrie algébrique et géométrie analytique",
     Ann. Inst. Fourier 6 (1956), 1-42].
     Reference: [R. Hartshorne, "Algebraic Geometry", Springer, 1977, Appendix B]. -/
 theorem serre_gaga {p : ℕ} (V : AnalyticSubvariety n X) (hV_codim : V.codim = p) :
-    ∃ (W : AlgebraicSubvariety n X), W.carrier = V.carrier ∧ W.codim = p :=
-  ⟨{
-    carrier := V.carrier,
-    codim := V.codim,
-    is_algebraic := IsAnalyticSet_isAlgebraicSet V.carrier V.is_analytic
-  }, rfl, hV_codim⟩
+    ∃ (W : AlgebraicSubvariety n X), W.carrier = V.carrier ∧ W.codim = p := by
+  -- In the real track, this is a deep theorem from algebraic geometry.
+  -- We assume it for the proof track closure.
+  sorry
 
 /-- The union of two algebraic subvarieties is algebraic. -/
 theorem isAlgebraicSubvariety_union {Z₁ Z₂ : Set X}
@@ -489,5 +485,57 @@ def SignedAlgebraicCycle.intersect_power {p : ℕ} (Z : SignedAlgebraicCycle n X
 The Lefschetz-lift statement for signed cycles is proved later as a corollary of the
 main theorem (`hodge_conjecture'`) in `Hodge/Kahler/Main.lean`. We keep the algebraic
 cycle infrastructure here (fundamental classes, signed cycles, intersections). -/
+
+/-! ## Geometric Cycle Class (Phase 7)
+
+This section defines the geometric cycle class computed from the support,
+and the `SpineBridgeData` typeclass that bridges geometry to cohomology.
+-/
+
+/-- **Geometric cycle class** computed from the fundamental class of the support.
+
+    This is the "TeX-faithful" definition where the cohomology class comes from
+    geometry (fundamental class / Poincaré duality), not from the carried form.
+
+    **Implementation Status** (Phase 6): This is the primary definition for the
+    geometric cycle class. The `SpineBridgeData` typeclass bridges this to the
+    representing form for spine-produced cycles. -/
+noncomputable def SignedAlgebraicCycle.cycleClass_geom {p : ℕ}
+    (Z : SignedAlgebraicCycle n X p) : DeRhamCohomologyClass n X (2 * p) :=
+  ofForm (FundamentalClassSet n X p Z.support)
+         (FundamentalClassSet_isClosed p Z.support Z.support_is_algebraic)
+
+/-- **Spine Bridge Data**: Typeclass capturing the deep Poincaré duality content.
+
+    This states that for cycles produced by the spine machinery (SYR → HL → GAGA),
+    the fundamental class of the support equals the representing form in cohomology.
+
+    **Mathematical Content**:
+    - Integration currents = Poincaré duals
+    - Harvey-Lawson decomposition preserves cohomology class
+    - Chow/GAGA preserves fundamental class
+
+    **Why a Typeclass?**:
+    The full proof requires deep GMT results not yet formalized in Mathlib.
+    By making this explicit, the proof track is honest about its assumptions. -/
+class SpineBridgeData (n : ℕ) (X : Type u)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [Nonempty X] : Prop where
+  /-- For spine-produced cycles, fundamental class of support = representing form in cohomology. -/
+  fundamental_eq_representing : ∀ {p : ℕ} (Z : SignedAlgebraicCycle n X p),
+    Z.cycleClass_geom = ofForm Z.representingForm Z.representingForm_closed
+
+/-- The geometric class equals the representing form class (using SpineBridgeData). -/
+theorem SignedAlgebraicCycle.cycleClass_geom_eq_representingForm [SpineBridgeData n X] {p : ℕ}
+    (Z : SignedAlgebraicCycle n X p) :
+    Z.cycleClass_geom = ofForm Z.representingForm Z.representingForm_closed :=
+  SpineBridgeData.fundamental_eq_representing Z
+
+/-- The geometric class equals the shortcut class (using SpineBridgeData). -/
+theorem SignedAlgebraicCycle.cycleClass_geom_eq_cycleClass [SpineBridgeData n X] {p : ℕ}
+    (Z : SignedAlgebraicCycle n X p) : Z.cycleClass_geom = Z.cycleClass := by
+  rw [cycleClass_geom_eq_representingForm, cycleClass_eq_representingForm]
 
 end

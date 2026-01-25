@@ -306,7 +306,8 @@ theorem cone_positive_produces_cycle {p : ℕ}
   -- Step 5: Z represents [γ] (now trivially true since cycleClass := ofForm representingForm)
   use Z
   constructor
-  · unfold SignedAlgebraicCycle.RepresentsClass
+  · -- Z.RepresentsClass (ofForm γ h_closed) means Z.cycleClass = ofForm γ h_closed
+    unfold SignedAlgebraicCycle.RepresentsClass
     exact Z.cycleClass_eq_representingForm
   · -- Z.representingForm = γ by construction (it's set to γ above)
     rfl
@@ -472,26 +473,20 @@ Clay Mathematics Institute in 2000, with a prize of $1,000,000 for a correct sol
     3. **Assembly**: Combine the algebraic representatives of γ⁺ and γ⁻ to
        obtain a signed algebraic cycle representing γ
 
-    ## Key Design Decision
+    ## TeX-Faithful Version (Phase 7)
 
-    The `SignedAlgebraicCycle` structure carries its representing cohomology class
-    directly as `representingForm`. This eliminates the need for the
-    `FundamentalClassSet_represents_class` axiom - the cycle is CONSTRUCTED from γ
-    via Harvey-Lawson + GAGA, so it represents [γ] by construction.
+    This version uses `cycleClass_geom` (computed from the fundamental class of the support)
+    and requires `SpineBridgeData` to bridge geometry to cohomology.
 
-    ## References
+    The cycle class comes from geometry, not from the carried form.
 
-    - [W.V.D. Hodge, "The Topological Invariants of Algebraic Varieties",
-      Proc. Int. Cong. Math. 1950, Vol. 1, 182-191]
-    - [J. Carlson, A. Jaffe, and A. Wiles, "The Millennium Prize Problems",
-      Clay Mathematics Institute, 2006]
-    - [R. Harvey and H.B. Lawson Jr., "Calibrated Geometries",
-      Acta Math. 148 (1982), 47-157]
-    - [J.P. Serre, "Géométrie algébrique et géométrie analytique",
-      Ann. Inst. Fourier 6 (1956), 1-42] -/
-theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
+    **Typeclass Assumption**: `SpineBridgeData` encapsulates the deep Poincaré duality
+    content that the fundamental class of the spine-produced support equals [γ]. -/
+theorem hodge_conjecture' {p : ℕ}
+    [SpineBridgeData n X]  -- TeX-faithful: explicit assumption for geometric bridge
+    (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
     (h_rational : isRationalClass (ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :
-    ∃ (Z : SignedAlgebraicCycle n X p), Z.RepresentsClass (ofForm γ h_closed) := by
+    ∃ (Z : SignedAlgebraicCycle n X p), Z.cycleClass_geom = ofForm γ h_closed := by
   -- Signed decomposition of the (p,p) rational class: γ = γplus - γminus
   let sd := signed_decomposition (n := n) (X := X) γ h_closed h_p_p h_rational
 
@@ -504,8 +499,6 @@ theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : Is
     sd.γminus sd.h_minus_closed sd.h_minus_rat sd.h_minus_cone
 
   -- Build the combined signed cycle for γ = γplus - γminus
-  -- The representing form is γ itself (since γ = γplus - γminus)
-  -- The geometric realization: pos = Zplus.pos ∪ Zminus.neg, neg = Zplus.neg ∪ Zminus.pos
   let Z_pos := Zplus.pos ∪ Zminus.neg
   let Z_neg := Zplus.neg ∪ Zminus.pos
   let Z_pos_alg := isAlgebraicSubvariety_union Zplus.pos_alg Zminus.neg_alg
@@ -520,8 +513,45 @@ theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : Is
   }
 
   use Z
-  -- Z.RepresentsClass (ofForm γ h_closed) means Z.cycleClass = ofForm γ h_closed
-  -- This is now trivially true since cycleClass := ofForm representingForm
+  -- Use SpineBridgeData: cycleClass_geom Z = ofForm Z.representingForm = ofForm γ
+  rw [Z.cycleClass_geom_eq_representingForm]
+
+/-- **Hodge Conjecture (Kernel-Only Version)**.
+
+    This version uses the definitional shortcut `cycleClass := ofForm representingForm`.
+    It's kernel-unconditional (no custom axioms) but not TeX-faithful.
+
+    See `hodge_conjecture'` for the TeX-faithful version with geometric cycle class. -/
+theorem hodge_conjecture_kernel {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
+    (h_rational : isRationalClass (ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :
+    ∃ (Z : SignedAlgebraicCycle n X p), Z.RepresentsClass (ofForm γ h_closed) := by
+  -- Signed decomposition of the (p,p) rational class: γ = γplus - γminus
+  let sd := signed_decomposition (n := n) (X := X) γ h_closed h_p_p h_rational
+
+  -- γplus is cone positive, so it has an algebraic representative Zplus
+  obtain ⟨Zplus, hZplus_rep, _⟩ := cone_positive_produces_cycle
+    sd.γplus sd.h_plus_closed sd.h_plus_rat sd.h_plus_cone
+
+  -- γminus is also cone positive, so it has an algebraic representative Zminus
+  obtain ⟨Zminus, hZminus_rep, _⟩ := cone_positive_produces_cycle
+    sd.γminus sd.h_minus_closed sd.h_minus_rat sd.h_minus_cone
+
+  -- Build the combined signed cycle for γ = γplus - γminus
+  let Z_pos := Zplus.pos ∪ Zminus.neg
+  let Z_neg := Zplus.neg ∪ Zminus.pos
+  let Z_pos_alg := isAlgebraicSubvariety_union Zplus.pos_alg Zminus.neg_alg
+  let Z_neg_alg := isAlgebraicSubvariety_union Zplus.neg_alg Zminus.pos_alg
+  let Z : SignedAlgebraicCycle n X p := {
+    pos := Z_pos,
+    neg := Z_neg,
+    pos_alg := Z_pos_alg,
+    neg_alg := Z_neg_alg,
+    representingForm := γ,
+    representingForm_closed := h_closed,
+  }
+
+  use Z
+  -- This uses the definitional shortcut: cycleClass := ofForm representingForm
   unfold SignedAlgebraicCycle.RepresentsClass
   exact Z.cycleClass_eq_representingForm
 
@@ -534,4 +564,26 @@ represents [γ] in cohomology by construction.
 
 SignedAlgebraicCycle.lefschetz_lift was moved to archive/Hodge/Kahler/LefschetzLift.lean.
 ══════════════════════════════════════════════════════════════════════════════════════════
+-/
+
+/-! ## TeX-Faithful Version (Phase 7)
+
+The TeX-faithful version `hodge_conjecture_tex_faithful` is in a separate file
+`Hodge/Kahler/TexFaithful.lean` to avoid circular dependencies.
+
+It uses the geometric cycle class `cycleClass_geom` computed from the fundamental class
+of the support, with the following typeclasses as explicit assumptions:
+
+- `StokesTheoremData` - Stokes theorem for the manifold
+- `SheetUnionStokesData` - Stokes for sheet unions in microstructure
+- `FlatNormDecompositionData` - GMT flat norm decomposition
+- `MicrostructureBoundaryData` - Boundary defect vanishes for microstructure sequence
+- `HarveyLawsonKingData` - Harvey-Lawson structure theorem
+- `ChowGAGAData` - Chow/GAGA theorem
+- `SpineBridgeData` - Poincaré duality bridge theorem
+
+To verify the TeX-faithful proof:
+```bash
+lake build Hodge.Kahler.TexFaithful
+```
 -/

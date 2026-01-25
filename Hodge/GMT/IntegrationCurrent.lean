@@ -106,7 +106,7 @@ noncomputable def integrationCurrentWithStokes (k : ℕ) (Z : Set X)
     **Note**: Complex submanifolds of complex dimension p have real dimension 2p,
     so the integration current lives in degree 2p (as a k-current for k = 2p forms).
 
-    This matches the signature used in `docs/OPERATIONAL_PLAN_5_AGENTS.md`. -/
+This matches the signature used in `docs/OPERATIONAL_PLAN_5_AGENTS.md`. -/
 noncomputable def integrationCurrent (p : ℕ) (Z : Set X) : DeRhamCurrent n X (2 * p) :=
   integrationCurrentK (n := n) (X := X) (k := 2 * p) Z
 

@@ -65,13 +65,10 @@ The mass of a current is the supremum of |T(ω)| over forms with comass ≤ 1.
 
     `Mass(T) := sup { |T(ω)| : comass(ω) ≤ 1 }`
 
-    Full definition would use supremum over unit comass forms.
-    For now, we use a placeholder that extracts from the bound field. -/
+    **Implementation Status** (Phase 3): Uses the real `Current.mass`
+    from `Hodge.Analytic.Currents`. -/
 noncomputable def currentMass {k : ℕ} (T : Current n X k) : ℝ :=
-  -- The bound field gives ∃ M, ∀ ω, |T(ω)| ≤ M * ‖ω‖
-  -- The mass is essentially this M (infimum of such M)
-  -- For now, use Classical.choose on the bound
-  Classical.choose T.bound
+  Current.mass T
 
 /-! ## Isoperimetric Inequality Interface
 

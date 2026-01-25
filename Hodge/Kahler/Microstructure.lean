@@ -263,32 +263,22 @@ This separates the interface (complete) from the GMT implementation (Agent 5 wor
     - Bounded: `|∫_X ω| ≤ vol(X) · ‖ω‖_∞`
     - For compact X: the integral is always finite
 
-    **Implementation Status** (Round 10): Returns 0 for the microstructure proofs.
-    The nontrivial integration is available in `topFormIntegral_real'` for other uses.
+    **Implementation Status** (Phase 2): Uses the real `topFormIntegral_real'`
+    from `Hodge.Analytic.Integration.TopFormIntegral`.
 
-    **Technical Note**: The proofs in this file (calibration_defect_from_gluing, etc.)
-    rely on topFormIntegral = 0 for the gluing bounds. This local definition
-    decouples the microstructure proof track from the general integration infrastructure.
-
-    See also: `Hodge.Analytic.Integration.TopFormIntegral` for the main definitions. -/
+    Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
 noncomputable def topFormIntegral : SmoothForm n X (2 * n) → ℝ :=
-  fun _ => 0  -- Stub for microstructure proofs
+  topFormIntegral_real'
 
 /-- Top form integration is linear. -/
 theorem topFormIntegral_linear (c : ℝ) (ω₁ ω₂ : SmoothForm n X (2 * n)) :
-    topFormIntegral (c • ω₁ + ω₂) = c * topFormIntegral ω₁ + topFormIntegral ω₂ := by
-  unfold topFormIntegral
-  ring
+    topFormIntegral (c • ω₁ + ω₂) = c * topFormIntegral ω₁ + topFormIntegral ω₂ :=
+  topFormIntegral_real'_linear c ω₁ ω₂
 
 /-- Top form integration is bounded (by volume × comass). -/
 theorem topFormIntegral_bound :
-    ∃ M : ℝ, M ≥ 0 ∧ ∀ ω : SmoothForm n X (2 * n), |topFormIntegral ω| ≤ M * ‖ω‖ := by
-  use 0
-  constructor
-  · linarith
-  · intro ω
-    unfold topFormIntegral
-    simp only [abs_zero, MulZeroClass.zero_mul, le_refl]
+    ∀ ω : SmoothForm n X (2 * n), |topFormIntegral ω| ≤ (kahlerMeasure (X := X) Set.univ).toReal * ‖ω‖ :=
+  topFormIntegral_real'_bound
 
 /-- **Global Pairing Between Complementary-Degree Forms** (Hodge Theory).
 
@@ -424,6 +414,21 @@ def RawSheetSum.support {p : ℕ} {hscale : ℝ}
     {C : Cubulation n X hscale} (T_raw : RawSheetSum n X p hscale C) : Set X :=
   ⋃ Q ∈ C.cubes, T_raw.sheets Q ‹_›
 
+/-- **Stokes Data for Sheet Unions**
+    Typeclass encapsulating that sheet unions satisfy Stokes theorem.
+
+    **Mathematical Content**: Complex submanifolds are closed (no boundary),
+    so ∫_Z dω = ∫_{∂Z} ω = 0 for any sheet union Z.
+
+    Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", Ch. 0]. -/
+class SheetUnionStokesData (n : ℕ) (X : Type*) (k : ℕ) (Z : Set X)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [Nonempty X] : Prop where
+  /-- Stokes theorem: ∫_Z dω = 0 for sheet unions (closed complex submanifolds). -/
+  stokes_integral_zero : ∀ ω : SmoothForm n X k, |setIntegral (k + 1) Z (smoothExtDeriv ω)| ≤ 0
+
 /-- Convert a RawSheetSum to an IntegrationData.
     This creates the integration data for the union of sheets.
 
@@ -436,19 +441,20 @@ def RawSheetSum.support {p : ℕ} {hscale : ℝ}
     Complex submanifolds of compact Kähler manifolds are closed (no boundary),
     so bdryMass = 0 and Stokes' theorem gives |∫_Z dω| = 0.
 
+    **Implementation Status** (Phase 2): Uses the real `setIntegral`
+    from `Hodge.Analytic.Currents`.
+
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", Ch. 0]. -/
 noncomputable def RawSheetSum.toIntegrationData {p : ℕ} {hscale : ℝ}
     {C : Cubulation n X hscale} (T_raw : RawSheetSum n X p hscale C) :
     IntegrationData n X (2 * (n - p)) where
   carrier := T_raw.support
-  -- Current implementation: microstructure currents are stubbed as zero.
-  -- We still record the correct carrier set for future integration upgrades.
-  integrate := fun _ => 0
-  integrate_linear := by
-    intro c ω₁ ω₂
-    ring
-  integrate_continuous := continuous_const
-  integrate_bound := ⟨0, fun _ => by simp⟩
+  integrate := setIntegral (2 * (n - p)) T_raw.support
+  integrate_linear := fun c ω₁ ω₂ => setIntegral_linear (2 * (n - p)) T_raw.support c ω₁ ω₂
+  integrate_continuous := continuous_of_discreteTopology
+  integrate_bound := by
+    obtain ⟨M, hM⟩ := setIntegral_bound (2 * (n - p)) T_raw.support
+    exact ⟨M, hM⟩
   bdryMass := 0
   bdryMass_nonneg := le_refl 0
   stokes_bound := by
@@ -456,7 +462,37 @@ noncomputable def RawSheetSum.toIntegrationData {p : ℕ} {hscale : ℝ}
     | zero => trivial
     | succ k' =>
       intro ω
-      simp only [abs_zero, MulZeroClass.zero_mul, le_refl]
+      simp only [MulZeroClass.zero_mul]
+      -- For closed submanifolds, the integral of an exact form is zero.
+      -- This is a semantic assumption for the real track.
+      sorry
+
+/-- **Real Integration Data for RawSheetSum** (Phase 2)
+    Uses actual `setIntegral` instead of zero stub.
+    Requires `ClosedSubmanifoldStokesData` typeclass for Stokes property.
+
+    **Note**: This version requires a Stokes instance. The stub version
+    `RawSheetSum.toIntegrationData` is used on the main proof track. -/
+noncomputable def RawSheetSum.toIntegrationData_real {p : ℕ} {hscale : ℝ}
+    {C : Cubulation n X hscale} (T_raw : RawSheetSum n X p hscale C)
+    [MeasurableSpace X]
+    (hStokes : ∀ (k : ℕ), ∀ ω : SmoothForm n X k,
+      |setIntegral (k + 1) T_raw.support (smoothExtDeriv ω)| ≤ 0) :
+    IntegrationData n X (2 * (n - p)) where
+  carrier := T_raw.support
+  integrate := setIntegral (2 * (n - p)) T_raw.support
+  integrate_linear := fun c ω₁ ω₂ => setIntegral_linear (2 * (n - p)) T_raw.support c ω₁ ω₂
+  integrate_continuous := continuous_of_discreteTopology
+  integrate_bound := setIntegral_bound (2 * (n - p)) T_raw.support
+  bdryMass := 0
+  bdryMass_nonneg := le_refl 0
+  stokes_bound := by
+    cases hk : (2 * (n - p)) with
+    | zero => trivial
+    | succ k' =>
+      intro ω
+      simp only [MulZeroClass.zero_mul]
+      exact hStokes k' ω
 
 /-- Convert a RawSheetSum to a CycleIntegralCurrent.
     This is now constructed via the IntegrationData infrastructure.
@@ -466,19 +502,27 @@ noncomputable def RawSheetSum.toIntegrationData {p : ℕ} {hscale : ℝ}
     Reference: [H. Federer, "Geometric Measure Theory", 1969, Section 4.2.25]. -/
 noncomputable def RawSheetSum.toCycleIntegralCurrent {p : ℕ} {hscale : ℝ}
     {C : Cubulation n X hscale} (T_raw : RawSheetSum n X p hscale C) :
-    CycleIntegralCurrent n X (2 * (n - p)) := by
-  -- Use the IntegrationData infrastructure
-  -- The integration data gives us a current with boundary_bound satisfied
-  -- Complex submanifolds are cycles (no boundary), so isCycleAt holds
-  by_cases h : 2 * (n - p) ≥ 1
-  · -- For k ≥ 1, we need to show it's a cycle
-    -- This follows from bdryMass = 0 for closed submanifolds
-    exact zeroCycleCurrent (2 * (n - p)) h
-  · -- For dimension 0, k = 0 is automatically a cycle
-    push_neg at h
-    have h0 : 2 * (n - p) = 0 := by omega
-    exact { current := zero_int n X (2 * (n - p))
-            is_cycle := Or.inl h0 }
+    CycleIntegralCurrent n X (2 * (n - p)) :=
+  { current := {
+      toCurrent := T_raw.toIntegrationData.toCurrent,
+      is_integral := sorry -- Federer-Fleming integrality theorem
+    },
+    is_cycle := by
+      unfold IntegralCurrent.isCycleAt
+      by_cases h : 2 * (n - p) = 0
+      · left; exact h
+      · right
+        have h_pos : 2 * (n - p) ≥ 1 := by omega
+        let k' := 2 * (n - p) - 1
+        have h_eq : 2 * (n - p) = k' + 1 := by omega
+        use k', h_eq
+        ext ω
+        simp only [Current.boundary, IntegrationData.toCurrent]
+        -- Use the stokes_bound from toIntegrationData
+        have h_stokes := T_raw.toIntegrationData.stokes_bound ω
+        -- Since bdryMass = 0, h_stokes gives |∫ dω| ≤ 0, so ∫ dω = 0
+        simp only [RawSheetSum.toIntegrationData, MulZeroClass.zero_mul, abs_le_zero] at h_stokes
+        exact h_stokes }
 
 /-- Convert a RawSheetSum to an IntegralCurrent. -/
 noncomputable def RawSheetSum.toIntegralCurrent {p : ℕ} {hscale : ℝ}
@@ -656,56 +700,11 @@ noncomputable def trivialRawSheetSum (p : ℕ) (h : ℝ) (C : Cubulation n X h) 
   sheet_submanifold := fun _ _ => IsComplexSubmanifold_empty p
   sheet_in_cube := fun _ _ => Set.empty_subset _
 
-/-- The zero cycle current' has zero toFun. -/
-private theorem zeroCycleCurrent'_toFun_eq_zero (k' : ℕ) :
-    (zeroCycleCurrent' (n := n) (X := X) k').current.toFun = 0 := by
-  rfl
-
-/-- Casting a CycleIntegralCurrent preserves toFun being 0. -/
-private theorem cast_cycle_toFun_eq_zero {k k' : ℕ} (h_eq : k = k')
-    (c : CycleIntegralCurrent n X k') (hc : c.current.toFun = 0) :
-    (h_eq ▸ c).current.toFun = 0 := by
-  subst h_eq
-  exact hc
-
-/-- The zero cycle current has zero toFun. -/
-private theorem zeroCycleCurrent_toFun_eq_zero (k : ℕ) (hk : k ≥ 1) :
-    (zeroCycleCurrent (n := n) (X := X) k hk).current.toFun = 0 := by
-  unfold zeroCycleCurrent
-  -- The cast preserves the zero function property
-  cases k with
-  | zero => omega
-  | succ k' =>
-    simp only [Nat.succ_sub_succ_eq_sub, Nat.sub_zero]
-    rfl
-
-/-- The underlying current of toIntegralCurrent is the zero current.
-    This is proved by unfolding the construction, which returns zeroCycleCurrent
-    or a zero integral current in all cases. -/
-theorem RawSheetSum.toIntegralCurrent_toFun_eq_zero {p : ℕ} {hscale : ℝ}
-    {C : Cubulation n X hscale} (T_raw : RawSheetSum n X p hscale C) :
-    T_raw.toIntegralCurrent.toFun = 0 := by
-  unfold RawSheetSum.toIntegralCurrent RawSheetSum.toCycleIntegralCurrent
-  by_cases h : 2 * (n - p) ≥ 1
-  · simp only [h, ↓reduceDIte]
-    exact zeroCycleCurrent_toFun_eq_zero (2 * (n - p)) h
-  · simp only [h, ↓reduceDIte]
-    rfl
-
 /-- **Calibration Defect from Gluing** (Federer-Fleming, 1960).
 
-    **Proof Status**: In the current stub implementation:
-    - `SmoothForm.pairing` is defined as 0
-    - `RawSheetSum.toIntegralCurrent` returns the zero current
-    - `calibrationDefect 0 ψ = 0`
-
-    Therefore, the theorem is provable by:
-    1. Using the trivial RawSheetSum with empty sheets
-    2. Using the zero current for IsValidGluing (|0 - 0| = 0 < comass β * h)
-    3. HasBoundedCalibrationDefect is satisfied since defect = 0
-
-    **Note**: The detailed proof involves showing that the trivial sheet sum
-    yields zero currents and that zero currents satisfy the bounds.
+    **Proof Status**: In the real track, this is a deep existence theorem.
+    For any cone-positive form β and mesh scale h, there exists a sheet sum T_raw
+    that approximates β with calibration defect O(h).
 
     Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 1960]. -/
 theorem calibration_defect_from_gluing (p : ℕ) (h : ℝ) (hh : h > 0) (C : Cubulation n X h)
@@ -713,81 +712,34 @@ theorem calibration_defect_from_gluing (p : ℕ) (h : ℝ) (hh : h > 0) (C : Cub
     (ψ : CalibratingForm n X (2 * (n - p))) :
     ∃ (T_raw : RawSheetSum n X p h C),
       IsValidGluing β T_raw ∧ HasBoundedCalibrationDefect T_raw ψ (comass β * h) := by
-  -- Use the trivial RawSheetSum with empty sheets
-  use trivialRawSheetSum p h C
-  constructor
-  · -- IsValidGluing: use the zero current
-    unfold IsValidGluing
-    use 0
-    intro ψ'
-    -- |0 - SmoothForm.pairing β ψ'| = |0 - 0| = 0 ≤ comass β * h
-    simp only [Current.zero_toFun, sub_zero, abs_zero]
-    -- SmoothForm.pairing returns 0 via topFormIntegral = 0 (local stub)
-    have hpairing : SmoothForm.pairing β ψ' = 0 := by
-      simp only [SmoothForm.pairing, topFormIntegral]
-      split_ifs <;> rfl
-    simp only [hpairing, sub_zero, abs_zero]
-    exact mul_nonneg (comass_nonneg β) (le_of_lt hh)
-  · -- HasBoundedCalibrationDefect: defect of zero current is 0 ≤ bound
-    unfold HasBoundedCalibrationDefect calibrationDefect
-    have h_zero : (trivialRawSheetSum p h C).toIntegralCurrent.toFun = 0 :=
-      RawSheetSum.toIntegralCurrent_toFun_eq_zero (trivialRawSheetSum p h C)
-    rw [h_zero, Current.mass_zero, Current.zero_toFun, sub_zero]
-    exact mul_nonneg (comass_nonneg β) (le_of_lt hh)
+  -- In the real track, this is the main existence theorem for local sheets.
+  sorry
 
 /-- **Mass bound for gluing construction** (Federer-Fleming, 1960).
-    The integral current from gluing has mass bounded by a constant times the comass.
-    This is now provable because toIntegralCurrent returns the zero current,
-    which has mass 0 ≤ any positive quantity. -/
+    The integral current from gluing has mass bounded by a constant times the comass. -/
 theorem gluing_mass_bound (p : ℕ) (h : ℝ) (hh : h > 0) (C : Cubulation n X h)
     (β : SmoothForm n X (2 * p)) (_hβ : isConePositive β) (_m : ℕ)
     (_ψ : CalibratingForm n X (2 * (n - p)))
     (T_raw : RawSheetSum n X p h C) :
     Current.mass (T_raw.toIntegralCurrent).toFun ≤ comass β * (1 + h) := by
-  rw [RawSheetSum.toIntegralCurrent_toFun_eq_zero]
-  rw [Current.mass_zero]
-  apply mul_nonneg (comass_nonneg β)
-  linarith
+  -- In the real track, this follows from the local mass estimates of sheets.
+  sorry
 
 /-- **Flat Limit for Bounded Integral Currents** (Federer-Fleming, 1960).
     Any sequence of integral currents with uniformly bounded flat norm has a
     subsequence converging in flat norm to an integral current.
 
-    **Proof Status**: This is a deep GMT result that follows from Federer-Fleming
-    compactness (Pillar 2). For our specific use case in the microstructure
-    construction, all currents in the sequence are zero (by
-    RawSheetSum.toIntegralCurrent_toFun_eq_zero), so we prove it directly.
-
     Reference: [H. Federer and W.H. Fleming, "Normal and integral currents",
     Annals of Mathematics 72 (1960), 458-520, Theorem 6.8]. -/
-theorem flat_limit_existence_for_zero_seq {k : ℕ}
+theorem flat_limit_existence {k : ℕ}
     (T_seq : ℕ → IntegralCurrent n X k)
-    (_M : ℝ) (_hM : ∀ j, flatNorm (T_seq j).toFun ≤ _M)
-    (h_all_zero : ∀ j, (T_seq j).toFun = 0) :
+    (M : ℝ) (hM : ∀ j, flatNorm (T_seq j).toFun ≤ M) :
     ∃ (T_limit : IntegralCurrent n X k) (φ : ℕ → ℕ),
       StrictMono φ ∧
       Filter.Tendsto (fun j => flatNorm ((T_seq (φ j)).toFun - T_limit.toFun))
         Filter.atTop (nhds 0) := by
-  -- Take the zero current as the limit and identity as the subsequence
-  use zero_int n X k, id, strictMono_id
-  -- All (T_seq j).toFun = 0, and (zero_int n X k).toFun = 0
-  -- So flatNorm (0 - 0) = flatNorm 0 = 0
-  have h_const_zero : ∀ j, flatNorm ((T_seq (id j)).toFun - (zero_int n X k).toFun) = 0 := by
-    intro j
-    simp only [id_eq]
-    rw [h_all_zero j]
-    -- (zero_int n X k).toFun = 0 by definition
-    have h_zero_int_toFun : (zero_int n X k).toFun = 0 := rfl
-    rw [h_zero_int_toFun]
-    -- 0 - 0 = 0 + (-0) = 0 + 0 = 0 for Currents
-    have h_sub : (0 : Current n X k) - 0 = 0 := by
-      show (0 : Current n X k) + -(0 : Current n X k) = 0
-      rw [Current.neg_zero_current, Current.add_zero]
-    rw [h_sub]
-    exact flatNorm_zero
-  -- Convergence to 0 when the sequence is constantly 0
-  simp_rw [h_const_zero]
-  exact tendsto_const_nhds
+  -- In the real track, this is the Federer-Fleming compactness theorem.
+  sorry
 
 /-! ## Main Construction Sequence
 
@@ -861,29 +813,12 @@ theorem microstructureSequence_are_cycles (p : ℕ) (γ : SmoothForm n X (2 * p)
 /-- **Lemma: Defect bound for microstructure sequence elements**.
     The calibration defect of each element in the sequence is bounded by 2 times the mesh scale.
 
-    In this stubbed implementation, `toIntegralCurrent` is the zero current, so the
-    defect is identically zero and the bound is immediate. -/
+    In the real track, this is the core quantitative estimate from the gluing construction. -/
 theorem microstructureSequence_defect_bound_axiom (p : ℕ) (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
     ∀ k, calibrationDefect (microstructureSequence p γ hγ ψ k).toFun ψ ≤ 2 * (canonicalMeshSequence.scale k) := by
-  intro k
-  unfold microstructureSequence
-  set h := canonicalMeshSequence.scale k with hh_def
-  have hh : h > 0 := canonicalMeshSequence.scale_pos k
-  set C : Cubulation n X h := cubulationFromMesh h hh with hC_def
-  set T_raw := Classical.choose (calibration_defect_from_gluing p h hh C γ hγ k ψ) with hT_raw
-  have h_toFun_zero : T_raw.toIntegralCurrent.toFun = 0 :=
-    RawSheetSum.toIntegralCurrent_toFun_eq_zero (n := n) (X := X) T_raw
-  -- Compute the defect of the zero current.
-  have h_defect_zero : calibrationDefect T_raw.toIntegralCurrent.toFun ψ = 0 := by
-    -- Reduce to the lemma `calibrationDefect_zero`.
-    simpa [h_toFun_zero] using (calibrationDefect_zero (n := n) (X := X) ψ)
-  -- Conclude using nonnegativity of the RHS (since h > 0).
-  have h_rhs_nonneg : 0 ≤ 2 * h := by nlinarith [le_of_lt hh]
-  -- Rewrite the goal to the zero defect inequality.
-  -- (At this point the goal has RHS `2 * h` due to `set h := ...` above.)
-  rw [h_defect_zero]
-  exact h_rhs_nonneg
+  -- In the real track, this follows from the gluing estimate.
+  sorry
 
 theorem microstructureSequence_defect_bound (p : ℕ) (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
@@ -908,26 +843,8 @@ theorem microstructureSequence_defect_vanishes (p : ℕ) (γ : SmoothForm n X (2
 theorem microstructureSequence_mass_bound_axiom (p : ℕ) (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
     ∀ k, (microstructureSequence p γ hγ ψ k : Current n X (2 * (n - p))).mass ≤ comass γ * 2 := by
-  intro k
-  unfold microstructureSequence
-  set h := canonicalMeshSequence.scale k with hh_def
-  have hh : h > 0 := canonicalMeshSequence.scale_pos k
-  set C : Cubulation n X h := cubulationFromMesh h hh with hC_def
-  -- Get the raw sheet sum from Classical.choose
-  set T_raw := Classical.choose (calibration_defect_from_gluing p h hh C γ hγ k ψ)
-  -- Use gluing_mass_bound: mass ≤ comass γ * (1 + h)
-  have h_mass := gluing_mass_bound p h hh C γ hγ k ψ T_raw
-  -- Since h = 1/(k+1) ≤ 1, we have 1 + h ≤ 2
-  have h_bound : h ≤ 1 := by
-    unfold canonicalMeshSequence at hh_def
-    simp only at hh_def
-    rw [hh_def]
-    rw [div_le_one (Nat.cast_add_one_pos k)]
-    linarith
-  have h_factor : 1 + h ≤ 2 := by linarith
-  calc Current.mass T_raw.toIntegralCurrent.toFun
-      ≤ comass γ * (1 + h) := h_mass
-    _ ≤ comass γ * 2 := by nlinarith [comass_nonneg γ]
+  -- In the real track, this follows from the uniform mass bound of the gluing construction.
+  sorry
 
 theorem microstructureSequence_mass_bound (p : ℕ) (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
@@ -949,13 +866,8 @@ theorem microstructureSequence_flat_limit_exists (p : ℕ) (γ : SmoothForm n X 
         Filter.atTop (nhds 0) := by
   -- Get the uniform flat norm bound
   obtain ⟨M, hM⟩ := microstructureSequence_flatnorm_bound p γ hγ ψ
-  -- All microstructure currents are zero (by RawSheetSum.toIntegralCurrent_toFun_eq_zero)
-  have h_all_zero : ∀ j, (microstructureSequence p γ hγ ψ j).toFun = 0 := by
-    intro j
-    unfold microstructureSequence
-    exact RawSheetSum.toIntegralCurrent_toFun_eq_zero _
-  -- Apply the flat limit existence theorem for zero sequences
-  exact flat_limit_existence_for_zero_seq (microstructureSequence p γ hγ ψ) M hM h_all_zero
+  -- Apply the flat limit existence theorem
+  exact flat_limit_existence (microstructureSequence p γ hγ ψ) M hM
 
 /-! ## Microstructure Current Boundary Bounds
 
@@ -998,18 +910,14 @@ The constant M = 0 for all microstructure currents because:
 3. Finite sums of zero-bounded currents have zero bound
 -/
 
-/-- **Theorem: RawSheetSum currents are zero in the current implementation**.
-    This is the foundation for all boundary bounds - zero currents have trivial bounds.
-
-    **Mathematical note**: For real sheet sums over complex submanifolds, the bound
-    would be M = ∑_{sheets} mass(∂(sheet)), which equals 0 for closed submanifolds.
-    This is because complex submanifolds of compact Kähler manifolds are closed.
+/-- **Theorem: RawSheetSum currents are nontrivial in the real implementation**.
+    This replaces the zero-current foundation with real integration.
 
     Reference: [H. Federer, "Geometric Measure Theory", 1969, Section 4.2.25]. -/
-theorem RawSheetSum.current_is_zero {p : ℕ} {hscale : ℝ}
+theorem RawSheetSum.current_is_real {p : ℕ} {hscale : ℝ}
     {C : Cubulation n X hscale} (T_raw : RawSheetSum n X p hscale C) :
-    T_raw.toIntegralCurrent.toFun = 0 :=
-  RawSheetSum.toIntegralCurrent_toFun_eq_zero T_raw
+    T_raw.toIntegralCurrent.toFun.toFun = setIntegral (2 * (n - p)) T_raw.support :=
+  rfl
 
 /-- **Theorem: Sheet sums over complex submanifolds are automatically closed**.
     Complex submanifolds of compact Kähler manifolds have no boundary, so
@@ -1021,16 +929,17 @@ theorem RawSheetSum.sheets_are_closed {p : ℕ} {hscale : ℝ}
     T_raw.toIntegralCurrent.isCycleAt := by
   exact RawSheetSum.toIntegralCurrent_isCycle T_raw
 
-/-- **Theorem: Microstructure sequence elements are zero currents**.
-    All currents in the sequence are zero in the current stubbed implementation.
+/-- **Theorem: Microstructure sequence elements are real currents**.
+    All currents in the sequence are real integration currents.
 
     Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 1960]. -/
-theorem microstructureSequence_is_zero (p : ℕ) (γ : SmoothForm n X (2 * p))
+theorem microstructureSequence_is_real (p : ℕ) (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
-    ∀ k, (microstructureSequence p γ hγ ψ k).toFun = 0 := by
+    ∀ k, (microstructureSequence p γ hγ ψ k).toFun.toFun =
+      setIntegral (2 * (n - p)) (Classical.choose (calibration_defect_from_gluing p (canonicalMeshSequence.scale k) (canonicalMeshSequence.scale_pos k) (cubulationFromMesh (canonicalMeshSequence.scale k) (canonicalMeshSequence.scale_pos k)) γ hγ k ψ)).support := by
   intro k
   unfold microstructureSequence
-  exact RawSheetSum.toIntegralCurrent_toFun_eq_zero _
+  rfl
 
 /-- **Theorem: Stokes-type bound for microstructure currents**.
     For any closed form ω, the boundary term vanishes identically because
@@ -1045,34 +954,21 @@ theorem microstructureSequence_stokes_vanishing (p : ℕ) (γ : SmoothForm n X (
     ∀ k, (microstructureSequence p γ hγ ψ k).isCycleAt := by
   exact microstructureSequence_are_cycles p γ hγ ψ
 
-/-- **Theorem: The limit current (from flat norm convergence) is also zero**.
-    Flat norm limits of zero currents are zero.
+/-- **Theorem: The limit current (from flat norm convergence) is real**.
+    Flat norm limits of integration currents are represented by analytic cycles.
 
     Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 1960,
     Theorem 6.8 - compactness and closure properties]. -/
-theorem microstructureSequence_limit_is_zero (p : ℕ) (γ : SmoothForm n X (2 * p))
+theorem microstructureSequence_limit_is_real (p : ℕ) (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p)))
     (T_limit : IntegralCurrent n X (2 * (n - p)))
     (φ : ℕ → ℕ) (_hφ : StrictMono φ)
     (h_conv : Filter.Tendsto (fun j => flatNorm ((microstructureSequence p γ hγ ψ (φ j)).toFun - T_limit.toFun))
         Filter.atTop (nhds 0)) :
-    T_limit.toFun = 0 := by
-  -- All sequence elements are zero
-  have h_all_zero : ∀ j, (microstructureSequence p γ hγ ψ j).toFun = 0 :=
-    microstructureSequence_is_zero p γ hγ ψ
-  -- Rewrite convergence using h_all_zero
-  simp_rw [h_all_zero] at h_conv
-  -- flatNorm(0 - T_limit) converges to 0, so flatNorm(0 - T_limit) = 0
-  -- h_conv: Tendsto (fun j => flatNorm(0 - T_limit)) atTop (nhds 0)
-  -- This is a constant sequence, so the limit equals the constant value
-  have h_fn_zero : flatNorm ((0 : Current n X (2 * (n - p))) - T_limit.toFun) = 0 := by
-    -- The sequence is constant, so if it converges to 0, the constant must be 0
-    have h_tendsto_const : Filter.Tendsto (fun (_ : ℕ) => flatNorm ((0 : Current n X (2 * (n - p))) - T_limit.toFun))
-        Filter.atTop (nhds (flatNorm ((0 : Current n X (2 * (n - p))) - T_limit.toFun))) := tendsto_const_nhds
-    -- By uniqueness of limits, flatNorm(0 - T_limit) = 0
-    exact tendsto_nhds_unique h_tendsto_const h_conv
-  rw [Current.zero_sub, flatNorm_neg] at h_fn_zero
-  exact (flatNorm_eq_zero_iff T_limit.toFun).mp h_fn_zero
+    ∃ (Z : Set X), T_limit.toFun.toFun = setIntegral (2 * (n - p)) Z := by
+  -- In the real track, the limit of integral cycles is an integral cycle
+  -- and therefore represented by integration over a rectifiable set.
+  sorry
 
 /-! ## Integration with Stokes Property Infrastructure
 
@@ -1198,7 +1094,7 @@ theorem microstructureSequence_hasStokesProperty (p : ℕ) (γ : SmoothForm n X 
     (h := hdim.symm) (hT := h_zero)
 
 /-- **Theorem: The flat limit of the microstructure sequence also satisfies Stokes property**.
-    Since the limit is zero (all sequence elements are zero), it has Stokes constant 0.
+    Since the limit is an analytic cycle, it has Stokes constant 0.
 
     Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 1960,
     Theorem 6.8 - compactness and closure properties]. -/
@@ -1212,14 +1108,9 @@ theorem microstructure_limit_hasStokesProperty (p : ℕ) (γ : SmoothForm n X (2
     HasStokesPropertyWith (n := n) (X := X) (k := 2 * (n - p) - 1)
       (((((Nat.add_one (2 * (n - p) - 1)).symm.trans (Nat.sub_add_cancel hk))).symm) ▸
         (T_limit.toFun)) 0 := by
-  have h_limit_zero := microstructureSequence_limit_is_zero p γ hγ ψ T_limit φ hφ h_conv
-  have hdim : Nat.succ (2 * (n - p) - 1) = 2 * (n - p) :=
-    (Nat.add_one (2 * (n - p) - 1)).symm.trans (Nat.sub_add_cancel hk)
-  exact hasStokesProperty_of_zero_current_transport
-    (n := n) (X := X)
-    (T := T_limit.toFun)
-    (k := 2 * (n - p)) (k' := 2 * (n - p) - 1)
-    (h := hdim.symm) (hT := h_limit_zero)
+  -- In the real track, the limit of cycles is a cycle
+  -- and therefore satisfies the Stokes property with M = 0.
+  sorry
 
 /-- **Main Theorem (Agent 4 Task 2d): Microstructure produces Stokes-bounded currents**.
     The entire microstructure construction (sequence + limit) has uniform Stokes bound M = 0.

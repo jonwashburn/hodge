@@ -517,7 +517,7 @@ theorem hodgeLaplacian_nonneg {k : ℕ} (hk : 1 ≤ k) (hk' : k ≤ n)
 /-!
 ### N5: Hodge Laplacian kernel characterization
 
-`Δω = 0 ⟺ dω = 0 ∧ d*ω = 0`
+    `Δω = 0 ⟺ dω = 0 ∧ d*ω = 0`
 
 This is the fundamental characterization of harmonic forms.
 

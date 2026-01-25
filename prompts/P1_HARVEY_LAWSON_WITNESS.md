@@ -49,10 +49,10 @@ Before running ANY `lake build` command, ALWAYS run:
 ```lean
 class HarveyLawsonRepresentsWitness (n : ℕ) (X : Type u) ... : Prop where
   witness {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
-      (Zpos : Set X) (h_alg : isAlgebraicSubvariety n X Zpos) :
-      ofForm γ h_closed =
-        ofForm (FundamentalClassSet n X p (Zpos ∪ ∅))
-          (FundamentalClassSet_isClosed p (Zpos ∪ ∅)
+    (Zpos : Set X) (h_alg : isAlgebraicSubvariety n X Zpos) :
+    ofForm γ h_closed =
+      ofForm (FundamentalClassSet n X p (Zpos ∪ ∅))
+             (FundamentalClassSet_isClosed p (Zpos ∪ ∅)
             (isAlgebraicSubvariety_union h_alg (isAlgebraicSubvariety_empty n X)))
 ```
 
