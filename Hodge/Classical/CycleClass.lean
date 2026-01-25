@@ -80,7 +80,8 @@ We provide a placeholder implementation of the existence of such a form with the
 structure PoincareDualFormData (n : ℕ) (X : Type u) (p : ℕ) (Z : Set X)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] where
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [Nonempty X] where
   /-- The Poincaré dual form representing the integration current -/
   form : SmoothForm n X (2 * p)
   /-- The form is closed -/
@@ -105,7 +106,7 @@ class PoincareDualFormExists (n : ℕ) (X : Type u) (p : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [Nonempty X] where
+    [MeasurableSpace X] [Nonempty X] : Prop where
   choose : ∀ Z : Set X, PoincareDualFormData n X p Z
 
 /-! ## Axiomatized Existence of Poincaré Dual Forms
