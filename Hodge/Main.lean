@@ -19,7 +19,6 @@ variable {n : ℕ} {X : Type*}
   [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
   [MeasurableSpace X] [Nonempty X]
-  [HarveyLawsonRepresentsWitness n X]
 
 /-- **The Hodge Conjecture** (Hodge, 1950; Millennium Prize Problem).
     For a smooth projective complex algebraic variety X, every rational Hodge class

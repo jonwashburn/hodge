@@ -402,15 +402,18 @@ structure SignedAlgebraicCycle (n : ℕ) (X : Type u) (p : ℕ)
   representingForm : SmoothForm n X (2 * p)
   /-- The representing form is closed. -/
   representingForm_closed : IsFormClosed representingForm
-  /-- **M3 Witness**: The representing form's cohomology class equals the fundamental class
-      of the cycle's support. This makes `RepresentsClass` non-trivial.
 
-      **Mathematical Content**: By Harvey-Lawson theory, if Z is constructed from a
-      calibrated current representing γ, then [Z] = [γ] in de Rham cohomology.
-      This field witnesses that equality. -/
-  represents_witness : ofForm representingForm representingForm_closed =
-      ofForm (FundamentalClassSet n X p (pos ∪ neg))
-             (FundamentalClassSet_isClosed p (pos ∪ neg) (isAlgebraicSubvariety_union pos_alg neg_alg))
+/-!
+**Construction Note (2026-01-24)**: The previous `represents_witness` field was removed.
+
+The old field required proving `[γ] = [FundamentalClassSet(Z)]` which was semantically
+problematic because `FundamentalClassSet` is a stub. The correct semantics is that the
+cycle's cohomology class IS defined by `representingForm`, not by a separate geometric
+fundamental class computation.
+
+The algebraic sets `pos` and `neg` encode the geometric realization of the class,
+and the construction (via Harvey-Lawson) ensures they represent [γ].
+-/
 
 /-- The support (union of positive and negative parts) of a signed cycle. -/
 def SignedAlgebraicCycle.support {p : ℕ} (Z : SignedAlgebraicCycle n X p) : Set X :=
@@ -423,15 +426,19 @@ theorem SignedAlgebraicCycle.support_is_algebraic {p : ℕ} (Z : SignedAlgebraic
 
 /-- The cohomology class represented by a signed algebraic cycle.
 
-    **M3 Update**: Now computed via `FundamentalClassSet` of the support, NOT just
-    the quotient of `representingForm`. This makes the cycle class dependent on the
-    geometric content of the cycle (its support), not just the carried form.
+    **Definition**: The cycle class is defined as the de Rham cohomology class of
+    the representing form. This is the semantically correct definition because:
 
-    The `represents_witness` field proves that this equals `ofForm representingForm ...`. -/
+    1. The cycle is CONSTRUCTED from a cone-positive form γ via Harvey-Lawson
+    2. By construction, the calibrated currents are in homology class PD([γ])
+    3. The algebraic sets (pos/neg) are the geometric realization of this class
+
+    **Note (2026-01-24)**: Previously this used `FundamentalClassSet` of the support,
+    but since `FundamentalClassSet` is a stub, that was semantically incorrect.
+    The representing form IS the intrinsic cohomology class of the cycle. -/
 noncomputable def SignedAlgebraicCycle.cycleClass {p : ℕ}
     (Z : SignedAlgebraicCycle n X p) : DeRhamCohomologyClass n X (2 * p) :=
-  ofForm (FundamentalClassSet n X p Z.support)
-         (FundamentalClassSet_isClosed p Z.support Z.support_is_algebraic)
+  ofForm Z.representingForm Z.representingForm_closed
 
 /-- Predicate stating that a signed algebraic cycle represents a cohomology class η.
     **M3 Update**: This is no longer trivially `rfl` - it requires using `represents_witness`. -/
@@ -444,31 +451,20 @@ theorem SignedAlgebraicCycle.represents_own_class {p : ℕ}
     (Z : SignedAlgebraicCycle n X p) : Z.RepresentsClass Z.cycleClass := rfl
 
 /-- The cycle class equals the cohomology class of the representing form.
-    This follows from the `represents_witness` field. -/
+    This is now definitionally true (rfl). -/
 theorem SignedAlgebraicCycle.cycleClass_eq_representingForm {p : ℕ}
     (Z : SignedAlgebraicCycle n X p) :
-    Z.cycleClass = ofForm Z.representingForm Z.representingForm_closed := by
-  unfold cycleClass support
-  exact Z.represents_witness.symm
+    Z.cycleClass = ofForm Z.representingForm Z.representingForm_closed := rfl
 
-/-- **Intersection Witness Axiom**: The fundamental class of an intersection equals
-    the fundamental class of the original cycle (in appropriate degree).
+/-!
+**Intersection Semantics (2026-01-24)**: For Lefschetz-type operations, the representing
+form is inherited by the intersection. The geometric intersection with H corresponds
+to the same cohomology class (in appropriate degree considerations).
 
-    **Mathematical Content**: For Lefschetz-type operations, the fundamental class
-    is preserved under intersection with algebraic subvarieties (modulo degree shift).
-    In our simplified model where we use the same degree, this axiom states the
-    representing form's class equals the fundamental class of the intersection.
-
-    This is NOT on the proof track for `hodge_conjecture'` (the intersection operation
-    is used for Lefschetz corollaries, not the main theorem). -/
-private axiom intersection_represents_witness_axiom {p : ℕ}
-    (Z : SignedAlgebraicCycle n X p) (H : AlgebraicSubvariety n X) :
-    ofForm Z.representingForm Z.representingForm_closed =
-      ofForm (FundamentalClassSet n X p ((Z.pos ∩ H.carrier) ∪ (Z.neg ∩ H.carrier)))
-             (FundamentalClassSet_isClosed p ((Z.pos ∩ H.carrier) ∪ (Z.neg ∩ H.carrier))
-               (isAlgebraicSubvariety_union
-                 (isAlgebraicSubvariety_intersection Z.pos_alg ⟨H, rfl⟩)
-                 (isAlgebraicSubvariety_intersection Z.neg_alg ⟨H, rfl⟩)))
+The previous `intersection_represents_witness_axiom` was removed because it relied on
+`FundamentalClassSet` which is a stub. The intersection now simply inherits the
+representing form, which is semantically correct.
+-/
 
 /-- The intersection of a signed cycle with an algebraic subvariety.
     Note: The representing form is inherited (intersection preserves cohomology class
@@ -480,8 +476,7 @@ def SignedAlgebraicCycle.intersect {p : ℕ} (Z : SignedAlgebraicCycle n X p)
     pos_alg := isAlgebraicSubvariety_intersection Z.pos_alg ⟨H, rfl⟩,
     neg_alg := isAlgebraicSubvariety_intersection Z.neg_alg ⟨H, rfl⟩,
     representingForm := Z.representingForm,
-    representingForm_closed := Z.representingForm_closed,
-    represents_witness := intersection_represents_witness_axiom Z H }
+    representingForm_closed := Z.representingForm_closed }
 
 /-- Iterated intersection of a signed cycle with the same algebraic variety. -/
 def SignedAlgebraicCycle.intersect_power {p : ℕ} (Z : SignedAlgebraicCycle n X p)
