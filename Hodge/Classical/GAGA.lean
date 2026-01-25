@@ -549,7 +549,8 @@ class SpineBridgeData (n : ℕ) (X : Type u)
     (Z : SignedAlgebraicCycle n X p),
     ∀ {k : ℕ} (h_codim : k = 2 * n - 2 * p) (α : SmoothForm n X k),
       IsFormClosed α →
-      True -- topFormIntegral (castForm (by omega) (FundamentalClassSet n X p Z.support ⋏ α)) = setIntegral (n := n) (X := X) k Z.support α
+      topFormIntegral (castForm (by omega) (FundamentalClassSet n X p Z.support ⋏ α)) =
+      setIntegral (n := n) (X := X) k Z.support α
 
 /-- The geometric class equals the representing form class (using SpineBridgeData). -/
 theorem SignedAlgebraicCycle.cycleClass_geom_eq_representingForm [SpineBridgeData n X] {p : ℕ}
