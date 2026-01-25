@@ -449,9 +449,7 @@ noncomputable def RawSheetSum.toIntegrationData {p : ℕ} {hscale : ℝ}
   integrate := setIntegral (2 * (n - p)) T_raw.support
   integrate_linear := fun c ω₁ ω₂ => setIntegral_linear (2 * (n - p)) T_raw.support c ω₁ ω₂
   integrate_continuous := continuous_of_discreteTopology
-  integrate_bound := by
-    obtain ⟨M, hM⟩ := setIntegral_bound (2 * (n - p)) T_raw.support
-    exact ⟨M, hM⟩
+  integrate_bound := setIntegral_bound (2 * (n - p)) T_raw.support
   bdryMass := 0
   bdryMass_nonneg := le_refl 0
   stokes_bound := by
@@ -537,7 +535,8 @@ noncomputable def RawSheetSum.toCycleIntegralCurrent {p : ℕ} {hscale : ℝ}
         -- Since bdryMass = 0, h_stokes gives |∫ dω| ≤ 0, so ∫ dω = 0
         have h_val := h_stokes ω
         simp only [RawSheetSum.toIntegrationData, MulZeroClass.zero_mul, abs_le_zero] at h_val
-        exact h_val }
+        exact h_val
+  }
 
 /-- Convert a RawSheetSum to an IntegralCurrent. -/
 noncomputable def RawSheetSum.toIntegralCurrent {p : ℕ} {hscale : ℝ}

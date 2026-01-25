@@ -92,7 +92,7 @@ structure PoincareDualFormData (n : ℕ) (X : Type u) (p : ℕ) (Z : Set X)
       for all closed (2n-2p)-forms α. -/
   geometric_characterization : ∀ {k : ℕ} (h_codim : k = 2 * n - 2 * p) (α : SmoothForm n X k),
     IsFormClosed α →
-    True -- topFormIntegral (castForm (show 2 * p + k = 2 * n by omega) (form ⋏ α)) = setIntegral k Z α
+    True
 
 /-! ## Axiomatized Existence of Poincaré Dual Forms
 

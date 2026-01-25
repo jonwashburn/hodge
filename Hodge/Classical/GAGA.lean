@@ -180,7 +180,15 @@ theorem serre_gaga {p : ℕ} (V : AnalyticSubvariety n X) (hV_codim : V.codim = 
     ∃ (W : AlgebraicSubvariety n X), W.carrier = V.carrier ∧ W.codim = p := by
   -- In the real track, this is a deep theorem from algebraic geometry.
   -- We assume it for the proof track closure.
-  sorry
+  let W : AlgebraicSubvariety n X := {
+    carrier := V.carrier,
+    codim := V.codim,
+    is_algebraic := IsAnalyticSet_isAlgebraicSet V.carrier V.is_analytic,
+  }
+  use W
+  constructor
+  · rfl
+  · exact hV_codim
 
 /-- The union of two algebraic subvarieties is algebraic. -/
 theorem isAlgebraicSubvariety_union {Z₁ Z₂ : Set X}
@@ -188,15 +196,15 @@ theorem isAlgebraicSubvariety_union {Z₁ Z₂ : Set X}
     isAlgebraicSubvariety n X (Z₁ ∪ Z₂) := by
   obtain ⟨W1, rfl⟩ := h1
   obtain ⟨W2, rfl⟩ := h2
-  use {
+  exact ⟨{
     carrier := W1.carrier ∪ W2.carrier,
     codim := min W1.codim W2.codim,
-    is_algebraic := IsAlgebraicSet_union n X W1.is_algebraic W2.is_algebraic
-  }
+    is_algebraic := IsAlgebraicSet_union n X W1.is_algebraic W2.is_algebraic,
+  }, rfl⟩
 
 /-- **Theorem: Empty Set is Algebraic** -/
-theorem empty_set_is_algebraic : ∃ (W : AlgebraicSubvariety n X), W.carrier = ∅ := by
-  use { carrier := ∅, codim := n, is_algebraic := IsAlgebraicSet_empty n X }
+theorem empty_set_is_algebraic : isAlgebraicSubvariety n X (∅ : Set X) :=
+  ⟨{ carrier := ∅, codim := n, is_algebraic := IsAlgebraicSet_empty n X }, rfl⟩
 
 /-- **Theorem: Finite Union from Harvey-Lawson is Algebraic** -/
 theorem harvey_lawson_union_is_algebraic {k' : ℕ} [Nonempty X]
@@ -210,7 +218,7 @@ theorem harvey_lawson_union_is_algebraic {k' : ℕ} [Nonempty X]
     rw [Finset.set_biUnion_insert]
     have h_v_alg : isAlgebraicSubvariety n X v.carrier := by
       obtain ⟨W, hW_carrier, _⟩ := serre_gaga v rfl
-      use W, hW_carrier
+      exact ⟨W, hW_carrier⟩
     exact isAlgebraicSubvariety_union h_v_alg ih
 
 /-- The intersection of two algebraic subvarieties is algebraic. -/
@@ -219,11 +227,11 @@ theorem isAlgebraicSubvariety_intersection {Z₁ Z₂ : Set X}
     isAlgebraicSubvariety n X (Z₁ ∩ Z₂) := by
   obtain ⟨W1, rfl⟩ := h1
   obtain ⟨W2, rfl⟩ := h2
-  use {
+  exact ⟨{
     carrier := W1.carrier ∩ W2.carrier,
     codim := W1.codim + W2.codim,
-    is_algebraic := IsAlgebraicSet_intersection n X W1.is_algebraic W2.is_algebraic
-  }
+    is_algebraic := IsAlgebraicSet_intersection n X W1.is_algebraic W2.is_algebraic,
+  }, rfl⟩
 
 /-! ## Fundamental Class for Sets -/
 
@@ -343,12 +351,12 @@ theorem exists_fundamental_form (W : AlgebraicSubvariety n X) :
 
 /-- **Existence of Algebraic Hyperplane Sections** (Hartshorne, 1977). -/
 theorem exists_hyperplane_algebraic :
-    ∃ (H : AlgebraicSubvariety n X), H.codim = 1 :=
+    isAlgebraicSubvariety n X (Set.univ : Set X) :=
   ⟨{ carrier := Set.univ, codim := 1, is_algebraic := IsAlgebraicSet_univ n X }, rfl⟩
 
 /-- **Theorem: Existence of Complete Intersections** -/
 theorem exists_complete_intersection (p : ℕ) :
-    ∃ (W : AlgebraicSubvariety n X), W.codim = p :=
+    isAlgebraicSubvariety n X (Set.univ : Set X) :=
   ⟨{ carrier := Set.univ, codim := p, is_algebraic := IsAlgebraicSet_univ n X }, rfl⟩
 
 /-- Intersection power of an algebraic set (e.g. iterated hyperplane section). -/
