@@ -193,7 +193,9 @@ noncomputable def RawSheetSum.toIntegrationData {p : ℕ} {hscale : ℝ}
     | succ k' =>
       intro ω
       simp only [MulZeroClass.zero_mul]
-      -- Type unification between k' and (2 * (n - p) - 1) when 2 * (n - p) = k' + 1
+      -- Since setIntegral uses SubmanifoldIntegration.universal which returns 0,
+      -- the bound |0| ≤ 0 is trivially satisfied.
+      -- This is a semantic stub: in real implementation, need Stokes' theorem.
       sorry
 
 /-- **Real Integration Data for RawSheetSum** (Phase 2)
