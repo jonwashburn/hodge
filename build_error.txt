@@ -1,0 +1,1399 @@
+⚠ [2487/2870] Replayed Hodge.Analytic.Advanced.ContMDiffForms
+warning: Hodge/Analytic/Advanced/ContMDiffForms.lean:100:4: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Advanced/ContMDiffForms.lean:454:5: unused variable `hy`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Hodge/Analytic/Advanced/ContMDiffForms.lean:703:10: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Advanced/ContMDiffForms.lean:718:8: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Advanced/ContMDiffForms.lean:723:6: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+⚠ [2488/2870] Replayed Hodge.Analytic.Advanced.LeibnizRule
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:55:4: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:60:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:69:4: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:84:56: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:97:18: This simp argument is unused:
+  mul_assoc
+
+Hint: Omit it from the simp argument list.
+  simp [hkill', m̵u̵l̵_̵a̵s̵s̵o̵c̵,̵ ̵mul_left_comm, mul_comm]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:97:29: This simp argument is unused:
+  mul_left_comm
+
+Hint: Omit it from the simp argument list.
+  simp [hkill', mul_assoc, m̵u̵l̵_̵l̵e̵f̵t̵_̵c̵o̵m̵m̵,̵ ̵mul_comm]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:120:61: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:126:20: This simp argument is unused:
+  Nat.add_assoc
+
+Hint: Omit it from the simp argument list.
+  simp [Nat.add_a̵s̵s̵o̵c̵,̵ ̵N̵a̵t̵.̵a̵d̵d̵_̵left_comm, Nat.add_comm, Nat.add_mod, Nat.mod_mod]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:126:81: This simp argument is unused:
+  Nat.mod_mod
+
+Hint: Omit it from the simp argument list.
+  simp [Nat.add_assoc, Nat.add_left_comm, Nat.add_comm, Nat.add_mod,̵ ̵N̵a̵t̵.̵m̵o̵d̵_̵m̵o̵d̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:154:4: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:202:68: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:203:33: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:215:4: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:231:56: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:248:10: This simp argument is unused:
+  hkill
+
+Hint: Omit it from the simp argument list.
+  simp [hkill,̵ ̵h̵k̵i̵l̵l̵', mul_assoc, mul_left_comm, mul_comm]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:248:25: This simp argument is unused:
+  mul_assoc
+
+Hint: Omit it from the simp argument list.
+  simp [hkill, hkill', m̵u̵l̵_̵a̵s̵s̵o̵c̵,̵ ̵mul_left_comm, mul_comm]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:248:36: This simp argument is unused:
+  mul_left_comm
+
+Hint: Omit it from the simp argument list.
+  simp [hkill, hkill', mul_assoc, m̵u̵l̵_̵l̵e̵f̵t̵_̵c̵o̵m̵m̵,̵ ̵mul_comm]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:284:8: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:321:58: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:340:63: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:320:22: This simp argument is unused:
+  permCongr_mul
+
+Hint: Omit it from the simp argument list.
+  simp [permCongr_m̵u̵l̵,̵ ̵p̵e̵r̵m̵C̵o̵n̵g̵r̵_̵inv]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:339:22: This simp argument is unused:
+  permCongr_mul
+
+Hint: Omit it from the simp argument list.
+  simp [permCongr_m̵u̵l̵,̵ ̵p̵e̵r̵m̵C̵o̵n̵g̵r̵_̵inv]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:386:27: This simp argument is unused:
+  permCongr_sumComm_sumCongr
+
+Hint: Omit it from the simp argument list.
+  simp [modSumCongrSwap, Quotient.map'_mk'',
+  ̵  ̵ ̵ ̵AlternatingMap.domCoprod.summand_mk'',
+      MultilinearMap.domDomCongr_apply,
+  ̵  ̵ ̵ ̵MultilinearMap.domCoprod_apply,
+      blockSwapEquiv_symm_apply_swap,
+  ̵  ̵ ̵ ̵Equiv.permCongr_apply, p̵e̵r̵m̵C̵o̵n̵g̵r̵_̵s̵u̵m̵C̵o̵m̵m̵_̵s̵u̵m̵C̵o̵n̵g̵r̵,̵
+  ̵ ̵ ̵ ̵ ̵LinearMap.mul'_apply,
+  ̲  ̲ ̲ ̲Function.comp_apply, mul_comm, mul_left_comm, mul_assoc]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:387:57: This simp argument is unused:
+  mul_left_comm
+
+Hint: Omit it from the simp argument list.
+  simp [modSumCongrSwap, Quotient.map'_mk'',
+  ̵  ̵ ̵ ̵AlternatingMap.domCoprod.summand_mk'',
+      MultilinearMap.domDomCongr_apply,
+  ̵  ̵ ̵ ̵MultilinearMap.domCoprod_apply,
+      blockSwapEquiv_symm_apply_swap,
+  ̵  ̵ ̵ ̵Equiv.permCongr_apply, permCongr_sumComm_sumCongr,
+      LinearMap.mul'_apply, Function.comp_apply, mul_comm, mul_l̵e̵f̵t̵_̵c̵o̵m̵m̵,̵ ̵m̵u̵l̵_̵assoc]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:387:72: This simp argument is unused:
+  mul_assoc
+
+Hint: Omit it from the simp argument list.
+  simp [modSumCongrSwap, Quotient.map'_mk'',
+  ̵  ̵ ̵ ̵AlternatingMap.domCoprod.summand_mk'',
+      MultilinearMap.domDomCongr_apply,
+  ̵  ̵ ̵ ̵MultilinearMap.domCoprod_apply,
+      blockSwapEquiv_symm_apply_swap,
+  ̵  ̵ ̵ ̵Equiv.permCongr_apply, permCongr_sumComm_sumCongr,
+      LinearMap.mul'_apply, Function.comp_apply, mul_comm, mul_left_comm,̵ ̵m̵u̵l̵_̵a̵s̵s̵o̵c̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:463:37: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:496:6: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:497:4: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:524:25: This simp argument is unused:
+  Equiv.Perm.sign_inv
+
+Hint: Omit it from the simp argument list.
+  simp [decomposeFinCycleRange, decomposeFinCycleRange_invFun, Equiv.Perm.sign_mul,
+  ̲  ̲ ̲ ̲E̵q̵u̵i̵v̵.̵P̵e̵r̵m̵.̵s̵i̵g̵n̵_̵i̵n̵v̵,̵ ̵Fin.sign_cycleRange, Equiv.Perm.decomposeFin.symm_sign]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:689:45: 'simp' tactic does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:689:45: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:750:15: This simp argument is unused:
+  Nat.mul_ne_zero
+
+Hint: Omit it from the simp argument list.
+  simp [m, Nat.m̵u̵l̵_̵n̵e̵_̵z̵e̵r̵o̵,̵ ̵N̵a̵t̵.̵factorial_ne_zero]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:778:18: This simp argument is unused:
+  smul_smul
+
+Hint: Omit it from the simp argument list.
+  simp [map_smul,̵ ̵s̵m̵u̵l̵_̵s̵m̵u̵l̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1036:8: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1049:8: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1052:8: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1057:4: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:985:79: This simp argument is unused:
+  mul_comm
+
+Hint: Omit it from the simp argument list.
+  simp [equiv, decomposeFinCycleRange_symm_sign, Equiv.Perm.sign_permCongr,̵ ̵m̵u̵l̵_̵c̵o̵m̵m̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1073:23: This simp argument is unused:
+  Equiv.trans_apply
+
+Hint: Omit it from the simp argument list.
+  simp [w, equiv, f, E̵q̵u̵i̵v̵.̵t̵r̵a̵n̵s̵_̵a̵p̵p̵l̵y̵,̵ ̵Equiv.permCongr_symm_apply, hf0, decomposeFinCycleRange_symm_apply_zero]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1073:42: This simp argument is unused:
+  Equiv.permCongr_symm_apply
+
+Hint: Omit it from the simp argument list.
+  simp [w, equiv, f, Equiv.trans_apply, E̵q̵u̵i̵v̵.̵p̵e̵r̵m̵C̵o̵n̵g̵r̵_̵s̵y̵m̵m̵_̵a̵p̵p̵l̵y̵,̵ ̵hf0, decomposeFinCycleRange_symm_apply_zero]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1085:26: This simp argument is unused:
+  Equiv.trans_apply
+
+Hint: Omit it from the simp argument list.
+  simp [w, equiv, f, g, Equiv.t̵r̵a̵n̵s̵_̵a̵pp̵l̵y̵,̵ ̵E̵q̵u̵i̵v̵.̵p̵ermCongr_symm_apply, hf_succ,
+        decomposeFinCycleRange_symm_apply_succ, Fin.removeNth]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1085:45: This simp argument is unused:
+  Equiv.permCongr_symm_apply
+
+Hint: Omit it from the simp argument list.
+  simp [w, equiv, f, g, Equiv.trans_apply, E̵q̵u̵i̵v̵.̵p̵e̵r̵m̵C̵o̵n̵g̵r̵_̵s̵y̵m̵m̵_̵a̵p̵p̵l̵y̵,̵ ̵hf_succ, decomposeFinCycleRange_symm_apply_succ,
+  ̲  ̲ ̲ ̲ ̲ ̲Fin.removeNth]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1096:26: This simp argument is unused:
+  Equiv.trans_apply
+
+Hint: Omit it from the simp argument list.
+  simp [w, equiv, f, g, Equiv.t̵r̵a̵n̵s̵_̵a̵pp̵l̵y̵,̵ ̵E̵q̵u̵i̵v̵.̵p̵ermCongr_symm_apply, hf_succ,
+        decomposeFinCycleRange_symm_apply_succ, Fin.removeNth]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1096:45: This simp argument is unused:
+  Equiv.permCongr_symm_apply
+
+Hint: Omit it from the simp argument list.
+  simp [w, equiv, f, g, Equiv.trans_apply, E̵q̵u̵i̵v̵.̵p̵e̵r̵m̵C̵o̵n̵g̵r̵_̵s̵y̵m̵m̵_̵a̵p̵p̵l̵y̵,̵ ̵hf_succ, decomposeFinCycleRange_symm_apply_succ,
+  ̲  ̲ ̲ ̲ ̲ ̲Fin.removeNth]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1158:60: This simp argument is unused:
+  Function.comp_apply
+
+Hint: Omit it from the simp argument list.
+  simp [MultilinearMap.alternatization_apply, MultilinearMap.domDomCongr_apply,
+        MultilinearMap.domCoprod_apply, LinearMap.mul'_apply,̵ ̵F̵u̵n̵c̵t̵i̵o̵n̵.̵c̵o̵m̵p̵_̵a̵p̵p̵l̵y̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1182:23: This simp argument is unused:
+  hh
+
+Hint: Omit it from the simp argument list.
+  simp [w, v', hh̵,̵ ̵h̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1182:27: This simp argument is unused:
+  h
+
+Hint: Omit it from the simp argument list.
+  simp [w, v', hh,̵ ̵h̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1320:8: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1323:84: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1394:6: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1386:10: This simp argument is unused:
+  smul_smul
+
+Hint: Omit it from the simp argument list.
+  simp [̵s̵m̵u̵l̵_̵s̵m̵u̵l̵,̵ ̵m̵u̵l̵_̵a̵s̵s̵o̵c̵,̵[̲m̲u̲l̲_̲a̲s̲s̲o̲c̲,̲ mul_left_comm, mul_comm]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1386:32: This simp argument is unused:
+  mul_left_comm
+
+Hint: Omit it from the simp argument list.
+  simp [smul_smul, mul_assoc, m̵u̵l̵_̵l̵e̵f̵t̵_̵c̵o̵m̵m̵,̵ ̵mul_comm]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1386:47: This simp argument is unused:
+  mul_comm
+
+Hint: Omit it from the simp argument list.
+  simp [smul_smul, mul_assoc, mul_left_comm,̵ ̵m̵u̵l̵_̵c̵o̵m̵m̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1647:10: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1649:35: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1652:49: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1655:14: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1776:6: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1807:6: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1843:8: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1877:20: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1932:6: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1977:14: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1682:12: This simp argument is unused:
+  u
+
+Hint: Omit it from the simp argument list.
+  simp [u̵,̵ ̵Units.smul_def, Finset.smul_sum, smul_smul, mul_assoc, mul_left_comm, mul_comm]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1682:48: This simp argument is unused:
+  smul_smul
+
+Hint: Omit it from the simp argument list.
+  simp [u, Units.smul_def, Finset.smul_sum, s̵mul_s̵m̵u̵l̵,̵ ̵m̵u̵l̵_̵assoc, mul_left_comm, mul_comm]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1682:59: This simp argument is unused:
+  mul_assoc
+
+Hint: Omit it from the simp argument list.
+  simp [u, Units.smul_def, Finset.smul_sum, smul_smul, mul_a̵s̵s̵o̵c̵,̵ ̵m̵u̵l_̵l̵eft_comm, mul_comm]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1682:85: This simp argument is unused:
+  mul_comm
+
+Hint: Omit it from the simp argument list.
+  simp [u, Units.smul_def, Finset.smul_sum, smul_smul, mul_assoc, mul_left_comm,̵ ̵m̵u̵l̵_̵c̵o̵m̵m̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1738:33: This simp argument is unused:
+  Fin.lt_def
+
+Hint: Omit it from the simp argument list.
+  simp [Fin.succAbove, F̵i̵n̵.̵l̵t̵_̵d̵e̵f̵,̵ ̵h, hcast, Fin.val_castSucc, Fin.val_succ]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1738:73: This simp argument is unused:
+  Fin.val_succ
+
+Hint: Omit it from the simp argument list.
+  simp [Fin.succAbove, Fin.lt_def, h, hcast, Fin.val_castSucc,̵ ̵F̵i̵n̵.̵v̵a̵l̵_̵s̵u̵c̵c̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1743:33: This simp argument is unused:
+  Fin.lt_def
+
+Hint: Omit it from the simp argument list.
+  simp [Fin.succAbove, F̵i̵n̵.̵l̵t̵_̵d̵e̵f̵,̵ ̵h, hcast, hle, Fin.val_castSucc, Fin.val_succ]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1743:55: This simp argument is unused:
+  hle
+
+Hint: Omit it from the simp argument list.
+  simp [Fin.succAbove, Fin.lt_def, h, hcast, h̵l̵e̵,̵ ̵Fin.val_castSucc, Fin.val_succ]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1743:60: This simp argument is unused:
+  Fin.val_castSucc
+
+Hint: Omit it from the simp argument list.
+  simp [Fin.succAbove, Fin.lt_def, h, hcast, hle, F̵i̵n̵.̵v̵a̵l̵_̵c̵a̵s̵t̵S̵u̵c̵c̵,̵ ̵Fin.val_succ]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1745:17: This simp argument is unused:
+  hjval
+
+Hint: Omit it from the simp argument list.
+  simp [j, h̵j̵v̵a̵l̵,̵ ̵finCongr_apply, Fin.val_cast, hval_succAbove]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1751:15: This simp argument is unused:
+  hjval
+
+Hint: Omit it from the simp argument list.
+  simp [j, h̵j̵v̵a̵l̵,̵ ̵hvj', harg]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1778:48: This simp argument is unused:
+  mul_assoc
+
+Hint: Omit it from the simp argument list.
+  simp [Units.smul_def, zsmul_eq_mul, hsignC, mul_a̵s̵s̵o̵c̵,̵ ̵m̵u̵l_̵l̵eft_comm, mul_comm]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1778:59: This simp argument is unused:
+  mul_left_comm
+
+Hint: Omit it from the simp argument list.
+  simp [Units.smul_def, zsmul_eq_mul, hsignC, mul_assoc, m̵u̵l̵_̵l̵e̵f̵t̵_̵c̵o̵m̵m̵,̵ ̵mul_comm]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1799:60: This simp argument is unused:
+  Function.comp_apply
+
+Hint: Omit it from the simp argument list.
+  simp [ContinuousAlternatingMap.domDomCongr_apply, altB,̵ ̵F̵u̵n̵c̵t̵i̵o̵n̵.̵c̵o̵m̵p̵_̵a̵p̵p̵l̵y̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1819:51: This simp argument is unused:
+  Equiv.permCongr_apply
+
+Hint: Omit it from the simp argument list.
+  simp [σ, blockSwapPerm, Function.comp_apply, E̵q̵u̵i̵v̵.̵p̵e̵r̵m̵C̵o̵n̵g̵r̵_̵a̵p̵p̵l̵y̵,̵ ̵finCongr_apply, v', hdim1, hbs]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1819:94: This simp argument is unused:
+  hdim1
+
+Hint: Omit it from the simp argument list.
+  simp [σ, blockSwapPerm, Function.comp_apply, Equiv.permCongr_apply, finCongr_apply, v', hd̵i̵m̵1̵,̵
+  ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵h̵bs]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1860:36: This simp argument is unused:
+  Nat.mul_left_comm
+
+Hint: Omit it from the simp argument list.
+  simp [Nat.mul_comm, N̵a̵t̵.̵m̵u̵l̵_̵l̵e̵f̵t̵_̵c̵o̵m̵m̵,̵ ̵Nat.mul_assoc]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1860:55: This simp argument is unused:
+  Nat.mul_assoc
+
+Hint: Omit it from the simp argument list.
+  simp [Nat.mul_comm, Nat.mul_left_comm,̵ ̵N̵a̵t̵.̵m̵u̵l̵_̵a̵s̵s̵o̵c̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1862:35: This simp argument is unused:
+  Nat.mul_assoc
+
+Hint: Omit it from the simp argument list.
+  simp [Nat.mul_add, N̵a̵t̵.̵m̵u̵l̵_̵a̵s̵s̵o̵c̵,̵ ̵Nat.add_assoc]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1862:50: This simp argument is unused:
+  Nat.add_assoc
+
+Hint: Omit it from the simp argument list.
+  simp [Nat.mul_add, Nat.mul_assoc,̵ ̵N̵a̵t̵.̵a̵d̵d̵_̵a̵s̵s̵o̵c̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1975:63: This simp argument is unused:
+  mul_assoc
+
+Hint: Omit it from the simp argument list.
+  simp [z, Units.smul_def, zsmul_eq_mul, hσsign,̵ ̵m̵u̵l̵_̵a̵s̵s̵o̵c̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1600:8: 'apply hv' tactic does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1600:18: 'simp only [Fin.val_cast]' tactic does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1600:18: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+warning: Hodge/Analytic/Advanced/LeibnizRule.lean:1816:14: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+⚠ [2489/2870] Replayed Hodge.Analytic.Forms
+warning: Hodge/Analytic/Forms.lean:50:0: automatically included section variable(s) unused in theorem `isSmoothAlternating_zero`:
+  [HasLocallyConstantCharts n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [HasLocallyConstantCharts n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/Forms.lean:56:0: automatically included section variable(s) unused in theorem `isSmoothAlternating_add`:
+  [HasLocallyConstantCharts n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [HasLocallyConstantCharts n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/Forms.lean:64:0: automatically included section variable(s) unused in theorem `isSmoothAlternating_neg`:
+  [HasLocallyConstantCharts n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [HasLocallyConstantCharts n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/Forms.lean:90:0: automatically included section variable(s) unused in theorem `isSmoothAlternating_smul`:
+  [HasLocallyConstantCharts n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [HasLocallyConstantCharts n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/Forms.lean:97:0: automatically included section variable(s) unused in theorem `isSmoothAlternating_sub`:
+  [HasLocallyConstantCharts n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [HasLocallyConstantCharts n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/Forms.lean:123:8: automatically included section variable(s) unused in theorem `castForm_refl`:
+  [HasLocallyConstantCharts n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [HasLocallyConstantCharts n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/Forms.lean:128:8: automatically included section variable(s) unused in theorem `SmoothForm.castForm_as_alternating`:
+  [HasLocallyConstantCharts n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [HasLocallyConstantCharts n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/Forms.lean:164:10: This simp argument is unused:
+  mul_add
+
+Hint: Omit it from the simp argument list.
+  simp ̵[̵m̵u̵l̵_̵a̵d̵d̵]̵
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Forms.lean:442:0: automatically included section variable(s) unused in theorem `isSmoothAlternating_wedge`:
+  [HasLocallyConstantCharts n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [HasLocallyConstantCharts n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/Forms.lean:659:45: This simp argument is unused:
+  SmoothForm.smul_apply
+
+Hint: Omit it from the simp argument list.
+  simp only [castForm_smul_as_alternating, SmoothForm.s̵m̵u̵l̵_̵a̵p̵p̵l̵y̵,̵ ̵S̵m̵o̵o̵t̵h̵F̵o̵r̵m̵.̵wedge_apply]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [2490/2870] Replayed Hodge.Cohomology.Basic
+warning: Hodge/Cohomology/Basic.lean:51:0: automatically included section variable(s) unused in theorem `Hodge.isFormClosed_of_isExact`:
+  [ProjectiveComplexManifold n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ProjectiveComplexManifold n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Cohomology/Basic.lean:125:0: automatically included section variable(s) unused in theorem `Hodge.ofForm_proof_irrel`:
+  [ProjectiveComplexManifold n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ProjectiveComplexManifold n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Cohomology/Basic.lean:135:0: automatically included section variable(s) unused in theorem `Hodge.DeRhamCohomologyClass.cast_zero`:
+  [ProjectiveComplexManifold n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ProjectiveComplexManifold n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Cohomology/Basic.lean:142:0: automatically included section variable(s) unused in theorem `Hodge.IsFormClosed_castForm`:
+  [ProjectiveComplexManifold n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ProjectiveComplexManifold n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+info: Hodge/Cohomology/Basic.lean:174:4: Try this:
+  [apply] abel_nf
+info: Hodge/Cohomology/Basic.lean:199:4: Try this:
+  [apply] abel_nf
+warning: Hodge/Cohomology/Basic.lean:259:16: automatically included section variable(s) unused in theorem `_private.Hodge.Cohomology.Basic.0.Hodge.castForm_castForm`:
+  [HasLocallyConstantCharts n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [HasLocallyConstantCharts n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Cohomology/Basic.lean:264:8: automatically included section variable(s) unused in theorem `_private.Hodge.Cohomology.Basic.0.Hodge.castForm_eq_of_proof_irrel`:
+  [HasLocallyConstantCharts n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [HasLocallyConstantCharts n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Cohomology/Basic.lean:269:16: automatically included section variable(s) unused in theorem `_private.Hodge.Cohomology.Basic.0.Hodge.eqRec_trans`:
+  [HasLocallyConstantCharts n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [HasLocallyConstantCharts n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Cohomology/Basic.lean:274:16: automatically included section variable(s) unused in theorem `_private.Hodge.Cohomology.Basic.0.Hodge.eqRec_refl'`:
+  [HasLocallyConstantCharts n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [HasLocallyConstantCharts n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Cohomology/Basic.lean:335:71: This simp argument is unused:
+  castForm_zero
+
+Hint: Omit it from the simp argument list.
+  simp only [hLeibniz, hClosed, smoothWedge_zero_left, eqRec_zero, c̵a̵s̵t̵F̵o̵r̵m̵_̵z̵e̵r̵o̵,̵zero_add, pow_zero, one_smul,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲← hη₂, castForm]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Cohomology/Basic.lean:347:17: This simp argument is unused:
+  eqRec_trans
+
+Hint: Omit it from the simp argument list.
+  simp only [hLeibniz, hClosed, wedge_zero, smul_zero, add_zero, ← hη₁, castForm, e̵q̵R̵e̵c̵_̵t̵r̵a̵n̵s̵,̵ ̵eqRec_refl']
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Cohomology/Basic.lean:347:30: This simp argument is unused:
+  eqRec_refl'
+
+Hint: Omit it from the simp argument list.
+  simp only [hLeibniz, hClosed, wedge_zero, smul_zero, add_zero, ← hη₁, castForm, e̵q̵R̵e̵c̵_̵t̵r̵a̵n̵s̵,̵ ̵e̵q̵R̵e̵c̵_̵r̵e̵f̵l̵'̵]̵e̲q̲R̲e̲c̲_̲t̲r̲a̲n̲s̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Cohomology/Basic.lean:368:17: This simp argument is unused:
+  smul_comm ((-1 : ℂ) ^ (k' + 1)) (castForm _ _)
+
+Hint: Omit it from the simp argument list.
+  simp only [̵s̵m̵u̵l̵_̵c̵o̵m̵m̵ ̵(̵(̵-̵1̵ ̵:̵ ̵ℂ̵)̵^̵(̵k̵'̵ ̵+̵ ̵1̵)̵)̵ ̵(̵c̵a̵s̵t̵F̵o̵r̵m̵ ̵_̵ ̵_̵)̵,̵ ̵c̵a̵s̵t̵F̵o̵r̵m̵_̵s̵m̵u̵l̵,̵[̲c̲a̲s̲t̲F̲o̲r̲m̲_̲s̲m̲u̲l̲,̲ smul_smul, hSign, one_smul]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Cohomology/Basic.lean:370:30: This simp argument is unused:
+  eqRec_refl'
+
+Hint: Omit it from the simp argument list.
+  simp only [eqRec_trans, e̵q̵R̵e̵c̵_̵r̵e̵f̵l̵'̵,̵ ̵castForm]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Cohomology/Basic.lean:497:0: automatically included section variable(s) unused in theorem `Hodge.smul_rat_eq_smul_real`:
+  [ProjectiveComplexManifold n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ProjectiveComplexManifold n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Cohomology/Basic.lean:516:0: automatically included section variable(s) unused in theorem `Hodge.mul_add`:
+  [ProjectiveComplexManifold n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ProjectiveComplexManifold n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Cohomology/Basic.lean:531:0: automatically included section variable(s) unused in theorem `Hodge.add_mul`:
+  [ProjectiveComplexManifold n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ProjectiveComplexManifold n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Cohomology/Basic.lean:544:0: automatically included section variable(s) unused in theorem `Hodge.mul_smul`:
+  [ProjectiveComplexManifold n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ProjectiveComplexManifold n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Cohomology/Basic.lean:557:0: automatically included section variable(s) unused in theorem `Hodge.smul_mul`:
+  [ProjectiveComplexManifold n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ProjectiveComplexManifold n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Cohomology/Basic.lean:570:0: automatically included section variable(s) unused in theorem `Hodge.zero_mul`:
+  [ProjectiveComplexManifold n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ProjectiveComplexManifold n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Cohomology/Basic.lean:578:10: This simp argument is unused:
+  smoothWedge_zero_left
+
+Hint: Omit it from the simp argument list.
+  simp ̵[̵s̵m̵o̵o̵t̵h̵W̵e̵d̵g̵e̵_̵z̵e̵r̵o̵_̵l̵e̵f̵t̵]̵
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Cohomology/Basic.lean:583:0: automatically included section variable(s) unused in theorem `Hodge.mul_zero`:
+  [ProjectiveComplexManifold n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ProjectiveComplexManifold n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Cohomology/Basic.lean:591:10: This simp argument is unused:
+  smoothWedge_zero_right
+
+Hint: Omit it from the simp argument list.
+  simp ̵[̵s̵m̵o̵o̵t̵h̵W̵e̵d̵g̵e̵_̵z̵e̵r̵o̵_̵r̵i̵g̵h̵t̵]̵
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Cohomology/Basic.lean:781:0: automatically included section variable(s) unused in theorem `Hodge.ofForm_add`:
+  [ProjectiveComplexManifold n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ProjectiveComplexManifold n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Cohomology/Basic.lean:784:0: automatically included section variable(s) unused in theorem `Hodge.ofForm_smul`:
+  [ProjectiveComplexManifold n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ProjectiveComplexManifold n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Cohomology/Basic.lean:787:0: automatically included section variable(s) unused in theorem `Hodge.ofForm_smul_real`:
+  [ProjectiveComplexManifold n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ProjectiveComplexManifold n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Cohomology/Basic.lean:790:0: automatically included section variable(s) unused in theorem `Hodge.ofForm_sub`:
+  [ProjectiveComplexManifold n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ProjectiveComplexManifold n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Cohomology/Basic.lean:799:0: automatically included section variable(s) unused in theorem `Hodge.ofForm_wedge`:
+  [ProjectiveComplexManifold n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ProjectiveComplexManifold n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Cohomology/Basic.lean:837:0: automatically included section variable(s) unused in theorem `Hodge.isPPForm_zero`:
+  [ProjectiveComplexManifold n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ProjectiveComplexManifold n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Cohomology/Basic.lean:840:0: automatically included section variable(s) unused in theorem `Hodge.isPPForm_unitForm`:
+  [ProjectiveComplexManifold n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ProjectiveComplexManifold n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Cohomology/Basic.lean:846:0: automatically included section variable(s) unused in theorem `Hodge.isPPForm_of_JInvariant`:
+  [ProjectiveComplexManifold n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ProjectiveComplexManifold n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Cohomology/Basic.lean:850:0: automatically included section variable(s) unused in theorem `Hodge.isPPForm_wedge`:
+  [ProjectiveComplexManifold n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ProjectiveComplexManifold n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+⚠ [2491/2870] Replayed Hodge.Kahler.Manifolds
+warning: Hodge/Kahler/Manifolds.lean:57:0: automatically included section variable(s) unused in theorem `unitForm_isClosed`:
+  [ProjectiveComplexManifold n X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ProjectiveComplexManifold n X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+⚠ [2492/2870] Replayed Hodge.Kahler.TypeDecomposition
+warning: Hodge/Kahler/TypeDecomposition.lean:45:0: automatically included section variable(s) unused in theorem `ofForm_wedge_TD`:
+  K
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit K in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+⚠ [2493/2870] Replayed Hodge.Analytic.HodgeStar.FiberStar
+warning: Hodge/Analytic/HodgeStar/FiberStar.lean:150:4: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/HodgeStar/FiberStar.lean:194:5: unused variable `h`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Hodge/Analytic/HodgeStar/FiberStar.lean:358:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/HodgeStar/FiberStar.lean:364:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+⚠ [2494/2870] Replayed Hodge.Analytic.Norms
+warning: Hodge/Analytic/Norms.lean:49:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Norms.lean:985:13: unused variable `α`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Hodge/Analytic/Norms.lean:985:15: unused variable `β`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+⚠ [2528/2870] Replayed Hodge.Analytic.Grassmannian
+warning: Hodge/Analytic/Grassmannian.lean:335:29: This simp argument is unused:
+  TangentModel
+
+Hint: Omit it from the simp argument list.
+  simp only [TangentSpace,̵ ̵T̵a̵n̵g̵e̵n̵t̵M̵o̵d̵e̵l̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: Hodge/Analytic/Grassmannian.lean:352:58: unused variable `hp`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Hodge/Analytic/Grassmannian.lean:388:0: automatically included section variable(s) unused in theorem `alternatingNormAtFiber_nonneg`:
+  [IsManifold (𝓒_complex n) ⊤ X]
+  [ProjectiveComplexManifold n X]
+  K
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] K in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+⚠ [2533/2870] Replayed Hodge.Classical.Bergman
+warning: Hodge/Classical/Bergman.lean:71:4: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Classical/Bergman.lean:68:0: automatically included section variable(s) unused in theorem `HolomorphicLineBundle.has_local_trivializations`:
+  [CompactSpace X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [CompactSpace X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Classical/Bergman.lean:80:21: unused variable `hx`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Hodge/Classical/Bergman.lean:87:34: unused variable `L₁`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Hodge/Classical/Bergman.lean:87:37: unused variable `L₂`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Hodge/Classical/Bergman.lean:124:43: unused variable `y`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Hodge/Classical/Bergman.lean:155:0: automatically included section variable(s) unused in theorem `IsHolomorphic_smul`:
+  [CompactSpace X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [CompactSpace X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Classical/Bergman.lean:178:43: unused variable `h`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Hodge/Classical/Bergman.lean:192:64: unused variable `h`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Hodge/Classical/Bergman.lean:210:60: unused variable `x`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Hodge/Classical/Bergman.lean:210:68: unused variable `k`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Hodge/Classical/Bergman.lean:217:0: automatically included section variable(s) unused in theorem `IsHolomorphic_tensor`:
+  [CompactSpace X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [CompactSpace X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+⚠ [2851/2870] Replayed Hodge.Analytic.SheafTheory
+warning: Hodge/Analytic/SheafTheory.lean:38:5: unused variable `F`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+⚠ [2852/2870] Replayed Hodge.Classical.SerreVanishing
+warning: Hodge/Classical/SerreVanishing.lean:39:0: automatically included section variable(s) unused in theorem `serre_vanishing`:
+  [KahlerManifold n X]
+  [CompactSpace X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [KahlerManifold n X] [CompactSpace X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Classical/SerreVanishing.lean:65:0: automatically included section variable(s) unused in theorem `jet_surjectivity`:
+  [ProjectiveComplexManifold n X]
+  [KahlerManifold n X]
+  [CompactSpace X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ProjectiveComplexManifold n X] [KahlerManifold n X] [CompactSpace X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+⚠ [2958/3036] Replayed Hodge.Analytic.Integration.VolumeForm
+warning: Hodge/Analytic/Integration/VolumeForm.lean:105:0: automatically included section variable(s) unused in theorem `kahlerPower_nonzero`:
+  [TopologicalSpace X]
+  [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+  [IsManifold (𝓒_complex n) ⊤ X]
+  [HasLocallyConstantCharts n X]
+  [ProjectiveComplexManifold n X]
+  K
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [TopologicalSpace
+  X] [ChartedSpace (EuclideanSpace ℂ (Fin n))
+  X] [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] K in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/Integration/VolumeForm.lean:156:0: automatically included section variable(s) unused in theorem `kahlerVolumeForm_nonzero`:
+  [TopologicalSpace X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [TopologicalSpace X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/Integration/VolumeForm.lean:180:0: automatically included section variable(s) unused in theorem `kahlerVolumeForm_positive`:
+  [TopologicalSpace X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [TopologicalSpace X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/Integration/VolumeForm.lean:198:18: declaration uses 'sorry'
+warning: Hodge/Analytic/Integration/VolumeForm.lean:206:8: declaration uses 'sorry'
+warning: Hodge/Analytic/Integration/VolumeForm.lean:228:0: automatically included section variable(s) unused in theorem `totalVolume_pos`:
+  [TopologicalSpace X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [TopologicalSpace X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/Integration/VolumeForm.lean:253:0: automatically included section variable(s) unused in theorem `volumeForm_volumeBasis`:
+  [TopologicalSpace X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [TopologicalSpace X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+⚠ [3011/3036] Replayed Hodge.Analytic.Integration.HausdorffMeasure
+warning: Hodge/Analytic/Integration/HausdorffMeasure.lean:43:18: declaration uses 'sorry'
+warning: Hodge/Analytic/Integration/HausdorffMeasure.lean:57:5: unused variable `ω`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Hodge/Analytic/Integration/HausdorffMeasure.lean:61:8: declaration uses 'sorry'
+warning: Hodge/Analytic/Integration/HausdorffMeasure.lean:70:8: declaration uses 'sorry'
+warning: Hodge/Analytic/Integration/HausdorffMeasure.lean:78:8: declaration uses 'sorry'
+warning: Hodge/Analytic/Integration/HausdorffMeasure.lean:84:8: declaration uses 'sorry'
+warning: Hodge/Analytic/Integration/HausdorffMeasure.lean:118:8: declaration uses 'sorry'
+warning: Hodge/Analytic/Integration/HausdorffMeasure.lean:125:8: declaration uses 'sorry'
+warning: Hodge/Analytic/Integration/HausdorffMeasure.lean:153:8: declaration uses 'sorry'
+warning: Hodge/Analytic/Integration/HausdorffMeasure.lean:175:0: automatically included section variable(s) unused in theorem `integrateDegree2p_eq_submanifoldIntegral`:
+  [HasLocallyConstantCharts n X]
+  [ProjectiveComplexManifold n X]
+  K
+  [MeasurableSpace X]
+  [Nonempty X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] K [MeasurableSpace X] [Nonempty X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/Integration/HausdorffMeasure.lean:189:8: declaration uses 'sorry'
+⚠ [3012/3036] Replayed Hodge.Analytic.Integration.TopFormIntegral
+warning: Hodge/Analytic/Integration/TopFormIntegral.lean:142:8: declaration uses 'sorry'
+warning: Hodge/Analytic/Integration/TopFormIntegral.lean:215:0: automatically included section variable(s) unused in theorem `topFormIntegral_continuous`:
+  [HasLocallyConstantCharts n X]
+  [ProjectiveComplexManifold n X]
+  [Nonempty X]
+  K
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [Nonempty X] K in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/Integration/TopFormIntegral.lean:230:0: automatically included section variable(s) unused in theorem `topFormIntegral_volumeForm`:
+  [TopologicalSpace X]
+  [MeasurableSpace X]
+  [Nonempty X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [TopologicalSpace X] [MeasurableSpace X] [Nonempty X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/Integration/TopFormIntegral.lean:244:0: automatically included section variable(s) unused in theorem `topFormIntegral_volumeForm_pos`:
+  [TopologicalSpace X]
+  [MeasurableSpace X]
+  [Nonempty X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [TopologicalSpace X] [MeasurableSpace X] [Nonempty X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/Integration/TopFormIntegral.lean:260:0: automatically included section variable(s) unused in theorem `stokes_closed`:
+  [HasLocallyConstantCharts n X]
+  [ProjectiveComplexManifold n X]
+  [MeasurableSpace X]
+  [Nonempty X]
+  K
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [MeasurableSpace X] [Nonempty X] K in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/Integration/TopFormIntegral.lean:290:0: automatically included section variable(s) unused in theorem `intersectionPairing_linear_left`:
+  [HasLocallyConstantCharts n X]
+  [ProjectiveComplexManifold n X]
+  [MeasurableSpace X]
+  [Nonempty X]
+  K
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [MeasurableSpace X] [Nonempty X] K in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/Integration/TopFormIntegral.lean:301:0: automatically included section variable(s) unused in theorem `intersectionPairing_linear_right`:
+  [HasLocallyConstantCharts n X]
+  [ProjectiveComplexManifold n X]
+  [MeasurableSpace X]
+  [Nonempty X]
+  K
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [MeasurableSpace X] [Nonempty X] K in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/Integration/TopFormIntegral.lean:315:0: automatically included section variable(s) unused in theorem `intersectionPairing_closed_exact_zero`:
+  [ProjectiveComplexManifold n X]
+  [MeasurableSpace X]
+  [Nonempty X]
+  K
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ProjectiveComplexManifold n X] [MeasurableSpace X] [Nonempty X] K in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+⚠ [3013/3036] Replayed Hodge.Analytic.Currents
+warning: Hodge/Analytic/Currents.lean:212:48: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Currents.lean:225:10: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Currents.lean:624:5: unused variable `h`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+⚠ [3014/3036] Replayed Hodge.Analytic.FlatNorm
+warning: Hodge/Analytic/FlatNorm.lean:44:0: automatically included section variable(s) unused in theorem `Current.boundary_zero`:
+  [CompactSpace X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [CompactSpace X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/FlatNorm.lean:50:0: automatically included section variable(s) unused in theorem `Current.boundary_smul`:
+  [CompactSpace X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [CompactSpace X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/FlatNorm.lean:79:0: automatically included section variable(s) unused in theorem `flatNormDecompSet_nonneg`:
+  [CompactSpace X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [CompactSpace X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/FlatNorm.lean:180:0: automatically included section variable(s) unused in theorem `Current.neg_add`:
+  [CompactSpace X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [CompactSpace X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/FlatNorm.lean:186:0: automatically included section variable(s) unused in theorem `Current.boundary_neg'`:
+  [CompactSpace X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [CompactSpace X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/FlatNorm.lean:236:5: unused variable `hS_ne`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Hodge/Analytic/FlatNorm.lean:237:28: unused variable `hS₁_bdd`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Hodge/Analytic/FlatNorm.lean:238:28: unused variable `hS₂_bdd`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Hodge/Analytic/FlatNorm.lean:301:0: automatically included section variable(s) unused in theorem `Current.smul_add`:
+  [CompactSpace X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [CompactSpace X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/FlatNorm.lean:308:0: automatically included section variable(s) unused in theorem `Current.smul_sub`:
+  [CompactSpace X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [CompactSpace X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/FlatNorm.lean:315:0: automatically included section variable(s) unused in theorem `Current.smul_smul`:
+  [CompactSpace X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [CompactSpace X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/FlatNorm.lean:354:0: automatically included section variable(s) unused in theorem `Current.one_smul`:
+  [CompactSpace X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [CompactSpace X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/FlatNorm.lean:360:0: automatically included section variable(s) unused in theorem `Current.zero_smul`:
+  [CompactSpace X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [CompactSpace X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+⚠ [3015/3036] Replayed Hodge.Analytic.IntegralCurrents
+warning: Hodge/Analytic/IntegralCurrents.lean:32:0: automatically included section variable(s) unused in theorem `isRectifiable_empty`:
+  [TopologicalSpace X]
+  [Nonempty X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [TopologicalSpace X] [Nonempty X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/IntegralCurrents.lean:35:0: automatically included section variable(s) unused in theorem `isRectifiable_union`:
+  [TopologicalSpace X]
+  [Nonempty X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [TopologicalSpace X] [Nonempty X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+⚠ [3016/3036] Replayed Hodge.Classical.FedererFleming
+warning: Hodge/Classical/FedererFleming.lean:54:4: unused variable `k'`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Hodge/Classical/FedererFleming.lean:61:8: declaration uses 'sorry'
+⚠ [3017/3036] Replayed Hodge.Analytic.Calibration
+warning: Hodge/Analytic/Calibration.lean:61:31: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Calibration.lean:65:31: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Hodge/Analytic/Calibration.lean:71:6: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+⚠ [3018/3036] Replayed Hodge.Analytic.Integration.L2Inner
+warning: Hodge/Analytic/Integration/L2Inner.lean:127:0: automatically included section variable(s) unused in theorem `Hodge.Analytic.L2.L2Inner_measure_smul_left`:
+  [OpensMeasurableSpace X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [OpensMeasurableSpace X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/Integration/L2Inner.lean:139:0: automatically included section variable(s) unused in theorem `Hodge.Analytic.L2.L2Inner_measure_comm`:
+  [OpensMeasurableSpace X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [OpensMeasurableSpace X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/Integration/L2Inner.lean:150:0: automatically included section variable(s) unused in theorem `Hodge.Analytic.L2.L2Inner_measure_self_nonneg`:
+  [OpensMeasurableSpace X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [OpensMeasurableSpace X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+⚠ [3019/3036] Replayed Hodge.Analytic.Advanced.ChartIndependence
+warning: Hodge/Analytic/Advanced/ChartIndependence.lean:105:5: unused variable `hx`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Hodge/Analytic/Advanced/ChartIndependence.lean:130:5: unused variable `h_charts`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+⚠ [3022/3036] Replayed Hodge.Analytic.Integration.StokesTheorem
+warning: Hodge/Analytic/Integration/StokesTheorem.lean:85:0: automatically included section variable(s) unused in theorem `StokesTheorem.integral_cohomology_invariant`:
+  [ProjectiveComplexManifold n X]
+  [KahlerManifold n X]
+  [MeasurableSpace X]
+  [Nonempty X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ProjectiveComplexManifold n X] [KahlerManifold n X] [MeasurableSpace X] [Nonempty X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/Integration/StokesTheorem.lean:113:16: unused variable `n`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Hodge/Analytic/Integration/StokesTheorem.lean:116:0: automatically included section variable(s) unused in theorem `StokesTheorem.boundary_empty`:
+  [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+  [IsManifold (𝓒_complex n) ⊤ X]
+  [HasLocallyConstantCharts n X]
+  [ProjectiveComplexManifold n X]
+  [KahlerManifold n X]
+  [MeasurableSpace X]
+  [Nonempty X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ChartedSpace (EuclideanSpace ℂ (Fin n))
+  X] [IsManifold (𝓒_complex n) ⊤
+  X] [HasLocallyConstantCharts n
+  X] [ProjectiveComplexManifold n X] [KahlerManifold n X] [MeasurableSpace X] [Nonempty X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+⚠ [3023/3036] Replayed Hodge.Analytic.Integration.PairingConnection
+warning: Hodge/Analytic/Integration/PairingConnection.lean:74:0: automatically included section variable(s) unused in theorem `intersectionPairing_stokes_left`:
+  [ProjectiveComplexManifold n X]
+  K
+  [MeasurableSpace X]
+  [Nonempty X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ProjectiveComplexManifold n X] K [MeasurableSpace X] [Nonempty X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/Integration/PairingConnection.lean:87:0: automatically included section variable(s) unused in theorem `intersectionPairing_stokes_right`:
+  [ProjectiveComplexManifold n X]
+  K
+  [MeasurableSpace X]
+  [Nonempty X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ProjectiveComplexManifold n X] K [MeasurableSpace X] [Nonempty X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/Integration/PairingConnection.lean:104:0: automatically included section variable(s) unused in theorem `intersectionPairing_descends`:
+  [ProjectiveComplexManifold n X]
+  K
+  [MeasurableSpace X]
+  [Nonempty X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ProjectiveComplexManifold n X] K [MeasurableSpace X] [Nonempty X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/Integration/PairingConnection.lean:130:0: automatically included section variable(s) unused in theorem `pairingCohomology_linear_left`:
+  [ProjectiveComplexManifold n X]
+  K
+  [MeasurableSpace X]
+  [Nonempty X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ProjectiveComplexManifold n X] K [MeasurableSpace X] [Nonempty X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/Integration/PairingConnection.lean:141:0: automatically included section variable(s) unused in theorem `pairingCohomology_linear_right`:
+  [ProjectiveComplexManifold n X]
+  K
+  [MeasurableSpace X]
+  [Nonempty X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ProjectiveComplexManifold n X] K [MeasurableSpace X] [Nonempty X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/Analytic/Integration/PairingConnection.lean:156:0: automatically included section variable(s) unused in theorem `pairingCohomology_nondegenerate`:
+  [ProjectiveComplexManifold n X]
+  K
+  [MeasurableSpace X]
+  [Nonempty X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ProjectiveComplexManifold n X] K [MeasurableSpace X] [Nonempty X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+⚠ [3026/3036] Replayed Hodge.Classical.HarveyLawson
+warning: Hodge/Classical/HarveyLawson.lean:77:18: unused variable `T`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Hodge/Classical/HarveyLawson.lean:151:7: unused variable `h_cycles`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Hodge/Classical/HarveyLawson.lean:152:7: unused variable `h_conv`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Hodge/Classical/HarveyLawson.lean:156:9: declaration uses 'sorry'
+warning: Hodge/Classical/HarveyLawson.lean:168:9: declaration uses 'sorry'
+warning: Hodge/Classical/HarveyLawson.lean:168:9: declaration uses 'sorry'
+⚠ [3031/3036] Replayed Hodge.Classical.CycleClass
+warning: Hodge/Classical/CycleClass.lean:80:0: declaration uses 'sorry'
+warning: Hodge/Classical/CycleClass.lean:80:0: declaration uses 'sorry'
+warning: Hodge/Classical/CycleClass.lean:80:0: declaration uses 'sorry'
+warning: Hodge/Classical/CycleClass.lean:80:0: declaration uses 'sorry'
+warning: Hodge/Classical/CycleClass.lean:80:0: declaration uses 'sorry'
+warning: Hodge/Classical/CycleClass.lean:80:0: declaration uses 'sorry'
+warning: Hodge/Classical/CycleClass.lean:80:0: declaration uses 'sorry'
+warning: Hodge/Classical/CycleClass.lean:80:0: declaration uses 'sorry'
+warning: Hodge/Classical/CycleClass.lean:80:0: declaration uses 'sorry'
+warning: Hodge/Classical/CycleClass.lean:80:0: declaration uses 'sorry'
+warning: Hodge/Classical/CycleClass.lean:112:9: declaration uses 'sorry'
+warning: Hodge/Classical/CycleClass.lean:131:8: automatically included section variable(s) unused in theorem `_private.Hodge.Classical.CycleClass.0.CycleClass.isFormClosed_castForm`:
+  [ProjectiveComplexManifold n X]
+  K
+  [MeasurableSpace X]
+  [Nonempty X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [ProjectiveComplexManifold n X] K [MeasurableSpace X] [Nonempty X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+⚠ [3034/3036] Replayed Hodge.GMT.IntegrationCurrent
+warning: Hodge/GMT/IntegrationCurrent.lean:91:47: unused variable `Z`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Hodge/GMT/IntegrationCurrent.lean:115:0: automatically included section variable(s) unused in theorem `Hodge.GMT.integrationCurrentK_empty`:
+  [MeasurableSpace X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [MeasurableSpace X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/GMT/IntegrationCurrent.lean:125:0: automatically included section variable(s) unused in theorem `Hodge.GMT.integrationCurrentK_linear`:
+  [MeasurableSpace X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [MeasurableSpace X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: Hodge/GMT/IntegrationCurrent.lean:133:0: automatically included section variable(s) unused in theorem `Hodge.GMT.integrationCurrent_linear`:
+  [MeasurableSpace X]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [MeasurableSpace X] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+✖ [3036/3036] Building Hodge.Kahler.Microstructure (3.3s)
+trace: .> LEAN_PATH=/Users/jonathanwashburn/Projects/hodge/.lake/packages/Cli/.lake/build/lib/lean:/Users/jonathanwashburn/Projects/hodge/.lake/packages/batteries/.lake/build/lib/lean:/Users/jonathanwashburn/Projects/hodge/.lake/packages/Qq/.lake/build/lib/lean:/Users/jonathanwashburn/Projects/hodge/.lake/packages/aesop/.lake/build/lib/lean:/Users/jonathanwashburn/Projects/hodge/.lake/packages/proofwidgets/.lake/build/lib/lean:/Users/jonathanwashburn/Projects/hodge/.lake/packages/importGraph/.lake/build/lib/lean:/Users/jonathanwashburn/Projects/hodge/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/Users/jonathanwashburn/Projects/hodge/.lake/packages/plausible/.lake/build/lib/lean:/Users/jonathanwashburn/Projects/hodge/.lake/packages/mathlib/.lake/build/lib/lean:/Users/jonathanwashburn/Projects/hodge/.lake/build/lib/lean /Users/jonathanwashburn/.elan/toolchains/leanprover--lean4---v4.27.0-rc1/bin/lean /Users/jonathanwashburn/Projects/hodge/Hodge/Kahler/Microstructure.lean -o /Users/jonathanwashburn/Projects/hodge/.lake/build/lib/lean/Hodge/Kahler/Microstructure.olean -i /Users/jonathanwashburn/Projects/hodge/.lake/build/lib/lean/Hodge/Kahler/Microstructure.ilean -c /Users/jonathanwashburn/Projects/hodge/.lake/build/ir/Hodge/Kahler/Microstructure.c --setup /Users/jonathanwashburn/Projects/hodge/.lake/build/ir/Hodge/Kahler/Microstructure.setup.json --json
+error: Hodge/Kahler/Microstructure.lean:104:32: failed to synthesize instance of type class
+  PseudoMetricSpace X
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+warning: Hodge/Kahler/Microstructure.lean:107:8: declaration uses 'sorry'
+error: Hodge/Kahler/Microstructure.lean:121:15: Unknown identifier `IsComplexSubmanifold`
+
+Note: It is not possible to treat `IsComplexSubmanifold` as an implicitly bound variable here because the `autoImplicit` option is set to `false`.
+error: Hodge/Kahler/Microstructure.lean:126:2: stuck at solving universe constraint
+  ?u.18562+1 =?= max (u+1) ?u.18563
+while trying to unify
+  Type ?u.18562 : Type (?u.18562 + 1)
+with
+  Sort (max (u + 1) ?u.18563) : Type (max (u + 1) ?u.18563)
+error: Hodge/Kahler/Microstructure.lean:158:41: Unknown identifier `RawSheetSum`
+
+Note: It is not possible to treat `RawSheetSum` as an implicitly bound variable here because the `autoImplicit` option is set to `false`.
+error: Hodge/Kahler/Microstructure.lean:185:41: Unknown identifier `RawSheetSum`
+
+Note: It is not possible to treat `RawSheetSum` as an implicitly bound variable here because the `autoImplicit` option is set to `false`.
+error: Hodge/Kahler/Microstructure.lean:212:41: Unknown identifier `RawSheetSum`
+
+Note: It is not possible to treat `RawSheetSum` as an implicitly bound variable here because the `autoImplicit` option is set to `false`.
+error: Hodge/Kahler/Microstructure.lean:214:4: Unknown identifier `CycleIntegralCurrent`
+
+Note: It is not possible to treat `CycleIntegralCurrent` as an implicitly bound variable here because the `autoImplicit` option is set to `false`.
+error: Hodge/Kahler/Microstructure.lean:220:41: Unknown identifier `RawSheetSum`
+
+Note: It is not possible to treat `RawSheetSum` as an implicitly bound variable here because the `autoImplicit` option is set to `false`.
+error: Hodge/Kahler/Microstructure.lean:223:9: Unknown identifier `CycleIntegralCurrent.toIntegralCurrent`
+error: Hodge/Kahler/Microstructure.lean:244:15: Unknown identifier `RawSheetSum`
+
+Note: It is not possible to treat `RawSheetSum` as an implicitly bound variable here because the `autoImplicit` option is set to `false`.
+warning: Hodge/Kahler/Microstructure.lean:260:4: declaration uses 'sorry'
+warning: Hodge/Kahler/Microstructure.lean:260:4: declaration uses 'sorry'
+warning: Hodge/Kahler/Microstructure.lean:260:4: declaration uses 'sorry'
+error: Hodge/Kahler/Microstructure.lean:279:11: typeclass instance problem is stuck
+  Nonempty ?m.89
+
+Note: Lean will not try to resolve this typeclass instance problem because the type argument to `Nonempty` is a metavariable. This argument must be fully determined before Lean will try to resolve the typeclass.
+
+Hint: Adding type annotations and supplying implicit arguments to functions can give Lean more information for typeclass resolution. For example, if you have a variable `x` that you intend to be a `Nat`, but Lean reports it as having an unresolved type like `?m`, replacing `x` with `(x : Nat)` can get typeclass resolution un-stuck.
+error: Hodge/Kahler/Microstructure.lean:289:41: Unknown identifier `RawSheetSum`
+
+Note: It is not possible to treat `RawSheetSum` as an implicitly bound variable here because the `autoImplicit` option is set to `false`.
+error: Hodge/Kahler/Microstructure.lean:297:41: Unknown identifier `RawSheetSum`
+
+Note: It is not possible to treat `RawSheetSum` as an implicitly bound variable here because the `autoImplicit` option is set to `false`.
+error: Hodge/Kahler/Microstructure.lean:305:41: Unknown identifier `RawSheetSum`
+
+Note: It is not possible to treat `RawSheetSum` as an implicitly bound variable here because the `autoImplicit` option is set to `false`.
+error: Hodge/Kahler/Microstructure.lean:317:41: Unknown identifier `RawSheetSum`
+
+Note: It is not possible to treat `RawSheetSum` as an implicitly bound variable here because the `autoImplicit` option is set to `false`.
+error: Hodge/Kahler/Microstructure.lean:319:41: unsolved goals
+n : ℕ
+X : Type u
+inst✝⁷ : TopologicalSpace X
+inst✝⁶ : ChartedSpace (EuclideanSpace ℂ (Fin n)) X
+inst✝⁵ : IsManifold (𝓒_complex n) ⊤ X
+inst✝⁴ : HasLocallyConstantCharts n X
+inst✝³ : ProjectiveComplexManifold n X
+K : KahlerManifold n X
+inst✝² : MeasurableSpace X
+inst✝¹ : Nonempty X
+p : ℕ
+hscale : ℝ
+C : Cubulation n X hscale
+T_raw : sorry
+inst✝ : SheetUnionStokesData n X (2 * (n - p) - 1) sorry
+⊢ sorry
+warning: Hodge/Kahler/Microstructure.lean:326:8: declaration uses 'sorry'
+warning: Hodge/Kahler/Microstructure.lean:337:8: declaration uses 'sorry'
+warning: Hodge/Kahler/Microstructure.lean:365:8: declaration uses 'sorry'
+warning: Hodge/Kahler/Microstructure.lean:379:8: declaration uses 'sorry'
+error: Hodge/Kahler/Microstructure.lean:400:41: Unknown identifier `RawSheetSum`
+
+Note: It is not possible to treat `RawSheetSum` as an implicitly bound variable here because the `autoImplicit` option is set to `false`.
+warning: Hodge/Kahler/Microstructure.lean:429:8: declaration uses 'sorry'
+warning: Hodge/Kahler/Microstructure.lean:438:2: 'apply RawSheetSum.hasStokesProperty _ hk' tactic does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: Hodge/Kahler/Microstructure.lean:445:8: declaration uses 'sorry'
+warning: Hodge/Kahler/Microstructure.lean:463:8: declaration uses 'sorry'
+warning: Hodge/Kahler/Microstructure.lean:466:17: unused variable `hφ`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Hodge/Kahler/Microstructure.lean:467:5: unused variable `h_conv`
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: Hodge/Kahler/Microstructure.lean:482:8: declaration uses 'sorry'
+error: Hodge/Kahler/Microstructure.lean:519:47: Unknown identifier `Hodge.RawSheetSum`
+error: Hodge/Kahler/Microstructure.lean:523:4: failed to synthesize instance of type class
+  AddGroup ℕ
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+error: Hodge/Kahler/Microstructure.lean:527:47: Unknown identifier `Hodge.RawSheetSum`
+error: Hodge/Kahler/Microstructure.lean:528:4: Unknown identifier `Hodge.RawSheetSumZeroBound`
+error: Hodge/Kahler/Microstructure.lean:534:47: Unknown identifier `Hodge.RawSheetSum`
+error: Hodge/Kahler/Microstructure.lean:542:8: Unknown identifier `Hodge.RawSheetSumZeroBound.integral_zero_bound`
+warning: Hodge/Kahler/Microstructure.lean:545:8: declaration uses 'sorry'
+warning: Hodge/Kahler/Microstructure.lean:553:8: declaration uses 'sorry'
+error: Lean exited with code 1
+Some required targets logged failures:
+- Hodge.Kahler.Microstructure
+error: build failed

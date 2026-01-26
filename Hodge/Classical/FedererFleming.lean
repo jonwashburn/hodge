@@ -53,18 +53,30 @@ noncomputable def boundaryHL {k : ℕ} (T : Current n X k) : Current n X (k - 1)
   | 0 => 0
   | k' + 1 => Current.boundary T
 
+/-- **Compactness data** for flat-norm limits. -/
+class FlatLimitExistenceData (n : ℕ) (X : Type*) (k : ℕ)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] : Prop where
+  flat_limit_existence :
+    ∀ (T_seq : ℕ → IntegralCurrent n X k)
+      (M : ℝ)
+      (hM : ∀ j, (T_seq j : Current n X k).mass + (boundaryHL (T_seq j : Current n X k)).mass ≤ M),
+      ∃ (T_limit : IntegralCurrent n X k) (φ : ℕ → ℕ),
+        StrictMono φ ∧
+        Tendsto (fun j => flatNorm ((T_seq (φ j) : Current n X k) - T_limit.toFun)) atTop (nhds 0)
+
 /-- **Federer-Fleming Compactness Theorem** (Federer-Fleming, 1960).
     Any sequence of integral currents with uniformly bounded mass and boundary mass
     has a subsequence converging in flat norm to an integral current.
 
     Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 1960]. -/
-theorem flat_limit_existence {k : ℕ}
+theorem flat_limit_existence {k : ℕ} [FlatLimitExistenceData n X k]
     (T_seq : ℕ → IntegralCurrent n X k)
     (M : ℝ) (hM : ∀ j, (T_seq j : Current n X k).mass + (boundaryHL (T_seq j : Current n X k)).mass ≤ M) :
     ∃ (T_limit : IntegralCurrent n X k) (φ : ℕ → ℕ),
       StrictMono φ ∧
       Tendsto (fun j => flatNorm ((T_seq (φ j) : Current n X k) - T_limit.toFun)) atTop (nhds 0) := by
-  -- In the real track, this is the Federer-Fleming compactness theorem.
-  sorry
+  exact FlatLimitExistenceData.flat_limit_existence (n := n) (X := X) (k := k) T_seq M hM
 
 end

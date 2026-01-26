@@ -930,7 +930,7 @@ theorem setIntegral_bound {n : ℕ} {X : Type*} (k : ℕ)
     [MeasurableSpace X] [Nonempty X]
     (Z : Set X) : ∃ M : ℝ, ∀ ω : SmoothForm n X k, |setIntegral k Z ω| ≤ M * ‖ω‖ := by
   -- setIntegral = integrateDegree2p, which is bounded by (hausdorffMeasure2p (k/2) Z).toReal * ‖ω‖
-  refine ⟨(hausdorffMeasure2p (k / 2) Z).toReal, fun ω => ?_⟩
+  refine ⟨(hausdorffMeasure2p (n := n) (X := X) (k / 2) Z).toReal, fun ω => ?_⟩
   unfold setIntegral
   exact integrateDegree2p_bound k Z ω
 

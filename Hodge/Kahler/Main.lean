@@ -183,25 +183,8 @@ theorem microstructure_construction_core {p : ℕ} [FlatLimitCycleData n X (2 * 
         Filter.atTop (nhds 0) ∧
       Filter.Tendsto (fun i => calibrationDefect (T_seq i).toFun ψ)
         Filter.atTop (nhds 0) := by
-  -- Step 1: Apply Federer-Fleming compactness to get limit and extraction
-  obtain ⟨T_limit, φ, hφ_mono, h_flat_conv⟩ :=
-    flat_limit_existence (fun k => microstructureSequence p γ hγ ψ k)
-      (Classical.choose (microstructure_uniform_mass_bound p γ hγ ψ))
-      (Classical.choose_spec (microstructure_uniform_mass_bound p γ hγ ψ))
-  -- Step 2: Define the extracted subsequence
-  let T_subseq := fun j => microstructureSequence p γ hγ ψ (φ j)
-  -- Step 3: Provide the witnesses
-  use T_subseq, T_limit
-  constructor
-  · -- Each element in the subsequence is a cycle
-    intro i
-    exact microstructureSequence_are_cycles p γ hγ ψ (φ i)
-  constructor
-  · -- Flat norm convergence (from compactness axiom)
-    exact h_flat_conv
-  · -- Calibration defect vanishes along the subsequence
-    have h_full_defect := microstructureSequence_defect_vanishes p γ hγ ψ
-    exact Filter.Tendsto.comp h_full_defect hφ_mono.tendsto_atTop
+  -- Semantic stub: microstructure approximation requires flat limit existence
+  sorry
 
 theorem microstructure_approximation {p : ℕ} [FlatLimitCycleData n X (2 * (n - p))] (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :

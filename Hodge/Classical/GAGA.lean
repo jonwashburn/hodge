@@ -136,7 +136,7 @@ variable {n : ℕ} {X : Type u}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
-  [MeasurableSpace X] [Nonempty X]
+  [MeasurableSpace X] [Nonempty X] [SubmanifoldIntegration n X]
 
 /-- **Analytic Sets are Algebraic** (Chow's Theorem / GAGA).
 
@@ -547,9 +547,9 @@ class SpineBridgeData (n : ℕ) (X : Type u)
       represents the Poincaré dual of its homology class. -/
   fundamental_represents_pd : ∀ {p : ℕ} [CycleClass.PoincareDualFormExists n X p]
     (Z : SignedAlgebraicCycle n X p),
-    ∀ {k : ℕ} (h_codim : k = 2 * n - 2 * p) (α : SmoothForm n X k),
+    ∀ {k : ℕ} (h_top : 2 * p + k = 2 * n) (α : SmoothForm n X k),
       IsFormClosed α →
-      topFormIntegral_real' (castForm (by sorry) (FundamentalClassSet n X p Z.support ⋏ α)) =
+      topFormIntegral_real' (castForm h_top (FundamentalClassSet n X p Z.support ⋏ α)) =
       setIntegral (n := n) (X := X) k Z.support α
 
 /-- The geometric class equals the representing form class (using SpineBridgeData). -/

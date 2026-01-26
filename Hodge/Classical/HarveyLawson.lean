@@ -153,9 +153,6 @@ class FlatLimitCycleData (n : ℕ) (X : Type*) (k : ℕ)
                 Filter.atTop (nhds 0)),
       T_limit.isCycleAt
 
-instance FlatLimitCycleData.universal {k : ℕ} : FlatLimitCycleData n X k where
-  flat_limit_of_cycles_is_cycle := fun _ _ _ _ => sorry
-
 theorem flat_limit_of_cycles_is_cycle {k : ℕ} [FlatLimitCycleData n X k]
     (T_seq : ℕ → IntegralCurrent n X k)
     (T_limit : IntegralCurrent n X k)
@@ -164,10 +161,6 @@ theorem flat_limit_of_cycles_is_cycle {k : ℕ} [FlatLimitCycleData n X k]
               Filter.atTop (nhds 0)) :
     T_limit.isCycleAt :=
   FlatLimitCycleData.flat_limit_of_cycles_is_cycle T_seq T_limit h_cycles h_conv
-
-instance HarveyLawsonKingData.universal {k : ℕ} : HarveyLawsonKingData n X k where
-  decompose := fun _ => Classical.choose (sorry : ∃ (x : HarveyLawsonConclusion n X k), True)
-  represents_input := fun _ => sorry
 
 /-- **Corollary: Any calibrated limit from the microstructure is a cycle** -/
 theorem calibrated_limit_is_cycle {k : ℕ} [FlatLimitCycleData n X k]
