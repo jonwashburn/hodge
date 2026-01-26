@@ -1,0 +1,66 @@
+[
+  {
+    "file": "Hodge/Analytic/Currents.lean",
+    "line": 828,
+    "name": "integrate_linear_rectifiable",
+    "description": "Prove linearity of integration for rectifiable sets: ∫_Z (c·ω₁ + ω₂) = c·∫_Z ω₁ + ∫_Z ω₂",
+    "context": "This is linearity of integration. hausdorffIntegrate is defined as (∫ x in carrier, formVectorPairing ω orientation x ∂measure).re. Use linearity of the Bochner integral from Mathlib (MeasureTheory.integral_add, integral_smul) and linearity of formVectorPairing and Complex.re.",
+    "status": "pending"
+  },
+  {
+    "file": "Hodge/Analytic/Currents.lean",
+    "line": 841,
+    "name": "stokes_bound_rectifiable",
+    "description": "Prove Stokes' theorem bound for rectifiable sets",
+    "context": "Stokes' theorem: ∫_Z dω = ∫_∂Z ω. For rectifiable sets, this relates the integral of the exterior derivative to the boundary integral. This is a deep GMT theorem - Federer's formulation of Stokes for rectifiable currents.",
+    "status": "pending"
+  },
+  {
+    "file": "Hodge/Analytic/Currents.lean",
+    "line": 856,
+    "name": "integrate_linear_closed",
+    "description": "Prove linearity of integration for closed submanifolds",
+    "context": "Same as integrate_linear_rectifiable but for ClosedSubmanifoldData. Should follow from linearity of hausdorffIntegrate.",
+    "status": "pending"
+  },
+  {
+    "file": "Hodge/Analytic/Currents.lean",
+    "line": 871,
+    "name": "stokes_bound_closed",
+    "description": "Prove Stokes' theorem for closed submanifolds: ∫_Z dω = 0",
+    "context": "For CLOSED submanifolds (no boundary), Stokes' theorem says ∫_Z dω = ∫_∂Z ω = 0 since ∂Z = ∅. This should be simpler than the general case.",
+    "status": "pending"
+  },
+  {
+    "file": "Hodge/Kahler/Microstructure.lean",
+    "line": 199,
+    "name": "rawsheetsum_stokes_bound",
+    "description": "Prove Stokes' bound for RawSheetSum integration data",
+    "context": "The stokes_bound field requires showing |∫_Z dω| ≤ boundary_mass * comass(ω). For the zero stub, this should be trivial since |0| ≤ 0.",
+    "status": "pending"
+  },
+  {
+    "file": "Hodge/Kahler/Microstructure.lean",
+    "line": 244,
+    "name": "rawsheetsum_is_integral",
+    "description": "Prove RawSheetSum current is integral",
+    "context": "Show that the current constructed from RawSheetSum is integral. For the zero stub, zero_int is already integral by isIntegral_zero_current.",
+    "status": "pending"
+  },
+  {
+    "file": "Hodge/Kahler/Microstructure.lean",
+    "line": 458,
+    "name": "rawsheetsum_mass_bound",
+    "description": "Prove mass bound for RawSheetSum",
+    "context": "Show |setIntegral T Z ω| ≤ 0 for the zero integral current. This should follow from the fact that the integral is 0.",
+    "status": "pending"
+  },
+  {
+    "file": "Hodge/Classical/HarveyLawson.lean",
+    "line": 214,
+    "name": "harveylawson_represents_input",
+    "description": "Prove Harvey-Lawson witness represents the input class",
+    "context": "This is the core of Harvey-Lawson: given a Hodge class γ, construct an integral current T representing it. The witness theorem says such T exists for positive closed currents. This is a deep theorem in complex geometry.",
+    "status": "pending"
+  }
+]

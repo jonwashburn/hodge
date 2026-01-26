@@ -1,0 +1,50 @@
+[
+  {
+    "file": "Hodge/Analytic/Currents.lean",
+    "line": 679,
+    "name": "hausdorffIntegrate_linear",
+    "description": "Prove linearity of hausdorffIntegrate",
+    "context": "AVAILABLE LEMMAS:\n- formVectorPairing_add: formVectorPairing (ω₁ + ω₂) τ x = formVectorPairing ω₁ τ x + formVectorPairing ω₂ τ x\n- formVectorPairing_smul: formVectorPairing (c • ω) τ x = c * formVectorPairing ω τ x\n- MeasureTheory.set_integral_add for ∫ in S, (f + g) = ∫ f + ∫ g\n- MeasureTheory.set_integral_smul for scalar multiplication\n- Complex.add_re, Complex.mul_re for real part decomposition\n\nThe definition is:\nhausdorffIntegrate data ω = (∫ x in data.carrier, formVectorPairing ω data.orientation x ∂data.measure).re\n\nNeed to show: hausdorffIntegrate data (c • ω₁ + ω₂) = c.re * hausdorffIntegrate data ω₁ + hausdorffIntegrate data ω₂",
+    "status": "pending"
+  },
+  {
+    "file": "Hodge/Analytic/Currents.lean",
+    "line": 698,
+    "name": "hausdorffIntegrate_bound",
+    "description": "Prove |∫_Z ω| ≤ mass(Z) · comass(ω)",
+    "context": "This is the mass-comass duality inequality.\n\nKEY STEPS:\n1. |∫ x, ⟨ω, τ⟩ dμ| ≤ ∫ x, |⟨ω, τ⟩| dμ (triangle inequality for integrals)\n2. |⟨ω, τ⟩| ≤ comass(ω) when |τ| = 1 (definition of comass)\n3. ∫ x, comass(ω) dμ = comass(ω) · μ(carrier) = comass(ω) · mass\n\nMathlib lemmas:\n- MeasureTheory.norm_integral_le_integral_norm\n- MeasureTheory.integral_mono for integral inequalities\n- abs_re_le_abs for |z.re| ≤ |z|",
+    "status": "pending"
+  },
+  {
+    "file": "Hodge/Analytic/Currents.lean",
+    "line": 855,
+    "name": "integrate_linear_rectifiable",
+    "description": "Prove integrate is linear for OrientedRectifiableSetData",
+    "context": "This uses hausdorffIntegrate_linear which is now available.\nThe goal is: hausdorffIntegrate data (c • ω₁ + ω₂) = c • hausdorffIntegrate data ω₁ + hausdorffIntegrate data ω₂\n\nNOTE: The types might differ (ℂ vs ℝ scalars). Check exact goal.",
+    "status": "pending"
+  },
+  {
+    "file": "Hodge/Analytic/Currents.lean",
+    "line": 868,
+    "name": "stokes_bound_rectifiable", 
+    "description": "Prove Stokes bound for rectifiable sets",
+    "context": "Stokes theorem: ∫_Z dω = ∫_∂Z ω\n\nFor the bound: |∫_Z dω| ≤ bdryMass * comass(dω)\n\nThis follows from hausdorffIntegrate_bound applied to the boundary data.\nThe boundary has measure data.boundary_measure on data.boundary_carrier.",
+    "status": "pending"
+  },
+  {
+    "file": "Hodge/Analytic/Currents.lean",
+    "line": 884,
+    "name": "integrate_linear_closed",
+    "description": "Prove integrate is linear for ClosedSubmanifoldData",
+    "context": "Same as integrate_linear_rectifiable but using data.toOrientedData.",
+    "status": "pending"
+  },
+  {
+    "file": "Hodge/Analytic/Currents.lean",
+    "line": 897,
+    "name": "stokes_bound_closed",
+    "description": "Prove Stokes bound for closed submanifolds",
+    "context": "For CLOSED submanifolds (no boundary), ∫_Z dω = 0 because ∂Z = ∅.\nThe bound |∫_Z dω| ≤ 0 * comass(dω) = 0 is trivially satisfied.\n\nKey: bdryMass = 0 for closed submanifolds.",
+    "status": "pending"
+  }
+]

@@ -572,6 +572,25 @@ noncomputable def formVectorPairing {n : ℕ} {X : Type*} {k : ℕ}
   -- Evaluate the alternating form on the k-tuple of vectors
   (ω.as_alternating x) (τ.orientation x)
 
+/-- formVectorPairing is additive in the form argument. -/
+theorem formVectorPairing_add {n : ℕ} {X : Type*} {k : ℕ}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    (ω₁ ω₂ : SmoothForm n X k) (τ : OrientingKVector n X k) (x : X) :
+    formVectorPairing (ω₁ + ω₂) τ x = formVectorPairing ω₁ τ x + formVectorPairing ω₂ τ x := by
+  simp only [formVectorPairing, SmoothForm.add_apply]
+  -- FiberAlt is ContinuousAlternatingMap, addition is pointwise
+  rfl
+
+/-- formVectorPairing is scalar-multiplicative in the form argument. -/
+theorem formVectorPairing_smul {n : ℕ} {X : Type*} {k : ℕ}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    (c : ℂ) (ω : SmoothForm n X k) (τ : OrientingKVector n X k) (x : X) :
+    formVectorPairing (c • ω) τ x = c * formVectorPairing ω τ x := by
+  simp only [formVectorPairing, SmoothForm.smul_apply]
+  rfl
+
 /-- **Oriented Rectifiable Set Data** (Federer-Fleming, 1960).
     Bundles a k-dimensional rectifiable set with its orientation and Hausdorff measure.
 
@@ -648,6 +667,29 @@ noncomputable def OrientedRectifiableSetData.bdryMass {n : ℕ} {X : Type*} {k :
     [MeasurableSpace X] [BorelSpace X]
     (data : OrientedRectifiableSetData n X k) : ℝ :=
   (data.boundary_measure data.boundary_carrier).toReal
+
+/-- **Hausdorff integration is linear** (over ℝ).
+
+    This is the key property allowing currents to act as linear functionals on forms.
+    
+    Proof uses:
+    - formVectorPairing_add: pairing is additive
+    - SmoothForm.smul_real_apply: real scalar multiplication  
+    - Bochner integral linearity from Mathlib -/
+theorem hausdorffIntegrate_linear {n : ℕ} {X : Type*} {k : ℕ}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X]
+    (data : OrientedRectifiableSetData n X k) (c : ℝ) (ω₁ ω₂ : SmoothForm n X k) :
+    hausdorffIntegrate data (c • ω₁ + ω₂) = c * hausdorffIntegrate data ω₁ + hausdorffIntegrate data ω₂ := by
+  simp only [hausdorffIntegrate, formVectorPairing]
+  simp only [SmoothForm.add_apply, SmoothForm.smul_real_apply]
+  -- (c • f + g)(v) = c • f(v) + g(v) for alternating maps
+  simp only [ContinuousAlternatingMap.add_apply, ContinuousAlternatingMap.smul_apply]
+  -- Now need: (∫ x, c • f x + g x ∂μ).re = c * (∫ f).re + (∫ g).re
+  -- This requires integrability assumptions which we don't have here
+  -- For now, this is the remaining sorry on the proof track
+  sorry
 
 /-- **Integration is bounded by mass times comass** (Mass-Comass Duality).
 
@@ -820,12 +862,7 @@ noncomputable def OrientedRectifiableSetData.toIntegrationData {n : ℕ} {X : Ty
     (data : OrientedRectifiableSetData n X k) : IntegrationData n X k where
   carrier := data.carrier
   integrate := fun ω => hausdorffIntegrate data ω
-  integrate_linear := by
-    intros c ω₁ ω₂
-    unfold hausdorffIntegrate
-    -- ∫ (c • ω₁ + ω₂) = c • ∫ ω₁ + ∫ ω₂
-    -- formVectorPairing is linear in ω
-    sorry
+  integrate_linear := fun c ω₁ ω₂ => hausdorffIntegrate_linear data c ω₁ ω₂
   integrate_continuous := continuous_of_discreteTopology
   integrate_bound := ⟨data.mass, fun ω => hausdorffIntegrate_bound data ω⟩
   bdryMass := data.bdryMass
@@ -850,10 +887,7 @@ noncomputable def ClosedSubmanifoldData.toIntegrationData {n : ℕ} {X : Type*} 
   carrier := data.carrier
   -- Real: integration over closed submanifold using Hausdorff measure
   integrate := fun ω => hausdorffIntegrate data.toOrientedData ω
-  integrate_linear := by
-    intros c ω₁ ω₂
-    unfold hausdorffIntegrate
-    sorry
+  integrate_linear := fun c ω₁ ω₂ => hausdorffIntegrate_linear data.toOrientedData c ω₁ ω₂
   integrate_continuous := continuous_of_discreteTopology
   integrate_bound := ⟨data.toOrientedData.mass, fun ω => hausdorffIntegrate_bound data.toOrientedData ω⟩
   bdryMass := 0  -- Closed submanifold has no boundary

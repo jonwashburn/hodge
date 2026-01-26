@@ -208,7 +208,7 @@ instance AutomaticSYRData.universal : AutomaticSYRData n X where
         intro _
         have heq : zero_current.toFun - zero_current.toFun = 0 := Current.sub_self zero_current.toFun
         rw [heq]; exact flatNorm_zero
-      have h_eq : (fun (i : ℕ) => flatNorm (zero_current.toFun - zero_current.toFun)) = 
+      have h_eq : (fun (i : ℕ) => flatNorm (zero_current.toFun - zero_current.toFun)) =
                    (fun (_ : ℕ) => (0 : ℝ)) := funext hfn
       rw [h_eq]; exact tendsto_const_nhds
     · -- Calibration defect: zero current has zero defect
