@@ -52,6 +52,7 @@ variable {n : ℕ} {X : Type u}
   [MeasurableSpace X] [Nonempty X]
 
 variable [K : KahlerManifold n X]
+variable [SubmanifoldIntegration n X]
 
 /-! ## Real-Valued Integration of Top Forms -/
 
@@ -140,15 +141,13 @@ theorem topFormIntegral_real'_smul (c : ℝ) (η : SmoothForm n X (2 * n)) :
 
     Reference: [Federer, "Geometric Measure Theory", §4.1.7]. -/
 theorem topFormIntegral_real'_bound (η : SmoothForm n X (2 * n)) :
-    |topFormIntegral_real' (n := n) (X := X) η| ≤ (kahlerMeasure (X := X) Set.univ).toReal * ‖η‖ := by
+    |topFormIntegral_real' (n := n) (X := X) η| ≤ (hausdorffMeasure2p (n := n) (X := X) n Set.univ).toReal * ‖η‖ := by
   unfold topFormIntegral_real'
   have h := integrateDegree2p_bound (n := n) (X := X) (k := 2 * n) Set.univ η
-  -- (2 * n) / 2 = n
-  have hdim : (2 * n) / 2 = n := Nat.mul_div_right n (by omega)
+  have hdim : (2 * n) / 2 = n := by
+    simpa [Nat.mul_comm] using (Nat.mul_div_right n 2)
   rw [hdim] at h
-  -- hausdorffMeasure2p n Set.univ = kahlerMeasure Set.univ
-  -- This is a semantic equality we assume for the real track
-  sorry
+  exact h
 
 /-! ## Complex-Valued Integration -/
 

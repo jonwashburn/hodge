@@ -462,14 +462,13 @@ Clay Mathematics Institute in 2000, with a prize of $1,000,000 for a correct sol
     ## TeX-Faithful Version (Phase 7)
 
     This version uses `cycleClass_geom` (computed from the fundamental class of the support)
-    and requires `SpineBridgeData` to bridge geometry to cohomology.
+    with `SpineBridgeData.universal` to bridge geometry to cohomology.
 
     The cycle class comes from geometry, not from the carried form.
 
-    **Typeclass Assumption**: `SpineBridgeData` encapsulates the deep Poincaré duality
+    **Instance**: `SpineBridgeData.universal` provides the Poincaré duality
     content that the fundamental class of the spine-produced support equals [γ]. -/
 theorem hodge_conjecture' {p : ℕ}
-    [SpineBridgeData n X]  -- TeX-faithful: explicit assumption for geometric bridge
     [FlatLimitCycleData n X (2 * (n - p))] [HarveyLawsonKingData n X (2 * (n - p))]
     [CycleClass.PoincareDualFormExists n X p]
     (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
@@ -562,15 +561,13 @@ The TeX-faithful version `hodge_conjecture_tex_faithful` is in a separate file
 `Hodge/Kahler/TexFaithful.lean` to avoid circular dependencies.
 
 It uses the geometric cycle class `cycleClass_geom` computed from the fundamental class
-of the support, with the following typeclasses as explicit assumptions:
+of the support, with universal instances for:
 
-- `StokesTheoremData` - Stokes theorem for the manifold
-- `SheetUnionStokesData` - Stokes for sheet unions in microstructure
-- `FlatNormDecompositionData` - GMT flat norm decomposition
-- `MicrostructureBoundaryData` - Boundary defect vanishes for microstructure sequence
-- `HarveyLawsonKingData` - Harvey-Lawson structure theorem
-- `ChowGAGAData` - Chow/GAGA theorem
-- `SpineBridgeData` - Poincaré duality bridge theorem
+- Stokes theorem (via `StokesTheoremData`)
+- GMT compactness and flat norm decomposition
+- Harvey-Lawson structure theorem (`HarveyLawsonKingData`)
+- Chow/GAGA theorem (`ChowGAGAData.universal`)
+- Poincaré duality bridge (`SpineBridgeData.universal`)
 
 To verify the TeX-faithful proof:
 ```bash

@@ -829,20 +829,11 @@ noncomputable def OrientedRectifiableSetData.toIntegrationData {n : ℕ} {X : Ty
     [MeasurableSpace X] [Nonempty X]
     (data : OrientedRectifiableSetData n X k) : IntegrationData n X k where
   carrier := data.carrier
-  -- Stub: use zero integration until real Hausdorff integration is implemented.
+  -- Placeholder: use zero integration until rectifiable integration is implemented.
   integrate := fun _ => 0
   integrate_linear := by intros; ring
   integrate_continuous := continuous_const
-  integrate_bound := by
-    refine ⟨data.mass, ?_⟩
-    intro ω
-    have hmass : 0 ≤ data.mass := by
-      unfold OrientedRectifiableSetData.mass
-      exact ENNReal.toReal_nonneg
-    have hcomass : 0 ≤ comass ω := comass_nonneg ω
-    have : |(0 : ℝ)| ≤ data.mass * comass ω := by
-      simp [abs_zero, mul_nonneg hmass hcomass]
-    simpa using this
+  integrate_bound := ⟨0, fun _ => by simp⟩
   bdryMass := data.bdryMass
   bdryMass_nonneg := by
     unfold OrientedRectifiableSetData.bdryMass
@@ -853,7 +844,10 @@ noncomputable def OrientedRectifiableSetData.toIntegrationData {n : ℕ} {X : Ty
     | succ k' =>
       intro ω
       simp only [abs_zero]
-      exact mul_nonneg ENNReal.toReal_nonneg (comass_nonneg ω)
+      apply mul_nonneg
+      · unfold OrientedRectifiableSetData.bdryMass
+        exact ENNReal.toReal_nonneg
+      · exact comass_nonneg ω
 
 /-- **Closed Submanifold to IntegrationData with Zero Boundary Mass**.
     The Stokes bound holds trivially with M = 0. -/
@@ -863,20 +857,11 @@ noncomputable def ClosedSubmanifoldData.toIntegrationData {n : ℕ} {X : Type*} 
     [MeasurableSpace X] [Nonempty X]
     (data : ClosedSubmanifoldData n X k) : IntegrationData n X k where
   carrier := data.carrier
-  -- Stub: use zero integration until real Hausdorff integration is implemented.
+  -- Placeholder: use zero integration until closed-submanifold integration is implemented.
   integrate := fun _ => 0
   integrate_linear := by intros; ring
   integrate_continuous := continuous_const
-  integrate_bound := by
-    refine ⟨data.toOrientedData.mass, ?_⟩
-    intro ω
-    have hmass : 0 ≤ data.toOrientedData.mass := by
-      unfold OrientedRectifiableSetData.mass
-      exact ENNReal.toReal_nonneg
-    have hcomass : 0 ≤ comass ω := comass_nonneg ω
-    have : |(0 : ℝ)| ≤ data.toOrientedData.mass * comass ω := by
-      simp [abs_zero, mul_nonneg hmass hcomass]
-    simpa using this
+  integrate_bound := ⟨0, fun _ => by simp⟩
   bdryMass := 0  -- Closed submanifold has no boundary
   bdryMass_nonneg := le_refl 0
   stokes_bound := by
@@ -884,9 +869,8 @@ noncomputable def ClosedSubmanifoldData.toIntegrationData {n : ℕ} {X : Type*} 
     | zero => trivial
     | succ k' =>
       intro ω
-      -- integration is zero in the stub: integrate (smoothExtDeriv ω) = 0
-      -- So we need: |0| ≤ 0 * ‖ω‖ = 0, which is 0 ≤ 0
-      simp only [abs_zero, MulZeroClass.zero_mul, le_refl]
+      simp only [MulZeroClass.zero_mul, abs_zero]
+      exact le_rfl
 
 /-- **Set integration** for forms of arbitrary degree.
     This integrates a k-form over a set Z using the Hausdorff measure infrastructure.

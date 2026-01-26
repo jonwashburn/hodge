@@ -302,12 +302,12 @@ theorem RawSheetSum.toIntegralCurrent_toFun_eq_real {p : ℕ} {hscale : ℝ}
   -- In the real track, this is an identity by definition.
   sorry
 
-/-- The underlying current of toIntegralCurrent is real (legacy name). -/
-theorem RawSheetSum.toIntegralCurrent_toFun_eq_zero {p : ℕ} {hscale : ℝ}
+/-- The underlying current of toIntegralCurrent equals setIntegral over support. -/
+theorem RawSheetSum.toIntegralCurrent_toFun_is_setIntegral {p : ℕ} {hscale : ℝ}
     {C : Cubulation n X hscale} (T_raw : RawSheetSum n X p hscale C)
     [SheetUnionStokesData n X (2 * (n - p) - 1) T_raw.support] :
     T_raw.toIntegralCurrent.toFun.toFun = setIntegral (n := n) (X := X) (2 * (n - p)) T_raw.support := by
-  -- In the real track, this is an identity by definition.
+  -- Real implementation uses setIntegral over the sheet support
   sorry
 
 /-- **Theorem: Sheet sums over complex submanifolds are automatically closed**.
@@ -328,8 +328,8 @@ theorem microstructureSequence_is_real (p : ℕ) (_γ : SmoothForm n X (2 * p))
     (_hγ : isConePositive _γ) (_ψ : CalibratingForm n X (2 * (n - p))) :
     True := trivial  -- Semantic stub
 
-/-- **Theorem: Microstructure sequence elements are real currents (legacy name)**. -/
-theorem microstructureSequence_is_zero (p : ℕ) (_γ : SmoothForm n X (2 * p))
+/-- **Theorem: Microstructure currents are real integration currents** (semantic stub). -/
+theorem microstructureSequence_currents_are_real (p : ℕ) (_γ : SmoothForm n X (2 * p))
     (_hγ : isConePositive _γ) (_ψ : CalibratingForm n X (2 * (n - p))) :
     True := trivial  -- Semantic stub
 
@@ -353,8 +353,8 @@ theorem microstructureSequence_limit_is_real (p : ℕ) (_γ : SmoothForm n X (2 
     (_φ : ℕ → ℕ) (_hφ : StrictMono _φ) (_hk : 2 * (n - p) ≥ 1) :
     True := trivial  -- Semantic stub
 
-/-- **Theorem: The limit current (from flat norm convergence) is real (legacy name)**. -/
-theorem microstructureSequence_limit_is_zero (p : ℕ) (_γ : SmoothForm n X (2 * p))
+/-- **Theorem: Microstructure limit is a real current** (semantic stub). -/
+theorem microstructureSequence_limit_is_real_legacy (p : ℕ) (_γ : SmoothForm n X (2 * p))
     (_hγ : isConePositive _γ) (_ψ : CalibratingForm n X (2 * (n - p)))
     (_T_limit : IntegralCurrent n X (2 * (n - p)))
     (_φ : ℕ → ℕ) (_hφ : StrictMono _φ) (_hk : 2 * (n - p) ≥ 1) :

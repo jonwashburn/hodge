@@ -94,10 +94,9 @@ class ChowGAGAData (n : ℕ) (X : Type*)
     Given an analytic subvariety V, produce an algebraic subvariety with the same carrier. -/
 def analyticToAlgebraic [ChowGAGAData n X] (V : AnalyticSubvariety n X) :
     AlgebraicSubvariety n X :=
-  ⟨V.carrier,
-   V.codim,
-   -- Use the existing bridge theorem (which is currently based on inductive definitions)
-   IsAnalyticSet_isAlgebraicSet V.carrier V.is_analytic⟩
+  -- Use ChowGAGAData typeclass for the conversion
+  let ⟨W, h_carrier, _⟩ := ChowGAGAData.analytic_to_algebraic V
+  ⟨V.carrier, V.codim, by rw [← h_carrier]; exact W.is_algebraic⟩
 
 /-- The conversion preserves the carrier. -/
 theorem analyticToAlgebraic_carrier [ChowGAGAData n X] (V : AnalyticSubvariety n X) :
@@ -107,25 +106,32 @@ theorem analyticToAlgebraic_carrier [ChowGAGAData n X] (V : AnalyticSubvariety n
 theorem analyticToAlgebraic_codim [ChowGAGAData n X] (V : AnalyticSubvariety n X) :
     (analyticToAlgebraic V).codim = V.codim := rfl
 
-/-! ## Instance from Existing Bridge
+/-! ## Universal Instance
 
-The existing `IsAnalyticSet_isAlgebraicSet` provides an instance automatically,
-though it's based on the "semantic shortcut" of matching inductive definitions.
+The universal instance of `ChowGAGAData` packages the deep algebraic geometry
+content of Chow's theorem and Serre's GAGA principle.
 -/
 
-/-- **Trivial instance from existing bridge**.
+/-- **Universal instance of ChowGAGAData**.
 
-    This instance uses the existing `IsAnalyticSet_isAlgebraicSet` theorem.
-    It's "trivial" in the sense that both sides are defined inductively with
-    the same constructors, so the proof is just a direct structural map.
+    This provides a default instance for Chow/GAGA using sorry-based proofs.
+    The mathematical content is Chow's theorem and Serre's GAGA principle.
 
-    For a "real" instance, we would need to:
+    **Mathematical Content**:
+    - Chow's theorem: Every closed analytic subset of projective space is algebraic
+    - Serre's GAGA: Analytic and algebraic categories coincide on projective varieties
+
+    **Status**: The real proof would require deep algebraic geometry:
     1. Define analytic sets as local zero loci of holomorphic functions
     2. Define algebraic sets as global zero loci of polynomials
-    3. Prove Chow's theorem: closed analytic → algebraic -/
-instance instChowGAGAData_trivial : ChowGAGAData n X where
-  analytic_to_algebraic := fun V =>
-    ⟨⟨V.carrier, V.codim, IsAnalyticSet_isAlgebraicSet V.carrier V.is_analytic⟩, rfl, rfl⟩
+    3. Prove Chow's theorem using complex analytic geometry
+
+    Reference: [W.-L. Chow, "On compact complex analytic varieties", Amer. J. Math. 71 (1949)]
+    Reference: [J.-P. Serre, "GAGA", Ann. Inst. Fourier 6 (1956)] -/
+instance ChowGAGAData.universal : ChowGAGAData n X where
+  analytic_to_algebraic := fun V => by
+    -- Deep algebraic geometry theorem: Chow/GAGA
+    exact ⟨⟨V.carrier, V.codim, sorry⟩, rfl, rfl⟩
 
 /-! ## Application to Harvey-Lawson Decomposition
 
@@ -148,10 +154,14 @@ theorem harveyLawson_varieties_algebraic [ChowGAGAData n X] {k : ℕ}
 theorem harveyLawson_support_algebraic [ChowGAGAData n X] {k : ℕ}
     {T : Current n X k}
     (concl : HarveyLawsonKing.HarveyLawsonConclusion_real n X k T) :
-    IsAlgebraicSet n X concl.support :=
+    IsAlgebraicSet n X concl.support := by
   -- concl.support is analytic (finite union of analytic sets)
-  -- Analytic sets are algebraic by GAGA
-  IsAnalyticSet_isAlgebraicSet concl.support concl.support_isAnalytic
+  -- Apply Chow/GAGA: analytic → algebraic
+  let V : AnalyticSubvariety n X := ⟨concl.support, 0, concl.support_isAnalytic⟩
+  have h := ChowGAGAData.analytic_to_algebraic V
+  obtain ⟨W, h_carrier, _⟩ := h
+  rw [← h_carrier]
+  exact W.is_algebraic
 
 /-! ## Full Spine: Harvey-Lawson + GAGA → Algebraic Cycle
 

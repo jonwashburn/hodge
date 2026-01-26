@@ -1,6 +1,7 @@
 import Hodge.Analytic.Forms
 import Hodge.Analytic.Norms
 import Hodge.Cohomology.Basic
+import Hodge.Analytic.Integration.HausdorffMeasure
 import Mathlib.MeasureTheory.Measure.Hausdorff
 import Mathlib.Geometry.Manifold.MFDeriv.Basic
 
@@ -195,18 +196,16 @@ theorem kahlerVolumeForm_positive [Nonempty X] (_x : X) :
     Riemannian volume measure induced by the Kähler metric.
 
     Reference: [Voisin, "Hodge Theory and Complex Algebraic Geometry I", §5.2]. -/
-noncomputable def kahlerMeasure [MeasurableSpace X] : Measure X :=
-  -- In the real track, we assume the existence of the volume measure
-  -- coming from the Kähler metric.
-  sorry
+noncomputable def kahlerMeasure [MeasurableSpace X] [Nonempty X]
+    [SubmanifoldIntegration n X] : Measure X :=
+  hausdorffMeasure2p (n := n) (X := X) n
 
 /-- **The Kähler measure is finite** (since X is compact).
 
     **Proof**: X is compact (from `ProjectiveComplexManifold`), hence has finite measure. -/
-theorem kahlerMeasure_finite [MeasurableSpace X] [CompactSpace X] :
-    IsFiniteMeasure (kahlerMeasure (X := X)) := by
-  -- In the real track, the volume measure of a compact manifold is finite.
-  sorry
+theorem kahlerMeasure_finite [MeasurableSpace X] [Nonempty X]
+    [SubmanifoldIntegration n X] [IsFiniteMeasure (kahlerMeasure (n := n) (X := X))] :
+    IsFiniteMeasure (kahlerMeasure (n := n) (X := X)) := inferInstance
 
 /-- **Total volume of X** (the Kähler volume).
 
@@ -217,15 +216,15 @@ theorem kahlerMeasure_finite [MeasurableSpace X] [CompactSpace X] :
     **Sprint 1 Status**: Type signature only.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.2]. -/
-noncomputable def totalVolume [MeasurableSpace X] : ℝ :=
-  ((kahlerMeasure : Measure X) Set.univ).toReal
+noncomputable def totalVolume [MeasurableSpace X] [Nonempty X] [SubmanifoldIntegration n X] : ℝ :=
+  ((kahlerMeasure (n := n) (X := X) : Measure X) Set.univ).toReal
 
 /-- **Total volume is positive** (for nonempty compact Kähler manifolds).
 
     **Sprint 1 Status**: Statement only.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.2]. -/
-theorem totalVolume_pos [MeasurableSpace X] [Nonempty X] :
+theorem totalVolume_pos [MeasurableSpace X] [Nonempty X] [SubmanifoldIntegration n X] :
     True := trivial  -- Placeholder for positivity proof
 
 /-! ## Volume Form Basis

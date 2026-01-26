@@ -76,10 +76,11 @@ The full theorem produces:
 
     This uses the Hausdorff measure on V. -/
 def integrationCurrentOfVariety (V : AnalyticSubvariety n X) (k : ℕ) :
-    Current n X k :=
-  -- Full implementation would use integration over V.carrier
-  -- For now, use zero as placeholder
-  0
+    Current n X k := by
+  -- Full implementation would construct the integration current over V.carrier:
+  --   [V](ω) = ∫_V ω (using Hausdorff measure)
+  -- This requires deep GMT: regularity of the variety, orientation, and measure theory
+  exact sorry
 
 /-- **Weighted sum of integration currents**.
 
@@ -88,10 +89,10 @@ def integrationCurrentOfVariety (V : AnalyticSubvariety n X) (k : ℕ) :
     **Implementation**: Uses a fold over the varieties. -/
 def weightedCurrentSum {ι : Type*} [Fintype ι] (k : ℕ)
     (varieties : ι → AnalyticSubvariety n X)
-    (multiplicities : ι → ℕ+) : Current n X k :=
-  -- Full implementation would use a fold/sum over varieties
-  -- For now, return zero as placeholder
-  0
+    (multiplicities : ι → ℕ+) : Current n X k := by
+  -- Full implementation: ∑ᵢ mᵢ [Vᵢ]
+  -- Uses `integrationCurrentOfVariety` and Finset.sum
+  exact sorry
 
 /-- **Real Harvey-Lawson Conclusion** with current decomposition.
 

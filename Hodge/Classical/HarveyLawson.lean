@@ -120,14 +120,22 @@ noncomputable def integrationCurrentHL {p k : ℕ} [MeasurableSpace X]
       rw [ClosedSubmanifoldStokesData.stokes_integral_exact_zero ω, MulZeroClass.mul_zero, abs_zero]
       apply mul_nonneg (le_refl 0) (comass_nonneg _)
 
-/-- The canonical supporting variety for Harvey-Lawson: the whole manifold. -/
+/-- **Harvey-Lawson support variety** (placeholder).
+
+    The real implementation would use the regularity theory to produce
+    the actual analytic support of a calibrated current.
+
+    **Mathematical Content**: For a calibrated current T, the support is
+    an analytic variety of the correct codimension.
+
+    Reference: [Harvey-Lawson, "Calibrated geometries", Acta Math. 1982]. -/
 def harveyLawsonSupportVariety (n : ℕ) (X : Type*)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     (k : ℕ) : AnalyticSubvariety n X where
-  carrier := Set.univ
+  carrier := sorry  -- Real: support of calibrated current (analytic variety)
   codim := 2 * n - k
-  is_analytic := IsAnalyticSet.univ
+  is_analytic := sorry  -- Real: proved via regularity theory
 
 /-- **Harvey-Lawson Structure Theorem** (Harvey-Lawson, 1982). -/
 def harvey_lawson_theorem {k : ℕ} [HarveyLawsonKingData n X k]

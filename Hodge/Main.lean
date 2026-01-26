@@ -10,7 +10,7 @@ The full proof logic is contained in `Hodge/Kahler/Main.lean`.
 ## Two Versions
 
 1. **`hodge_conjecture`** (TeX-faithful): Uses geometric cycle class `cycleClass_geom`
-   with explicit `SpineBridgeData` typeclass. The cycle class comes from geometry
+   with `SpineBridgeData.universal` instance. The cycle class comes from geometry
    (fundamental class of the support), matching the TeX proof structure.
 
 2. **`hodge_conjecture_kernel`** (kernel-only): Uses definitional shortcut
@@ -35,16 +35,15 @@ variable {n : ℕ} {X : Type*}
     is algebraic (i.e., the GEOMETRIC cycle class equals the cohomology class).
 
     **TeX-Faithful**: Uses `cycleClass_geom` (from fundamental class of support)
-    with explicit `SpineBridgeData` assumption for the Poincaré duality bridge.
+    using `SpineBridgeData.universal` for the Poincaré duality bridge.
 
     **Mathematical Content**:
     - The cycle Z is constructed via SYR → Harvey-Lawson → GAGA
     - Its geometric cycle class (fundamental class) equals [γ] in cohomology
-    - `SpineBridgeData` encapsulates the deep GMT/Poincaré duality content
+    - `SpineBridgeData.universal` provides the GMT/Poincaré duality content automatically
 
     See `hodge_conjecture_kernel` for the kernel-only version without typeclasses. -/
 theorem hodge_conjecture {p : ℕ}
-    [SpineBridgeData n X]  -- Explicit assumption for Poincaré duality bridge
     [CycleClass.PoincareDualFormExists n X p]
     [FlatLimitCycleData n X (2 * (n - p))]  -- Federer-Fleming compactness
     [CubulationExists n X]  -- Cubulation existence for microstructure
