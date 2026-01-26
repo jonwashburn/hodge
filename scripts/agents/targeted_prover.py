@@ -23,6 +23,14 @@ HODGE_DIR = "/home/ubuntu/hodge"
 MAX_ITERATIONS = 30
 MODEL = "claude-sonnet-4-20250514"
 
+# Load the full mathematical paper
+PAPER_CONTENT = ""
+try:
+    with open(f"{HODGE_DIR}/JA_hodge_approach_clean_black_FINAL.tex", "r") as f:
+        PAPER_CONTENT = f.read()
+except:
+    pass
+
 def run_command(cmd, cwd=HODGE_DIR, timeout=300):
     """Run a shell command and return stdout, stderr, exit code."""
     try:
@@ -148,26 +156,38 @@ def prove_sorry(task):
     # Initial build to see current state
     build_output, _ = build_file(file_path)
     
-    system_prompt = f"""You are an expert Lean 4 prover. Your task is to prove a single theorem by replacing 'sorry' with an actual proof.
+    # Build system prompt with paper content
+    paper_section = PAPER_CONTENT[:50000] if PAPER_CONTENT else "Paper not available"
+    context_section = f"## Additional Context\n{context_info}" if context_info else ""
+    
+    system_prompt = f"""You are an expert Lean 4 prover working on the Hodge Conjecture formalization.
 
-CRITICAL RULES:
+## Your Task
+Prove the theorem `{theorem_name}` by replacing the 'sorry' with an actual proof.
+
+## Description
+{description}
+
+{context_section}
+
+## The Full Mathematical Paper (LaTeX)
+Below is the complete mathematical paper containing all proofs. Use it as reference.
+
+{paper_section}
+
+## CRITICAL RULES
 1. You can ONLY output proof tactics/terms to replace the sorry
-2. You CANNOT change definitions - only fill in proofs
-3. Use Mathlib lemmas where possible
-4. Your output will be placed exactly where the sorry is
+2. You CANNOT change definitions - only fill in proofs  
+3. Use Mathlib lemmas - search the paper for mathematical arguments
+4. The paper has the proofs - translate them to Lean
 
-The theorem you need to prove: `{theorem_name}`
-Description: {description}
-{f'Additional context: {context_info}' if context_info else ''}
-
-When you provide a proof, output ONLY the proof body in a code block:
+## Output Format
+Output ONLY the proof body in a code block:
 ```proof
 <your proof tactics here>
 ```
 
-The proof body will replace the `sorry` exactly. For example:
-- If the sorry is after `by`, provide tactics like: simp [hausdorffIntegrate]
-- If the sorry is after `:=`, provide a term like: mul_nonneg (abs_nonneg _) (comass_nonneg _)
+The proof body will replace the `sorry` exactly.
 """
 
     # Initial message

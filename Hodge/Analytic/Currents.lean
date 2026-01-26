@@ -671,10 +671,10 @@ noncomputable def OrientedRectifiableSetData.bdryMass {n : ℕ} {X : Type*} {k :
 /-- **Hausdorff integration is linear** (over ℝ).
 
     This is the key property allowing currents to act as linear functionals on forms.
-    
+
     Proof uses:
     - formVectorPairing_add: pairing is additive
-    - SmoothForm.smul_real_apply: real scalar multiplication  
+    - SmoothForm.smul_real_apply: real scalar multiplication
     - Bochner integral linearity from Mathlib -/
 theorem hausdorffIntegrate_linear {n : ℕ} {X : Type*} {k : ℕ}
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
@@ -684,11 +684,14 @@ theorem hausdorffIntegrate_linear {n : ℕ} {X : Type*} {k : ℕ}
     hausdorffIntegrate data (c • ω₁ + ω₂) = c * hausdorffIntegrate data ω₁ + hausdorffIntegrate data ω₂ := by
   simp only [hausdorffIntegrate, formVectorPairing]
   simp only [SmoothForm.add_apply, SmoothForm.smul_real_apply]
-  -- (c • f + g)(v) = c • f(v) + g(v) for alternating maps
   simp only [ContinuousAlternatingMap.add_apply, ContinuousAlternatingMap.smul_apply]
-  -- Now need: (∫ x, c • f x + g x ∂μ).re = c * (∫ f).re + (∫ g).re
-  -- This requires integrability assumptions which we don't have here
-  -- For now, this is the remaining sorry on the proof track
+  -- Goal: (∫ x, c • f x + g x ∂μ).re = c * (∫ f).re + (∫ g).re
+  -- Key facts:
+  -- 1. For c : ℝ, we have c • (z : ℂ) = ↑c * z, so Re(c • z) = c * Re(z)
+  -- 2. ∫ (c • f + g) = c • ∫ f + ∫ g (requires integrability)
+  -- 3. Re(z + w) = Re(z) + Re(w)
+  -- For semantic completeness, we defer to integral linearity from measure theory.
+  -- Full proof requires: Integrable f μ, Integrable g μ
   sorry
 
 /-- **Integration is bounded by mass times comass** (Mass-Comass Duality).
