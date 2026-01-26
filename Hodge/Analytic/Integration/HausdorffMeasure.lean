@@ -28,7 +28,7 @@ variable {n : ℕ} {X : Type u}
   [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
-  [MeasurableSpace X] [Nonempty X]
+  [MeasurableSpace X] [Nonempty X] [MetricSpace X] [BorelSpace X]
 
 /-! ## Submanifold Integration Typeclass -/
 
@@ -57,15 +57,16 @@ class SubmanifoldIntegration (n : ℕ) (X : Type u)
   integral_bound : ∀ (p : ℕ) (ω : SmoothForm n X (2 * p)) (Z : Set X),
     |integral p ω Z| ≤ (measure2p p Z).toReal * ‖ω‖
 
-/-- Universal instance using placeholder implementation.
-    All fields are trivially satisfied since integral returns 0. -/
+/-- Universal instance using real Hausdorff measure.
+    The integral is currently `sorry` pending the implementation of
+    oriented tangent plane pairing. -/
 instance SubmanifoldIntegration.universal : SubmanifoldIntegration n X where
-  measure2p := fun _ => 0
-  integral := fun _ _ _ => 0
-  integral_linear := fun _ _ _ _ _ => by simp
-  integral_union := fun _ _ _ _ _ _ _ => by simp
-  integral_empty := fun _ _ => by rfl
-  integral_bound := fun _ ω _ => by simp [comass_nonneg ω]
+  measure2p := fun p => Measure.hausdorffMeasure (2 * p)
+  integral := fun _ _ _ => sorry
+  integral_linear := fun _ _ _ _ _ => sorry
+  integral_union := fun _ _ _ _ _ _ _ => sorry
+  integral_empty := fun _ _ => sorry
+  integral_bound := fun _ _ _ => sorry
 
 /-! ## Hausdorff Measure on Submanifolds -/
 
@@ -247,7 +248,8 @@ theorem submanifoldIntegral_bound {p : ℕ} [SubmanifoldIntegration n X]
   apply submanifoldIntegral_abs_le
 
 /-- **Degree-2p integration is bounded**. -/
-theorem integrateDegree2p_bound (k : ℕ) (Z : Set X) (ω : SmoothForm n X k) :
+theorem integrateDegree2p_bound (k : ℕ) (Z : Set X) (ω : SmoothForm n X k)
+    [SubmanifoldIntegration n X] :
     |integrateDegree2p (n := n) (X := X) k Z ω| ≤ (hausdorffMeasure2p (n := n) (X := X) (k / 2) Z).toReal * ‖ω‖ := by
   unfold integrateDegree2p
   by_cases hk : 2 ∣ k
