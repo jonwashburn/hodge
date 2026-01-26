@@ -51,9 +51,9 @@ set_option autoImplicit false
 universe u
 
 variable {n : ℕ} {X : Type u}
-  [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+  [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-  [ProjectiveComplexManifold n X]
+  [ProjectiveComplexManifold n X] [MeasurableSpace X] [BorelSpace X]
 
 /-! ## Iterated Wedge Product of Kähler Form -/
 

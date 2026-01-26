@@ -15,10 +15,10 @@ open Classical Filter Topology Hodge
 set_option autoImplicit false
 
 variable {n : ℕ} {X : Type*}
-  [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+  [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X]
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
-  [Nonempty X]
+  [Nonempty X] [MeasurableSpace X] [BorelSpace X]
 
 /-- A calibrating form is a closed form with comass at most 1. -/
 structure CalibratingForm (n : ℕ) (X : Type*) (k : ℕ)

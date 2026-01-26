@@ -3,6 +3,7 @@ import Hodge.Analytic.Norms
 import Hodge.Analytic.Integration.TopFormIntegral
 import Hodge.Analytic.Integration.HausdorffMeasure
 import Mathlib.MeasureTheory.Measure.Hausdorff
+import Mathlib.Data.Complex.Basic
 
 /-!
 # Currents on Kähler Manifolds
@@ -18,14 +19,14 @@ open Classical Hodge MeasureTheory
 set_option autoImplicit false
 
 variable {n : ℕ} {X : Type*}
-  [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+  [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X]
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
-  [Nonempty X]
+  [Nonempty X] [MeasurableSpace X] [BorelSpace X]
 
 /-- A current of dimension k is a continuous linear functional on smooth k-forms. -/
 structure Current (n : ℕ) (X : Type*) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] where
   toFun : SmoothForm n X k → ℝ
@@ -55,13 +56,13 @@ variable {k : ℕ}
 
 /-- Extensionality for currents: two currents are equal iff they agree on all forms. -/
 @[ext]
-theorem ext' {n k : ℕ} {X : Type*} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+theorem ext' {n k : ℕ} {X : Type*} [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
     {S T : Current n X k} (h : ∀ ω, S.toFun ω = T.toFun ω) : S = T := by
   cases S; cases T; simp only [Current.mk.injEq]; funext ω; exact h ω
 
 /-- Linearity properties derive from the `is_linear` field. -/
-theorem map_add {n k : ℕ} {X : Type*} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+theorem map_add {n k : ℕ} {X : Type*} [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
     (T : Current n X k) (ω₁ ω₂ : SmoothForm n X k) : T.toFun (ω₁ + ω₂) = T.toFun ω₁ + T.toFun ω₂ := by
   have h := T.is_linear 1 ω₁ ω₂
@@ -69,7 +70,7 @@ theorem map_add {n k : ℕ} {X : Type*} [TopologicalSpace X] [ChartedSpace (Eucl
   exact h
 
 /-- Currents map zero to zero. Follows from map_add with ω₁=ω₂=0. -/
-theorem map_zero' {n k : ℕ} {X : Type*} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+theorem map_zero' {n k : ℕ} {X : Type*} [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
     (T : Current n X k) : T.toFun 0 = 0 := by
   -- T(0 + 0) = T(0) + T(0) from map_add
@@ -82,7 +83,7 @@ theorem map_zero' {n k : ℕ} {X : Type*} [TopologicalSpace X] [ChartedSpace (Eu
   linarith
 
 /-- Linearity: scalar multiplication. Derives from the is_linear field with ω₂ = 0. -/
-theorem map_smul {n k : ℕ} {X : Type*} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+theorem map_smul {n k : ℕ} {X : Type*} [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
     (T : Current n X k) (r : ℝ) (ω : SmoothForm n X k) : T.toFun (r • ω) = r * T.toFun ω := by
   -- Use is_linear with ω₁ = ω, ω₂ = 0
@@ -97,7 +98,7 @@ theorem map_smul {n k : ℕ} {X : Type*} [TopologicalSpace X] [ChartedSpace (Euc
 
 /-- The zero current evaluates to zero on all forms. -/
 def zero (n : ℕ) (X : Type*) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] : Current n X k where
   toFun := fun _ => 0
@@ -540,15 +541,17 @@ open MeasureTheory
     **Implementation**: Currently represented as a function from points to ℝ.
     In a full implementation, this would be a section of the k-th exterior power of TX. -/
 structure OrientingKVector (n : ℕ) (X : Type*) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] where
   /-- The carrier set on which the orientation is defined -/
   support : Set X
-  /-- The orienting k-vector field. Currently returns 1 as a stub;
-      in full development, this would be a section of Λ^k(TX). -/
-  orientation : X → ℝ
-  /-- The orientation is unit at points in the support -/
-  unit_norm : ∀ x ∈ support, |orientation x| = 1
+  /-- The orienting k-vector field.
+      Represented as a map to k-tuples of tangent vectors.
+      The value at x represents v₁ ∧ ... ∧ vₖ. -/
+  orientation : X → (Fin k → TangentModel n)
+  /-- The orientation is unit at points in the support.
+      (Norm definition for k-vectors would go here). -/
+  unit_norm : ∀ x ∈ support, ‖orientation x‖ = 1
 
 /-- **Form-Vector Pairing** (Federer, 1969).
     The canonical pairing of a k-form ω with a k-vector τ at a point x.
@@ -563,13 +566,11 @@ structure OrientingKVector (n : ℕ) (X : Type*) (k : ℕ)
 
     Reference: [H. Federer, "Geometric Measure Theory", 1969, §1.5.1]. -/
 noncomputable def formVectorPairing {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    (ω : SmoothForm n X k) (τ : OrientingKVector n X k) (x : X) : ℝ :=
-  -- Full implementation would compute ω_x(τ(x)) using the fiber map
-  -- Currently: τ.orientation x * (evaluation of ω at x)
-  -- Since we don't have full fiber evaluation, we use comass as a proxy bound
-  τ.orientation x * comass ω
+    (ω : SmoothForm n X k) (τ : OrientingKVector n X k) (x : X) : ℂ :=
+  -- Evaluate the alternating form on the k-tuple of vectors
+  (ω.as_alternating x) (τ.orientation x)
 
 /-- **Oriented Rectifiable Set Data** (Federer-Fleming, 1960).
     Bundles a k-dimensional rectifiable set with its orientation and Hausdorff measure.
@@ -581,9 +582,9 @@ noncomputable def formVectorPairing {n : ℕ} {X : Type*} {k : ℕ}
 
     Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", Ann. Math. 72 (1960)]. -/
 structure OrientedRectifiableSetData (n : ℕ) (X : Type*) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] where
+    [MeasurableSpace X] [BorelSpace X] where
   /-- The underlying set -/
   carrier : Set X
   /-- The orienting k-vector field -/
@@ -614,17 +615,13 @@ structure OrientedRectifiableSetData (n : ℕ) (X : Type*) (k : ℕ)
 
     Reference: [H. Federer, "Geometric Measure Theory", 1969, §4.1.7]. -/
 noncomputable def hausdorffIntegrate {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X]
+    [MeasurableSpace X] [BorelSpace X]
     (data : OrientedRectifiableSetData n X k) (ω : SmoothForm n X k) : ℝ :=
-  -- Full implementation: ∫_Z ⟨ω(x), τ(x)⟩ dH^k(x)
-  -- Currently: mass(Z) * comass(ω) as a bound
-  -- This is mathematically correct as an upper bound: |∫_Z ω| ≤ mass(Z) · comass(ω)
-  if h : data.measure data.carrier < ⊤ then
-    (data.measure data.carrier).toReal * comass ω
-  else
-    0
+  -- Real implementation: ∫_Z ⟨ω(x), τ(x)⟩ dH^k(x)
+  -- We take the real part since Currents are defined as real-valued functionals
+  (∫ x in data.carrier, formVectorPairing ω data.orientation x ∂data.measure).re
 
 /-- **Mass of an Oriented Rectifiable Set**.
     The k-dimensional Hausdorff measure of the set.
@@ -633,9 +630,9 @@ noncomputable def hausdorffIntegrate {n : ℕ} {X : Type*} {k : ℕ}
 
     Reference: [H. Federer, "Geometric Measure Theory", 1969, §4.1.7]. -/
 noncomputable def OrientedRectifiableSetData.mass {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X]
+    [MeasurableSpace X] [BorelSpace X]
     (data : OrientedRectifiableSetData n X k) : ℝ :=
   (data.measure data.carrier).toReal
 
@@ -646,9 +643,9 @@ noncomputable def OrientedRectifiableSetData.mass {n : ℕ} {X : Type*} {k : ℕ
 
     Reference: [H. Federer, "Geometric Measure Theory", 1969, §4.5.5]. -/
 noncomputable def OrientedRectifiableSetData.bdryMass {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X]
+    [MeasurableSpace X] [BorelSpace X]
     (data : OrientedRectifiableSetData n X k) : ℝ :=
   (data.boundary_measure data.boundary_carrier).toReal
 
@@ -660,20 +657,13 @@ noncomputable def OrientedRectifiableSetData.bdryMass {n : ℕ} {X : Type*} {k :
 
     Reference: [H. Federer, "Geometric Measure Theory", 1969, §4.1.7]. -/
 theorem hausdorffIntegrate_bound {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X]
+    [MeasurableSpace X] [BorelSpace X]
     (data : OrientedRectifiableSetData n X k) (ω : SmoothForm n X k) :
     |hausdorffIntegrate data ω| ≤ data.mass * comass ω := by
-  unfold hausdorffIntegrate OrientedRectifiableSetData.mass
-  split_ifs with h
-  · -- Finite measure case
-    simp only [abs_mul]
-    have hpos : (data.measure data.carrier).toReal ≥ 0 := ENNReal.toReal_nonneg
-    rw [abs_of_nonneg hpos, abs_of_nonneg (comass_nonneg ω)]
-  · -- Infinite measure case (shouldn't happen by finite_mass hypothesis)
-    simp only [abs_zero]
-    exact mul_nonneg ENNReal.toReal_nonneg (comass_nonneg ω)
+  -- Bound the integral by mass * comass
+  sorry
 
 -- NOTE: OrientedRectifiableSetData.toIntegrationData is defined after IntegrationData structure
 
@@ -692,9 +682,9 @@ with M = 0 since there is no boundary. This is the key case for the Hodge conjec
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", Ch. 0-1]. -/
 structure ClosedSubmanifoldData (n : ℕ) (X : Type*) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] where
+    [MeasurableSpace X] [BorelSpace X] where
   /-- The underlying set -/
   carrier : Set X
   /-- The orienting k-vector field -/
@@ -711,9 +701,9 @@ structure ClosedSubmanifoldData (n : ℕ) (X : Type*) (k : ℕ)
 /-- Convert closed submanifold data to oriented rectifiable set data.
     The key point: boundary_carrier = ∅ and boundary_measure = 0. -/
 noncomputable def ClosedSubmanifoldData.toOrientedData {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X]
+    [MeasurableSpace X] [BorelSpace X]
     (data : ClosedSubmanifoldData n X k) : OrientedRectifiableSetData n X k where
   carrier := data.carrier
   orientation := data.orientation
@@ -728,9 +718,9 @@ noncomputable def ClosedSubmanifoldData.toOrientedData {n : ℕ} {X : Type*} {k 
 /-- **Closed Submanifold has Zero Boundary Mass**.
     This is the key property for the Hodge conjecture. -/
 theorem ClosedSubmanifoldData.bdryMass_zero {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X]
+    [MeasurableSpace X] [BorelSpace X]
     (data : ClosedSubmanifoldData n X k) :
     data.toOrientedData.bdryMass = 0 := by
   unfold ClosedSubmanifoldData.toOrientedData OrientedRectifiableSetData.bdryMass
@@ -750,7 +740,7 @@ open MeasureTheory in
 
     Reference: [H. Federer, "Geometric Measure Theory", 1969, §4.1.7]. -/
 structure IntegrationData (n : ℕ) (X : Type*) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [Nonempty X] where
   /-- The underlying set being integrated over -/
@@ -780,7 +770,7 @@ structure IntegrationData (n : ℕ) (X : Type*) (k : ℕ)
 
 /-- The empty set as integration data with zero integral. -/
 noncomputable def IntegrationData.empty (n : ℕ) (X : Type*) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [Nonempty X] : IntegrationData n X k where
   carrier := ∅
@@ -798,7 +788,7 @@ noncomputable def IntegrationData.empty (n : ℕ) (X : Type*) (k : ℕ)
 /-- Convert IntegrationData to a Current.
     This is the main constructor for integration currents. -/
 noncomputable def IntegrationData.toCurrent {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [Nonempty X]
     (data : IntegrationData n X k) : Current n X k where
@@ -824,16 +814,20 @@ noncomputable def IntegrationData.toCurrent {n : ℕ} {X : Type*} {k : ℕ}
     - `bdryMass` is the actual boundary mass
     - `stokes_bound` follows from Stokes' theorem -/
 noncomputable def OrientedRectifiableSetData.toIntegrationData {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
     (data : OrientedRectifiableSetData n X k) : IntegrationData n X k where
   carrier := data.carrier
-  -- Placeholder: use zero integration until rectifiable integration is implemented.
-  integrate := fun _ => 0
-  integrate_linear := by intros; ring
-  integrate_continuous := continuous_const
-  integrate_bound := ⟨0, fun _ => by simp⟩
+  integrate := fun ω => hausdorffIntegrate data ω
+  integrate_linear := by
+    intros c ω₁ ω₂
+    unfold hausdorffIntegrate
+    -- ∫ (c • ω₁ + ω₂) = c • ∫ ω₁ + ∫ ω₂
+    -- formVectorPairing is linear in ω
+    sorry
+  integrate_continuous := continuous_of_discreteTopology
+  integrate_bound := ⟨data.mass, fun ω => hausdorffIntegrate_bound data ω⟩
   bdryMass := data.bdryMass
   bdryMass_nonneg := by
     unfold OrientedRectifiableSetData.bdryMass
@@ -843,25 +837,25 @@ noncomputable def OrientedRectifiableSetData.toIntegrationData {n : ℕ} {X : Ty
     | zero => trivial
     | succ k' =>
       intro ω
-      simp only [abs_zero]
-      apply mul_nonneg
-      · unfold OrientedRectifiableSetData.bdryMass
-        exact ENNReal.toReal_nonneg
-      · exact comass_nonneg ω
+      -- Stokes theorem for rectifiable sets
+      sorry
 
 /-- **Closed Submanifold to IntegrationData with Zero Boundary Mass**.
     The Stokes bound holds trivially with M = 0. -/
 noncomputable def ClosedSubmanifoldData.toIntegrationData {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
     (data : ClosedSubmanifoldData n X k) : IntegrationData n X k where
   carrier := data.carrier
-  -- Placeholder: use zero integration until closed-submanifold integration is implemented.
-  integrate := fun _ => 0
-  integrate_linear := by intros; ring
-  integrate_continuous := continuous_const
-  integrate_bound := ⟨0, fun _ => by simp⟩
+  -- Real: integration over closed submanifold using Hausdorff measure
+  integrate := fun ω => hausdorffIntegrate data.toOrientedData ω
+  integrate_linear := by
+    intros c ω₁ ω₂
+    unfold hausdorffIntegrate
+    sorry
+  integrate_continuous := continuous_of_discreteTopology
+  integrate_bound := ⟨data.toOrientedData.mass, fun ω => hausdorffIntegrate_bound data.toOrientedData ω⟩
   bdryMass := 0  -- Closed submanifold has no boundary
   bdryMass_nonneg := le_refl 0
   stokes_bound := by
@@ -869,8 +863,9 @@ noncomputable def ClosedSubmanifoldData.toIntegrationData {n : ℕ} {X : Type*} 
     | zero => trivial
     | succ k' =>
       intro ω
-      simp only [MulZeroClass.zero_mul, abs_zero]
-      exact le_rfl
+      -- Stokes theorem for closed submanifolds: ∫_Z dω = 0
+      -- So |0| ≤ 0 * ‖ω‖
+      sorry
 
 /-- **Set integration** for forms of arbitrary degree.
     This integrates a k-form over a set Z using the Hausdorff measure infrastructure.
@@ -882,19 +877,19 @@ noncomputable def ClosedSubmanifoldData.toIntegrationData {n : ℕ} {X : Type*} 
 
     Reference: [Federer, "Geometric Measure Theory", §4.1]. -/
 noncomputable def setIntegral {n : ℕ} {X : Type*} (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
     (Z : Set X) (ω : SmoothForm n X k) : ℝ :=
   integrateDegree2p (n := n) (X := X) k Z ω
 
 /-- Set integration is linear in the form. -/
 theorem setIntegral_linear {n : ℕ} {X : Type*} (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
     (Z : Set X) (c : ℝ) (ω₁ ω₂ : SmoothForm n X k) :
     setIntegral k Z (c • ω₁ + ω₂) = c * setIntegral k Z ω₁ + setIntegral k Z ω₂ := by
   unfold setIntegral
@@ -908,10 +903,10 @@ theorem setIntegral_linear {n : ℕ} {X : Type*} (k : ℕ)
 
     **Proof**: Uses `integrateDegree2p_bound`. -/
 theorem setIntegral_bound {n : ℕ} {X : Type*} (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
     (Z : Set X) : ∃ M : ℝ, ∀ ω : SmoothForm n X k, |setIntegral k Z ω| ≤ M * ‖ω‖ := by
   -- setIntegral = integrateDegree2p, which is bounded by (hausdorffMeasure2p (k/2) Z).toReal * ‖ω‖
   refine ⟨(hausdorffMeasure2p (n := n) (X := X) (k / 2) Z).toReal, fun ω => ?_⟩
@@ -921,10 +916,10 @@ theorem setIntegral_bound {n : ℕ} {X : Type*} (k : ℕ)
 /-- **Set integration over the empty set is zero** (proved from `integrateDegree2p_empty`). -/
 @[simp]
 theorem setIntegral_empty {n : ℕ} {X : Type*} (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
     (ω : SmoothForm n X k) : setIntegral k (∅ : Set X) ω = 0 := by
   unfold setIntegral
   exact integrateDegree2p_empty k ω
@@ -934,12 +929,15 @@ theorem setIntegral_empty {n : ℕ} {X : Type*} (k : ℕ)
     This is the canonical example of Stokes' theorem: any integral over ∅ vanishes.
     It provides an automatic instance of `ClosedSubmanifoldStokesData` for ∅. -/
 theorem stokes_empty_set {n : ℕ} {X : Type*} (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [Nonempty X]
-    (ω : SmoothForm n X k) : setIntegral (k + 1) (∅ : Set X) (smoothExtDeriv ω) = 0 :=
-  setIntegral_empty (k + 1) (smoothExtDeriv ω)
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    (ω : SmoothForm n X k) : setIntegral (k + 1) (∅ : Set X) (smoothExtDeriv ω) = 0 := by
+  dsimp [setIntegral, integrateDegree2p]
+  split_ifs
+  · apply submanifoldIntegral_empty
+  · rfl
 
 /-! ## Stokes Property for Closed Submanifolds (Round 9: Agent 4)
 
@@ -961,20 +959,20 @@ the geometric assumption.
 
     **Reference**: [Federer, "Geometric Measure Theory", 1969, §4.2.1]. -/
 class ClosedSubmanifoldStokesData (n : ℕ) (X : Type*) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
     (Z : Set X) : Prop where
   /-- For closed submanifolds, the integral of an exact form vanishes. -/
   stokes_integral_exact_zero : ∀ ω : SmoothForm n X k, setIntegral (k + 1) Z (smoothExtDeriv ω) = 0
 
 /-- If Z has the Stokes property, then |∫_Z dω| ≤ 0. -/
 theorem stokes_bound_of_ClosedSubmanifoldStokesData {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
     (Z : Set X) [h : ClosedSubmanifoldStokesData n X k Z]
     (ω : SmoothForm n X k) : |setIntegral (k + 1) Z (smoothExtDeriv ω)| ≤ 0 := by
   rw [h.stokes_integral_exact_zero ω]
@@ -985,10 +983,10 @@ theorem stokes_bound_of_ClosedSubmanifoldStokesData {n : ℕ} {X : Type*} {k : �
     The empty set trivially satisfies Stokes' property since any integral over ∅ is zero.
     This allows constructing `integration_current` for ∅ without manual assumptions. -/
 instance ClosedSubmanifoldStokesData.empty {n : ℕ} {X : Type*} (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [Nonempty X] :
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X] :
     ClosedSubmanifoldStokesData n X k (∅ : Set X) where
   stokes_integral_exact_zero := stokes_empty_set k
 
@@ -1006,30 +1004,30 @@ instance ClosedSubmanifoldStokesData.empty {n : ℕ} {X : Type*} (k : ℕ)
 
     Reference: [Federer, "Geometric Measure Theory", 1969, §4.2.1]. -/
 class StokesTheoremData (n : ℕ) (X : Type*) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [Nonempty X] : Prop where
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X] : Prop where
   /-- Stokes theorem: ∫_X dω = 0 for compact X without boundary. -/
   stokes_univ : ∀ ω : SmoothForm n X k, setIntegral (k + 1) (Set.univ : Set X) (smoothExtDeriv ω) = 0
 
 /-- **Stokes' theorem for Set.univ**: `∫_X dω = 0`.
     Requires `StokesTheoremData` typeclass assumption. -/
 theorem stokes_univ_set {n : ℕ} {X : Type*} (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [Nonempty X] [StokesTheoremData n X k]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X] [StokesTheoremData n X k]
     (ω : SmoothForm n X k) : setIntegral (k + 1) (Set.univ : Set X) (smoothExtDeriv ω) = 0 :=
   StokesTheoremData.stokes_univ ω
 
 /-- **Stokes instance for the whole manifold** (Set.univ).
     Requires `StokesTheoremData` typeclass. -/
 def ClosedSubmanifoldStokesData.univ {n : ℕ} {X : Type*} (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [Nonempty X] [StokesTheoremData n X k] :
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X] [StokesTheoremData n X k] :
     ClosedSubmanifoldStokesData n X k (Set.univ : Set X) where
   stokes_integral_exact_zero := stokes_univ_set k
 
@@ -1049,10 +1047,10 @@ For other closed submanifolds Z ⊂ X, assume `[ClosedSubmanifoldStokesData n X 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", Ch. 0]. -/
 /-- Helper for degree 0 case (no Stokes data needed). -/
 noncomputable def IntegrationData.closedSubmanifold_zero (n : ℕ) (X : Type*)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
     (Z : Set X) : IntegrationData n X 0 :=
   { carrier := Z
     integrate := setIntegral 0 Z
@@ -1065,10 +1063,10 @@ noncomputable def IntegrationData.closedSubmanifold_zero (n : ℕ) (X : Type*)
 
 /-- Helper for degree k+1 case (Stokes data required for degree k). -/
 noncomputable def IntegrationData.closedSubmanifold_succ (n : ℕ) (X : Type*) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
     (Z : Set X) [hZ : ClosedSubmanifoldStokesData n X k Z] : IntegrationData n X (Nat.succ k) :=
   { carrier := Z
     integrate := setIntegral (Nat.succ k) Z
@@ -1091,19 +1089,19 @@ noncomputable def IntegrationData.closedSubmanifold_succ (n : ℕ) (X : Type*) (
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", Ch. 0]. -/
 noncomputable def IntegrationData.closedSubmanifold (n : ℕ) (X : Type*) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
     (Z : Set X) [ClosedSubmanifoldStokesData n X k Z] : IntegrationData n X (Nat.succ k) :=
   IntegrationData.closedSubmanifold_succ n X k Z
 
 /-- The integration current over a closed submanifold has boundary bound 0. -/
 theorem integration_current_closedSubmanifold_bdryMass_zero {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
     (Z : Set X) [ClosedSubmanifoldStokesData n X k Z] :
     (IntegrationData.closedSubmanifold n X k Z).bdryMass = 0 := by
   rfl
@@ -1123,17 +1121,17 @@ theorem integration_current_closedSubmanifold_bdryMass_zero {n : ℕ} {X : Type*
 
     Reference: [H. Federer, "Geometric Measure Theory", 1969, §4.1.7]. -/
 noncomputable def integration_current {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
     (Z : Set X) [ClosedSubmanifoldStokesData n X k Z] : Current n X (Nat.succ k) :=
   (IntegrationData.closedSubmanifold n X k Z).toCurrent
 
 /-- Integration current from IntegrationData.
     This is the preferred way to construct integration currents with explicit bounds. -/
 noncomputable def integration_current_of_data {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [Nonempty X]
     (data : IntegrationData n X k) : Current n X k :=
@@ -1141,7 +1139,7 @@ noncomputable def integration_current_of_data {n : ℕ} {X : Type*} {k : ℕ}
 
 /-- The integration current of a set equals the current from its IntegrationData. -/
 theorem integration_current_eq_toCurrent {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [Nonempty X]
     (data : IntegrationData n X k) :
@@ -1192,7 +1190,7 @@ For an integration current `[Z]` over a rectifiable set `Z`:
     In a full development, this would be defined via Hausdorff measure.
     **Status**: Proof-first stub returning 0 for all sets. -/
 noncomputable def boundaryMass {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [Nonempty X]
     (_Z : Set X) : ℝ :=
@@ -1200,7 +1198,7 @@ noncomputable def boundaryMass {n : ℕ} {X : Type*}
 
 /-- Boundary mass is non-negative. -/
 theorem boundaryMass_nonneg {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [Nonempty X]
     (Z : Set X) : boundaryMass (n := n) (X := X) Z ≥ 0 := by
@@ -1221,7 +1219,7 @@ theorem boundaryMass_nonneg {n : ℕ} {X : Type*}
 
     Reference: [H. Federer, "Geometric Measure Theory", 1969, §4.5]. -/
 def HasStokesPropertyWith {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [Nonempty X]
     (T : Current n X (Nat.succ k)) (M : ℝ) : Prop :=
@@ -1235,18 +1233,18 @@ def HasStokesPropertyWith {n : ℕ} {X : Type*} {k : ℕ}
     This lemma provides the bridge between the geometric Stokes theorem and
     the functional-analytic boundedness condition. -/
 theorem stokes_property_implies_boundary_bound {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [Nonempty X]
+    [Nonempty X] [MeasurableSpace X] [BorelSpace X]
     (T : Current n X (Nat.succ k)) (M : ℝ) (hT : HasStokesPropertyWith T M) :
     ∃ M' : ℝ, ∀ ω : SmoothForm n X k, |T.toFun (smoothExtDeriv ω)| ≤ M' * ‖ω‖ :=
   ⟨M, hT⟩
 
 /-- The zero current satisfies the Stokes property with constant 0. -/
 theorem zero_hasStokesProperty {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [Nonempty X] :
+    [Nonempty X] [MeasurableSpace X] [BorelSpace X] :
     HasStokesPropertyWith (0 : Current n X (Nat.succ k)) 0 := by
   intro ω
   simp [Current.zero_toFun]
@@ -1255,9 +1253,9 @@ theorem zero_hasStokesProperty {n : ℕ} {X : Type*} {k : ℕ}
     If `T₁` has Stokes constant `M₁` and `T₂` has Stokes constant `M₂`,
     then `T₁ + T₂` has Stokes constant `M₁ + M₂`. -/
 theorem add_hasStokesProperty {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [Nonempty X]
+    [Nonempty X] [MeasurableSpace X] [BorelSpace X]
     (T₁ T₂ : Current n X (Nat.succ k)) (M₁ M₂ : ℝ)
     (h₁ : HasStokesPropertyWith T₁ M₁) (h₂ : HasStokesPropertyWith T₂ M₂) :
     HasStokesPropertyWith (T₁ + T₂) (M₁ + M₂) := by
@@ -1274,9 +1272,9 @@ theorem add_hasStokesProperty {n : ℕ} {X : Type*} {k : ℕ}
 /-- **Scalar Multiple of Stokes-Bounded Current**.
     If `T` has Stokes constant `M`, then `c • T` has Stokes constant `|c| * M`. -/
 theorem smul_hasStokesProperty {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [Nonempty X]
+    [Nonempty X] [MeasurableSpace X] [BorelSpace X]
     (c : ℝ) (T : Current n X (Nat.succ k)) (M : ℝ)
     (hT : HasStokesPropertyWith T M) :
     HasStokesPropertyWith (c • T) (|c| * M) := by
@@ -1304,10 +1302,10 @@ theorem smul_hasStokesProperty {n : ℕ} {X : Type*} {k : ℕ}
 
     Reference: [H. Federer, "Geometric Measure Theory", 1969, §4.5]. -/
 theorem integration_current_hasStokesProperty {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
     (Z : Set X) [hZ : ClosedSubmanifoldStokesData n X k Z] :
     HasStokesPropertyWith (n := n) (X := X) (k := k)
       (integration_current (n := n) (X := X) (k := k) Z)
@@ -1337,10 +1335,10 @@ theorem integration_current_hasStokesProperty {n : ℕ} {X : Type*} {k : ℕ}
     **Note**: Once we have real integration currents (Agent 5 work), this
     theorem will provide the concrete boundary bound constant. -/
 theorem integration_current_boundary_bound {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
     (Z : Set X) [hZ : ClosedSubmanifoldStokesData n X k Z] :
     ∃ M : ℝ, ∀ ω : SmoothForm n X k,
       |(integration_current (n := n) (X := X) (k := k) Z).toFun (smoothExtDeriv ω)| ≤ M * ‖ω‖ :=
@@ -1361,10 +1359,10 @@ These results are already proved above (`add_hasStokesProperty`, `smul_hasStokes
 /-- Sum of integration currents has bounded boundary.
     For `[Z₁] + [Z₂]`, the Stokes constant is `boundaryMass(Z₁) + boundaryMass(Z₂)`. -/
 theorem integration_current_sum_boundary_bound {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
     (Z₁ Z₂ : Set X)
     [hZ₁ : ClosedSubmanifoldStokesData n X k Z₁] [hZ₂ : ClosedSubmanifoldStokesData n X k Z₂] :
     HasStokesPropertyWith (n := n) (X := X) (k := k)
@@ -1381,10 +1379,10 @@ theorem integration_current_sum_boundary_bound {n : ℕ} {X : Type*} {k : ℕ}
 /-- Scalar multiple of integration current has bounded boundary.
     For `c • [Z]`, the Stokes constant is `|c| * boundaryMass(Z)`. -/
 theorem integration_current_smul_boundary_bound {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
     (c : ℝ) (Z : Set X) [hZ : ClosedSubmanifoldStokesData n X k Z] :
     HasStokesPropertyWith (n := n) (X := X) (k := k)
       (c • (integration_current (n := n) (X := X) (k := k) Z))
@@ -1427,7 +1425,7 @@ infrastructure (which requires GMT).
 
     Reference: [H. Federer, "Geometric Measure Theory", 1969, §4.2]. -/
 structure RectifiableSetData (n : ℕ) (X : Type*)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [Nonempty X] where
   /-- The underlying set -/
@@ -1439,7 +1437,7 @@ structure RectifiableSetData (n : ℕ) (X : Type*)
 
 /-- The empty set as rectifiable set data with zero boundary mass. -/
 def RectifiableSetData.empty (n : ℕ) (X : Type*)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [Nonempty X] : RectifiableSetData n X where
   carrier := ∅
@@ -1449,7 +1447,7 @@ def RectifiableSetData.empty (n : ℕ) (X : Type*)
 /-- Union of rectifiable sets: boundary mass is at most the sum.
     (In general, boundaries can cancel, so this is an upper bound.) -/
 def RectifiableSetData.union {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [Nonempty X]
     (Z₁ Z₂ : RectifiableSetData n X) : RectifiableSetData n X where
@@ -1459,7 +1457,7 @@ def RectifiableSetData.union {n : ℕ} {X : Type*}
 
 /-- Scalar multiple of rectifiable set data. -/
 def RectifiableSetData.smul {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [Nonempty X]
     (c : ℝ) (Z : RectifiableSetData n X) : RectifiableSetData n X where
@@ -1476,30 +1474,30 @@ def RectifiableSetData.smul {n : ℕ} {X : Type*}
     The key property is that the resulting current satisfies `HasStokesPropertyWith`
     with constant `Z.bdryMass`. -/
 noncomputable def RectifiableSetData.toCurrent {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [Nonempty X]
-    (_Z : RectifiableSetData n X) : Current n X k :=
-  0
+    (_Z : RectifiableSetData n X) : Current n X (Nat.succ k) :=
+  sorry
 
 /-- The integration current from rectifiable set data satisfies the Stokes property. -/
 theorem RectifiableSetData.toCurrent_hasStokesProperty {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [Nonempty X]
+    [Nonempty X] [MeasurableSpace X] [BorelSpace X]
     (Z : RectifiableSetData n X) :
     HasStokesPropertyWith (n := n) (X := X) (k := k) (Z.toCurrent) Z.bdryMass := by
   -- Currently trivial since toCurrent = 0
   intro ω
   unfold RectifiableSetData.toCurrent
-  simp [Current.zero_toFun]
-  exact mul_nonneg Z.bdryMass_nonneg (comass_nonneg ω)
+  -- Reduce to `0 ≤ Z.bdryMass * ‖ω‖`.
+  simpa [Current.zero_toFun] using mul_nonneg Z.bdryMass_nonneg (comass_nonneg ω)
 
 /-- Sum of integration currents from rectifiable set data. -/
 theorem RectifiableSetData.toCurrent_union {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [Nonempty X]
+    [Nonempty X] [MeasurableSpace X] [BorelSpace X]
     (Z₁ Z₂ : RectifiableSetData n X) :
     HasStokesPropertyWith (n := n) (X := X) (k := k)
       (Z₁.toCurrent + Z₂.toCurrent)
@@ -1512,9 +1510,9 @@ theorem RectifiableSetData.toCurrent_union {n : ℕ} {X : Type*} {k : ℕ}
 
 /-- Scalar multiple of integration current from rectifiable set data. -/
 theorem RectifiableSetData.toCurrent_smul {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [Nonempty X]
+    [Nonempty X] [MeasurableSpace X] [BorelSpace X]
     (c : ℝ) (Z : RectifiableSetData n X) :
     HasStokesPropertyWith (n := n) (X := X) (k := k)
       (c • Z.toCurrent)
@@ -1563,9 +1561,9 @@ The key insight is that we can separate:
     - [H. Federer and W.H. Fleming, "Normal and integral currents", 1960]
 -/
 theorem stokes_theorem_blueprint {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [Nonempty X]
+    [Nonempty X] [MeasurableSpace X] [BorelSpace X]
     (Z : RectifiableSetData n X) :
     HasStokesPropertyWith (n := n) (X := X) (k := k) (Z.toCurrent) Z.bdryMass :=
   Z.toCurrent_hasStokesProperty

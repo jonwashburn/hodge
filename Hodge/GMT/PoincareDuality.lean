@@ -95,10 +95,10 @@ This matches the operational plan sketch:
 `regularizeCurrentToForm` is still a placeholder (returns 0). When regularization
 is implemented, this will produce the actual Poincaré dual form. -/
 noncomputable def poincareDualForm_construct_fromCurrent {n : ℕ} {X : Type*} {p : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
     (Z : Set X) : SmoothForm n X (2 * p) :=
   regularizeCurrentToForm (n := n) (X := X) (k := 2 * p)
     (integrationCurrent (n := n) (X := X) p Z)
@@ -116,10 +116,10 @@ and how this relates to the Poincaré dual form. -/
 universe u
 
 variable {n : ℕ} {X : Type u}
-  [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+  [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
   [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
-  [MeasurableSpace X]
+  [MeasurableSpace X] [BorelSpace X]
 
 /-- A cohomology class associated to a set `Z`, using the *current proof-track* PD-form interface.
 

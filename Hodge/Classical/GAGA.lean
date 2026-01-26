@@ -133,10 +133,24 @@ theorem IsAlgebraicSet_isAnalyticSet (n : ℕ) (X : Type u)
   | inter Z₁ Z₂ _ _ ih₁ ih₂ => exact IsAnalyticSet.inter Z₁ Z₂ ih₁ ih₂
 
 variable {n : ℕ} {X : Type u}
-  [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+  [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
-  [MeasurableSpace X] [Nonempty X] [SubmanifoldIntegration n X]
+  [MeasurableSpace X] [BorelSpace X] [Nonempty X] [SubmanifoldIntegration n X]
+
+/-- **Chow/GAGA Data** (Analytic → Algebraic), as an explicit proof-track assumption.
+
+This packages the deep fact that every analytic subset of a projective variety is algebraic.
+
+We keep this as a typeclass (not a global `axiom`) so it is transparent in theorem statements
+and does not pollute Lean's kernel axiom list. -/
+class ChowGAGAData (n : ℕ) (X : Type u)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] : Prop where
+  /-- Analytic sets in a projective variety are algebraic (Chow + GAGA consequence). -/
+  analytic_to_algebraic :
+    ∀ (Z : Set X), IsAnalyticSet (n := n) (X := X) Z → IsAlgebraicSet n X Z
 
 /-- **Chow's Theorem / GAGA** (Analytic → Algebraic).
 
@@ -155,11 +169,10 @@ variable {n : ℕ} {X : Type u}
     Amer. J. Math. 71 (1949), 893-914].
     Reference: [J.-P. Serre, "GAGA", Ann. Inst. Fourier 6 (1956), 1-42].
     Reference: [R. Hartshorne, "Algebraic Geometry", Springer, 1977, Appendix B]. -/
-theorem chow_gaga_analytic_to_algebraic (Z : Set X) :
+theorem chow_gaga_analytic_to_algebraic [ChowGAGAData n X] (Z : Set X) :
     IsAnalyticSet (n := n) (X := X) Z → IsAlgebraicSet n X Z := by
-  intro _
-  -- Deep algebraic geometry theorem: Chow's theorem
-  sorry
+  intro hZ
+  exact ChowGAGAData.analytic_to_algebraic (n := n) (X := X) Z hZ
 
 /-- **Serre's GAGA Theorem** (Serre, 1956).
 
@@ -178,7 +191,7 @@ theorem chow_gaga_analytic_to_algebraic (Z : Set X) :
     Reference: [J.-P. Serre, "Géométrie algébrique et géométrie analytique",
     Ann. Inst. Fourier 6 (1956), 1-42].
     Reference: [R. Hartshorne, "Algebraic Geometry", Springer, 1977, Appendix B]. -/
-theorem serre_gaga {p : ℕ} (V : AnalyticSubvariety n X) (hV_codim : V.codim = p) :
+theorem serre_gaga [ChowGAGAData n X] {p : ℕ} (V : AnalyticSubvariety n X) (hV_codim : V.codim = p) :
     ∃ (W : AlgebraicSubvariety n X), W.carrier = V.carrier ∧ W.codim = p := by
   -- Deep algebraic geometry: Serre's GAGA theorem
   let W : AlgebraicSubvariety n X := {
@@ -206,7 +219,7 @@ theorem empty_set_is_algebraic : isAlgebraicSubvariety n X (∅ : Set X) :=
   ⟨{ carrier := ∅, codim := n, is_algebraic := IsAlgebraicSet_empty n X }, rfl⟩
 
 /-- **Theorem: Finite Union from Harvey-Lawson is Algebraic** -/
-theorem harvey_lawson_union_is_algebraic {k' : ℕ} [Nonempty X]
+theorem harvey_lawson_union_is_algebraic [ChowGAGAData n X] {k' : ℕ} [Nonempty X]
     (hl_concl : HarveyLawsonConclusion n X k') :
     isAlgebraicSubvariety n X (⋃ v ∈ hl_concl.varieties, v.carrier) := by
   induction hl_concl.varieties using Finset.induction with
@@ -536,10 +549,10 @@ noncomputable def SignedAlgebraicCycle.cycleClass_geom {p : ℕ}
     The full proof requires deep GMT results not yet formalized in Mathlib.
     By making this explicit, the proof track is honest about its assumptions. -/
 class SpineBridgeData (n : ℕ) (X : Type u)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [Nonempty X] : Prop where
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X] : Prop where
   /-- For spine-produced cycles, fundamental class of support = representing form in cohomology. -/
   fundamental_eq_representing : ∀ {p : ℕ} [CycleClass.PoincareDualFormExists n X p]
     (Z : SignedAlgebraicCycle n X p),

@@ -46,10 +46,10 @@ set_option autoImplicit false
 universe u
 
 variable {n : ℕ} {X : Type u}
-  [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+  [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
   [ProjectiveComplexManifold n X]
-  [MeasurableSpace X] [Nonempty X]
+  [MeasurableSpace X] [BorelSpace X] [Nonempty X]
 
 variable [K : KahlerManifold n X]
 variable [SubmanifoldIntegration n X]

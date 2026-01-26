@@ -20,9 +20,10 @@ namespace Hodge.GMT
 
 /-- Compatibility alias for the project’s core current type. -/
 abbrev DeRhamCurrent (n : ℕ) (X : Type*) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] : Type _ :=
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] : Type _ :=
   Current n X k
 
 /-- Boundary operator on currents, phrased using `Nat.sub` on degrees.
@@ -30,9 +31,10 @@ abbrev DeRhamCurrent (n : ℕ) (X : Type*) (k : ℕ)
 For `k = 0`, the boundary is defined to be `0` (since `k - 1 = 0` in `Nat`).
 For `k = k' + 1`, this is `Current.boundary`. -/
 def DeRhamCurrent.boundary {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X]
     {k : ℕ} (T : DeRhamCurrent n X k) : DeRhamCurrent n X (k - 1) := by
   cases k with
   | zero =>
@@ -44,9 +46,10 @@ def DeRhamCurrent.boundary {n : ℕ} {X : Type*}
 
 /-- Linearity of evaluation: `T(c • ω₁ + ω₂) = c*T(ω₁) + T(ω₂)`. -/
 theorem current_eval_linear {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X]
     (T : DeRhamCurrent n X k) (c : ℝ) (ω₁ ω₂ : SmoothForm n X k) :
     T.toFun (c • ω₁ + ω₂) = c * T.toFun ω₁ + T.toFun ω₂ :=
   T.is_linear c ω₁ ω₂

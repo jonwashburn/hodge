@@ -16,10 +16,10 @@ open Classical TopologicalSpace Hodge
 set_option autoImplicit false
 
 variable {n : ℕ} {X : Type*}
-  [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+  [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
-  [Nonempty X]
+  [Nonempty X] [MeasurableSpace X] [BorelSpace X]
 
 /-! ### Complex Analytic Sets -/
 
@@ -58,9 +58,10 @@ instance : CoeTC (AnalyticSubvariety n X) (Set X) where
 
 /-- The hypothesis structure for the Harvey-Lawson theorem. -/
 structure HarveyLawsonHypothesis (n : ℕ) (X : Type*) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] where
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] where
   T : IntegralCurrent n X k
   ψ : CalibratingForm n X k
   is_cycle : T.isCycleAt
@@ -68,9 +69,10 @@ structure HarveyLawsonHypothesis (n : ℕ) (X : Type*) (k : ℕ)
 
 /-- The conclusion structure for the Harvey-Lawson theorem. -/
 structure HarveyLawsonConclusion (n : ℕ) (X : Type*) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] where
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] where
   varieties : Finset (AnalyticSubvariety n X)
   multiplicities : varieties → ℕ+
   codim_correct : ∀ v ∈ varieties, v.codim = 2 * n - k
@@ -78,20 +80,21 @@ structure HarveyLawsonConclusion (n : ℕ) (X : Type*) (k : ℕ)
 
 /-- **Real Harvey-Lawson / King Data** as a typeclass. -/
 class HarveyLawsonKingData (n : ℕ) (X : Type*) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] where
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] where
   /-- The decomposition theorem: given a calibrated integral current,
       produce the analytic variety decomposition. -/
-  decompose : (hyp : @HarveyLawsonHypothesis n X k _ _ _ _ _ _ _) →
+  decompose : (hyp : HarveyLawsonHypothesis n X k) →
               HarveyLawsonConclusion n X k
   /-- The decomposition represents the input current. -/
   represents_input :
-    ∀ (hyp : @HarveyLawsonHypothesis n X k _ _ _ _ _ _ _),
+    ∀ (hyp : HarveyLawsonHypothesis n X k),
       (decompose hyp).represents hyp.T.toFun
 
 /-- The current of integration along an analytic subvariety. -/
-noncomputable def integrationCurrentHL {p k : ℕ} [MeasurableSpace X]
+noncomputable def integrationCurrentHL {p k : ℕ}
     (V : AnalyticSubvariety n X) (_hV : V.codim = p)
     (mult : ℤ) [ClosedSubmanifoldStokesData n X k V.carrier] : Current n X (Nat.succ k) where
   toFun := fun ω => (mult : ℝ) * setIntegral (n := n) (X := X) (Nat.succ k) V.carrier ω
@@ -150,9 +153,10 @@ theorem harvey_lawson_represents {k : ℕ} [HarveyLawsonKingData n X k]
 
 /-- **Flat Limit of Cycles is a Cycle** (Federer, 1960). -/
 class FlatLimitCycleData (n : ℕ) (X : Type*) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] : Prop where
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] : Prop where
   flat_limit_of_cycles_is_cycle :
     ∀ (T_seq : ℕ → IntegralCurrent n X k)
       (T_limit : IntegralCurrent n X k)

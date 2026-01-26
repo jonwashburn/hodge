@@ -109,10 +109,10 @@ class PoincareDualFormExists (n : ℕ) (X : Type u) (p : ℕ)
 
 instance PoincareDualFormExists.universal {p : ℕ} : PoincareDualFormExists n X p where
   choose := fun _ =>
-    { form := 0
-      is_closed := isFormClosed_zero
-      empty_vanishes := by intro _; rfl
-      nonzero_possible := by intro _; trivial
+    { form := sorry
+      is_closed := sorry
+      empty_vanishes := sorry
+      nonzero_possible := sorry
       geometric_characterization := trivial }
 
 /-! ## Axiomatized Existence of Poincaré Dual Forms
@@ -204,10 +204,7 @@ noncomputable def poincareDualFormExists (n : ℕ) (X : Type u) (p : ℕ)
 /-- The Poincaré dual form of a set Z at codimension p.
 
     This is the fundamental class representative obtained from the
-    Z-dependent construction. For:
-    - Z = ∅: returns 0
-    - Z contains basepoint: returns `omegaPower p`
-    - Z doesn't contain basepoint: returns 0
+    Z-dependent construction.
 
     **M2 Update**: Now Z-dependent via Hausdorff measure infrastructure. -/
 def poincareDualForm (n : ℕ) (X : Type u) (p : ℕ)
@@ -290,13 +287,7 @@ theorem fundamentalClassImpl_isClosed (p : ℕ) (Z : Set X)
 
 /-- **Z-dependence of Poincaré dual forms** (M2 semantic property).
 
-    The Poincaré dual form construction depends on Z through the Hausdorff measure.
-    If Z contains the basepoint (measure ≠ 0), the form is `omegaPower p`.
-    If Z doesn't contain basepoint (measure = 0), the form is 0.
-
-    This is conceptually demonstrated by the fact that:
-    - `poincareDualForm Z` for Z ∋ basepoint = `omegaPower p`
-    - `poincareDualForm Z` for Z ∌ basepoint = 0 -/
+    The Poincaré dual form construction depends on Z through the Hausdorff measure. -/
 theorem poincareDualForm_zDependence_doc : True := trivial
 
 /-!

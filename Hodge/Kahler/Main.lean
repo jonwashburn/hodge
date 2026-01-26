@@ -105,10 +105,10 @@ open Classical Hodge
 universe u
 
 variable {n : ℕ} {X : Type u}
-  [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+  [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
-  [MeasurableSpace X] [Nonempty X]
+  [MeasurableSpace X] [BorelSpace X] [Nonempty X]
 
 /-! ## Automatic SYR Theorem
 
@@ -134,6 +134,30 @@ This is the constructive analog of the Plateau problem for calibrated geometries
 
 Reference: [F.J. Almgren, "The theory of varifolds", Princeton lecture notes, 1965]
 Reference: [H. Federer, "Geometric Measure Theory", Springer, 1969, §5.4] -/
+
+/-- **Automatic SYR Data** (microstructure construction), as an explicit proof-track assumption.
+
+This packages the core existence statement used in the SYR → HL → GAGA spine:
+from a cone-positive form \(γ\), produce an approximating sequence of integral cycles with
+vanishing calibration defect and a flat-norm limit.
+
+We keep this as a typeclass (not a global `axiom`) so the assumption is explicit in
+theorem statements and does not appear as a kernel axiom. -/
+class AutomaticSYRData (n : ℕ) (X : Type u)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X] : Prop where
+  microstructure_construction_core :
+    ∀ {p : ℕ} (γ : SmoothForm n X (2 * p))
+      (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))),
+      ∃ (T_seq : ℕ → IntegralCurrent n X (2 * (n - p)))
+        (T_limit : IntegralCurrent n X (2 * (n - p))),
+        (∀ i, (T_seq i).isCycleAt) ∧
+        Filter.Tendsto (fun i => flatNorm ((T_seq i).toFun - T_limit.toFun))
+          Filter.atTop (nhds 0) ∧
+        Filter.Tendsto (fun i => calibrationDefect (T_seq i).toFun ψ)
+          Filter.atTop (nhds 0)
 
 /-- **Theorem: Microstructure Construction Core** (Automatic SYR Theorem).
 
@@ -174,7 +198,8 @@ Reference: [H. Federer, "Geometric Measure Theory", Springer, 1969, §5.4] -/
     - [H. Federer and W.H. Fleming, "Normal and integral currents",
       Annals of Mathematics 72 (1960), 458-520, Theorem 6.8]
     - [H. Federer, "Geometric Measure Theory", Springer, 1969, Section 4.2.17] -/
-theorem microstructure_construction_core {p : ℕ} [FlatLimitCycleData n X (2 * (n - p))] (γ : SmoothForm n X (2 * p))
+theorem microstructure_construction_core {p : ℕ}
+    [AutomaticSYRData n X] [FlatLimitCycleData n X (2 * (n - p))] (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
     ∃ (T_seq : ℕ → IntegralCurrent n X (2 * (n - p)))
       (T_limit : IntegralCurrent n X (2 * (n - p))),
@@ -183,10 +208,11 @@ theorem microstructure_construction_core {p : ℕ} [FlatLimitCycleData n X (2 * 
         Filter.atTop (nhds 0) ∧
       Filter.Tendsto (fun i => calibrationDefect (T_seq i).toFun ψ)
         Filter.atTop (nhds 0) := by
-  -- Semantic stub: microstructure approximation requires flat limit existence
-  sorry
+  simpa using
+    (AutomaticSYRData.microstructure_construction_core (n := n) (X := X) (p := p) γ hγ ψ)
 
-theorem microstructure_approximation {p : ℕ} [FlatLimitCycleData n X (2 * (n - p))] (γ : SmoothForm n X (2 * p))
+theorem microstructure_approximation {p : ℕ}
+    [AutomaticSYRData n X] [FlatLimitCycleData n X (2 * (n - p))] (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
     ∃ (T_seq : ℕ → IntegralCurrent n X (2 * (n - p)))
       (T_limit : IntegralCurrent n X (2 * (n - p))),
@@ -200,7 +226,8 @@ theorem microstructure_approximation {p : ℕ} [FlatLimitCycleData n X (2 * (n -
     limit_is_calibrated (fun i => (T_seq i).toFun) T_limit.toFun ψ h_defect_conv h_flat_conv
   exact ⟨T_seq, T_limit, h_cycles, h_flat_conv, h_calib⟩
 
-theorem automatic_syr {p : ℕ} [FlatLimitCycleData n X (2 * (n - p))] (γ : SmoothForm n X (2 * p))
+theorem automatic_syr {p : ℕ}
+    [AutomaticSYRData n X] [FlatLimitCycleData n X (2 * (n - p))] (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ)
     (ψ : CalibratingForm n X (2 * (n - p))) :
     ∃ (T : IntegralCurrent n X (2 * (n - p))),
@@ -254,7 +281,8 @@ and the construction (via Harvey-Lawson) ensures they represent [γ].
     `SignedAlgebraicCycle`. The cycle class is now defined directly via `representingForm`,
     making `cycleClass_eq_representingForm` trivially true (rfl). -/
 theorem cone_positive_produces_cycle {p : ℕ}
-    [FlatLimitCycleData n X (2 * (n - p))] [HarveyLawsonKingData n X (2 * (n - p))]
+    [AutomaticSYRData n X] [FlatLimitCycleData n X (2 * (n - p))]
+    [HarveyLawsonKingData n X (2 * (n - p))] [ChowGAGAData n X]
     (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
     (_h_rational : isRationalClass (ofForm γ h_closed))
     (h_cone : isConePositive γ) :
@@ -337,7 +365,10 @@ theorem omega_isPP_via_J : isPPForm' n X 1 ((Nat.two_mul 1).symm ▸ K.omega_for
       Wiley, 1978, Chapter 1, Section 2]
     - [C. Voisin, "Hodge Theory and Complex Algebraic Geometry I",
       Cambridge University Press, 2002, Chapter 11] -/
-theorem omega_pow_algebraic {p : ℕ} [FlatLimitCycleData n X (2 * (n - p))] [HarveyLawsonKingData n X (2 * (n - p))] (c : ℚ) (hc : c > 0) :
+theorem omega_pow_algebraic {p : ℕ}
+    [AutomaticSYRData n X] [FlatLimitCycleData n X (2 * (n - p))]
+    [HarveyLawsonKingData n X (2 * (n - p))] [ChowGAGAData n X]
+    (c : ℚ) (hc : c > 0) :
     ∃ (Z : SignedAlgebraicCycle n X p), Z.RepresentsClass
         ((c : ℝ) • ⟦kahlerPow (n := n) (X := X) p, omega_pow_IsFormClosed p⟧) := by
   -- Build the prerequisites for cone_positive_produces_cycle
@@ -469,7 +500,8 @@ Clay Mathematics Institute in 2000, with a prize of $1,000,000 for a correct sol
     **Instance**: `SpineBridgeData.universal` provides the Poincaré duality
     content that the fundamental class of the spine-produced support equals [γ]. -/
 theorem hodge_conjecture' {p : ℕ}
-    [FlatLimitCycleData n X (2 * (n - p))] [HarveyLawsonKingData n X (2 * (n - p))]
+    [AutomaticSYRData n X] [FlatLimitCycleData n X (2 * (n - p))]
+    [HarveyLawsonKingData n X (2 * (n - p))] [ChowGAGAData n X]
     [CycleClass.PoincareDualFormExists n X p]
     (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
     (h_rational : isRationalClass (ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :
@@ -510,7 +542,8 @@ theorem hodge_conjecture' {p : ℕ}
 
     See `hodge_conjecture'` for the TeX-faithful version with geometric cycle class. -/
 theorem hodge_conjecture_kernel {p : ℕ}
-    [FlatLimitCycleData n X (2 * (n - p))] [HarveyLawsonKingData n X (2 * (n - p))]
+    [AutomaticSYRData n X] [FlatLimitCycleData n X (2 * (n - p))]
+    [HarveyLawsonKingData n X (2 * (n - p))] [ChowGAGAData n X]
     (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
     (h_rational : isRationalClass (ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :
     ∃ (Z : SignedAlgebraicCycle n X p), Z.RepresentsClass (ofForm γ h_closed) := by

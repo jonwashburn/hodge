@@ -33,10 +33,10 @@ open Classical Set Hodge
 set_option autoImplicit false
 
 variable {n : ℕ} {X : Type*}
-  [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+  [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X]
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
-  [Nonempty X] [CompactSpace X]
+  [Nonempty X] [CompactSpace X] [MeasurableSpace X] [BorelSpace X]
 
 /-! ## Auxiliary Lemmas -/
 

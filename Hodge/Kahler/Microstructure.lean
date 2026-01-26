@@ -67,16 +67,17 @@ open scoped Manifold
 universe u
 
 variable {n : ℕ} {X : Type u}
-  [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+  [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
-  [MeasurableSpace X] [Nonempty X] [SubmanifoldIntegration n X]
+  [MeasurableSpace X] [BorelSpace X] [Nonempty X] [SubmanifoldIntegration n X]
 
 /-- Integral current data with a cycle intent (wrapper for integration data). -/
 structure CycleIntegralCurrent (n : ℕ) (X : Type u) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] where
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] where
   toIntegrationData : IntegrationData n X k
   is_integral : isIntegral toIntegrationData.toCurrent
 
@@ -114,10 +115,10 @@ structure Cubulation (n : ℕ) (X : Type u) (h : ℝ) where
 
 /-- Existence of cubulations for any mesh size (as an explicit assumption). -/
 class CubulationExists (n : ℕ) (X : Type u)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [Nonempty X] : Prop where
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X] : Prop where
   exists_cubulation : ∀ h : ℝ, h > 0 → Nonempty (Cubulation n X h)
 
 /-- Existence of cubulations for any mesh size. -/
@@ -151,12 +152,13 @@ structure RawSheetSum (n : ℕ) (X : Type u) (p : ℕ) (hscale : ℝ) (C : Cubul
     satisfies the Stokes property (boundary integral vanishes).
     This is true because complex submanifolds are cycles. -/
 class SheetUnionStokesData (n : ℕ) (X : Type*) (k : ℕ) (Z : Set X)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [instMetric : MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [Nonempty X] : Prop where
+    [MeasurableSpace X] [instBorel : BorelSpace X] [Nonempty X] : Prop where
   /-- Stokes theorem: ∫_Z dω = 0 for sheet unions (closed complex submanifolds). -/
-  stokes_integral_zero : ∀ ω : SmoothForm n X k, |setIntegral (k + 1) Z (smoothExtDeriv ω)| ≤ 0
+  stokes_integral_zero : ∀ ω : SmoothForm n X k,
+    |@setIntegral n X (k + 1) instMetric _ _ _ _ _ _ instBorel _ Z (smoothExtDeriv ω)| ≤ 0
 
 /-- Convert a RawSheetSum to an IntegrationData.
     This creates the integration data for the union of sheets.
@@ -202,7 +204,7 @@ noncomputable def RawSheetSum.toIntegrationData {p : ℕ} {hscale : ℝ}
     `RawSheetSum.toIntegrationData` is used on the main proof track. -/
 noncomputable def RawSheetSum.toIntegrationData_real {p : ℕ} {hscale : ℝ}
     {C : Cubulation n X hscale} (T_raw : RawSheetSum n X p hscale C)
-    [MeasurableSpace X]
+    [MeasurableSpace X] [BorelSpace X]
     (hStokes : ∀ (k : ℕ), ∀ ω : SmoothForm n X k,
       |setIntegral (k + 1) T_raw.support (smoothExtDeriv ω)| ≤ 0) :
     IntegrationData n X (2 * (n - p)) where
@@ -412,10 +414,10 @@ theorem microstructure_produces_stokes_bounded_currents (p : ℕ) (_γ : SmoothF
 
     For the proof track, this is used to establish boundary bounds. -/
 class RawSheetSumZeroBound (n : ℕ) (X : Type*) (p : ℕ) (hscale : ℝ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
     (C : Cubulation n X hscale) (T_raw : RawSheetSum n X p hscale C) : Prop where
   /-- The integral over the support gives zero bound. -/
   integral_zero_bound : ∀ ω : SmoothForm n X (2 * (n - p)),

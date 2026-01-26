@@ -24,10 +24,10 @@ open Classical Hodge
 set_option autoImplicit false
 
 variable {n : ℕ} {X : Type*}
-  [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+  [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
-  [MeasurableSpace X] [Nonempty X]
+  [MeasurableSpace X] [BorelSpace X] [Nonempty X]
 
 /-- **The Hodge Conjecture** (Hodge, 1950; Millennium Prize Problem).
 
@@ -45,9 +45,11 @@ variable {n : ℕ} {X : Type*}
     See `hodge_conjecture_kernel` for the kernel-only version without typeclasses. -/
 theorem hodge_conjecture {p : ℕ}
     [CycleClass.PoincareDualFormExists n X p]
+    [AutomaticSYRData n X]
     [FlatLimitCycleData n X (2 * (n - p))]  -- Federer-Fleming compactness
     [CubulationExists n X]  -- Cubulation existence for microstructure
     [HarveyLawsonKingData n X (2 * (n - p))]  -- Harvey-Lawson regularity
+    [ChowGAGAData n X]  -- Chow/GAGA: analytic subvarieties are algebraic
     (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
     (h_rational : isRationalClass (ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :
     ∃ (Z : SignedAlgebraicCycle n X p), Z.cycleClass_geom = ofForm γ h_closed :=

@@ -11,9 +11,10 @@ open Classical Filter Hodge
 set_option autoImplicit false
 
 variable {n : ℕ} {X : Type*}
-  [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+  [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
   [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+  [MeasurableSpace X] [BorelSpace X]
 
 /-!
 # Track A.3: Federer-Fleming Compactness Theorem
@@ -29,18 +30,20 @@ noncomputable def C4 (_n _k : ℕ) : ℝ := 2
 
 /-- The hypothesis bundle for Federer-Fleming compactness. -/
 structure FFCompactnessHypothesis (n : ℕ) (X : Type*) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] where
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] where
   T : ℕ → IntegralCurrent n X (k + 1)
   M : ℝ
   mass_bound : ∀ j, (T j : Current n X (k + 1)).mass + (T j).boundary.toFun.mass ≤ M
 
 /-- The conclusion of Federer-Fleming. -/
 structure FFCompactnessConclusion (n : ℕ) (X : Type*) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X]
     (hyp : FFCompactnessHypothesis n X k) where
   T_limit : IntegralCurrent n X (k + 1)
   φ : ℕ → ℕ
@@ -55,9 +58,10 @@ noncomputable def boundaryHL {k : ℕ} (T : Current n X k) : Current n X (k - 1)
 
 /-- **Compactness data** for flat-norm limits. -/
 class FlatLimitExistenceData (n : ℕ) (X : Type*) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] : Prop where
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] : Prop where
   flat_limit_existence :
     ∀ (T_seq : ℕ → IntegralCurrent n X k)
       (M : ℝ)

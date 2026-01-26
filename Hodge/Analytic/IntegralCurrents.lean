@@ -16,9 +16,10 @@ open Classical MeasureTheory Hodge
 set_option autoImplicit false
 
 variable {n : ℕ} {X : Type*}
-  [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+  [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X]
   [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+  [MeasurableSpace X] [BorelSpace X]
 
 /-- **Rectifiability** (Federer, 1969).
     A set S ⊆ X is k-rectifiable if it can be covered (up to measure zero)
@@ -42,8 +43,9 @@ theorem isRectifiable_union (k : ℕ) (S₁ S₂ : Set X) :
     with integer multiplicities. Defined inductively with explicit closure properties.
     Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 1960]. -/
 inductive IntegralPolyhedralChain' {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] :
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] :
     Current n X k → Prop where
   | zero : IntegralPolyhedralChain' 0
   | add {S T : Current n X k} : IntegralPolyhedralChain' S → IntegralPolyhedralChain' T →
@@ -53,8 +55,9 @@ inductive IntegralPolyhedralChain' {n : ℕ} {X : Type*} {k : ℕ}
 
 /-- Convert the inductive predicate to a set. -/
 def IntegralPolyhedralChain (n : ℕ) (X : Type*) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] :
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] :
     Set (Current n X k) :=
   { T | IntegralPolyhedralChain' T }
 
@@ -226,9 +229,10 @@ theorem isIntegral_boundary {k : ℕ} (T : Current n X (k + 1)) :
 
 /-- An integral current structure wrapping the predicate. -/
 structure IntegralCurrent (n : ℕ) (X : Type*) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] where
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] where
   toFun : Current n X k
   is_integral : isIntegral toFun
 
@@ -246,9 +250,10 @@ structure IntegralCurrent (n : ℕ) (X : Type*) (k : ℕ)
     **Note**: This should NOT be confused with placeholder `:= 0` stubs elsewhere
     in the codebase. This is a genuine mathematical definition. -/
 def zero_int (n : ℕ) (X : Type*) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] :
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] :
     IntegralCurrent n X k :=
   { toFun := 0
     is_integral := isIntegral_zero_current k }
@@ -276,9 +281,9 @@ For the current stub (zero currents), this is trivial.
     which are trivially integral. Once real Hausdorff integration is implemented,
     this will require the full approximation theorem. -/
 noncomputable def IntegrationData.toIntegralCurrent {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [Nonempty X]
+    [Nonempty X] [MeasurableSpace X] [BorelSpace X]
     (data : IntegrationData n X k) (h_integral : isIntegral data.toCurrent) : IntegralCurrent n X k :=
   { toFun := data.toCurrent
     is_integral := h_integral }
@@ -294,10 +299,10 @@ noncomputable def IntegrationData.toIntegralCurrent {n : ℕ} {X : Type*} {k : �
 
     Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 1960]. -/
 structure ClosedSubmanifoldIntegralData (n : ℕ) (X : Type*) (k : ℕ) (Z : Set X)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
     [ClosedSubmanifoldStokesData n X k Z] where
   /-- The current over Z is integral (can be approximated by polyhedral chains). -/
   is_integral : isIntegral (IntegrationData.closedSubmanifold n X k Z).toCurrent
@@ -311,10 +316,10 @@ structure ClosedSubmanifoldIntegralData (n : ℕ) (X : Type*) (k : ℕ) (Z : Set
     Complex submanifolds of compact Kähler manifolds are automatically integral
     (Federer-Fleming approximation theorem), but this requires substantial GMT machinery. -/
 noncomputable def IntegrationData.closedSubmanifold_toIntegralCurrent {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
     (Z : Set X) [ClosedSubmanifoldStokesData n X k Z]
     (data : ClosedSubmanifoldIntegralData n X k Z) : IntegralCurrent n X (Nat.succ k) :=
   (IntegrationData.closedSubmanifold n X k Z).toIntegralCurrent data.is_integral
@@ -322,10 +327,10 @@ noncomputable def IntegrationData.closedSubmanifold_toIntegralCurrent {n : ℕ} 
 /-- The integration current from a closed submanifold has zero boundary mass.
     This follows from complex submanifolds being closed. -/
 theorem IntegrationData.closedSubmanifold_bdryMass {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
     (Z : Set X) [ClosedSubmanifoldStokesData n X k Z] :
     (IntegrationData.closedSubmanifold n X k Z).bdryMass = 0 := by
   unfold IntegrationData.closedSubmanifold
