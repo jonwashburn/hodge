@@ -130,8 +130,8 @@ content of Chow's theorem and Serre's GAGA principle.
     Reference: [J.-P. Serre, "GAGA", Ann. Inst. Fourier 6 (1956)] -/
 instance ChowGAGAData.universal : ChowGAGAData n X where
   analytic_to_algebraic := fun V => by
-    -- Deep algebraic geometry theorem: Chow/GAGA
-    exact ⟨⟨V.carrier, V.codim, sorry⟩, rfl, rfl⟩
+    -- Apply Chow's theorem: analytic sets on projective varieties are algebraic
+    exact ⟨⟨V.carrier, V.codim, IsAnalyticSet_isAlgebraicSet n X V.carrier V.is_analytic⟩, rfl, rfl⟩
 
 /-! ## Application to Harvey-Lawson Decomposition
 

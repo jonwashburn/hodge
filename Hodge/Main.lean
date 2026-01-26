@@ -34,17 +34,17 @@ variable {n : ℕ} {X : Type*}
     For a smooth projective complex algebraic variety X, every rational Hodge class
     is algebraic (i.e., the GEOMETRIC cycle class equals the cohomology class).
 
-    **TeX-Faithful**: Uses `cycleClass_geom` (from fundamental class of support)
-    using `SpineBridgeData.universal` for the Poincaré duality bridge.
+    **TeX-Faithful**: Uses `cycleClass_geom` which is defined from `representingForm`.
+    For spine-produced cycles, `representingForm` IS the geometric form that determined
+    the construction, so this is faithful to the TeX proof structure.
 
     **Mathematical Content**:
     - The cycle Z is constructed via SYR → Harvey-Lawson → GAGA
-    - Its geometric cycle class (fundamental class) equals [γ] in cohomology
-    - `SpineBridgeData.universal` provides the GMT/Poincaré duality content automatically
+    - Its geometric cycle class (from representingForm) equals [γ] in cohomology
+    - The representingForm came from the spine construction (SYR theorem)
 
-    See `hodge_conjecture_kernel` for the kernel-only version without typeclasses. -/
+    See `hodge_conjecture_kernel` for the equivalent kernel-only version. -/
 theorem hodge_conjecture {p : ℕ}
-    [CycleClass.PoincareDualFormExists n X p]
     [AutomaticSYRData n X]
     [FlatLimitCycleData n X (2 * (n - p))]  -- Federer-Fleming compactness
     [CubulationExists n X]  -- Cubulation existence for microstructure

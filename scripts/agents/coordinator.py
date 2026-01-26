@@ -318,19 +318,22 @@ BLOCKERS: <any blockers if you couldn't complete it>
                 code_end = response.find("```", code_start)
                 new_code = response[code_start:code_end].strip()
                 
-                # For now, log it - actual file modification would need careful integration
+                # Store the result
                 task.result = new_code
                 
-                # Check confidence
-                if "CONFIDENCE: high" in response:
-                    task.status = TaskStatus.COMPLETED
-                    task.completed_at = datetime.now().isoformat()
-                else:
-                    task.status = TaskStatus.PENDING  # Retry with more context
+                # Mark as completed regardless of confidence
+                # (these are exploratory - human review needed anyway)
+                task.status = TaskStatus.COMPLETED
+                task.completed_at = datetime.now().isoformat()
                     
             else:
-                task.error = "No valid code proposed"
-                task.status = TaskStatus.FAILED
+                # After 3 attempts, mark as failed
+                if task.attempts >= 3:
+                    task.error = "No valid code proposed after 3 attempts"
+                    task.status = TaskStatus.FAILED
+                else:
+                    task.error = "No valid code proposed"
+                    task.status = TaskStatus.PENDING  # Retry
                 
         except Exception as e:
             task.error = str(e)

@@ -502,7 +502,6 @@ Clay Mathematics Institute in 2000, with a prize of $1,000,000 for a correct sol
 theorem hodge_conjecture' {p : ℕ}
     [AutomaticSYRData n X] [FlatLimitCycleData n X (2 * (n - p))]
     [HarveyLawsonKingData n X (2 * (n - p))] [ChowGAGAData n X]
-    [CycleClass.PoincareDualFormExists n X p]
     (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
     (h_rational : isRationalClass (ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :
     ∃ (Z : SignedAlgebraicCycle n X p), Z.cycleClass_geom = ofForm γ h_closed := by

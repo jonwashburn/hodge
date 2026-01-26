@@ -56,10 +56,10 @@ namespace Hodge.TexSpine.HarveyLawsonKing
 universe u
 
 variable {n : ℕ} {X : Type u} {k : ℕ}
-  [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+  [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
-  [MeasurableSpace X] [Nonempty X]
+  [MeasurableSpace X] [BorelSpace X] [Nonempty X]
 
 /-! ## Real Harvey-Lawson Structure
 

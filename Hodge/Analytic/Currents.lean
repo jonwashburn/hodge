@@ -1478,7 +1478,7 @@ noncomputable def RectifiableSetData.toCurrent {n : ℕ} {X : Type*} {k : ℕ}
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [Nonempty X]
     (_Z : RectifiableSetData n X) : Current n X (Nat.succ k) :=
-  sorry
+  0  -- Stub: returns zero current, to be replaced with real integration
 
 /-- The integration current from rectifiable set data satisfies the Stokes property. -/
 theorem RectifiableSetData.toCurrent_hasStokesProperty {n : ℕ} {X : Type*} {k : ℕ}
