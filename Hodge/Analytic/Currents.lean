@@ -863,8 +863,11 @@ noncomputable def ClosedSubmanifoldData.toIntegrationData {n : ℕ} {X : Type*} 
     | zero => trivial
     | succ k' =>
       intro ω
-      -- Stokes theorem for closed submanifolds: ∫_Z dω = 0
-      -- So |0| ≤ 0 * ‖ω‖
+      -- Stokes theorem for closed submanifolds: ∫_Z dω = ∫_∂Z ω = 0
+      -- Since ∂Z = ∅ for closed submanifolds, the integral vanishes.
+      -- So |0| ≤ 0 * ‖ω‖ holds.
+      -- Currently using sorry pending full Stokes infrastructure
+      -- Mathematical content: Stokes' theorem on manifolds with boundary
       sorry
 
 /-- **Set integration** for forms of arbitrary degree.

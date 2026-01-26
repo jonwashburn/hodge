@@ -401,11 +401,11 @@ noncomputable def VolumeIntegrationData.trivial (n : ℕ) (X : Type*)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] : VolumeIntegrationData n X where
-  -- Real: volume integration using Kähler measure
-  integrate := fun ω => sorry
-  integrate_add := fun _ _ => sorry
-  integrate_smul := fun _ _ => sorry
-  integrate_nonneg := fun _ _ => sorry
+  -- Trivial implementation: all integrals return 0
+  integrate := fun _ => 0
+  integrate_add := fun _ _ => by simp
+  integrate_smul := fun _ _ => by simp
+  integrate_nonneg := fun _ _ => le_refl 0
 
 /-- **Basepoint Volume Integration Data**.
 

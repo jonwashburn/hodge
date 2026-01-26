@@ -19,8 +19,8 @@ import traceback
 
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 MODEL = "claude-sonnet-4-20250514"
-MAX_CONCURRENT_AGENTS = 3  # Fewer but deeper
-MAX_ITERATIONS = 15  # More iterations per task
+MAX_CONCURRENT_AGENTS = 6  # Run more agents in parallel for Phase 2
+MAX_ITERATIONS = 20  # More iterations per task
 HODGE_PATH = Path("/home/ubuntu/hodge")
 STATE_FILE = HODGE_PATH / "deep_agent_state.json"
 LOG_DIR = HODGE_PATH / "deep_agent_logs"
@@ -308,7 +308,42 @@ class DeepCoordinator:
         task.status = TaskStatus.IN_PROGRESS
         self.save_state()
 
-        system = f"""You are an expert Lean 4 mathematician working on the Hodge Conjecture formalization.
+        # Dynamic system prompt based on task type
+        if task.id.startswith("faithfulness_"):
+            system = f"""You are an expert Lean 4 mathematician working on the Hodge Conjecture formalization.
+
+YOUR TASK: {task.description}
+TARGET: {task.target} in {task.file_path}
+
+**PHASE 2: FAITHFULNESS RESTORATION**
+
+Your goal is to replace all `True := trivial` stubs with REAL mathematical statements.
+
+For each `True := trivial` pattern:
+1. Identify what the theorem SHOULD state mathematically
+2. Replace `True` with the actual statement type (e.g., `α.toForm = β` or `∃ c, ∫ ω = c`)
+3. Replace `trivial` with `by sorry` (we'll prove these later)
+
+Example transformation:
+  BEFORE: theorem foo : True := trivial  -- Placeholder
+  AFTER:  theorem foo : α.mass ≤ C * β.comass := by sorry
+
+WORKFLOW:
+1. Read the target file with read_file
+2. Find all `True := trivial` patterns with grep
+3. For each one, understand the mathematical context
+4. Replace with the real statement using search_replace
+5. Run lake build to verify it compiles
+6. Call task_complete with a summary of changes
+
+RULES:
+- The new statement must be mathematically meaningful
+- Use `sorry` for proofs - that's fine for Phase 2
+- Must compile without errors
+- You have up to {MAX_ITERATIONS} tool calls
+"""
+        else:
+            system = f"""You are an expert Lean 4 mathematician working on the Hodge Conjecture formalization.
 
 YOUR TASK: {task.description}
 TARGET: {task.target} in {task.file_path}
