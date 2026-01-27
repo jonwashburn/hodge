@@ -1086,15 +1086,15 @@ structure IntegrationData (n : ℕ) (X : Type*) (k : ℕ)
   bdryMass : ℝ
   /-- Boundary mass is non-negative -/
   bdryMass_nonneg : bdryMass ≥ 0
-  /-- **Stokes property**: |∫_Z dω| ≤ bdryMass · ‖ω‖
-      This encodes Stokes' theorem: ∫_Z dω = ∫_{∂Z} ω, so
-      |∫_Z dω| = |∫_{∂Z} ω| ≤ mass(∂Z) · comass(ω) = bdryMass · ‖ω‖
-      For k = 0, this is trivial (no boundary condition).
-      For k = k' + 1, this bounds the response to exact forms. -/
-  stokes_bound :
-    match k with
-    | 0 => True
-    | k' + 1 => ∀ ω : SmoothForm n X k', |integrate (smoothExtDeriv ω)| ≤ bdryMass * ‖ω‖
+  /-- **Stokes property**: for any form ω, the integral of dω is bounded by bdryMass · ‖ω‖.
+      This is the shape needed for the `boundary_bound` field of `Current`.
+
+      Note: In full GMT, only the case `k = k' + 1` is meaningful (integrating exact (k)-forms).
+      We package it uniformly as a Prop so downstream constructions don't need to pattern-match
+      on `k` (which can be a complex expression like `2 * (n - p)`).
+  -/
+  stokes_bound : ∀ {k' : ℕ}, k = k' + 1 → ∀ ω : SmoothForm n X k',
+    |integrate (smoothExtDeriv ω)| ≤ bdryMass * ‖ω‖
 
 /-- The empty set as integration data with zero integral. -/
 noncomputable def IntegrationData.empty (n : ℕ) (X : Type*) (k : ℕ)

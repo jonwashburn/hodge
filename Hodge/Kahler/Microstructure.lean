@@ -338,32 +338,31 @@ noncomputable def RawSheetSum.toIntegrationData {p : ℕ} {hscale : ℝ}
   bdryMass := 0
   bdryMass_nonneg := le_refl 0
   stokes_bound := by
+    -- `IntegrationData.stokes_bound` is a `match` on the degree. We split on it directly.
     cases hk : (2 * (n - p)) with
-    | zero => trivial
+    | zero =>
+      -- k = 0, so the Stokes field is `True`.
+      trivial
     | succ k' =>
       intro ω
       simp only [MulZeroClass.zero_mul]
       -- Each sheet is a closed submanifold, so its Stokes bound is 0; sums preserve this.
-      have h0 :
+      have h0sum :
           (∑ Q ∈ C.cubes.attach, ∑ s ∈ T_raw.sheets Q.1 Q.2,
               (s.data.toIntegrationData.integrate (smoothExtDeriv ω))) = 0 := by
         classical
-        -- Each summand is 0 because |∫ dω| ≤ 0 implies ∫ dω = 0.
         refine Finset.sum_eq_zero ?_
         intro Q hQ
         refine Finset.sum_eq_zero ?_
         intro s hs
         have habs : |s.data.toIntegrationData.integrate (smoothExtDeriv ω)| ≤ 0 := by
-          -- Use the Stokes bound from the closed-submanifold integration data.
           simpa [ClosedSubmanifoldData.toIntegrationData] using
             (s.data.toOrientedData.stokes_bound ω)
         have hEqAbs : |s.data.toIntegrationData.integrate (smoothExtDeriv ω)| = 0 :=
           le_antisymm habs (abs_nonneg _)
         exact (abs_eq_zero).1 hEqAbs
-      -- Conclude.
-      -- The `integrate` field is definitionally this finite sum, so rewrite using `h0`.
-      -- Goal is `|0| ≤ 0`.
-      simpa [h0]
+      -- Now |0| ≤ 0.
+      simpa [hk, h0sum, abs_zero]
 
 /-- **Real Integration Data for RawSheetSum** (Phase 2)
     Uses actual `setIntegral` instead of zero stub.
