@@ -199,13 +199,142 @@ class SheetUnionStokesData (n : ℕ) (X : Type*) (k : ℕ) (Z : Set X)
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", Ch. 0]. -/
 noncomputable def RawSheetSum.toIntegrationData {p : ℕ} {hscale : ℝ}
     {C : Cubulation n X hscale} (T_raw : RawSheetSum n X p hscale C)
-    [SheetUnionStokesData n X (2 * (n - p) - 1) T_raw.support] :
-    IntegrationData n X (2 * (n - p)) where
+    : IntegrationData n X (2 * (n - p)) where
   carrier := T_raw.support
-  integrate := setIntegral (2 * (n - p)) T_raw.support
-  integrate_linear := fun c ω₁ ω₂ => setIntegral_linear (2 * (n - p)) T_raw.support c ω₁ ω₂
+  -- Real: sum of sheet integrals using each sheet’s `ClosedSubmanifoldData` witness.
+  integrate := fun ω =>
+    ∑ Q ∈ C.cubes.attach, ∑ s ∈ T_raw.sheets Q.1 Q.2, (s.data.toIntegrationData.integrate ω)
+  integrate_linear := by
+    classical
+    intro c ω₁ ω₂
+    -- Expand the sums and use linearity of each sheet’s integration functional.
+    -- Outer sum over cubes:
+    --   ∑Q ∑s I_s(c•ω₁+ω₂) = ∑Q (c * ∑s I_s ω₁ + ∑s I_s ω₂)
+    --   = c * ∑Q∑s I_s ω₁ + ∑Q∑s I_s ω₂
+    -- where `I_s` is the integration functional from `ClosedSubmanifoldData.toIntegrationData`.
+    --
+    -- We keep the proof explicit (no `simp`-only magic) to avoid fragility.
+    have hQ :
+        ∀ Q : { Q // Q ∈ C.cubes },
+          (∑ s ∈ T_raw.sheets Q.1 Q.2, s.data.toIntegrationData.integrate (c • ω₁ + ω₂)) =
+            c * (∑ s ∈ T_raw.sheets Q.1 Q.2, s.data.toIntegrationData.integrate ω₁) +
+              (∑ s ∈ T_raw.sheets Q.1 Q.2, s.data.toIntegrationData.integrate ω₂) := by
+      intro Q
+      -- Inner sum over sheets:
+      calc
+        (∑ s ∈ T_raw.sheets Q.1 Q.2, s.data.toIntegrationData.integrate (c • ω₁ + ω₂))
+            =
+            ∑ s ∈ T_raw.sheets Q.1 Q.2,
+              (c * (s.data.toIntegrationData.integrate ω₁) + (s.data.toIntegrationData.integrate ω₂)) := by
+              refine Finset.sum_congr rfl ?_
+              intro s hs
+              -- Use linearity of each sheet's integration functional.
+              simpa using (s.data.toIntegrationData.integrate_linear c ω₁ ω₂)
+        _ = (∑ s ∈ T_raw.sheets Q.1 Q.2, c * (s.data.toIntegrationData.integrate ω₁)) +
+              (∑ s ∈ T_raw.sheets Q.1 Q.2, (s.data.toIntegrationData.integrate ω₂)) := by
+              simpa [Finset.sum_add_distrib]
+        _ = c * (∑ s ∈ T_raw.sheets Q.1 Q.2, (s.data.toIntegrationData.integrate ω₁)) +
+              (∑ s ∈ T_raw.sheets Q.1 Q.2, (s.data.toIntegrationData.integrate ω₂)) := by
+              -- Pull out the scalar `c`.
+              have hm :
+                  (∑ s ∈ T_raw.sheets Q.1 Q.2, c * (s.data.toIntegrationData.integrate ω₁)) =
+                    c * (∑ s ∈ T_raw.sheets Q.1 Q.2, (s.data.toIntegrationData.integrate ω₁)) := by
+                  simpa using
+                    (Finset.mul_sum (s := T_raw.sheets Q.1 Q.2)
+                      (f := fun s => s.data.toIntegrationData.integrate ω₁) c).symm
+              simpa [hm]
+    -- Now sum hQ over cubes and rearrange.
+    calc
+      (∑ Q ∈ C.cubes.attach, ∑ s ∈ T_raw.sheets Q.1 Q.2, s.data.toIntegrationData.integrate (c • ω₁ + ω₂))
+          = ∑ Q ∈ C.cubes.attach,
+              (c * (∑ s ∈ T_raw.sheets Q.1 Q.2, s.data.toIntegrationData.integrate ω₁) +
+                (∑ s ∈ T_raw.sheets Q.1 Q.2, s.data.toIntegrationData.integrate ω₂)) := by
+            -- Use hQ pointwise (note `C.cubes.attach` elements carry membership proofs).
+            refine Finset.sum_congr rfl ?_
+            intro Q hQmem
+            -- Cast `Q` to the subtype expected by hQ.
+            have : (∑ s ∈ T_raw.sheets Q.1 Q.2, s.data.toIntegrationData.integrate (c • ω₁ + ω₂)) =
+                c * (∑ s ∈ T_raw.sheets Q.1 Q.2, s.data.toIntegrationData.integrate ω₁) +
+                  (∑ s ∈ T_raw.sheets Q.1 Q.2, s.data.toIntegrationData.integrate ω₂) := by
+              -- `Q` here is already a subtype element.
+              simpa using hQ Q
+            simpa [this]
+      _ = c * (∑ Q ∈ C.cubes.attach, ∑ s ∈ T_raw.sheets Q.1 Q.2, s.data.toIntegrationData.integrate ω₁) +
+            (∑ Q ∈ C.cubes.attach, ∑ s ∈ T_raw.sheets Q.1 Q.2, s.data.toIntegrationData.integrate ω₂) := by
+            -- Distribute sum over addition, then pull out scalar `c`.
+            simp [Finset.sum_add_distrib, Finset.mul_sum, add_assoc, add_left_comm, add_comm]
   integrate_continuous := continuous_of_discreteTopology
-  integrate_bound := setIntegral_bound (2 * (n - p)) T_raw.support
+  integrate_bound := by
+    classical
+    -- Use the mass bound on each sheet and the triangle inequality for finite sums.
+    refine ⟨(∑ Q ∈ C.cubes.attach, ∑ s ∈ T_raw.sheets Q.1 Q.2, s.data.toOrientedData.mass), ?_⟩
+    intro ω
+    -- Step 1: triangle inequality on the outer sum.
+    have h_outer :
+        |∑ Q ∈ C.cubes.attach, (∑ s ∈ T_raw.sheets Q.1 Q.2, s.data.toIntegrationData.integrate ω)| ≤
+          ∑ Q ∈ C.cubes.attach, |∑ s ∈ T_raw.sheets Q.1 Q.2, s.data.toIntegrationData.integrate ω| :=
+      Finset.abs_sum_le_sum_abs
+        (fun Q => ∑ s ∈ T_raw.sheets Q.1 Q.2, s.data.toIntegrationData.integrate ω)
+        C.cubes.attach
+
+    -- Step 2: triangle inequality on each inner sum, then sum those inequalities.
+    have h_inner :
+        (∑ Q ∈ C.cubes.attach, |∑ s ∈ T_raw.sheets Q.1 Q.2, s.data.toIntegrationData.integrate ω|) ≤
+          ∑ Q ∈ C.cubes.attach, ∑ s ∈ T_raw.sheets Q.1 Q.2, |s.data.toIntegrationData.integrate ω| := by
+      refine Finset.sum_le_sum ?_
+      intro Q hQ
+      -- abs(sum) ≤ sum(abs) for the sheet sum at fixed Q
+      simpa using
+        (Finset.abs_sum_le_sum_abs (fun s => s.data.toIntegrationData.integrate ω) (T_raw.sheets Q.1 Q.2))
+
+    have h_abs :
+        |∑ Q ∈ C.cubes.attach, ∑ s ∈ T_raw.sheets Q.1 Q.2, s.data.toIntegrationData.integrate ω| ≤
+          ∑ Q ∈ C.cubes.attach, ∑ s ∈ T_raw.sheets Q.1 Q.2, |s.data.toIntegrationData.integrate ω| :=
+      le_trans h_outer h_inner
+
+    -- Step 3: bound each term by mass · ‖ω‖ and sum.
+    have h_termwise :
+        (∑ Q ∈ C.cubes.attach, ∑ s ∈ T_raw.sheets Q.1 Q.2, |s.data.toIntegrationData.integrate ω|) ≤
+          ∑ Q ∈ C.cubes.attach, ∑ s ∈ T_raw.sheets Q.1 Q.2, s.data.toOrientedData.mass * ‖ω‖ := by
+      refine Finset.sum_le_sum ?_
+      intro Q hQ
+      refine Finset.sum_le_sum ?_
+      intro s hs
+      -- `s.data.toIntegrationData.integrate` is `hausdorffIntegrate` on the oriented data.
+      simpa [ClosedSubmanifoldData.toIntegrationData] using
+        (hausdorffIntegrate_bound (data := s.data.toOrientedData) ω)
+
+    -- Step 4: factor out the constant ‖ω‖.
+    have h_factor :
+        (∑ Q ∈ C.cubes.attach, ∑ s ∈ T_raw.sheets Q.1 Q.2, s.data.toOrientedData.mass * ‖ω‖) =
+          (∑ Q ∈ C.cubes.attach, ∑ s ∈ T_raw.sheets Q.1 Q.2, s.data.toOrientedData.mass) * ‖ω‖ := by
+      -- Use `Finset.sum_mul` twice (inner then outer).
+      -- First, rewrite each inner sum.
+      have h_inner_mul :
+          ∀ Q : { Q // Q ∈ C.cubes },
+            (∑ s ∈ T_raw.sheets Q.1 Q.2, s.data.toOrientedData.mass * ‖ω‖) =
+              (∑ s ∈ T_raw.sheets Q.1 Q.2, s.data.toOrientedData.mass) * ‖ω‖ := by
+        intro Q
+        -- (∑ mass) * ‖ω‖ = ∑ (mass * ‖ω‖)
+        simpa using
+          (Finset.sum_mul (s := T_raw.sheets Q.1 Q.2) (f := fun s => s.data.toOrientedData.mass) ‖ω‖).symm
+      -- Now apply the same idea to the outer sum.
+      -- Replace each inner sum using h_inner_mul, then factor out ‖ω‖.
+      calc
+        (∑ Q ∈ C.cubes.attach, ∑ s ∈ T_raw.sheets Q.1 Q.2, s.data.toOrientedData.mass * ‖ω‖)
+            = ∑ Q ∈ C.cubes.attach, (∑ s ∈ T_raw.sheets Q.1 Q.2, s.data.toOrientedData.mass) * ‖ω‖ := by
+                refine Finset.sum_congr rfl ?_
+                intro Q hQ'
+                simpa using h_inner_mul Q
+        _ = (∑ Q ∈ C.cubes.attach, ∑ s ∈ T_raw.sheets Q.1 Q.2, s.data.toOrientedData.mass) * ‖ω‖ := by
+              simpa using
+                (Finset.sum_mul (s := C.cubes.attach)
+                  (f := fun Q => ∑ s ∈ T_raw.sheets Q.1 Q.2, s.data.toOrientedData.mass) ‖ω‖).symm
+
+    -- Finish.
+    have h1 :=
+      le_trans h_abs (le_trans h_termwise (le_of_eq h_factor))
+    simpa using h1
   bdryMass := 0
   bdryMass_nonneg := le_refl 0
   stokes_bound := by
@@ -214,18 +343,27 @@ noncomputable def RawSheetSum.toIntegrationData {p : ℕ} {hscale : ℝ}
     | succ k' =>
       intro ω
       simp only [MulZeroClass.zero_mul]
-      -- Use the Stokes bound packaged in `SheetUnionStokesData`.
-      have hk' : 2 * (n - p) - 1 = k' := by
-        -- From `2*(n-p) = k'+1`, subtract 1 on both sides.
-        have := congrArg (fun t => t - 1) hk
-        simpa using this
-      have inst0 : SheetUnionStokesData n X (2 * (n - p) - 1) T_raw.support := by
-        infer_instance
-      have inst1 : SheetUnionStokesData n X k' T_raw.support := by
-        simpa [hk'] using inst0
-      have h := inst1.stokes_integral_zero ω
-      -- Rewrite the target degree `2*(n-p)` to `k'+1` using `hk`.
-      simpa [hk] using h
+      -- Each sheet is a closed submanifold, so its Stokes bound is 0; sums preserve this.
+      have h0 :
+          (∑ Q ∈ C.cubes.attach, ∑ s ∈ T_raw.sheets Q.1 Q.2,
+              (s.data.toIntegrationData.integrate (smoothExtDeriv ω))) = 0 := by
+        classical
+        -- Each summand is 0 because |∫ dω| ≤ 0 implies ∫ dω = 0.
+        refine Finset.sum_eq_zero ?_
+        intro Q hQ
+        refine Finset.sum_eq_zero ?_
+        intro s hs
+        have habs : |s.data.toIntegrationData.integrate (smoothExtDeriv ω)| ≤ 0 := by
+          -- Use the Stokes bound from the closed-submanifold integration data.
+          simpa [ClosedSubmanifoldData.toIntegrationData] using
+            (s.data.toOrientedData.stokes_bound ω)
+        have hEqAbs : |s.data.toIntegrationData.integrate (smoothExtDeriv ω)| = 0 :=
+          le_antisymm habs (abs_nonneg _)
+        exact (abs_eq_zero).1 hEqAbs
+      -- Conclude.
+      -- The `integrate` field is definitionally this finite sum, so rewrite using `h0`.
+      -- Goal is `|0| ≤ 0`.
+      simpa [h0]
 
 /-- **Real Integration Data for RawSheetSum** (Phase 2)
     Uses actual `setIntegral` instead of zero stub.
@@ -267,9 +405,8 @@ class RawSheetSumIntegralityData (n : ℕ) (X : Type*) (p : ℕ) (hscale : ℝ)
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [BorelSpace X] [Nonempty X] [SubmanifoldIntegration n X]
-    (C : Cubulation n X hscale) (T_raw : RawSheetSum n X p hscale C)
-    [SheetUnionStokesData n X (2 * (n - p) - 1) T_raw.support] : Prop where
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    (C : Cubulation n X hscale) (T_raw : RawSheetSum n X p hscale C) : Prop where
   /-- The current induced by `T_raw.toIntegrationData` is integral. -/
   is_integral : isIntegral T_raw.toIntegrationData.toCurrent
 
@@ -281,7 +418,6 @@ class RawSheetSumIntegralityData (n : ℕ) (X : Type*) (p : ℕ) (hscale : ℝ)
     Reference: [H. Federer, "Geometric Measure Theory", 1969, Section 4.2.25]. -/
 noncomputable def RawSheetSum.toCycleIntegralCurrent {p : ℕ} {hscale : ℝ}
     {C : Cubulation n X hscale} (T_raw : RawSheetSum n X p hscale C)
-    [SheetUnionStokesData n X (2 * (n - p) - 1) T_raw.support]
     [RawSheetSumIntegralityData n X p hscale C T_raw] :
     CycleIntegralCurrent n X (2 * (n - p)) where
   toIntegrationData := T_raw.toIntegrationData
@@ -293,7 +429,6 @@ noncomputable def RawSheetSum.toCycleIntegralCurrent {p : ℕ} {hscale : ℝ}
 /-- Convert a RawSheetSum to an IntegralCurrent. -/
 noncomputable def RawSheetSum.toIntegralCurrent {p : ℕ} {hscale : ℝ}
     {C : Cubulation n X hscale} (T_raw : RawSheetSum n X p hscale C)
-    [SheetUnionStokesData n X (2 * (n - p) - 1) T_raw.support]
     [RawSheetSumIntegralityData n X p hscale C T_raw] :
     IntegralCurrent n X (2 * (n - p)) :=
   T_raw.toCycleIntegralCurrent.toIntegralCurrent
@@ -356,36 +491,6 @@ theorem microstructureSequence_are_cycles (p : ℕ) (γ : SmoothForm n X (2 * p)
   -- microstructureSequence returns zero_int, which is a cycle
   unfold microstructureSequence
   exact zero_int_isCycle (2 * (n - p))
-
-/-- **Theorem: RawSheetSum currents are real in the current implementation**.
-    This replaces the zero-current foundation with real integration.
-
-    Reference: [H. Federer, "Geometric Measure Theory", 1969, Section 4.2.25]. -/
-theorem RawSheetSum.current_is_real {p : ℕ} {hscale : ℝ}
-    {C : Cubulation n X hscale} (T_raw : RawSheetSum n X p hscale C)
-    [SheetUnionStokesData n X (2 * (n - p) - 1) T_raw.support]
-    [RawSheetSumIntegralityData n X p hscale C T_raw] :
-    T_raw.toIntegralCurrent.toFun.toFun = setIntegral (n := n) (X := X) (2 * (n - p)) T_raw.support := by
-  ext ω
-  rfl
-
-/-- The underlying current of toIntegralCurrent is real. -/
-theorem RawSheetSum.toIntegralCurrent_toFun_eq_real {p : ℕ} {hscale : ℝ}
-    {C : Cubulation n X hscale} (T_raw : RawSheetSum n X p hscale C)
-    [SheetUnionStokesData n X (2 * (n - p) - 1) T_raw.support]
-    [RawSheetSumIntegralityData n X p hscale C T_raw] :
-    T_raw.toIntegralCurrent.toFun.toFun = setIntegral (n := n) (X := X) (2 * (n - p)) T_raw.support := by
-  ext ω
-  rfl
-
-/-- The underlying current of toIntegralCurrent equals setIntegral over support. -/
-theorem RawSheetSum.toIntegralCurrent_toFun_is_setIntegral {p : ℕ} {hscale : ℝ}
-    {C : Cubulation n X hscale} (T_raw : RawSheetSum n X p hscale C)
-    [SheetUnionStokesData n X (2 * (n - p) - 1) T_raw.support]
-    [RawSheetSumIntegralityData n X p hscale C T_raw] :
-    T_raw.toIntegralCurrent.toFun.toFun = setIntegral (n := n) (X := X) (2 * (n - p)) T_raw.support := by
-  ext ω
-  rfl
 
 /-!
 **Sheet sums over complex submanifolds are automatically closed** (documentation-only placeholder).

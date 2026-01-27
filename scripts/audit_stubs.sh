@@ -83,7 +83,20 @@ echo "4. PLACEHOLDER DEFINITIONS (:= 0)"
 echo "=================================="
 echo "The following := 0 patterns may be placeholders (review needed):"
 echo ""
+echo "4a. Single-line := 0 patterns:"
 grep -rn ":= 0" Hodge/ 2>/dev/null | grep -v "test\|Test\|example\|finrank\|degree\|codim" | head -40
+echo ""
+echo "4b. Multi-line := 0 patterns (definition on one line, 0 on next):"
+# Match blocks where a line ends with `:=` (optionally followed by whitespace) and the following
+# line is (indented) `0`.
+#
+# Note: with `grep -A1`, the *next* line is printed in "context" format:
+#   path/to/File.lean-124-  0
+# so we match that prefix explicitly.
+grep -A1 -rn -E ":=[[:space:]]*$" Hodge/ 2>/dev/null \
+  | grep -B1 -E ".*-[0-9]+-[[:space:]]*0[[:space:]]*$" \
+  | grep -v "test\|Test\|example\|finrank\|degree\|codim" \
+  | head -40
 echo ""
 
 echo "5. KNOWN KAHLER OPERATOR STUBS"
