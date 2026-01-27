@@ -1093,8 +1093,8 @@ structure IntegrationData (n : ℕ) (X : Type*) (k : ℕ)
       We package it uniformly as a Prop so downstream constructions don't need to pattern-match
       on `k` (which can be a complex expression like `2 * (n - p)`).
   -/
-  stokes_bound : ∀ {k' : ℕ}, k = k' + 1 → ∀ ω : SmoothForm n X k',
-    |integrate (smoothExtDeriv ω)| ≤ bdryMass * ‖ω‖
+  stokes_bound : ∀ {k' : ℕ} (hk : k = k' + 1) (ω : SmoothForm n X k'),
+    |integrate (hk ▸ smoothExtDeriv ω)| ≤ bdryMass * ‖ω‖
 
 /-- The empty set as integration data with zero integral. -/
 noncomputable def IntegrationData.empty (n : ℕ) (X : Type*) (k : ℕ)
@@ -1108,10 +1108,12 @@ noncomputable def IntegrationData.empty (n : ℕ) (X : Type*) (k : ℕ)
   integrate_bound := ⟨0, fun _ => by simp⟩
   bdryMass := 0
   bdryMass_nonneg := le_refl 0
-  stokes_bound := by
-    cases k with
-    | zero => trivial
-    | succ k' => intro ω; simp
+  stokes_bound := fun {k'} hk' ω => by
+    -- integrate := fun _ => 0, so integrate (smoothExtDeriv ω) = 0.
+    -- The goal is |0| ≤ 0 * ‖ω‖ = 0 which is true.
+    -- We need to use hk' : k = k' + 1 to typecheck (smoothExtDeriv ω : SmoothForm n X (k' + 1)).
+    -- For the empty set, integrate is constant 0 regardless of degree.
+    simp only [MulZeroClass.zero_mul, abs_zero, le_refl]
 
 /-- Convert IntegrationData to a Current.
     This is the main constructor for integration currents. -/
@@ -1132,7 +1134,9 @@ noncomputable def IntegrationData.toCurrent {n : ℕ} {X : Type*} {k : ℕ}
       refine ⟨data.bdryMass, ?_⟩
       intro ω
       -- data.stokes_bound gives us the bound for smoothExtDeriv
-      exact data.stokes_bound ω
+      -- Now signature is: stokes_bound : ∀ {k'}, k = k' + 1 → ∀ ω, ...
+      -- In the succ k' case, k = k' + 1, so we use rfl.
+      exact data.stokes_bound rfl ω
 
 /-- **Convert Oriented Rectifiable Set Data to IntegrationData**.
     This bridges the GMT structure with the Current infrastructure.
@@ -1156,12 +1160,14 @@ noncomputable def OrientedRectifiableSetData.toIntegrationData {n : ℕ} {X : Ty
     unfold OrientedRectifiableSetData.bdryMass
     exact ENNReal.toReal_nonneg
   stokes_bound := by
-    cases k with
-    | zero => trivial
-    | succ k' =>
-      intro ω
-      -- Stokes theorem for rectifiable sets (recorded in `data.stokes_bound`).
-      simpa [hausdorffIntegrate, OrientedRectifiableSetData.bdryMass] using data.stokes_bound ω
+    intro k' hk' ω
+    -- hk' : k = k' + 1, so data.stokes_bound applies.
+    -- Stokes theorem for rectifiable sets (recorded in `data.stokes_bound`).
+    -- data.stokes_bound has type: match k with | 0 => True | k' + 1 => ...
+    -- Since k = k' + 1, the match evaluates to the non-trivial case.
+    have hk_succ : k = Nat.succ k' := hk'
+    cases hk_succ
+    simpa [hausdorffIntegrate, OrientedRectifiableSetData.bdryMass] using data.stokes_bound ω
 
 /-- **Closed Submanifold to IntegrationData with Zero Boundary Mass**.
     The Stokes bound holds trivially with M = 0. -/
@@ -1179,30 +1185,36 @@ noncomputable def ClosedSubmanifoldData.toIntegrationData {n : ℕ} {X : Type*} 
   bdryMass := 0  -- Closed submanifold has no boundary
   bdryMass_nonneg := le_refl 0
   stokes_bound := by
-    cases k with
-    | zero => trivial
-    | succ k' =>
-      intro ω
-      -- Reduce to the Stokes bound already recorded on `data.toOrientedData`.
-      have h := data.toOrientedData.stokes_bound ω
-      -- For a closed submanifold, the boundary measure is `0`, so the RHS is `0`.
-      have h' :
-          |(∫ x in data.toOrientedData.carrier,
-                formVectorPairing (smoothExtDeriv ω) data.toOrientedData.orientation x ∂data.toOrientedData.measure).re| ≤
-            0 := by
-        -- `data.toOrientedData.boundary_measure = 0` and `boundary_carrier = ∅`
-        simpa [ClosedSubmanifoldData.toOrientedData, OrientedRectifiableSetData.bdryMass] using h
-      -- Conclude by showing the integral real part is zero.
-      have habs :
-          |(∫ x in data.toOrientedData.carrier,
-                formVectorPairing (smoothExtDeriv ω) data.toOrientedData.orientation x ∂data.toOrientedData.measure).re| = 0 :=
-        le_antisymm h' (abs_nonneg _)
-      have hz :
-          (∫ x in data.toOrientedData.carrier,
-                formVectorPairing (smoothExtDeriv ω) data.toOrientedData.orientation x ∂data.toOrientedData.measure).re = 0 :=
-        (abs_eq_zero).1 habs
-      -- Now the inequality is trivial.
-      simp [hausdorffIntegrate, hz]
+    intro k' hk' ω
+    simp only [MulZeroClass.zero_mul]
+    -- hk' : k = k' + 1, so k = Nat.succ k' and ω : SmoothForm n X k'.
+    -- Substitute k = k' + 1 so that data.toOrientedData.stokes_bound reduces.
+    cases hk'
+    -- Now data : ClosedSubmanifoldData n X (k' + 1), and the match reduces.
+    -- Reduce to the Stokes bound already recorded on `data.toOrientedData`.
+    -- For a closed submanifold, the boundary measure is `0`, so |∫ dω| ≤ 0.
+    have h := data.toOrientedData.stokes_bound ω
+    have h' :
+        |(∫ x in data.toOrientedData.carrier,
+              formVectorPairing (smoothExtDeriv ω) data.toOrientedData.orientation x ∂data.toOrientedData.measure).re| ≤
+          0 := by
+      -- `data.toOrientedData.boundary_measure = 0` and `boundary_carrier = ∅`
+      simpa [ClosedSubmanifoldData.toOrientedData, OrientedRectifiableSetData.bdryMass] using h
+    -- Conclude by showing the integral real part is zero.
+    have habs :
+        |(∫ x in data.toOrientedData.carrier,
+              formVectorPairing (smoothExtDeriv ω) data.toOrientedData.orientation x ∂data.toOrientedData.measure).re| = 0 :=
+      le_antisymm h' (abs_nonneg _)
+    have hz :
+        (∫ x in data.toOrientedData.carrier,
+              formVectorPairing (smoothExtDeriv ω) data.toOrientedData.orientation x ∂data.toOrientedData.measure).re = 0 :=
+      (abs_eq_zero).1 habs
+    -- The goal involves `integrate (smoothExtDeriv ω)` which is hausdorffIntegrate.
+    -- We need to show the LHS is 0 (which implies |LHS| ≤ 0).
+    -- By hz, the integral is 0, so |0| = 0 ≤ 0.
+    simp only [hausdorffIntegrate]
+    rw [hz]
+    simp only [abs_zero, le_refl]
 
 /-- **Set integration** for forms of arbitrary degree.
     This integrates a k-form over a set Z using the Hausdorff measure infrastructure.
@@ -1405,7 +1417,8 @@ noncomputable def IntegrationData.closedSubmanifold_zero (n : ℕ) (X : Type*)
     integrate_bound := setIntegral_bound 0 Z
     bdryMass := 0
     bdryMass_nonneg := le_refl 0
-    stokes_bound := trivial }
+    -- For k = 0, the premise 0 = k' + 1 is always false, so this is vacuously true.
+    stokes_bound := fun {k'} hk _ => (Nat.succ_ne_zero k' hk.symm).elim }
 
 /-- Helper for degree k+1 case (Stokes data required for degree k). -/
 noncomputable def IntegrationData.closedSubmanifold_succ (n : ℕ) (X : Type*) (k : ℕ)
@@ -1422,8 +1435,11 @@ noncomputable def IntegrationData.closedSubmanifold_succ (n : ℕ) (X : Type*) (
     bdryMass := 0
     bdryMass_nonneg := le_refl 0
     stokes_bound := by
-      intro ω
+      intro k' hk' ω
       simp only [MulZeroClass.zero_mul]
+      -- From hk' : Nat.succ k = k' + 1, we get k = k'.
+      have hk_eq : k = k' := Nat.succ.inj hk'
+      cases hk_eq
       exact stokes_bound_of_ClosedSubmanifoldStokesData (n := n) (X := X) (k := k) Z ω }
 
 /-- **Integration Data for Closed Submanifolds**.
@@ -1665,9 +1681,10 @@ theorem integration_current_hasStokesProperty {n : ℕ} {X : Type*} {k : ℕ}
   -- integration_current evaluates as setIntegral, so the bound follows from Stokes
   -- `integration_current` is `IntegrationData.closedSubmanifold.toCurrent`, so this
   -- is exactly the `stokes_bound` field of `IntegrationData.closedSubmanifold`.
+  -- Note: stokes_bound now requires a proof that (Nat.succ k) = k + 1 (which is rfl).
   simpa [integration_current, IntegrationData.toCurrent,
     IntegrationData.closedSubmanifold, IntegrationData.closedSubmanifold_succ]
-    using (IntegrationData.closedSubmanifold (n := n) (X := X) (k := k) Z).stokes_bound ω
+    using (IntegrationData.closedSubmanifold (n := n) (X := X) (k := k) Z).stokes_bound rfl ω
 
 /-- **Integration Current Boundary Bound** (Agent 2a).
 
