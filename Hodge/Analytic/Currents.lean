@@ -69,6 +69,42 @@ namespace Current
 
 variable {k : ℕ}
 
+/-! ## Support of a Current
+
+The **support** of a current T is the smallest closed set Z such that T(ω) = 0
+for all smooth forms ω whose support is disjoint from Z. This is a fundamental
+concept in GMT that characterizes "where" a current lives.
+
+For our purposes, we define support operationally as the closure of the set
+of points where the current "acts" non-trivially.
+
+Reference: [Federer, "Geometric Measure Theory", 1969, §4.1.7].
+-/
+
+/-- **Support of a Current** (placeholder definition).
+
+    The support of a current T is the smallest closed set Z ⊆ X such that
+    T(ω) = 0 whenever supp(ω) ∩ Z = ∅.
+
+    **Implementation Note**: This is defined as Set.univ as a placeholder.
+    In the full GMT implementation, this would be computed from the current's
+    action on test forms via a proper localization procedure.
+
+    Reference: [Federer, "Geometric Measure Theory", 1969, §4.1.7]. -/
+def support {n k : ℕ} {X : Type*}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+    (T : Current n X k) : Set X :=
+  Set.univ  -- Placeholder: support is contained in X
+
+/-- The support of a current is closed (placeholder). -/
+theorem support_isClosed {n k : ℕ} {X : Type*}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [Nonempty X] (T : Current n X k) : IsClosed (support T) := by
+  simp only [support]
+  exact isClosed_univ
+
 /-- Extensionality for currents: two currents are equal iff they agree on all forms. -/
 @[ext]
 theorem ext' {n k : ℕ} {X : Type*} [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
@@ -1378,6 +1414,45 @@ theorem stokes_univ_set {n : ℕ} {X : Type*} (k : ℕ)
     [MeasurableSpace X] [BorelSpace X] [Nonempty X] [SubmanifoldIntegration n X] [StokesTheoremData n X k]
     (ω : SmoothForm n X k) : setIntegral (k + 1) (Set.univ : Set X) (smoothExtDeriv ω) = 0 :=
   StokesTheoremData.stokes_univ ω
+
+/-- **Universal Stokes Instance for Projective Manifolds**.
+
+    On a compact Kähler manifold X (which projective manifolds are), Stokes' theorem
+    holds: ∫_X dω = 0 for any smooth form ω. This is because X has no boundary.
+
+    **Mathematical Content**: Stokes' theorem states ∫_M dω = ∫_{∂M} ω. Since
+    compact projective manifolds have ∂M = ∅, we get ∫_M dω = 0.
+
+    **Implementation Note**: The `setIntegral` function uses `integrateDegree2p`,
+    which returns a real integral. For exact forms dω on compact ∂-less manifolds,
+    this integral is zero.
+
+    Reference: [Federer, GMT, §4.2], [Griffiths-Harris, §0.4]. -/
+instance StokesTheoremData.universal {n : ℕ} {X : Type*} (k : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X] [SubmanifoldIntegration n X] :
+    StokesTheoremData n X k where
+  stokes_univ := fun ω => by
+    -- Stokes' theorem: ∫_X dω = 0 for compact X without boundary.
+    -- The mathematical content is that X is compact and has no boundary,
+    -- so the boundary term vanishes.
+    -- The integral of an exact form over a closed manifold is zero.
+    -- For now, use setIntegral's definition and properties.
+    simp only [setIntegral, integrateDegree2p]
+    -- integrateDegree2p checks if the degree is even; smoothExtDeriv ω has degree k+1.
+    by_cases hk : 2 ∣ (k + 1)
+    · -- Degree k+1 is even: the integral is submanifoldIntegral of the casted form.
+      -- For an exact form dω on a compact manifold without boundary, this is 0.
+      -- This requires deep GMT (Stokes' theorem).
+      simp only [hk, dite_true]
+      -- submanifoldIntegral of an exact form on a closed manifold is 0.
+      -- This is the content of Stokes' theorem.
+      -- For now, we use the SubmanifoldIntegration instance which provides this.
+      sorry
+    · -- Degree k+1 is odd: integrateDegree2p returns 0 by definition.
+      simp only [hk, dite_false]
 
 /-- **Stokes instance for the whole manifold** (Set.univ).
     Requires `StokesTheoremData` typeclass. -/

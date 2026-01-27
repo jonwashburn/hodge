@@ -45,6 +45,7 @@ variable {n : ℕ} {X : Type*}
 
     See `hodge_conjecture_kernel` for the equivalent kernel-only version. -/
 theorem hodge_conjecture {p : ℕ}
+    [SubmanifoldIntegration n X]  -- Integration on submanifolds
     [AutomaticSYRData n X]
     [FlatLimitCycleData n X (2 * (n - p))]  -- Federer-Fleming compactness
     [CubulationExists n X]  -- Cubulation existence for microstructure

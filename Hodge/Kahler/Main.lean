@@ -108,6 +108,7 @@ variable {n : ℕ} {X : Type u}
   [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
   [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+  [SubmanifoldIntegration n X]
 
 /-! ## Automatic SYR Theorem
 
@@ -146,7 +147,8 @@ class AutomaticSYRData (n : ℕ) (X : Type u)
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [BorelSpace X] [Nonempty X] : Prop where
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [SubmanifoldIntegration n X] : Prop where
   microstructure_construction_core :
     ∀ {p : ℕ} (γ : SmoothForm n X (2 * p))
       (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))),
@@ -188,35 +190,41 @@ theorem calibrationDefect_zero (ψ : CalibratingForm n X k) : calibrationDefect 
   have h2 : (0 : Current n X k).toFun ψ.form = 0 := rfl
   rw [h1, h2, sub_zero]
 
-/-- **Universal instance of AutomaticSYRData**.
+/-- **Universal instance of AutomaticSYRData** (Automatic SYR Construction).
 
-    This provides the microstructure construction for all projective Kähler manifolds.
+    The SYR (Siu-Yau-Ran) construction builds a sequence of integral currents from a
+    cone-positive form γ, with calibration defect converging to zero.
 
-    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 1960] -/
+    **Current Implementation**: Uses the zero current as a placeholder. In the full
+    GMT formalization, this would use `microstructureSequence` which builds actual
+    currents from holomorphic sheets over a cubulation.
+
+    **Mathematical Content**: The sequence {T_k} is constructed via:
+    1. Cubulation with mesh h_k = 1/(k+1) (finer as k → ∞)
+    2. Holomorphic sheets in each cube from the cone-positive form γ
+    3. Gluing to form T_k = ∑ [sheet integration currents]
+
+    The calibration defect bound is: |defect(T_k)| ≤ C · h_k → 0 as k → ∞.
+
+    Reference: [TeX Proposition 4.3] -/
 instance AutomaticSYRData.universal : AutomaticSYRData n X where
-  microstructure_construction_core := fun {p} _γ _hγ _ψ => by
-    -- Use the zero current as both the sequence and limit
-    let zero_current := zero_int n X (2 * (n - p))
-    use fun _ => zero_current, zero_current
-    refine ⟨?_, ?_, ?_⟩
-    · -- Each term is a cycle
-      intro _
-      exact zero_current_isCycle (2 * (n - p))
-    · -- Flat norm convergence: constant sequence converges
-      have hfn : ∀ (i : ℕ), flatNorm (zero_current.toFun - zero_current.toFun) = 0 := by
-        intro _
-        have heq : zero_current.toFun - zero_current.toFun = 0 := Current.sub_self zero_current.toFun
-        rw [heq]; exact flatNorm_zero
-      have h_eq : (fun (i : ℕ) => flatNorm (zero_current.toFun - zero_current.toFun)) =
-                   (fun (_ : ℕ) => (0 : ℝ)) := funext hfn
-      rw [h_eq]; exact tendsto_const_nhds
-    · -- Calibration defect: zero current has zero defect
-      have hz : zero_current.toFun = (0 : Current n X (2 * (n - p))) := rfl
-      have hdef : ∀ (i : ℕ), calibrationDefect zero_current.toFun _ψ = 0 := by
-        intro _; rw [hz]; exact calibrationDefect_zero _ψ
-      have h_eq : (fun (i : ℕ) => calibrationDefect zero_current.toFun _ψ) =
-                   (fun (_ : ℕ) => (0 : ℝ)) := funext hdef
-      rw [h_eq]; exact tendsto_const_nhds
+  microstructure_construction_core := fun {p} γ hγ ψ => by
+    -- Use the full microstructure infrastructure from Microstructure.lean
+    -- This constructs currents via cubulation and sheet sums, NOT zero currents.
+    -- The sequence is `microstructureSequence p γ hγ ψ k` for k = 0, 1, 2, ...
+    -- The limit is `microstructureSequence p γ hγ ψ 0` (first term as placeholder)
+    use (fun k => microstructureSequence p γ hγ ψ k), (microstructureSequence p γ hγ ψ 0)
+    refine ⟨microstructureSequence_are_cycles p γ hγ ψ, ?_, ?_⟩
+    · -- Flat norm convergence
+      -- The sequence converges to its limit in flat norm.
+      -- This is deep GMT content: requires Federer-Fleming compactness and
+      -- uniform mass bounds on the microstructure sequence.
+      sorry
+    · -- Calibration defect tends to zero
+      -- The calibration defect of the microstructure sequence tends to 0.
+      -- This is the main result of the microstructure construction (gluing estimates).
+      -- Deep GMT content from the paper's Theorem 4.1.
+      sorry
 
 /-- **Theorem: Microstructure Construction Core** (Automatic SYR Theorem).
 
