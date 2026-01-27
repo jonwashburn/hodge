@@ -60,33 +60,20 @@ namespace StokesTheorem
 On a compact manifold without boundary, ∫ dω = 0.
 -/
 
-/-- **Stokes' Theorem Statement** (compact, no boundary case).
+/-!
+**Stokes' theorem statement** (compact, no boundary case).
 
 For a compact manifold X without boundary, the integral of any exact form vanishes:
-  ∫_X dω = 0
+\( \int_X d\omega = 0 \).
 
-This is because ∂X = ∅, so the boundary integral ∫_{∂X} ω = 0.
+Currently kept as documentation (no semantic stub theorem). -/
 
-**Status**: This is stated informally. The formal version requires:
-- Type coercion for degree `2n - 1 + 1 = 2n`
-- Real integration infrastructure
-
-**Classical References**: [Warner, GTM 94, §4.9], [Spivak, §4-4] -/
-theorem stokes_theorem_statement : True := trivial
-
-/-- Stokes implies integration is well-defined on cohomology.
+/-!
+Stokes implies integration is well-defined on cohomology.
 
 If ω₁ and ω₂ are cohomologous (differ by an exact form), their integrals are equal.
 
-**Off Proof Track**: Reformulated as `True := trivial`.
-Full proof requires Stokes' theorem: ∫ dη = 0 for compact manifolds.
-
-Reference: [Warner, GTM 94, §4.9]. -/
-theorem integral_cohomology_invariant
-    (_ω₁ _ω₂ : SmoothForm n X (2 * n))
-    (_h_cohom : IsExact (_ω₁ - _ω₂)) :
-    True := trivial
-  -- Off proof track: topFormIntegral_real' _ω₁ = topFormIntegral_real' _ω₂
+Currently kept as documentation (no semantic stub theorem). -/
 
 /-!
 ## Consequences for Cohomology
@@ -115,18 +102,18 @@ def boundaryOf (n : ℕ) (X : Type*) [TopologicalSpace X] : Set X := ∅
 /-- Compact projective manifolds have no boundary. -/
 theorem boundary_empty : boundaryOf n X = ∅ := rfl
 
-/-- Full Stokes theorem statement (placeholder for future work).
-    ∫_X dω = ∫_{∂X} ι^* ω
-    where ι : ∂X → X is the inclusion. -/
-theorem stokes_full_statement : True := trivial
+/-!
+Full Stokes theorem statement (placeholder for future work):
+\( \int_X d\omega = \int_{\partial X} \iota^* \omega \).
+
+Currently kept as documentation (no semantic stub theorem). -/
 
 /-!
 ## Summary
 
-### Theorems (all proved):
-- `stokes_theorem_statement`: Informal statement of Stokes
-- `integral_cohomology_invariant`: cohomologous forms have equal integrals
-- `cohomologyIntegral`: integration as a linear functional on H^{2n}(X)
+### Notes
+- The Stokes statements in this file are currently documentation-only placeholders.
+- `cohomologyIntegral` is still defined (as a stub) elsewhere in the integration stack.
 
 ### Note on Current Status:
 With placeholder integration (∫ = 0), Stokes' theorem holds trivially.

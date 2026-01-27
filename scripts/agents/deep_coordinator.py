@@ -13,11 +13,33 @@ import subprocess
 from dataclasses import dataclass, field, asdict
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Tuple
 from enum import Enum
 import traceback
 
-ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
+def _load_anthropic_api_key() -> str:
+    """Load Anthropic API key from env, with a safe on-disk fallback on the server."""
+    key = (os.environ.get("ANTHROPIC_API_KEY") or "").strip()
+    if key:
+        return key
+    # Fallback paths (avoid putting secrets in process args)
+    home = Path.home()
+    candidates = [
+        home / ".anthropic_api_key",
+        home / ".config" / "hodge" / "anthropic_api_key",
+    ]
+    for p in candidates:
+        try:
+            if p.exists():
+                v = p.read_text().strip()
+                if v:
+                    return v
+        except Exception:
+            continue
+    return ""
+
+
+ANTHROPIC_API_KEY = _load_anthropic_api_key()
 MODEL = "claude-sonnet-4-20250514"
 MAX_CONCURRENT_AGENTS = 6  # Run more agents in parallel for Phase 2
 MAX_ITERATIONS = 20  # More iterations per task
@@ -95,7 +117,10 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "path": {"type": "string", "description": "Path relative to repo root"}
+                "path": {"type": "string", "description": "Path relative to repo root"},
+                "start_line": {"type": "integer", "description": "Optional 1-based start line"},
+                "end_line": {"type": "integer", "description": "Optional 1-based end line (inclusive)"},
+                "max_chars": {"type": "integer", "description": "Optional max chars to return"}
             },
             "required": ["path"]
         }
@@ -182,9 +207,35 @@ def execute_tool(name: str, input_data: Dict) -> Dict:
             if not path.exists():
                 return {"error": f"File not found: {path}"}
             content = path.read_text()
+
+            # Optional line slicing for large files
+            if "start_line" in input_data or "end_line" in input_data:
+                lines = content.splitlines()
+                total = len(lines)
+                start_line = int(input_data.get("start_line", 1) or 1)
+                end_line = input_data.get("end_line", None)
+                if end_line is None:
+                    end_line = start_line + 200  # default window
+                end_line = int(end_line)
+                start_line = max(1, start_line)
+                end_line = max(start_line, end_line)
+                start_idx = start_line - 1
+                end_idx = min(total, end_line)
+                sliced = "\n".join(lines[start_idx:end_idx])
+                max_chars = input_data.get("max_chars", None)
+                if max_chars is not None:
+                    sliced = sliced[: int(max_chars)]
+                return {
+                    "content": sliced,
+                    "start_line": start_line,
+                    "end_line": end_idx,
+                    "total_lines": total,
+                }
+
             # Truncate if too long
-            if len(content) > 50000:
-                content = content[:50000] + "\n... [truncated]"
+            max_chars = int(input_data.get("max_chars", 50000) or 50000)
+            if len(content) > max_chars:
+                content = content[:max_chars] + "\n... [truncated]"
             return {"content": content}
 
         elif name == "write_file":
@@ -210,13 +261,20 @@ def execute_tool(name: str, input_data: Dict) -> Dict:
 
         elif name == "run_lake_build":
             module = input_data.get("module", "")
+            # Workspace rule: NEVER rebuild Mathlib from source.
+            # Always fetch Mathlib cache before any `lake build`.
+            cache = subprocess.run(
+                ["lake", "exe", "cache", "get"],
+                cwd=HODGE_PATH, capture_output=True, text=True, timeout=900
+            )
+
             cmd = ["lake", "build"]
             if module:
                 cmd.append(module)
             result = subprocess.run(
-                cmd, cwd=HODGE_PATH, capture_output=True, text=True, timeout=300
+                cmd, cwd=HODGE_PATH, capture_output=True, text=True, timeout=600
             )
-            output = (result.stdout + result.stderr)[-8000:]  # Last 8k chars
+            output = (cache.stdout + cache.stderr + result.stdout + result.stderr)[-8000:]  # Last 8k chars
             return {
                 "success": result.returncode == 0,
                 "output": output
@@ -260,6 +318,8 @@ class DeepCoordinator:
     def __init__(self):
         self.tasks: Dict[str, Task] = {}
         self.session: Optional[aiohttp.ClientSession] = None
+        self.session_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+        self.backup_dir = HODGE_PATH / "deep_agent_backups" / self.session_id
         self.load_state()
 
     def load_state(self):
@@ -271,6 +331,7 @@ class DeepCoordinator:
             for task in TASKS:
                 self.tasks[task.id] = task
         LOG_DIR.mkdir(parents=True, exist_ok=True)
+        self.backup_dir.mkdir(parents=True, exist_ok=True)
 
     def save_state(self):
         with open(STATE_FILE, 'w') as f:
@@ -308,63 +369,56 @@ class DeepCoordinator:
         task.status = TaskStatus.IN_PROGRESS
         self.save_state()
 
-        # Dynamic system prompt based on task type
-        if task.id.startswith("faithfulness_"):
-            system = f"""You are an expert Lean 4 mathematician working on the Hodge Conjecture formalization.
+        # Per-task backups to prevent corrupted state when an agent fails.
+        # Maps relative path -> (existed_before, previous_content)
+        backups: Dict[str, Tuple[bool, Optional[str]]] = {}
+
+        def backup_path(rel_path: str) -> None:
+            if rel_path in backups:
+                return
+            abs_path = HODGE_PATH / rel_path
+            if abs_path.exists():
+                backups[rel_path] = (True, abs_path.read_text())
+            else:
+                backups[rel_path] = (False, None)
+
+        def restore_backups() -> None:
+            for rel_path, (existed, content) in backups.items():
+                abs_path = HODGE_PATH / rel_path
+                try:
+                    if existed:
+                        abs_path.parent.mkdir(parents=True, exist_ok=True)
+                        abs_path.write_text(content or "")
+                    else:
+                        abs_path.unlink(missing_ok=True)
+                except Exception:
+                    # Best-effort restore; keep going.
+                    continue
+
+        # Verified/deep mode system prompt (NO `sorry` allowed).
+        system = f"""You are an expert Lean 4 mathematician working on the Hodge Conjecture formalization.
 
 YOUR TASK: {task.description}
 TARGET: {task.target} in {task.file_path}
 
-**PHASE 2: FAITHFULNESS RESTORATION**
+HARD REQUIREMENTS:
+- Do NOT use `sorry`, `admit`, or introduce `axiom`s.
+- Do NOT "paper over" missing theory with semantic stubs (e.g. `integral := 0`) unless it is
+  genuinely the mathematically correct value for the object in question.
+- Keep the project building (use `run_lake_build` frequently; prefer module-level builds).
 
-Your goal is to replace all `True := trivial` stubs with REAL mathematical statements.
-
-For each `True := trivial` pattern:
-1. Identify what the theorem SHOULD state mathematically
-2. Replace `True` with the actual statement type (e.g., `α.toForm = β` or `∃ c, ∫ ω = c`)
-3. Replace `trivial` with `by sorry` (we'll prove these later)
-
-Example transformation:
-  BEFORE: theorem foo : True := trivial  -- Placeholder
-  AFTER:  theorem foo : α.mass ≤ C * β.comass := by sorry
+If the task involves removing a stubbed *instance*, you may:
+- Remove the instance and make the dependency explicit by adding a typeclass parameter where needed, OR
+- Replace the stub by a new interface (typeclass/structure field) that precisely captures the missing theorem,
+  but do not fake an implementation.
 
 WORKFLOW:
-1. Read the target file with read_file
-2. Find all `True := trivial` patterns with grep
-3. For each one, understand the mathematical context
-4. Replace with the real statement using search_replace
-5. Run lake build to verify it compiles
-6. Call task_complete with a summary of changes
+1. Read the target file (use line ranges for large files).
+2. Make small, targeted edits with `search_replace` (prefer minimal diffs).
+3. Run `run_lake_build` on the affected module and iterate until it passes.
+4. When done, call `task_complete(success=true, summary=..., changes_made=...)`.
 
-RULES:
-- The new statement must be mathematically meaningful
-- Use `sorry` for proofs - that's fine for Phase 2
-- Must compile without errors
-- You have up to {MAX_ITERATIONS} tool calls
-"""
-        else:
-            system = f"""You are an expert Lean 4 mathematician working on the Hodge Conjecture formalization.
-
-YOUR TASK: {task.description}
-TARGET: {task.target} in {task.file_path}
-
-You have tools to read/write files and run lake build. Your goal is to eliminate sorries
-and make the code compile without sorryAx in the axiom list.
-
-WORKFLOW:
-1. Read the target file to understand current state
-2. Use grep to find relevant Mathlib lemmas
-3. Make targeted edits using search_replace
-4. Run lake build to check if it compiles
-5. If errors, read the error and fix
-6. Repeat until it compiles or you're stuck
-7. Call task_complete when done
-
-RULES:
-- Use Mathlib 4 conventions
-- Only change what's necessary
-- If a sorry requires deep math you can't formalize, document what's needed
-- You have up to {MAX_ITERATIONS} tool calls
+You have up to {MAX_ITERATIONS} tool calls.
 """
 
         messages = [{
@@ -409,6 +463,13 @@ RULES:
                     tool_input = tool_use["input"]
                     log_lines.append(f"Tool: {tool_name}({json.dumps(tool_input)[:200]})")
 
+                    # Backup any file about to be modified.
+                    if tool_name in ("write_file", "search_replace"):
+                        try:
+                            backup_path(tool_input.get("path", ""))
+                        except Exception:
+                            pass
+
                     result = execute_tool(tool_name, tool_input)
                     log_lines.append(f"Result: {json.dumps(result)[:300]}")
 
@@ -426,6 +487,7 @@ RULES:
                         else:
                             task.status = TaskStatus.FAILED
                             task.error = tool_input.get("summary", "Failed")
+                            restore_backups()
                         self.save_state()
                         log_file.write_text("\n".join(log_lines))
                         return task.status == TaskStatus.COMPLETED
@@ -435,10 +497,12 @@ RULES:
             # Max iterations reached
             task.status = TaskStatus.FAILED
             task.error = f"Max iterations ({MAX_ITERATIONS}) reached"
+            restore_backups()
 
         except Exception as e:
             task.status = TaskStatus.FAILED
             task.error = str(e)
+            restore_backups()
             log_lines.append(f"Error: {traceback.format_exc()}")
 
         self.save_state()
@@ -451,12 +515,33 @@ RULES:
             if task.status != TaskStatus.PENDING:
                 continue
             deps_met = all(
-                self.tasks[dep].status == TaskStatus.COMPLETED
-                for dep in task.dependencies if dep in self.tasks
+                (dep in self.tasks) and (self.tasks[dep].status == TaskStatus.COMPLETED)
+                for dep in task.dependencies
             )
             if deps_met:
                 ready.append(task)
         return ready
+
+    def propagate_dependency_failures(self) -> bool:
+        """Mark tasks as failed if they are blocked by missing/failed dependencies."""
+        changed = False
+        for task in self.tasks.values():
+            if task.status != TaskStatus.PENDING:
+                continue
+            for dep in task.dependencies:
+                if dep not in self.tasks:
+                    task.status = TaskStatus.FAILED
+                    task.error = f"Missing dependency: {dep}"
+                    changed = True
+                    break
+                if self.tasks[dep].status == TaskStatus.FAILED:
+                    task.status = TaskStatus.FAILED
+                    task.error = f"Dependency failed: {dep}"
+                    changed = True
+                    break
+        if changed:
+            self.save_state()
+        return changed
 
     async def run(self):
         print(f"Deep Coordinator starting")
@@ -465,6 +550,8 @@ RULES:
 
         try:
             while True:
+                # Avoid infinite waiting when a dependency has already failed.
+                self.propagate_dependency_failures()
                 ready = self.get_ready_tasks()
                 if not ready:
                     pending = [t for t in self.tasks.values() if t.status == TaskStatus.PENDING]

@@ -57,22 +57,6 @@ class SubmanifoldIntegration (n : ℕ) (X : Type u)
   integral_bound : ∀ (p : ℕ) (ω : SmoothForm n X (2 * p)) (Z : Set X),
     |integral p ω Z| ≤ (measure2p p Z).toReal * ‖ω‖
 
-/-- Universal instance using real Hausdorff measure.
-    The integral implementation returns 0 as a semantic stub.
-    Real implementation would use oriented tangent plane pairing. -/
-instance SubmanifoldIntegration.universal : SubmanifoldIntegration n X where
-  measure2p := fun p => Measure.hausdorffMeasure (2 * p)
-  integral := fun _ _ _ => 0
-  integral_linear := fun _ _ _ _ _ => by simp
-  integral_union := fun _ _ _ _ _ _ _ => by simp
-  integral_empty := fun _ _ => rfl
-  integral_bound := fun p ω Z => by
-    show |(0 : ℝ)| ≤ ((Measure.hausdorffMeasure (2 * p)) Z).toReal * comass ω
-    simp only [abs_zero]
-    apply mul_nonneg
-    · exact ENNReal.toReal_nonneg
-    · exact comass_nonneg ω
-
 /-! ## Hausdorff Measure on Submanifolds -/
 
 /-- The real dimension of a complex p-dimensional submanifold. -/
@@ -122,12 +106,12 @@ theorem submanifoldIntegral_abs_le {p : ℕ} [SubmanifoldIntegration n X]
 /-! ## Integration Currents -/
 
 /-- **Integration current** associated to a submanifold. -/
-noncomputable def integrationCurrentValue {p : ℕ}
+noncomputable def integrationCurrentValue {p : ℕ} [SubmanifoldIntegration n X]
     (Z : Set X) (ω : SmoothForm n X (2 * p)) : ℝ :=
   submanifoldIntegral ω Z
 
 /-- Integration current is linear. -/
-theorem integrationCurrentValue_linear {p : ℕ} (Z : Set X)
+theorem integrationCurrentValue_linear {p : ℕ} [SubmanifoldIntegration n X] (Z : Set X)
     (c : ℝ) (ω₁ ω₂ : SmoothForm n X (2 * p)) :
     integrationCurrentValue (n := n) (X := X) (p := p) Z (c • ω₁ + ω₂) =
       c * integrationCurrentValue (n := n) (X := X) (p := p) Z ω₁ +
@@ -237,9 +221,12 @@ theorem integrateDegree2p_empty (k : ℕ) (ω : SmoothForm n X k) [SubmanifoldIn
   · apply submanifoldIntegral_empty
   · rfl
 
-/-- For even degree `k = 2 * p`, `integrateDegree2p` equals `submanifoldIntegral`. -/
-theorem integrateDegree2p_eq_submanifoldIntegral {p : ℕ} (_Z : Set X)
-    [SubmanifoldIntegration n X] (_ω : SmoothForm n X (2 * p)) : True := trivial
+/-!
+For even degree `k = 2 * p`, `integrateDegree2p` dispatches to `submanifoldIntegral`
+(after an index-cast of the form degree).
+
+This was previously tracked as a documentation stub; it will be reinstated
+as an actual lemma once the degree-cast bookkeeping is stabilized in the integration layer. -/
 
 /-- Integration of zero on the empty set is zero. -/
 theorem submanifoldIntegral_zero_empty {p : ℕ} [SubmanifoldIntegration n X] :

@@ -31,9 +31,9 @@ On a compact complex n-dimensional Kähler manifold X:
 
 ✅ **COMPLETE** - All definitions implemented, no `sorry` statements on proof track.
 
-The integration infrastructure uses placeholder definitions for now. The core
-theorems that are **off the proof track** (volume form integrals) are reformulated
-as `True := trivial` statements with documentation of their mathematical meaning.
+The integration infrastructure uses placeholder definitions for now. Any deep
+analytic facts that are **off the proof track** are kept as documentation-only
+comments (no semantic stub theorems).
 
 -/
 
@@ -217,49 +217,31 @@ theorem topFormIntegral_continuous :
 
 /-! ## Integration of Volume Form -/
 
-/-- **Integration of the volume form gives the total volume** (off proof track).
+/-! **Integration of the volume form gives the total volume** (documentation-only).
 
     ∫_X vol = vol(X)
 
-    **Off Proof Track**: Reformulated as `True := trivial`.
-    The mathematical statement is that the integral of the volume form equals
-    the total volume. This is a tautology once measure theory is connected.
+    This will be formalized once measure-theory integration is connected.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.2]. -/
-theorem topFormIntegral_volumeForm [MeasurableSpace X] :
-    True := trivial
-  -- Off proof track: ∫_X kahlerVolumeForm = totalVolume
-  -- Requires full measure theory integration
 
-/-- **Volume integral is positive** (off proof track).
+/-! **Volume integral is positive** (documentation-only).
 
     ∫_X vol > 0 for nonempty compact Kähler manifolds.
 
-    **Off Proof Track**: Reformulated as `True := trivial`.
-    The mathematical statement is that the volume integral is positive on
-    nonempty compact Kähler manifolds.
+    This will be formalized once measure-theory integration is connected.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.2]. -/
-theorem topFormIntegral_volumeForm_pos [MeasurableSpace X] [Nonempty X] :
-    True := trivial
-  -- Off proof track: topFormIntegral_real' kahlerVolumeForm > 0
 
 /-! ## Stokes' Theorem for Top Forms -/
 
-/-- **Stokes' Theorem for closed manifolds**: ∫_X dη = 0.
+/-! **Stokes' Theorem for closed manifolds**: ∫_X dη = 0 (documentation-only).
 
     On a compact manifold without boundary, the integral of an exact form vanishes.
 
-    **Off Proof Track**: Reformulated as `True := trivial`.
-    The mathematical statement requires full Stokes' theorem for compact manifolds,
-    which is a deep analytical fact. See `ClosedSubmanifoldStokesData` for the
-    interface used in the proof track.
+    This will be formalized once Stokes' theorem is on-track.
 
     Reference: [Warner, "Foundations of Differentiable Manifolds", §4.9]. -/
-theorem stokes_closed (_η : SmoothForm n X (2 * n - 1)) (_hn : n ≥ 1) :
-    True := trivial
-  -- Off proof track: topFormIntegral_real' (castForm ... (smoothExtDeriv η)) = 0
-  -- Mathematical content: ∫_X dη = ∫_∂X η = 0 since ∂X = ∅
 
 /-! ## Pairing of Complementary-Degree Forms -/
 
@@ -280,41 +262,25 @@ noncomputable def intersectionPairing {p : ℕ} (_hp : p ≤ n)
   have hdeg : 2 * p + 2 * (n - p) = 2 * n := by omega
   topFormIntegral_real' (castForm hdeg (α ⋏ β))
 
-/-- **Intersection pairing is bilinear in the first argument**.
+/-! **Intersection pairing is bilinear in the first argument** (documentation-only).
 
-    **Off Proof Track**: Reformulated as `True := trivial`.
     Full bilinearity requires wedge product linearity combined with integration linearity.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
-theorem intersectionPairing_linear_left {p : ℕ} (_hp : p ≤ n)
-    (_c : ℝ) (_α₁ _α₂ : SmoothForm n X (2 * p)) (_β : SmoothForm n X (2 * (n - p))) :
-    True := trivial
-  -- Off proof track: uses wedge product linearity + integration linearity
 
-/-- **Intersection pairing is bilinear in the second argument**.
+/-! **Intersection pairing is bilinear in the second argument** (documentation-only).
 
-    **Off Proof Track**: Reformulated as `True := trivial`.
     Full bilinearity requires wedge product linearity combined with integration linearity.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
-theorem intersectionPairing_linear_right {p : ℕ} (_hp : p ≤ n)
-    (_α : SmoothForm n X (2 * p)) (_c : ℝ) (_β₁ _β₂ : SmoothForm n X (2 * (n - p))) :
-    True := trivial
-  -- Off proof track: uses wedge product linearity + integration linearity
 
-/-- **Intersection pairing descends to cohomology** (Stokes).
+/-! **Intersection pairing descends to cohomology** (Stokes; documentation-only).
 
     If α is closed and β is exact, then ⟨α, β⟩ = 0.
 
-    **Off Proof Track**: Reformulated as `True := trivial`.
-    Full proof requires: if β = dγ and dα = 0, then
-    ∫_X α ∧ dγ = ±∫_X d(α ∧ γ) = 0 by Stokes.
+    Full proof requires Stokes: if β = dγ and dα = 0, then
+    ∫_X α ∧ dγ = ±∫_X d(α ∧ γ) = 0.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
-theorem intersectionPairing_closed_exact_zero {p : ℕ} (_hp : p ≤ n)
-    (_α : SmoothForm n X (2 * p)) (_hα : IsFormClosed _α)
-    (_β : SmoothForm n X (2 * (n - p))) (_hβ : IsExact _β) :
-    True := trivial
-  -- Off proof track: uses Stokes' theorem
 
 end

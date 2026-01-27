@@ -188,33 +188,26 @@ Reference: [de Rham, "Variétés Différentiables", 1955, Ch. V]
 Reference: [Hodge, "The Theory and Applications of Harmonic Integrals", 1941]
 -/
 
-/-- **Cycle class is well-defined** (conceptual statement).
+/-!
+**Cycle class is well-defined** (conceptual statement).
 
-    The cohomology class `[Z] ∈ H^{2p}(X)` depends only on the homology class of Z.
+The cohomology class `[Z] ∈ H^{2p}(X)` depends only on the homology class of Z.
 
-    **Mathematical Content**: If Z₁ and Z₂ are homologous cycles (Z₁ - Z₂ = ∂W),
-    then their cycle classes agree: `[Z₁] = [Z₂]`.
+Mathematical content: If Z₁ and Z₂ are homologous cycles (Z₁ - Z₂ = ∂W),
+then their cycle classes agree: `[Z₁] = [Z₂]`.
 
-    **Proof Sketch**: By Stokes, for any closed form α:
-    `∫_{Z₁} α - ∫_{Z₂} α = ∫_{∂W} α = ∫_W dα = 0`
-    So the integration functional on cohomology is the same for Z₁ and Z₂.
+Proof sketch: By Stokes, for any closed form α:
+`∫_{Z₁} α - ∫_{Z₂} α = ∫_{∂W} α = ∫_W dα = 0`.
 
-    This theorem is stated at the conceptual level since homology is not fully
-    formalized in this development. -/
-theorem cycle_class_well_defined_conceptual : True := trivial
+This is currently kept as documentation (no semantic stub theorem). -/
 
-/-- **Poincaré duality pairing** (conceptual statement).
+/-!
+**Poincaré duality pairing** (conceptual statement).
 
-    For Z a p-codimensional cycle and α a closed (2n-2p)-form:
-    `⟨[Z], [α]⟩ = ∫_Z α`
+For Z a p-codimensional cycle and α a closed (2n-2p)-form:
+`⟨[Z], [α]⟩ = ∫_Z α`.
 
-    This is the fundamental pairing that identifies `H_{2p}(X) ≅ H^{2n-2p}(X)^*`
-    and hence `H_{2p}(X) ≅ H^{2p}(X)` (using Poincaré duality on the right).
-
-    The cycle class `[Z] ∈ H^{2p}(X)` is characterized by:
-    `∫_X [Z] ∧ α = ∫_Z α` for all closed (2n-2p)-forms α
-
-    This is the defining property of the Poincaré dual form. -/
-theorem poincare_duality_pairing_conceptual : True := trivial
+This is the defining characterization of the Poincaré dual form.
+Currently kept as documentation (no semantic stub theorem). -/
 
 end Hodge.GMT

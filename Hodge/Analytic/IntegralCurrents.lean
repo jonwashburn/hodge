@@ -302,7 +302,7 @@ structure ClosedSubmanifoldIntegralData (n : ℕ) (X : Type*) (k : ℕ) (Z : Set
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X] [SubmanifoldIntegration n X]
     [ClosedSubmanifoldStokesData n X k Z] where
   /-- The current over Z is integral (can be approximated by polyhedral chains). -/
   is_integral : isIntegral (IntegrationData.closedSubmanifold n X k Z).toCurrent
@@ -319,7 +319,7 @@ noncomputable def IntegrationData.closedSubmanifold_toIntegralCurrent {n : ℕ} 
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X] [SubmanifoldIntegration n X]
     (Z : Set X) [ClosedSubmanifoldStokesData n X k Z]
     (data : ClosedSubmanifoldIntegralData n X k Z) : IntegralCurrent n X (Nat.succ k) :=
   (IntegrationData.closedSubmanifold n X k Z).toIntegralCurrent data.is_integral
@@ -330,7 +330,7 @@ theorem IntegrationData.closedSubmanifold_bdryMass {n : ℕ} {X : Type*} {k : �
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X] [SubmanifoldIntegration n X]
     (Z : Set X) [ClosedSubmanifoldStokesData n X k Z] :
     (IntegrationData.closedSubmanifold n X k Z).bdryMass = 0 := by
   unfold IntegrationData.closedSubmanifold

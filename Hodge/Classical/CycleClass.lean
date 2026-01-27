@@ -107,14 +107,6 @@ class PoincareDualFormExists (n : ℕ) (X : Type u) (p : ℕ)
     [MeasurableSpace X] [Nonempty X] where
   choose : (Z : Set X) → PoincareDualFormData n X p Z
 
-instance PoincareDualFormExists.universal {p : ℕ} : PoincareDualFormExists n X p where
-  choose := fun _ =>
-    { form := 0
-      is_closed := isFormClosed_zero
-      empty_vanishes := fun _ => rfl
-      nonzero_possible := fun _ => trivial
-      geometric_characterization := trivial }
-
 /-! ## Axiomatized Existence of Poincaré Dual Forms
 
 This is the key placeholder: for every algebraic set, we provide Poincaré dual form data.
@@ -285,10 +277,13 @@ theorem fundamentalClassImpl_isClosed (p : ℕ) (Z : Set X)
     IsFormClosed (fundamentalClassImpl n X p Z) :=
   CycleClass.poincareDualForm_isClosed n X p Z
 
-/-- **Z-dependence of Poincaré dual forms** (M2 semantic property).
+/-!
+**Z-dependence of Poincaré dual forms** (M2 semantic property).
 
-    The Poincaré dual form construction depends on Z through the Hausdorff measure. -/
-theorem poincareDualForm_zDependence_doc : True := trivial
+The Poincaré dual form construction depends on Z through the Hausdorff measure.
+-/
+-- NOTE: Documentation-only stub removed (was a trivial placeholder).
+-- TODO (unconditional track): state and prove the actual Z-dependence property.
 
 /-!
 NOTE: fundamentalClassImpl_isPP, _isRational, _additive were archived with their axioms.

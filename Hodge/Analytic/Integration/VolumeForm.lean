@@ -31,11 +31,12 @@ On a compact complex n-dimensional Kähler manifold (X, ω):
 
 ✅ **COMPLETE** - All definitions implemented, no `sorry` statements.
 
-The mathematical properties (e.g., `kahlerPower_nonzero`) are reformulated as
-`True := trivial` statements because:
+The mathematical properties (e.g., nonvanishing of ω^k, positivity of volume) are
+currently kept as documentation-only comments because:
 1. They are **off the main proof track** for `hodge_conjecture'`
 2. They encode geometric facts about Kähler manifolds (Wirtinger's theorem, etc.)
-3. The actual statements are documented in each theorem's docstring
+3. The actual statements are documented below and will be reintroduced as theorems
+   once the corresponding analytic infrastructure is formalized
 
 The core infrastructure (`kahlerPower`, `kahlerVolumeForm`, `kahlerMeasure`) is
 fully implemented with real definitions.
@@ -87,11 +88,10 @@ noncomputable def kahlerPower (k : ℕ) : SmoothForm n X (2 * k) :=
 The following theorems concern geometric properties of Kähler manifolds.
 They are OFF THE MAIN PROOF TRACK for `hodge_conjecture'`.
 
-For infrastructure purposes, we reformulate these as trivial `True` statements
-with documentation of what they mathematically represent.
+For now, these are documentation-only placeholders (no semantic stub theorems).
 -/
 
-/-- **Kähler power is nonzero for k ≤ n** (Wirtinger's Theorem).
+/-! **Kähler power is nonzero for k ≤ n** (Wirtinger's Theorem; documentation-only).
 
     On a Kähler manifold of complex dimension n, ω^k ≠ 0 for k ≤ n.
     This is because ω is a symplectic form on the underlying real 2n-manifold.
@@ -103,12 +103,8 @@ with documentation of what they mathematically represent.
     The mathematical content is: `kahlerPower k ≠ 0` when `k ≤ n`.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.2]. -/
-theorem kahlerPower_nonzero (_k : ℕ) (_hk : _k ≤ n) [Nonempty X] :
-    True := trivial
-  -- Off proof track: Wirtinger's theorem (symplectic non-degeneracy)
-  -- Mathematical statement: kahlerPower k ≠ 0 for k ≤ n
 
-/-- **Kähler power vanishes for k > n** (Dimension counting).
+/-! **Kähler power vanishes for k > n** (Dimension counting; documentation-only).
 
     On a complex n-dimensional manifold, any (2k)-form with k > n must vanish
     because the real dimension is 2n.
@@ -119,9 +115,6 @@ theorem kahlerPower_nonzero (_k : ℕ) (_hk : _k ≤ n) [Nonempty X] :
     The mathematical content is: `kahlerPower k = 0` when `k > n`.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.2]. -/
-theorem kahlerPower_zero_of_gt (_k : ℕ) (_hk : _k > n) :
-    True := trivial
-  -- Off proof track: dimension counting (2k > 2n implies form vanishes)
 
 /-! ## Kähler Volume Form -/
 
@@ -147,30 +140,20 @@ noncomputable def kahlerVolumeForm : SmoothForm n X (2 * n) :=
   -- ω^n / n! where ω is the Kähler form
   (1 / (Nat.factorial n : ℂ)) • kahlerPower n
 
-/-- **The Kähler volume form is nonzero** (for nonempty X).
+/-! **The Kähler volume form is nonzero** (for nonempty X; documentation-only).
 
     This follows from ω^n ≠ 0 (Wirtinger) and n! ≠ 0.
 
-    **Off Proof Track**: Reformulated as `True` for infrastructure.
-
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.2]. -/
-theorem kahlerVolumeForm_nonzero [Nonempty X] :
-    True := trivial
-  -- Off proof track: follows from kahlerPower_nonzero and n! ≠ 0
 
-/-- **The Kähler volume form is closed**.
+/-! **The Kähler volume form is closed** (documentation-only).
 
     Since ω is closed (dω = 0) and d is a derivation, d(ω^n) = 0.
     Therefore d(vol) = d((1/n!) ω^n) = (1/n!) d(ω^n) = 0.
 
-    **Off Proof Track**: Reformulated as `True` for infrastructure.
-
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.2]. -/
-theorem kahlerVolumeForm_isClosed :
-    True := trivial
-  -- Off proof track: follows from omega_closed and Leibniz rule
 
-/-- **The Kähler volume form is positive** (pointwise positivity).
+/-! **The Kähler volume form is positive** (pointwise positivity; documentation-only).
 
     At each point x ∈ X, evaluating the volume form on a positively-oriented
     basis gives a positive real number.
@@ -178,8 +161,6 @@ theorem kahlerVolumeForm_isClosed :
     **Sprint 1 Status**: Statement only.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.2]. -/
-theorem kahlerVolumeForm_positive [Nonempty X] (_x : X) :
-    True := trivial  -- Actual positivity requires oriented bases
 
 /-! ## Kähler Measure -/
 
@@ -219,13 +200,11 @@ theorem kahlerMeasure_finite [MeasurableSpace X] [Nonempty X]
 noncomputable def totalVolume [MeasurableSpace X] [Nonempty X] [SubmanifoldIntegration n X] : ℝ :=
   ((kahlerMeasure (n := n) (X := X) : Measure X) Set.univ).toReal
 
-/-- **Total volume is positive** (for nonempty compact Kähler manifolds).
+/-! **Total volume is positive** (for nonempty compact Kähler manifolds; documentation-only).
 
     **Sprint 1 Status**: Statement only.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.2]. -/
-theorem totalVolume_pos [MeasurableSpace X] [Nonempty X] [SubmanifoldIntegration n X] :
-    True := trivial  -- Placeholder for positivity proof
 
 /-! ## Volume Form Basis
 
@@ -244,12 +223,10 @@ theorem totalVolume_pos [MeasurableSpace X] [Nonempty X] [SubmanifoldIntegration
 noncomputable def volumeBasis (_x : X) : Fin (2 * n) → TangentSpace (𝓒_complex n) _x :=
   fun _ => 0  -- Stub: would need orthonormal frame from Kähler metric
 
-/-- **Volume form evaluates to 1 on volume basis**.
+/-! **Volume form evaluates to 1 on volume basis** (documentation-only).
 
     **Sprint 1 Status**: Statement only.
 
     Reference: [Lee, "Riemannian Manifolds", Chapter 3]. -/
-theorem volumeForm_volumeBasis (_x : X) :
-    True := trivial  -- Placeholder: kahlerVolumeForm x (volumeBasis x) = 1
 
 end

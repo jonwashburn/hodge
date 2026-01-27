@@ -86,9 +86,8 @@ theorem cohomologous_iff_differ_by_exact {k : ℕ}
     Cohomologous (n := n) (k := k) (X := X) a b ↔ IsExact (a.val - b.val) :=
   Iff.rfl
 
-/-- De Rham cohomology is the quotient of closed forms by exact forms. -/
-theorem deRham_cohomology_eq_closed_mod_exact :
-    True := trivial  -- Just documentation
+-- NOTE: Documentation-only stub removed (was a trivial placeholder).
+-- De Rham cohomology is (by definition in this development) the quotient of closed forms by exact forms.
 
 /-!
 ## Summary

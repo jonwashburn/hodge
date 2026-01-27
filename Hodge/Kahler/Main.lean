@@ -8,7 +8,6 @@ import Hodge.Analytic.Currents
 import Hodge.Analytic.Calibration
 import Hodge.Classical.HarveyLawson
 import Hodge.Classical.GAGA
-import Hodge.GMT.PoincareDuality
 -- NOTE: Lefschetz.lean moved to archive - not on proof track for hodge_conjecture'
 
 /-!
@@ -299,7 +298,8 @@ theorem automatic_syr {p : ℕ}
 
 /-! ## Cone-Positive Classes are Algebraic -/
 
-/-- **Kähler Power Representation** (de Rham Theorem).
+/-!
+**Kähler Power Representation** (de Rham Theorem).
 
     The cohomology class of the p-th power of the Kähler form is the p-th
     cup power of the cohomology class of the Kähler form.
@@ -310,8 +310,9 @@ theorem automatic_syr {p : ℕ}
     - Base case (p=0): [ω^0] = [1] is the unit class.
     - Inductive step: [ω^{p+1}] = [ω ∧ ω^p] = [ω] ∪ [ω^p].
       By induction hypothesis, [ω^p] = [ω]^p, so [ω^{p+1}] = [ω] ∪ [ω]^p = [ω]^{p+1}.
-    Axiomatized due to missing type class instances. -/
-theorem omega_pow_represents_multiple (_p : ℕ) : True := trivial
+NOTE: This was previously tracked as a documentation stub.
+It will be reinstated as an actual theorem on the unconditional track.
+-/
 
 /-!
 ### Cohomology Bridge (Resolved 2026-01-24)
@@ -552,16 +553,15 @@ Clay Mathematics Institute in 2000, with a prize of $1,000,000 for a correct sol
 
     ## TeX-Faithful Version (Phase 7)
 
-    This version uses `cycleClass_geom` (computed from the fundamental class of the support)
-    with `SpineBridgeData.universal` to bridge geometry to cohomology.
+    This version uses `cycleClass_geom` computed from the fundamental class of the support,
+    and an explicit bridge assumption `SpineBridgeData` to compare that geometric class to
+    the carried `representingForm` class.
 
-    The cycle class comes from geometry, not from the carried form.
-
-    **Instance**: `SpineBridgeData.universal` provides the Poincaré duality
-    content that the fundamental class of the spine-produced support equals [γ]. -/
+    In the fully unconditional project, `SpineBridgeData` will be discharged by GMT + PD. -/
 theorem hodge_conjecture' {p : ℕ}
     [AutomaticSYRData n X] [FlatLimitCycleData n X (2 * (n - p))]
     [HarveyLawsonKingData n X (2 * (n - p))] [ChowGAGAData n X]
+    [CycleClass.PoincareDualFormExists n X p] [SpineBridgeData n X]
     (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
     (h_rational : isRationalClass (ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :
     ∃ (Z : SignedAlgebraicCycle n X p), Z.cycleClass_geom = ofForm γ h_closed := by
@@ -591,8 +591,9 @@ theorem hodge_conjecture' {p : ℕ}
   }
 
   use Z
-  -- Use SpineBridgeData: cycleClass_geom Z = ofForm Z.representingForm = ofForm γ
-  rw [Z.cycleClass_geom_eq_representingForm]
+  -- Use SpineBridgeData: geometric class from support equals representing form class
+  simpa using (SignedAlgebraicCycle.cycleClass_geom_eq_representingForm
+    (n := n) (X := X) (p := p) (Z := Z))
 
 /-- **Hodge Conjecture (Kernel-Only Version)**.
 

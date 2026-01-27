@@ -96,7 +96,8 @@ class HarveyLawsonKingData (n : ℕ) (X : Type*) (k : ℕ)
 /-- The current of integration along an analytic subvariety. -/
 noncomputable def integrationCurrentHL {p k : ℕ}
     (V : AnalyticSubvariety n X) (_hV : V.codim = p)
-    (mult : ℤ) [ClosedSubmanifoldStokesData n X k V.carrier] : Current n X (Nat.succ k) where
+    (mult : ℤ) [SubmanifoldIntegration n X] [ClosedSubmanifoldStokesData n X k V.carrier] :
+    Current n X (Nat.succ k) where
   toFun := fun ω => (mult : ℝ) * setIntegral (n := n) (X := X) (Nat.succ k) V.carrier ω
   is_linear := fun c ω₁ ω₂ => by
     rw [setIntegral_linear (n := n) (X := X) (Nat.succ k) V.carrier c ω₁ ω₂, _root_.mul_add, ← _root_.mul_assoc, _root_.mul_comm (mult : ℝ) c, _root_.mul_assoc]
@@ -201,17 +202,96 @@ theorem calibrated_limit_is_cycle {k : ℕ} [FlatLimitCycleData n X k]
 instance FlatLimitCycleData.universal {k : ℕ} : FlatLimitCycleData n X k where
   flat_limit_of_cycles_is_cycle := fun T_seq T_limit h_cycles h_conv => by
     -- The flat limit of cycles is a cycle by Federer-Fleming
-    -- Since the current infrastructure uses semantic stubs (zero current),
-    -- the limit is trivially a cycle.
+    -- Proof: boundary is continuous in flat norm, and limit of zeros is zero
     unfold IntegralCurrent.isCycleAt
     by_cases hk : k = 0
     · left; exact hk
     · right
       obtain ⟨k', hk'⟩ := Nat.exists_eq_succ_of_ne_zero hk
       use k', hk'
-      -- For the zero current stub, boundary = 0
-      -- This is a semantic stub: in real proof, this follows from Federer-Fleming
-      sorry
+      -- Goal: Current.boundary (hk' ▸ T_limit.toFun) = 0
+      subst hk'
+      -- Now goal is: Current.boundary T_limit.toFun = 0
+      -- Strategy: show flatNorm (∂T_limit) = 0, then use flatNorm_eq_zero_iff
+      rw [← flatNorm_eq_zero_iff]
+      -- Goal: flatNorm (Current.boundary T_limit.toFun) = 0
+      -- For any i: ∂(T_seq i) = 0 (from h_cycles), so
+      -- flatNorm (∂T_limit) ≤ flatNorm (T_seq i - T_limit) → 0
+      apply le_antisymm _ (flatNorm_nonneg _)
+      -- Show flatNorm (∂T_limit) ≤ 0
+      by_contra h_pos
+      push_neg at h_pos
+      -- Get ε such that flatNorm ∂T_limit > 2ε > 0
+      set ε := flatNorm (Current.boundary T_limit.toFun) / 2 with hε_def
+      have hε_pos : 0 < ε := by linarith
+      -- From h_conv: exists N such that for n ≥ N, flatNorm (T_seq n - T_limit) < ε
+      rw [Metric.tendsto_atTop] at h_conv
+      obtain ⟨N, hN⟩ := h_conv ε hε_pos
+      specialize hN N (le_refl N)
+      simp only [Real.dist_eq] at hN
+      have hN' : flatNorm ((T_seq N).toFun - T_limit.toFun) < ε := by
+        -- `dist x 0 < ε` is `|x - 0| < ε`, and flatNorm is nonnegative.
+        have hN0 : |flatNorm ((T_seq N).toFun - T_limit.toFun)| < ε := by
+          simpa [sub_zero] using hN
+        have hnnonneg : 0 ≤ flatNorm ((T_seq N).toFun - T_limit.toFun) := flatNorm_nonneg _
+        simpa [abs_of_nonneg hnnonneg] using hN0
+      -- For T_seq N, extract ∂(T_seq N).toFun = 0 from isCycleAt
+      have h_cycle_N := h_cycles N
+      have h_bdy_N : Current.boundary (T_seq N).toFun = 0 := by
+        unfold IntegralCurrent.isCycleAt at h_cycle_N
+        cases h_cycle_N with
+        | inl h_zero => exact (Nat.succ_ne_zero k' h_zero).elim
+        | inr h_exists =>
+          obtain ⟨k'', hk'', h_bdy⟩ := h_exists
+          cases hk''
+          exact h_bdy
+      -- Now derive contradiction
+      have h1 : flatNorm (Current.boundary T_limit.toFun) =
+                flatNorm (Current.boundary T_limit.toFun - Current.boundary (T_seq N).toFun) := by
+        -- Reduce to subtraction by zero, then use `Current.neg_zero_current` and `Current.add_zero`.
+        rw [h_bdy_N]
+        have hsub0 :
+            Current.boundary T_limit.toFun - (0 : Current n X k') = Current.boundary T_limit.toFun := by
+          calc
+            Current.boundary T_limit.toFun - (0 : Current n X k')
+                = Current.boundary T_limit.toFun + -(0 : Current n X k') := rfl
+            _ = Current.boundary T_limit.toFun + 0 := by
+              simpa using
+                congrArg (fun U => Current.boundary T_limit.toFun + U)
+                  (Current.neg_zero_current (n := n) (X := X) (k := k'))
+            _ = Current.boundary T_limit.toFun := by
+              simpa using (Current.add_zero (T := Current.boundary T_limit.toFun))
+        simpa [hsub0]
+      have h2 : flatNorm (Current.boundary T_limit.toFun - Current.boundary (T_seq N).toFun) =
+                flatNorm (Current.boundary (T_limit.toFun - (T_seq N).toFun)) := by
+        rw [← Current.boundary_sub]
+      have h3 : flatNorm (Current.boundary (T_limit.toFun - (T_seq N).toFun)) ≤
+                flatNorm (T_limit.toFun - (T_seq N).toFun) := flatNorm_boundary_le _
+      have h4 : flatNorm (T_limit.toFun - (T_seq N).toFun) =
+                flatNorm ((T_seq N).toFun - T_limit.toFun) := by
+        have hswap : T_limit.toFun - (T_seq N).toFun = -((T_seq N).toFun - T_limit.toFun) := by
+          ext ω
+          change
+              T_limit.toFun.toFun ω + (-(T_seq N).toFun).toFun ω =
+                -(((T_seq N).toFun.toFun ω + (-T_limit.toFun).toFun ω))
+          have hnegSeq : (-(T_seq N).toFun).toFun ω = -((T_seq N).toFun.toFun ω) := rfl
+          have hnegLim : (-T_limit.toFun).toFun ω = -(T_limit.toFun.toFun ω) := rfl
+          simp [hnegSeq, hnegLim]
+        calc
+          flatNorm (T_limit.toFun - (T_seq N).toFun)
+              = flatNorm (-((T_seq N).toFun - T_limit.toFun)) := by simpa [hswap]
+          _ = flatNorm ((T_seq N).toFun - T_limit.toFun) := by
+            simpa using (flatNorm_neg ((T_seq N).toFun - T_limit.toFun))
+      have h_bound : flatNorm (Current.boundary T_limit.toFun) <
+                     flatNorm (Current.boundary T_limit.toFun) := by
+        calc flatNorm (Current.boundary T_limit.toFun)
+            = flatNorm (Current.boundary T_limit.toFun - Current.boundary (T_seq N).toFun) := h1
+          _ = flatNorm (Current.boundary (T_limit.toFun - (T_seq N).toFun)) := h2
+          _ ≤ flatNorm (T_limit.toFun - (T_seq N).toFun) := h3
+          _ = flatNorm ((T_seq N).toFun - T_limit.toFun) := h4
+          _ < ε := hN'
+          _ < flatNorm (Current.boundary T_limit.toFun) := by linarith
+      exact lt_irrefl _ h_bound
 
 /-- **Universal instance of HarveyLawsonKingData**.
 

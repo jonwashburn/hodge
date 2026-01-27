@@ -19,7 +19,6 @@ import Hodge.Analytic.Calibration
 import Hodge.Analytic.Integration
 import Hodge.Analytic.Integration.TopFormIntegral
 import Hodge.Cohomology.Basic
-import Hodge.GMT.PoincareDuality
 
 /-!
 # Microstructure Construction (SYR = Sheet-by-sheet Yoga Refinement)
@@ -121,6 +120,17 @@ class CubulationExists (n : ℕ) (X : Type u)
     [MeasurableSpace X] [BorelSpace X] [Nonempty X] : Prop where
   exists_cubulation : ∀ h : ℝ, h > 0 → Nonempty (Cubulation n X h)
 
+/-- A trivial cubulation exists for every mesh size (single cube `Set.univ`).
+
+This discharges `CubulationExists` for the current (minimal) `Cubulation` interface.
+When `Cubulation` is strengthened with diameter/mesh bounds, this instance will be
+replaced by a genuine construction using compactness/finite atlases. -/
+instance CubulationExists.universal : CubulationExists n X where
+  exists_cubulation := fun h _hp => by
+    refine ⟨{ cubes := {Set.univ}, is_partition := ?_ }⟩
+    -- ⋃ Q ∈ {univ}, Q = univ
+    simp
+
 /-- Existence of cubulations for any mesh size. -/
 theorem exists_cubulation [CubulationExists n X] (h : ℝ) (hp : h > 0) : Nonempty (Cubulation n X h) := by
   simpa using (CubulationExists.exists_cubulation (n := n) (X := X) h hp)
@@ -131,19 +141,30 @@ def cubulationFromMesh [CubulationExists n X] (h : ℝ) (hp : h > 0) : Cubulatio
 
 /-! ## Local Holomorphic Sheets -/
 
-/-- Y is a complex submanifold of dimension p.
-    Semantic stub: in full track, this encodes proper smooth manifold structure. -/
-def IsComplexSubmanifold (_n : ℕ) (_X : Type*) (_p : ℕ) (_Y : Set _X) : Prop := True
+/-!
+In the fully unconditional development, a “holomorphic sheet” should carry genuine
+submanifold/rectifiability data (so it can be integrated against).
 
-/-- **Holomorphic Sheet** (conceptual).
-    A local complex submanifold of codimension p. -/
-structure HolomorphicSheet (n : ℕ) (X : Type u) (p : ℕ) where
+For now, we model this by requiring a `ClosedSubmanifoldData` witness whose carrier
+is the sheet support. This removes the previous semantic stub `Prop := True`.
+-/
+
+/-- **Holomorphic Sheet** (data-carrying placeholder).
+    A local complex submanifold of codimension p, represented by `ClosedSubmanifoldData`. -/
+structure HolomorphicSheet (n : ℕ) (X : Type u) (p : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] where
   support : Set X
-  is_complex : IsComplexSubmanifold n X (2 * (n - p)) support
+  data : ClosedSubmanifoldData n X (2 * (n - p))
+  data_support : data.carrier = support
 
 /-- **Sheet Sum** (conceptual).
     A collection of holomorphic sheets in a cubulation. -/
-structure RawSheetSum (n : ℕ) (X : Type u) (p : ℕ) (hscale : ℝ) (C : Cubulation n X hscale) where
+structure RawSheetSum (n : ℕ) (X : Type u) (p : ℕ) (hscale : ℝ) (C : Cubulation n X hscale)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] where
   sheets : ∀ Q ∈ C.cubes, Finset (HolomorphicSheet n X p)
   support : Set X
 
@@ -155,10 +176,10 @@ class SheetUnionStokesData (n : ℕ) (X : Type*) (k : ℕ) (Z : Set X)
     [instMetric : MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [instBorel : BorelSpace X] [Nonempty X] : Prop where
+    [MeasurableSpace X] [instBorel : BorelSpace X] [Nonempty X] [SubmanifoldIntegration n X] : Prop where
   /-- Stokes theorem: ∫_Z dω = 0 for sheet unions (closed complex submanifolds). -/
   stokes_integral_zero : ∀ ω : SmoothForm n X k,
-    |@setIntegral n X (k + 1) instMetric _ _ _ _ _ _ instBorel _ Z (smoothExtDeriv ω)| ≤ 0
+    |setIntegral (n := n) (X := X) (k + 1) Z (smoothExtDeriv ω)| ≤ 0
 
 /-- Convert a RawSheetSum to an IntegrationData.
     This creates the integration data for the union of sheets.
@@ -193,14 +214,18 @@ noncomputable def RawSheetSum.toIntegrationData {p : ℕ} {hscale : ℝ}
     | succ k' =>
       intro ω
       simp only [MulZeroClass.zero_mul]
-      -- setIntegral → integrateDegree2p → submanifoldIntegral → 0 (via SubmanifoldIntegration.universal)
-      -- So we need |0| ≤ 0
-      simp only [setIntegral, integrateDegree2p]
-      split_ifs with h
-      · -- Even degree case: submanifoldIntegral returns 0
-        simp only [submanifoldIntegral, SubmanifoldIntegration.universal, abs_zero, le_refl]
-      · -- Odd degree case: integrateDegree2p returns 0
-        simp only [abs_zero, le_refl]
+      -- Use the Stokes bound packaged in `SheetUnionStokesData`.
+      have hk' : 2 * (n - p) - 1 = k' := by
+        -- From `2*(n-p) = k'+1`, subtract 1 on both sides.
+        have := congrArg (fun t => t - 1) hk
+        simpa using this
+      have inst0 : SheetUnionStokesData n X (2 * (n - p) - 1) T_raw.support := by
+        infer_instance
+      have inst1 : SheetUnionStokesData n X k' T_raw.support := by
+        simpa [hk'] using inst0
+      have h := inst1.stokes_integral_zero ω
+      -- Rewrite the target degree `2*(n-p)` to `k'+1` using `hk`.
+      simpa [hk] using h
 
 /-- **Real Integration Data for RawSheetSum** (Phase 2)
     Uses actual `setIntegral` instead of zero stub.
@@ -210,7 +235,6 @@ noncomputable def RawSheetSum.toIntegrationData {p : ℕ} {hscale : ℝ}
     `RawSheetSum.toIntegrationData` is used on the main proof track. -/
 noncomputable def RawSheetSum.toIntegrationData_real {p : ℕ} {hscale : ℝ}
     {C : Cubulation n X hscale} (T_raw : RawSheetSum n X p hscale C)
-    [MeasurableSpace X] [BorelSpace X]
     (hStokes : ∀ (k : ℕ), ∀ ω : SmoothForm n X k,
       |setIntegral (k + 1) T_raw.support (smoothExtDeriv ω)| ≤ 0) :
     IntegrationData n X (2 * (n - p)) where
@@ -229,6 +253,26 @@ noncomputable def RawSheetSum.toIntegrationData_real {p : ℕ} {hscale : ℝ}
       simp only [MulZeroClass.zero_mul]
       exact hStokes k' ω
 
+/-!
+### Integrality data for sheet-union currents
+
+Once `setIntegral` is no longer a “zero integral” stub, integrality of the resulting current
+is a genuinely deep GMT input (polyhedral approximation / Federer–Fleming).
+
+We keep that input explicit as a typeclass, so the proof track does not silently rely on a
+fake universal instance. -/
+
+/-- **Integrality Data for a RawSheetSum current** (Federer–Fleming, 1960). -/
+class RawSheetSumIntegralityData (n : ℕ) (X : Type*) (p : ℕ) (hscale : ℝ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X] [SubmanifoldIntegration n X]
+    (C : Cubulation n X hscale) (T_raw : RawSheetSum n X p hscale C)
+    [SheetUnionStokesData n X (2 * (n - p) - 1) T_raw.support] : Prop where
+  /-- The current induced by `T_raw.toIntegrationData` is integral. -/
+  is_integral : isIntegral T_raw.toIntegrationData.toCurrent
+
 /-- Convert a RawSheetSum to a CycleIntegralCurrent.
     This is now constructed via the IntegrationData infrastructure.
 
@@ -237,39 +281,29 @@ noncomputable def RawSheetSum.toIntegrationData_real {p : ℕ} {hscale : ℝ}
     Reference: [H. Federer, "Geometric Measure Theory", 1969, Section 4.2.25]. -/
 noncomputable def RawSheetSum.toCycleIntegralCurrent {p : ℕ} {hscale : ℝ}
     {C : Cubulation n X hscale} (T_raw : RawSheetSum n X p hscale C)
-    [SheetUnionStokesData n X (2 * (n - p) - 1) T_raw.support] :
+    [SheetUnionStokesData n X (2 * (n - p) - 1) T_raw.support]
+    [RawSheetSumIntegralityData n X p hscale C T_raw] :
     CycleIntegralCurrent n X (2 * (n - p)) where
   toIntegrationData := T_raw.toIntegrationData
   is_integral := by
-    -- The integrate function uses setIntegral → integrateDegree2p → SubmanifoldIntegration.integral
-    -- which returns 0 in the universal instance.
-    -- So toCurrent is the zero current, which is integral.
-    -- We need to show: isIntegral T_raw.toIntegrationData.toCurrent
-    -- Since toIntegrationData.integrate = setIntegral = 0, the current is the zero current.
-    have h_zero : ∀ ω, T_raw.toIntegrationData.toCurrent.toFun ω = 0 := fun ω => by
-      simp only [IntegrationData.toCurrent, RawSheetSum.toIntegrationData]
-      simp only [setIntegral, integrateDegree2p]
-      split_ifs
-      · simp only [submanifoldIntegral, SubmanifoldIntegration.universal]
-      · rfl
-    -- The current with all-zero values equals 0
-    have h_eq_zero : T_raw.toIntegrationData.toCurrent = 0 := by
-      ext ω; exact h_zero ω
-    rw [h_eq_zero]
-    exact isIntegral_zero_current (2 * (n - p))
+    -- Use explicit integrality data (Federer–Fleming approximation theorem).
+    simpa using (RawSheetSumIntegralityData.is_integral (n := n) (X := X) (p := p)
+      (hscale := hscale) (C := C) (T_raw := T_raw))
 
 /-- Convert a RawSheetSum to an IntegralCurrent. -/
 noncomputable def RawSheetSum.toIntegralCurrent {p : ℕ} {hscale : ℝ}
     {C : Cubulation n X hscale} (T_raw : RawSheetSum n X p hscale C)
-    [SheetUnionStokesData n X (2 * (n - p) - 1) T_raw.support] :
+    [SheetUnionStokesData n X (2 * (n - p) - 1) T_raw.support]
+    [RawSheetSumIntegralityData n X p hscale C T_raw] :
     IntegralCurrent n X (2 * (n - p)) :=
   T_raw.toCycleIntegralCurrent.toIntegralCurrent
 
-/-- The cycle property of RawSheetSum. -/
-theorem RawSheetSum.toIntegralCurrent_isCycle {p : ℕ} {hscale : ℝ}
-    {C : Cubulation n X hscale} (_T_raw : RawSheetSum n X p hscale C)
-    [SheetUnionStokesData n X (2 * (n - p) - 1) _T_raw.support] :
-    True := trivial  -- Cycle property follows from IntegrationData boundary mass = 0
+/-!
+The cycle property of `RawSheetSum` (documentation-only placeholder).
+
+This will be reinstated as an actual theorem once the microstructure construction and
+Stokes/flat-norm infrastructure are fully formalized.
+-/
 
 /-! ## Microstructure Sequence -/
 
@@ -329,115 +363,59 @@ theorem microstructureSequence_are_cycles (p : ℕ) (γ : SmoothForm n X (2 * p)
     Reference: [H. Federer, "Geometric Measure Theory", 1969, Section 4.2.25]. -/
 theorem RawSheetSum.current_is_real {p : ℕ} {hscale : ℝ}
     {C : Cubulation n X hscale} (T_raw : RawSheetSum n X p hscale C)
-    [SheetUnionStokesData n X (2 * (n - p) - 1) T_raw.support] :
+    [SheetUnionStokesData n X (2 * (n - p) - 1) T_raw.support]
+    [RawSheetSumIntegralityData n X p hscale C T_raw] :
     T_raw.toIntegralCurrent.toFun.toFun = setIntegral (n := n) (X := X) (2 * (n - p)) T_raw.support := by
-  -- By definition: toIntegralCurrent.toFun.toFun = integrate = setIntegral
+  ext ω
   rfl
 
 /-- The underlying current of toIntegralCurrent is real. -/
 theorem RawSheetSum.toIntegralCurrent_toFun_eq_real {p : ℕ} {hscale : ℝ}
     {C : Cubulation n X hscale} (T_raw : RawSheetSum n X p hscale C)
-    [SheetUnionStokesData n X (2 * (n - p) - 1) T_raw.support] :
+    [SheetUnionStokesData n X (2 * (n - p) - 1) T_raw.support]
+    [RawSheetSumIntegralityData n X p hscale C T_raw] :
     T_raw.toIntegralCurrent.toFun.toFun = setIntegral (n := n) (X := X) (2 * (n - p)) T_raw.support := by
+  ext ω
   rfl
 
 /-- The underlying current of toIntegralCurrent equals setIntegral over support. -/
 theorem RawSheetSum.toIntegralCurrent_toFun_is_setIntegral {p : ℕ} {hscale : ℝ}
     {C : Cubulation n X hscale} (T_raw : RawSheetSum n X p hscale C)
-    [SheetUnionStokesData n X (2 * (n - p) - 1) T_raw.support] :
+    [SheetUnionStokesData n X (2 * (n - p) - 1) T_raw.support]
+    [RawSheetSumIntegralityData n X p hscale C T_raw] :
     T_raw.toIntegralCurrent.toFun.toFun = setIntegral (n := n) (X := X) (2 * (n - p)) T_raw.support := by
+  ext ω
   rfl
 
-/-- **Theorem: Sheet sums over complex submanifolds are automatically closed**.
-    Complex submanifolds of compact Kähler manifolds have no boundary, so
-    their integration currents are cycles. This gives boundary_bound with M = 0.
+/-!
+**Sheet sums over complex submanifolds are automatically closed** (documentation-only placeholder).
 
-    Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", Ch. 0]. -/
-theorem RawSheetSum.sheets_are_closed {p : ℕ} {hscale : ℝ}
-    {C : Cubulation n X hscale} (_T_raw : RawSheetSum n X p hscale C)
-    [SheetUnionStokesData n X (2 * (n - p) - 1) _T_raw.support] :
-    True := trivial  -- Cycle property from IntegrationData boundary mass = 0
+Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", Ch. 0]. -/
 
-/-- **Theorem: Microstructure sequence elements are real currents**.
-    All currents in the sequence are real integration currents.
+/-!
+Microstructure sequence currents are real (documentation-only placeholders).
 
-    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 1960]. -/
-theorem microstructureSequence_is_real (p : ℕ) (_γ : SmoothForm n X (2 * p))
-    (_hγ : isConePositive _γ) (_ψ : CalibratingForm n X (2 * (n - p))) :
-    True := trivial  -- Semantic stub
+Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 1960]. -/
 
-/-- **Theorem: Microstructure currents are real integration currents** (semantic stub). -/
-theorem microstructureSequence_currents_are_real (p : ℕ) (_γ : SmoothForm n X (2 * p))
-    (_hγ : isConePositive _γ) (_ψ : CalibratingForm n X (2 * (n - p))) :
-    True := trivial  -- Semantic stub
+/-!
+Microstructure sequence Stokes-type vanishing (documentation-only placeholder).
 
-/-- **Theorem: Stokes-type bound for microstructure currents**.
-    For any closed form ω, the boundary term vanishes identically because
-    microstructure currents are cycles (boundary = 0).
+Reference: [Stokes' theorem + cycle property of complex submanifolds]. -/
 
-    Reference: [Stokes' theorem + cycle property of complex submanifolds]. -/
-theorem microstructureSequence_stokes_vanishing (p : ℕ) (_γ : SmoothForm n X (2 * p))
-    (_hγ : isConePositive _γ) (_ψ : CalibratingForm n X (2 * (n - p)))
-    [CubulationExists n X] :
-    ∀ (_k : ℕ), True := fun _ => trivial  -- Semantic stub
+/-!
+Microstructure flat-limit realness (documentation-only placeholders).
 
-/-- **Theorem: The limit current (from flat norm convergence) is real**.
-    Flat norm limits of integration currents are represented by analytic cycles.
+Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 1960]. -/
 
-    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 1960]. -/
-theorem microstructureSequence_limit_is_real (p : ℕ) (_γ : SmoothForm n X (2 * p))
-    (_hγ : isConePositive _γ) (_ψ : CalibratingForm n X (2 * (n - p)))
-    (_T_limit : IntegralCurrent n X (2 * (n - p)))
-    (_φ : ℕ → ℕ) (_hφ : StrictMono _φ) (_hk : 2 * (n - p) ≥ 1) :
-    True := trivial  -- Semantic stub
+/-!
+RawSheetSum Stokes property (documentation-only placeholder).
 
-/-- **Theorem: Microstructure limit is a real current** (semantic stub). -/
-theorem microstructureSequence_limit_is_real_legacy (p : ℕ) (_γ : SmoothForm n X (2 * p))
-    (_hγ : isConePositive _γ) (_ψ : CalibratingForm n X (2 * (n - p)))
-    (_T_limit : IntegralCurrent n X (2 * (n - p)))
-    (_φ : ℕ → ℕ) (_hφ : StrictMono _φ) (_hk : 2 * (n - p) ≥ 1) :
-    True := trivial  -- Semantic stub
+Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", Ch. 0]. -/
 
-/-- **Theorem: RawSheetSum currents satisfy Stokes property with M = 0**.
-    Complex submanifolds are closed (no boundary), so the Stokes constant is zero.
+/-!
+Microstructure Stokes properties (documentation-only placeholders).
 
-    This is the core connection between Agent 5's microstructure work and
-    Agent 2a's Stokes property infrastructure.
-
-    Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", Ch. 0]. -/
-theorem RawSheetSum.hasStokesProperty {p : ℕ} {hscale : ℝ}
-    {C : Cubulation n X hscale} (_T_raw : RawSheetSum n X p hscale C)
-    (_hk : 2 * (n - p) ≥ 1)
-    [SheetUnionStokesData n X (2 * (n - p) - 1) _T_raw.support] :
-    True := trivial  -- Semantic stub: Stokes property from closed submanifolds
-
-/-- **Theorem: All microstructure sequence elements satisfy Stokes property with M = 0**.
-    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 1960]. -/
-theorem microstructureSequence_hasStokesProperty (p : ℕ) (_γ : SmoothForm n X (2 * p))
-    (_hγ : isConePositive _γ) (_ψ : CalibratingForm n X (2 * (n - p)))
-    (_hk : 2 * (n - p) ≥ 1) [CubulationExists n X] :
-    True := trivial  -- Semantic stub
-
-/-- **Theorem: The flat limit of the microstructure sequence also satisfies Stokes property**.
-    Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 1960]. -/
-theorem microstructure_limit_hasStokesProperty (p : ℕ) (_γ : SmoothForm n X (2 * p))
-    (_hγ : isConePositive _γ) (_ψ : CalibratingForm n X (2 * (n - p)))
-    (_T_limit : IntegralCurrent n X (2 * (n - p)))
-    (_φ : ℕ → ℕ) (_hφ : StrictMono _φ) (_hk : 2 * (n - p) ≥ 1) [CubulationExists n X] :
-    True := trivial  -- Semantic stub
-
-/-- **Main Theorem (Agent 4 Task 2d): Microstructure produces Stokes-bounded currents**. -/
-theorem microstructure_construction_stokes (p : ℕ) (_γ : SmoothForm n X (2 * p))
-    (_hγ : isConePositive _γ) (_ψ : CalibratingForm n X (2 * (n - p)))
-    (_T_limit : IntegralCurrent n X (2 * (n - p)))
-    (_φ : ℕ → ℕ) (_hφ : StrictMono _φ) (_hk : 2 * (n - p) ≥ 1) [CubulationExists n X] :
-    True := trivial  -- Semantic stub
-
-/-- **Main Theorem (Agent 4 Task 2d): Microstructure produces Stokes-bounded currents (legacy name)**. -/
-theorem microstructure_produces_stokes_bounded_currents (p : ℕ) (_γ : SmoothForm n X (2 * p))
-    (_hγ : isConePositive _γ) (_ψ : CalibratingForm n X (2 * (n - p)))
-    (_hk : 2 * (n - p) ≥ 1) [CubulationExists n X] :
-    True := trivial  -- Semantic stub
+Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 1960]. -/
 
 /-- **RawSheetSum Stokes Bound Interface** (Round 9: Agent 4).
 
@@ -453,33 +431,15 @@ class RawSheetSumZeroBound (n : ℕ) (X : Type*) (p : ℕ) (hscale : ℝ)
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X] [SubmanifoldIntegration n X]
     (C : Cubulation n X hscale) (T_raw : RawSheetSum n X p hscale C) : Prop where
   /-- The integral over the support gives zero bound. -/
   integral_zero_bound : ∀ ω : SmoothForm n X (2 * (n - p)),
     [SheetUnionStokesData n X (2 * (n - p) - 1) T_raw.support] →
     |T_raw.toIntegrationData.integrate ω| ≤ 0
 
-/-- Universal instance for RawSheetSum zero bound. -/
-instance RawSheetSumZeroBound.universal {p : ℕ} {hscale : ℝ}
-    {C : Cubulation n X hscale} (T_raw : RawSheetSum n X p hscale C) :
-    RawSheetSumZeroBound n X p hscale C T_raw where
-  integral_zero_bound := fun ω _ => by
-    -- toIntegrationData.integrate = setIntegral.
-    -- Since SubmanifoldIntegration.universal.integral returns 0,
-    -- |setIntegral ...| = |0| = 0 ≤ 0.
-    simp only [RawSheetSum.toIntegrationData, setIntegral, integrateDegree2p]
-    split_ifs with h
-    · -- Even degree: submanifoldIntegral = 0
-      simp only [submanifoldIntegral, SubmanifoldIntegration.universal, abs_zero, le_refl]
-    · -- Odd degree: already 0
-      simp only [abs_zero, le_refl]
-
-theorem RawSheetSum.stokes_bound_from_integrationData {p : ℕ} {hscale : ℝ}
-    {C : Cubulation n X hscale} (_T_raw : RawSheetSum n X p hscale C)
-    (_hk : 2 * (n - p) ≥ 1)
-    [SheetUnionStokesData n X (2 * (n - p) - 1) _T_raw.support] :
-    True := trivial  -- Semantic stub
+/-!
+RawSheetSum Stokes bound from IntegrationData (documentation-only placeholder). -/
 
 /-- **Uniform mass bound for the microstructure sequence**. -/
 theorem microstructure_uniform_mass_bound (p : ℕ) (_γ : SmoothForm n X (2 * p))
@@ -487,17 +447,12 @@ theorem microstructure_uniform_mass_bound (p : ℕ) (_γ : SmoothForm n X (2 * p
     [CubulationExists n X] :
     ∃ M : ℝ, M ≥ 0 := ⟨0, le_refl 0⟩  -- Semantic stub
 
-/-- **Calibration defect vanishes for the microstructure sequence**. -/
-theorem microstructureSequence_defect_vanishes (p : ℕ) (_γ : SmoothForm n X (2 * p))
-    (_hγ : isConePositive _γ) (_ψ : CalibratingForm n X (2 * (n - p)))
-    [CubulationExists n X] :
-    True := trivial  -- Semantic stub
+/-!
+Calibration defect vanishes for the microstructure sequence (documentation-only placeholder). -/
 
-/-- **The flat limit of the microstructure sequence exists**.
-    This is the Federer-Fleming compactness theorem applied to the sequence. -/
-theorem microstructureSequence_flat_limit_exists (p : ℕ) (_γ : SmoothForm n X (2 * p))
-    (_hγ : isConePositive _γ) (_ψ : CalibratingForm n X (2 * (n - p)))
-    [CubulationExists n X] :
-    True := trivial  -- Semantic stub
+/-!
+The flat limit of the microstructure sequence exists (documentation-only placeholder).
+
+This is the Federer-Fleming compactness theorem applied to the sequence. -/
 
 end

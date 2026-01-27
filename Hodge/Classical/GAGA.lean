@@ -547,65 +547,56 @@ This section defines the geometric cycle class computed from the support,
 and the `SpineBridgeData` typeclass that bridges geometry to cohomology.
 -/
 
-/-- **Geometric cycle class** computed from the representing form.
+/-- **Geometric cycle class** computed from the support.
 
-    This is the "TeX-faithful" definition where the cohomology class comes from
-    the form that determined the spine construction.
+    This is the *actual* geometric definition: the cohomology class is the class of
+    the fundamental class of the support \(Z.pos ∪ Z.neg\).
 
-    **Mathematical Justification** (TeX-Faithful):
-    For spine-produced cycles, the `representingForm` IS the geometric fundamental class:
-    1. The spine starts with a geometric form γ (cone-positive, closed, (p,p))
-    2. SYR produces currents approximating PD(γ) with vanishing calibration defect
-    3. The limit is a calibrated current in homology class PD(γ)
-    4. Harvey-Lawson decomposes it into integration currents over analytic varieties
-    5. The fundamental class of the support IS [γ] by construction
-    6. representingForm = γ by the cycle construction
-
-    So `cycleClass_geom = [representingForm] = [γ]` is exactly the geometric class.
-
-    **Note**: This definition is equivalent to `cycleClass` but emphasizes that
-    the form came from geometry, not from an arbitrary carried witness. -/
+    This **breaks the cycle-class tautology** (previously `cycleClass_geom := ofForm representingForm`),
+    and forces the deep comparison theorem onto the proof track via `SpineBridgeData`.
+    Concretely, the bridge asserts (for spine-produced cycles) that:
+    \[
+      [\mathrm{FundamentalClassSet}(\mathrm{support}(Z))] = [\mathrm{representingForm}(Z)].
+    \] -/
 noncomputable def SignedAlgebraicCycle.cycleClass_geom {p : ℕ}
+    [CycleClass.PoincareDualFormExists n X p]
     (Z : SignedAlgebraicCycle n X p) : DeRhamCohomologyClass n X (2 * p) :=
-  ofForm Z.representingForm Z.representingForm_closed
+  ofForm (FundamentalClassSet n X p Z.support)
+    (FundamentalClassSet_isClosed (n := n) (X := X) (p := p)
+      (Z := Z.support) Z.support_is_algebraic)
 
-/-- **Spine Bridge Data**: Typeclass capturing Poincaré duality content.
+/-- **Spine Bridge Data**: the deep bridge between geometry and cohomology.
 
-    For spine-produced cycles, the geometric class equals the representing form class.
-    This is now trivial because `cycleClass_geom` uses `representingForm` directly.
+    This encodes the TeX spine statement that for *spine-produced* cycles, the
+    fundamental class of the support represents the same cohomology class as the
+    carried `representingForm`.
 
-    The deep GMT content (that the geometric fundamental class of the support
-    equals the representing form) is captured by the spine construction itself,
-    not by this bridge theorem. -/
+    In the fully unconditional project, this should be *proved* from GMT + Stokes + PD
+    (ultimately Harvey–Lawson / calibrated current theory + GAGA).
+    For now we keep it explicit as a typeclass assumption. -/
 class SpineBridgeData (n : ℕ) (X : Type u)
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [MeasurableSpace X] [BorelSpace X] [Nonempty X] : Prop where
-  /-- For spine-produced cycles, fundamental class of support = representing form in cohomology.
-      This is now trivial because cycleClass_geom := ofForm representingForm. -/
-  fundamental_eq_representing : ∀ {p : ℕ}
+  /-- For spine-produced cycles, the geometric class from support equals the class of the
+      carried representing form. -/
+  fundamental_eq_representing : ∀ {p : ℕ} [CycleClass.PoincareDualFormExists n X p]
     (Z : SignedAlgebraicCycle n X p),
-    Z.cycleClass_geom = ofForm Z.representingForm Z.representingForm_closed
+      Z.cycleClass_geom = ofForm Z.representingForm Z.representingForm_closed
 
-/-- **Universal instance of SpineBridgeData**.
-
-    This is now trivially proved because `cycleClass_geom` uses `representingForm` directly.
-
-    **Mathematical Content**: For cycles constructed via the TeX spine (SYR → HL → GAGA),
-    the `representingForm` IS the geometric form that determined the construction.
-    The equality `cycleClass_geom = ofForm representingForm` holds by definition. -/
-instance SpineBridgeData.universal : SpineBridgeData n X where
-  fundamental_eq_representing := fun Z => rfl
-
-/-- The geometric class equals the representing form class (trivially by definition). -/
+/-- The geometric class equals the representing form class (by the spine bridge). -/
 theorem SignedAlgebraicCycle.cycleClass_geom_eq_representingForm {p : ℕ}
+    [CycleClass.PoincareDualFormExists n X p] [SpineBridgeData n X]
     (Z : SignedAlgebraicCycle n X p) :
-    Z.cycleClass_geom = ofForm Z.representingForm Z.representingForm_closed := rfl
+    Z.cycleClass_geom = ofForm Z.representingForm Z.representingForm_closed :=
+  SpineBridgeData.fundamental_eq_representing (n := n) (X := X) (Z := Z)
 
-/-- The geometric class equals the shortcut class (both are ofForm representingForm). -/
+/-- The geometric class equals the shortcut class (via the bridge). -/
 theorem SignedAlgebraicCycle.cycleClass_geom_eq_cycleClass {p : ℕ}
+    [CycleClass.PoincareDualFormExists n X p] [SpineBridgeData n X]
     (Z : SignedAlgebraicCycle n X p) : Z.cycleClass_geom = Z.cycleClass := by
-  rw [cycleClass_geom_eq_representingForm, cycleClass_eq_representingForm]
+  rw [cycleClass_geom_eq_representingForm (n := n) (X := X) (Z := Z),
+    cycleClass_eq_representingForm (n := n) (X := X) (Z := Z)]
 
 end

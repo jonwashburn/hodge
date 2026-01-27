@@ -108,9 +108,9 @@ When real Λ and metric infrastructure is available, these will need proper proo
 This is the fundamental relation that relates the Lefschetz operator,
 its dual, and the weight operator.
 
-**Note**: With placeholders (L = 0, Λ = 0), this holds trivially.
-The statement here captures the informal mathematical fact. -/
-theorem sl2_L_Lambda_eq_zero_statement : True := trivial
+NOTE: This was previously a documentation stub. It will be
+reintroduced as an actual theorem once the real operators (wedge, Λ, metric) are
+implemented. -/
 
 /-- **Second sl(2) relation**: [H, L] = 2L.
 

@@ -10,8 +10,8 @@ The full proof logic is contained in `Hodge/Kahler/Main.lean`.
 ## Two Versions
 
 1. **`hodge_conjecture`** (TeX-faithful): Uses geometric cycle class `cycleClass_geom`
-   with `SpineBridgeData.universal` instance. The cycle class comes from geometry
-   (fundamental class of the support), matching the TeX proof structure.
+   computed from the fundamental class of the support, together with an explicit
+   bridge assumption `SpineBridgeData`.
 
 2. **`hodge_conjecture_kernel`** (kernel-only): Uses definitional shortcut
    `cycleClass := ofForm representingForm`. No custom axioms, but not TeX-faithful.
@@ -34,9 +34,9 @@ variable {n : ℕ} {X : Type*}
     For a smooth projective complex algebraic variety X, every rational Hodge class
     is algebraic (i.e., the GEOMETRIC cycle class equals the cohomology class).
 
-    **TeX-Faithful**: Uses `cycleClass_geom` which is defined from `representingForm`.
-    For spine-produced cycles, `representingForm` IS the geometric form that determined
-    the construction, so this is faithful to the TeX proof structure.
+    **TeX-Faithful**: Uses `cycleClass_geom` defined from the support (fundamental class),
+    and a bridge assumption `SpineBridgeData` relating that geometric class to the carried
+    `representingForm` class.
 
     **Mathematical Content**:
     - The cycle Z is constructed via SYR → Harvey-Lawson → GAGA
@@ -50,6 +50,7 @@ theorem hodge_conjecture {p : ℕ}
     [CubulationExists n X]  -- Cubulation existence for microstructure
     [HarveyLawsonKingData n X (2 * (n - p))]  -- Harvey-Lawson regularity
     [ChowGAGAData n X]  -- Chow/GAGA: analytic subvarieties are algebraic
+    [CycleClass.PoincareDualFormExists n X p] [SpineBridgeData n X]
     (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
     (h_rational : isRationalClass (ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :
     ∃ (Z : SignedAlgebraicCycle n X p), Z.cycleClass_geom = ofForm γ h_closed :=
