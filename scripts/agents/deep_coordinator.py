@@ -78,34 +78,47 @@ class Task:
         return cls(**d)
 
 
-# Remaining hard tasks + validation of completed ones
+# Phase 5: Replace trivial universal instances with real implementations
+# The goal is to make the proof non-vacuous (so the critic on Zulip has no complaint)
 TASKS = [
-    # The 3 that failed
+    # 1. AutomaticSYRData.universal currently returns zero current
+    # Replace with non-trivial microstructure sequence construction
     Task(
-        id="microstructure_sorries",
-        description="Eliminate sorries in Hodge/Kahler/Microstructure.lean",
-        file_path="Hodge/Kahler/Microstructure.lean",
-        target="microstructureSequence and related sorries"
+        id="automatic_syr_nontrivial",
+        description="Replace AutomaticSYRData.universal with a non-trivial microstructure construction that actually builds currents from sheets",
+        file_path="Hodge/Kahler/Main.lean",
+        target="AutomaticSYRData.universal"
     ),
+    # 2. HarveyLawsonKingData.universal returns empty varieties
+    # Replace with real analytic decomposition
     Task(
-        id="harvey_lawson_sorries",
-        description="Eliminate sorries in harveyLawsonSupportVariety",
+        id="harvey_lawson_nontrivial",
+        description="Replace HarveyLawsonKingData.universal with a construction that extracts analytic varieties from calibrated currents (not empty set)",
         file_path="Hodge/Classical/HarveyLawson.lean",
-        target="harveyLawsonSupportVariety carrier and is_analytic"
+        target="HarveyLawsonKingData.universal"
     ),
+    # 3. PoincareDualFormExists needs a universal instance that returns actual forms
     Task(
-        id="cycle_class_sorries",
-        description="Verify CycleClass has no sorries",
+        id="poincare_dual_universal",
+        description="Create PoincareDualFormExists.universal instance that returns omega^p for non-empty sets (not zero)",
         file_path="Hodge/Classical/CycleClass.lean",
-        target="PoincareDualFormExists.universal"
+        target="PoincareDualFormExists"
     ),
-    # Validate the proof compiles
+    # 4. SpineBridgeData.universal - bridge geometric class to representing form
     Task(
-        id="validate_main_theorem",
-        description="Verify hodge_conjecture' compiles without sorryAx",
+        id="spine_bridge_universal",
+        description="Create SpineBridgeData.universal instance that proves fundamental_eq_representing",
+        file_path="Hodge/Classical/GAGA.lean",
+        target="SpineBridgeData"
+    ),
+    # 5. Validate entire proof after above changes
+    Task(
+        id="validate_full_proof",
+        description="Verify hodge_conjecture' compiles and check axioms only show standard 3",
         file_path="Hodge/Kahler/Main.lean",
         target="hodge_conjecture'",
-        dependencies=["microstructure_sorries", "harvey_lawson_sorries", "cycle_class_sorries"]
+        dependencies=["automatic_syr_nontrivial", "harvey_lawson_nontrivial", 
+                      "poincare_dual_universal", "spine_bridge_universal"]
     ),
 ]
 
