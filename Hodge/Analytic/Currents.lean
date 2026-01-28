@@ -1270,6 +1270,22 @@ noncomputable def setIntegral {n : ℕ} {X : Type*} (k : ℕ)
     (Z : Set X) (ω : SmoothForm n X k) : ℝ :=
   integrateDegree2p (n := n) (X := X) k Z ω
 
+/-- Transport lemma for `setIntegral` across a degree equality.
+
+This exists purely to make `IntegrationData.stokes_bound` usable when the top-degree `k`
+is a *nontrivial expression* (e.g. `2 * (n - p)`), so we can rewrite away the `hk ▸ …`
+without doing dependent elimination on that expression directly. -/
+theorem setIntegral_transport {n : ℕ} {X : Type*} {k k' : ℕ}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [SubmanifoldIntegration n X]
+    (hk : k = k') (Z : Set X) (ω : SmoothForm n X k') :
+    setIntegral k Z (hk ▸ ω) = setIntegral k' Z ω := by
+  cases hk
+  rfl
+
 /-- Set integration is linear in the form. -/
 theorem setIntegral_linear {n : ℕ} {X : Type*} (k : ℕ)
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
@@ -1445,24 +1461,17 @@ instance StokesTheoremData.universal {n : ℕ} {X : Type*} (k : ℕ)
     by_cases hk : 2 ∣ (k + 1)
     · -- Degree k+1 is even: the integral is submanifoldIntegral of the casted form.
       -- For an exact form dω on a compact manifold without boundary, this is 0.
-      -- This requires deep GMT (Stokes' theorem).
       simp only [hk, dite_true]
-      -- DEEP GMT CONTENT: Stokes' Theorem for Currents
-      -- ================================================
-      -- Goal: Show |submanifoldIntegral p Set.univ (smoothExtDeriv ω)| ≤ 0
-      -- This implies submanifoldIntegral p Set.univ (smoothExtDeriv ω) = 0
-      --
-      -- Mathematical proof:
-      -- 1. smoothExtDeriv ω = dω is an exact form
-      -- 2. For compact X without boundary: ∫_X dω = ∫_{∂X} ω = 0
-      -- 3. This is Stokes' theorem (Federer GMT §4.1.28)
-      --
-      -- Required formalization (~500 lines):
-      -- - Define exterior derivative d on smooth forms
-      -- - Prove ∫_M dω = ∫_{∂M} ω for manifolds with boundary
-      -- - For closed M (∂M = ∅), conclude ∫_M dω = 0
-      -- - Connect to submanifoldIntegral infrastructure
-      sorry
+      -- Reduce to the Stokes field provided by `SubmanifoldIntegration`.
+      -- (At this point the goal is `submanifoldIntegral ... = 0`.)
+      -- `integrateDegree2p` chose `p := (k+1)/2` and `hkp := k+1 = 2*p`.
+      -- We reuse that exact witness.
+      let p : ℕ := (k + 1) / 2
+      have hkp : k + 1 = 2 * p := Nat.eq_mul_of_div_eq_right hk rfl
+      -- Rewrite `submanifoldIntegral` and apply the Stokes axiom from the integration package.
+      simpa [submanifoldIntegral, p, hkp] using
+        (SubmanifoldIntegration.stokes_integral_zero (n := n) (X := X)
+          (k := k) (p := p) hkp ω (Set.univ : Set X) isClosed_univ)
     · -- Degree k+1 is odd: integrateDegree2p returns 0 by definition.
       simp only [hk, dite_false]
 

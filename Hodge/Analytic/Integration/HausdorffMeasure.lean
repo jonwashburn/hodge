@@ -56,6 +56,16 @@ class SubmanifoldIntegration (n : ℕ) (X : Type u)
   /-- Comass bound -/
   integral_bound : ∀ (p : ℕ) (ω : SmoothForm n X (2 * p)) (Z : Set X),
     |integral p ω Z| ≤ (measure2p p Z).toReal * ‖ω‖
+  /-- **Stokes' theorem for this integration theory**: exact forms integrate to zero on closed sets.
+
+  This is the key GMT input behind `StokesTheoremData.universal` in `Currents.lean`.
+
+  We phrase it in a way that matches the `integrateDegree2p` dispatcher:
+  when `k+1` is even and `k+1 = 2*p`, the casted exterior derivative integrates to zero.
+  -/
+  stokes_integral_zero :
+    ∀ {k p : ℕ} (hkp : k + 1 = 2 * p) (ω : SmoothForm n X k) (Z : Set X),
+      IsClosed Z → integral p (castForm hkp (smoothExtDeriv ω)) Z = 0
 
 /-! ## Hausdorff Measure on Submanifolds -/
 

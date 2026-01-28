@@ -615,21 +615,24 @@ instance SpineBridgeData.universal : SpineBridgeData n X where
     --
     -- Goal: ofForm (FundamentalClassSet Z.support) = ofForm Z.representingForm
     --
-    -- Mathematical content:
-    -- - FundamentalClassSet Z.support is the Poincaré dual form of Z.support
-    -- - Z.representingForm is γ (the input closed (p,p)-form)
-    -- - In hodge_conjecture', Z is constructed from Harvey-Lawson decomposition
-    --   of a calibrated current that represents [γ]
+    -- CRITICAL NOTE: This is the CORE of the Hodge Conjecture.
     --
-    -- Proof strategy (from paper Section 5):
-    -- 1. The calibrated current T represents [γ] in de Rham cohomology
-    -- 2. Harvey-Lawson decomposes T = Σ_i m_i [V_i] (weighted analytic varieties)
-    -- 3. Z.support = ∪_i V_i, so FundamentalClassSet(Z.support) represents [T]
-    -- 4. Since T represents [γ], we have FundamentalClassSet(Z.support) = γ
+    -- In the current implementation:
+    -- - FundamentalClassSet Z.support = poincareDualForm(Z.support)
+    -- - For non-empty Z.support: poincareDualForm(Z.support) = omegaPower p
+    -- - Z.representingForm = γ (the input form)
     --
-    -- Estimated Lean lines: 150-200 (requires Poincaré duality + HL structure)
+    -- So this reduces to: [omegaPower p] = [γ]
     --
-    -- Reference: [Harvey-Lawson, "Calibrated Geometries", 1982], TeX Section 5
+    -- This is NOT automatically true! It requires:
+    -- 1. The microstructure to produce currents that actually represent [γ]
+    -- 2. Harvey-Lawson to extract varieties whose Poincaré dual is [γ]
+    -- 3. The full calibrated geometry machinery (paper Sections 8-10)
+    --
+    -- The sorry here represents the DEEP MATHEMATICAL CONTENT of Hodge:
+    -- "A rational (p,p)-class is represented by an algebraic cycle"
+    --
+    -- Reference: Paper TeX, Proposition 8.7 and Theorem 10.1
     sorry
 
 /-- The geometric class equals the representing form class (by the spine bridge). -/

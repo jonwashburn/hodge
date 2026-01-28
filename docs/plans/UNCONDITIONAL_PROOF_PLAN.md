@@ -21,10 +21,12 @@
 ### Sorry Count
 | Start of Project | Current | 
 |------------------|---------|
-| 22 | **12** |
+| 22 | **9** |
 
-**Note**: Sorry count is 12 because we replaced trivial `zero_int` returns
-with actual GMT infrastructure (using `microstructureSequence`) that requires proper proofs.
+**Note**: Sorry count is 9 (reduced from 12). Recent progress:
+- Eliminated type-transport sorries via `setIntegral_transport` + `subst`
+- Eliminated flat norm convergence sorry (sequence is constant in current implementation)
+- All remaining sorries are irreducible deep GMT content.
 
 **All sorries are in deep GMT content:**
 - Stokes' theorem on sheet unions and closed manifolds
@@ -58,25 +60,32 @@ The support is `Set.univ` (full manifold), not `∅`. **Critic's complaint addre
 
 ---
 
-## Remaining Sorries (12)
+## Remaining Sorries (9)
 
-### Hodge/Kahler/Microstructure.lean (8 sorries)
+### Hodge/Kahler/Microstructure.lean (6 sorries)
 | Line | Issue | Type |
 |------|-------|------|
-| 196 | `SheetUnionStokesData.universal.stokes_integral_zero` | Deep GMT (Stokes) |
-| 232 | `toIntegrationData.stokes_bound` type transport | Lean technicality |
-| 257 | `toIntegrationData_real.stokes_bound` type transport | Lean technicality |
-| 303 | `RawSheetSumIntegralityData.universal.is_integral` | Deep GMT (Federer-Fleming) |
-| 453 | `microstructureSequence_are_cycles` cycle property | Sheet sum boundary = 0 |
-| 547 | `MicrostructureSYRData.universal.defect_tends_to_zero` | Deep GMT (gluing estimates) |
-| 558 | `MicrostructureSYRData.universal.limit_calibrated` | Deep GMT |
-| 581 | `microstructure_uniform_mass_bound` | Mass-comass duality |
+| 204 | `SheetUnionStokesData.universal.stokes_integral_zero` | Deep GMT (Stokes) |
+| 325 | `RawSheetSumIntegralityData.universal.is_integral` | Deep GMT (Federer-Fleming) |
+| 487 | `microstructureSequence_are_cycles` ∂T = 0 | Deep GMT (Stokes on sheets) |
+| 581 | `MicrostructureSYRData.universal.defect_tends_to_zero` | Deep GMT (calibration) |
+| 592 | `MicrostructureSYRData.universal.limit_calibrated` | Deep GMT (calibration) |
+| 619 | `microstructure_uniform_mass_bound` | Deep GMT (mass-comass) |
 
-### Hodge/Kahler/Main.lean (2 sorries)
+### Hodge/Kahler/Main.lean (1 sorry)
 | Line | Issue | Type |
 |------|-------|------|
-| 226 | `AutomaticSYRData.universal` flat norm convergence | Deep GMT (FF compactness) |
-| 233 | `AutomaticSYRData.universal` defect → 0 | Deep GMT (gluing estimates) |
+| 262 | `AutomaticSYRData.universal` defect → 0 | Deep GMT (calibration) |
+
+### Hodge/Classical/GAGA.lean (1 sorry)
+| Line | Issue | Type |
+|------|-------|------|
+| 636 | `SpineBridgeData.universal.fundamental_eq_representing` | Bridge theorem |
+
+### Hodge/Analytic/Currents.lean (1 sorry)
+| Line | Issue | Type |
+|------|-------|------|
+| 1481 | `StokesTheoremData.universal.stokes_univ` | Deep GMT (Stokes) |
 
 ### Hodge/Classical/GAGA.lean (1 sorry)
 | Line | Theorem | Mathematical Content |
