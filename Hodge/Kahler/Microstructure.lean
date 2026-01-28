@@ -285,7 +285,21 @@ instance RawSheetSumIntegralityData.universal {p : ℕ} {hscale : ℝ}
       have hsub :
           T_raw.toIntegrationData.toCurrent - T_raw.toIntegrationData.toCurrent =
             (0 : Current n X (2 * (n - p))) := by
-        simpa using (sub_self T_raw.toIntegrationData.toCurrent)
+        ext ω
+        -- `T - T` is definitionally `T + (-T)`, so evaluation cancels.
+        change
+          (T_raw.toIntegrationData.toCurrent + -T_raw.toIntegrationData.toCurrent).toFun ω = 0
+        -- Expand `+`/`-` and evaluate on ω.
+        change
+          (Current.add_curr (k := 2 * (n - p))
+              T_raw.toIntegrationData.toCurrent (-T_raw.toIntegrationData.toCurrent)).toFun ω = 0
+        -- Unfold `add_curr`, then rewrite the negation evaluation and cancel in ℝ.
+        simp [Current.add_curr]
+        have hneg :
+            (-T_raw.toIntegrationData.toCurrent).toFun ω =
+              -(T_raw.toIntegrationData.toCurrent.toFun ω) := by
+          rfl
+        simpa [hneg] using add_neg_cancel (T_raw.toIntegrationData.toCurrent.toFun ω)
       have h0 : flatNorm (T_raw.toIntegrationData.toCurrent - T_raw.toIntegrationData.toCurrent) = 0 := by
         simpa [hsub] using (flatNorm_zero (n := n) (X := X) (k := 2 * (n - p)))
       simpa [h0] using hε
@@ -414,9 +428,9 @@ theorem microstructureSequence_eval_eq_setIntegral (p : ℕ) (γ : SmoothForm n 
     [CubulationExists n X] (k : ℕ) (ω : SmoothForm n X (2 * (n - p))) :
     (microstructureSequence p γ hγ ψ k).toFun.toFun ω =
       setIntegral (2 * (n - p)) (Set.univ : Set X) ω := by
-  -- This follows by unwinding definitions (projection `toFun` ignores integrality proofs).
+  -- Definitional unfolding: `microstructureSequence` evaluates via `setIntegral` on `Set.univ`.
   unfold microstructureSequence
-  simp [buildSheetsFromConePositive, RawSheetSum.toIntegrationData, IntegrationData.toCurrent]
+  dsimp [buildSheetsFromConePositive, RawSheetSum.toIntegrationData, IntegrationData.toCurrent]
 
 /-- Zero current is a cycle (local copy for Microstructure). -/
 private theorem zero_int_isCycle (k : ℕ) : (zero_int n X k).isCycleAt := by
@@ -573,41 +587,17 @@ structure MicrostructureSYRData (n : ℕ) (X : Type*) (p : ℕ)
   /-- The limit has zero calibration defect (is calibrated). -/
   limit_calibrated : calibrationDefect limit.toFun ψ = 0
 
-/-- **Universal instance of MicrostructureSYRData** (Phase 4).
+/-!
+## Note: `MicrostructureSYRData.universal` intentionally omitted
 
-    This provides the microstructure SYR data using the full `microstructureSequence`
-    infrastructure. The sequence is built from sheet sums with support `Set.univ`,
-    giving non-trivial currents.
+The detailed `MicrostructureSYRData` record requires proving the deepest GMT inputs of the
+microstructure construction (defect → 0 and calibrated limit). We do **not** provide a
+universal constructor here until those proofs are formalized, to avoid leaving `sorry` on
+the proof track.
 
-    **Mathematical Content**:
-    - The sequence is `microstructureSequence p γ hγ ψ k` for k = 0, 1, 2, ...
-    - Each term is a cycle (sheet sums have no boundary)
-    - The calibration defect tends to 0 as k → ∞ (finer mesh → better approximation)
-    - The limit is a calibrated integral current
-
-    Reference: [TeX Theorem 4.1 (Automatic SYR)]. -/
-noncomputable def MicrostructureSYRData.universal (γ : SmoothForm n X (2 * p)) (hγ : isConePositive γ)
-    (ψ : CalibratingForm n X (2 * (n - p))) [CubulationExists n X] :
-    MicrostructureSYRData n X p γ hγ ψ where
-  sequence := fun k => microstructureSequence p γ hγ ψ k
-  sequence_are_cycles := microstructureSequence_are_cycles p γ hγ ψ
-  defect_tends_to_zero := by
-    -- The calibration defect of the microstructure sequence tends to 0.
-    -- This is the key property: finer cubulations give better approximations
-    -- to the cohomology class, with defect → 0 as mesh → 0.
-    -- This requires deep GMT (gluing estimates from the paper).
-    sorry
-  limit := by
-    -- The limit is obtained from the sequence via flat norm convergence.
-    -- For now, use the first term of the sequence as a placeholder.
-    -- In the full formalization, this would be the actual flat limit.
-    exact microstructureSequence p γ hγ ψ 0
-  limit_is_cycle := microstructureSequence_are_cycles p γ hγ ψ 0
-  limit_calibrated := by
-    -- The limit is calibrated: calibrationDefect = 0.
-    -- This follows from the defect tending to 0 and lower semicontinuity.
-    -- Deep GMT content.
-    sorry
+The main proof track only needs the weaker existence interface `AutomaticSYRData` in
+`Hodge/Kahler/Main.lean`.
+-/
 
 /-- Microstructure sequence has uniformly bounded mass.
 
