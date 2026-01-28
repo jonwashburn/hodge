@@ -60,6 +60,35 @@ class LeanWorker:
             self.max_iterations = int(os.environ.get("MAX_ITERATIONS", "25"))
         except Exception:
             self.max_iterations = 25
+        # Ensure we never rebuild Mathlib from source on the server: run `lake exe cache get` once.
+        # (Repo rule: ALWAYS fetch cache before any `lake build`.)
+        self._mathlib_cache_ready_flag = HODGE_PATH / ".mathlib_cache_ready"
+
+    def _ensure_mathlib_cache(self) -> ToolResult:
+        """Run `lake exe cache get` once per repo clone to avoid rebuilding Mathlib from source."""
+        try:
+            if self._mathlib_cache_ready_flag.exists():
+                return ToolResult(True, "Mathlib cache already fetched")
+            result = subprocess.run(
+                ["lake", "exe", "cache", "get"],
+                cwd=HODGE_PATH,
+                capture_output=True,
+                text=True,
+                timeout=900,
+            )
+            output = (result.stdout or "") + (result.stderr or "")
+            if result.returncode != 0:
+                return ToolResult(False, "Mathlib cache fetch failed:\n" + output[-4000:])
+            try:
+                self._mathlib_cache_ready_flag.write_text("ok\n")
+            except Exception:
+                # Non-fatal: cache fetch succeeded; flag is just an optimization.
+                pass
+            return ToolResult(True, "Mathlib cache fetched:\n" + output[-4000:])
+        except subprocess.TimeoutExpired:
+            return ToolResult(False, "Mathlib cache fetch timed out")
+        except Exception as e:
+            return ToolResult(False, f"Error while fetching Mathlib cache: {e}\n{traceback.format_exc()}")
 
     async def call_claude(
         self,
@@ -124,6 +153,9 @@ class LeanWorker:
             
             elif name == "run_lake_build":
                 target = input_data.get("target", "")
+                cache_res = self._ensure_mathlib_cache()
+                if not cache_res.success:
+                    return cache_res
                 cmd = ["lake", "build"]
                 if target:
                     cmd.append(target)
@@ -139,6 +171,9 @@ class LeanWorker:
             
             elif name == "run_lake_check":
                 target = input_data.get("file", "")
+                cache_res = self._ensure_mathlib_cache()
+                if not cache_res.success:
+                    return cache_res
                 cmd = ["lake", "env", "lean", target]
                 result = subprocess.run(
                     cmd,

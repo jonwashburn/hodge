@@ -90,6 +90,16 @@ noncomputable def iteratedFDeriv_toBoundedCLM (i : ℕ) :
     𝓓(Ω, F) →L[ℝ] (E →ᵇ IteratedFDerivTarget (E := E) (F := F) i) :=
 by
   classical
+  -- Help typeclass inference for the codomain (required by `TestFunction.mkCLM`).
+  letI : SeminormedAddCommGroup (E →ᵇ IteratedFDerivTarget (E := E) (F := F) i) := inferInstance
+  letI : IsTopologicalAddGroup (E →ᵇ IteratedFDerivTarget (E := E) (F := F) i) :=
+    SeminormedAddCommGroup.toIsTopologicalAddGroup
+      (E := (E →ᵇ IteratedFDerivTarget (E := E) (F := F) i))
+  letI : NormedSpace ℝ (E →ᵇ IteratedFDerivTarget (E := E) (F := F) i) := inferInstance
+  letI : LocallyConvexSpace ℝ (E →ᵇ IteratedFDerivTarget (E := E) (F := F) i) :=
+    NormedSpace.toLocallyConvexSpace
+      (E := (E →ᵇ IteratedFDerivTarget (E := E) (F := F) i))
+  letI : ContinuousSMul ℝ (E →ᵇ IteratedFDerivTarget (E := E) (F := F) i) := inferInstance
   refine
     TestFunction.mkCLM ℝ (iteratedFDeriv_toBounded (Ω := Ω) (F := F) i)
       (fun f g => ?_) (fun c f => ?_) (fun K K_sub_Ω => ?_)
