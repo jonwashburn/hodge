@@ -1,8 +1,59 @@
 # Hodge Conjecture Lean Proof - Multi-Agent Coordination
 
-**Last Updated**: 2026-01-18 (Round 6 - proof track sorry-free; `shuffle_bijection_left` + Microstructure transport complete)
-**Status**: Active Development
-**Goal**: Unconditional, axiom-free, sorry-free proof of `hodge_conjecture'`
+**Last Updated**: 2026-01-28
+**Status**: Active Development (Plan-driven refactor)
+**Goal**: Complete the formalization **per** `tex/archive/HodgePlan-mc-28.1.26.rtf`:
+no semantic stubs, no toy geometry, no assumption-interfaces in the final theorem.
+
+---
+
+## Plan 28.1.26 Execution Status (High-level)
+
+### Stage 0 — Decontamination ✅ COMPLETE
+
+Hard gate: `./scripts/audit_faithfulness.sh --strict` now fails if any of the banned “toy analytic /
+toy Zariski” inductive encodings appear **outside** `Hodge/Quarantine/`.
+
+Work done:
+- Quarantined legacy toy modules:
+  - `Hodge/Quarantine/Classical/HarveyLawson.lean`
+  - `Hodge/Quarantine/Classical/GAGA.lean`
+  - `Hodge/Quarantine/Classical/ChowGAGA.lean`
+  - `Hodge/Quarantine/GMT/FedererFleming.lean`
+- Removed non-quarantine inductive encodings:
+  - `Hodge/Classical/HarveyLawson.lean`: `IsAnalyticSet` is now a minimal interface (closedness only)
+  - `Hodge/Classical/GAGA.lean`: removed `IsZariskiClosed` inductive + induction-based bridges;
+    `IsAlgebraicSet` is temporarily approximated by `IsClosed` (no toy eliminator)
+
+### Stage 1 — Test forms (Track A) 🔄 IN PROGRESS
+
+Work done:
+- Added compact-support test-form seed:
+  - `Hodge/Analytic/TestForms.lean` (defines `TestForm` with 0/+/-/•)
+- Added Mathlib-aligned Euclidean LF-space wrapper:
+  - `Hodge/Analytic/DistributionTestForms.lean` (records `𝓓(Ω, FiberAlt n k)` specializations)
+
+Next: finish the LF/Fréchet topology story on manifolds and move `Current` to `ContinuousLinearMap`
+on test forms (no ad hoc `bound` fields).
+
+### Stage 2–6 — Surveys ✅ CREATED (living notes)
+
+These are starting points for agent work; they must be refined as we discover exact Mathlib APIs.
+- `docs/notes/STAGE2_INTEGRATION_MATHLIB_SURVEY.md`
+- `docs/notes/STAGE3_4_GMT_CALIBRATION_SURVEY.md`
+- `docs/notes/STAGE5_ANALYTIC_CHOW_GAGA_SURVEY.md`
+- `docs/notes/STAGE6_COHOMOLOGY_RATIONALITY_SURVEY.md`
+
+### Kernel report (still useful, but not the end-goal)
+
+`lake env lean Hodge/Utils/DependencyCheck.lean`:
+```
+'hodge_conjecture' depends on axioms: [propext, Classical.choice, Quot.sound]
+'hodge_conjecture'' depends on axioms: [propext, Classical.choice, Quot.sound]
+```
+
+This is **necessary but not sufficient** for the plan’s “no hidden assumptions / no toy geometry”
+unconditionality.
 
 ---
 

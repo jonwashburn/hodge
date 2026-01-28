@@ -6,7 +6,8 @@ import Hodge.GMT.FlatNormTopology
 import Hodge.GMT.IntegralCurrentSpace
 import Hodge.GMT.CalibratedGeometry
 import Hodge.GMT.HarveyLawsonTheorem
-import Hodge.GMT.FedererFleming
+-- NOTE (Stage 0 decontamination): the legacy “everything-is-0” Federer–Fleming stub
+-- was moved to `Hodge.Quarantine.GMT.FedererFleming`. We intentionally do not import it here.
 
 /-!
 # `Hodge.GMT` (Compatibility Umbrella)

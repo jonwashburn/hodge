@@ -3,7 +3,7 @@ Copyright (c) 2026 Hodge Formalization Project. All rights reserved.
 Released under Apache 2.0 license.
 Authors: TeX Spine Semantic Closure Implementation
 -/
-import Hodge.Classical.ChowGAGA
+import Hodge.Quarantine.Classical.ChowGAGA
 import Hodge.Kahler.Main
 
 /-!

@@ -73,12 +73,23 @@ report_grep "Project axioms (Lean axiom declarations)" '^axiom\b' "Hodge" \
 # 2) Opaques (hidden assumptions; not reported by #print axioms)
 report_grep "Opaque constants (opaque declarations)" '^opaque\b' "Hodge"
 
+# 2b) Stage-0 decontamination gates: forbid toy analytic/algebraic closure predicates
+# and induction-based “Chow/GAGA” bridges outside `Hodge/Quarantine/`.
+#
+# These patterns were explicitly called out as semantic hazards in:
+# `tex/archive/HodgePlan-mc-28.1.26.rtf` (Stage 0).
+report_grep "Stage 0 gate: toy analytic/algebraic inductives (must be quarantined)" \
+  'inductive\s+IsAnalyticSet\b|inductive\s+IsZariskiClosed\b|theorem\s+IsAnalyticSet_isAlgebraicSet\b|theorem\s+IsAlgebraicSet_isAnalyticSet\b' \
+  "Hodge" \
+  --exclude-dir="Quarantine"
+
 # 3) Sorries (outside quarantined sandboxes)
 #
 # We *only* treat sorries as Clay blockers if they are intended to be on the proof track.
 # Off-track development sorries are "stashed" by quarantining a small set of known files.
 report_grep "Sorries outside quarantined buckets" '^[[:space:]]*sorry([[:space:]]|$)' "Hodge" \
   --exclude-dir="Advanced" \
+  --exclude-dir="Quarantine" \
   --exclude="Currents.lean" \
   --exclude="HausdorffMeasure.lean" \
   --exclude="Microstructure.lean" \

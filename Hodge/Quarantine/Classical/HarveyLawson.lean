@@ -21,66 +21,28 @@ variable {n : ℕ} {X : Type*}
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
   [Nonempty X] [MeasurableSpace X] [BorelSpace X]
 
-/-! ### Complex Analytic Sets
+/-! ### Complex Analytic Sets -/
 
-Stage 0 (repo decontamination): we **do not** encode “analytic set” as an inductive closure
-predicate (empty/univ/union/inter), since that makes it too easy to “prove” deep analytic geometry
-by structural recursion.
-
-Instead, we keep `IsAnalyticSet` as a **minimal interface** that only records closedness for now.
-This is enough to wire the spine at the level of *assumptions* without introducing toy eliminators.
-
-Stages 5A/5B replace this interface with real analytic geometry (local holomorphic zero sets). -/
-
-/-- **Analytic Subsets** (temporary interface).
-
-For now we only record that an analytic set is closed. -/
-class IsAnalyticSet {n : ℕ} {X : Type*}
+/-- **Analytic Subsets** (Complex Geometry). -/
+inductive IsAnalyticSet {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] (S : Set X) : Prop where
-  isClosed : IsClosed S
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] : Set X → Prop where
+  | empty : IsAnalyticSet ∅
+  | univ : IsAnalyticSet Set.univ
+  | union (S T : Set X) : IsAnalyticSet S → IsAnalyticSet T → IsAnalyticSet (S ∪ T)
+  | inter (S T : Set X) : IsAnalyticSet S → IsAnalyticSet T → IsAnalyticSet (S ∩ T)
 
-namespace IsAnalyticSet
-
-theorem empty {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] :
-    IsAnalyticSet (n := n) (X := X) (∅ : Set X) :=
-  ⟨isClosed_empty⟩
-
-theorem univ {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] :
-    IsAnalyticSet (n := n) (X := X) (Set.univ : Set X) :=
-  ⟨isClosed_univ⟩
-
-theorem union {n : ℕ} {X : Type*} [TopologicalSpace X]
-    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-    (S T : Set X) :
-    IsAnalyticSet (n := n) (X := X) S →
-      IsAnalyticSet (n := n) (X := X) T →
-        IsAnalyticSet (n := n) (X := X) (S ∪ T) := by
-  intro hS hT
-  exact ⟨IsClosed.union hS.isClosed hT.isClosed⟩
-
-theorem inter {n : ℕ} {X : Type*} [TopologicalSpace X]
-    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-    (S T : Set X) :
-    IsAnalyticSet (n := n) (X := X) S →
-      IsAnalyticSet (n := n) (X := X) T →
-        IsAnalyticSet (n := n) (X := X) (S ∩ T) := by
-  intro hS hT
-  exact ⟨IsClosed.inter hS.isClosed hT.isClosed⟩
-
-end IsAnalyticSet
-
-/-- Analytic sets are closed in the classical topology (by interface field). -/
+/-- Analytic sets are closed in the classical topology. -/
 theorem IsAnalyticSet_isClosed {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-    (S : Set X) : IsAnalyticSet (n := n) (X := X) S → IsClosed S := fun h => h.isClosed
+    (S : Set X) : IsAnalyticSet (n := n) (X := X) S → IsClosed S := by
+  intro h
+  induction h with
+  | empty => exact isClosed_empty
+  | univ => exact isClosed_univ
+  | union S T _ _ ihS ihT => exact IsClosed.union ihS ihT
+  | inter S T _ _ ihS ihT => exact IsClosed.inter ihS ihT
 
 /-- A complex analytic subvariety of a complex manifold X. -/
 structure AnalyticSubvariety (n : ℕ) (X : Type*)

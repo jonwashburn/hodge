@@ -1,0 +1,178 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2709
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 HelveticaNeue;\f1\fnil\fcharset0 AppleSymbols;\f2\fnil\fcharset0 Menlo-Regular;
+}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab560
+\pard\pardeftab560\slleading20\partightenfactor0
+
+\f0\fs26 \cf0 ### Current semantic blockers (from `--semantic-strict`, plus manual sweep)\
+- `Hodge/Classical/GAGA.lean`: `FundamentalClassSet` is still a placeholder interface.\
+- `Hodge/Analytic/Currents.lean`: `integration_current` (and friends) rely on the `SubmanifoldIntegration` interface; still interface-level, not a real construction.\
+- `Hodge/Cohomology/Basic.lean`: `isRationalClass` remains an interface predicate (no actual \uc0\u8474 -structure realization).\
+- Analytic foundation: `extDerivLinearMap` is flagged as a \'93stubby\'94 wrapper; acceptable short-term but needs replacement by a real distributional `d`.\
+- GMT layer: `Hodge/GMT/CurrentToForm.lean` still returns `0`; `Hodge/GMT/FedererFleming.lean` contains the \'93everything is 0\'94 stub regime. These must stay off proof-track.\
+- Chow/Gaga inductive trivialization: In Hodge/Classical/ChowGaga.lean the math is trivialized, in particular in this the inductive definition works as a trivialization trick\
+\
+\
+The Hodge.Analytic.Advanced folder contains genuine rigorous proofs. So the same standards should be adopted for the other tasks:\
+\
+ the final theorem must depend only on Mathlib (plus upstreamed additions) and **no project-defined \'93assumption interfaces\'94, no placeholder definitions, no toy inductives whose eliminator proves deep geometry**. During development you may temporarily keep interfaces\'97but only **quarantined** and **not imported** by the proof-track entry point.\
+\
+### Guiding invariants (ideally these should be non\uc0\u8209 negotiable)\
+- **No toy geometry**: nothing like \'93analytic sets are closed under 
+\f1 \uc0\u8709 
+\f0 /univ/
+\f1 \uc0\u8746 
+\f0 /
+\f1 \uc0\u8745 
+\f0 \'94 standing in for complex analytic geometry; nothing like \'93Zariski closed = inductive closure under 
+\f1 \uc0\u8746 
+\f0 /
+\f1 \uc0\u8745 
+\f0 \'94.\
+- **No interface assumptions on final statement**: `ChowGAGAData`, `HarveyLawsonKingData`, `SubmanifoldIntegration`, `PoincareDualFormExists`, `FundamentalClassSet`, `isRationalClass` (as an ad hoc inductive predicate) must be absent from the dependency cone of the final theorem.\
+- **Every deep bridge is a theorem**: cycle class = de Rham class of an actual PD current/form, Stokes is proved, compactness is proved, calibrated currents are proved to be holomorphic chains, analytic subvarieties are proved algebraic on projective \\(X\\), etc.\
+- **Provenance sensitivity remains**: any \'93spine produces a cycle\'94 bridge is allowed only for spine-produced objects, but in the end even the spine itself must be a theorem-built construction, not a typeclass oracle.\
+\
+---\
+\
+## Stage 0 \'97 Repo decontamination (remove existing trivializations)\
+**Goal**: eliminate *current* semantic hazards before building anything else.\
+\
+- **Delete/quarantine all \'93structural-induction Chow/GAGA\'94 and \'93structural-induction Zariski topology\'94 content**, e.g. anything of the form:\
+  - `IsAnalyticSet` as an inductive closure predicate,\
+  - `IsZariskiClosed` as an inductive closure predicate,\
+  - `IsAnalyticSet_isAlgebraicSet` proved by induction over the predicate.\
+- **Hard gate**: `./scripts/audit_faithfulness.sh --strict` must fail if any of those patterns appear outside `Hodge/Quarantine/`.\
+- **Outcome**: the repo cannot accidentally \'93prove\'94 Chow/GAGA or analytic geometry by definitional trick.\
+\
+---\
+\
+## Stage 1 \'97 Replace the current \'93Currents\'94 model with a real test-function/distribution model\
+**Goal**: define currents in the only principled way: as continuous linear functionals on an appropriate **LF/Fr\'e9chet** space of test forms.\
+\
+### 1A. Build the test space \\( \\mathcal\{D\}\\Omega^k(X) \\)\
+- **Define** compactly supported smooth differential \\(k\\)-forms on a smooth real manifold \\(X\\) as a topological vector space with the standard LF topology (inductive limit of Fr\'e9chet spaces over compact exhaustion).\
+- **Hard gate**: you can state and prove continuity results without inserting \'93boundedness fields\'94 into the definition.\
+- **Upstream work** (likely needed): reusable Mathlib API for\
+  - `C\uc0\u8734 ` compactly supported sections on manifolds as LF spaces,\
+  - continuity of pullback/wedge/exterior derivative on test forms.\
+\
+### 1B. Define de Rham currents\
+- Define \\(k\\)-currents as `ContinuousLinearMap` from the LF space of test \\((n-k)\\)-forms (or \\(k\\)-forms, depending on conventions) to `
+\f2 \uc0\u8477 
+\f0 `/`\uc0\u8450 `.\
+- Define **boundary** \\(\uc0\u8706 T\\) by duality with exterior derivative on test forms:\
+  \\[\
+  \uc0\u8706 T(\\omega) := T(d\\omega)\
+  \\]\
+  with sign conventions fixed once.\
+- **Hard gate**: boundary is well-defined by continuity of \\(d\\) on the test space; no ad hoc `boundary_bound` fields.\
+\
+**Outcome**: `Hodge/Analytic/Currents.lean` becomes a thin layer over real topological vector space + `ContinuousLinearMap`, not a bespoke structure.\
+\
+---\
+\
+## Stage 2 \'97 Real integration currents (no `SubmanifoldIntegration` interface)\
+**Goal**: define \\( [Z] \\) for a smooth oriented embedded submanifold \\(Z\\subset X\\) as an actual current by integrating test forms.\
+\
+- Use Mathlib\'92s measure/integration on manifolds (or build it upstream if missing) to define:\
+  \\[\
+  [Z](\\omega) := \\int_Z \\iota^*\\omega\
+  \\]\
+  with orientation/volume data encoded correctly.\
+- Prove **Stokes** for smooth compact \\(Z\\) with boundary:\
+  \\[\
+  [Z](d\\eta) = [\\partial Z](\\eta)\
+  \\]\
+- Specialize to closed \\(Z\\) to get \\(\uc0\u8706 [Z]=0\\).\
+- **Hard gate**: `integration_current` is definitional (a real integral), and Stokes is a theorem.\
+- **No shortcuts**: do *not* define \'93integration on submanifolds\'94 as a typeclass of axioms.\
+\
+**Outcome**: the paper\'92s \'93integration current\'94 objects are real.\
+\
+---\
+\
+## Stage 3 \'97 Mass/comass, flat norm, compactness (Federer\'96Fleming in Lean)\
+**Goal**: build the GMT backbone used explicitly by the manuscript.\
+\
+- Define **mass** of a current via dual norm against comass-bounded test forms.\
+- Define **flat norm** \\( \\mathcal\{F\}(T) = \\inf \\\{\\mathrm\{Mass\}(R)+\\mathrm\{Mass\}(Q): T = R + \uc0\u8706 Q\\\}\\).\
+- Prove:\
+  - triangle inequality / lower semicontinuity properties,\
+  - compactness statement(s) sufficient for \'93almost-calibrated sequence has a convergent subsequence\'94.\
+- **Hard gate**: remove/ignore any file that currently proves \'93everything is 0\'94 by stub regime; those must be deleted or quarantined permanently.\
+\
+**Outcome**: you can take limits of integral currents in a real topology exactly as the paper does.\
+\
+---\
+\
+## Stage 4 \'97 Calibration theory and \'93calibrated \uc0\u8658  complex analytic\'94\
+**Goal**: formalize the analytic heart: K\'e4hler calibration, calibrated currents, and the Harvey\'96Lawson/King identification.\
+\
+- Define K\'e4hler calibration forms \\( \\varphi = \\omega^p/p! \\) and \\( \\psi = *\\varphi \\) using a **non-degenerate** Hodge star induced from the Riemannian metric.\
+- Prove the calibration inequality for currents:\
+  \\[\
+  \\langle T,\\psi\\rangle \\le \\mathrm\{Mass\}(T)\
+  \\]\
+  and define calibration defect.\
+- Prove the theorem (Harvey\'96Lawson/King):\
+  - any **integral** \\( \\psi \\)-calibrated current is a positive holomorphic chain (analytic cycle).\
+- **Hard gate**: no assumption interfaces here; this is a real theorem chain relying on:\
+  - rectifiability theory,\
+  - almost-complex structure compatibility,\
+  - deep regularity results.\
+\
+**Outcome**: calibrated limit currents become actual analytic subvarieties in Lean.\
+\
+---\
+\
+## Stage 5 \'97 Real complex analytic geometry + Chow/GAGA (no interface)\
+**Goal**: discharge the final geometric step: analytic subvariety in projective \\(X\\) is algebraic.\
+\
+Two subprojects are mandatory if you follow the paper\'92s route:\
+\
+### 5A. Complex analytic geometry foundations\
+- Define complex analytic spaces/subsets as **local common zero sets of holomorphic functions** in charts.\
+- Build sheaf/coherence machinery needed for GAGA.\
+\
+### 5B. Chow\'92s theorem / Serre\'92s GAGA\
+- Prove analytic subvarieties of projective manifolds are algebraic.\
+- **Hard gate**: no inductive \'93closure under unions\'94 stand-in; must be real holomorphic local equations + global projective arguments.\
+\
+**Outcome**: the paper\'92s \'93hence algebraic by Chow/GAGA\'94 becomes a Lean theorem.\
+\
+---\
+\
+## Stage 6 \'97 Cycle class map and rationality (no placeholder `FundamentalClassSet`, no ad hoc `isRationalClass`)\
+**Goal**: define the cycle class map in a way that actually matches the conjecture statement.\
+\
+- Define singular (co)homology and de Rham cohomology and prove de Rham\'92s theorem in the needed generality.\
+- Define the cycle class of an algebraic cycle \\(Z\\) as the de Rham class of its **Poincar\'e9 dual current/form** arising from the integration current and the de Rham isomorphism.\
+- Define \'93rational class\'94 via an actual **\uc0\u8474 -structure**:\
+  - either via comparison to singular cohomology with 
+\f2 \uc0\u8484 
+\f0 /\uc0\u8474  coefficients and the image of algebraic cycles,\
+  - or via periods/integrality (requires a real pairing with integral homology).\
+- **Hard gate**: delete `FundamentalClassSet` and replace it by theorems; delete the inductive `isRationalClass` and replace by a definition tied to actual \uc0\u8474 /
+\f2 \uc0\u8484 
+\f0  lattices.\
+\
+**Outcome**: the *statement* \'93\\(\\gamma\\in H^\{2p\}(X,\\mathbb\{Q\})\\cap H^\{p,p\}\\) is algebraic\'94 is literally the classical one.\
+\
+---\
+\
+## Stage 7 \'97 Formalize the paper\'92s proof pipeline end-to-end\
+**Goal**: produce the exact theorem your manuscript claims, with no hidden assumptions.\
+\
+- Formalize:\
+  - the \'93realization/microstructure\'94 construction (your spine) as an actual construction that outputs integral cycles with defect \\(\\to 0\\),\
+  - the compactness extraction,\
+  - calibrated limit \uc0\u8658  holomorphic chain,\
+  - holomorphic chain \uc0\u8658  algebraic cycle (Chow/GAGA),\
+  - signed decomposition + Hard Lefschetz reduction.\
+- **Hard gate**: the final theorem\'92s dependency cone contains **no** project-only assumption typeclasses encoding deep content.\
+\
+**Outcome**: a genuine end-to-end proof track.}

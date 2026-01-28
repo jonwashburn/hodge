@@ -12,48 +12,21 @@ import Mathlib.Order.Filter.Basic
 import Mathlib.Order.LiminfLimsup
 
 /-!
-# Federer-Fleming Compactness Theorem (Sprint 6)
+# Quarantine: Federer–Fleming “everything-is-0” stub regime
 
-This file provides the GMT-layer wrapper for the Federer-Fleming compactness theorem.
+⚠️ **QUARANTINED MODULE**
 
-## Main Results
+This file contains the legacy GMT wrapper that **collapses** large parts of the theory by proving
+“everything is 0” using a toy `IntegralPolyhedralChain'` generator regime.
 
-* `federer_fleming_compactness`: The space of integral currents with bounded mass
-  is sequentially compact in the flat norm topology.
+Per `tex/archive/HodgePlan-mc-28.1.26.rtf` **Stage 0 (Decontamination)**, this must not be used on
+the unconditional proof track. It remains only as archived reference.
 
-## Mathematical Background
-
-**Federer-Fleming Compactness Theorem** (1960):
-Let M be a compact Riemannian manifold. The space of integral k-currents T with
-  `mass(T) ≤ M` and `mass(∂T) ≤ M`
-is compact in the flat norm topology.
-
-This is one of the "Classical Pillars" of geometric measure theory and is
-fundamental to:
-- Existence of area-minimizing surfaces
-- Regularity theory for minimal currents
-- Proof of the Harvey-Lawson structure theorem
-
-## Implementation Status
-
-**Sprint 6 Status**: This is a research-level theorem.
-
-We provide the theorem statement and a **stub-level implementation** because:
-1. A full proof requires Mathlib infrastructure for:
-   - Hausdorff measure on manifolds
-   - Polyhedral approximation
-   - BV functions and slicing
-2. The proof is ~50 pages in Federer's treatise
-3. Stubbing is acceptable per operational plan guidelines (and this file is off-proof-track).
-
-**Repo policy note**: this project avoids introducing new `axiom` declarations; deep results are
-tracked as documented stubs in non-proof-track modules.
-
-## References
-
-* [Federer-Fleming, "Normal and Integral Currents", Ann. Math. 1960]
-* [Federer, "Geometric Measure Theory", Chapter 4.2]
-* [Simon, "Lectures on Geometric Measure Theory"]
+Stages 1–4 replace this with:
+- real test-form LF spaces,
+- real integration currents,
+- real mass/comass and flat norm,
+- real Federer–Fleming compactness.
 -/
 
 noncomputable section
@@ -202,18 +175,7 @@ structure HasConvergentSubsequence {k : ℕ} (M : ℝ)
     Every sequence of integral k-currents with uniformly bounded mass and
     boundary mass has a convergent subsequence in the flat norm topology.
 
-    **Mathematical Content**: For any M > 0, the space
-    `{ T : IntegralCurrent | mass(T) ≤ M ∧ mass(∂T) ≤ M }`
-    is sequentially compact in the flat norm topology.
-
-    **Proof Sketch** (not formalized):
-    1. Use polyhedral approximation to approximate T by polyhedral chains
-    2. Apply Arzelà-Ascoli type argument to get convergent subsequence
-    3. Show limit is an integral current via lower semicontinuity of mass
-
-    **Sprint 6 Status**: Stubbed (research-level theorem).
-
-    Reference: [Federer-Fleming, "Normal and Integral Currents", Ann. Math. 1960]. -/
+    **Sprint 6 Status**: QUARANTINED STUB. -/
 noncomputable def federer_fleming_compactness {k : ℕ} (M : ℝ) (hM : M > 0)
     (T : ℕ → IntegralCurrent n X k)
     (hT : ∀ j, T j ∈ BoundedIntegralCurrents (n := n) (X := X) k M) :
@@ -283,30 +245,6 @@ theorem mass_lsc_flatNorm {k : ℕ} (T : ℕ → IntegralCurrent n X k)
     simpa [hj, Current.mass_zero]
   -- Rewrite and finish by simp.
   simpa [h0_limit, h0_seq, Current.mass_zero, liminf_const]
-
-/-! ## Summary
-
-This file provides the Federer-Fleming compactness theorem infrastructure:
-
-1. **Flat norm convergence**: `FlatNormConverges`, `flatNormDist`
-2. **Sequential compactness**: `HasConvergentSubsequence`
-3. **Main theorem**: `federer_fleming_compactness` (stubbed)
-4. **Lower semicontinuity**: `mass_lsc_flatNorm` (stubbed)
-5. **Round-2 helper lemmas**: `mass_nonneg`, `bdryMass_nonneg`, `bounded_currents_nonempty`
-
-**Sprint 6 Deliverables** (Agent 2):
-- [x] `federer_fleming_compactness` statement (stubbed)
-- [x] `HasConvergentSubsequence` structure
-- [x] `FlatNormConverges` definition
-- [x] `mass_lsc_flatNorm` statement (stubbed)
-- [x] Documentation of proof sketch
-
-**Note**: This is a Classical Pillar. Full formalization would require:
-- Polyhedral chain approximation
-- BV functions and slicing theory
-- Hausdorff measure compactness arguments
-
--/
 
 end Hodge.GMT
 

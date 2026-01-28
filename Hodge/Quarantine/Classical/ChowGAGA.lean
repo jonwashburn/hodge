@@ -3,44 +3,22 @@ Copyright (c) 2026 Hodge Formalization Project. All rights reserved.
 Released under Apache 2.0 license.
 Authors: TeX Spine Semantic Closure Implementation
 -/
-import Hodge.Classical.GAGA
+import Hodge.Quarantine.Classical.GAGA
 import Hodge.Classical.HarveyLawsonReal
 
 /-!
-# Real Chow/GAGA Implementation (TeX Spine Step 5)
+# Quarantine: Chow/GAGA toy implementation (TeX Spine Step 5)
 
-This file provides the **real** Chow/GAGA bridge, following the TeX spine checklist.
+⚠️ **QUARANTINED MODULE**
 
-## Mathematical Content
+This file contains the legacy “TeX spine” Chow/GAGA layer that relied on the **toy**
+analytic/algebraic set predicates (`IsAnalyticSet`, `IsZariskiClosed`) and the induction-based
+bridge `IsAnalyticSet_isAlgebraicSet`.
 
-**Chow's Theorem**: Every closed analytic subset of a projective variety is algebraic.
+Per `tex/archive/HodgePlan-mc-28.1.26.rtf` **Stage 0 (Decontamination)**, this code is kept only
+as an archived reference and must not be imported by the proof-track entry point.
 
-**Serre's GAGA**: The functor from coherent algebraic sheaves to coherent analytic sheaves
-is an equivalence on projective varieties.
-
-The key consequence for the Hodge Conjecture:
-> The analytic subvarieties Vᵢ produced by Harvey-Lawson are actually algebraic.
-
-## Two Approaches
-
-1. **Real path**: Prove Chow/GAGA using Mathlib algebraic geometry (large undertaking).
-2. **Staged path** (implemented here): Package as explicit typeclass assumption.
-
-## Main Definitions
-
-* `ChowGAGAData` - Typeclass packaging the analytic → algebraic functor
-* `analytic_to_algebraic` - The conversion function
-
-## TeX Reference
-
-This implements the Chow/GAGA step in the proof spine.
-
-## Status
-
-⚠️ PARALLEL TRACK - Interface for real implementation. Build with:
-```bash
-lake build Hodge.Classical.ChowGAGA
-```
+Future work (Stages 5A/5B) replaces this entire module with real analytic geometry and real Chow/GAGA.
 -/
 
 noncomputable section
@@ -110,27 +88,19 @@ theorem analyticToAlgebraic_codim [ChowGAGAData n X] (V : AnalyticSubvariety n X
 
 The universal instance of `ChowGAGAData` packages the deep algebraic geometry
 content of Chow's theorem and Serre's GAGA principle.
+
+⚠️ This was previously provided via an induction over a toy analytic predicate and is therefore
+**not acceptable** on the unconditional track. It remains quarantined here only as history.
 -/
 
 /-- **Universal instance of ChowGAGAData**.
 
-    This provides a default instance for Chow/GAGA using sorry-based proofs.
-    The mathematical content is Chow's theorem and Serre's GAGA principle.
+    This provides a default instance for Chow/GAGA using the legacy toy bridge.
 
-    **Mathematical Content**:
-    - Chow's theorem: Every closed analytic subset of projective space is algebraic
-    - Serre's GAGA: Analytic and algebraic categories coincide on projective varieties
-
-    **Status**: The real proof would require deep algebraic geometry:
-    1. Define analytic sets as local zero loci of holomorphic functions
-    2. Define algebraic sets as global zero loci of polynomials
-    3. Prove Chow's theorem using complex analytic geometry
-
-    Reference: [W.-L. Chow, "On compact complex analytic varieties", Amer. J. Math. 71 (1949)]
-    Reference: [J.-P. Serre, "GAGA", Ann. Inst. Fourier 6 (1956)] -/
+    **Status**: QUARANTINED. Do not import on proof track. -/
 instance ChowGAGAData.universal : ChowGAGAData n X where
   analytic_to_algebraic := fun V => by
-    -- Apply Chow's theorem: analytic sets on projective varieties are algebraic
+    -- Legacy toy proof (induction over the toy predicate).
     exact ⟨⟨V.carrier, V.codim, IsAnalyticSet_isAlgebraicSet n X V.carrier V.is_analytic⟩, rfl, rfl⟩
 
 /-! ## Application to Harvey-Lawson Decomposition

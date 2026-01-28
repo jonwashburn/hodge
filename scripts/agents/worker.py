@@ -15,7 +15,29 @@ from typing import Optional, List, Dict, Any
 import re
 import traceback
 
-ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
+def _load_anthropic_api_key() -> str:
+    """Load Anthropic API key from env, with a safe on-disk fallback on the server."""
+    key = (os.environ.get("ANTHROPIC_API_KEY") or "").strip()
+    if key:
+        return key
+    # Fallback paths (avoid putting secrets in process args)
+    home = Path.home()
+    candidates = [
+        home / ".anthropic_api_key",
+        home / ".config" / "hodge" / "anthropic_api_key",
+    ]
+    for p in candidates:
+        try:
+            if p.exists():
+                v = p.read_text().strip()
+                if v:
+                    return v
+        except Exception:
+            continue
+    return ""
+
+
+ANTHROPIC_API_KEY = _load_anthropic_api_key()
 MODEL = "claude-sonnet-4-20250514"
 HODGE_PATH = Path(os.environ.get("HODGE_PATH", "/home/ubuntu/hodge"))
 
@@ -32,7 +54,12 @@ class LeanWorker:
     def __init__(self, session: aiohttp.ClientSession):
         self.session = session
         self.conversation: List[Dict] = []
-        self.max_iterations = 10
+        # Allow longer runs for research-heavy tasks (docs surveys, large refactors).
+        # Can be overridden per-run: `MAX_ITERATIONS=30 python3 worker.py ...`
+        try:
+            self.max_iterations = int(os.environ.get("MAX_ITERATIONS", "25"))
+        except Exception:
+            self.max_iterations = 25
 
     async def call_claude(
         self,
