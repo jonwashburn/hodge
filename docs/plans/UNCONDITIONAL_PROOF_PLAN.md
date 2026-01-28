@@ -10,7 +10,7 @@
 
 ---
 
-## Current Status (2026-01-27 - Updated)
+## Current Status (2026-01-27 - Final Update)
 
 ### Kernel Status
 ```
@@ -58,19 +58,25 @@ The support is `Set.univ` (full manifold), not `∅`. **Critic's complaint addre
 
 ---
 
-## Remaining Sorries (10)
+## Remaining Sorries (12)
 
 ### Hodge/Kahler/Microstructure.lean (8 sorries)
 | Line | Issue | Type |
 |------|-------|------|
-| 196 | `SheetUnionStokesData.universal.stokes_integral_zero` | Deep GMT |
-| 233 | `toIntegrationData.stokes_bound` type transport | Lean technicality |
-| 258 | `toIntegrationData_real.stokes_bound` type transport | Lean technicality |
-| 304 | `RawSheetSumIntegralityData.universal.is_integral` | Deep GMT (Federer-Fleming) |
-| 444 | `microstructureSequence_are_cycles` cycle property | Sheet sum boundary = 0 |
-| 538 | `MicrostructureSYRData.universal.defect_tends_to_zero` | Deep GMT (gluing estimates) |
-| 549 | `MicrostructureSYRData.universal.limit_calibrated` | Deep GMT |
-| 572 | `microstructure_uniform_mass_bound` | Mass-comass duality |
+| 196 | `SheetUnionStokesData.universal.stokes_integral_zero` | Deep GMT (Stokes) |
+| 232 | `toIntegrationData.stokes_bound` type transport | Lean technicality |
+| 257 | `toIntegrationData_real.stokes_bound` type transport | Lean technicality |
+| 303 | `RawSheetSumIntegralityData.universal.is_integral` | Deep GMT (Federer-Fleming) |
+| 453 | `microstructureSequence_are_cycles` cycle property | Sheet sum boundary = 0 |
+| 547 | `MicrostructureSYRData.universal.defect_tends_to_zero` | Deep GMT (gluing estimates) |
+| 558 | `MicrostructureSYRData.universal.limit_calibrated` | Deep GMT |
+| 581 | `microstructure_uniform_mass_bound` | Mass-comass duality |
+
+### Hodge/Kahler/Main.lean (2 sorries)
+| Line | Issue | Type |
+|------|-------|------|
+| 226 | `AutomaticSYRData.universal` flat norm convergence | Deep GMT (FF compactness) |
+| 233 | `AutomaticSYRData.universal` defect → 0 | Deep GMT (gluing estimates) |
 
 ### Hodge/Classical/GAGA.lean (1 sorry)
 | Line | Theorem | Mathematical Content |

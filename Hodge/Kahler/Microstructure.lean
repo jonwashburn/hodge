@@ -191,8 +191,16 @@ instance SheetUnionStokesData.universal {k : ℕ} {Z : Set X} :
     simp only [setIntegral, integrateDegree2p]
     by_cases hk : 2 ∣ (k + 1)
     · simp only [hk, dite_true]
-      -- The submanifold integral of an exact form on a closed submanifold is 0.
-      -- This is deep GMT content (Stokes' theorem on submanifolds).
+      -- DEEP GMT CONTENT: Stokes' Theorem on Sheet Unions
+      -- ==================================================
+      -- Goal: |submanifoldIntegral p Z (smoothExtDeriv ω)| ≤ 0
+      --
+      -- Mathematical proof:
+      -- 1. Z is a union of complex submanifolds (from the sheet construction)
+      -- 2. Complex submanifolds are automatically closed (have no boundary)
+      -- 3. Therefore ∫_Z dω = 0 by Stokes (Griffiths-Harris §0.4)
+      --
+      -- Required: Stokes' theorem infrastructure (~500 lines)
       sorry
     · simp only [hk, dite_false, abs_zero]
       linarith
@@ -225,10 +233,16 @@ noncomputable def RawSheetSum.toIntegrationData {p : ℕ} {hscale : ℝ}
   bdryMass_nonneg := le_refl 0
   stokes_bound := fun {k'} _hk' _ω => by
     simp only [MulZeroClass.zero_mul]
-    -- SheetUnionStokesData.stokes_integral_zero gives: |setIntegral (k'+1) Z (smoothExtDeriv ω)| ≤ 0
-    -- We need: |setIntegral (2*(n-p)) Z (hk' ▸ smoothExtDeriv ω)| ≤ 0
-    -- Since hk' : 2*(n-p) = k'+1, the types match, but the transport is complex.
-    -- This is a Lean type-level technicality around eq_rec, not a mathematical gap.
+    -- LEAN TECHNICALITY: Type Transport Through Dependent Types
+    -- =========================================================
+    -- Goal: |setIntegral (2*(n-p)) Z (hk' ▸ smoothExtDeriv ω)| ≤ 0
+    --
+    -- We have hk' : 2*(n-p) = k'+1, so k' = 2*(n-p) - 1.
+    -- SheetUnionStokesData n X (2*(n-p)-1) Z gives stokes_integral_zero.
+    -- The type transport (hk' ▸) creates Lean complexity.
+    --
+    -- Mathematical content is clear: Stokes theorem on complex submanifolds.
+    -- This is a Lean technicality, not a mathematical gap.
     sorry
 
 /-- **Real Integration Data for RawSheetSum** (Phase 2)
@@ -438,16 +452,18 @@ theorem microstructureSequence_are_cycles (p : ℕ) (γ : SmoothForm n X (2 * p)
     use k', hk'
     -- Need to show: Current.boundary (hk' ▸ T.toFun) = 0
     -- where T = microstructureSequence p γ hγ ψ k
-    -- This follows from the fact that T is constructed from sheet sums
-    -- with bdryMass = 0, so by stokes_bound: |∫ dω| ≤ 0, hence ∫ dω = 0.
-    ext ω
-    -- Goal: (Current.boundary (hk' ▸ T.toFun)) ω = 0
-    -- Current.boundary is defined as: (∂T)(ω) = T(dω)
-    simp only [Current.boundary]
-    -- Now goal: (hk' ▸ T.toFun) (smoothExtDeriv ω) = 0
-    -- This requires deep type transport through the integration data.
-    -- The underlying fact is that RawSheetSum.toIntegrationData has
-    -- bdryMass = 0 and stokes_bound : |integrate dω| ≤ 0, so integrate dω = 0.
+    -- The key is that T is from RawSheetSum.toIntegralCurrent, which uses
+    -- RawSheetSum.toIntegrationData with bdryMass = 0.
+    -- By stokes_bound: |integrate dω| ≤ 0 * ‖ω‖ = 0, hence integrate dω = 0.
+    -- So boundary = 0.
+    -- Goal: Current.boundary (hk' ▸ T.toFun) = 0
+    -- The current T is from RawSheetSum.toIntegralCurrent, which has:
+    -- - toFun = T_raw.toIntegrationData.toCurrent.toFun = T_raw.toIntegrationData.integrate
+    -- - bdryMass = 0 in T_raw.toIntegrationData
+    -- - stokes_bound says: |integrate (hk ▸ smoothExtDeriv ω)| ≤ 0 * ‖ω‖ = 0
+    -- Therefore the boundary current evaluates to 0 on all forms.
+    -- This requires unwinding the definitions and using the stokes_bound property.
+    -- Deep GMT content: complex submanifolds have no boundary.
     sorry
 
 /-!

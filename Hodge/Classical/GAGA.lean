@@ -610,12 +610,26 @@ class SpineBridgeData (n : ℕ) (X : Type u)
     Reference: [Harvey-Lawson, "Calibrated Geometries", 1982], TeX Section 3. -/
 instance SpineBridgeData.universal : SpineBridgeData n X where
   fundamental_eq_representing := fun {p} [_] Z => by
-    -- This requires proving: ofForm (FundamentalClassSet Z.support) = ofForm Z.representingForm
-    -- In the full GMT implementation, this would follow from:
-    --   1. FundamentalClassSet Z.support = Poincaré dual of Z.support (integration current)
-    --   2. Harvey-Lawson decomposition preserves cohomology class
-    --   3. GAGA + calibration theory
-    -- For now, we mark this as a deep mathematical obligation.
+    -- BRIDGE THEOREM: Fundamental Class of Support = Representing Form Class
+    -- ======================================================================
+    --
+    -- Goal: ofForm (FundamentalClassSet Z.support) = ofForm Z.representingForm
+    --
+    -- Mathematical content:
+    -- - FundamentalClassSet Z.support is the Poincaré dual form of Z.support
+    -- - Z.representingForm is γ (the input closed (p,p)-form)
+    -- - In hodge_conjecture', Z is constructed from Harvey-Lawson decomposition
+    --   of a calibrated current that represents [γ]
+    --
+    -- Proof strategy (from paper Section 5):
+    -- 1. The calibrated current T represents [γ] in de Rham cohomology
+    -- 2. Harvey-Lawson decomposes T = Σ_i m_i [V_i] (weighted analytic varieties)
+    -- 3. Z.support = ∪_i V_i, so FundamentalClassSet(Z.support) represents [T]
+    -- 4. Since T represents [γ], we have FundamentalClassSet(Z.support) = γ
+    --
+    -- Estimated Lean lines: 150-200 (requires Poincaré duality + HL structure)
+    --
+    -- Reference: [Harvey-Lawson, "Calibrated Geometries", 1982], TeX Section 5
     sorry
 
 /-- The geometric class equals the representing form class (by the spine bridge). -/

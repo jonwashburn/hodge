@@ -1447,9 +1447,21 @@ instance StokesTheoremData.universal {n : ℕ} {X : Type*} (k : ℕ)
       -- For an exact form dω on a compact manifold without boundary, this is 0.
       -- This requires deep GMT (Stokes' theorem).
       simp only [hk, dite_true]
-      -- submanifoldIntegral of an exact form on a closed manifold is 0.
-      -- This is the content of Stokes' theorem.
-      -- For now, we use the SubmanifoldIntegration instance which provides this.
+      -- DEEP GMT CONTENT: Stokes' Theorem for Currents
+      -- ================================================
+      -- Goal: Show |submanifoldIntegral p Set.univ (smoothExtDeriv ω)| ≤ 0
+      -- This implies submanifoldIntegral p Set.univ (smoothExtDeriv ω) = 0
+      --
+      -- Mathematical proof:
+      -- 1. smoothExtDeriv ω = dω is an exact form
+      -- 2. For compact X without boundary: ∫_X dω = ∫_{∂X} ω = 0
+      -- 3. This is Stokes' theorem (Federer GMT §4.1.28)
+      --
+      -- Required formalization (~500 lines):
+      -- - Define exterior derivative d on smooth forms
+      -- - Prove ∫_M dω = ∫_{∂M} ω for manifolds with boundary
+      -- - For closed M (∂M = ∅), conclude ∫_M dω = 0
+      -- - Connect to submanifoldIntegral infrastructure
       sorry
     · -- Degree k+1 is odd: integrateDegree2p returns 0 by definition.
       simp only [hk, dite_false]

@@ -216,13 +216,19 @@ instance AutomaticSYRData.universal : AutomaticSYRData n X where
     use (fun k => microstructureSequence p γ hγ ψ k), (microstructureSequence p γ hγ ψ 0)
     refine ⟨microstructureSequence_are_cycles p γ hγ ψ, ?_, ?_⟩
     · -- Flat norm convergence
-      -- The sequence converges to its limit in flat norm.
-      -- This is deep GMT content: requires Federer-Fleming compactness and
-      -- uniform mass bounds on the microstructure sequence.
+      -- Key insight: In the current implementation, all terms of microstructureSequence
+      -- integrate over Set.univ (via buildSheetsFromConePositive), so while the
+      -- intermediate types vary (different cubulation meshes), the underlying
+      -- integration functional is the same: setIntegral (2*(n-p)) Set.univ.
+      -- Thus the sequence is "morally constant" and converges trivially.
+      -- The technical proof requires showing this through the type layers.
+      -- For now, mark as deep GMT requiring Federer-Fleming + uniform mass bounds.
       sorry
     · -- Calibration defect tends to zero
-      -- The calibration defect of the microstructure sequence tends to 0.
-      -- This is the main result of the microstructure construction (gluing estimates).
+      -- In the current implementation, all terms have the same underlying current
+      -- (integration over Set.univ), so the calibration defect is constant.
+      -- The limit is 0 if we can show the defect of any term is 0.
+      -- This requires Stokes' theorem on the support (closed submanifold).
       -- Deep GMT content from the paper's Theorem 4.1.
       sorry
 
