@@ -231,19 +231,16 @@ noncomputable def RawSheetSum.toIntegrationData {p : ℕ} {hscale : ℝ}
   integrate_bound := setIntegral_bound (2 * (n - p)) T_raw.support
   bdryMass := 0
   bdryMass_nonneg := le_refl 0
-  stokes_bound := fun {k'} _hk' _ω => by
+  stokes_bound := fun {k'} hk' ω => by
     simp only [MulZeroClass.zero_mul]
-    -- LEAN TECHNICALITY: Type Transport Through Dependent Types
-    -- =========================================================
     -- Goal: |setIntegral (2*(n-p)) Z (hk' ▸ smoothExtDeriv ω)| ≤ 0
-    --
-    -- We have hk' : 2*(n-p) = k'+1, so k' = 2*(n-p) - 1.
-    -- SheetUnionStokesData n X (2*(n-p)-1) Z gives stokes_integral_zero.
-    -- The type transport (hk' ▸) creates Lean complexity.
-    --
-    -- Mathematical content is clear: Stokes theorem on complex submanifolds.
-    -- This is a Lean technicality, not a mathematical gap.
-    sorry
+    -- The mathematical content is Stokes: ∫_Z dω = 0 for closed Z.
+    have h : setIntegral (2 * (n - p)) T_raw.support (hk' ▸ smoothExtDeriv ω) = 0 := by
+      -- Integration of exact forms on closed submanifolds is 0 (Stokes).
+      -- Deep GMT content.
+      sorry
+    simp only [h, abs_zero]
+    linarith
 
 /-- **Real Integration Data for RawSheetSum** (Phase 2)
     Uses actual `setIntegral` instead of zero stub.
@@ -457,13 +454,22 @@ theorem microstructureSequence_are_cycles (p : ℕ) (γ : SmoothForm n X (2 * p)
     -- By stokes_bound: |integrate dω| ≤ 0 * ‖ω‖ = 0, hence integrate dω = 0.
     -- So boundary = 0.
     -- Goal: Current.boundary (hk' ▸ T.toFun) = 0
-    -- The current T is from RawSheetSum.toIntegralCurrent, which has:
-    -- - toFun = T_raw.toIntegrationData.toCurrent.toFun = T_raw.toIntegrationData.integrate
-    -- - bdryMass = 0 in T_raw.toIntegrationData
-    -- - stokes_bound says: |integrate (hk ▸ smoothExtDeriv ω)| ≤ 0 * ‖ω‖ = 0
-    -- Therefore the boundary current evaluates to 0 on all forms.
-    -- This requires unwinding the definitions and using the stokes_bound property.
-    -- Deep GMT content: complex submanifolds have no boundary.
+    -- Strategy: use ext to show (boundary T).toFun ω = 0 for all ω.
+    -- (boundary T).toFun ω = T.toFun (smoothExtDeriv ω) by definition
+    -- T is from RawSheetSum.toIntegralCurrent, so T.toFun = setIntegral on support
+    -- By stokes_bound: |setIntegral (smoothExtDeriv ω)| ≤ 0, so the integral is 0.
+    ext ω
+    -- Now goal: (boundary (hk' ▸ T.toFun)).toFun ω = (0 : Current n X k').toFun ω
+    simp only [Current.boundary, Current.zero_toFun]
+    -- Goal after simp: (hk' ▸ T.toFun).toFun (smoothExtDeriv ω) = 0
+    -- We have hk' : 2*(n-p) = k'+1, so k' = 2*(n-p) - 1.
+    -- microstructureSequence p γ hγ ψ _k = T_raw.toIntegralCurrent
+    -- where T_raw.toIntegralCurrent.toFun = setIntegral (2*(n-p)) T_raw.support.
+    -- So we need: setIntegral (2*(n-p)) T_raw.support (smoothExtDeriv ω) = 0.
+    -- This is exactly SheetUnionStokesData.stokes_integral_zero for degree k' = 2*(n-p)-1.
+    -- We have SheetUnionStokesData n X (2*(n-p)-1) T_raw.support.
+    -- The issue is the type transport through hk' makes this complex.
+    -- Deep GMT: Stokes on complex submanifolds.
     sorry
 
 /-!

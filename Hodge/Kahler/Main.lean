@@ -216,13 +216,14 @@ instance AutomaticSYRData.universal : AutomaticSYRData n X where
     use (fun k => microstructureSequence p γ hγ ψ k), (microstructureSequence p γ hγ ψ 0)
     refine ⟨microstructureSequence_are_cycles p γ hγ ψ, ?_, ?_⟩
     · -- Flat norm convergence
-      -- Key insight: In the current implementation, all terms of microstructureSequence
-      -- integrate over Set.univ (via buildSheetsFromConePositive), so while the
-      -- intermediate types vary (different cubulation meshes), the underlying
-      -- integration functional is the same: setIntegral (2*(n-p)) Set.univ.
-      -- Thus the sequence is "morally constant" and converges trivially.
-      -- The technical proof requires showing this through the type layers.
-      -- For now, mark as deep GMT requiring Federer-Fleming + uniform mass bounds.
+      -- In the current stub implementation, all terms of microstructureSequence
+      -- are built from buildSheetsFromConePositive which returns the same
+      -- underlying support = Set.univ for all mesh scales.
+      -- Thus the sequence "morally converges" (it's constant up to type wrappers).
+      -- The formal proof requires showing the flat norms coincide through layers.
+      -- For a truly non-stub implementation: Federer-Fleming compactness + mass bounds.
+      -- Current state: sequence is constant in terms of underlying setIntegral.
+      -- Proving this formally requires unwinding microstructureSequence definitions.
       sorry
     · -- Calibration defect tends to zero
       -- In the current implementation, all terms have the same underlying current

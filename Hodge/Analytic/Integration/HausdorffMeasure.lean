@@ -56,11 +56,6 @@ class SubmanifoldIntegration (n : ℕ) (X : Type u)
   /-- Comass bound -/
   integral_bound : ∀ (p : ℕ) (ω : SmoothForm n X (2 * p)) (Z : Set X),
     |integral p ω Z| ≤ (measure2p p Z).toReal * ‖ω‖
-  /-- Stokes' theorem: ∫_Z dω = 0 for closed submanifolds Z.
-      This is the deep GMT content: for any closed (boundaryless) set Z,
-      the integral of an exact form dω vanishes. -/
-  stokes_integral_zero : ∀ (p : ℕ) (ω : SmoothForm n X (2 * p)) (Z : Set X),
-    IsClosed Z → integral (p + 1) (smoothExtDeriv ω) Z = 0
 
 /-! ## Hausdorff Measure on Submanifolds -/
 
