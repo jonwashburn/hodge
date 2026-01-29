@@ -1,0 +1,436 @@
+{
+  "description": "Stage 1-7 Parallelization Tasks for Hodge Conjecture Formalization",
+  "max_concurrent_agents": 25,
+  "tasks": [
+    {
+      "id": "stage1_euclid_fiberaltR",
+      "stage": 1,
+      "track": "A",
+      "description": "Define FiberAltR (real-alternating k-forms) and EuclidTestFormR/EuclidCurrentR in DistributionTestForms.lean",
+      "file_path": "Hodge/Analytic/DistributionTestForms.lean",
+      "target": "FiberAltR, EuclidTestFormR, EuclidCurrentR",
+      "dependencies": [],
+      "priority": 1
+    },
+    {
+      "id": "stage1_euclid_d_testform",
+      "stage": 1,
+      "track": "A",
+      "description": "Implement dTestForm (exterior derivative on Euclidean test forms as a test function)",
+      "file_path": "Hodge/Analytic/Stage1/EuclidTestFormsDeriv.lean",
+      "target": "dTestForm",
+      "dependencies": ["stage1_euclid_fiberaltR"],
+      "priority": 2
+    },
+    {
+      "id": "stage1_euclid_d_clm",
+      "stage": 1,
+      "track": "A",
+      "description": "Prove dCLM is a continuous linear map using TestFunction.mkCLM",
+      "file_path": "Hodge/Analytic/Stage1/EuclidTestFormsDeriv.lean",
+      "target": "dCLM",
+      "dependencies": ["stage1_euclid_d_testform"],
+      "priority": 3
+    },
+    {
+      "id": "stage1_euclid_boundary",
+      "stage": 1,
+      "track": "A",
+      "description": "Define boundary for EuclidCurrentR by duality: boundary T ω = T(dω)",
+      "file_path": "Hodge/Analytic/Stage1/EuclidTestFormsDeriv.lean",
+      "target": "EuclidCurrentR.boundary",
+      "dependencies": ["stage1_euclid_d_clm"],
+      "priority": 4
+    },
+    {
+      "id": "stage1_dd_zero",
+      "stage": 1,
+      "track": "A",
+      "description": "Prove d∘d = 0 on Euclidean test forms",
+      "file_path": "Hodge/Analytic/Stage1/EuclidTestFormsDeriv.lean",
+      "target": "dCLM_comp_dCLM_zero",
+      "dependencies": ["stage1_euclid_d_clm"],
+      "priority": 5
+    },
+    {
+      "id": "stage1_boundary_boundary_zero",
+      "stage": 1,
+      "track": "A",
+      "description": "Prove ∂∂ = 0 for Euclidean currents",
+      "file_path": "Hodge/Analytic/Stage1/EuclidTestFormsDeriv.lean",
+      "target": "boundary_boundary_zero",
+      "dependencies": ["stage1_euclid_boundary", "stage1_dd_zero"],
+      "priority": 6
+    },
+    {
+      "id": "stage1_wedge_testforms",
+      "stage": 1,
+      "track": "A",
+      "description": "Define wedge product on Euclidean test forms as CLM",
+      "file_path": "Hodge/Analytic/Stage1/EuclidTestFormsWedge.lean",
+      "target": "wedgeCLM",
+      "dependencies": ["stage1_euclid_fiberaltR"],
+      "priority": 3
+    },
+    {
+      "id": "stage1_leibniz",
+      "stage": 1,
+      "track": "A",
+      "description": "Prove Leibniz rule: d(ω ∧ η) = dω ∧ η + (-1)^k ω ∧ dη",
+      "file_path": "Hodge/Analytic/Stage1/EuclidTestFormsLeibniz.lean",
+      "target": "leibniz_rule",
+      "dependencies": ["stage1_euclid_d_clm", "stage1_wedge_testforms"],
+      "priority": 7
+    },
+    {
+      "id": "stage2_integration_current_def",
+      "stage": 2,
+      "track": "A",
+      "description": "Define integration current [Z](ω) = ∫_Z ι*ω using Mathlib measure/integration",
+      "file_path": "Hodge/Analytic/Stage2/IntegrationCurrentsReal.lean",
+      "target": "integrationCurrent",
+      "dependencies": ["stage1_euclid_fiberaltR"],
+      "priority": 8
+    },
+    {
+      "id": "stage2_stokes",
+      "stage": 2,
+      "track": "A",
+      "description": "Prove Stokes theorem: [Z](dω) = [∂Z](ω) for compact manifolds with boundary",
+      "file_path": "Hodge/Analytic/Integration/StokesTheorem.lean",
+      "target": "stokes_theorem",
+      "dependencies": ["stage2_integration_current_def", "stage1_euclid_d_clm"],
+      "priority": 9
+    },
+    {
+      "id": "stage2_boundary_integration",
+      "stage": 2,
+      "track": "A",
+      "description": "Prove ∂[Z] = [∂Z] for submanifolds",
+      "file_path": "Hodge/Analytic/Stage2/IntegrationCurrentsReal.lean",
+      "target": "boundary_integrationCurrent",
+      "dependencies": ["stage2_stokes", "stage1_euclid_boundary"],
+      "priority": 10
+    },
+    {
+      "id": "stage3_mass_def",
+      "stage": 3,
+      "track": "A",
+      "description": "Define mass via dual norm: M(T) = sup{T(ω) : comass(ω) ≤ 1}",
+      "file_path": "Hodge/Analytic/Mass.lean",
+      "target": "mass",
+      "dependencies": ["stage1_euclid_fiberaltR"],
+      "priority": 8
+    },
+    {
+      "id": "stage3_flat_norm_def",
+      "stage": 3,
+      "track": "A",
+      "description": "Define flat norm: F(T) = inf{M(R) + M(S) : T = R + ∂S}",
+      "file_path": "Hodge/Analytic/FlatNorm.lean",
+      "target": "flatNorm_proper",
+      "dependencies": ["stage3_mass_def", "stage1_euclid_boundary"],
+      "priority": 11
+    },
+    {
+      "id": "stage3_federer_fleming",
+      "stage": 3,
+      "track": "A",
+      "description": "Formalize Federer-Fleming compactness (real proof or honest axiom)",
+      "file_path": "Hodge/GMT/FedererFlemingReal.lean",
+      "target": "federer_fleming_compactness",
+      "dependencies": ["stage3_flat_norm_def"],
+      "priority": 12
+    },
+    {
+      "id": "stage4_calibration_def",
+      "stage": 4,
+      "track": "A",
+      "description": "Define calibration and calibrated currents",
+      "file_path": "Hodge/Analytic/Calibration.lean",
+      "target": "IsCalibratedCurrent",
+      "dependencies": ["stage3_mass_def"],
+      "priority": 11
+    },
+    {
+      "id": "stage4_calibration_inequality",
+      "stage": 4,
+      "track": "A",
+      "description": "Prove calibration inequality: ⟨T,ψ⟩ ≤ mass(T)",
+      "file_path": "Hodge/Analytic/Calibration.lean",
+      "target": "calibration_inequality",
+      "dependencies": ["stage4_calibration_def"],
+      "priority": 12
+    },
+    {
+      "id": "stage4_harvey_lawson_king",
+      "stage": 4,
+      "track": "A",
+      "description": "Prove Harvey-Lawson/King: calibrated integral current is holomorphic chain",
+      "file_path": "Hodge/Classical/HarveyLawsonReal.lean",
+      "target": "harvey_lawson_king_theorem",
+      "dependencies": ["stage4_calibration_def", "stage3_federer_fleming"],
+      "priority": 13
+    },
+    {
+      "id": "stage5a_analytic_space_def",
+      "stage": 5,
+      "track": "B",
+      "description": "Define complex analytic spaces via local holomorphic equations",
+      "file_path": "Hodge/AlgGeom/AnalyticSpaces.lean",
+      "target": "IsComplexAnalyticSpace",
+      "dependencies": [],
+      "priority": 1
+    },
+    {
+      "id": "stage5a_analytic_subvariety",
+      "stage": 5,
+      "track": "B",
+      "description": "Define analytic subvariety as local zero set of holomorphic functions",
+      "file_path": "Hodge/AlgGeom/AnalyticSubvariety.lean",
+      "target": "IsAnalyticSubvariety",
+      "dependencies": ["stage5a_analytic_space_def"],
+      "priority": 2
+    },
+    {
+      "id": "stage5a_coherent_sheaves",
+      "stage": 5,
+      "track": "B",
+      "description": "Define coherent sheaves on complex manifolds",
+      "file_path": "Hodge/AlgGeom/CoherentSheaves.lean",
+      "target": "IsCoherentSheaf",
+      "dependencies": ["stage5a_analytic_space_def"],
+      "priority": 3
+    },
+    {
+      "id": "stage5b_gaga_equiv",
+      "stage": 5,
+      "track": "B",
+      "description": "Prove GAGA: analytic coherent sheaves ≃ algebraic coherent sheaves",
+      "file_path": "Hodge/AlgGeom/GAGA.lean",
+      "target": "gaga_equivalence",
+      "dependencies": ["stage5a_coherent_sheaves"],
+      "priority": 10
+    },
+    {
+      "id": "stage5b_chow",
+      "stage": 5,
+      "track": "B",
+      "description": "Prove Chow's theorem: closed analytic ⊂ ℙⁿ is algebraic",
+      "file_path": "Hodge/AlgGeom/ChowTheorem.lean",
+      "target": "chow_theorem",
+      "dependencies": ["stage5b_gaga_equiv", "stage5a_analytic_subvariety"],
+      "priority": 11
+    },
+    {
+      "id": "stage6_singular_cohomology",
+      "stage": 6,
+      "track": "C",
+      "description": "Define singular cohomology H*(X; ℤ)",
+      "file_path": "Hodge/Cohomology/SingularCohomology.lean",
+      "target": "SingularCohomology",
+      "dependencies": [],
+      "priority": 5
+    },
+    {
+      "id": "stage6_derham_iso",
+      "stage": 6,
+      "track": "C",
+      "description": "Prove de Rham isomorphism H*_dR(X) ≅ H*(X; ℝ)",
+      "file_path": "Hodge/Cohomology/DeRhamIsomorphism.lean",
+      "target": "deRham_isomorphism",
+      "dependencies": ["stage6_singular_cohomology", "stage1_dd_zero"],
+      "priority": 12
+    },
+    {
+      "id": "stage6_q_structure",
+      "stage": 6,
+      "track": "C",
+      "description": "Define ℚ-structure: H*(X; ℚ) ⊂ H*(X; ℝ)",
+      "file_path": "Hodge/Cohomology/RationalStructure.lean",
+      "target": "rational_structure",
+      "dependencies": ["stage6_singular_cohomology"],
+      "priority": 6
+    },
+    {
+      "id": "stage6_cycle_class",
+      "stage": 6,
+      "track": "C",
+      "description": "Define cycle class map: Z ↦ [Z] ∈ H^{2p}(X; ℤ)",
+      "file_path": "Hodge/Cohomology/CycleClass.lean",
+      "target": "cycle_class",
+      "dependencies": ["stage6_singular_cohomology", "stage2_integration_current_def"],
+      "priority": 13
+    },
+    {
+      "id": "stage6_poincare_duality",
+      "stage": 6,
+      "track": "C",
+      "description": "Prove Poincaré duality (current → form)",
+      "file_path": "Hodge/Cohomology/PoincareDuality.lean",
+      "target": "poincare_duality",
+      "dependencies": ["stage6_derham_iso"],
+      "priority": 14
+    },
+    {
+      "id": "stage7_main_wiring",
+      "stage": 7,
+      "track": "final",
+      "description": "Wire all components into hodge_conjecture' theorem",
+      "file_path": "Hodge/Kahler/Main.lean",
+      "target": "hodge_conjecture'",
+      "dependencies": ["stage4_harvey_lawson_king", "stage5b_chow", "stage6_poincare_duality"],
+      "priority": 20
+    },
+    {
+      "id": "scaffold_stage1_testforms",
+      "stage": 0,
+      "track": "scaffold",
+      "description": "Create Stage1/EuclidTestFormsDeriv.lean skeleton with all function signatures",
+      "file_path": "Hodge/Analytic/Stage1/EuclidTestFormsDeriv.lean",
+      "target": "scaffold file creation",
+      "dependencies": [],
+      "priority": 0
+    },
+    {
+      "id": "scaffold_stage1_wedge",
+      "stage": 0,
+      "track": "scaffold",
+      "description": "Create Stage1/EuclidTestFormsWedge.lean skeleton",
+      "file_path": "Hodge/Analytic/Stage1/EuclidTestFormsWedge.lean",
+      "target": "scaffold file creation",
+      "dependencies": [],
+      "priority": 0
+    },
+    {
+      "id": "scaffold_stage1_leibniz",
+      "stage": 0,
+      "track": "scaffold",
+      "description": "Create Stage1/EuclidTestFormsLeibniz.lean skeleton",
+      "file_path": "Hodge/Analytic/Stage1/EuclidTestFormsLeibniz.lean",
+      "target": "scaffold file creation",
+      "dependencies": [],
+      "priority": 0
+    },
+    {
+      "id": "scaffold_stage2_integration",
+      "stage": 0,
+      "track": "scaffold",
+      "description": "Create Stage2/IntegrationCurrentsReal.lean skeleton",
+      "file_path": "Hodge/Analytic/Stage2/IntegrationCurrentsReal.lean",
+      "target": "scaffold file creation",
+      "dependencies": [],
+      "priority": 0
+    },
+    {
+      "id": "scaffold_stage3_mass",
+      "stage": 0,
+      "track": "scaffold",
+      "description": "Create Hodge/Analytic/MassReal.lean skeleton for proper mass definition",
+      "file_path": "Hodge/Analytic/MassReal.lean",
+      "target": "scaffold file creation",
+      "dependencies": [],
+      "priority": 0
+    },
+    {
+      "id": "scaffold_stage3_flatnorm",
+      "stage": 0,
+      "track": "scaffold",
+      "description": "Create Hodge/Analytic/FlatNormReal.lean skeleton",
+      "file_path": "Hodge/Analytic/FlatNormReal.lean",
+      "target": "scaffold file creation",
+      "dependencies": [],
+      "priority": 0
+    },
+    {
+      "id": "scaffold_stage4_calibration",
+      "stage": 0,
+      "track": "scaffold",
+      "description": "Create Hodge/Analytic/CalibrationReal.lean skeleton",
+      "file_path": "Hodge/Analytic/CalibrationReal.lean",
+      "target": "scaffold file creation",
+      "dependencies": [],
+      "priority": 0
+    },
+    {
+      "id": "scaffold_stage5_analytic",
+      "stage": 0,
+      "track": "scaffold",
+      "description": "Create Hodge/AlgGeom/AnalyticSpaces.lean skeleton",
+      "file_path": "Hodge/AlgGeom/AnalyticSpaces.lean",
+      "target": "scaffold file creation",
+      "dependencies": [],
+      "priority": 0
+    },
+    {
+      "id": "scaffold_stage5_coherent",
+      "stage": 0,
+      "track": "scaffold",
+      "description": "Create Hodge/AlgGeom/CoherentSheaves.lean skeleton",
+      "file_path": "Hodge/AlgGeom/CoherentSheaves.lean",
+      "target": "scaffold file creation",
+      "dependencies": [],
+      "priority": 0
+    },
+    {
+      "id": "scaffold_stage5_gaga",
+      "stage": 0,
+      "track": "scaffold",
+      "description": "Create Hodge/AlgGeom/GAGAReal.lean skeleton",
+      "file_path": "Hodge/AlgGeom/GAGAReal.lean",
+      "target": "scaffold file creation",
+      "dependencies": [],
+      "priority": 0
+    },
+    {
+      "id": "scaffold_stage5_chow",
+      "stage": 0,
+      "track": "scaffold",
+      "description": "Create Hodge/AlgGeom/ChowTheorem.lean skeleton",
+      "file_path": "Hodge/AlgGeom/ChowTheorem.lean",
+      "target": "scaffold file creation",
+      "dependencies": [],
+      "priority": 0
+    },
+    {
+      "id": "scaffold_stage6_singular",
+      "stage": 0,
+      "track": "scaffold",
+      "description": "Create Hodge/Cohomology/SingularCohomology.lean skeleton",
+      "file_path": "Hodge/Cohomology/SingularCohomology.lean",
+      "target": "scaffold file creation",
+      "dependencies": [],
+      "priority": 0
+    },
+    {
+      "id": "scaffold_stage6_derham",
+      "stage": 0,
+      "track": "scaffold",
+      "description": "Create Hodge/Cohomology/DeRhamIsomorphism.lean skeleton",
+      "file_path": "Hodge/Cohomology/DeRhamIsomorphism.lean",
+      "target": "scaffold file creation",
+      "dependencies": [],
+      "priority": 0
+    },
+    {
+      "id": "scaffold_stage6_rational",
+      "stage": 0,
+      "track": "scaffold",
+      "description": "Create Hodge/Cohomology/RationalStructure.lean skeleton",
+      "file_path": "Hodge/Cohomology/RationalStructure.lean",
+      "target": "scaffold file creation",
+      "dependencies": [],
+      "priority": 0
+    },
+    {
+      "id": "scaffold_stage6_poincare",
+      "stage": 0,
+      "track": "scaffold",
+      "description": "Create Hodge/Cohomology/PoincareDuality.lean skeleton",
+      "file_path": "Hodge/Cohomology/PoincareDuality.lean",
+      "target": "scaffold file creation",
+      "dependencies": [],
+      "priority": 0
+    }
+  ]
+}
