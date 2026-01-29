@@ -1,0 +1,288 @@
+{
+  "description": "Complete Hodge Conjecture Formalization - All Stages",
+  "version": "2.0",
+  "tracks": {
+    "A": "GMT/Currents (Sequential: 1→2→3→4)",
+    "B": "Algebraic Geometry (Parallel to Track A)",
+    "C": "Cohomology Bridge (After A+B complete)"
+  },
+  "stages": [
+    {
+      "stage": 0,
+      "name": "Decontamination",
+      "status": "COMPLETED",
+      "description": "Clean repo of fake/trivial implementations"
+    },
+    {
+      "stage": 1,
+      "name": "LF-space Test Forms",
+      "track": "A",
+      "files": [
+        {
+          "path": "Hodge/Analytic/TestForms/LFTopology.lean",
+          "description": "LF-space topology on compactly supported forms",
+          "tasks": [
+            "Define D^k_K(X) = smooth k-forms with support in compact K",
+            "Define D^k(X) = colimit over compact exhaustion",
+            "Prove D^k(X) is an LF-space (locally convex inductive limit)",
+            "Connect to Mathlib's TestFunction infrastructure"
+          ]
+        },
+        {
+          "path": "Hodge/Analytic/TestForms/Operations.lean",
+          "description": "Continuous operations on test forms",
+          "tasks": [
+            "Prove d : D^k(X) → D^{k+1}(X) is continuous",
+            "Prove ∧ : D^k(X) × D^l(X) → D^{k+l}(X) is continuous",
+            "Prove pullback f* : D^k(Y) → D^k(X) is continuous",
+            "Prove Leibniz rule d(ω ∧ η) = dω ∧ η ± ω ∧ dη"
+          ]
+        },
+        {
+          "path": "Hodge/Analytic/TestForms/Currents.lean",
+          "description": "Currents as continuous linear functionals",
+          "tasks": [
+            "Define Current(X,k) = (D^k(X))' (continuous dual)",
+            "Define boundary ∂ : Current(X,k+1) → Current(X,k) by ∂T(ω) = T(dω)",
+            "Prove ∂∂ = 0",
+            "Prove currents form a chain complex"
+          ]
+        }
+      ]
+    },
+    {
+      "stage": 2,
+      "name": "Integration Currents",
+      "track": "A",
+      "depends_on": [1],
+      "files": [
+        {
+          "path": "Hodge/Analytic/Integration/SubmanifoldIntegral.lean",
+          "description": "Integration on submanifolds using Mathlib",
+          "tasks": [
+            "Define oriented submanifold structure",
+            "Define ∫_Z ω using Mathlib's MeasureTheory.integral",
+            "Prove change of variables formula",
+            "Handle boundary orientation"
+          ]
+        },
+        {
+          "path": "Hodge/Analytic/Integration/IntegrationCurrent.lean",
+          "description": "Integration currents [Z]",
+          "tasks": [
+            "Define [Z](ω) := ∫_Z ι*ω as current",
+            "Prove [Z] is continuous on test forms",
+            "Prove linearity and support properties"
+          ]
+        },
+        {
+          "path": "Hodge/Analytic/Integration/StokesTheorem.lean",
+          "description": "Stokes theorem: ∂[Z] = [∂Z]",
+          "tasks": [
+            "State Stokes: ∫_Z dω = ∫_{∂Z} ω",
+            "Prove ∂[Z](ω) = [Z](dω) = ∫_Z dω = ∫_{∂Z} ω = [∂Z](ω)",
+            "Handle orientation on boundary"
+          ]
+        }
+      ]
+    },
+    {
+      "stage": 3,
+      "name": "Mass and Flat Norm",
+      "track": "A",
+      "depends_on": [2],
+      "files": [
+        {
+          "path": "Hodge/GMT/Mass.lean",
+          "description": "Mass functional via dual norm",
+          "tasks": [
+            "Define comass(ω) = sup over unit k-vectors",
+            "Define mass(T) = sup{T(ω) : comass(ω) ≤ 1}",
+            "Prove mass is a norm on currents",
+            "Prove mass([Z]) = volume(Z) for submanifolds"
+          ]
+        },
+        {
+          "path": "Hodge/GMT/FlatNorm.lean",
+          "description": "Flat norm for current convergence",
+          "tasks": [
+            "Define flat(T) = inf{mass(R) + mass(S) : T = R + ∂S}",
+            "Prove flat norm is a seminorm",
+            "Prove flat ≤ mass",
+            "Define flat norm topology on currents"
+          ]
+        },
+        {
+          "path": "Hodge/GMT/Compactness.lean",
+          "description": "Federer-Fleming compactness",
+          "tasks": [
+            "State: bounded mass + flat norm → precompact",
+            "Prove or axiomatize compactness theorem",
+            "Define integral currents",
+            "Prove closure properties"
+          ]
+        }
+      ]
+    },
+    {
+      "stage": 4,
+      "name": "Calibration + Harvey-Lawson",
+      "track": "A", 
+      "depends_on": [3],
+      "files": [
+        {
+          "path": "Hodge/GMT/Calibration.lean",
+          "description": "Calibration theory",
+          "tasks": [
+            "Define calibration: closed form φ with comass ≤ 1",
+            "Define calibrated current: T(φ) = mass(T)",
+            "Prove calibrated minimizes mass in homology class",
+            "Define calibration defect"
+          ]
+        },
+        {
+          "path": "Hodge/GMT/HarveyLawsonKing.lean",
+          "description": "Harvey-Lawson-King structure theorem",
+          "tasks": [
+            "State: calibrated integral current → analytic variety support",
+            "Define positive (p,p)-currents",
+            "Prove Kähler calibration ω^p/p! calibrates (p,p)-currents",
+            "Extract analytic variety from calibrated current"
+          ]
+        },
+        {
+          "path": "Hodge/GMT/Regularity.lean",
+          "description": "Regularity for calibrated currents",
+          "tasks": [
+            "State regularity: calibrated → smooth away from singular set",
+            "Bound dimension of singular set",
+            "Connect to analytic variety structure"
+          ]
+        }
+      ]
+    },
+    {
+      "stage": 5,
+      "name": "Complex Geometry + GAGA",
+      "track": "B",
+      "depends_on": [0],
+      "files": [
+        {
+          "path": "Hodge/AlgGeom/AnalyticSpace.lean",
+          "description": "Complex analytic spaces",
+          "tasks": [
+            "Define complex analytic space via local models",
+            "Define analytic subvariety as local zero set",
+            "Prove basic properties (locally closed, etc.)",
+            "Connect to Mathlib complex analysis"
+          ]
+        },
+        {
+          "path": "Hodge/AlgGeom/CoherentSheaves.lean",
+          "description": "Coherent sheaves",
+          "tasks": [
+            "Define sheaf of holomorphic functions",
+            "Define coherent analytic sheaf",
+            "Prove Oka coherence theorem (or axiomatize)",
+            "Define sheaf cohomology H^i(X, F)"
+          ]
+        },
+        {
+          "path": "Hodge/AlgGeom/GAGA.lean",
+          "description": "GAGA theorem",
+          "tasks": [
+            "State GAGA: analytic ≃ algebraic for projective varieties",
+            "Define algebraization functor",
+            "Prove equivalence of categories (or axiomatize)",
+            "Apply to coherent sheaves"
+          ]
+        },
+        {
+          "path": "Hodge/AlgGeom/ChowTheorem.lean",
+          "description": "Chow's theorem",
+          "tasks": [
+            "State: closed analytic in ℙⁿ → algebraic",
+            "Connect to GAGA",
+            "Define algebraic cycle from analytic variety",
+            "Prove projectivity is essential"
+          ]
+        }
+      ]
+    },
+    {
+      "stage": 6,
+      "name": "Cohomology Bridge",
+      "track": "C",
+      "depends_on": [4, 5],
+      "files": [
+        {
+          "path": "Hodge/Cohomology/Singular.lean",
+          "description": "Singular cohomology",
+          "tasks": [
+            "Define singular chains and cochains",
+            "Define H^k(X; R) for R = ℤ, ℚ, ℝ",
+            "Prove basic properties (homotopy invariance, etc.)",
+            "Connect to Mathlib algebraic topology"
+          ]
+        },
+        {
+          "path": "Hodge/Cohomology/DeRham.lean",
+          "description": "de Rham isomorphism",
+          "tasks": [
+            "State de Rham theorem: H^k_dR(X) ≅ H^k(X; ℝ)",
+            "Define the comparison map",
+            "Prove isomorphism (or use Mathlib if available)"
+          ]
+        },
+        {
+          "path": "Hodge/Cohomology/RationalStructure.lean",
+          "description": "ℚ-structure on cohomology",
+          "tasks": [
+            "Define H^k(X; ℚ) ⊂ H^k(X; ℝ)",
+            "Prove H^k(X; ℝ) = H^k(X; ℚ) ⊗_ℚ ℝ",
+            "Define rational Hodge class",
+            "Connect to algebraicity"
+          ]
+        },
+        {
+          "path": "Hodge/Cohomology/CycleClass.lean",
+          "description": "Cycle class map",
+          "tasks": [
+            "Define cl: Z^p(X) → H^{2p}(X; ℤ)",
+            "Prove compatibility with intersection",
+            "Prove cl(Z) is a Hodge class",
+            "State the Hodge conjecture in this language"
+          ]
+        },
+        {
+          "path": "Hodge/Cohomology/PoincareDuality.lean",
+          "description": "Poincaré duality",
+          "tasks": [
+            "State PD: H^k(X) ≅ H_{2n-k}(X)",
+            "Connect currents to homology",
+            "Prove current [Z] represents Poincaré dual of cl(Z)"
+          ]
+        }
+      ]
+    },
+    {
+      "stage": 7,
+      "name": "Final Wiring",
+      "track": "final",
+      "depends_on": [6],
+      "files": [
+        {
+          "path": "Hodge/Kahler/Main.lean",
+          "description": "Wire everything together",
+          "tasks": [
+            "Connect microstructure to real integration currents",
+            "Connect Harvey-Lawson to real analytic varieties",
+            "Connect Chow to real algebraic cycles",
+            "Eliminate remaining sorries (line 262, line 589)",
+            "Verify #print axioms shows only propext, choice, quot.sound"
+          ]
+        }
+      ]
+    }
+  ]
+}
