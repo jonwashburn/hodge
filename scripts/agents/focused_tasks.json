@@ -1,0 +1,23 @@
+{
+  "description": "Focused tasks - the 2 key sorries that complete the Hodge proof",
+  "tasks": [
+    {
+      "id": "main_microstructure_sorry",
+      "file": "Hodge/Kahler/Main.lean",
+      "line": 262,
+      "description": "Prove calibration defect sequence converges to 0",
+      "context": "The microstructure sequence is constant (by construction). Need to show the defect of integration currents over Set.univ with calibrating forms is 0.",
+      "paper_ref": "Paper Section 8, Proposition 8.7 - calibrated currents have zero defect",
+      "priority": 1
+    },
+    {
+      "id": "gaga_deep_hodge_sorry",
+      "file": "Hodge/Classical/GAGA.lean",
+      "line": 589,
+      "description": "Prove rational (p,p)-class is represented by algebraic cycle",
+      "context": "This is the core Hodge content. Need: 1) Microstructure produces currents representing [γ], 2) Harvey-Lawson extracts varieties, 3) Poincare dual equals [γ]",
+      "paper_ref": "Paper Sections 8-10, Theorem 10.1",
+      "priority": 1
+    }
+  ]
+}

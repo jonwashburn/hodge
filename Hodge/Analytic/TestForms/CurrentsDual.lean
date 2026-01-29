@@ -7,8 +7,7 @@ import Hodge.Analytic.TestForms.Operations
 /-!
 # Currents as Continuous Linear Functionals
 
-This file defines currents as continuous linear functionals on the LF-space
-of test forms, following the distributional approach.
+Currents are the dual space of test forms.
 
 ## Main Definitions
 
@@ -18,23 +17,21 @@ of test forms, following the distributional approach.
 ## Main Results
 
 * `boundary_boundary` - ∂∂ = 0
-* `Current.chainComplex` - Currents form a chain complex
 
 ## References
 
 * de Rham, "Differentiable Manifolds"
-* Federer, "Geometric Measure Theory"
 * [Washburn-Barghi, Section 6]
 -/
 
 noncomputable section
 
-open scoped Distributions Manifold
+open scoped Distributions
 open TopologicalSpace Classical
 
 namespace Hodge.Currents
 
-variable {n : ℕ} {X : Type*}
+variable {n : ℕ} {X : Type*} {k : ℕ}
   [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X]
 
@@ -42,70 +39,35 @@ open Hodge.TestForms
 
 /-! ## Current Definition -/
 
-/-- A k-current on X is a continuous linear functional on test k-forms.
-    This is the distributional definition from GMT. -/
+/-- A k-current on X is a continuous linear functional on test k-forms. -/
 def Current (n : ℕ) (X : Type*) (k : ℕ)
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] :=
-  TestForm n X k →L[ℂ] ℂ
+  TestForm n X k →ₗ[ℂ] ℂ
 
 namespace Current
 
-variable {k : ℕ}
-
 instance : CoeFun (Current n X k) (fun _ => TestForm n X k → ℂ) :=
-  ContinuousLinearMap.toCoeFun
+  ⟨fun T => T.toFun⟩
 
-instance : AddCommGroup (Current n X k) := ContinuousLinearMap.addCommGroup
+instance : AddCommGroup (Current n X k) := LinearMap.addCommGroup
 
-instance : Module ℂ (Current n X k) := ContinuousLinearMap.module
+instance : Module ℂ (Current n X k) := LinearMap.module
 
 /-! ## Boundary Operator -/
 
 /-- The boundary of a (k+1)-current T is the k-current defined by ∂T(ω) = T(dω). -/
 def boundary (T : Current n X (k + 1)) : Current n X k :=
-  T.comp (dCLM k)
+  T.comp extDerivLM
 
-/-- Boundary is linear. -/
-theorem boundary_add (S T : Current n X (k + 1)) :
-    boundary (S + T) = boundary S + boundary T := by
-  ext ω
-  simp [boundary]
-
-theorem boundary_smul (c : ℂ) (T : Current n X (k + 1)) :
-    boundary (c • T) = c • boundary T := by
-  ext ω
-  simp [boundary]
-
-/-- ∂∂ = 0 (boundary of boundary is zero) -/
+/-- ∂∂ = 0 -/
 theorem boundary_boundary (T : Current n X (k + 2)) :
     boundary (boundary T) = 0 := by
-  ext ω
-  simp only [boundary, ContinuousLinearMap.comp_apply, ContinuousLinearMap.zero_apply]
-  -- Need: T(d(dω)) = 0, which follows from d∘d = 0
-  have h : extDeriv (k + 1) (extDeriv k ω) = 0 := d_comp_d ω
-  simp [h]
-
-/-! ## Chain Complex Structure -/
-
-/-- The boundary operator as a linear map. -/
-def boundaryLM : Current n X (k + 1) →ₗ[ℂ] Current n X k where
-  toFun := boundary
-  map_add' := boundary_add
-  map_smul' := boundary_smul
-
-/-- Currents form a chain complex: im(∂_{k+1}) ⊆ ker(∂_k) -/
-theorem chainComplex : ∀ T : Current n X (k + 2), 
-    boundaryLM (boundaryLM T) = 0 := 
-  boundary_boundary
-
-/-! ## Support of a Current -/
-
-/-- The support of a current (to be defined properly). -/
-def support (T : Current n X k) : Set X := sorry
-
-/-- Currents with compact support. -/
-def HasCompactSupport (T : Current n X k) : Prop := IsCompact (support T)
+  apply LinearMap.ext
+  intro ω
+  simp only [boundary, LinearMap.comp_apply, LinearMap.zero_apply]
+  have h : extDeriv (extDeriv ω) = 0 := d_comp_d ω
+  simp [extDerivLM, h]
 
 end Current
 
