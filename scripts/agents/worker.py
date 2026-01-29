@@ -38,7 +38,7 @@ def _load_anthropic_api_key() -> str:
 
 
 ANTHROPIC_API_KEY = _load_anthropic_api_key()
-MODEL = "claude-sonnet-4-20250514"
+MODEL = "claude-opus-4-5-20251101"
 HODGE_PATH = Path(os.environ.get("HODGE_PATH", "/home/ubuntu/hodge"))
 
 

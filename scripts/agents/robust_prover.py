@@ -22,7 +22,7 @@ from datetime import datetime
 # Configuration
 API_TIMEOUT = 300  # 5 minutes
 MAX_ITERATIONS = 15
-MODEL = "claude-sonnet-4-20250514"
+MODEL = "claude-opus-4-5-20251101"
 
 BASE_DIR = "/home/ubuntu/hodge"
 BACKUP_DIR = "/home/ubuntu/hodge_backup"

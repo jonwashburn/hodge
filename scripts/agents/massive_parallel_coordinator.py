@@ -33,7 +33,7 @@ def _load_anthropic_api_key():
 
 
 ANTHROPIC_API_KEY = _load_anthropic_api_key()
-MODEL = "claude-sonnet-4-20250514"
+MODEL = "claude-opus-4-5-20251101"
 MAX_CONCURRENT_AGENTS = 25
 MAX_ITERATIONS = 15
 HODGE_PATH = Path("/home/ubuntu/hodge")

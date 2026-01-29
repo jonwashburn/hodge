@@ -23,7 +23,7 @@ from datetime import datetime
 MAX_CONCURRENT_AGENTS = 7  # One per sorry
 API_TIMEOUT = 600  # 10 minutes per API call
 MAX_ITERATIONS = 30  # Keep trying
-MODEL = "claude-sonnet-4-20250514"
+MODEL = "claude-opus-4-5-20251101"
 
 # The 7 remaining sorries
 TASKS = [

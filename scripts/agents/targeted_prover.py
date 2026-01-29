@@ -21,7 +21,7 @@ from datetime import datetime
 
 HODGE_DIR = "/home/ubuntu/hodge"
 MAX_ITERATIONS = 30
-MODEL = "claude-sonnet-4-20250514"
+MODEL = "claude-opus-4-5-20251101"
 
 # Load the full mathematical paper
 PAPER_CONTENT = ""

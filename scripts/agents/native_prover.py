@@ -22,7 +22,7 @@ from datetime import datetime
 # Configuration
 HODGE_DIR = "/home/ubuntu/hodge"
 MAX_ITERATIONS = 50
-MODEL = "claude-sonnet-4-20250514"
+MODEL = "claude-opus-4-5-20251101"
 
 def run_command(cmd, cwd=HODGE_DIR, timeout=300):
     """Run a shell command and return stdout, stderr, exit code."""

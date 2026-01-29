@@ -45,8 +45,8 @@ def _load_api_key():
     return ""
 
 API_KEY = _load_api_key()
-MODEL = "claude-sonnet-4-20250514"
-OPUS_MODEL = "claude-opus-4-20250514"  # For hard problems
+MODEL = "claude-opus-4-5-20251101"
+OPUS_MODEL = "claude-opus-4-5-20251101"  # For hard problems
 MAX_WORKERS = 20
 MAX_TASK_ATTEMPTS = 5
 HODGE_PATH = Path("/home/ubuntu/hodge")

@@ -26,7 +26,7 @@ import time
 
 # Configuration
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
-MODEL = "claude-sonnet-4-20250514"
+MODEL = "claude-opus-4-5-20251101"
 MAX_CONCURRENT_AGENTS = 5
 HODGE_REPO_PATH = Path("/home/ubuntu/hodge")
 STATE_FILE = HODGE_REPO_PATH / "agent_state.json"

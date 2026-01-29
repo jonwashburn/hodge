@@ -15,7 +15,7 @@ BASE_DIR = "/home/ubuntu/hodge"
 BACKUP_DIR = "/home/ubuntu/hodge_backup"
 API_TIMEOUT = 300
 MAX_ITERATIONS = 10
-MODEL = "claude-sonnet-4-20250514"
+MODEL = "claude-opus-4-5-20251101"
 
 # Specific hints for each sorry - UPDATED with correct Mathlib names
 SORRY_HINTS = {
