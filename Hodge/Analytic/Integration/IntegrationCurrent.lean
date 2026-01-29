@@ -42,32 +42,25 @@ open Hodge.TestForms Hodge.Currents
 /-! ## Integration Current -/
 
 /-- The integration current associated to an oriented submanifold.
-    [Z](ω) := ∫_Z ι*ω where ι : Z ↪ X is the inclusion. -/
+
+In the full development, currents are *continuous* linear functionals on the LF-space
+of test forms. In this scaffolding layer, `Current` is currently just a `LinearMap`,
+so we only record linearity (continuity will be added once the LF-topology is implemented).
+
+`⟦Z⟧(ω) := ∫_Z ω`. -/
 def integrationCurrent (Z : OrientedSubmanifold n X k) : Current n X k where
   toFun := submanifoldIntegral Z
   map_add' := integral_add Z
-  map_smul' := fun c ω => by
-    simp only [integral_smul, RingHom.id_apply]
-  cont := integral_continuous Z
+  map_smul' := integral_smul Z
 
 notation "⟦" Z "⟧" => integrationCurrent Z
 
-/-- Integration current is linear in the submanifold (for chains). -/
-theorem integrationCurrent_add_chain 
-    (Z₁ Z₂ : OrientedSubmanifold n X k) (ω : TestForm n X k) :
-    sorry := sorry -- Need chain structure
+/-! ## TODO (Stage 2) -/
 
-/-- The mass of an integration current equals the volume. -/
-theorem integrationCurrent_mass (Z : OrientedSubmanifold n X k) :
-    sorry := sorry -- mass(⟦Z⟧) = volume(Z)
-
-/-! ## Relation to Currents Module -/
-
-/-- Integration currents are the "nice" currents. -/
-def IsIntegrationCurrent (T : Current n X k) : Prop :=
-  ∃ Z : OrientedSubmanifold n X k, T = ⟦Z⟧
-
-/-- Integration currents are closed under addition. -/
-theorem integrationCurrent_add_closed : sorry := sorry
+-- Once we have chains, mass, and a genuine current topology:
+-- - prove additivity in the chain variable
+-- - prove `mass ⟦Z⟧ = volume(Z)` for smooth submanifolds
+-- - define `IsIntegrationCurrent` / normal / integral currents
+-- - prove closure properties
 
 end Hodge.Integration

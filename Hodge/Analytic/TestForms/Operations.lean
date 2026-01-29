@@ -56,7 +56,7 @@ axiom leibniz : True  -- Placeholder for the full Leibniz rule
 
 /-! ## Pullback -/
 
-variable {Y : Type*} [MetricSpace Y] 
+variable {Y : Type*} [MetricSpace Y]
   [ChartedSpace (EuclideanSpace ℂ (Fin n)) Y] [IsManifold (𝓒_complex n) ⊤ Y]
 
 /-- Pullback of test forms. -/

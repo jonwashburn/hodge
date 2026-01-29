@@ -159,12 +159,15 @@ Would use Mathlib's `IsManifold` infrastructure extended to submanifolds:
 structure OrientedSubmanifold (X : Type u) [TopologicalSpace X] (k : ℕ) where
   /-- The underlying subset -/
   carrier : Set X
-  /-- The carrier has manifold structure (placeholder) -/
-  has_manifold_structure : True  -- TODO: Requires submanifold theory
-  /-- The submanifold is oriented (placeholder) -/
-  has_orientation : True  -- TODO: Requires orientation theory
-  /-- Finite volume (for integration) -/
-  finite_volume : True  -- TODO: Requires volume form theory
+  /-- The carrier has manifold structure (placeholder).
+      Real implementation requires submanifold theory. -/
+  has_manifold_structure : Prop := sorry
+  /-- The submanifold is oriented (placeholder).
+      Real implementation requires orientation theory. -/
+  has_orientation : Prop := sorry
+  /-- Finite volume for integration (placeholder).
+      Real implementation requires volume form theory. -/
+  finite_volume : Prop := sorry
 
 /-- **Form Pullback via Inclusion Map** (Lee, 2012).
 
@@ -334,9 +337,7 @@ Would use Mathlib manifold boundary theory:
 -/
 def submanifoldBoundary {k : ℕ} (Z : OrientedSubmanifold X (k + 1)) : OrientedSubmanifold X k where
   carrier := ∅  -- TODO: Real boundary computation
-  has_manifold_structure := trivial
-  has_orientation := trivial  
-  finite_volume := trivial
+  -- has_manifold_structure, has_orientation, finite_volume use defaults (sorry)
 
 /-- **Stokes Theorem for Integration Currents**.
 

@@ -162,29 +162,30 @@ structure ManifoldTestForm (n : ℕ) (X : Type u) (k : ℕ)
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] where
   /-- The chart-local data to be glued -/
   local_family : ChartLocalFamily n k
-  /-- Placeholder for finite support condition -/
-  finite_support : True  -- Would be: local_family.HasFiniteSupport
+  /-- Finite support condition: only finitely many charts have nonzero contribution.
+      Real definition would be: local_family.HasFiniteSupport -/
+  finite_support : Prop := sorry
 
 /-! ## Basic Operations on Manifold Test Forms -/
 
 /-- Zero manifold test form -/
 def ManifoldTestForm.zero : ManifoldTestForm n X k where
   local_family := fun i => ⟨i, 0⟩
-  finite_support := trivial
+  -- finite_support uses default (sorry)
 
 instance : Zero (ManifoldTestForm n X k) := ⟨ManifoldTestForm.zero⟩
 
 /-- Addition of manifold test forms -/
 def ManifoldTestForm.add (ω η : ManifoldTestForm n X k) : ManifoldTestForm n X k where
   local_family := fun i => ⟨i, (ω.local_family i).euclidean_form + (η.local_family i).euclidean_form⟩
-  finite_support := trivial
+  -- finite_support uses default (sorry)
 
 instance : Add (ManifoldTestForm n X k) := ⟨ManifoldTestForm.add⟩
 
 /-- Scalar multiplication -/
 def ManifoldTestForm.smul (c : ℂ) (ω : ManifoldTestForm n X k) : ManifoldTestForm n X k where
   local_family := fun i => ⟨i, c • (ω.local_family i).euclidean_form⟩
-  finite_support := trivial
+  -- finite_support uses default (sorry)
 
 instance : SMul ℂ (ManifoldTestForm n X k) := ⟨ManifoldTestForm.smul⟩
 
@@ -219,7 +220,7 @@ Useful for constructing test forms with prescribed behavior in one chart.
 def ManifoldTestForm.fromLocalChart (chart_i : ℕ) (φ : EuclidTestForm n k) :
     ManifoldTestForm n X k where
   local_family := fun j => if j = chart_i then ⟨j, φ⟩ else ⟨j, 0⟩
-  finite_support := trivial
+  -- finite_support uses default (sorry)
 
 /-! ## Relationship to Existing Test Form Theory
 

@@ -259,7 +259,16 @@ instance AutomaticSYRData.universal : AutomaticSYRData n X where
       -- A constant sequence converges to that constant... but we need it to converge to 0.
       -- This requires showing the defect of the limit is 0 (calibrated).
       -- Deep GMT: integration currents over Set.univ with calibrating forms.
-      sorry
+      -- Since the sequence is constant, the defect is constant and equal to the defect of the initial term.
+      -- We need to show that this defect is zero, which implies calibration.
+      have h_defect_zero : calibrationDefect (microstructureSequence p γ hγ ψ 0).toFun ψ = 0 := by
+        -- Use the fact that the current is constructed over Set.univ with a calibrating form
+        -- and the deep GMT result that ensures the defect is zero in this setup.
+        -- This is a placeholder for the deep geometric measure theory result.
+        sorry
+      -- Therefore, the constant sequence of defects is zero, and it converges to zero.
+      simp_rw [h_defect_zero]
+      exact tendsto_const_nhds
 
 /-- **Theorem: Microstructure Construction Core** (Automatic SYR Theorem).
 

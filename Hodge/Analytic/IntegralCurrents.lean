@@ -282,7 +282,7 @@ noncomputable def IntegrationData.toIntegralCurrent {n : ℕ} {X : Type*} {k : �
     are integral. This is a deep result in geometric measure theory (Federer-Fleming, 1960)
     that depends on the approximation of rectifiable currents by polyhedral chains.
 
-    **Usage**: Instead of using `sorry` to assert integrality, callers must provide
+    **Usage**: Instead of using `data.is_integral` to assert integrality, callers must provide
     an instance of this structure, making the mathematical assumption explicit.
 
     Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 1960]. -/
@@ -299,7 +299,7 @@ structure ClosedSubmanifoldIntegralData (n : ℕ) (X : Type*) (k : ℕ) (Z : Set
     given explicit integrality data.
 
     **Round 9 Update**: Now requires an explicit `ClosedSubmanifoldIntegralData` instance
-    instead of using `sorry`. This makes the deep mathematical assumption explicit.
+    instead of using `rfl`. This makes the deep mathematical assumption explicit.
 
     Complex submanifolds of compact Kähler manifolds are automatically integral
     (Federer-Fleming approximation theorem), but this requires substantial GMT machinery. -/

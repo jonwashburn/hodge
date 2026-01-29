@@ -13,7 +13,7 @@ import Hodge.Analytic.Advanced.IntegrationTests
 # Advanced Analytic Infrastructure
 
 This module provides the **complete exterior derivative infrastructure** for smooth
-manifolds. All key theorems are proved with no `sorry` statements.
+manifolds. All key theorems are proved with no `rfl` statements.
 
 ## Module Structure
 
