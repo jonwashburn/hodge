@@ -598,7 +598,8 @@ instance SpineBridgeData.universal : SpineBridgeData n X where
     -- This is a non-trivial result that relies on the full machinery of calibrated geometry.
     -- In practice, this would involve constructing explicit currents and verifying their properties.
     --
-    -- For now, we acknowledge this gap and assume the result holds as per the referenced theorems.
+    -- For now, we acknowledge this gap and use a sorry as a deep content placeholder.
+    -- The full proof requires the Harvey-Lawson + GAGA machinery.
     sorry
 
 /-- The geometric class equals the representing form class (by the spine bridge). -/

@@ -35,9 +35,32 @@ REPO_PATH = Path("/home/ubuntu/hodge")
 LOG_DIR = REPO_PATH / "autonomous_logs"
 LAKE_PATH = "/home/ubuntu/.elan/bin/lake"
 PROOF_HINTS_PATH = REPO_PATH / "scripts" / "agents" / "PROOF_HINTS.md"
+AGENT_CONTEXT_PATH = REPO_PATH / "scripts" / "agents" / "AGENT_CONTEXT.md"
 
 # How many recent rejections to show the model as "do not do this".
 MAX_RECENT_REJECTIONS = 5
+
+# Key placeholder definitions agents must understand
+PLACEHOLDER_DEFINITIONS = """
+## KEY PLACEHOLDER DEFINITIONS IN THIS CODEBASE
+
+These definitions return trivial values - understand this before proving!
+
+1. comass (Hodge/GMT/Mass.lean:53):
+   def comass (_ω : TestForm n X k) : ℝ := 0  -- RETURNS 0!
+
+2. submanifoldIntegral (Hodge/Analytic/Integration/SubmanifoldIntegral.lean:86):
+   def submanifoldIntegral (Z : OrientedSubmanifold n X k) (ω : TestForm n X k) : ℂ := 0  -- RETURNS 0!
+
+3. IsSupportedOnAnalyticVariety (Hodge/GMT/Calibration.lean):
+   def IsSupportedOnAnalyticVariety (_T : Current n X k) : Prop := True  -- ALWAYS TRUE!
+
+4. isIntegral (Hodge/GMT/FlatNorm.lean):
+   isIntegral : Prop := True  -- TRIVIALLY TRUE!
+
+CONSEQUENCE: If a theorem uses comass, RHS of bounds = 0. If it uses submanifoldIntegral, 
+currents evaluate to 0. Some theorems become unprovable as stated - use sorry with docs.
+"""
 
 # Number of parallel agents
 NUM_AGENTS = 10
@@ -95,7 +118,14 @@ def load_proof_hints() -> str:
     except Exception:
         return ""
 
+def load_agent_context() -> str:
+    try:
+        return AGENT_CONTEXT_PATH.read_text()
+    except Exception:
+        return ""
+
 PROOF_HINTS_TEXT = load_proof_hints()
+AGENT_CONTEXT_TEXT = load_agent_context()
 
 def log(msg, agent_id=None):
     """Thread-safe logging."""
@@ -182,7 +212,7 @@ def rejection_feedback_for(filepath: str) -> str:
     return "\n\n".join(blocks).strip()
 
 def find_first_sorry(filepath):
-    """Find first sorry in file with context."""
+    """Find first sorry in file with FULL FILE CONTEXT."""
     try:
         content = (REPO_PATH / filepath).read_text()
         lines = content.splitlines()
@@ -190,13 +220,19 @@ def find_first_sorry(filepath):
         
         for i, line in enumerate(lines):
             if re.search(pattern, line) and not line.strip().startswith('--'):
+                # FULL FILE CONTEXT - not just 45 lines
+                # Include entire file with line numbers
+                full_context = '\n'.join(f"{j+1}|{lines[j]}" for j in range(len(lines)))
+                
+                # Also provide focused context around the sorry
                 start = max(0, i - 30)
                 end = min(len(lines), i + 15)
-                context = '\n'.join(f"{j+1}|{lines[j]}" for j in range(start, end))
-                return i + 1, line, context
-        return None, None, None
+                focused_context = '\n'.join(f"{j+1}|{lines[j]}" for j in range(start, end))
+                
+                return i + 1, line, full_context, focused_context
+        return None, None, None, None
     except:
-        return None, None, None
+        return None, None, None, None
 
 def call_claude(prompt, agent_id):
     """Call Claude API."""
@@ -234,31 +270,65 @@ def build_file(filepath):
         )
         return "error" not in output.lower() or "Build completed" in output, output
 
-def attempt_proof(filepath, line_num, line_content, context, agent_id):
-    """Attempt to prove one sorry."""
+def attempt_proof(filepath, line_num, line_content, full_context, focused_context, agent_id):
+    """Attempt to prove one sorry with FULL CONTEXT."""
     feedback = rejection_feedback_for(filepath)
     hints = PROOF_HINTS_TEXT
-    hints_block = f"PROOF HINTS:\n{hints}\n" if hints else ""
-    feedback_block = f"FEEDBACK:\n{feedback}\n" if feedback else ""
-    prompt = f"""You are proving lemmas in a Lean 4 Hodge Conjecture formalization.
+    agent_context = AGENT_CONTEXT_TEXT
+    
+    # Truncate full context if too long (keep first 200 lines + last 100 lines + lines around sorry)
+    full_lines = full_context.split('\n')
+    if len(full_lines) > 400:
+        # Keep first 150 lines
+        first_part = '\n'.join(full_lines[:150])
+        # Keep last 80 lines
+        last_part = '\n'.join(full_lines[-80:])
+        full_context = first_part + "\n... (middle truncated) ...\n" + last_part
+    
+    hints_block = f"\n## PROOF HINTS:\n{hints}\n" if hints else ""
+    feedback_block = f"\n## REJECTION FEEDBACK:\n{feedback}\n" if feedback else ""
+    
+    prompt = f"""# CRITICAL: READ THIS ENTIRE CONTEXT BEFORE ATTEMPTING ANY PROOF
+
+{PLACEHOLDER_DEFINITIONS}
+
+{agent_context}
+
+---
+
+# YOUR TASK
 
 File: {filepath}
-Line {line_num}: {line_content}
+Sorry at Line {line_num}: {line_content}
 
-Context:
+## FULL FILE CONTENT (read ALL of this to understand imports, definitions, and structure):
 ```lean
-{context}
+{full_context}
 ```
 
+## FOCUSED CONTEXT (around the sorry):
+```lean
+{focused_context}
+```
 {hints_block}{feedback_block}
 
-RULES:
-1. Replace the `sorry` with a REAL Lean 4 proof
-2. DO NOT use: `:= trivial`, `:= True`, `True.intro`, `⟨⟩`, or `admit`
-3. Use proper tactics: `simp`, `exact`, `apply`, `intro`, `constructor`, etc.
+## DECISION PROCESS
 
-Respond with ONLY JSON:
-{{"old_code": "exact line with sorry", "new_code": "replacement with proof"}}
+1. Does this theorem use `comass`? → RHS of bounds will be 0 (placeholder)
+2. Does this theorem use `submanifoldIntegral`? → Currents evaluate to 0
+3. Is this a "deep content" sorry? → Check Section 9 of AGENT_CONTEXT above
+4. Can this actually be proven, or should it remain as a documented sorry?
+
+## RULES:
+1. If provable: Replace `sorry` with a REAL Lean 4 proof
+2. If deep content: Leave as sorry but document WHY
+3. NEVER use: `:= trivial`, `:= True`, `True.intro`, `⟨⟩`, or `admit`
+4. Use proper tactics: `simp`, `exact`, `apply`, `intro`, `constructor`, `linarith`, etc.
+
+## RESPONSE FORMAT
+
+Respond with ONLY valid JSON (no markdown, no explanation):
+{{"old_code": "the exact line containing sorry", "new_code": "replacement (either proof or documented sorry)", "reasoning": "why this works or why it's deep content"}}
 """
     
     response = call_claude(prompt, agent_id)
@@ -346,10 +416,10 @@ def agent_worker(agent_id, file_queue):
                 
                 log(f"Working on {filepath} ({sorry_count} sorries)", agent_id)
                 
-                # Work on first sorry
-                line_num, line_content, context = find_first_sorry(filepath)
+                # Work on first sorry - now with FULL context
+                line_num, line_content, full_context, focused_context = find_first_sorry(filepath)
                 if line_num:
-                    attempt_proof(filepath, line_num, line_content, context, agent_id)
+                    attempt_proof(filepath, line_num, line_content, full_context, focused_context, agent_id)
                 
                 # Put file back if more sorries remain
                 if count_sorries(filepath) > 0:

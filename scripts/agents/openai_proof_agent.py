@@ -56,6 +56,37 @@ FORBIDDEN_PATTERNS = [
 ]
 
 # Proof hints discovered during manual work
+AGENT_CONTEXT_PATH = REPO_PATH / "scripts" / "agents" / "AGENT_CONTEXT.md"
+
+PLACEHOLDER_DEFINITIONS = """
+## KEY PLACEHOLDER DEFINITIONS IN THIS CODEBASE
+
+These definitions return trivial values - understand this before proving!
+
+1. comass (Hodge/GMT/Mass.lean:53):
+   def comass (_ω : TestForm n X k) : ℝ := 0  -- RETURNS 0!
+
+2. submanifoldIntegral (Hodge/Analytic/Integration/SubmanifoldIntegral.lean:86):
+   def submanifoldIntegral (Z : OrientedSubmanifold n X k) (ω : TestForm n X k) : ℂ := 0  -- RETURNS 0!
+
+3. IsSupportedOnAnalyticVariety (Hodge/GMT/Calibration.lean):
+   def IsSupportedOnAnalyticVariety (_T : Current n X k) : Prop := True  -- ALWAYS TRUE!
+
+4. isIntegral (Hodge/GMT/FlatNorm.lean):
+   isIntegral : Prop := True  -- TRIVIALLY TRUE!
+
+CONSEQUENCE: If a theorem uses comass, RHS of bounds = 0. If it uses submanifoldIntegral, 
+currents evaluate to 0. Some theorems become unprovable as stated - use sorry with docs.
+"""
+
+def load_agent_context():
+    try:
+        return AGENT_CONTEXT_PATH.read_text()
+    except Exception:
+        return ""
+
+AGENT_CONTEXT_TEXT = load_agent_context()
+
 PROOF_HINTS = """
 ## Key Proof Patterns That Work:
 
@@ -115,10 +146,10 @@ NO_TEMPERATURE_MODELS = {
 DISABLED_MODELS = set()
 
 MAX_OUTPUT_TOKENS_BY_MODEL = {
-    # gpt-5.2 with reasoning.effort=high uses reasoning tokens; give it room.
-    "gpt-5.2": 16384,
+    # gpt-5.2 with reasoning.effort=high uses lots of reasoning tokens; give it maximum room.
+    "gpt-5.2": 100000,
     # Codex often needs more room to return a full JSON object with Lean code.
-    "gpt-5.2-codex": 16384,
+    "gpt-5.2-codex": 32000,
 }
 DEFAULT_MAX_OUTPUT_TOKENS = 4096
 
@@ -194,6 +225,7 @@ def is_trivialization(code):
     return False
 
 def find_first_sorry(filepath):
+    """Find first sorry with FULL FILE CONTEXT."""
     try:
         content = (REPO_PATH / filepath).read_text()
         lines = content.splitlines()
@@ -201,13 +233,18 @@ def find_first_sorry(filepath):
         
         for i, line in enumerate(lines):
             if re.search(pattern, line) and not line.strip().startswith('--'):
+                # FULL FILE with line numbers
+                full_context = '\n'.join(f"{j+1}|{lines[j]}" for j in range(len(lines)))
+                
+                # Focused context around sorry
                 start = max(0, i - 40)
                 end = min(len(lines), i + 20)
-                context = '\n'.join(f"{j+1}|{lines[j]}" for j in range(start, end))
-                return i + 1, line, context
-        return None, None, None
+                focused_context = '\n'.join(f"{j+1}|{lines[j]}" for j in range(start, end))
+                
+                return i + 1, line, full_context, focused_context
+        return None, None, None, None
     except:
-        return None, None, None
+        return None, None, None, None
 
 def call_openai(prompt):
     """Call OpenAI Responses API; try primary model then fallbacks."""
@@ -283,33 +320,54 @@ def call_openai_responses(prompt, model):
         log(f"OpenAI exception for model={model}: {e}")
         return None
 
-def attempt_proof(filepath, line_num, line_content, context):
-    """Attempt to prove one sorry using GPT-5.2-high."""
-    prompt = f"""You are an expert Lean 4 theorem prover working on a Hodge Conjecture formalization.
+def attempt_proof(filepath, line_num, line_content, full_context, focused_context):
+    """Attempt to prove one sorry with FULL CONTEXT."""
+    
+    # Truncate full context if needed (keep first 200 + last 100 lines)
+    full_lines = full_context.split('\n')
+    if len(full_lines) > 400:
+        first_part = '\n'.join(full_lines[:200])
+        last_part = '\n'.join(full_lines[-100:])
+        full_context = first_part + "\n... (middle truncated) ...\n" + last_part
+    
+    prompt = f"""# CRITICAL: READ ALL CONTEXT BEFORE ATTEMPTING PROOF
+
+{PLACEHOLDER_DEFINITIONS}
+
+{AGENT_CONTEXT_TEXT}
 
 {PROOF_HINTS}
 
-## Current Task
+---
+
+# YOUR TASK
 
 File: {filepath}
-Line {line_num} has a `sorry` that needs to be replaced with a real proof.
+Sorry at Line {line_num}: {line_content}
 
-### Context (with line numbers):
+## FULL FILE CONTENT (understand imports, definitions, structure):
 ```lean
-{context}
+{full_context}
 ```
 
-### The line with sorry:
+## FOCUSED CONTEXT (around the sorry):
 ```lean
-{line_content}
+{focused_context}
 ```
+
+## DECISION PROCESS
+
+1. Does this theorem use `comass`? → RHS of bounds = 0 (placeholder)
+2. Does this theorem use `submanifoldIntegral`? → Currents evaluate to 0
+3. Is this a "deep content" sorry? → May need to remain as documented sorry
+4. Can this actually be proven given the placeholder definitions?
 
 ## Instructions
 
-1. Replace the `sorry` with a REAL Lean 4 proof using proper tactics
-2. DO NOT use trivializations: `:= trivial`, `:= True`, `True.intro`, `⟨⟩`
-3. Use the proof patterns and lemmas from the hints above
-4. Keep the proof simple and focused
+1. If provable: Replace `sorry` with a REAL Lean 4 proof
+2. If deep content: Leave as sorry but document WHY
+3. NEVER use: `:= trivial`, `:= True`, `True.intro`, `⟨⟩`, or `admit`
+4. Use proper tactics: `simp`, `exact`, `apply`, `intro`, `constructor`, `linarith`
 
 ## Response Format
 
@@ -405,12 +463,13 @@ def main():
             
             log(f"\n--- {filepath}: {sorry_count} sorries ---")
             
-            line_num, line_content, context = find_first_sorry(filepath)
+            # Now with FULL FILE CONTEXT
+            line_num, line_content, full_context, focused_context = find_first_sorry(filepath)
             if line_num is None:
                 continue
             
             log(f"Attempting line {line_num}...")
-            attempt_proof(filepath, line_num, line_content, context)
+            attempt_proof(filepath, line_num, line_content, full_context, focused_context)
             
             time.sleep(2)  # Rate limiting
         

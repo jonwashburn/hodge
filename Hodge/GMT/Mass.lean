@@ -108,7 +108,13 @@ theorem mass_smul (c : ℂ) (T : Current n X k) :
   -- mass(c•T) = ⨆ ω, ‖(c•T)(ω)‖ = ⨆ ω, ‖c‖ * ‖T(ω)‖ = ‖c‖ * ⨆ ω, ‖T(ω)‖
   -- The proof requires careful manipulation of biSup with ENNReal multiplication
   -- Key lemma needed: ENNReal.mul_iSup₂ or similar
-  sorry
+  unfold mass
+  have heq : ∀ ω, (c • T) ω = c • (T ω) := fun ω => LinearMap.smul_apply c T ω
+  simp_rw [heq, nnnorm_smul, ENNReal.coe_mul]
+  rw [ENNReal.mul_iSup]
+  congr 1
+  ext ω
+  rw [ENNReal.mul_iSup]
 
 /-- A current has finite mass. -/
 def HasFiniteMass (T : Current n X k) : Prop := mass T < ⊤
