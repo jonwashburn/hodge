@@ -179,7 +179,6 @@ noncomputable def RawSheetSum.toIntegrationData {p : ℕ} {hscale : ℝ}
   carrier := T_raw.support
   integrate := setIntegral (2 * (n - p)) T_raw.support
   integrate_linear := fun c ω₁ ω₂ => setIntegral_linear (2 * (n - p)) T_raw.support c ω₁ ω₂
-  integrate_continuous := continuous_of_discreteTopology
   integrate_bound := setIntegral_bound (2 * (n - p)) T_raw.support
   bdryMass := 0
   bdryMass_nonneg := le_refl 0
@@ -220,7 +219,6 @@ noncomputable def RawSheetSum.toIntegrationData_real {p : ℕ} {hscale : ℝ}
   carrier := T_raw.support
   integrate := setIntegral (2 * (n - p)) T_raw.support
   integrate_linear := fun c ω₁ ω₂ => setIntegral_linear (2 * (n - p)) T_raw.support c ω₁ ω₂
-  integrate_continuous := continuous_of_discreteTopology
   integrate_bound := setIntegral_bound (2 * (n - p)) T_raw.support
   bdryMass := 0
   bdryMass_nonneg := le_refl 0
@@ -481,7 +479,7 @@ theorem microstructureSequence_are_cycles (p : ℕ) (γ : SmoothForm n X (2 * p)
     -- where T = microstructureSequence p γ hγ ψ k
     ext ω
     -- Now goal: (boundary (hk' ▸ T.toFun)).toFun ω = (0 : Current n X k').toFun ω
-    simp only [Current.boundary, Current.zero_toFun]
+    simp only [Current.boundary_toFun, Current.zero_toFun]
     -- Unwind `microstructureSequence` evaluation to `setIntegral` on `Set.univ`.
     -- First, rewrite the transported current evaluation using a general transport lemma.
     rw [current_toFun_transport (n := n) (X := X) (hk := hk')

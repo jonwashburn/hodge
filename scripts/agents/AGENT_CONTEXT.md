@@ -2,28 +2,26 @@
 
 ## You MUST understand this before attempting ANY proof
 
-### 1. PLACEHOLDER DEFINITIONS (Key Insight!)
+### 1. PLACEHOLDER DEFINITIONS (Updated Jan 30, 2026)
 
-Many definitions in this codebase are **stubs that return trivial values**. Before attempting a proof, CHECK if the definitions involved are placeholders:
+The following definitions have been updated to be **opaque (axiomatized)** to match the paper's mathematical structure. They are NO LONGER `0` or `True`.
 
 ```lean
 -- In Hodge/GMT/Mass.lean:
-def comass (_ω : TestForm n X k) : ℝ := 0  -- PLACEHOLDER! Returns 0
+opaque comass (ω : TestForm n X k) : ℝ  -- Axiomatized norm
+opaque volume (Z : OrientedSubmanifold n X k) : ℝ≥0∞ -- Axiomatized volume
 
 -- In Hodge/Analytic/Integration/SubmanifoldIntegral.lean:
-def submanifoldIntegral (Z : OrientedSubmanifold n X k) (ω : TestForm n X k) : ℂ := 0  -- PLACEHOLDER!
+opaque submanifoldIntegral (Z : OrientedSubmanifold n X k) (ω : TestForm n X k) : ℂ -- Axiomatized integral
 
 -- In Hodge/GMT/FlatNorm.lean:
-isIntegral : Prop := True  -- PLACEHOLDER: trivially true
+isIntegral : Prop := True  -- Still a placeholder (trivially true)
 
 -- In Hodge/GMT/Calibration.lean:
-def IsSupportedOnAnalyticVariety (_T : Current n X k) : Prop := True  -- PLACEHOLDER
+def IsSupportedOnAnalyticVariety (_T : Current n X k) : Prop := True  -- Still a placeholder
 ```
 
-**CONSEQUENCE**: If a theorem uses `comass`, the RHS of any bound is 0! If it uses `submanifoldIntegral`, currents evaluate to 0! This means:
-- Some theorems become trivially true
-- Some theorems become unprovable as stated
-- You may need to use `sorry` as a "deep content placeholder"
+**CONSEQUENCE**: Theorems involving `comass` and `mass` are now structurally provable using the provided axioms (e.g., `comass_add`, `mass_integrationCurrent_eq_volume`). Do not assume they evaluate to 0.
 
 ### 2. PROOF ARCHITECTURE
 

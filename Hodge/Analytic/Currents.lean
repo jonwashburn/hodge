@@ -4,6 +4,7 @@ import Hodge.Analytic.Integration.TopFormIntegral
 import Hodge.Analytic.Integration.HausdorffMeasure
 import Mathlib.MeasureTheory.Measure.Hausdorff
 import Mathlib.Data.Complex.Basic
+import Mathlib.Analysis.Normed.Operator.ContinuousLinearMap
 
 /-!
 # Currents on Kähler Manifolds
@@ -39,27 +40,26 @@ variable {n : ℕ} {X : Type*}
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
   [Nonempty X] [MeasurableSpace X] [BorelSpace X]
 
-/-- A current of dimension k is a continuous linear functional on smooth k-forms. -/
+/-- A current of dimension k is a **continuous ℝ-linear functional** on smooth k-forms.
+
+This is the functional-analytic reformulation of the earlier data-carrying structure:
+`toFun` is now a `ContinuousLinearMap`, so boundedness with respect to the comass seminorm
+is derived (and no longer stored as a per-current field).
+
+We *still* record a separate `boundary_bound` hypothesis (normality-style): comass is a
+`C^0`-type seminorm, so continuity does **not** automatically control `ω ↦ T(dω)`. -/
 structure Current (n : ℕ) (X : Type*) (k : ℕ)
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] where
-  toFun : SmoothForm n X k → ℝ
-  is_linear : ∀ (c : ℝ) (ω₁ ω₂ : SmoothForm n X k), toFun (c • ω₁ + ω₂) = c * toFun ω₁ + toFun ω₂
-  is_continuous : Continuous toFun
-  /-- **Seminorm boundedness**: there exists a constant `M` such that
-      \(|T(ω)| \le M \cdot \|ω\|\) for all test forms `ω`, where `‖·‖` is the global comass norm.
-
-      In the TeX development (`Hodge-v6-w-Jon-Update-MERGED.tex`), this is the standard
-      functional-analytic consequence of continuity of a linear functional on the
-      Fréchet space of smooth forms. In our Lean model, the topology on `SmoothForm`
-      is currently a placeholder, so we record this boundedness directly. -/
-  bound : ∃ M : ℝ, ∀ ω : SmoothForm n X k, |toFun ω| ≤ M * ‖ω‖
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] where
+  /-- The underlying continuous ℝ-linear functional on k-forms. -/
+  toFun : SmoothForm n X k →L[ℝ] ℝ
   /-- **Boundary boundedness** (normality-style hypothesis): for `k = k' + 1`, the functional
-  `ω ↦ T(dω)` is bounded with respect to the comass norm on `k'`-forms.
+      `ω ↦ T(dω)` is bounded with respect to the comass seminorm on `k'`-forms.
 
-  This is exactly what is needed to define the boundary current `∂T` as a `Current`.
-  For `k = 0` there is no boundary, so we record `True`. -/
+      This is exactly what is needed to define the boundary current `∂T` as a `Current`.
+      For `k = 0` there is no boundary, so we record `True`. -/
   boundary_bound :
     match k with
     | 0 => True
@@ -94,6 +94,7 @@ Reference: [Federer, "Geometric Measure Theory", 1969, §4.1.7].
 def support {n k : ℕ} {X : Type*}
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X]
     (T : Current n X k) : Set X :=
   Set.univ  -- Placeholder: support is contained in X
 
@@ -101,7 +102,8 @@ def support {n k : ℕ} {X : Type*}
 theorem support_isClosed {n k : ℕ} {X : Type*}
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [Nonempty X] (T : Current n X k) : IsClosed (support T) := by
+    [Nonempty X] [MeasurableSpace X] [BorelSpace X]
+    (T : Current n X k) : IsClosed (support T) := by
   simp only [support]
   exact isClosed_univ
 
@@ -109,56 +111,52 @@ theorem support_isClosed {n k : ℕ} {X : Type*}
 @[ext]
 theorem ext' {n k : ℕ} {X : Type*} [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X]
     {S T : Current n X k} (h : ∀ ω, S.toFun ω = T.toFun ω) : S = T := by
-  cases S; cases T; simp only [Current.mk.injEq]; funext ω; exact h ω
+  cases S with
+  | mk Sfun Sbd =>
+    cases T with
+    | mk Tfun Tbd =>
+      have hfun : Sfun = Tfun := by
+        ext ω
+        exact h ω
+      subst hfun
+      have hbd : Sbd = Tbd := by
+        -- proof-irrelevance for Prop fields
+        apply Subsingleton.elim
+      subst hbd
+      rfl
 
 /-- Linearity properties derive from the `is_linear` field. -/
 theorem map_add {n k : ℕ} {X : Type*} [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
-    (T : Current n X k) (ω₁ ω₂ : SmoothForm n X k) : T.toFun (ω₁ + ω₂) = T.toFun ω₁ + T.toFun ω₂ := by
-  have h := T.is_linear 1 ω₁ ω₂
-  simp [one_smul, _root_.one_mul] at h
-  exact h
+    [MeasurableSpace X] [BorelSpace X]
+    (T : Current n X k) (ω₁ ω₂ : SmoothForm n X k) :
+    T.toFun (ω₁ + ω₂) = T.toFun ω₁ + T.toFun ω₂ := by
+  simpa using T.toFun.map_add ω₁ ω₂
 
 /-- Currents map zero to zero. Follows from map_add with ω₁=ω₂=0. -/
 theorem map_zero' {n k : ℕ} {X : Type*} [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X]
     (T : Current n X k) : T.toFun 0 = 0 := by
-  -- T(0 + 0) = T(0) + T(0) from map_add
-  have h_add := map_add T 0 0
-  -- 0 + 0 = 0 in SmoothForm
-  have h_zero : (0 : SmoothForm n X k) + 0 = 0 := by ext x; simp
-  rw [h_zero] at h_add
-  -- h_add : T.toFun 0 = T.toFun 0 + T.toFun 0
-  -- From a = a + a, we get a = 0 (in ℝ)
-  linarith
+  simpa using T.toFun.map_zero
 
 /-- Linearity: scalar multiplication. Derives from the is_linear field with ω₂ = 0. -/
 theorem map_smul {n k : ℕ} {X : Type*} [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X]
     (T : Current n X k) (r : ℝ) (ω : SmoothForm n X k) : T.toFun (r • ω) = r * T.toFun ω := by
-  -- Use is_linear with ω₁ = ω, ω₂ = 0
-  -- T(r • ω + 0) = r * T(ω) + T(0)
-  have h := T.is_linear r ω 0
-  -- r • ω + 0 = r • ω in SmoothForm
-  have h_smul_zero : r • ω + (0 : SmoothForm n X k) = r • ω := by ext x; simp
-  rw [h_smul_zero] at h
-  -- T(0) = 0 from map_zero'
-  rw [map_zero' T, add_zero] at h
-  exact h
+  -- `toFun` is an ℝ-linear map, so scalar multiplication is respected.
+  simpa [smul_eq_mul] using (T.toFun.map_smul r ω)
 
 /-- The zero current evaluates to zero on all forms. -/
 def zero (n : ℕ) (X : Type*) (k : ℕ)
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] : Current n X k where
-  toFun := fun _ => 0
-  is_linear := by intros; simp
-  is_continuous := continuous_const
-  bound := by
-    refine ⟨0, ?_⟩
-    intro ω
-    simp
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] : Current n X k where
+  toFun := 0
   boundary_bound := by
     cases k with
     | zero => trivial
@@ -172,23 +170,7 @@ instance instZero : Zero (Current n X k) := ⟨zero n X k⟩
 
 /-- Addition of currents: (T₁ + T₂)(ω) = T₁(ω) + T₂(ω). -/
 def add_curr (T₁ T₂ : Current n X k) : Current n X k where
-  toFun := fun ω => T₁.toFun ω + T₂.toFun ω
-  is_linear := by
-    intros c ω₁ ω₂
-    rw [map_add T₁, map_add T₂, map_smul T₁, map_smul T₂]
-    ring
-  is_continuous := T₁.is_continuous.add T₂.is_continuous
-  bound := by
-    obtain ⟨M₁, hM₁⟩ := T₁.bound
-    obtain ⟨M₂, hM₂⟩ := T₂.bound
-    refine ⟨M₁ + M₂, ?_⟩
-    intro ω
-    have h1 := hM₁ ω
-    have h2 := hM₂ ω
-    calc
-      |T₁.toFun ω + T₂.toFun ω| ≤ |T₁.toFun ω| + |T₂.toFun ω| := abs_add_le _ _
-      _ ≤ M₁ * ‖ω‖ + M₂ * ‖ω‖ := add_le_add h1 h2
-      _ = (M₁ + M₂) * ‖ω‖ := by ring
+  toFun := T₁.toFun + T₂.toFun
   boundary_bound := by
     cases k with
     | zero => trivial
@@ -202,7 +184,7 @@ def add_curr (T₁ T₂ : Current n X k) : Current n X k where
       have h2 := hM₂ ω
       -- (T₁+T₂)(dω) = T₁(dω) + T₂(dω)
       calc
-        |T₁.toFun (smoothExtDeriv ω) + T₂.toFun (smoothExtDeriv ω)|
+        |(T₁.toFun + T₂.toFun) (smoothExtDeriv ω)|
             ≤ |T₁.toFun (smoothExtDeriv ω)| + |T₂.toFun (smoothExtDeriv ω)| := abs_add_le _ _
         _ ≤ M₁ * ‖ω‖ + M₂ * ‖ω‖ := add_le_add h1 h2
         _ = (M₁ + M₂) * ‖ω‖ := by ring
@@ -211,17 +193,7 @@ instance : Add (Current n X k) := ⟨add_curr⟩
 
 /-- Negation of currents: (-T)(ω) = -T(ω). -/
 def neg_curr (T : Current n X k) : Current n X k where
-  toFun := fun ω => -T.toFun ω
-  is_linear := by
-    intros c ω₁ ω₂
-    rw [map_add T, map_smul T]
-    ring
-  is_continuous := T.is_continuous.neg
-  bound := by
-    obtain ⟨M, hM⟩ := T.bound
-    refine ⟨M, ?_⟩
-    intro ω
-    simpa using (hM ω)
+  toFun := -T.toFun
   boundary_bound := by
     cases k with
     | zero => trivial
@@ -248,22 +220,7 @@ instance : Sub (Current n X k) := ⟨fun T₁ T₂ => T₁ + -T₂⟩
 
 /-- Scalar multiplication of currents: (r • T)(ω) = r * T(ω). -/
 def smul_curr (r : ℝ) (T : Current n X k) : Current n X k where
-  toFun := fun ω => r * T.toFun ω
-  is_linear := by
-    intros c ω₁ ω₂
-    rw [map_add T, map_smul T]
-    ring
-  is_continuous := continuous_const.mul T.is_continuous
-  bound := by
-    obtain ⟨M, hM⟩ := T.bound
-    refine ⟨|r| * M, ?_⟩
-    intro ω
-    have h := hM ω
-    -- |r * T(ω)| = |r| * |T(ω)| ≤ |r| * (M * ‖ω‖) = (|r|*M) * ‖ω‖
-    calc
-      |r * T.toFun ω| = |r| * |T.toFun ω| := by simpa [abs_mul]
-      _ ≤ |r| * (M * ‖ω‖) := mul_le_mul_of_nonneg_left h (abs_nonneg r)
-      _ = (|r| * M) * ‖ω‖ := by ring
+  toFun := r • T.toFun
   boundary_bound := by
     cases k with
     | zero => trivial
@@ -273,8 +230,8 @@ def smul_curr (r : ℝ) (T : Current n X k) : Current n X k where
       intro ω
       have h := hM ω
       calc
-        |r * T.toFun (smoothExtDeriv ω)| = |r| * |T.toFun (smoothExtDeriv ω)| := by
-          simpa [abs_mul]
+        |(r • T.toFun) (smoothExtDeriv ω)| = |r| * |T.toFun (smoothExtDeriv ω)| := by
+          simp [Real.norm_eq_abs, abs_mul, mul_assoc]
         _ ≤ |r| * (M * ‖ω‖) := mul_le_mul_of_nonneg_left h (abs_nonneg r)
         _ = (|r| * M) * ‖ω‖ := by ring
 
@@ -293,7 +250,10 @@ theorem zero_toFun (ω : SmoothForm n X k) : (0 : Current n X k).toFun ω = 0 :=
 
     **Proof**: A continuous linear map between seminormed groups is bounded. -/
 theorem is_bounded (T : Current n X k) : ∃ M : ℝ, ∀ ω : SmoothForm n X k, |T.toFun ω| ≤ M * ‖ω‖ := by
-  simpa using T.bound
+  refine ⟨‖T.toFun‖, ?_⟩
+  intro ω
+  -- `‖T ω‖ ≤ ‖T‖ * ‖ω‖` for continuous linear maps, and `‖·‖` on ℝ is `|·|`.
+  simpa [Real.norm_eq_abs] using (T.toFun.le_opNorm ω)
 
 
 /-- **Mass of a current** (Federer, 1969).
@@ -418,7 +378,18 @@ theorem mass_smul (r : ℝ) (T : Current n X k) : mass (r • T) = |r| * mass T 
 /-- Extensionality for currents. -/
 @[ext]
 theorem ext {S T : Current n X k} (h : ∀ ω, S.toFun ω = T.toFun ω) : S = T := by
-  cases S; cases T; simp only [Current.mk.injEq]; funext ω; exact h ω
+  cases S with
+  | mk Sfun Sbd =>
+    cases T with
+    | mk Tfun Tbd =>
+      have hfun : Sfun = Tfun := by
+        ext ω
+        exact h ω
+      subst hfun
+      have hbd : Sbd = Tbd := by
+        apply Subsingleton.elim
+      subst hbd
+      rfl
 
 theorem zero_add (T : Current n X k) : 0 + T = T := by
   ext ω
@@ -473,14 +444,25 @@ we work with.
 - [Federer-Fleming, "Normal and integral currents", Ann. Math. 1960]
 -/
 def boundary (T : Current n X (k + 1)) : Current n X k where
-  toFun := fun ω => T.toFun (smoothExtDeriv ω)
-  is_linear := fun c ω₁ ω₂ => by
-    rw [smoothExtDeriv_add, smoothExtDeriv_smul_real]
-    exact T.is_linear c (smoothExtDeriv ω₁) (smoothExtDeriv ω₂)
-  is_continuous := T.is_continuous.comp smoothExtDeriv_continuous
-  bound := by
-    -- This is exactly the `boundary_bound` field of `T` (since `k+1` is a successor).
-    simpa using (T.boundary_bound)
+  -- We build a continuous linear functional using the (axiomatized) boundary bound on `T`.
+  -- NOTE: `smoothExtDeriv` is not continuous w.r.t. the comass seminorm, so we cannot use
+  -- `T.toFun.comp`. Instead, we use `LinearMap.mkContinuousOfExistsBound`.
+  toFun :=
+    let f : SmoothForm n X k →ₗ[ℝ] ℝ :=
+      { toFun := fun ω => T.toFun (smoothExtDeriv ω)
+        map_add' := fun ω₁ ω₂ => by
+          -- T(d(ω₁+ω₂)) = T(dω₁ + dω₂)
+          simp [smoothExtDeriv_add]
+        map_smul' := fun r ω => by
+          -- T(d(r•ω)) = r * T(dω)
+          simp [smoothExtDeriv_smul_real, map_smul] }
+    have hbound : ∃ M : ℝ, ∀ ω : SmoothForm n X k, ‖f ω‖ ≤ M * ‖ω‖ := by
+      -- This is exactly the `boundary_bound` field of `T` (since `k+1` is a successor).
+      obtain ⟨M, hM⟩ := (T.boundary_bound : ∃ M : ℝ, ∀ ω : SmoothForm n X k, |T.toFun (smoothExtDeriv ω)| ≤ M * ‖ω‖)
+      refine ⟨M, ?_⟩
+      intro ω
+      simpa [f, Real.norm_eq_abs] using (hM ω)
+    f.mkContinuousOfExistsBound hbound
   boundary_bound := by
     -- ∂∂ = 0 gives a trivial bound for the boundary of the boundary.
     cases k with
@@ -502,10 +484,7 @@ def isCycle (T : Current n X (k + 1)) : Prop := T.boundary = 0
 theorem boundary_boundary (T : Current n X (k + 2)) : (boundary (boundary T)) = 0 := by
   ext ω; show T.toFun (smoothExtDeriv (smoothExtDeriv ω)) = 0
   rw [smoothExtDeriv_extDeriv]
-  have h_zero : T.toFun 0 = 0 := by
-    have h1 : (0 : ℝ) • (0 : SmoothForm n X (k + 2)) = 0 := zero_smul ℝ 0
-    have h2 := map_smul T 0 0; rw [h1] at h2; simp at h2; exact h2
-  exact h_zero
+  exact map_zero' T
 
 /-- **Boundary is additive**. -/
 theorem boundary_add (S T : Current n X (k + 1)) : boundary (S + T) = boundary S + boundary T := by
@@ -517,6 +496,10 @@ theorem boundary_neg (T : Current n X (k + 1)) : boundary (-T) = -(boundary T) :
 
 theorem boundary_sub (S T : Current n X (k + 1)) : boundary (S - T) = boundary S - boundary T := by
   ext ω; rfl
+
+@[simp] theorem boundary_toFun (T : Current n X (k + 1)) (ω : SmoothForm n X k) :
+    (boundary T).toFun ω = T.toFun (smoothExtDeriv ω) := by
+  rfl
 
 end Current
 
@@ -1114,8 +1097,6 @@ structure IntegrationData (n : ℕ) (X : Type*) (k : ℕ)
   /-- Integration is linear -/
   integrate_linear : ∀ (c : ℝ) (ω₁ ω₂ : SmoothForm n X k),
     integrate (c • ω₁ + ω₂) = c * integrate ω₁ + integrate ω₂
-  /-- Integration is continuous (in the form topology) -/
-  integrate_continuous : Continuous integrate
   /-- Integration is bounded by comass norm -/
   integrate_bound : ∃ M : ℝ, ∀ ω : SmoothForm n X k, |integrate ω| ≤ M * ‖ω‖
   /-- Boundary mass: mass(∂Z), used for Stokes bound -/
@@ -1140,7 +1121,6 @@ noncomputable def IntegrationData.empty (n : ℕ) (X : Type*) (k : ℕ)
   carrier := ∅
   integrate := fun _ => 0
   integrate_linear := by intros; ring
-  integrate_continuous := continuous_const
   integrate_bound := ⟨0, fun _ => by simp⟩
   bdryMass := 0
   bdryMass_nonneg := le_refl 0
@@ -1156,22 +1136,38 @@ noncomputable def IntegrationData.empty (n : ℕ) (X : Type*) (k : ℕ)
 noncomputable def IntegrationData.toCurrent {n : ℕ} {X : Type*} {k : ℕ}
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [Nonempty X]
+    [Nonempty X] [MeasurableSpace X] [BorelSpace X]
     (data : IntegrationData n X k) : Current n X k where
-  toFun := data.integrate
-  is_linear := data.integrate_linear
-  is_continuous := data.integrate_continuous
-  bound := data.integrate_bound
+  toFun :=
+    let f : SmoothForm n X k →ₗ[ℝ] ℝ :=
+      { toFun := data.integrate
+        map_add' := fun ω₁ ω₂ => by
+          -- linearity with c = 1
+          simpa [one_smul, _root_.one_mul] using (data.integrate_linear 1 ω₁ ω₂)
+        map_smul' := fun r ω => by
+          -- First, `integrate 0 = 0` follows from additivity at 0.
+          have h0' := data.integrate_linear 1 (0 : SmoothForm n X k) (0 : SmoothForm n X k)
+          have h0'' : data.integrate (0 : SmoothForm n X k) =
+              data.integrate (0 : SmoothForm n X k) + data.integrate (0 : SmoothForm n X k) := by
+            simpa [one_smul, _root_.one_mul] using h0'
+          have h0 : data.integrate (0 : SmoothForm n X k) = 0 := by
+            linarith
+          -- Now use linearity with ω₂ = 0.
+          have h := data.integrate_linear r ω 0
+          simpa [add_zero, h0] using h }
+    have hbound : ∃ C : ℝ, ∀ ω : SmoothForm n X k, ‖f ω‖ ≤ C * ‖ω‖ := by
+      obtain ⟨M, hM⟩ := data.integrate_bound
+      refine ⟨M, ?_⟩
+      intro ω
+      simpa [f, Real.norm_eq_abs] using (hM ω)
+    f.mkContinuousOfExistsBound hbound
   boundary_bound := by
     cases k with
     | zero => trivial
     | succ k' =>
-      -- Use the stokes_bound from data
+      -- Use the stokes_bound from data.
       refine ⟨data.bdryMass, ?_⟩
       intro ω
-      -- data.stokes_bound gives us the bound for smoothExtDeriv
-      -- Now signature is: stokes_bound : ∀ {k'}, k = k' + 1 → ∀ ω, ...
-      -- In the succ k' case, k = k' + 1, so we use rfl.
       exact data.stokes_bound rfl ω
 
 /-- **Convert Oriented Rectifiable Set Data to IntegrationData**.
@@ -1189,7 +1185,6 @@ noncomputable def OrientedRectifiableSetData.toIntegrationData {n : ℕ} {X : Ty
   carrier := data.carrier
   integrate := fun ω => hausdorffIntegrate data ω
   integrate_linear := fun c ω₁ ω₂ => hausdorffIntegrate_linear data c ω₁ ω₂
-  integrate_continuous := continuous_of_discreteTopology
   integrate_bound := ⟨data.mass, fun ω => hausdorffIntegrate_bound data ω⟩
   bdryMass := data.bdryMass
   bdryMass_nonneg := by
@@ -1216,7 +1211,6 @@ noncomputable def ClosedSubmanifoldData.toIntegrationData {n : ℕ} {X : Type*} 
   -- Real: integration over closed submanifold using Hausdorff measure
   integrate := fun ω => hausdorffIntegrate data.toOrientedData ω
   integrate_linear := fun c ω₁ ω₂ => hausdorffIntegrate_linear data.toOrientedData c ω₁ ω₂
-  integrate_continuous := continuous_of_discreteTopology
   integrate_bound := ⟨data.toOrientedData.mass, fun ω => hausdorffIntegrate_bound data.toOrientedData ω⟩
   bdryMass := 0  -- Closed submanifold has no boundary
   bdryMass_nonneg := le_refl 0
@@ -1509,7 +1503,6 @@ noncomputable def IntegrationData.closedSubmanifold_zero (n : ℕ) (X : Type*)
   { carrier := Z
     integrate := setIntegral 0 Z
     integrate_linear := fun c ω₁ ω₂ => setIntegral_linear 0 Z c ω₁ ω₂
-    integrate_continuous := by exact continuous_of_discreteTopology
     integrate_bound := setIntegral_bound 0 Z
     bdryMass := 0
     bdryMass_nonneg := le_refl 0
@@ -1526,7 +1519,6 @@ noncomputable def IntegrationData.closedSubmanifold_succ (n : ℕ) (X : Type*) (
   { carrier := Z
     integrate := setIntegral (Nat.succ k) Z
     integrate_linear := fun c ω₁ ω₂ => setIntegral_linear (Nat.succ k) Z c ω₁ ω₂
-    integrate_continuous := by exact continuous_of_discreteTopology
     integrate_bound := setIntegral_bound (Nat.succ k) Z
     bdryMass := 0
     bdryMass_nonneg := le_refl 0
@@ -1591,7 +1583,7 @@ noncomputable def integration_current {n : ℕ} {X : Type*} {k : ℕ}
 noncomputable def integration_current_of_data {n : ℕ} {X : Type*} {k : ℕ}
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [Nonempty X]
+    [Nonempty X] [MeasurableSpace X] [BorelSpace X]
     (data : IntegrationData n X k) : Current n X k :=
   data.toCurrent
 
@@ -1599,7 +1591,7 @@ noncomputable def integration_current_of_data {n : ℕ} {X : Type*} {k : ℕ}
 theorem integration_current_eq_toCurrent {n : ℕ} {X : Type*} {k : ℕ}
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [Nonempty X]
+    [Nonempty X] [MeasurableSpace X] [BorelSpace X]
     (data : IntegrationData n X k) :
     data.toCurrent = integration_current_of_data data :=
   rfl
@@ -1679,7 +1671,7 @@ theorem boundaryMass_nonneg {n : ℕ} {X : Type*}
 def HasStokesPropertyWith {n : ℕ} {X : Type*} {k : ℕ}
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [Nonempty X]
+    [Nonempty X] [MeasurableSpace X] [BorelSpace X]
     (T : Current n X (Nat.succ k)) (M : ℝ) : Prop :=
   ∀ ω : SmoothForm n X k, |T.toFun (smoothExtDeriv ω)| ≤ M * ‖ω‖
 
@@ -1935,7 +1927,7 @@ def RectifiableSetData.smul {n : ℕ} {X : Type*}
 noncomputable def RectifiableSetData.toCurrent {n : ℕ} {X : Type*} {k : ℕ}
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [Nonempty X]
+    [Nonempty X] [MeasurableSpace X] [BorelSpace X]
     (_Z : RectifiableSetData n X) : Current n X (Nat.succ k) :=
   0  -- Stub: returns zero current, to be replaced with real integration
 

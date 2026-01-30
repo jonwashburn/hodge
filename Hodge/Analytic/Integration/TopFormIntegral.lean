@@ -1,6 +1,7 @@
 import Hodge.Analytic.Integration.VolumeForm
 import Hodge.Analytic.Integration.HausdorffMeasure
 import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.Analysis.Normed.Operator.ContinuousLinearMap
 
 /-!
 # Top-Form Integration on Compact Kähler Manifolds
@@ -213,7 +214,19 @@ noncomputable def topFormIntegral_linearMap :
     Reference: [Warner, "Foundations of Differentiable Manifolds", §4.8]. -/
 theorem topFormIntegral_continuous :
     Continuous (topFormIntegral_real' (n := n) (X := X)) :=
-  continuous_of_discreteTopology
+by
+  -- `topFormIntegral_real'` is ℝ-linear and bounded by `topFormIntegral_real'_bound`,
+  -- hence continuous in the comass seminorm topology on forms.
+  classical
+  let f : SmoothForm n X (2 * n) →ₗ[ℝ] ℝ := topFormIntegral_linearMap (n := n) (X := X)
+  have hbound : ∃ C, ∀ η, ‖f η‖ ≤ C * ‖η‖ := by
+    refine ⟨(hausdorffMeasure2p (n := n) (X := X) n Set.univ).toReal, ?_⟩
+    intro η
+    -- `‖f η‖ = |f η|` for ℝ, and `f η = topFormIntegral_real' η` by definition.
+    simpa [f, topFormIntegral_linearMap, Real.norm_eq_abs] using
+      (topFormIntegral_real'_bound (n := n) (X := X) η)
+  -- Build the associated continuous linear map, then extract continuity of the underlying function.
+  simpa [f, topFormIntegral_linearMap] using (f.mkContinuousOfExistsBound hbound).continuous
 
 /-! ## Integration of Volume Form -/
 

@@ -127,7 +127,9 @@ theorem integrationCurrentK_linear (k : ℕ) (Z : Set X) (c : ℝ)
     (integrationCurrentK (n := n) (X := X) k Z).toFun (c • ω₁ + ω₂) =
       c * (integrationCurrentK (n := n) (X := X) k Z).toFun ω₁ +
         (integrationCurrentK (n := n) (X := X) k Z).toFun ω₂ :=
-  (integrationCurrentK (n := n) (X := X) k Z).is_linear c ω₁ ω₂
+by
+  simpa [DeRhamCurrent] using
+    (Hodge.GMT.current_eval_linear (T := integrationCurrentK (n := n) (X := X) k Z) c ω₁ ω₂)
 
 /-- Linearity of the integration current evaluation (codimension form, degree `2*p`). -/
 theorem integrationCurrent_linear (p : ℕ) (Z : Set X) (c : ℝ)
@@ -135,7 +137,9 @@ theorem integrationCurrent_linear (p : ℕ) (Z : Set X) (c : ℝ)
     (integrationCurrent (n := n) (X := X) p Z).toFun (c • ω₁ + ω₂) =
       c * (integrationCurrent (n := n) (X := X) p Z).toFun ω₁ +
         (integrationCurrent (n := n) (X := X) p Z).toFun ω₂ :=
-  (integrationCurrent (n := n) (X := X) p Z).is_linear c ω₁ ω₂
+by
+  simpa [DeRhamCurrent] using
+    (Hodge.GMT.current_eval_linear (T := integrationCurrent (n := n) (X := X) p Z) c ω₁ ω₂)
 
 /-! ## Integration Current Properties (with Stokes data) -/
 

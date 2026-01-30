@@ -25,9 +25,10 @@ namespace Hodge.GMT
 universe u
 
 variable {n : ℕ} {X : Type u}
-  [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+  [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X] [Nonempty X]
+  [MeasurableSpace X] [BorelSpace X]
 
 /-! ## Re-exports -/
 
@@ -38,12 +39,12 @@ abbrev HarveyLawsonHypothesis (k : ℕ) := _root_.HarveyLawsonHypothesis n X k
 abbrev HarveyLawsonConclusion (k : ℕ) := _root_.HarveyLawsonConclusion n X k
 
 /-- Harvey–Lawson structure theorem (semantic stub), as provided in `Hodge/Classical/HarveyLawson.lean`. -/
-def harveyLawsonTheorem {k : ℕ} (hyp : HarveyLawsonHypothesis (n := n) (X := X) k) :
-    HarveyLawsonConclusion (n := n) (X := X) k :=
-  harvey_lawson_theorem (n := n) (X := X) hyp
+def harveyLawsonTheorem {k : ℕ} (hyp : _root_.HarveyLawsonHypothesis n X k) :
+    _root_.HarveyLawsonConclusion n X k :=
+  harvey_lawson_theorem hyp
 
-theorem harveyLawson_represents {k : ℕ} (hyp : HarveyLawsonHypothesis (n := n) (X := X) k) :
-    (harveyLawsonTheorem (n := n) (X := X) hyp).represents hyp.T.toFun :=
-  harvey_lawson_represents (n := n) (X := X) hyp
+theorem harveyLawson_represents {k : ℕ} (hyp : _root_.HarveyLawsonHypothesis n X k) :
+    (harveyLawsonTheorem hyp).represents hyp.T.toFun :=
+  harvey_lawson_represents hyp
 
 end Hodge.GMT

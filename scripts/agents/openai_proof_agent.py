@@ -22,12 +22,18 @@ import time
 import datetime
 import urllib.request
 import urllib.error
+import threading
 from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from queue import Queue
 
 # Configuration
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
 SLACK_WEBHOOK = os.environ.get("SLACK_WEBHOOK", "")
 MODEL = os.environ.get("OPENAI_MODEL", "gpt-5.2")
+
+# Number of parallel agents
+NUM_AGENTS = int(os.environ.get("NUM_AGENTS", "8"))
 FALLBACK_MODELS = [
     m.strip() for m in os.environ.get("OPENAI_FALLBACK_MODELS", "gpt-5.2-codex,gpt-4o").split(",")
     if m.strip()
@@ -61,22 +67,24 @@ AGENT_CONTEXT_PATH = REPO_PATH / "scripts" / "agents" / "AGENT_CONTEXT.md"
 PLACEHOLDER_DEFINITIONS = """
 ## KEY PLACEHOLDER DEFINITIONS IN THIS CODEBASE
 
-These definitions return trivial values - understand this before proving!
+These definitions have been updated to be OPAQUE (axiomatized). Do NOT assume they are 0.
 
-1. comass (Hodge/GMT/Mass.lean:53):
-   def comass (_ω : TestForm n X k) : ℝ := 0  -- RETURNS 0!
+1. comass (Hodge/GMT/Mass.lean):
+   opaque comass (ω : TestForm n X k) : ℝ  -- Axiomatized norm
 
-2. submanifoldIntegral (Hodge/Analytic/Integration/SubmanifoldIntegral.lean:86):
-   def submanifoldIntegral (Z : OrientedSubmanifold n X k) (ω : TestForm n X k) : ℂ := 0  -- RETURNS 0!
+2. submanifoldIntegral (Hodge/Analytic/Integration/SubmanifoldIntegral.lean):
+   opaque submanifoldIntegral (Z : OrientedSubmanifold n X k) (ω : TestForm n X k) : ℂ -- Axiomatized integral
 
-3. IsSupportedOnAnalyticVariety (Hodge/GMT/Calibration.lean):
+3. volume (Hodge/GMT/Mass.lean):
+   opaque volume (Z : OrientedSubmanifold n X k) : ℝ≥0∞ -- Axiomatized volume
+
+4. IsSupportedOnAnalyticVariety (Hodge/GMT/Calibration.lean):
    def IsSupportedOnAnalyticVariety (_T : Current n X k) : Prop := True  -- ALWAYS TRUE!
 
-4. isIntegral (Hodge/GMT/FlatNorm.lean):
+5. isIntegral (Hodge/GMT/FlatNorm.lean):
    isIntegral : Prop := True  -- TRIVIALLY TRUE!
 
-CONSEQUENCE: If a theorem uses comass, RHS of bounds = 0. If it uses submanifoldIntegral, 
-currents evaluate to 0. Some theorems become unprovable as stated - use sorry with docs.
+CONSEQUENCE: Theorems involving comass/mass are now PROVABLE using the axioms (e.g. comass_add, mass_integrationCurrent_eq_volume).
 """
 
 def load_agent_context():
@@ -135,7 +143,14 @@ stats = {
     "sorries_eliminated": 0,
     "failed_attempts": 0,
     "rejected_trivializations": 0,
+    "agents_active": 0,
 }
+
+# Thread-safe resources
+build_lock = threading.Lock()
+stats_lock = threading.Lock()
+log_lock = threading.Lock()
+file_locks = {f: threading.Lock() for f in TARGET_FILES}
 
 NO_TEMPERATURE_MODELS = {
     # Returns 400: "Unsupported parameter: 'temperature' is not supported with this model."
@@ -181,10 +196,12 @@ JSON_SCHEMA_FORMAT = {
     },
 }
 
-def log(msg):
+def log(msg, agent_id=None):
     ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    line = f"[{ts}] [OpenAI] {msg}"
-    print(line, flush=True)
+    prefix = f"[GPT-{agent_id}]" if agent_id is not None else "[OpenAI]"
+    line = f"[{ts}] {prefix} {msg}"
+    with log_lock:
+        print(line, flush=True)
 
 def slack_notify(msg):
     try:
@@ -320,7 +337,7 @@ def call_openai_responses(prompt, model):
         log(f"OpenAI exception for model={model}: {e}")
         return None
 
-def attempt_proof(filepath, line_num, line_content, full_context, focused_context):
+def attempt_proof(filepath, line_num, line_content, full_context, focused_context, agent_id=None):
     """Attempt to prove one sorry with FULL CONTEXT."""
     
     # Truncate full context if needed (keep first 200 + last 100 lines)
@@ -393,8 +410,9 @@ Make sure old_code matches exactly what's in the file.
             return False
         
         if is_trivialization(new_code):
-            stats["rejected_trivializations"] += 1
-            log(f"REJECTED trivialization")
+            with stats_lock:
+                stats["rejected_trivializations"] += 1
+            log(f"REJECTED trivialization", agent_id)
             return False
         
         # Read file and apply change
@@ -408,72 +426,137 @@ Make sure old_code matches exactly what's in the file.
         new_content = content.replace(old_code, new_code, 1)
         full_path.write_text(new_content)
         
-        # Test build
+        # Test build (with lock to prevent concurrent builds)
         module = filepath.replace('/', '.').replace('.lean', '')
-        ok, output = run_cmd(
-            f"export PATH=/home/ubuntu/.elan/bin:$PATH && {LAKE_PATH} build {module} 2>&1 | tail -20",
-            timeout=180
-        )
+        with build_lock:
+            ok, output = run_cmd(
+                f"export PATH=/home/ubuntu/.elan/bin:$PATH && {LAKE_PATH} build {module} 2>&1 | tail -20",
+                timeout=180
+            )
         
         if "Build completed" in output or ("error" not in output.lower()):
-            log(f"✅ SUCCESS at {filepath}:{line_num} (model={used_model})")
-            stats["sorries_eliminated"] += 1
+            if "sorry" in new_code.lower():
+                log(f"⚠️  Kept sorry at {filepath}:{line_num} (model={used_model})", agent_id)
+                return False
+            
+            log(f"✅ SUCCESS at {filepath}:{line_num} (model={used_model})", agent_id)
+            with stats_lock:
+                stats["sorries_eliminated"] += 1
             return True
         else:
             # Revert
             full_path.write_text(content)
-            stats["failed_attempts"] += 1
-            log(f"Build failed, reverted")
+            with stats_lock:
+                stats["failed_attempts"] += 1
+            log(f"Build failed, reverted", agent_id)
             return False
             
     except Exception as e:
-        log(f"Error: {e}")
-        stats["failed_attempts"] += 1
+        log(f"Error: {e}", agent_id)
+        with stats_lock:
+            stats["failed_attempts"] += 1
         return False
+
+def agent_worker(agent_id, file_queue):
+    """Worker thread for one GPT-5.2 agent."""
+    log(f"Starting", agent_id)
+    
+    with stats_lock:
+        stats["agents_active"] += 1
+    
+    try:
+        while True:
+            # Get a file to work on
+            try:
+                filepath = file_queue.get(timeout=10)
+            except:
+                # Check if more work exists
+                for f in TARGET_FILES:
+                    if count_sorries(f) > 0:
+                        file_queue.put(f)
+                continue
+            
+            # Acquire exclusive lock on this file
+            if filepath not in file_locks:
+                file_locks[filepath] = threading.Lock()
+            
+            if not file_locks[filepath].acquire(blocking=False):
+                file_queue.put(filepath)  # Put back for another agent
+                time.sleep(1)
+                continue
+            
+            try:
+                sorry_count = count_sorries(filepath)
+                if sorry_count <= 0:
+                    continue
+                
+                log(f"Working on {filepath} ({sorry_count} sorries)", agent_id)
+                
+                # Work on first sorry - with FULL CONTEXT
+                line_num, line_content, full_context, focused_context = find_first_sorry(filepath)
+                if line_num:
+                    log(f"Attempting line {line_num}...", agent_id)
+                    attempt_proof(filepath, line_num, line_content, full_context, focused_context, agent_id)
+                
+                # Put file back if more sorries remain
+                if count_sorries(filepath) > 0:
+                    file_queue.put(filepath)
+                    
+            finally:
+                file_locks[filepath].release()
+            
+            time.sleep(2)  # Rate limiting between attempts
+            
+    except Exception as e:
+        log(f"Worker error: {e}", agent_id)
+    finally:
+        with stats_lock:
+            stats["agents_active"] -= 1
+        log(f"Stopping", agent_id)
 
 def main():
     LOG_DIR.mkdir(exist_ok=True)
     
     log("=" * 60)
-    log(f"GPT-5.2-HIGH PROOF AGENT STARTING")
+    log(f"GPT-5.2-HIGH PARALLEL AGENT STARTING ({NUM_AGENTS} agents)")
     log("=" * 60)
     
     stats["start_time"] = time.time()
     
     total = get_total_sorries()
-    slack_notify(f"🚀 *GPT-5.2-high Agent Started*\n• Model: {MODEL}\n• Target files: {len(TARGET_FILES)}\n• Initial sorries: {total}")
+    slack_notify(f"🚀 *GPT-5.2-high Parallel Started*\n• Model: {MODEL}\n• Agents: {NUM_AGENTS}\n• Initial sorries: {total}")
     
-    cycles = 0
-    while True:
-        cycles += 1
-        log(f"\n=== CYCLE {cycles} ===")
-        
-        total = get_total_sorries()
-        if total == 0:
-            slack_notify("🎉 *ALL SORRIES ELIMINATED!*")
-            log("🎉 ALL SORRIES ELIMINATED!")
-            break
-        
-        log(f"Remaining sorries: {total}")
-        
-        for filepath in TARGET_FILES:
-            sorry_count = count_sorries(filepath)
-            if sorry_count <= 0:
-                continue
+    # Create work queue with all files
+    file_queue = Queue()
+    for f in TARGET_FILES:
+        if count_sorries(f) > 0:
+            file_queue.put(f)
+    
+    # Start worker threads
+    threads = []
+    for i in range(NUM_AGENTS):
+        t = threading.Thread(target=agent_worker, args=(i, file_queue), daemon=True)
+        t.start()
+        threads.append(t)
+        time.sleep(0.5)  # Stagger starts
+    
+    # Monitor progress
+    try:
+        while True:
+            time.sleep(60)
+            total = get_total_sorries()
+            with stats_lock:
+                eliminated = stats["sorries_eliminated"]
+                active = stats["agents_active"]
             
-            log(f"\n--- {filepath}: {sorry_count} sorries ---")
+            log(f"Status: {eliminated} eliminated, {total} remaining, {active}/{NUM_AGENTS} agents active")
             
-            # Now with FULL FILE CONTEXT
-            line_num, line_content, full_context, focused_context = find_first_sorry(filepath)
-            if line_num is None:
-                continue
-            
-            log(f"Attempting line {line_num}...")
-            attempt_proof(filepath, line_num, line_content, full_context, focused_context)
-            
-            time.sleep(2)  # Rate limiting
-        
-        time.sleep(5)
+            if total == 0:
+                slack_notify("🎉 *ALL SORRIES ELIMINATED!*")
+                log("🎉 ALL SORRIES ELIMINATED!")
+                break
+    except KeyboardInterrupt:
+        log("Interrupted")
     
     elapsed = (time.time() - stats["start_time"]) / 60
     final_msg = f"""📊 *GPT-5.2-high Agent Complete*

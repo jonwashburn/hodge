@@ -52,6 +52,13 @@ theorem current_eval_linear {n : ℕ} {X : Type*} {k : ℕ}
     [MeasurableSpace X] [BorelSpace X]
     (T : DeRhamCurrent n X k) (c : ℝ) (ω₁ ω₂ : SmoothForm n X k) :
     T.toFun (c • ω₁ + ω₂) = c * T.toFun ω₁ + T.toFun ω₂ :=
-  T.is_linear c ω₁ ω₂
+by
+  -- `toFun` is a continuous linear map, so it is ℝ-linear.
+  calc
+    T.toFun (c • ω₁ + ω₂) = T.toFun (c • ω₁) + T.toFun ω₂ := by
+      simpa [DeRhamCurrent] using (T.toFun.map_add (c • ω₁) ω₂)
+    _ = c * T.toFun ω₁ + T.toFun ω₂ := by
+      -- `c • T.toFun ω₁` is definitional `c * T.toFun ω₁` in ℝ.
+      simpa [DeRhamCurrent, smul_eq_mul] using congrArg (fun x => x + T.toFun ω₂) (T.toFun.map_smul c ω₁)
 
 end Hodge.GMT

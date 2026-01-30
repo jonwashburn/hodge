@@ -20,7 +20,7 @@ set_option autoImplicit false
 namespace Hodge.GMT
 
 variable {n : ℕ} {X : Type*}
-  [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+  [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X]
   [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
 

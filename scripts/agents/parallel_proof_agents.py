@@ -44,26 +44,28 @@ MAX_RECENT_REJECTIONS = 5
 PLACEHOLDER_DEFINITIONS = """
 ## KEY PLACEHOLDER DEFINITIONS IN THIS CODEBASE
 
-These definitions return trivial values - understand this before proving!
+These definitions have been updated to be OPAQUE (axiomatized). Do NOT assume they are 0.
 
-1. comass (Hodge/GMT/Mass.lean:53):
-   def comass (_ω : TestForm n X k) : ℝ := 0  -- RETURNS 0!
+1. comass (Hodge/GMT/Mass.lean):
+   opaque comass (ω : TestForm n X k) : ℝ  -- Axiomatized norm
 
-2. submanifoldIntegral (Hodge/Analytic/Integration/SubmanifoldIntegral.lean:86):
-   def submanifoldIntegral (Z : OrientedSubmanifold n X k) (ω : TestForm n X k) : ℂ := 0  -- RETURNS 0!
+2. submanifoldIntegral (Hodge/Analytic/Integration/SubmanifoldIntegral.lean):
+   opaque submanifoldIntegral (Z : OrientedSubmanifold n X k) (ω : TestForm n X k) : ℂ -- Axiomatized integral
 
-3. IsSupportedOnAnalyticVariety (Hodge/GMT/Calibration.lean):
+3. volume (Hodge/GMT/Mass.lean):
+   opaque volume (Z : OrientedSubmanifold n X k) : ℝ≥0∞ -- Axiomatized volume
+
+4. IsSupportedOnAnalyticVariety (Hodge/GMT/Calibration.lean):
    def IsSupportedOnAnalyticVariety (_T : Current n X k) : Prop := True  -- ALWAYS TRUE!
 
-4. isIntegral (Hodge/GMT/FlatNorm.lean):
+5. isIntegral (Hodge/GMT/FlatNorm.lean):
    isIntegral : Prop := True  -- TRIVIALLY TRUE!
 
-CONSEQUENCE: If a theorem uses comass, RHS of bounds = 0. If it uses submanifoldIntegral, 
-currents evaluate to 0. Some theorems become unprovable as stated - use sorry with docs.
+CONSEQUENCE: Theorems involving comass/mass are now PROVABLE using the axioms (e.g. comass_add, mass_integrationCurrent_eq_volume).
 """
 
 # Number of parallel agents
-NUM_AGENTS = 10
+NUM_AGENTS = 2
 
 # All files with sorries (will work through these)
 ALL_TARGET_FILES = [
@@ -257,6 +259,12 @@ def call_claude(prompt, agent_id):
             result = json.loads(resp.read().decode())
             return result["content"][0]["text"]
     except Exception as e:
+        if hasattr(e, 'read'):
+            try:
+                err_body = e.read().decode()
+                log(f"API error body: {err_body}", agent_id)
+            except:
+                pass
         log(f"API error: {e}", agent_id)
         return None
 
@@ -276,23 +284,26 @@ def attempt_proof(filepath, line_num, line_content, full_context, focused_contex
     hints = PROOF_HINTS_TEXT
     agent_context = AGENT_CONTEXT_TEXT
     
-    # Truncate full context if too long (keep first 200 lines + last 100 lines + lines around sorry)
+    # Truncate full context if too long (Claude has smaller context than GPT-5.2)
     full_lines = full_context.split('\n')
-    if len(full_lines) > 400:
-        # Keep first 150 lines
-        first_part = '\n'.join(full_lines[:150])
-        # Keep last 80 lines
-        last_part = '\n'.join(full_lines[-80:])
-        full_context = first_part + "\n... (middle truncated) ...\n" + last_part
+    if len(full_lines) > 200:
+        # Keep first 80 lines (imports + early definitions)
+        first_part = '\n'.join(full_lines[:80])
+        # Keep last 40 lines
+        last_part = '\n'.join(full_lines[-40:])
+        full_context = first_part + "\n... (middle truncated - see focused context) ...\n" + last_part
     
     hints_block = f"\n## PROOF HINTS:\n{hints}\n" if hints else ""
     feedback_block = f"\n## REJECTION FEEDBACK:\n{feedback}\n" if feedback else ""
     
-    prompt = f"""# CRITICAL: READ THIS ENTIRE CONTEXT BEFORE ATTEMPTING ANY PROOF
+    # Truncate agent context to avoid prompt too long errors
+    agent_context_short = agent_context[:3000] if len(agent_context) > 3000 else agent_context
+    
+    prompt = f"""# CRITICAL CONTEXT
 
 {PLACEHOLDER_DEFINITIONS}
 
-{agent_context}
+{agent_context_short}
 
 ---
 

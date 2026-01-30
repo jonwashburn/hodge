@@ -229,7 +229,47 @@ theorem comass_smul {n : ℕ} {X : Type*}
   -- Apply the general `sSup` scaling lemma.
   rw [Real.sSup_smul_of_nonneg (abs_nonneg c) (range (pointwiseComass ω)), smul_eq_mul]
 
--- The instances for SeminormedAddCommGroup and NormedSpace are moved to axioms above
+/-! ## Seminormed structure on Smooth Forms (comass)
+
+We now equip `SmoothForm n X k` with the **seminormed** structure coming from the global comass
+seminorm:
+
+`‖ω‖ := comass ω`.
+
+This upgrades the old “discrete topology placeholder” to the topology induced by the comass
+pseudometric.
+
+Note: comass is only a *seminorm* (we deliberately do not assume definiteness
+`comass ω = 0 → ω = 0`), so we provide `SeminormedAddCommGroup`, not `NormedAddCommGroup`.
+-/
+
+instance instSeminormedAddCommGroupSmoothForm {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+    {k : ℕ} : SeminormedAddCommGroup (SmoothForm n X k) := by
+  classical
+  -- `SeminormedAddCommGroup.ofCore` builds the pseudometric from a seminorm core.
+  refine SeminormedAddCommGroup.ofCore (𝕜 := ℝ) (E := SmoothForm n X k)
+    { norm_nonneg := fun ω => by
+        -- `‖ω‖` is definitional `comass ω`
+        simpa using (comass_nonneg (n := n) (X := X) (k := k) ω)
+      norm_smul := fun r ω => by
+        -- comass(r • ω) = |r| * comass(ω) = ‖r‖ * ‖ω‖
+        simpa [Real.norm_eq_abs] using
+          (comass_smul (n := n) (X := X) (k := k) (c := r) ω)
+      norm_triangle := fun ω η => by
+        simpa using (comass_add_le (n := n) (X := X) (k := k) ω η) }
+
+instance instNormedSpaceRealSmoothForm {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+    {k : ℕ} : NormedSpace ℝ (SmoothForm n X k) where
+  norm_smul_le r ω := by
+    -- We have equality from `comass_smul`, so the ≤-bound is immediate.
+    simpa [Real.norm_eq_abs] using
+      (le_of_eq (comass_smul (n := n) (X := X) (k := k) (c := r) ω))
 
 /-! ## L2 Inner Product (Agent 3 - Riemannian/Kähler Infrastructure)
 

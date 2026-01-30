@@ -83,22 +83,22 @@ def submanifoldMeasure (Z : OrientedSubmanifold n X k) : Measure Z.carrier := Me
 
 /-- Integration of a k-form over a k-dimensional oriented submanifold.
     ∫_Z ω is defined via pullback and the induced measure. -/
-def submanifoldIntegral (Z : OrientedSubmanifold n X k) (ω : TestForm n X k) : ℂ := 0
+opaque submanifoldIntegral (Z : OrientedSubmanifold n X k) (ω : TestForm n X k) : ℂ
 
 -- NOTE: We avoid introducing a custom `∫_Z, ω` notation here because it interacts
 -- poorly with parsing/precedence in this scaffold layer. Use `submanifoldIntegral Z ω` instead.
 
 /-- Integration is linear in the form. -/
-theorem integral_add (Z : OrientedSubmanifold n X k) (ω₁ ω₂ : TestForm n X k) :
+axiom integral_add (Z : OrientedSubmanifold n X k) (ω₁ ω₂ : TestForm n X k) :
     submanifoldIntegral Z (ω₁ + ω₂) =
-      submanifoldIntegral Z ω₁ + submanifoldIntegral Z ω₂ := by simp [submanifoldIntegral]
+      submanifoldIntegral Z ω₁ + submanifoldIntegral Z ω₂
 
-theorem integral_smul (Z : OrientedSubmanifold n X k) (c : ℂ) (ω : TestForm n X k) :
-    submanifoldIntegral Z (c • ω) = c • submanifoldIntegral Z ω := by simp [submanifoldIntegral]
+axiom integral_smul (Z : OrientedSubmanifold n X k) (c : ℂ) (ω : TestForm n X k) :
+    submanifoldIntegral Z (c • ω) = c • submanifoldIntegral Z ω
 
 /-- Integration is continuous in the LF topology. -/
-theorem integral_continuous (Z : OrientedSubmanifold n X k) :
-    Continuous (submanifoldIntegral Z) := continuous_const
+axiom integral_continuous (Z : OrientedSubmanifold n X k) :
+    Continuous (submanifoldIntegral Z)
 
 /-! ## Change of Variables (TODO) -/
 

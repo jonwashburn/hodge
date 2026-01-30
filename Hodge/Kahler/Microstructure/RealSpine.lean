@@ -175,9 +175,6 @@ def toIntegrationData_real [SheetStokesData n X] {p : ℕ} {hscale : ℝ}
   integrate := fun ω => integrateDegree2p (n := n) (X := X) (2 * (n - p)) (sheetUnion_real T_raw) ω
   integrate_linear := fun c ω₁ ω₂ =>
     integrateDegree2p_linear (n := n) (X := X) (2 * (n - p)) (sheetUnion_real T_raw) c ω₁ ω₂
-  integrate_continuous := by
-    -- SmoothForm has discrete topology (placeholder), so all functions are continuous
-    exact continuous_of_discreteTopology
   integrate_bound := by
     use 1
     intro ω

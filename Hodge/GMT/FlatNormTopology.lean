@@ -18,7 +18,7 @@ namespace Hodge.GMT
 
 /-- Flat norm on currents, real-valued (re-export of `_root_.flatNorm`). -/
 abbrev flatNormReal {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] [CompactSpace X]
     (T : Current n X k) : ℝ :=
@@ -26,7 +26,7 @@ abbrev flatNormReal {n : ℕ} {X : Type*} {k : ℕ}
 
 /-- Flat norm on currents, packaged as an extended nonnegative real `ENNReal` (a.k.a. `ℝ≥0∞`). -/
 def flatNorm {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] [CompactSpace X]
     (T : Current n X k) : ENNReal :=

@@ -122,17 +122,13 @@ theorem isIntegral_add {k : ℕ} (S T : Current n X k) :
     have h_sum : (S + T) - (P₁ + P₂) = (S - P₁) + (T - P₂) := by
       apply Current.ext
       intro ω
-      -- LHS: ((S + T) - (P₁ + P₂)).toFun ω = (S + T).toFun ω - (P₁ + P₂).toFun ω
-      -- = S.toFun ω + T.toFun ω - (P₁.toFun ω + P₂.toFun ω)
-      -- = S.toFun ω + T.toFun ω - P₁.toFun ω - P₂.toFun ω
-      -- RHS: ((S - P₁) + (T - P₂)).toFun ω
-      -- = (S - P₁).toFun ω + (T - P₂).toFun ω
-      -- = (S.toFun ω - P₁.toFun ω) + (T.toFun ω - P₂.toFun ω)
-      -- These are equal by commutativity
-      show (Current.add_curr (Current.add_curr S T) (Current.neg_curr (Current.add_curr P₁ P₂))).toFun ω =
-           (Current.add_curr (Current.add_curr S (Current.neg_curr P₁)) (Current.add_curr T (Current.neg_curr P₂))).toFun ω
-      simp only [Current.add_curr, Current.neg_curr]
-      ring
+      -- Avoid relying on definitional unfolding of the `+`/`-` instances on `Current`:
+      -- rewrite the goal using the constructors, then simplify to ℝ and finish by commutativity/associativity.
+      show
+          (Current.add_curr (Current.add_curr S T) (Current.neg_curr (Current.add_curr P₁ P₂))).toFun ω =
+            (Current.add_curr (Current.add_curr S (Current.neg_curr P₁))
+              (Current.add_curr T (Current.neg_curr P₂))).toFun ω
+      simp [Current.add_curr, Current.neg_curr, add_assoc, add_left_comm, add_comm]
     rw [h_sum]
     calc flatNorm ((S - P₁) + (T - P₂))
         ≤ flatNorm (S - P₁) + flatNorm (T - P₂) := flatNorm_add_le (S - P₁) (T - P₂)

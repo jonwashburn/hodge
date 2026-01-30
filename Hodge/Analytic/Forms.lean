@@ -169,17 +169,25 @@ instance (k : ℕ) : Module ℂ (SmoothForm n X k) where
     ext x v
     simp
 
-/-- Topology on smooth forms induced by the uniform (sup) operator norm.
-    A smooth form has pointwise operator norm at each x, and we consider the topology
-    where forms are close if their operator norms are uniformly close across all x.
-
-    For now, we use the discrete topology as a placeholder. This ensures all maps
-    from SmoothForm are continuous (vacuously), which is stronger than needed.
-    In a full implementation, this would be the C^∞ compact-open topology. -/
-instance SmoothForm.instTopologicalSpace (k : ℕ) : TopologicalSpace (SmoothForm n X k) :=
-  ⊥  -- discrete topology
-
-instance (k : ℕ) : DiscreteTopology (SmoothForm n X k) := ⟨rfl⟩
+instance (k : ℕ) : Module ℝ (SmoothForm n X k) where
+  one_smul ω := by
+    ext x v
+    simp
+  mul_smul r s ω := by
+    ext x v
+    simp [mul_assoc]
+  smul_zero r := by
+    ext x v
+    simp
+  smul_add r ω η := by
+    ext x v
+    simp [mul_add]
+  add_smul r s ω := by
+    ext x v
+    simp [add_mul]
+  zero_smul ω := by
+    ext x v
+    simp
 
 /-!
 ### Exterior Derivative on Smooth Forms
@@ -689,9 +697,9 @@ theorem smoothExtDeriv_smul_real {k : ℕ} (r : ℝ) (ω : SmoothForm n X k) :
     smoothExtDeriv (r • ω) = r • smoothExtDeriv ω :=
   map_smul (extDerivLinearMap n X k) (r : ℂ) ω
 
-/-- Exterior derivative is a continuous linear map (in the discrete topology). -/
-theorem smoothExtDeriv_continuous {k : ℕ} : Continuous (smoothExtDeriv (n := n) (X := X) (k := k)) :=
-  continuous_of_discreteTopology
+-- NOTE: Continuity of `smoothExtDeriv` lives in the Stage-1 functional-analytic layer
+-- (it is not true for the pure comass/C⁰ seminorm alone). We intentionally do not
+-- assert continuity here in `Forms.lean`.
 
 /-- The unit 0-form (constant `1`).
 
