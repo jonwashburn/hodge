@@ -1,149 +1,120 @@
-# CRITICAL AGENT CONTEXT - READ BEFORE ANY WORK
+# CRITICAL AGENT CONTEXT (Updated 2026-01-30)
 
-## You MUST understand this before attempting ANY proof
+This repo is a Lean 4 formalization of the Hodge conjecture. The proof track is **green** and the
+remaining “deep content” is isolated behind explicit placeholders (sorries/axioms/typeclasses).
 
-### 1. PLACEHOLDER DEFINITIONS (Updated Jan 30, 2026)
+## 0. Build rule (repo-specific)
 
-The following definitions have been updated to be **opaque (axiomatized)** to match the paper's mathematical structure. They are NO LONGER `0` or `True`.
+**Before any `lake build`, run:**
+
+```bash
+lake exe cache get
+```
+
+## 1. Phase‑1 functional-analytic layer (DO NOT fight it)
+
+### 1.1 `SmoothForm` is NOT discrete anymore
+
+`SmoothForm n X k` now carries a genuine seminormed/Normed structure over ℝ coming from comass:
+
+- **File**: `Hodge/Analytic/Norms.lean`
+- **Key fact**: `‖ω‖ = comass ω` (and comass triangle/scaling lemmas are proved)
+
+**Do NOT use** `continuous_of_discreteTopology`. Any old proofs relying on “everything is continuous”
+will now break and must be replaced with bounded-linear-map arguments.
+
+### 1.2 `Current` is a continuous linear functional (`→L[ℝ]`)
+
+`Current n X k` is now:
+
+- **File**: `Hodge/Analytic/Currents.lean`
+- **Definition**:
+  - `toFun : SmoothForm n X k →L[ℝ] ℝ`
+  - `boundary_bound : (k = 0 → True) ∧ (k = k'+1 → ∃ M, ∀ ω, |T(dω)| ≤ M * ‖ω‖)`
+
+**Important consequences**
+
+- **No per-current boundedness field** anymore. Use operator norm:
+  - Pattern: `simpa [Real.norm_eq_abs] using (T.toFun.le_opNorm ω)`
+- `d` (here `smoothExtDeriv`) is **not** continuous for comass; we therefore keep `boundary_bound`
+  as a separate hypothesis.
+
+### 1.3 `Current.boundary` is built from `boundary_bound` (not by continuity of `d`)
+
+- `Current.boundary` is constructed via `LinearMap.mkContinuousOfExistsBound`.
+- There is a simp lemma:
+  - `Current.boundary_toFun`
+
+## 2. “Still placeholder” items (real remaining axioms / stubs)
+
+Full scan (`./scripts/audit_stubs.sh --full`) currently reports these **axioms**:
+
+- `Hodge/Classical/GAGA.lean`:
+  - `axiom fundamental_eq_representing_axiom` (spine bridge; deep geometry/cohomology)
+- `Hodge/Analytic/Integration/SubmanifoldIntegral.lean`:
+  - `opaque submanifoldIntegral ... : ℂ`
+  - `axiom integral_add`, `axiom integral_smul`, `axiom integral_continuous`
+- Legacy “Stage‑1 test forms” namespace `Hodge.TestForms` (mostly off the main proof track):
+  - `Hodge/Analytic/TestForms/LFTopology.lean`: `axiom realTopology`
+  - `Hodge/Analytic/TestForms/Operations.lean`: `axiom leibniz`, `axiom pullback_d`
+
+## 3. Remaining `sorry` locations (current repo)
+
+`./scripts/audit_stubs.sh --full` currently reports:
+
+- `Hodge/Kahler/Main.lean`:
+  - one `sorry` in the “defect → 0” portion (deep calibration/microstructure content)
+- `Hodge/Analytic/FlatNormReal.lean`:
+  - many sorries (generic RealChain development; typically **off-track**)
+- `Hodge/Analytic/Stage2/IntegrationCurrentsManifoldSkeleton.lean`:
+  - several `Prop := sorry` placeholders + one remaining `sorry` used for mass computation
+- plus a quarantined file under `Hodge/Quarantine/...` (off-track)
+
+## 4. What the “proof track” currently depends on
+
+Ground truth is Lean’s kernel report:
 
 ```lean
--- In Hodge/GMT/Mass.lean:
-opaque comass (ω : TestForm n X k) : ℝ  -- Axiomatized norm
-opaque volume (Z : OrientedSubmanifold n X k) : ℝ≥0∞ -- Axiomatized volume
-
--- In Hodge/Analytic/Integration/SubmanifoldIntegral.lean:
-opaque submanifoldIntegral (Z : OrientedSubmanifold n X k) (ω : TestForm n X k) : ℂ -- Axiomatized integral
-
--- In Hodge/GMT/FlatNorm.lean:
-isIntegral : Prop := True  -- Still a placeholder (trivially true)
-
--- In Hodge/GMT/Calibration.lean:
-def IsSupportedOnAnalyticVariety (_T : Current n X k) : Prop := True  -- Still a placeholder
+#print axioms hodge_conjecture
+#print axioms hodge_conjecture'
 ```
 
-**CONSEQUENCE**: Theorems involving `comass` and `mass` are now structurally provable using the provided axioms (e.g., `comass_add`, `mass_integrationCurrent_eq_volume`). Do not assume they evaluate to 0.
+Currently:
 
-### 2. PROOF ARCHITECTURE
+- `hodge_conjecture` depends on `[propext, Classical.choice, Quot.sound]`
+- `hodge_conjecture'` depends on `[propext, Classical.choice, Quot.sound]`
 
-The proof uses **typeclasses to encapsulate deep mathematical content**:
+So: **no `sorryAx` in the dependency cone** of the main theorem.
+
+## 5. What NOT to do (hard rules)
+
+- **Never** use `admit`.
+- **Never** replace nontrivial goals with trivializations (`:= trivial`, `:= True`, `⟨⟩`, etc).
+- Do **not** reintroduce the “SmoothForm is discrete topology” hack.
+- If you touch anything in the functional-analytic layer:
+  - keep `SmoothForm` seminormed by comass
+  - keep `Current` as `→L[ℝ]` with only `boundary_bound` stored
+
+## 6. High-signal proof patterns (use these)
+
+- **Bounded linear ⇒ continuous**:
 
 ```lean
-class AutomaticSYRData (n : ℕ) (X : Type u) ... : Prop where
-  microstructure_construction_core : ...
-
-class HarveyLawsonKingData (n : ℕ) (X : Type u) ... : Prop where
-  calibrated_support_is_analytic : ...
-
-class SpineBridgeData (n : ℕ) (X : Type u) ... : Prop where
-  fundamental_eq_representing : ...
+-- Given f : E →ₗ[ℝ] F and ∃ C, ∀ x, ‖f x‖ ≤ C * ‖x‖
+exact f.mkContinuousOfExistsBound hbound
 ```
 
-**KEY INSIGHT**: The main theorems `hodge_conjecture` and `hodge_conjecture'` are **conditional on these typeclasses**. The sorries inside the typeclass instances are where the "deep content" lives.
+- **Current boundedness via opNorm**:
 
-### 3. WHAT "DEEP CONTENT SORRY" MEANS
-
-A "deep content sorry" is NOT a bug - it represents genuinely difficult mathematics:
-
-1. **`flatNorm_eq_zero_iff`** - Requires GMT compactness arguments
-2. **`flatNorm_add`** - Triangle inequality (provable but complex Lean proof)
-3. **`federerFleming_compactness`** - Deep compactness theorem
-4. **`current_form_bound`** - Requires proper comass (currently 0)
-5. **`calibrated_minimizes_mass`** - Harvey-Lawson calibration theory
-6. **`h_defect_zero` in Main.lean** - Microstructure currents are calibrated
-7. **`fundamental_eq_representing` in GAGA.lean** - THE CORE OF HODGE CONJECTURE
-
-### 4. STRATEGIES THAT WORK
-
-#### Strategy A: If definition is a placeholder returning 0/True
 ```lean
--- Example: IsSupportedOnAnalyticVariety is True
-theorem calibrated_implies_analytic_support ... : IsSupportedOnAnalyticVariety T.toCurrent := trivial
+-- |T(ω)| ≤ ‖T‖ * ‖ω‖
+simpa [Real.norm_eq_abs] using (T.toFun.le_opNorm ω)
 ```
 
-#### Strategy B: If theorem uses placeholder comass (= 0)
-The theorem may be unprovable as stated. Use `sorry` with clear documentation:
-```lean
-theorem current_form_bound (T : Current n X k) (ω : TestForm n X k) :
-    ‖T ω‖ ≤ (mass T).toReal * comass ω := by
-  -- comass is currently defined as 0, making RHS = 0
-  -- This requires proper comass definition from Norms.lean
-  sorry
-```
+## 7. Where to focus agent effort
 
-#### Strategy C: For deep mathematical content
-Use `sorry` with extensive documentation explaining what's needed:
-```lean
-theorem federerFleming_compactness ... := by
-  -- This is a deep GMT theorem requiring:
-  -- 1. Compactness of integral currents in flat norm
-  -- 2. Lower semicontinuity of mass
-  -- Reference: Federer-Fleming (1960), Federer GMT 4.2.17
-  sorry
-```
+If you are running autonomous agents, prioritize:
 
-### 5. BEFORE ATTEMPTING ANY SORRY
+1. `Hodge/Kahler/Main.lean` (the remaining `sorry` — deep calibration defect = 0)
+2. Then, if explicitly requested: eliminate the explicit axioms in Submanifold integration / spine bridge.
 
-1. **Read the ENTIRE file** containing the sorry (not just 40 lines around it)
-2. **Check all definitions** used in the theorem - are they placeholders?
-3. **Trace imports** to understand what's available
-4. **Check if the theorem is in the proof track** - if not, it may be infrastructure
-5. **Look for existing similar proofs** in the codebase
-
-### 6. FILE STRUCTURE OVERVIEW
-
-```
-Hodge/
-├── Analytic/           # Current/form infrastructure
-│   ├── Currents.lean       # Main Current type, mass, boundary
-│   ├── Calibration.lean    # CalibratingForm, calibrationDefect
-│   └── Integration/        # Submanifold integration (PLACEHOLDER)
-├── GMT/                # Geometric Measure Theory
-│   ├── Mass.lean           # mass, comass (comass = 0 PLACEHOLDER)
-│   ├── FlatNorm.lean       # flatNorm, IntegralCurrent
-│   └── Calibration.lean    # GMT calibration (different from Analytic)
-├── Kahler/             # Main proof
-│   ├── Main.lean           # hodge_conjecture, hodge_conjecture'
-│   └── Microstructure.lean # microstructureSequence
-└── Classical/          # Algebraic geometry
-    ├── GAGA.lean           # SpineBridgeData, core bridge theorem
-    └── HarveyLawson.lean   # Harvey-Lawson structure theorem
-```
-
-### 7. KERNEL AXIOM STATUS
-
-```
-'hodge_conjecture' depends on axioms: [propext, Classical.choice, Quot.sound]
-'hodge_conjecture'' depends on axioms: [propext, Classical.choice, Quot.sound]
-```
-
-These are STANDARD Lean axioms - NO `sorryAx`! The sorries are in typeclass instances (deep content), not the main proof track.
-
-### 8. WHAT NOT TO DO
-
-❌ **DON'T** use `admit` - it's banned and will be rejected
-❌ **DON'T** use `:= trivial` or `:= True` for non-trivial theorems
-❌ **DON'T** try to prove theorems that depend on placeholder definitions without understanding the placeholder
-❌ **DON'T** assume a sorry can be proven just because the types match
-❌ **DON'T** spend more than 3 attempts on a deep content sorry
-
-### 9. REMAINING SORRIES (as of Jan 29, 2026)
-
-| File | Line | Theorem | Nature |
-|------|------|---------|--------|
-| FlatNorm.lean | 61 | flatNorm_eq_zero_iff | Deep GMT (compactness) |
-| FlatNorm.lean | 94 | flatNorm_add | Provable but complex |
-| FlatNorm.lean | 139 | federerFleming_compactness | Deep GMT |
-| Calibration.lean | 79 | current_form_bound | Needs proper comass |
-| Calibration.lean | 106 | calibrated_minimizes_mass | Deep calibration |
-| Main.lean | 268 | h_defect_zero | Microstructure calibrated |
-| GAGA.lean | 603 | fundamental_eq_representing | CORE OF HODGE |
-
-### 10. SUCCESS CRITERIA
-
-A proof is only valid if:
-1. `lake build` succeeds
-2. No `admit` statements
-3. No trivializations (`:= trivial`, `:= True`, `:= ⟨⟩` for non-unit types)
-4. The sorry count in the file decreases OR stays the same
-
-If you cannot prove a sorry after reading full context, REPORT why it's a deep content sorry and move to the next one.

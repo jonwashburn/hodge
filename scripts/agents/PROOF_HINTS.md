@@ -1,145 +1,83 @@
-# Agent Proof Hints
+# Agent Proof Hints (Updated 2026-01-30)
 
-These hints document proof patterns that work for the Hodge formalization.
-Use these strategies when attempting to eliminate `sorry` statements.
+These hints are tuned to the **current** Phase‑1 architecture:
 
-## Successful Proof Patterns
+- `SmoothForm` is seminormed by comass (NOT discrete topology).
+- `Current` is `SmoothForm →L[ℝ] ℝ`.
+- Continuity proofs should come from **bounded linear maps**, not `continuous_of_discreteTopology`.
 
-### 1. Triangle Inequality for iSup (mass_add)
+## 1. Core functional-analytic patterns
 
-When proving `⨆ ω, ‖f(ω)‖ + ⨆ ω, ‖g(ω)‖ ≥ ⨆ ω, ‖f(ω) + g(ω)‖`:
+### 1.1 Build a continuous linear map from a bound
 
-```lean
-apply iSup₂_le
-intro ω hω
-have h1 : (‖(S + T) ω‖₊ : ℝ≥0∞) ≤ ‖S ω‖₊ + ‖T ω‖₊ := by
-  have : (S + T) ω = S ω + T ω := LinearMap.add_apply S T ω
-  rw [this]
-  exact_mod_cast nnnorm_add_le (S ω) (T ω)
-have h2 : (‖S ω‖₊ : ℝ≥0∞) ≤ ⨆ ω' ∈ comassUnitBall n X k, (‖S ω'‖₊ : ℝ≥0∞) := by
-  apply le_iSup₂_of_le ω hω
-  rfl
--- ... combine with add_le_add
-```
-
-### 2. Infimum Upper Bound (flatNorm_le_mass)
-
-When proving `⨅ x, f(x) ≤ specific_value`:
+If you can produce a linear map `f : E →ₗ[ℝ] F` and a bound `∃ C, ∀ x, ‖f x‖ ≤ C * ‖x‖`, then:
 
 ```lean
-have h : T = T + Current.boundary 0 := by simp [Current.boundary]
-calc ⨅ R, ⨅ S, ⨅ _ : T = R + Current.boundary S, mass R + mass S
-    ≤ mass T + mass (0 : Current n X (k + 1)) := by
-      apply iInf_le_of_le T
-      apply iInf_le_of_le 0
-      apply iInf_le_of_le h
-      rfl
-  _ = mass T + 0 := by rw [mass_zero]
-  _ = mass T := add_zero _
+exact f.mkContinuousOfExistsBound hbound
 ```
 
-### 3. Placeholder Definitions (comass = 0)
+This is the standard way to package “bounded linear functional” as `→L[ℝ]`.
 
-When `comass` is defined as 0:
-- `comass_add` and `comass_smul` become trivial via `simp [comass]`
-- `mass` becomes trivial via the same simplification
+### 1.2 Get a bound from a `Current` (opNorm)
 
-### 4. Zero Current Arguments
+`Current.toFun` is a `ContinuousLinearMap`, so you automatically get:
 
-When `submanifoldIntegral` is defined as 0:
-- `integrationCurrent Z = 0` can be shown with:
 ```lean
-apply LinearMap.ext
-intro ω
-simp only [integrationCurrent, submanifoldIntegral, LinearMap.coe_mk, 
-           AddHom.coe_mk, LinearMap.zero_apply]
+-- |T(ω)| ≤ ‖T‖ * ‖ω‖
+simpa [Real.norm_eq_abs] using (T.toFun.le_opNorm ω)
 ```
 
----
+### 1.3 Boundary evaluation simplification
 
-## Remaining Sorries with Hints
+Use the simp lemma:
 
-### GMT/Mass.lean:111 - mass_smul
 ```lean
-mass (c • T) = ‖c‖₊ * mass T
+by simp [Current.boundary_toFun]
 ```
-**Hint**: Need `ENNReal.mul_iSup₂` or manual manipulation. Key step:
+
+to rewrite `(Current.boundary T).toFun ω` into `T.toFun (smoothExtDeriv ω)`.
+
+## 2. Algebra on currents/forms (recommended rewrites)
+
+- **Addition / subtraction**:
+  - Rewrite `S - T` as `S + -T` with `sub_eq_add_neg`.
+  - Use `simp [sub_eq_add_neg, add_assoc, add_left_comm, add_comm]`.
+
+- **Linearity of evaluation**:
+  - Use `T.toFun.map_add` and `T.toFun.map_smul`.
+
+## 3. Practical “don’t get stuck” advice
+
+### 3.1 Avoid old discrete-topology hacks
+
+If you see/think “`continuous_of_discreteTopology`”, that is almost certainly wrong now.
+Replace with `mkContinuousOfExistsBound` or `ContinuousLinearMap.le_opNorm`.
+
+### 3.2 When `simp` doesn’t fire on `Current` arithmetic
+
+Sometimes rewriting via the constructor defs is easier:
+
 ```lean
-have h : ∀ ω, (c • T) ω = c • T ω := fun ω => LinearMap.smul_apply c T ω
-simp_rw [h, nnnorm_smul]
--- Then factor out ‖c‖₊ from the iSup using ENNReal multiplication properties
+simp [Current.add_curr, Current.neg_curr, add_assoc, add_left_comm, add_comm]
 ```
 
-### GMT/FlatNorm.lean:50 - flatNorm_eq_zero_iff
-```lean
-flatNorm T = 0 ↔ ∃ S, T = Current.boundary S
+## 4. What to work on (priority)
+
+Run:
+
+```bash
+./scripts/audit_stubs.sh --full
 ```
-**Hint**: The ← direction requires showing the infimum is 0 by taking R = 0, S = the witness.
-The → direction requires showing mass R = mass S = 0 implies R = 0 and T = ∂S.
 
-### GMT/FlatNorm.lean:69 - flatNorm_add
-```lean
-flatNorm (S + T) ≤ flatNorm S + flatNorm T
-```
-**Hint**: Use the definition. If S = R₁ + ∂S₁ and T = R₂ + ∂S₂, then:
-S + T = (R₁ + R₂) + ∂(S₁ + S₂). Use `mass_add` for both parts.
+and prioritize:
 
-### GMT/FlatNorm.lean:74 - flatNormTopology
-```lean
-def flatNormTopology : TopologicalSpace (Current n X k)
-```
-**Hint**: Use `UniformSpace.toTopologicalSpace` with the flat norm as metric,
-or define via `TopologicalSpace.induced` from the flat norm function.
+1. `Hodge/Kahler/Main.lean` remaining `sorry` (deep calibration defect = 0)
+2. Only after that (or if explicitly requested): eliminate explicit axioms in
+   `Hodge/Analytic/Integration/SubmanifoldIntegral.lean` and `Hodge/Classical/GAGA.lean`.
 
-### GMT/FlatNorm.lean:90 - isIntegral
-```lean
-isIntegral : Prop := sorry
-```
-**Hint**: This is a placeholder for "integer multiplicities". Could define as True 
-temporarily, or reference the slicing measure being integer-valued.
+## 5. Hard rules (always enforced)
 
-### GMT/FlatNorm.lean:108 - federerFleming_compactness
-**Hint**: This is a deep theorem. For scaffolding, either:
-- Define it as an axiom with honest documentation
-- Use `sorry` with a note about what it requires
+- No `admit`.
+- No trivializations (`:= trivial`, `:= True`, `⟨⟩`, etc).
+- Don’t revert Phase‑1 refactors (SmoothForm discrete / Current carrying “bound” field).
 
-### GMT/Calibration.lean:88 - current_form_bound  
-```lean
-‖T ω‖ ≤ (mass T).toReal * comass ω
-```
-**Hint**: With comass = 0, RHS = 0. This can't be proven without proper comass.
-Leave as sorry until comass is properly defined.
-
-### GMT/Calibration.lean:97 - calibrated_minimizes_mass
-**Hint**: This is Harvey-Lawson calibration theorem. Deep result requiring
-the calibration inequality and proper GMT infrastructure.
-
-### GMT/Calibration.lean:111 & 121 - IsSupportedOnAnalyticVariety
-**Hint**: These require analytic variety theory from AlgGeom. Keep as sorry
-until that infrastructure exists.
-
-### Kahler/Main.lean:262 - calibration defect → 0
-**Hint**: This is CORE HODGE. The proof requires:
-1. Show microstructure sequence has vanishing defect
-2. Use GMT compactness to extract limit
-3. Apply Harvey-Lawson to get analytic support
-
-### Classical/GAGA.lean:590 - fundamental_eq_representing
-**Hint**: This is CORE HODGE. The proof requires:
-1. Integration current of support has Poincaré dual = representing form
-2. Uses the full spine bridge construction
-3. Reference paper Sections 8-10
-
----
-
-## Key Lemmas to Know
-
-- `LinearMap.add_apply`: `(S + T) ω = S ω + T ω`
-- `LinearMap.smul_apply`: `(c • T) ω = c • T ω`
-- `nnnorm_add_le`: triangle inequality for nnnorm
-- `nnnorm_smul`: `‖c • x‖₊ = ‖c‖₊ * ‖x‖₊`
-- `le_iSup₂_of_le`: prove ≤ iSup by exhibiting witness
-- `iSup₂_le`: prove iSup ≤ something by proving for all elements
-- `iInf_le_of_le`: prove iInf ≤ something by exhibiting witness
-- `ENNReal.mul_iSup`: factor out multiplication from iSup
-- `mass_zero`: `mass 0 = 0`

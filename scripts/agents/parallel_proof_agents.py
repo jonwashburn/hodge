@@ -42,26 +42,22 @@ MAX_RECENT_REJECTIONS = 5
 
 # Key placeholder definitions agents must understand
 PLACEHOLDER_DEFINITIONS = """
-## KEY PLACEHOLDER DEFINITIONS IN THIS CODEBASE
+## KEY DEFINITIONS (PHASE‑1 FUNCTIONAL‑ANALYTIC LAYER)
 
-These definitions have been updated to be OPAQUE (axiomatized). Do NOT assume they are 0.
+1) Smooth forms are NOT discrete:
+   - `SmoothForm n X k` is a seminormed/NormedSpace over ℝ with `‖ω‖ = comass ω`
+   - Do NOT use `continuous_of_discreteTopology`.
+   - See: `Hodge/Analytic/Norms.lean`
 
-1. comass (Hodge/GMT/Mass.lean):
-   opaque comass (ω : TestForm n X k) : ℝ  -- Axiomatized norm
+2) Currents are continuous linear functionals:
+   - `Current n X k` has `toFun : SmoothForm n X k →L[ℝ] ℝ`
+   - Boundedness is derived from opNorm; there is no per-current `bound` field.
+   - The only extra hypothesis stored is `boundary_bound`.
+   - See: `Hodge/Analytic/Currents.lean`
 
-2. submanifoldIntegral (Hodge/Analytic/Integration/SubmanifoldIntegral.lean):
-   opaque submanifoldIntegral (Z : OrientedSubmanifold n X k) (ω : TestForm n X k) : ℂ -- Axiomatized integral
-
-3. volume (Hodge/GMT/Mass.lean):
-   opaque volume (Z : OrientedSubmanifold n X k) : ℝ≥0∞ -- Axiomatized volume
-
-4. IsSupportedOnAnalyticVariety (Hodge/GMT/Calibration.lean):
-   def IsSupportedOnAnalyticVariety (_T : Current n X k) : Prop := True  -- ALWAYS TRUE!
-
-5. isIntegral (Hodge/GMT/FlatNorm.lean):
-   isIntegral : Prop := True  -- TRIVIALLY TRUE!
-
-CONSEQUENCE: Theorems involving comass/mass are now PROVABLE using the axioms (e.g. comass_add, mass_integrationCurrent_eq_volume).
+3) Remaining explicit axioms (deep stubs):
+   - `Hodge/Classical/GAGA.lean`: `fundamental_eq_representing_axiom`
+   - `Hodge/Analytic/Integration/SubmanifoldIntegral.lean`: `opaque submanifoldIntegral` + axioms about add/smul/continuity
 """
 
 # Number of parallel agents
@@ -69,18 +65,10 @@ NUM_AGENTS = 2
 
 # All files with sorries (will work through these)
 ALL_TARGET_FILES = [
-    "Hodge/Analytic/FlatNormReal.lean",
-    "Hodge/Analytic/Integration/SubmanifoldIntegral.lean",
-    "Hodge/GMT/FlatNorm.lean",
-    "Hodge/GMT/Mass.lean",
-    "Hodge/GMT/Calibration.lean",
-    "Hodge/Analytic/Stage2/IntegrationCurrentsManifoldSkeleton.lean",
-    "Hodge/Analytic/Integration/Stokes.lean",
-    "Hodge/Classical/CycleClass.lean",
-    "Hodge/Classical/GAGA.lean",
-    "Hodge/Analytic/Advanced.lean",
-    "Hodge/Analytic/IntegralCurrents.lean",
+    # Keep this list tight: only files with on-track / high-signal sorries.
     "Hodge/Kahler/Main.lean",
+    # Optional (scaffold / not usually on the main proof dependency cone):
+    "Hodge/Analytic/Stage2/IntegrationCurrentsManifoldSkeleton.lean",
 ]
 
 # FORBIDDEN patterns - trivializations

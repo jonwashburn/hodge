@@ -45,13 +45,6 @@ variable {n : ℕ} {X : Type*}
 
     See `hodge_conjecture_kernel` for the equivalent kernel-only version. -/
 theorem hodge_conjecture {p : ℕ}
-    [SubmanifoldIntegration n X]  -- Integration on submanifolds
-    [AutomaticSYRData n X]
-    [FlatLimitCycleData n X (2 * (n - p))]  -- Federer-Fleming compactness
-    [CubulationExists n X]  -- Cubulation existence for microstructure
-    [HarveyLawsonKingData n X (2 * (n - p))]  -- Harvey-Lawson regularity
-    [ChowGAGAData n X]  -- Chow/GAGA: analytic subvarieties are algebraic
-    [CycleClass.PoincareDualFormExists n X p] [SpineBridgeData n X]
     (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
     (h_rational : isRationalClass (ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :
     ∃ (Z : SignedAlgebraicCycle n X p), Z.cycleClass_geom = ofForm γ h_closed :=

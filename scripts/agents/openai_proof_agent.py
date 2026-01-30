@@ -43,12 +43,11 @@ LOG_DIR = REPO_PATH / "autonomous_logs"
 LAKE_PATH = "/home/ubuntu/.elan/bin/lake"
 
 # Target files with remaining sorries (priority order)
+# Keep this list tight: only files with actual `sorry` on the main path.
 TARGET_FILES = [
-    "Hodge/GMT/Mass.lean",           # mass_smul
-    "Hodge/GMT/FlatNorm.lean",       # flatNorm theorems
-    "Hodge/GMT/Calibration.lean",    # calibration theorems
-    "Hodge/Kahler/Main.lean",        # CORE: calibration defect → 0
-    "Hodge/Classical/GAGA.lean",     # CORE: fundamental = representing
+    "Hodge/Kahler/Main.lean",
+    # Optional scaffold file (not usually in the dependency cone of the main theorem):
+    "Hodge/Analytic/Stage2/IntegrationCurrentsManifoldSkeleton.lean",
 ]
 
 # FORBIDDEN patterns - trivializations
@@ -63,28 +62,23 @@ FORBIDDEN_PATTERNS = [
 
 # Proof hints discovered during manual work
 AGENT_CONTEXT_PATH = REPO_PATH / "scripts" / "agents" / "AGENT_CONTEXT.md"
+PROOF_HINTS_PATH = REPO_PATH / "scripts" / "agents" / "PROOF_HINTS.md"
 
 PLACEHOLDER_DEFINITIONS = """
-## KEY PLACEHOLDER DEFINITIONS IN THIS CODEBASE
+## KEY DEFINITIONS (PHASE‑1 FUNCTIONAL‑ANALYTIC LAYER)
 
-These definitions have been updated to be OPAQUE (axiomatized). Do NOT assume they are 0.
+1) Smooth forms are NOT discrete:
+   - `SmoothForm n X k` is seminormed/Normed over ℝ with `‖ω‖ = comass ω`.
+   - Do NOT use `continuous_of_discreteTopology`.
 
-1. comass (Hodge/GMT/Mass.lean):
-   opaque comass (ω : TestForm n X k) : ℝ  -- Axiomatized norm
+2) Currents are continuous linear functionals:
+   - `Current n X k` has `toFun : SmoothForm n X k →L[ℝ] ℝ`.
+   - Boundedness comes from opNorm; there is no per-current `bound` field.
+   - Only extra hypothesis stored is `boundary_bound` (controls `ω ↦ T(dω)`).
 
-2. submanifoldIntegral (Hodge/Analytic/Integration/SubmanifoldIntegral.lean):
-   opaque submanifoldIntegral (Z : OrientedSubmanifold n X k) (ω : TestForm n X k) : ℂ -- Axiomatized integral
-
-3. volume (Hodge/GMT/Mass.lean):
-   opaque volume (Z : OrientedSubmanifold n X k) : ℝ≥0∞ -- Axiomatized volume
-
-4. IsSupportedOnAnalyticVariety (Hodge/GMT/Calibration.lean):
-   def IsSupportedOnAnalyticVariety (_T : Current n X k) : Prop := True  -- ALWAYS TRUE!
-
-5. isIntegral (Hodge/GMT/FlatNorm.lean):
-   isIntegral : Prop := True  -- TRIVIALLY TRUE!
-
-CONSEQUENCE: Theorems involving comass/mass are now PROVABLE using the axioms (e.g. comass_add, mass_integrationCurrent_eq_volume).
+3) Deep axioms still present (do not “fake-prove”):
+   - `Hodge/Classical/GAGA.lean`: `fundamental_eq_representing_axiom`
+   - `Hodge/Analytic/Integration/SubmanifoldIntegral.lean`: `opaque submanifoldIntegral` + axioms about add/smul/continuity
 """
 
 def load_agent_context():
@@ -95,48 +89,13 @@ def load_agent_context():
 
 AGENT_CONTEXT_TEXT = load_agent_context()
 
-PROOF_HINTS = """
-## Key Proof Patterns That Work:
+def load_proof_hints():
+    try:
+        return PROOF_HINTS_PATH.read_text()
+    except Exception:
+        return ""
 
-### 1. Triangle Inequality for iSup (mass_add pattern):
-```lean
-apply iSup₂_le
-intro ω hω
-have h1 : (‖(S + T) ω‖₊ : ℝ≥0∞) ≤ ‖S ω‖₊ + ‖T ω‖₊ := by
-  have : (S + T) ω = S ω + T ω := LinearMap.add_apply S T ω
-  rw [this]
-  exact_mod_cast nnnorm_add_le (S ω) (T ω)
-have h2 : (‖S ω‖₊ : ℝ≥0∞) ≤ ⨆ ω' ∈ comassUnitBall n X k, (‖S ω'‖₊ : ℝ≥0∞) := by
-  apply le_iSup₂_of_le ω hω
-  rfl
--- ... combine with add_le_add h2 h3
-```
-
-### 2. Infimum Upper Bound (flatNorm_le_mass pattern):
-```lean
-have h : T = T + Current.boundary 0 := by simp [Current.boundary]
-apply iInf_le_of_le T
-apply iInf_le_of_le 0
-apply iInf_le_of_le h
-```
-
-### 3. Key Lemmas:
-- `LinearMap.add_apply`: `(S + T) ω = S ω + T ω`
-- `LinearMap.smul_apply`: `(c • T) ω = c • T ω`
-- `nnnorm_add_le`: triangle inequality for nnnorm
-- `nnnorm_smul`: `‖c • x‖₊ = ‖c‖₊ * ‖x‖₊`
-- `le_iSup₂_of_le`: prove ≤ iSup by exhibiting witness
-- `iSup₂_le`: prove iSup ≤ something by proving for all elements
-- `iInf_le_of_le`: prove iInf ≤ something by exhibiting witness
-- `ENNReal.mul_iSup`: factor out multiplication from iSup
-- `mass_zero`: `mass 0 = 0`
-- `mass_add`: already proven, use it!
-
-### 4. Specific Hints:
-- mass_smul: Use `LinearMap.smul_apply`, `nnnorm_smul`, then factor ‖c‖₊ using ENNReal.mul_iSup
-- flatNorm_add: Decompose S = R₁ + ∂S₁, T = R₂ + ∂S₂, then S+T = (R₁+R₂) + ∂(S₁+S₂)
-- flatNormTopology: Use `UniformSpace.toTopologicalSpace` with flat norm metric
-"""
+PROOF_HINTS_TEXT = load_proof_hints()
 
 stats = {
     "start_time": None,
@@ -353,7 +312,7 @@ def attempt_proof(filepath, line_num, line_content, full_context, focused_contex
 
 {AGENT_CONTEXT_TEXT}
 
-{PROOF_HINTS}
+{PROOF_HINTS_TEXT}
 
 ---
 
@@ -374,17 +333,16 @@ Sorry at Line {line_num}: {line_content}
 
 ## DECISION PROCESS
 
-1. Does this theorem use `comass`? → RHS of bounds = 0 (placeholder)
-2. Does this theorem use `submanifoldIntegral`? → Currents evaluate to 0
-3. Is this a "deep content" sorry? → May need to remain as documented sorry
-4. Can this actually be proven given the placeholder definitions?
+1. Identify the *actual* definitions in scope (SmoothForm is seminormed; Current is `→L[ℝ]`).
+2. If you need continuity: use `mkContinuousOfExistsBound` (bounded linear ⇒ continuous) or opNorm bounds.
+3. Do NOT assume `smoothExtDeriv` is continuous w.r.t. comass; boundary uses `boundary_bound`.
+4. Produce a real Lean proof (no `sorry`, no trivializations).
 
 ## Instructions
 
-1. If provable: Replace `sorry` with a REAL Lean 4 proof
-2. If deep content: Leave as sorry but document WHY
-3. NEVER use: `:= trivial`, `:= True`, `True.intro`, `⟨⟩`, or `admit`
-4. Use proper tactics: `simp`, `exact`, `apply`, `intro`, `constructor`, `linarith`
+1. Replace `sorry` with a REAL Lean 4 proof (this agent rejects any patch that still contains `sorry`)
+2. NEVER use: `:= trivial`, `:= True`, `True.intro`, `⟨⟩`, or `admit`
+3. Prefer: `simp`, `exact`, `apply`, `intro`, `constructor`, `linarith`
 
 ## Response Format
 
