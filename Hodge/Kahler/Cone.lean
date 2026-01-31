@@ -179,6 +179,13 @@ theorem isConePositive_smul {p : ℕ} (α : SmoothForm n X (2 * p))
     isConePositive (t • α) := by
   intro x; exact stronglyPositiveCone_smul p x α (hα x) t ht
 
+/-- `isConePositive` is preserved under multiplication by a nonnegative rational scalar. -/
+theorem isConePositive_smul_rat {p : ℕ} (α : SmoothForm n X (2 * p))
+    (hα : isConePositive α) (q : ℚ) (hq : q ≥ 0) :
+    isConePositive ((q : ℝ) • α) := by
+  have hq' : (q : ℝ) ≥ 0 := by exact_mod_cast hq
+  exact isConePositive_smul (n := n) (X := X) (p := p) α hα (q : ℝ) hq'
+
 /-- Any smooth form has a finite pointwise bound (cone version). -/
 theorem form_is_bounded_cone {k : ℕ} (α : SmoothForm n X k) :
     ∃ M : ℝ, M > 0 ∧ ∀ x, pointwiseComass α x ≤ M := by

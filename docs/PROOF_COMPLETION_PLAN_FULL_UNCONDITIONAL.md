@@ -29,44 +29,47 @@ We are **done** only when all of the following hold:
 
 ## Baseline (What’s Broken Today)
 
-Current audits show **no `sorry`**, but many **semantic placeholders** and a handful of **actual `axiom`/`opaque` declarations**.
+Current audits show:
 
-### Actual axioms/opaque that must be eliminated
+- **No `sorry`**, **no `axiom`**, **no `opaque`** declarations in `Hodge/`.
+- `Hodge/Utils/DependencyCheck.lean` reports only the standard Lean axioms:
+  - `propext`, `Classical.choice`, `Quot.sound`
 
-- `Hodge/Analytic/TestForms/LFTopology.lean`
-  - `axiom realTopology : TopologicalSpace (TestForm n X k)`
-- `Hodge/Analytic/TestForms/Operations.lean`
-  - `axiom leibniz : True`
-  - `axiom pullback_d ...`
-- `Hodge/Analytic/Integration/SubmanifoldIntegral.lean`
-  - `opaque submanifoldIntegral ...`
-  - `axiom integral_add`, `axiom integral_smul`, `axiom integral_continuous`
+But the repo still contains **semantic placeholders** (“gotchas”) that make the present proof track *not* mathematically genuine
+even though it compiles.
+
+The authoritative, file-pointed list is:
+
+- `docs/SEMANTIC_GOTCHAS_INDEX.md`
 
 ### Key semantic stubs that must be replaced with genuine meaning
 
 This is not exhaustive, but it captures the major blockers currently *on the proof spine*:
 
-- **Test forms are a fake type**:
-  - `Hodge/Analytic/TestForms/LFTopology.lean`: `structure TestForm ... where data : Unit := ()`
-  - `TopologicalSpace (TestForm ...) := ⊥`
-- **Operations on test forms are fake**:
-  - `Hodge/Analytic/TestForms/Operations.lean`: `extDeriv`, `wedge`, `pullback` all return `⟨()⟩`.
-- **Submanifold integration is fake / axiomatized**:
-  - `Hodge/Analytic/Integration/SubmanifoldIntegral.lean`: `OrientedSubmanifold` is a placeholder; `submanifoldMeasure := Measure.count`; integral is `opaque` + axioms.
-- **Current support is fake**:
-  - `Hodge/Analytic/Currents.lean`: `Current.support := Set.univ` (explicitly documented as a placeholder).
-- **Analytic & algebraic sets are approximated by closedness**:
-  - `Hodge/Classical/HarveyLawson.lean`: `IsAnalyticSet` stores only `IsClosed`.
+- **Geometric cycle class is still a tautology on the proof track**:
+  - `Hodge/Classical/GAGA.lean`: `SignedAlgebraicCycle.cycleClass_geom := Z.cycleClass` (carried form), so `hodge_conjecture'` can end with `rfl`.
+- **Poincaré dual / fundamental class is still placeholder-level**:
+  - `Hodge/Classical/CycleClass.lean`: placeholder `PoincareDualFormExists.universal` / `omegaPower` scaffolding.
+  - `Hodge/Classical/GAGA.lean`: `FundamentalClassSet` depends on the above.
+- **“Analytic/algebraic = closed”** (explicitly forbidden by the spec):
+  - `Hodge/Classical/HarveyLawson.lean`: `IsAnalyticSet` is (currently) essentially `IsClosed`.
   - `Hodge/Classical/GAGA.lean`: `IsAlgebraicSet := IsClosed`.
-- **Microstructure/SYR is fake**:
-  - `Hodge/Kahler/Main.lean`: `AutomaticSYRData.universal` returns the **zero integral current** sequence.
-  - `Hodge/Kahler/Microstructure.lean`: `CubulationExists.universal` is now a **genuine finite ball cover**
-    with diameter control and chart containment (still needs real holomorphic sheets + gluing + defect → 0).
-- **Hodge-theoretic operators are fake**:
+- **Submanifold integration is still the zero model**:
+  - `Hodge/Analytic/Integration/SubmanifoldIntegral.lean`: `submanifoldIntegral := 0`.
+  - `Hodge/Analytic/Integration/HausdorffMeasure.lean`: `SubmanifoldIntegration.universal` sets `measure2p := 0`, `integral := 0`.
+  - `Hodge/Deep/Pillars/Stokes.lean`: `SubmanifoldIntegration.real` still sets `integral := 0` (even though `measure2p := μH[2p]`).
+- **Microstructure/SYR is still fake**:
+  - `Hodge/Kahler/Microstructure.lean`: `buildSheetsFromConePositive` returns `sheets := ∅` and `support := Set.univ`.
+  - `Hodge/Kahler/Microstructure/RealSpine.lean`: `microstructureSequence_real := fun _k => zero_int ...`.
+- **Federer/Fleming boundary mass placeholder**:
+  - `Hodge/Analytic/Currents.lean`: `boundaryMass := 0`.
+- **Hodge-theoretic operators are still stubbed**:
   - `Hodge/Analytic/Norms.lean`: `HodgeStarData.trivial` defines ⋆ as `0`, etc.
   - `Hodge/Kahler/Identities/*.lean`: several operators are `:= 0`.
-- **Poincaré dual / cycle class infrastructure is still an interface**:
-  - `Hodge/Classical/CycleClass.lean`: `PoincareDualFormExists` is a typeclass interface; placeholder constructions exist (`omegaPower` etc.).
+
+### Notes on resolved baseline items
+
+- `Current.support` was previously `Set.univ`; it has been replaced by a standard nontrivial support definition in `Hodge/Analytic/Currents.lean`.
 
 ## Dependency Graph (High-Level)
 

@@ -5,6 +5,8 @@ Authors: TeX Spine Semantic Closure Implementation
 -/
 import Hodge.Kahler.Microstructure
 import Hodge.Analytic.Integration.HausdorffMeasure
+import Hodge.GMT.TemplateExtension
+import Hodge.GMT.TransportFlat
 -- NOTE: Removed import of Hodge.Kahler.Main to avoid circular dependency
 -- The bridge to automatic_syr is handled via typeclass wiring in Main.lean
 
@@ -67,6 +69,17 @@ private theorem integrateDegree2p_transport {k k' : ℕ} (hk : k = k')
       integrateDegree2p (n := n) (X := X) k' Z ω := by
   cases hk
   rfl
+
+/-! ## TeX reference: `prop:sliver-template-extension`
+
+The TeX proposition “sliver-template-extension” is purely combinatorial: it identifies the
+unmatched tail when comparing two prefix sums in a common ordered template, and (combined with
+triangle inequality) yields a flat-norm bound on the mismatch.
+
+The Lean formalization of the *flat-norm* part lives in:
+`Hodge.TexSpine.TemplateFlat.flatNorm_prefix_mismatch_le_unmatched`
+in `Hodge/GMT/TemplateExtension.lean`.
+-/
 
 /-! ## Typeclass Assumptions for GMT Results
 

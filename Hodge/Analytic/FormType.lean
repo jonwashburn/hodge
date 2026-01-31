@@ -37,7 +37,7 @@ def IsSmoothAlternating (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     (k : ℕ) (f : X → FiberAlt n k) : Prop :=
-  ContMDiff (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ⊤ f
+  ContMDiff (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ⊤ f
 
 @[ext]
 structure SmoothForm (n : ℕ) (X : Type u) (k : ℕ)
@@ -54,7 +54,7 @@ variable {n : ℕ} {X : Type u} [TopologicalSpace X]
 
 /-- The underlying `ContMDiff` smoothness proof from a `SmoothForm`. -/
 theorem smooth (ω : SmoothForm n X k) :
-    ContMDiff (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ⊤ ω.as_alternating :=
+    ContMDiff (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ⊤ ω.as_alternating :=
   ω.is_smooth
 
 end SmoothForm

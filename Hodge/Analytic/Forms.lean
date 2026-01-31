@@ -55,15 +55,15 @@ instance (k : ℕ) : Zero (SmoothForm n X k) := ⟨⟨fun _ => 0, isSmoothAltern
 /-- The sum of smooth forms is smooth. -/
 theorem isSmoothAlternating_add (k : ℕ) (ω η : SmoothForm n X k) :
     IsSmoothAlternating n X k (fun x => ω.as_alternating x + η.as_alternating x) := by
-  let addCLM : (FiberAlt n k × FiberAlt n k) →L[ℂ] FiberAlt n k :=
-    ContinuousLinearMap.fst ℂ (FiberAlt n k) (FiberAlt n k) +
-    ContinuousLinearMap.snd ℂ (FiberAlt n k) (FiberAlt n k)
+  let addCLM : (FiberAlt n k × FiberAlt n k) →L[ℝ] FiberAlt n k :=
+    ContinuousLinearMap.fst ℝ (FiberAlt n k) (FiberAlt n k) +
+    ContinuousLinearMap.snd ℝ (FiberAlt n k) (FiberAlt n k)
   exact addCLM.contMDiff.comp (ω.is_smooth.prodMk_space η.is_smooth)
 
 /-- The negation of a smooth form is smooth. -/
 theorem isSmoothAlternating_neg (k : ℕ) (ω : SmoothForm n X k) :
     IsSmoothAlternating n X k (fun x => -ω.as_alternating x) := by
-  let negCLM : FiberAlt n k →L[ℂ] FiberAlt n k := -ContinuousLinearMap.id ℂ (FiberAlt n k)
+  let negCLM : FiberAlt n k →L[ℝ] FiberAlt n k := -ContinuousLinearMap.id ℝ (FiberAlt n k)
   exact negCLM.contMDiff.comp ω.is_smooth
 
 /-- For a fixed continuous alternating map, the "evaluation-on-the-unit-ball" set is bounded above.
@@ -89,16 +89,16 @@ theorem IsSmoothAlternating.bddAbove {k : ℕ} (f : FiberAlt n k) :
 /-- Scalar multiplication preserves smoothness. -/
 theorem isSmoothAlternating_smul (k : ℕ) (c : ℂ) (ω : SmoothForm n X k) :
     IsSmoothAlternating n X k (fun x => c • ω.as_alternating x) := by
-  let smulCLM : FiberAlt n k →L[ℂ] FiberAlt n k := c • ContinuousLinearMap.id ℂ (FiberAlt n k)
+  let smulCLM : FiberAlt n k →L[ℝ] FiberAlt n k := c • ContinuousLinearMap.id ℝ (FiberAlt n k)
   exact smulCLM.contMDiff.comp ω.is_smooth
 
 
 /-- The difference of smooth forms is smooth (follows from add and neg). -/
 theorem isSmoothAlternating_sub (k : ℕ) (ω η : SmoothForm n X k) :
     IsSmoothAlternating n X k (fun x => ω.as_alternating x - η.as_alternating x) := by
-  let subCLM : (FiberAlt n k × FiberAlt n k) →L[ℂ] FiberAlt n k :=
-    ContinuousLinearMap.fst ℂ (FiberAlt n k) (FiberAlt n k) -
-    ContinuousLinearMap.snd ℂ (FiberAlt n k) (FiberAlt n k)
+  let subCLM : (FiberAlt n k × FiberAlt n k) →L[ℝ] FiberAlt n k :=
+    ContinuousLinearMap.fst ℝ (FiberAlt n k) (FiberAlt n k) -
+    ContinuousLinearMap.snd ℝ (FiberAlt n k) (FiberAlt n k)
   exact subCLM.contMDiff.comp (ω.is_smooth.prodMk_space η.is_smooth)
 
 instance (k : ℕ) : Add (SmoothForm n X k) := ⟨fun ω η => ⟨fun x => ω.as_alternating x + η.as_alternating x, isSmoothAlternating_add k ω η⟩⟩
@@ -449,11 +449,11 @@ This axiom is **ON THE PROOF TRACK** for `hodge_conjecture'`. It is used to:
 -/
 theorem isSmoothAlternating_wedge (k l : ℕ) (ω : SmoothForm n X k) (η : SmoothForm n X l) :
     IsSmoothAlternating n X (k + l)
-      (fun x => ContinuousAlternatingMap.wedge (𝕜 := ℂ) (E := TangentModel n)
+      (fun x => ContinuousAlternatingMap.wedge (𝕜 := ℝ) (E := TangentModel n)
                   (ω.as_alternating x) (η.as_alternating x)) := by
   -- wedgeCLM_alt is a continuous bilinear map, composition with smooth is smooth
-  let f := ContinuousAlternatingMap.wedgeCLM_alt ℂ (TangentModel n) k l
-  -- f : (FiberAlt n k) →L[ℂ] (FiberAlt n l) →L[ℂ] (FiberAlt n (k + l))
+  let f := ContinuousAlternatingMap.wedgeCLM_alt ℝ (TangentModel n) k l
+  -- f : (FiberAlt n k) →L[ℝ] (FiberAlt n l) →L[ℝ] (FiberAlt n (k + l))
   -- We need: ContMDiff ... (fun x => f (ω x) (η x))
   -- f.contMDiff.comp ω.is_smooth gives: ContMDiff ... (fun x => f (ω x)) as a CLM
   -- Then .clm_apply η.is_smooth gives: ContMDiff ... (fun x => f (ω x) (η x))
@@ -461,7 +461,7 @@ theorem isSmoothAlternating_wedge (k l : ℕ) (ω : SmoothForm n X k) (η : Smoo
 
 noncomputable def smoothWedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) : SmoothForm n X (k + l) where
   as_alternating := fun x =>
-    ContinuousAlternatingMap.wedge (𝕜 := ℂ) (E := TangentModel n)
+    ContinuousAlternatingMap.wedge (𝕜 := ℝ) (E := TangentModel n)
       (ω.as_alternating x) (η.as_alternating x)
   is_smooth := isSmoothAlternating_wedge k l ω η
 
@@ -475,7 +475,7 @@ notation:67 ω:68 " ⋏ " η:68 => smoothWedge ω η
   simpa [smoothWedge] using
     congrArg (fun (f : FiberAlt n (k + l)) => f v)
       (ContinuousAlternatingMap.wedge_smul_left
-        (𝕜 := ℂ) (E := TangentModel n) (c := (0 : ℂ))
+        (𝕜 := ℝ) (E := TangentModel n) (c := (0 : ℂ))
         (ω := (0 : FiberAlt n k)) (η := η.as_alternating x))
 
 @[simp] lemma wedge_zero {k l : ℕ} (ω : SmoothForm n X k) : ω ⋏ (0 : SmoothForm n X l) = 0 := by
@@ -483,7 +483,7 @@ notation:67 ω:68 " ⋏ " η:68 => smoothWedge ω η
   simpa [smoothWedge] using
     congrArg (fun (f : FiberAlt n (k + l)) => f v)
       (ContinuousAlternatingMap.wedge_smul_right
-        (𝕜 := ℂ) (E := TangentModel n) (c := (0 : ℂ))
+        (𝕜 := ℝ) (E := TangentModel n) (c := (0 : ℂ))
         (ω := ω.as_alternating x) (η := (0 : FiberAlt n l)))
 
 /-- **Nilpotency of Exterior Derivative: d² = 0** (Classical Pillar Axiom).
@@ -770,14 +770,14 @@ theorem isFormClosed_unitForm : IsFormClosed (unitForm (n := n) (X := X)) := by
   -- Goal: alternatizeUncurryFin (mfderiv unitForm.as_alternating x) = 0
   -- unitForm.as_alternating = const (constOfIsEmpty 1), so mfderiv = 0
   -- mfderiv of a constant function is 0
-  have h_mf_zero : mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n 0)
+  have h_mf_zero : mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n 0)
       (unitForm (n := n) (X := X)).as_alternating x = 0 := by
     unfold unitForm
     exact mfderiv_const
   rw [SmoothForm.toContMDiffForm_as_alternating, h_mf_zero]
   -- alternatizeUncurryFin 0 = 0 because it's a linear map
   simp only [ContinuousAlternatingMap.alternatizeUncurryFin]
-  exact (ContinuousAlternatingMap.alternatizeUncurryFinCLM ℂ (TangentModel n) ℂ (n := 0)).map_zero
+  exact (ContinuousAlternatingMap.alternatizeUncurryFinCLM ℝ (TangentModel n) ℂ (n := 0)).map_zero
 
 theorem smoothWedge_add_left {k l : ℕ} (ω₁ ω₂ : SmoothForm n X k) (η : SmoothForm n X l) :
     (ω₁ + ω₂) ⋏ η = (ω₁ ⋏ η) + (ω₂ ⋏ η) := by

@@ -927,7 +927,14 @@ class KahlerManifold (n : ℕ) (X : Type u)
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] where
   omega_form : SmoothForm n X 2
   omega_closed : IsFormClosed omega_form
-  omega_positive : ∀ (x : X) (v : TangentSpace (𝓒_complex n) x), v ≠ 0 → True
+  /-- Positivity of the Kähler form: \(ω(v, Jv) > 0\) for all nonzero real tangent vectors.
+
+  In this codebase’s model, the complex structure \(J\) is represented by multiplication by `Complex.I`
+  on `TangentSpace (𝓒_complex n) x`. We record positivity as positivity of the real part of
+  `ω(v, i•v)`. -/
+  omega_positive :
+    ∀ (x : X) (v : TangentSpace (𝓒_complex n) x), v ≠ 0 →
+      0 < (omega_form.as_alternating x ![v, Complex.I • v]).re
   omega_is_pp : isPPForm' n X 1 omega_form
   /-- **Kähler form rationality witness** (Comparison Isomorphism).
       The Kähler form defines a rational cohomology class because it is the first

@@ -580,17 +580,17 @@ The technical details involve:
 4. Relating fderiv of chart representation back to mfderiv -/
 theorem mfderiv_wedge_apply {k l : ℕ} (ω : ContMDiffForm n X k) (η : ContMDiffForm n X l) (x : X)
     (v : TangentSpace (𝓒_complex n) x) :
-    mfderiv (𝓒_complex n) 𝓘(ℂ, Alt n (k+l)) (ω.wedge η).as_alternating x v =
-    (mfderiv (𝓒_complex n) 𝓘(ℂ, Alt n k) ω.as_alternating x v).wedge (η.as_alternating x) +
-    (ω.as_alternating x).wedge (mfderiv (𝓒_complex n) 𝓘(ℂ, Alt n l) η.as_alternating x v) := by
+    mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n (k+l)) (ω.wedge η).as_alternating x v =
+    (mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n k) ω.as_alternating x v).wedge (η.as_alternating x) +
+    (ω.as_alternating x).wedge (mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n l) η.as_alternating x v) := by
   -- The wedge of ContMDiffForms has as_alternating = fun x => ω(x) ∧ η(x)
   have h_eq : (ω.wedge η).as_alternating = fun y => (ω.as_alternating y).wedge (η.as_alternating y) := rfl
   rw [h_eq]
 
   -- Step 1: Get differentiability hypotheses
-  have hω_diff : MDifferentiableAt (𝓒_complex n) 𝓘(ℂ, Alt n k) ω.as_alternating x :=
+  have hω_diff : MDifferentiableAt (𝓒_complex n) 𝓘(ℝ, Alt n k) ω.as_alternating x :=
     ω.smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
-  have hη_diff : MDifferentiableAt (𝓒_complex n) 𝓘(ℂ, Alt n l) η.as_alternating x :=
+  have hη_diff : MDifferentiableAt (𝓒_complex n) 𝓘(ℝ, Alt n l) η.as_alternating x :=
     η.smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
 
   -- Step 2: Define the bilinear wedge map on the product
@@ -601,7 +601,7 @@ theorem mfderiv_wedge_apply {k l : ℕ} (ω : ContMDiffForm n X k) (η : ContMDi
   let pair : X → Alt n k × Alt n l := fun y => (ω.as_alternating y, η.as_alternating y)
 
   -- Step 4: Show the pair is differentiable
-  have hpair_diff : MDifferentiableAt (𝓒_complex n) 𝓘(ℂ, Alt n k × Alt n l) pair x :=
+  have hpair_diff : MDifferentiableAt (𝓒_complex n) 𝓘(ℝ, Alt n k × Alt n l) pair x :=
     hω_diff.prodMk_space hη_diff
 
   -- Step 5: B is smooth (ContDiff)
@@ -617,7 +617,7 @@ theorem mfderiv_wedge_apply {k l : ℕ} (ω : ContMDiffForm n X k) (η : ContMDi
   rw [mfderiv_comp x hB_diff.mdifferentiableAt hpair_diff]
 
   -- Step 8: Simplify mfderiv of B using mfderiv_eq_fderiv (source is vector space)
-  have h_mfderiv_B : mfderiv 𝓘(ℂ, Alt n k × Alt n l) 𝓘(ℂ, Alt n (k + l)) B (pair x) =
+  have h_mfderiv_B : mfderiv 𝓘(ℝ, Alt n k × Alt n l) 𝓘(ℝ, Alt n (k + l)) B (pair x) =
       fderiv ℂ B (pair x) := mfderiv_eq_fderiv
 
   -- Step 9: Get fderiv of bilinear map
@@ -625,19 +625,19 @@ theorem mfderiv_wedge_apply {k l : ℕ} (ω : ContMDiffForm n X k) (η : ContMDi
 
   -- Step 10: Simplify mfderiv of pair using mfderiv_prodMk
   -- Use modelWithCornersSelf_prod and chartedSpaceSelf_prod to unify types
-  have h_mfderiv_pair : mfderiv (𝓒_complex n) 𝓘(ℂ, Alt n k × Alt n l) pair x =
-      (mfderiv (𝓒_complex n) 𝓘(ℂ, Alt n k) ω.as_alternating x).prod
-        (mfderiv (𝓒_complex n) 𝓘(ℂ, Alt n l) η.as_alternating x) := by
+  have h_mfderiv_pair : mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n k × Alt n l) pair x =
+      (mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n k) ω.as_alternating x).prod
+        (mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n l) η.as_alternating x) := by
     rw [modelWithCornersSelf_prod, ← chartedSpaceSelf_prod]
     exact mfderiv_prodMk hω_diff hη_diff
 
   -- Step 11: Compute the final form
   simp only [h_mfderiv_B, h_fderiv_B, h_mfderiv_pair, IsBoundedBilinearMap.deriv, pair]
   show (hB.toContinuousLinearMap.deriv₂ (ω.as_alternating x, η.as_alternating x))
-       ((mfderiv (𝓒_complex n) 𝓘(ℂ, Alt n k) ω.as_alternating x v,
-         mfderiv (𝓒_complex n) 𝓘(ℂ, Alt n l) η.as_alternating x v)) =
-       (mfderiv (𝓒_complex n) 𝓘(ℂ, Alt n k) ω.as_alternating x v).wedge (η.as_alternating x) +
-       (ω.as_alternating x).wedge (mfderiv (𝓒_complex n) 𝓘(ℂ, Alt n l) η.as_alternating x v)
+       ((mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n k) ω.as_alternating x v,
+         mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n l) η.as_alternating x v)) =
+       (mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n k) ω.as_alternating x v).wedge (η.as_alternating x) +
+       (ω.as_alternating x).wedge (mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n l) η.as_alternating x v)
   -- Apply coe_deriv₂
   simp only [ContinuousLinearMap.coe_deriv₂]
   -- Goal: f (ω x) (mfderiv η v) + f (mfderiv ω v) (η x) = (mfderiv ω v).wedge (η x) + (ω x).wedge (mfderiv η v)
@@ -2023,24 +2023,24 @@ theorem extDerivAt_wedge {k l : ℕ} (ω : ContMDiffForm n X k) (η : ContMDiffF
   simp only [ContMDiffForm.extDerivAt, ContMDiffForm.wedge]
 
   -- 2. Define the components
-  let A_ω := mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x
+  let A_ω := mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ω.as_alternating x
   let B_η := η.as_alternating x
-  let A_η := mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n l) η.as_alternating x
+  let A_η := mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n l) η.as_alternating x
   let B_ω := ω.as_alternating x
 
   -- 3. Use mfderiv_wedge_apply
   -- At this point, the goal's LHS has the form alternatizeUncurryFin (mfderiv ... (fun y => ω y ∧ η y) x)
   -- mfderiv_wedge_apply ω η x provides exactly this derivative
-  have hmf : mfderiv (𝓒_complex n) 𝓘(ℂ, Alt n (k+l)) (fun y => (ω.as_alternating y).wedge (η.as_alternating y)) x =
+  have hmf : mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n (k+l)) (fun y => (ω.as_alternating y).wedge (η.as_alternating y)) x =
       (ContinuousAlternatingMap.wedgeCLM_alt ℂ (TangentModel n) k l).flip B_η ∘L A_ω +
       (ContinuousAlternatingMap.wedgeCLM_alt ℂ (TangentModel n) k l B_ω) ∘L A_η := by
     ext v
     simp only [ContinuousAlternatingMap.wedgeCLM_alt]
     -- Inline proof of `mfderiv_wedge_apply` (avoids a kernel “unknown constant” issue).
     -- Step 1: Get differentiability hypotheses
-    have hω_diff : MDifferentiableAt (𝓒_complex n) 𝓘(ℂ, Alt n k) ω.as_alternating x :=
+    have hω_diff : MDifferentiableAt (𝓒_complex n) 𝓘(ℝ, Alt n k) ω.as_alternating x :=
       ω.smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
-    have hη_diff : MDifferentiableAt (𝓒_complex n) 𝓘(ℂ, Alt n l) η.as_alternating x :=
+    have hη_diff : MDifferentiableAt (𝓒_complex n) 𝓘(ℝ, Alt n l) η.as_alternating x :=
       η.smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
 
     -- Step 2: Define the bilinear wedge map on the product
@@ -2051,7 +2051,7 @@ theorem extDerivAt_wedge {k l : ℕ} (ω : ContMDiffForm n X k) (η : ContMDiffF
     let pair : X → Alt n k × Alt n l := fun y => (ω.as_alternating y, η.as_alternating y)
 
     -- Step 4: Show the pair is differentiable
-    have hpair_diff : MDifferentiableAt (𝓒_complex n) 𝓘(ℂ, Alt n k × Alt n l) pair x :=
+    have hpair_diff : MDifferentiableAt (𝓒_complex n) 𝓘(ℝ, Alt n k × Alt n l) pair x :=
       hω_diff.prodMk_space hη_diff
 
     -- Step 5: B is smooth (ContDiff)
@@ -2068,7 +2068,7 @@ theorem extDerivAt_wedge {k l : ℕ} (ω : ContMDiffForm n X k) (η : ContMDiffF
 
     -- Step 8: Simplify mfderiv of B using mfderiv_eq_fderiv (source is vector space)
     have h_mfderiv_B :
-        mfderiv 𝓘(ℂ, Alt n k × Alt n l) 𝓘(ℂ, Alt n (k + l)) B (pair x) =
+        mfderiv 𝓘(ℝ, Alt n k × Alt n l) 𝓘(ℝ, Alt n (k + l)) B (pair x) =
           fderiv ℂ B (pair x) := mfderiv_eq_fderiv
 
     -- Step 9: Get fderiv of bilinear map
@@ -2077,21 +2077,21 @@ theorem extDerivAt_wedge {k l : ℕ} (ω : ContMDiffForm n X k) (η : ContMDiffF
 
     -- Step 10: Simplify mfderiv of pair using mfderiv_prodMk
     have h_mfderiv_pair :
-        mfderiv (𝓒_complex n) 𝓘(ℂ, Alt n k × Alt n l) pair x =
-          (mfderiv (𝓒_complex n) 𝓘(ℂ, Alt n k) ω.as_alternating x).prod
-            (mfderiv (𝓒_complex n) 𝓘(ℂ, Alt n l) η.as_alternating x) := by
+        mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n k × Alt n l) pair x =
+          (mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n k) ω.as_alternating x).prod
+            (mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n l) η.as_alternating x) := by
       rw [modelWithCornersSelf_prod, ← chartedSpaceSelf_prod]
       exact mfderiv_prodMk hω_diff hη_diff
 
     -- Step 11: Compute the final form
     simp only [h_mfderiv_B, h_fderiv_B, h_mfderiv_pair, IsBoundedBilinearMap.deriv, pair]
     show (hB.toContinuousLinearMap.deriv₂ (ω.as_alternating x, η.as_alternating x))
-            (mfderiv (𝓒_complex n) 𝓘(ℂ, Alt n k) ω.as_alternating x v,
-              mfderiv (𝓒_complex n) 𝓘(ℂ, Alt n l) η.as_alternating x v)
+            (mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n k) ω.as_alternating x v,
+              mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n l) η.as_alternating x v)
           =
-          (mfderiv (𝓒_complex n) 𝓘(ℂ, Alt n k) ω.as_alternating x v).wedge (η.as_alternating x) +
+          (mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n k) ω.as_alternating x v).wedge (η.as_alternating x) +
             (ω.as_alternating x).wedge
-              (mfderiv (𝓒_complex n) 𝓘(ℂ, Alt n l) η.as_alternating x v)
+              (mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n l) η.as_alternating x v)
     simp only [ContinuousLinearMap.coe_deriv₂]
     -- The bilinear derivative returns the same two summands in the opposite order.
     exact add_comm _ _

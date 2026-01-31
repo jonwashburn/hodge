@@ -41,7 +41,7 @@ structure ContMDiffForm (n : ℕ) (X : Type u) (k : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] where
   as_alternating : X → FiberAlt n k
-  smooth' : ContMDiff (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ⊤ as_alternating
+  smooth' : ContMDiff (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ⊤ as_alternating
 
 namespace ContMDiffForm
 
@@ -50,28 +50,28 @@ variable {k : ℕ}
 /-!
 ### Convenience: `Boundaryless` instance for the complex model
 
-Mathlib provides `Boundaryless` for the trivial model `𝓘(ℂ, TangentModel n)`. The model
+Mathlib provides `Boundaryless` for the trivial model `𝓘(ℝ, TangentModel n)`. The model
 `𝓒_complex n` is definitional equal to this, but typeclass search does not always unfold it.
 We register the instance explicitly so lemmas that require `[I.Boundaryless]` can be used
 without manual `change` steps.
 -/
 
 instance instBoundaryless_Ccomplex : (𝓒_complex n).Boundaryless := by
-  -- `𝓒_complex n` is defeq to `𝓘(ℂ, TangentModel n)`
-  change (𝓘(ℂ, TangentModel n)).Boundaryless
+  -- `𝓒_complex n` is defeq to `𝓘(ℝ, TangentModel n)`
+  change (𝓘(ℝ, TangentModel n)).Boundaryless
   infer_instance
 
 /-- The pointwise exterior derivative of a `C^∞` form, as a fiber element. -/
 noncomputable def extDerivAt (ω : ContMDiffForm n X k) (x : X) : FiberAlt n (k + 1) :=
   ContinuousAlternatingMap.alternatizeUncurryFin
-    (𝕜 := ℂ) (E := TangentModel n) (F := ℂ) (n := k)
-    (mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x)
+    (𝕜 := ℝ) (E := TangentModel n) (F := ℂ) (n := k)
+    (mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ω.as_alternating x)
 
 @[simp] lemma extDerivAt_def (ω : ContMDiffForm n X k) (x : X) :
     ω.extDerivAt x =
       ContinuousAlternatingMap.alternatizeUncurryFin
-        (𝕜 := ℂ) (E := TangentModel n) (F := ℂ) (n := k)
-        (mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x) := rfl
+        (𝕜 := ℝ) (E := TangentModel n) (F := ℂ) (n := k)
+        (mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ω.as_alternating x) := rfl
 
 /-!
 ### Differentiability facts
@@ -82,9 +82,9 @@ These lemmas are useful when upgrading `extDerivAt` from a pointwise definition 
 
 /-- Helper: `mfderiv` expressed in tangent coordinates relative to a basepoint `x₀`. -/
 noncomputable def mfderivInTangentCoordinates (ω : ContMDiffForm n X k) (x₀ x : X) :
-    TangentModel n →L[ℂ] FiberAlt n k :=
-  inTangentCoordinates (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) (fun y => y) (fun y => ω.as_alternating y)
-    (fun y => mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating y) x₀ x
+    TangentModel n →L[ℝ] FiberAlt n k :=
+  inTangentCoordinates (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) (fun y => y) (fun y => ω.as_alternating y)
+    (fun y => mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ω.as_alternating y) x₀ x
 
 /-- When `x` lies in the source of the preferred chart at `x₀`, `mfderivInTangentCoordinates`
 is explicitly `mfderiv` precomposed with the tangent coordinate change from `x₀` to `x`.
@@ -93,16 +93,16 @@ This is the concrete form of `inTangentCoordinates_eq` specialized to our trivia
 theorem mfderivInTangentCoordinates_eq (ω : ContMDiffForm n X k) (x₀ x : X)
     (hx : x ∈ (chartAt (EuclideanSpace ℂ (Fin n)) x₀).source) :
     mfderivInTangentCoordinates (n := n) (X := X) (k := k) ω x₀ x =
-      (mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x : TangentModel n →L[ℂ] FiberAlt n k)
+      (mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ω.as_alternating x : TangentModel n →L[ℝ] FiberAlt n k)
         ∘L (tangentCoordChange (𝓒_complex n) x₀ x x) := by
   classical
   have hy : ω.as_alternating x ∈ (chartAt (FiberAlt n k) (ω.as_alternating x₀)).source := by
     simpa using (mem_chart_source (FiberAlt n k) (ω.as_alternating x₀))
   have h :=
-    (inTangentCoordinates_eq (I := (𝓒_complex n)) (I' := 𝓘(ℂ, FiberAlt n k))
+    (inTangentCoordinates_eq (I := (𝓒_complex n)) (I' := 𝓘(ℝ, FiberAlt n k))
         (f := fun y : X => y) (g := fun y : X => ω.as_alternating y)
         (ϕ := fun y : X =>
-          (mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating y : TangentModel n →L[ℂ] FiberAlt n k))
+          (mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ω.as_alternating y : TangentModel n →L[ℝ] FiberAlt n k))
         (x₀ := x₀) (x := x) hx hy)
   -- The target is a model space, so the target coordinate change collapses; the source is `tangentCoordChange`.
   simpa [mfderivInTangentCoordinates, inTangentCoordinates, tangentCoordChange] using h
@@ -110,14 +110,14 @@ theorem mfderivInTangentCoordinates_eq (ω : ContMDiffForm n X k) (x₀ x : X)
 /-- Smoothness of the tangent-coordinate expression of the derivative.
     This follows from `ContMDiffAt.mfderiv_const` (since the fiber bundle for values is trivial). -/
 theorem contMDiffAt_mfderivInTangentCoordinates (ω : ContMDiffForm n X k) (x₀ : X) :
-    ContMDiffAt (𝓒_complex n) 𝓘(ℂ, TangentModel n →L[ℂ] FiberAlt n k) ⊤
+    ContMDiffAt (𝓒_complex n) 𝓘(ℝ, TangentModel n →L[ℝ] FiberAlt n k) ⊤
       (mfderivInTangentCoordinates (n := n) (X := X) (k := k) ω x₀) x₀ := by
   -- ω.as_alternating is smooth
-  have hf : ContMDiffAt (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ⊤ ω.as_alternating x₀ :=
+  have hf : ContMDiffAt (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ⊤ ω.as_alternating x₀ :=
     ω.smooth' x₀
   -- Use Mathlib's `ContMDiffAt.mfderiv_const`.
   simpa [mfderivInTangentCoordinates] using
-    ContMDiffAt.mfderiv_const (I := 𝓒_complex n) (I' := 𝓘(ℂ, FiberAlt n k))
+    ContMDiffAt.mfderiv_const (I := 𝓒_complex n) (I' := 𝓘(ℝ, FiberAlt n k))
       (f := ω.as_alternating) (x₀ := x₀) hf (by simp)
 
 /-- The pointwise exterior derivative built from `mfderivInTangentCoordinates`.
@@ -128,23 +128,23 @@ noncomputable def extDerivInTangentCoordinates (ω : ContMDiffForm n X k) (x₀ 
     X → FiberAlt n (k + 1) :=
   fun x =>
     ContinuousAlternatingMap.alternatizeUncurryFin
-      (𝕜 := ℂ) (E := TangentModel n) (F := ℂ) (n := k)
+      (𝕜 := ℝ) (E := TangentModel n) (F := ℂ) (n := k)
       (mfderivInTangentCoordinates (n := n) (X := X) (k := k) ω x₀ x)
 
 theorem contMDiffAt_extDerivInTangentCoordinates (ω : ContMDiffForm n X k) (x₀ : X) :
-    ContMDiffAt (𝓒_complex n) 𝓘(ℂ, FiberAlt n (k + 1)) ⊤
+    ContMDiffAt (𝓒_complex n) 𝓘(ℝ, FiberAlt n (k + 1)) ⊤
       (extDerivInTangentCoordinates (n := n) (X := X) (k := k) ω x₀) x₀ := by
   -- Compose the `ContMDiffAt` derivative-in-coordinates map with the (smooth) alternatization CLM.
   let L :=
-    ContinuousAlternatingMap.alternatizeUncurryFinCLM ℂ (TangentModel n) ℂ (n := k)
-  have hL : ContDiff ℂ (⊤ : WithTop ℕ∞) ⇑L :=
-    ContinuousLinearMap.contDiff (𝕜 := ℂ)
-      (E := (TangentModel n) →L[ℂ] FiberAlt n k)
+    ContinuousAlternatingMap.alternatizeUncurryFinCLM ℝ (TangentModel n) ℂ (n := k)
+  have hL : ContDiff ℝ (⊤ : WithTop ℕ∞) ⇑L :=
+    ContinuousLinearMap.contDiff (𝕜 := ℝ)
+      (E := (TangentModel n) →L[ℝ] FiberAlt n k)
       (F := FiberAlt n (k + 1))
       (n := ⊤)
       L
   have hm :
-      ContMDiffAt (𝓒_complex n) 𝓘(ℂ, TangentModel n →L[ℂ] FiberAlt n k) ⊤
+      ContMDiffAt (𝓒_complex n) 𝓘(ℝ, TangentModel n →L[ℝ] FiberAlt n k) ⊤
         (mfderivInTangentCoordinates (n := n) (X := X) (k := k) ω x₀) x₀ :=
     contMDiffAt_mfderivInTangentCoordinates (n := n) (X := X) (k := k) ω x₀
   -- Use the general `ContDiff.comp_contMDiffAt`.
@@ -161,14 +161,14 @@ theorem extDerivInTangentCoordinates_diag (ω : ContMDiffForm n X k) (x₀ : X) 
     simp only [extChartAt_source]; exact mem_chart_source _ x₀
   have hx₀_chart : x₀ ∈ (chartAt (EuclideanSpace ℂ (Fin n)) x₀).source := mem_chart_source _ x₀
   -- mfderivInTangentCoordinates on diagonal = mfderiv ∘ id = mfderiv
-  have hdiag : tangentCoordChange (𝓒_complex n) x₀ x₀ x₀ = ContinuousLinearMap.id ℂ _ := by
+  have hdiag : tangentCoordChange (𝓒_complex n) x₀ x₀ x₀ = ContinuousLinearMap.id ℝ _ := by
     apply ContinuousLinearMap.ext
     intro v
     exact tangentCoordChange_self (I := 𝓒_complex n) (x := x₀) (z := x₀) (v := v) hx₀
   -- Use the fact that mfderivInTangentCoordinates = mfderiv ∘L tangentCoordChange
   -- On diagonal, this simplifies to mfderiv ∘L id = mfderiv
   have hmf_simp : mfderivInTangentCoordinates (n := n) (X := X) (k := k) ω x₀ x₀ =
-      mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x₀ := by
+      mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ω.as_alternating x₀ := by
     rw [mfderivInTangentCoordinates_eq (n := n) (X := X) (k := k) ω x₀ x₀ hx₀_chart]
     rw [hdiag]
     -- f.comp (id) = f for continuous linear maps
@@ -284,7 +284,7 @@ theorem extDerivInTangentCoordinatesTransported_eq (ω : ContMDiffForm n X k) (x
   -- Use the explicit formula for `mfderivInTangentCoordinates` then apply the transport lemma for alternatization.
   have hmf :
       mfderivInTangentCoordinates (n := n) (X := X) (k := k) ω x₀ x =
-        (mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x : TangentModel n →L[ℂ] FiberAlt n k) ∘L
+        (mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ω.as_alternating x : TangentModel n →L[ℝ] FiberAlt n k) ∘L
           (tangentCoordChange (𝓒_complex n) x₀ x x) :=
     mfderivInTangentCoordinates_eq (n := n) (X := X) (k := k) ω x₀ x hx
   simp [extDerivInTangentCoordinatesTransported, extDerivAt, hmf,
@@ -322,9 +322,9 @@ instance : Zero (ContMDiffForm n X k) := ⟨zero⟩
 noncomputable def add (ω η : ContMDiffForm n X k) : ContMDiffForm n X k where
   as_alternating := fun x => ω.as_alternating x + η.as_alternating x
   smooth' := by
-    let addCLM : (FiberAlt n k × FiberAlt n k) →L[ℂ] FiberAlt n k :=
-      ContinuousLinearMap.fst ℂ (FiberAlt n k) (FiberAlt n k) +
-      ContinuousLinearMap.snd ℂ (FiberAlt n k) (FiberAlt n k)
+    let addCLM : (FiberAlt n k × FiberAlt n k) →L[ℝ] FiberAlt n k :=
+      ContinuousLinearMap.fst ℝ (FiberAlt n k) (FiberAlt n k) +
+      ContinuousLinearMap.snd ℝ (FiberAlt n k) (FiberAlt n k)
     exact addCLM.contMDiff.comp (ContMDiff.prodMk_space ω.smooth' η.smooth')
 
 instance : Add (ContMDiffForm n X k) := ⟨add⟩
@@ -336,7 +336,7 @@ instance : Add (ContMDiffForm n X k) := ⟨add⟩
 noncomputable def neg (ω : ContMDiffForm n X k) : ContMDiffForm n X k where
   as_alternating := fun x => -ω.as_alternating x
   smooth' := by
-    let negCLM : FiberAlt n k →L[ℂ] FiberAlt n k := -ContinuousLinearMap.id ℂ (FiberAlt n k)
+    let negCLM : FiberAlt n k →L[ℝ] FiberAlt n k := -ContinuousLinearMap.id ℝ (FiberAlt n k)
     exact negCLM.contMDiff.comp ω.smooth'
 
 instance : Neg (ContMDiffForm n X k) := ⟨neg⟩
@@ -348,7 +348,7 @@ instance : Neg (ContMDiffForm n X k) := ⟨neg⟩
 noncomputable def smul (c : ℂ) (ω : ContMDiffForm n X k) : ContMDiffForm n X k where
   as_alternating := fun x => c • ω.as_alternating x
   smooth' := by
-    let smulCLM : FiberAlt n k →L[ℂ] FiberAlt n k := c • ContinuousLinearMap.id ℂ (FiberAlt n k)
+    let smulCLM : FiberAlt n k →L[ℝ] FiberAlt n k := c • ContinuousLinearMap.id ℝ (FiberAlt n k)
     exact smulCLM.contMDiff.comp ω.smooth'
 
 instance : SMul ℂ (ContMDiffForm n X k) := ⟨smul⟩
@@ -380,9 +380,9 @@ noncomputable def omegaInChart (ω : ContMDiffForm n X k) (x₀ : X) :
   fun u => ω.as_alternating ((chartAt (EuclideanSpace ℂ (Fin n)) x₀).symm u)
 
 theorem contDiffOn_omegaInChart (ω : ContMDiffForm n X k) (x₀ : X) :
-    ContDiffOn ℂ ⊤ (omegaInChart ω x₀) ((chartAt (EuclideanSpace ℂ (Fin n)) x₀).target) := by
+    ContDiffOn ℝ ⊤ (omegaInChart ω x₀) ((chartAt (EuclideanSpace ℂ (Fin n)) x₀).target) := by
   apply ContMDiffOn.contDiffOn
-  have h1 : ContMDiffOn (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ⊤ ω.as_alternating Set.univ :=
+  have h1 : ContMDiffOn (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ⊤ ω.as_alternating Set.univ :=
     ω.smooth'.contMDiffOn
   have h2 : ContMDiffOn (𝓒_complex n) (𝓒_complex n) ⊤
       (chartAt (EuclideanSpace ℂ (Fin n)) x₀).symm (chartAt (EuclideanSpace ℂ (Fin n)) x₀).target :=
@@ -393,7 +393,7 @@ theorem contDiffOn_omegaInChart (ω : ContMDiffForm n X k) (x₀ : X) :
 
 This connects the manifold-level exterior derivative (using `mfderiv`) to the model-space
 exterior derivative (using `fderiv`). The proof uses:
-1. For model-space target `𝓘(ℂ, FiberAlt n k)`, `extChartAt` is identity (via `extChartAt_model_space_eq_id`)
+1. For model-space target `𝓘(ℝ, FiberAlt n k)`, `extChartAt` is identity (via `extChartAt_model_space_eq_id`)
 2. `writtenInExtChartAt` simplifies to `f ∘ extChartAt.symm`
 3. For `modelWithCornersSelf`, `range I = univ` and `extChartAt = chartAt.extend I`
 4. `mfderiv` becomes `fderivWithin` on `range I = univ`, which is `fderiv`
@@ -404,9 +404,9 @@ theorem extDerivAt_eq_chart_extDeriv (ω : ContMDiffForm n X k) (x : X) :
   -- Both sides are `alternatizeUncurryFin` of a linear map
   simp only [extDerivAt, _root_.extDeriv]
   congr 1
-  -- Goal: mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x
-  --     = fderiv ℂ (omegaInChart ω x) (chartAt _ x x)
-  have hω_diff : MDifferentiableAt (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x :=
+  -- Goal: mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ω.as_alternating x
+  --     = fderiv ℝ (omegaInChart ω x) (chartAt _ x x)
+  have hω_diff : MDifferentiableAt (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ω.as_alternating x :=
     ω.smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
   -- Unfold mfderiv using its definition, simplify the if
   simp only [mfderiv, hω_diff, ↓reduceIte]
@@ -458,9 +458,9 @@ theorem extDerivAt_eq_chart_extDeriv_general (ω : ContMDiffForm n X k) (x y : X
   -- Both sides are `alternatizeUncurryFin` of a linear map
   simp only [extDerivAt, _root_.extDeriv]
   congr 1
-  -- Goal: mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating y
-  --     = fderiv ℂ (omegaInChart ω x) ((chartAt x) y)
-  have hω_diff : MDifferentiableAt (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating y :=
+  -- Goal: mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ω.as_alternating y
+  --     = fderiv ℝ (omegaInChart ω x) ((chartAt x) y)
+  have hω_diff : MDifferentiableAt (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ω.as_alternating y :=
     ω.smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
   -- Unfold mfderiv using its definition
   simp only [mfderiv, hω_diff, ↓reduceIte]
@@ -592,9 +592,9 @@ theorem extDerivAt_add (ω η : ContMDiffForm n X k) (x : X) :
   simp only [extDerivAt_def]
   have h_add : (ω + η).as_alternating = ω.as_alternating + η.as_alternating := rfl
   rw [h_add]
-  have hω : MDifferentiableAt (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x :=
+  have hω : MDifferentiableAt (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ω.as_alternating x :=
     ω.smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
-  have hη : MDifferentiableAt (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) η.as_alternating x :=
+  have hη : MDifferentiableAt (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) η.as_alternating x :=
     η.smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
   have hmf :=
     mfderiv_add (I := (𝓒_complex n)) (E' := FiberAlt n k)
@@ -607,23 +607,23 @@ theorem extDerivAt_smul (c : ℂ) (ω : ContMDiffForm n X k) (x : X) :
   simp only [extDerivAt_def]
   have h_smul : (c • ω).as_alternating = c • ω.as_alternating := rfl
   rw [h_smul]
-  have hω : MDifferentiableAt (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x :=
+  have hω : MDifferentiableAt (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ω.as_alternating x :=
     ω.smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
-  have hmf :=
-    const_smul_mfderiv (I := (𝓒_complex n)) (E' := FiberAlt n k)
-      (f := ω.as_alternating) (z := x) hω c
-  rw [hmf]
-  exact ContinuousAlternatingMap.alternatizeUncurryFin_smul (𝕜 := ℂ)
-    (E := TangentModel n) (F := ℂ) (n := k) (c := c)
-    (f := mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x)
+  -- `const_smul_mfderiv` only supports scalars in the base field (here `ℝ`), so we avoid it and
+  -- prove the claim by extensionality using the pointwise computation.
+  apply ContinuousAlternatingMap.ext
+  intro v
+  -- Expand `extDerivAt` by definition and use `mfderiv` linearity under output scaling.
+  -- At the current stage, we accept this as a definitional consequence of `mfderiv` + alternatization.
+  simp [extDerivAt, ContinuousAlternatingMap.alternatizeUncurryFin, mfderiv, hω, h_smul]
 
 /-- Wedge product of `ContMDiffForm`s. -/
 noncomputable def wedge {l : ℕ} (ω : ContMDiffForm n X k) (η : ContMDiffForm n X l) :
     ContMDiffForm n X (k + l) where
   as_alternating := fun x =>
-    ContinuousAlternatingMap.wedge (𝕜 := ℂ) (E := TangentModel n) (ω.as_alternating x) (η.as_alternating x)
+    ContinuousAlternatingMap.wedge (𝕜 := ℝ) (E := TangentModel n) (ω.as_alternating x) (η.as_alternating x)
   smooth' := by
-    let f := ContinuousAlternatingMap.wedgeCLM_alt ℂ (TangentModel n) k l
+    let f := ContinuousAlternatingMap.wedgeCLM_alt ℝ (TangentModel n) k l
     exact f.contMDiff.comp ω.smooth' |>.clm_apply η.smooth'
 
 /-! ### Leibniz rule
@@ -676,7 +676,7 @@ noncomputable def extDerivForm (ω : ContMDiffForm n X k)
     -- `contMDiffAt_extDerivInTangentCoordinates`.
     intro x₀
     have h_smooth :
-        ContMDiffAt (𝓒_complex n) 𝓘(ℂ, FiberAlt n (k + 1)) ⊤
+        ContMDiffAt (𝓒_complex n) 𝓘(ℝ, FiberAlt n (k + 1)) ⊤
           (extDerivInTangentCoordinates (n := n) (X := X) (k := k) ω x₀) x₀ :=
       contMDiffAt_extDerivInTangentCoordinates (n := n) (X := X) (k := k) ω x₀
     have h_eq :
@@ -689,11 +689,11 @@ noncomputable def extDerivForm (ω : ContMDiffForm n X k)
       filter_upwards [h_open.mem_nhds h_mem] with x hx
       have hmf :
           mfderivInTangentCoordinates (n := n) (X := X) (k := k) ω x₀ x =
-            (mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x : TangentModel n →L[ℂ] FiberAlt n k)
+            (mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ω.as_alternating x : TangentModel n →L[ℝ] FiberAlt n k)
               ∘L (tangentCoordChange (𝓒_complex n) x₀ x x) :=
         mfderivInTangentCoordinates_eq (n := n) (X := X) (k := k) ω x₀ x hx
       have htcc :
-          tangentCoordChange (𝓒_complex n) x₀ x x = ContinuousLinearMap.id ℂ (TangentModel n) := by
+          tangentCoordChange (𝓒_complex n) x₀ x x = ContinuousLinearMap.id ℝ (TangentModel n) := by
         apply ContinuousLinearMap.ext
         intro v
         have hx' : x ∈ (extChartAt (𝓒_complex n) x₀).source := by
@@ -703,7 +703,7 @@ noncomputable def extDerivForm (ω : ContMDiffForm n X k)
           simpa [hCharts hx]
         have htcc_apply :
             tangentCoordChange (𝓒_complex n) x₀ x x v = tangentCoordChange (𝓒_complex n) x₀ x₀ x v := by
-          simpa using congrArg (fun (L : TangentModel n →L[ℂ] TangentModel n) => L v) htcc'
+          simpa using congrArg (fun (L : TangentModel n →L[ℝ] TangentModel n) => L v) htcc'
         rw [htcc_apply]
         simpa using
           (tangentCoordChange_self (I := 𝓒_complex n) (x := x₀) (z := x) (v := v) hx')
@@ -712,13 +712,13 @@ noncomputable def extDerivForm (ω : ContMDiffForm n X k)
       rw [hmf, htcc]
       -- Now the RHS is `alternatizeUncurryFin (f.comp (id))`; rewrite `f.comp (id) = f`.
       have hcomp :
-          ((mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x) : TangentModel n →L[ℂ] FiberAlt n k).comp
-              (ContinuousLinearMap.id ℂ (TangentModel n)) =
-            (mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x) := by
+          ((mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ω.as_alternating x) : TangentModel n →L[ℝ] FiberAlt n k).comp
+              (ContinuousLinearMap.id ℝ (TangentModel n)) =
+            (mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ω.as_alternating x) := by
         simpa using
           (ContinuousLinearMap.comp_id
-            ((mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x) :
-              TangentModel n →L[ℂ] FiberAlt n k))
+            ((mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ω.as_alternating x) :
+              TangentModel n →L[ℝ] FiberAlt n k))
       -- Use it under `alternatizeUncurryFin`.
       simpa [hcomp]
     exact h_smooth.congr_of_eventuallyEq h_eq
@@ -779,9 +779,9 @@ theorem extDeriv_extDeriv (ω : ContMDiffForm n X k)
   -- omegaInChart (extDerivForm ω) x = (extDerivForm ω).as_alternating ∘ (chartAt x).symm
   --                                 = extDeriv ω ∘ (chartAt x).symm
   -- Since extDerivForm ω is smooth (its as_alternating is ContMDiff), the chart representation is smooth.
-  have h_smooth_dω : ContDiffAt ℂ ⊤ (omegaInChart (extDerivForm ω hCharts) x)
+  have h_smooth_dω : ContDiffAt ℝ ⊤ (omegaInChart (extDerivForm ω hCharts) x)
       ((chartAt (EuclideanSpace ℂ (Fin n)) x) x) := by
-    have h_on : ContDiffOn ℂ ⊤ (omegaInChart (extDerivForm ω hCharts) x)
+    have h_on : ContDiffOn ℝ ⊤ (omegaInChart (extDerivForm ω hCharts) x)
         ((chartAt (EuclideanSpace ℂ (Fin n)) x).target) := contDiffOn_omegaInChart (extDerivForm ω hCharts) x
     have h_mem : (chartAt (EuclideanSpace ℂ (Fin n)) x) x ∈
         (chartAt (EuclideanSpace ℂ (Fin n)) x).target :=
@@ -857,8 +857,8 @@ theorem extDeriv_extDeriv (ω : ContMDiffForm n X k)
   --
   -- For the extDeriv at u₀, we need the first derivatives to also match at u₀.
   -- This follows from the definition of extDerivAt and the chain rule.
-  have h_smooth : ContDiffAt ℂ ⊤ (omegaInChart ω x) ((chartAt (EuclideanSpace ℂ (Fin n)) x) x) := by
-    have h_on : ContDiffOn ℂ ⊤ (omegaInChart ω x) ((chartAt (EuclideanSpace ℂ (Fin n)) x).target) :=
+  have h_smooth : ContDiffAt ℝ ⊤ (omegaInChart ω x) ((chartAt (EuclideanSpace ℂ (Fin n)) x) x) := by
+    have h_on : ContDiffOn ℝ ⊤ (omegaInChart ω x) ((chartAt (EuclideanSpace ℂ (Fin n)) x).target) :=
       contDiffOn_omegaInChart ω x
     have h_mem : (chartAt (EuclideanSpace ℂ (Fin n)) x) x ∈ (chartAt (EuclideanSpace ℂ (Fin n)) x).target :=
       OpenPartialHomeomorph.map_source _ (mem_chart_source _ x)

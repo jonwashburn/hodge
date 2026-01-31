@@ -52,10 +52,14 @@ abbrev TangentModel (n : ℕ) := EuclideanSpace ℂ (Fin n)
 /-- The (fiberwise) space of continuous alternating `k`-linear maps on the model tangent space.
 This is the correct object to put a norm/topology on (Mathlib: operator norm on
 `ContinuousAlternatingMap`). -/
-abbrev FiberAlt (n : ℕ) (k : ℕ) := (TangentModel n) [⋀^Fin k]→L[ℂ] ℂ
+abbrev FiberAlt (n : ℕ) (k : ℕ) := (TangentModel n) [⋀^Fin k]→L[ℝ] ℂ
 
-def 𝓒_complex (n : ℕ) : ModelWithCorners ℂ (EuclideanSpace ℂ (Fin n)) (EuclideanSpace ℂ (Fin n)) :=
-  modelWithCornersSelf ℂ (EuclideanSpace ℂ (Fin n))
+/-- Real-smooth structure on the underlying real manifold of `ℂⁿ`.
+
+In this repository, we take the base field for smoothness to be `ℝ` so that `ContMDiff`
+matches the usual \(C^\infty\) notion used by de Rham theory and Hodge theory. -/
+def 𝓒_complex (n : ℕ) : ModelWithCorners ℝ (EuclideanSpace ℂ (Fin n)) (EuclideanSpace ℂ (Fin n)) :=
+  modelWithCornersSelf ℝ (EuclideanSpace ℂ (Fin n))
 
 /-- Charts are locally constant on their domains.
 

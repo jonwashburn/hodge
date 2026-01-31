@@ -89,7 +89,7 @@ def ExtDerivChartData.chart2 (data : ExtDerivChartData n X) :
 
 /-- The transition map from chart1 to chart2 at the basepoint -/
 def ExtDerivChartData.transition (data : ExtDerivChartData n X) :
-    TangentModel n →L[ℂ] TangentModel n :=
+    TangentModel n →L[ℝ] TangentModel n :=
   tangentCoordChange (𝓒_complex n) data.ref1 data.ref2 data.basepoint
 
 /-!
@@ -105,8 +105,8 @@ noncomputable def extDerivAt_chart (ω : ContMDiffForm n X k) (x ref : X)
     (hx : x ∈ (chartAt (EuclideanSpace ℂ (Fin n)) ref).source) :
     FiberAlt n (k + 1) :=
   ContinuousAlternatingMap.alternatizeUncurryFin
-    (𝕜 := ℂ) (E := TangentModel n) (F := ℂ) (n := k)
-    (mfderiv (𝓒_complex n) 𝓘(ℂ, FiberAlt n k) ω.as_alternating x)
+    (𝕜 := ℝ) (E := TangentModel n) (F := ℂ) (n := k)
+    (mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ω.as_alternating x)
 
 /-- At the diagonal (x = ref), the chart-based exterior derivative equals `extDerivAt`.
     This is immediate from the definition. -/
