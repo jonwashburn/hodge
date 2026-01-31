@@ -1,5 +1,6 @@
 import Hodge.Analytic.FormType
 import Hodge.Analytic.DomCoprod
+import Hodge.Analytic.DomCoprodComplex
 import Mathlib.Geometry.Manifold.ContMDiff.NormedSpace
 import Mathlib.Geometry.Manifold.ContMDiffMFDeriv
 import Mathlib.Geometry.Manifold.MFDeriv.Tangent
@@ -604,26 +605,79 @@ theorem extDerivAt_add (ω η : ContMDiffForm n X k) (x : X) :
 
 theorem extDerivAt_smul (c : ℂ) (ω : ContMDiffForm n X k) (x : X) :
     extDerivAt (c • ω) x = c • extDerivAt ω x := by
+  -- Unfold `extDerivAt` and reduce to a statement about `mfderiv` commuting with the
+  -- constant ℂ-scalar action (viewed as an ℝ-smooth map).
   simp only [extDerivAt_def]
   have h_smul : (c • ω).as_alternating = c • ω.as_alternating := rfl
   rw [h_smul]
-  have hω : MDifferentiableAt (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ω.as_alternating x :=
+  -- Let `f : X → FiberAlt n k` be the coefficient map and `g` be ℂ-scalar multiplication on the target.
+  let f : X → FiberAlt n k := ω.as_alternating
+  let g : FiberAlt n k → FiberAlt n k := fun z => c • z
+  have hf : MDifferentiableAt (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) f x :=
     ω.smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
-  -- `const_smul_mfderiv` only supports scalars in the base field (here `ℝ`), so we avoid it and
-  -- prove the claim by extensionality using the pointwise computation.
-  apply ContinuousAlternatingMap.ext
-  intro v
-  -- Expand `extDerivAt` by definition and use `mfderiv` linearity under output scaling.
-  -- At the current stage, we accept this as a definitional consequence of `mfderiv` + alternatization.
-  simp [extDerivAt, ContinuousAlternatingMap.alternatizeUncurryFin, mfderiv, hω, h_smul]
+  have hg : MDifferentiableAt 𝓘(ℝ, FiberAlt n k) 𝓘(ℝ, FiberAlt n k) g (f x) := by
+    -- Maps between vector spaces: `MDifferentiableAt` ↔ `DifferentiableAt`.
+    -- `g` is constant scalar multiplication by `c`, hence differentiable.
+    have hid : DifferentiableAt ℝ (fun z : FiberAlt n k => z) (f x) := differentiableAt_id
+    have hg' : DifferentiableAt ℝ (c • (fun z : FiberAlt n k => z)) (f x) := hid.const_smul c
+    -- `c • id = g`.
+    simpa [g, Pi.smul_apply] using hg'.mdifferentiableAt
+  -- Chain rule for `mfderiv`: `mfderiv (g ∘ f) = mfderiv g ∘ mfderiv f`.
+  have hcomp :
+      mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) (g ∘ f) x =
+        (mfderiv 𝓘(ℝ, FiberAlt n k) 𝓘(ℝ, FiberAlt n k) g (f x)).comp
+          (mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) f x) :=
+    mfderiv_comp x hg hf
+  -- Compute `mfderiv` of the ℂ-scalar multiplication map `g` using `mfderiv_eq_fderiv`.
+  have h_mfderiv_g :
+      mfderiv 𝓘(ℝ, FiberAlt n k) 𝓘(ℝ, FiberAlt n k) g (f x) =
+        c • (1 : FiberAlt n k →L[ℝ] FiberAlt n k) := by
+    -- First compute the Fréchet derivative of `g`.
+    have hid : DifferentiableAt ℝ (fun z : FiberAlt n k => z) (f x) := differentiableAt_id
+    have hfd :
+        fderiv ℝ (fun z : FiberAlt n k => c • z) (f x) =
+          c • (1 : FiberAlt n k →L[ℝ] FiberAlt n k) := by
+      -- `fderiv` commutes with constant scalar multiplication.
+      simpa [fderiv_id] using
+        (fderiv_fun_const_smul (𝕜 := ℝ) (f := fun z : FiberAlt n k => z) (x := f x) (h := hid) (c := c))
+    -- Convert `mfderiv` to `fderiv` for maps between vector spaces.
+    simpa [g] using (mfderiv_eq_fderiv (𝕜 := ℝ) (f := fun z : FiberAlt n k => c • z) (x := f x)).trans hfd
+  -- Rewrite `mfderiv` of `c • f` using the chain rule and simplify.
+  have h_mfderiv_smul :
+      mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) (c • f) x =
+        (c • (1 : FiberAlt n k →L[ℝ] FiberAlt n k)).comp
+          (mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) f x) := by
+    -- `c • f = g ∘ f`.
+    have hgf : (g ∘ f) = (c • f) := by
+      funext y
+      rfl
+    -- Use the chain rule computed above.
+    -- Start from `hcomp` and rewrite `mfderiv g` by `h_mfderiv_g`.
+    -- Then simplify using `h_mfderiv_g`.
+    simpa [hgf, h_mfderiv_g] using hcomp
+  -- Rewrite the `mfderiv` term using `h_mfderiv_smul`.
+  -- Rewrite `mfderiv (c • f)` as scalar multiplication on the resulting CLM.
+  have h_mfderiv_smul' :
+      mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) (c • f) x =
+        c • mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) f x := by
+    -- Both sides are CLMs `TangentModel n →L[ℝ] FiberAlt n k`.
+    -- The RHS scalar action is the one induced from the ℂ-normed-space structure on `FiberAlt n k`.
+    ext v
+    -- `h_mfderiv_smul` gives the same statement as a composition with the scaled identity.
+    simpa [h_mfderiv_smul] using rfl
+  rw [h_mfderiv_smul']
+  simpa using
+    (ContinuousAlternatingMap.alternatizeUncurryFin_smul (𝕜 := ℝ) (E := TangentModel n) (F := ℂ)
+      (n := k) (c := c)
+      (f := mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) f x))
 
 /-- Wedge product of `ContMDiffForm`s. -/
 noncomputable def wedge {l : ℕ} (ω : ContMDiffForm n X k) (η : ContMDiffForm n X l) :
     ContMDiffForm n X (k + l) where
   as_alternating := fun x =>
-    ContinuousAlternatingMap.wedge (𝕜 := ℝ) (E := TangentModel n) (ω.as_alternating x) (η.as_alternating x)
+    ContinuousAlternatingMap.wedgeℂ (E := TangentModel n) (ω.as_alternating x) (η.as_alternating x)
   smooth' := by
-    let f := ContinuousAlternatingMap.wedgeCLM_alt ℝ (TangentModel n) k l
+    let f := ContinuousAlternatingMap.wedgeℂCLM_alt (E := TangentModel n) k l
     exact f.contMDiff.comp ω.smooth' |>.clm_apply η.smooth'
 
 /-! ### Leibniz rule
@@ -798,7 +852,7 @@ theorem extDeriv_extDeriv (ω : ContMDiffForm n X k)
   --
   -- The chart cocycle identity (relating mfderiv at varying basepoints to fderiv in a fixed chart)
   -- is technically involved. For now, we use the structural smoothness argument.
-  have h_minSmoothness : minSmoothness ℂ 2 ≤ ⊤ := by
+  have h_minSmoothness : minSmoothness ℝ 2 ≤ ⊤ := by
     simp only [minSmoothness_of_isRCLikeNormedField]
     exact le_top
   -- Key insight: We don't need full functional equality. At the specific evaluation point

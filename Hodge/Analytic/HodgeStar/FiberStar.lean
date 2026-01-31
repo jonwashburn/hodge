@@ -251,7 +251,7 @@ the wedge of the coordinate covectors indexed by `s`.
 -/
 
 /-- The coordinate map `ℂⁿ → (Fin n → ℂ)` as a linear map. -/
-noncomputable def coordLM (n : ℕ) : TangentModel n →ₗ[ℝ] (Fin n → ℂ) :=
+noncomputable def coordLM (n : ℕ) : TangentModel n →ₗ[ℂ] (Fin n → ℂ) :=
   (EuclideanSpace.equiv (ι := Fin n) (𝕜 := ℂ)).toLinearEquiv.toLinearMap
 
 /-- Project `ℂⁿ` to the `k` coordinates indexed by a finset `s`.
@@ -260,15 +260,15 @@ If `s` has fewer than `k` elements, we pad with zero coordinates (so the result 
 `Fin k → ℂ`). This keeps the definition non-dependent (no `s.card = k` argument).
 -/
 noncomputable def projCoords (n k : ℕ) (s : Finset (Fin n)) :
-    TangentModel n →ₗ[ℝ] (Fin k → ℂ) := by
+    TangentModel n →ₗ[ℂ] (Fin k → ℂ) := by
   classical
-  let coord : TangentModel n →ₗ[ℝ] (Fin n → ℂ) := coordLM n
+  let coord : TangentModel n →ₗ[ℂ] (Fin n → ℂ) := coordLM n
   let l : List (Fin n) := s.sort (· ≤ ·)
   refine LinearMap.pi (fun i : Fin k => by
     classical
     by_cases h : i.1 < l.length
     · -- x ↦ (coord x) (l.get i)
-      exact (LinearMap.proj (R := ℝ) (ι := Fin n) (φ := fun _ => ℂ)
+      exact (LinearMap.proj (R := ℂ) (ι := Fin n) (φ := fun _ => ℂ)
         (l.get ⟨i.1, h⟩)).comp coord
     · -- padding coordinate
       exact 0)
@@ -281,16 +281,17 @@ it to `s ∈ powersetCard k univ`, so it agrees with the usual basis form indexe
 -/
 noncomputable def fiberBasisForm (n k : ℕ) (s : Finset (Fin n)) : FiberAlt n k := by
   classical
-  let det : (Fin k → ℂ) [⋀^Fin k]→ₗ[ℝ] ℂ := Matrix.detRowAlternating
-  let lin : (TangentModel n) [⋀^Fin k]→ₗ[ℝ] ℂ := det.compLinearMap (projCoords n k s)
+  let det : (Fin k → ℂ) [⋀^Fin k]→ₗ[ℂ] ℂ := Matrix.detRowAlternating
+  let lin : (TangentModel n) [⋀^Fin k]→ₗ[ℂ] ℂ := det.compLinearMap (projCoords n k s)
   -- Make it continuous using the finite-dimensional bound lemma from `DomCoprod.lean`.
   have h_ex :
       ∃ C : ℝ, ∀ v : Fin k → TangentModel n, ‖lin v‖ ≤ C * ∏ i, ‖v i‖ :=
-    AlternatingMap.exists_bound_fin_dim (𝕜 := ℝ) (E := TangentModel n) (F := ℂ) (ι := Fin k) lin
+    AlternatingMap.exists_bound_fin_dim (𝕜 := ℂ) (E := TangentModel n) (F := ℂ) (ι := Fin k) lin
   let C : ℝ := Classical.choose h_ex
   have hC : ∀ v : Fin k → TangentModel n, ‖lin v‖ ≤ C * ∏ i, ‖v i‖ :=
     Classical.choose_spec h_ex
-  exact lin.mkContinuous C hC
+  -- Convert the resulting ℂ-alternating continuous map to an ℝ-alternating one by restricting scalars.
+  exact (lin.mkContinuous C hC).restrictScalars ℝ
 
 /-- Evaluation at a fixed frame, as a continuous linear functional on `FiberAlt`. -/
 noncomputable def fiberEvalCLM (n k : ℕ) (v : Fin k → TangentModel n) : FiberAlt n k →L[ℂ] ℂ := by

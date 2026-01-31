@@ -1,6 +1,7 @@
 import Mathlib.LinearAlgebra.StdBasis
 import Mathlib.Geometry.Manifold.Algebra.Monoid
 import Hodge.Analytic.DomCoprod
+import Hodge.Analytic.DomCoprodComplex
 import Hodge.Analytic.FormType
 import Hodge.Analytic.Advanced.ContMDiffForms
 import Hodge.Analytic.Advanced.LeibnizRule
@@ -449,19 +450,15 @@ This axiom is **ON THE PROOF TRACK** for `hodge_conjecture'`. It is used to:
 -/
 theorem isSmoothAlternating_wedge (k l : ℕ) (ω : SmoothForm n X k) (η : SmoothForm n X l) :
     IsSmoothAlternating n X (k + l)
-      (fun x => ContinuousAlternatingMap.wedge (𝕜 := ℝ) (E := TangentModel n)
+      (fun x => ContinuousAlternatingMap.wedgeℂ (E := TangentModel n)
                   (ω.as_alternating x) (η.as_alternating x)) := by
-  -- wedgeCLM_alt is a continuous bilinear map, composition with smooth is smooth
-  let f := ContinuousAlternatingMap.wedgeCLM_alt ℝ (TangentModel n) k l
-  -- f : (FiberAlt n k) →L[ℝ] (FiberAlt n l) →L[ℝ] (FiberAlt n (k + l))
-  -- We need: ContMDiff ... (fun x => f (ω x) (η x))
-  -- f.contMDiff.comp ω.is_smooth gives: ContMDiff ... (fun x => f (ω x)) as a CLM
-  -- Then .clm_apply η.is_smooth gives: ContMDiff ... (fun x => f (ω x) (η x))
+  -- `wedgeℂCLM_alt` is a continuous bilinear map; composition with smooth maps is smooth.
+  let f := (ContinuousAlternatingMap.wedgeℂCLM_alt (E := TangentModel n) k l)
   exact f.contMDiff.comp ω.is_smooth |>.clm_apply η.is_smooth
 
 noncomputable def smoothWedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) : SmoothForm n X (k + l) where
   as_alternating := fun x =>
-    ContinuousAlternatingMap.wedge (𝕜 := ℝ) (E := TangentModel n)
+    ContinuousAlternatingMap.wedgeℂ (E := TangentModel n)
       (ω.as_alternating x) (η.as_alternating x)
   is_smooth := isSmoothAlternating_wedge k l ω η
 
