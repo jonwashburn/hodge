@@ -1438,7 +1438,7 @@ theorem stokes_univ_set {n : ℕ} {X : Type*} (k : ℕ)
     this integral is zero.
 
     Reference: [Federer, GMT, §4.2], [Griffiths-Harris, §0.4]. -/
-instance StokesTheoremData.universal {n : ℕ} {X : Type*} (k : ℕ)
+def StokesTheoremData.universal {n : ℕ} {X : Type*} (k : ℕ)
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]

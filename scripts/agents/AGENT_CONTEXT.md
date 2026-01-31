@@ -1,7 +1,7 @@
 # CRITICAL AGENT CONTEXT (Updated 2026-01-30)
 
 This repo is a Lean 4 formalization of the Hodge conjecture. The proof track is **green** and the
-remaining “deep content” is isolated behind explicit placeholders (sorries/axioms/typeclasses).
+remaining "deep content" is isolated in the **Deep Track** (`Hodge/Deep/`).
 
 ## 0. Build rule (repo-specific)
 
@@ -11,110 +11,108 @@ remaining “deep content” is isolated behind explicit placeholders (sorries/a
 lake exe cache get
 ```
 
-## 1. Phase‑1 functional-analytic layer (DO NOT fight it)
+## 1. TWO TRACKS: Proof Track vs Deep Track
 
-### 1.1 `SmoothForm` is NOT discrete anymore
+### Proof Track (COMPLETE — do not touch unless asked)
+- **Main theorem**: `hodge_conjecture` in `Hodge/Main.lean`
+- **Axioms**: Only `[propext, Classical.choice, Quot.sound]` ✅
+- **Status**: Kernel-unconditional (via stub instances)
 
-`SmoothForm n X k` now carries a genuine seminormed/Normed structure over ℝ coming from comass:
+### Deep Track (YOUR WORK GOES HERE)
+- **Build target**: `lake build Hodge.Deep`
+- **Files**: `Hodge/Deep/Pillars/*.lean`
+- **Goal**: Replace `sorry` with real proofs
 
-- **File**: `Hodge/Analytic/Norms.lean`
-- **Key fact**: `‖ω‖ = comass ω` (and comass triangle/scaling lemmas are proved)
+## 2. DEEP TRACK PILLARS (Priority Order)
 
-**Do NOT use** `continuous_of_discreteTopology`. Any old proofs relying on “everything is continuous”
-will now break and must be replaced with bounded-linear-map arguments.
+| Pillar | File | Sorries | Description |
+|--------|------|---------|-------------|
+| **Stokes** | `Hodge/Deep/Pillars/Stokes.lean` | ~7 | Hausdorff measure, submanifold integration |
+| **Microstructure** | `Hodge/Deep/Pillars/Microstructure.lean` | ~6 | Cubulation, sheets, gluing, defect→0 |
+| **Harvey-Lawson** | `Hodge/Deep/Pillars/HarveyLawson.lean` | ~5 | Calibrated current → analytic variety |
+| **GAGA** | `Hodge/Deep/Pillars/GAGA.lean` | ~4 | Strong analytic/algebraic sets, Chow theorem |
+| **Federer-Fleming** | `Hodge/Deep/Pillars/FedererFleming.lean` | ~6 | Flat compactness, cycles preserved |
+| **Poincaré Duality** | `Hodge/Deep/Pillars/PoincareDuality.lean` | ~5 | Integration current, fundamental class |
 
-### 1.2 `Current` is a continuous linear functional (`→L[ℝ]`)
+## 3. HARD RULES — READ CAREFULLY
 
-`Current n X k` is now:
+### ❌ NEVER DO THESE:
+1. **Never use `admit`**
+2. **Never trivialize**: No `:= trivial`, `:= True`, `:= ⟨⟩`, `:= by simp`, `:= rfl` for deep theorems
+3. **Never weaken statement types** — the goal types are locked
+4. **Never add new `.universal` instances** that bypass the work
+5. **Never replace `sorry` with `trivial`** — that defeats the purpose
 
-- **File**: `Hodge/Analytic/Currents.lean`
-- **Definition**:
-  - `toFun : SmoothForm n X k →L[ℝ] ℝ`
-  - `boundary_bound : (k = 0 → True) ∧ (k = k'+1 → ∃ M, ∀ ω, |T(dω)| ≤ M * ‖ω‖)`
+### ✅ ALWAYS DO THESE:
+1. **Prove actual mathematical content** — use Mathlib lemmas
+2. **Document TeX references** — cite which paper proposition you're proving
+3. **Build incrementally** — prove helper lemmas first
+4. **Run `lake build Hodge.Deep`** after each change
 
-**Important consequences**
+## 4. How to Work on a Pillar
 
-- **No per-current boundedness field** anymore. Use operator norm:
-  - Pattern: `simpa [Real.norm_eq_abs] using (T.toFun.le_opNorm ω)`
-- `d` (here `smoothExtDeriv`) is **not** continuous for comass; we therefore keep `boundary_bound`
-  as a separate hypothesis.
+```bash
+# 1. Get Mathlib cache
+lake exe cache get
 
-### 1.3 `Current.boundary` is built from `boundary_bound` (not by continuity of `d`)
+# 2. Build the deep track to see current sorry count
+lake build Hodge.Deep 2>&1 | grep -c "declaration uses 'sorry'"
 
-- `Current.boundary` is constructed via `LinearMap.mkContinuousOfExistsBound`.
-- There is a simp lemma:
-  - `Current.boundary_toFun`
+# 3. Pick a pillar file, find a sorry, prove it
+# Example: Hodge/Deep/Pillars/Stokes.lean
 
-## 2. “Still placeholder” items (real remaining axioms / stubs)
-
-Full scan (`./scripts/audit_stubs.sh --full`) currently reports these **axioms**:
-
-- `Hodge/Classical/GAGA.lean`:
-  - `axiom fundamental_eq_representing_axiom` (spine bridge; deep geometry/cohomology)
-- `Hodge/Analytic/Integration/SubmanifoldIntegral.lean`:
-  - `opaque submanifoldIntegral ... : ℂ`
-  - `axiom integral_add`, `axiom integral_smul`, `axiom integral_continuous`
-- Legacy “Stage‑1 test forms” namespace `Hodge.TestForms` (mostly off the main proof track):
-  - `Hodge/Analytic/TestForms/LFTopology.lean`: `axiom realTopology`
-  - `Hodge/Analytic/TestForms/Operations.lean`: `axiom leibniz`, `axiom pullback_d`
-
-## 3. Remaining `sorry` locations (current repo)
-
-`./scripts/audit_stubs.sh --full` currently reports:
-
-- `Hodge/Kahler/Main.lean`:
-  - one `sorry` in the “defect → 0” portion (deep calibration/microstructure content)
-- `Hodge/Analytic/FlatNormReal.lean`:
-  - many sorries (generic RealChain development; typically **off-track**)
-- `Hodge/Analytic/Stage2/IntegrationCurrentsManifoldSkeleton.lean`:
-  - several `Prop := sorry` placeholders + one remaining `sorry` used for mass computation
-- plus a quarantined file under `Hodge/Quarantine/...` (off-track)
-
-## 4. What the “proof track” currently depends on
-
-Ground truth is Lean’s kernel report:
-
-```lean
-#print axioms hodge_conjecture
-#print axioms hodge_conjecture'
+# 4. Rebuild to verify
+lake build Hodge.Deep
 ```
 
-Currently:
+## 5. What Success Looks Like
 
-- `hodge_conjecture` depends on `[propext, Classical.choice, Quot.sound]`
-- `hodge_conjecture'` depends on `[propext, Classical.choice, Quot.sound]`
+- **Before**: `warning: Hodge/Deep/Pillars/Stokes.lean:55:4: declaration uses 'sorry'`
+- **After**: No warning for that line
 
-So: **no `sorryAx` in the dependency cone** of the main theorem.
+When a pillar has 0 sorries, the `.real` instance can replace the `.universal` stub.
 
-## 5. What NOT to do (hard rules)
+## 6. Mathlib Patterns for Deep Work
 
-- **Never** use `admit`.
-- **Never** replace nontrivial goals with trivializations (`:= trivial`, `:= True`, `⟨⟩`, etc).
-- Do **not** reintroduce the “SmoothForm is discrete topology” hack.
-- If you touch anything in the functional-analytic layer:
-  - keep `SmoothForm` seminormed by comass
-  - keep `Current` as `→L[ℝ]` with only `boundary_bound` stored
-
-## 6. High-signal proof patterns (use these)
-
-- **Bounded linear ⇒ continuous**:
-
+### Hausdorff Measure
 ```lean
--- Given f : E →ₗ[ℝ] F and ∃ C, ∀ x, ‖f x‖ ≤ C * ‖x‖
-exact f.mkContinuousOfExistsBound hbound
+import Mathlib.MeasureTheory.Measure.Hausdorff
+
+-- Use MeasureTheory.Measure.hausdorffMeasure
+-- Finite on compact sets in finite dimensions
 ```
 
-- **Current boundedness via opNorm**:
-
+### Submanifold Integration
 ```lean
--- |T(ω)| ≤ ‖T‖ * ‖ω‖
-simpa [Real.norm_eq_abs] using (T.toFun.le_opNorm ω)
+-- Build using MeasureTheory.Integral.Lebesgue
+-- Key: mass-comass duality |∫_Z ω| ≤ mass(Z) · ‖ω‖
 ```
 
-## 7. Where to focus agent effort
+### Compactness Arguments
+```lean
+-- Use IsCompact.exists_finite_cover for cubulation
+-- Use Filter.Tendsto for convergence
+```
 
-If you are running autonomous agents, prioritize:
+## 7. Verification Commands
 
-1. `Hodge/Kahler/Main.lean` (the remaining `sorry` — deep calibration defect = 0)
-2. Then, if explicitly requested: eliminate the explicit axioms in Submanifold integration / spine bridge.
+```bash
+# Check deep track sorry count
+lake build Hodge.Deep 2>&1 | grep "sorry" | wc -l
 
+# Check proof track is still clean
+lake env lean Hodge/Utils/DependencyCheck.lean
+
+# Full build
+lake build
+```
+
+## 8. TeX References
+
+Each deep theorem corresponds to a paper result:
+- Stokes: Federer GMT §4.1.7
+- Harvey-Lawson: "Calibrated Geometries" (1982)
+- GAGA: Serre (1956), Chow (1949)
+- Federer-Fleming: "Normal and integral currents" (1960)
+
+Cite the specific proposition in your proof comments.

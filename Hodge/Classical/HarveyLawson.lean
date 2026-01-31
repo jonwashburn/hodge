@@ -235,7 +235,7 @@ theorem calibrated_limit_is_cycle {k : ℕ} [FlatLimitCycleData n X k]
     Therefore ∂T_∞ = 0, so T_∞ is a cycle.
 
     Reference: [H. Federer, "Geometric Measure Theory", 1969, Theorem 4.2.17] -/
-instance FlatLimitCycleData.universal {k : ℕ} : FlatLimitCycleData n X k where
+def FlatLimitCycleData.universal {k : ℕ} : FlatLimitCycleData n X k where
   flat_limit_of_cycles_is_cycle := fun T_seq T_limit h_cycles h_conv => by
     -- The flat limit of cycles is a cycle by Federer-Fleming
     -- Proof: boundary is continuous in flat norm, and limit of zeros is zero
@@ -341,7 +341,7 @@ instance FlatLimitCycleData.universal {k : ℕ} : FlatLimitCycleData n X k where
     In the full GMT implementation, this would be the actual geometric support.
 
     Reference: [Harvey-Lawson, "Calibrated geometries", Acta Math. 1982] -/
-instance HarveyLawsonKingData.universal {k : ℕ} : HarveyLawsonKingData n X k where
+def HarveyLawsonKingData.universal {k : ℕ} : HarveyLawsonKingData n X k where
   decompose := fun hyp => {
     -- Return the support variety extracted from the calibrated current
     varieties := {harveyLawsonSupportVariety' hyp.T hyp.ψ hyp.is_calibrated}

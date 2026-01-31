@@ -20,7 +20,8 @@ namespace Hodge.GMT
 abbrev flatNormReal {n : ℕ} {X : Type*} {k : ℕ}
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] [CompactSpace X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X] [CompactSpace X]
     (T : Current n X k) : ℝ :=
   _root_.flatNorm T
 
@@ -28,7 +29,8 @@ abbrev flatNormReal {n : ℕ} {X : Type*} {k : ℕ}
 def flatNorm {n : ℕ} {X : Type*} {k : ℕ}
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] [CompactSpace X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X] [CompactSpace X]
     (T : Current n X k) : ENNReal :=
   ENNReal.ofReal (flatNormReal T)
 

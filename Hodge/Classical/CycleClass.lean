@@ -257,7 +257,7 @@ archive/Hodge/Classical/CycleClassAxioms.lean because they are NOT needed for ho
     This serves as a placeholder until the full GMT integration machinery is in place.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", Ch. 0]. -/
-instance PoincareDualFormExists.universal (p : ℕ) : PoincareDualFormExists n X p where
+def PoincareDualFormExists.universal (p : ℕ) : PoincareDualFormExists n X p where
   choose := fun Z => {
     form := if Z = ∅ then 0 else omegaPower (n := n) (X := X) (K := K) p
     is_closed := by

@@ -138,7 +138,7 @@ In the current proof-track interface:
 - `IsAlgebraicSet` is defined as *topological closedness*.
 
 So the Chow/GAGA conversion is immediate. -/
-instance ChowGAGAData.universal : ChowGAGAData n X where
+def ChowGAGAData.universal : ChowGAGAData n X where
   analytic_to_algebraic := by
     intro Z hZ
     simpa [IsAlgebraicSet] using hZ.isClosed
@@ -524,7 +524,6 @@ and the `SpineBridgeData` typeclass that bridges geometry to cohomology.
       [\mathrm{FundamentalClassSet}(\mathrm{support}(Z))] = [\mathrm{representingForm}(Z)].
     \] -/
 noncomputable def SignedAlgebraicCycle.cycleClass_geom {p : ℕ}
-    [CycleClass.PoincareDualFormExists n X p]
     (Z : SignedAlgebraicCycle n X p) : DeRhamCohomologyClass n X (2 * p) :=
   -- NOTE (unconditional track): `FundamentalClassSet` is still a staged placeholder.
   -- For the proof-track-safe, unconditional development we define the cycle class by the
@@ -547,26 +546,26 @@ class SpineBridgeData (n : ℕ) (X : Type u)
     [MeasurableSpace X] [BorelSpace X] [Nonempty X] : Prop where
   /-- For spine-produced cycles, the geometric class from support equals the class of the
       carried representing form. -/
-  fundamental_eq_representing : ∀ {p : ℕ} [CycleClass.PoincareDualFormExists n X p]
+  fundamental_eq_representing : ∀ {p : ℕ}
     (Z : SignedAlgebraicCycle n X p),
       Z.cycleClass_geom = ofForm Z.representingForm Z.representingForm_closed
 
 /-- **Universal Instance for SpineBridgeData**. -/
-instance SpineBridgeData.universal : SpineBridgeData n X where
-  fundamental_eq_representing := fun {p} [_] Z => by
+def SpineBridgeData.universal : SpineBridgeData n X where
+  fundamental_eq_representing := fun {p} Z => by
     -- `cycleClass_geom` is currently defined as `cycleClass`.
     rfl
 
 /-- The geometric class equals the representing form class (by the spine bridge). -/
 theorem SignedAlgebraicCycle.cycleClass_geom_eq_representingForm {p : ℕ}
-    [CycleClass.PoincareDualFormExists n X p] [SpineBridgeData n X]
+    [SpineBridgeData n X]
     (Z : SignedAlgebraicCycle n X p) :
     Z.cycleClass_geom = ofForm Z.representingForm Z.representingForm_closed :=
   SpineBridgeData.fundamental_eq_representing (n := n) (X := X) (Z := Z)
 
 /-- The geometric class equals the shortcut class (via the bridge). -/
 theorem SignedAlgebraicCycle.cycleClass_geom_eq_cycleClass {p : ℕ}
-    [CycleClass.PoincareDualFormExists n X p] [SpineBridgeData n X]
+    [SpineBridgeData n X]
     (Z : SignedAlgebraicCycle n X p) : Z.cycleClass_geom = Z.cycleClass := by
   rw [cycleClass_geom_eq_representingForm (n := n) (X := X) (Z := Z),
     cycleClass_eq_representingForm (n := n) (X := X) (Z := Z)]

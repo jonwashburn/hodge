@@ -98,7 +98,7 @@ content of Chow's theorem and Serre's GAGA principle.
     This provides a default instance for Chow/GAGA using the legacy toy bridge.
 
     **Status**: QUARANTINED. Do not import on proof track. -/
-instance ChowGAGAData.universal : ChowGAGAData n X where
+def ChowGAGAData.universal : ChowGAGAData n X where
   analytic_to_algebraic := fun V => by
     -- Legacy toy proof (induction over the toy predicate).
     exact ⟨⟨V.carrier, V.codim, IsAnalyticSet_isAlgebraicSet n X V.carrier V.is_analytic⟩, rfl, rfl⟩

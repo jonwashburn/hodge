@@ -80,7 +80,7 @@ All required laws then hold by simp.
 -/
 
 /-- **Universal (stub) integration theory**: all measures and integrals are zero. -/
-instance SubmanifoldIntegration.universal : SubmanifoldIntegration n X where
+def SubmanifoldIntegration.universal : SubmanifoldIntegration n X where
   measure2p := fun _p => 0
   integral := fun _p _ω _Z => 0
   integral_linear := by

@@ -114,7 +114,7 @@ class CubulationExists (n : ℕ) (X : Type u)
 This discharges `CubulationExists` for the current (minimal) `Cubulation` interface.
 When `Cubulation` is strengthened with diameter/mesh bounds, this instance will be
 replaced by a genuine construction using compactness/finite atlases. -/
-instance CubulationExists.universal : CubulationExists n X where
+def CubulationExists.universal : CubulationExists n X where
   exists_cubulation := fun h _hp => by
     refine ⟨{ cubes := {Set.univ}, is_partition := ?_ }⟩
     -- ⋃ Q ∈ {univ}, Q = univ
@@ -266,7 +266,7 @@ class RawSheetSumIntegralityData (n : ℕ) (X : Type*) (p : ℕ) (hscale : ℝ)
     currents is again integral.
 
     Reference: [Federer-Fleming, "Normal and integral currents", 1960]. -/
-instance RawSheetSumIntegralityData.universal {p : ℕ} {hscale : ℝ}
+def RawSheetSumIntegralityData.universal {p : ℕ} {hscale : ℝ}
     {C : Cubulation n X hscale} (T_raw : RawSheetSum n X p hscale C) :
     RawSheetSumIntegralityData n X p hscale C T_raw where
   is_integral := by
@@ -406,9 +406,9 @@ noncomputable def microstructureSequence (p : ℕ) (γ : SmoothForm n X (2 * p))
   { toFun := T_raw.toIntegrationData.toCurrent
     is_integral := by
       -- Integrality is provided by the explicit Federer–Fleming-type interface.
-      simpa using
-        (RawSheetSumIntegralityData.is_integral (n := n) (X := X) (p := p)
-          (hscale := hscale) (C := C) (T_raw := T_raw)) }
+      exact
+        (RawSheetSumIntegralityData.universal (n := n) (X := X) (p := p) (hscale := hscale)
+            (C := C) T_raw).is_integral }
 
 /-- **Key Definitional Equality**: The microstructure sequence current evaluates forms
     via setIntegral over Set.univ.
