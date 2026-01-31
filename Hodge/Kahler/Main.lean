@@ -232,7 +232,10 @@ def AutomaticSYRData.universal : AutomaticSYRData n X where
         funext i
         simpa using h_norm_zero i
       -- a constant sequence converges to its value
-      simpa [h_fn] using (tendsto_const_nhds : Filter.Tendsto (fun _i : ℕ => (0 : ℝ)) Filter.atTop (nhds 0))
+      -- `simp` can turn `Tendsto (fun _ => 0) _ (nhds 0)` into `True` (since it has a `[simp]` proof),
+      -- so avoid `simp/simpa` here and just rewrite directly.
+      rw [h_fn]
+      exact (tendsto_const_nhds : Filter.Tendsto (fun _i : ℕ => (0 : ℝ)) Filter.atTop (nhds 0))
     · -- calibrationDefect(T_i) = 0 for all i
       have h_defect_zero : ∀ i : ℕ, calibrationDefect (((fun (_i : ℕ) => T0) i).toFun) ψ = 0 := by
         intro _i

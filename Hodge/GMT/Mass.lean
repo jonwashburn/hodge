@@ -14,7 +14,7 @@ The project’s *real* comass and mass live in:
 - `Hodge/Analytic/Currents.lean` (`Current.mass` on `Current`)
 
 Historically, this repository also contained an older “test-form as `Unit`” GMT stub with an
-opaque `comass` and ENNReal-valued `mass`. That regime is no longer used by the proof track nor
+`opaque` comass and ENNReal-valued `mass`. That regime is no longer used by the proof track nor
 the `Hodge.GMT` umbrella; it made automation look successful while hiding mathematical content.
 
 This file is therefore a **thin re-export** matching the planned module location

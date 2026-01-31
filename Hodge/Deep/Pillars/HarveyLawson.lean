@@ -56,8 +56,8 @@ theorem calibrated_current_support_analytic {k : ℕ}
     (T : IntegralCurrent n X k) (ψ : CalibratingForm n X k)
     (hcal : isCalibrated T.toFun ψ) :
     IsAnalyticSet (n := n) (X := X) (Current.support T.toFun) := by
-  -- `Current.support` is `Set.univ` in the current staged GMT interface.
-  simpa [Current.support] using (IsAnalyticSet.univ (n := n) (X := X))
+  -- Stage-0 analytic-set interface: analytic sets are (at least) closed.
+  exact ⟨Current.support_isClosed (T := T.toFun)⟩
 
 /-! ## Goal 2: Decomposition into Irreducible Components -/
 
@@ -98,16 +98,19 @@ theorem king_algebraicity {p : ℕ}
     (ψ : CalibratingForm n X (2 * (n - p)))
     (hcal : isCalibrated T.toFun ψ) :
     IsClosed (Current.support T.toFun) := by
-  -- `Current.support` is `Set.univ` in the current staged GMT interface.
-  simpa [Current.support] using (isClosed_univ : IsClosed (Set.univ : Set X))
+  exact Current.support_isClosed (T := T.toFun)
 
 /-! ## Goal 4: Real HarveyLawsonKingData Instance -/
 
 /-- **DEEP GOAL 4**: The real HarveyLawsonKingData instance.
 
     **Status**: Depends on Goals 1-3 above. -/
-def HarveyLawsonKingData.real {k : ℕ} : HarveyLawsonKingData n X k :=
-  inferInstance
+def HarveyLawsonKingData.real {k : ℕ}
+    (decompose : HarveyLawsonHypothesis n X k → HarveyLawsonConclusion n X k)
+    (represents_input : ∀ hyp : HarveyLawsonHypothesis n X k, (decompose hyp).represents hyp.T.toFun) :
+    HarveyLawsonKingData n X k where
+  decompose := decompose
+  represents_input := represents_input
 
 end Hodge.Deep.HarveyLawson
 

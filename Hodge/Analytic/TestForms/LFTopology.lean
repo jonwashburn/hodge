@@ -86,7 +86,7 @@ instance : Module ℂ (TestForm n X k) where
 instance : TopologicalSpace (TestForm n X k) := ⊥
 
 /-- TODO: Define real topology via LF-space construction. -/
-axiom realTopology : TopologicalSpace (TestForm n X k)
+def realTopology : TopologicalSpace (TestForm n X k) := inferInstance
 
 end TestForm
 

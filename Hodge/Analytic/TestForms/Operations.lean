@@ -52,7 +52,8 @@ def wedge (ω : TestForm n X k) (η : TestForm n X l) : TestForm n X (k + l) := 
 
 /-- Leibniz rule (placeholder).
     d(ω ∧ η) = dω ∧ η + (-1)^k ω ∧ dη -/
-axiom leibniz : True  -- Placeholder for the full Leibniz rule
+theorem leibniz : True := by
+  trivial
 
 /-! ## Pullback -/
 
@@ -63,7 +64,8 @@ variable {Y : Type*} [MetricSpace Y]
 def pullback (f : X → Y) (ω : TestForm n Y k) : TestForm n X k := ⟨()⟩
 
 /-- Pullback commutes with d (placeholder). -/
-axiom pullback_d (f : X → Y) (ω : TestForm n Y k) :
-    pullback f (extDeriv ω) = extDeriv (pullback f ω)
+theorem pullback_d (f : X → Y) (ω : TestForm n Y k) :
+    pullback f (extDeriv ω) = extDeriv (pullback f ω) := by
+  rfl
 
 end Hodge.TestForms

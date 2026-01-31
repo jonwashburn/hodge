@@ -96,10 +96,14 @@ def canonicalMeshSequence : MeshSequence where
 /-- **Cubulation** (conceptual).
     A partition of X into coordinate cubes of mesh size h.
     In the real track, this is a finite collection of charts. -/
-structure Cubulation (n : ℕ) (X : Type u) (h : ℝ) where
+structure Cubulation (n : ℕ) (X : Type u) (h : ℝ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] where
   cubes : Finset (Set X)
   is_partition : (⋃ Q ∈ cubes, Q) = Set.univ
-  -- Note: diameter_bound is a semantic property (requires PseudoMetricSpace)
+  /-- Each cube has diameter ≤ h (mesh control). -/
+  diameter_bound : ∀ Q ∈ cubes, Metric.diam Q ≤ h
+  /-- Each cube is contained in some chart source. -/
+  in_chart : ∀ Q ∈ cubes, ∃ x : X, Q ⊆ (chartAt (EuclideanSpace ℂ (Fin n)) x).source
 
 /-- Existence of cubulations for any mesh size (as an explicit assumption). -/
 class CubulationExists (n : ℕ) (X : Type u)
@@ -116,9 +120,84 @@ When `Cubulation` is strengthened with diameter/mesh bounds, this instance will 
 replaced by a genuine construction using compactness/finite atlases. -/
 def CubulationExists.universal : CubulationExists n X where
   exists_cubulation := fun h _hp => by
-    refine ⟨{ cubes := {Set.univ}, is_partition := ?_ }⟩
-    -- ⋃ Q ∈ {univ}, Q = univ
-    simp
+    classical
+    -- For each point `x`, choose a small ball around `x` contained in the chart domain at `x`.
+    have hball_in_chart :
+        ∀ x : X, ∃ r0 : ℝ, 0 < r0 ∧
+          Metric.ball x r0 ⊆ (chartAt (EuclideanSpace ℂ (Fin n)) x).source := by
+      intro x
+      have hx : x ∈ (chartAt (EuclideanSpace ℂ (Fin n)) x).source := by
+        simpa using (ChartedSpace.mem_chart_source (H := (EuclideanSpace ℂ (Fin n))) x)
+      have hopen : IsOpen ((chartAt (EuclideanSpace ℂ (Fin n)) x).source) := by
+        simpa using (chartAt (EuclideanSpace ℂ (Fin n)) x).open_source
+      have hnhds : ((chartAt (EuclideanSpace ℂ (Fin n)) x).source) ∈ nhds x :=
+        hopen.mem_nhds hx
+      rcases (Metric.mem_nhds_iff).1 hnhds with ⟨r0, hr0, hr0sub⟩
+      exact ⟨r0, hr0, hr0sub⟩
+
+    choose r0 hr0pos hr0sub using hball_in_chart
+
+    -- Shrink each ball so that its diameter is ≤ h (use radius ≤ h/2).
+    let r : X → ℝ := fun x => min (h / 2) (r0 x)
+    have hr_pos : ∀ x : X, 0 < r x := by
+      intro x
+      have hh2 : 0 < h / 2 := by linarith
+      exact lt_min hh2 (hr0pos x)
+
+    let U : X → Set X := fun x => Metric.ball x (r x)
+    have hU_open : ∀ x : X, IsOpen (U x) := fun _ => Metric.isOpen_ball
+
+    -- The family `U x` covers `univ`.
+    have hU_cover : (Set.univ : Set X) ⊆ ⋃ x : X, U x := by
+      intro x _hx
+      refine Set.mem_iUnion_of_mem x ?_
+      -- `x ∈ ball x (r x)` since `0 < r x`.
+      simpa [U, Metric.mem_ball] using (hr_pos x)
+
+    -- Extract a finite subcover using compactness of `X` (projective ⇒ compact).
+    obtain ⟨t, ht⟩ :=
+      (isCompact_univ : IsCompact (Set.univ : Set X)).elim_finite_subcover U (fun x => hU_open x) (by
+        simpa using hU_cover)
+
+    -- Define the cubulation cubes as the selected balls.
+    let cubes : Finset (Set X) := t.image U
+
+    refine ⟨{
+      cubes := cubes
+      is_partition := ?_
+      diameter_bound := ?_
+      in_chart := ?_
+    }⟩
+    · -- `is_partition`
+      ext x
+      constructor
+      · intro _hx
+        simp
+      · intro _hx
+        -- Use the finite subcover.
+        have hx' : x ∈ ⋃ y ∈ t, U y := ht (by simp)
+        -- Convert membership in the union over indices `t` to membership in the union over `cubes`.
+        simpa [cubes, U] using hx'
+    · -- `diameter_bound`
+      intro Q hQ
+      rcases Finset.mem_image.1 hQ with ⟨x, hx_t, rfl⟩
+      have hr_nonneg : 0 ≤ r x := le_of_lt (hr_pos x)
+      have hdiam : Metric.diam (Metric.ball x (r x)) ≤ 2 * r x :=
+        Metric.diam_ball (x := x) hr_nonneg
+      have hr_le : r x ≤ h / 2 := min_le_left _ _
+      have hmul : (2 : ℝ) * r x ≤ (2 : ℝ) * (h / 2) := by nlinarith
+      have : Metric.diam (Metric.ball x (r x)) ≤ (2 : ℝ) * (h / 2) :=
+        le_trans hdiam hmul
+      simpa [two_mul, mul_assoc, mul_left_comm, mul_comm] using (this.trans_eq (by ring))
+    · -- `in_chart`
+      intro Q hQ
+      rcases Finset.mem_image.1 hQ with ⟨x, hx_t, rfl⟩
+      refine ⟨x, ?_⟩
+      -- Ball is contained in the chart source at its center by construction.
+      have hr_le_r0 : r x ≤ r0 x := min_le_right _ _
+      have hball : Metric.ball x (r x) ⊆ Metric.ball x (r0 x) :=
+        Metric.ball_subset_ball hr_le_r0
+      exact hball.trans (hr0sub x)
 
 /-- Existence of cubulations for any mesh size. -/
 theorem exists_cubulation [CubulationExists n X] (h : ℝ) (hp : h > 0) : Nonempty (Cubulation n X h) := by
@@ -150,10 +229,11 @@ structure HolomorphicSheet (n : ℕ) (X : Type u) (p : ℕ)
 
 /-- **Sheet Sum** (conceptual).
     A collection of holomorphic sheets in a cubulation. -/
-structure RawSheetSum (n : ℕ) (X : Type u) (p : ℕ) (hscale : ℝ) (C : Cubulation n X hscale)
+structure RawSheetSum (n : ℕ) (X : Type u) (p : ℕ) (hscale : ℝ)
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [BorelSpace X] where
+    [MeasurableSpace X] [BorelSpace X]
+    (C : Cubulation n X hscale) where
   sheets : ∀ Q ∈ C.cubes, Finset (HolomorphicSheet n X p)
   support : Set X
   support_closed : IsClosed support
@@ -280,27 +360,11 @@ def RawSheetSumIntegralityData.universal {p : ℕ} {hscale : ℝ}
       exact IntegralPolyhedralChain'.ofIntegrationData (n := n) (X := X) (k := 2 * (n - p))
         T_raw.toIntegrationData
     · -- flatNorm(T - T) = 0 < ε
-      have hsub :
-          T_raw.toIntegrationData.toCurrent - T_raw.toIntegrationData.toCurrent =
-            (0 : Current n X (2 * (n - p))) := by
-        ext ω
-        -- `T - T` is definitionally `T + (-T)`, so evaluation cancels.
-        change
-          (T_raw.toIntegrationData.toCurrent + -T_raw.toIntegrationData.toCurrent).toFun ω = 0
-        -- Expand `+`/`-` and evaluate on ω.
-        change
-          (Current.add_curr (k := 2 * (n - p))
-              T_raw.toIntegrationData.toCurrent (-T_raw.toIntegrationData.toCurrent)).toFun ω = 0
-        -- Unfold `add_curr`, then rewrite the negation evaluation and cancel in ℝ.
-        simp [Current.add_curr]
-        have hneg :
-            (-T_raw.toIntegrationData.toCurrent).toFun ω =
-              -(T_raw.toIntegrationData.toCurrent.toFun ω) := by
-          rfl
-        simpa [hneg] using add_neg_cancel (T_raw.toIntegrationData.toCurrent.toFun ω)
-      have h0 : flatNorm (T_raw.toIntegrationData.toCurrent - T_raw.toIntegrationData.toCurrent) = 0 := by
-        simpa [hsub] using (flatNorm_zero (n := n) (X := X) (k := 2 * (n - p)))
-      simpa [h0] using hε
+      -- With `AddCommGroup` on currents, we can use `sub_self` directly.
+      have hflat0 : flatNorm (0 : Current n X (2 * (n - p))) = 0 :=
+        flatNorm_zero (n := n) (X := X) (k := 2 * (n - p))
+      -- Goal reduces to `0 < ε` via `sub_self` and `hflat0`.
+      simpa [sub_self, hflat0] using hε
 
 /-- Convert a RawSheetSum to a CycleIntegralCurrent.
     This is now constructed via the IntegrationData infrastructure.

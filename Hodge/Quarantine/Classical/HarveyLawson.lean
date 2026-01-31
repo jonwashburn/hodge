@@ -97,32 +97,8 @@ class HarveyLawsonKingData (n : ℕ) (X : Type*) (k : ℕ)
 noncomputable def integrationCurrentHL {p k : ℕ}
     (V : AnalyticSubvariety n X) (_hV : V.codim = p)
     (mult : ℤ) [SubmanifoldIntegration n X] [ClosedSubmanifoldStokesData n X k V.carrier] :
-    Current n X (Nat.succ k) where
-  toFun := fun ω => (mult : ℝ) * setIntegral (n := n) (X := X) (Nat.succ k) V.carrier ω
-  is_linear := fun c ω₁ ω₂ => by
-    rw [setIntegral_linear (n := n) (X := X) (Nat.succ k) V.carrier c ω₁ ω₂, _root_.mul_add, ← _root_.mul_assoc, _root_.mul_comm (mult : ℝ) c, _root_.mul_assoc]
-  is_continuous := continuous_const.mul continuous_of_discreteTopology
-  bound := by
-    obtain ⟨M, hM⟩ := setIntegral_bound (n := n) (X := X) (Nat.succ k) V.carrier
-    use |(mult : ℝ)| * M
-    intro ω
-    rw [abs_mul, _root_.mul_assoc]
-    apply mul_le_mul_of_nonneg_left (hM ω) (abs_nonneg _)
-  boundary_bound := by
-    -- Stokes for closed submanifolds gives zero boundary integral.
-    cases k with
-    | zero =>
-      use 0
-      intro ω
-      show |(mult : ℝ) * setIntegral (n := n) (X := X) 1 V.carrier (smoothExtDeriv ω)| ≤ 0 * ‖ω‖
-      rw [ClosedSubmanifoldStokesData.stokes_integral_exact_zero ω, MulZeroClass.mul_zero, abs_zero]
-      apply mul_nonneg (le_refl 0) (comass_nonneg _)
-    | succ k' =>
-      use 0
-      intro ω
-      show |(mult : ℝ) * setIntegral (n := n) (X := X) (Nat.succ k' + 1) V.carrier (smoothExtDeriv ω)| ≤ 0 * ‖ω‖
-      rw [ClosedSubmanifoldStokesData.stokes_integral_exact_zero ω, MulZeroClass.mul_zero, abs_zero]
-      apply mul_nonneg (le_refl 0) (comass_nonneg _)
+    Current n X (Nat.succ k) :=
+  (mult : ℝ) • integration_current (n := n) (X := X) (k := k) V.carrier
 
 /-- **Harvey-Lawson support variety** (from calibrated current).
 
@@ -140,14 +116,10 @@ noncomputable def integrationCurrentHL {p k : ℕ}
 def harveyLawsonSupportVariety' {k : ℕ}
     (T : IntegralCurrent n X k) (_ψ : CalibratingForm n X k) (_hcal : isCalibrated T.toFun _ψ) :
     AnalyticSubvariety n X where
-  carrier := Current.support T.toFun
+  -- Quarantine scaffold: we do not attempt real Harvey–Lawson regularity here.
+  carrier := Set.univ
   codim := 2 * n - k
-  is_analytic := by
-    -- The support of a calibrated current is analytic (Harvey-Lawson regularity)
-    -- This is a deep result that we encode here.
-    -- Current.support is Set.univ (placeholder), which is analytic.
-    simp only [Current.support]
-    exact IsAnalyticSet.univ
+  is_analytic := IsAnalyticSet.univ
 
 /-- **Harvey-Lawson support variety** (placeholder version without current).
 

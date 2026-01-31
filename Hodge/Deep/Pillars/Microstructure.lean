@@ -277,11 +277,11 @@ Once Goals 1-4 are complete, this replaces `AutomaticSYRData.universal`.
 
     This instance should be activated once all the above goals are proven.
     It replaces `AutomaticSYRData.universal` in `Hodge/Kahler/Main.lean`. -/
-def AutomaticSYRData.real' : AutomaticSYRData n X :=
-  -- For now, reuse the existing proof-track-safe `AutomaticSYRData.universal` instance
+def AutomaticSYRData.real' [SubmanifoldIntegration n X] : AutomaticSYRData n X :=
+  -- For now, reuse the existing proof-track-safe `AutomaticSYRData.universal` definition
   -- (zero-current construction). This will be replaced by a genuine implementation
   -- once the deep GMT/sheet/gluing estimates are proven.
-  inferInstance
+  AutomaticSYRData.universal (n := n) (X := X)
 
 end Hodge.Deep.Microstructure
 

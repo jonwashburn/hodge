@@ -59,6 +59,15 @@ variable {n : ℕ} {X : Type u}
   [SubmanifoldIntegration n X]
   [CubulationExists n X]
 
+/-! ## Transport helpers -/
+
+private theorem integrateDegree2p_transport {k k' : ℕ} (hk : k = k')
+    (Z : Set X) (ω : SmoothForm n X k') :
+    integrateDegree2p (n := n) (X := X) k Z (hk ▸ ω) =
+      integrateDegree2p (n := n) (X := X) k' Z ω := by
+  cases hk
+  rfl
+
 /-! ## Typeclass Assumptions for GMT Results
 
 These typeclasses encapsulate deep GMT results not yet formalized in Mathlib.
@@ -199,8 +208,8 @@ def toIntegrationData_real [SheetStokesData n X] {p : ℕ} {hscale : ℝ}
     have hcast :
         integrateDegree2p (n := n) (X := X) (2 * (n - p)) (sheetUnion_real T_raw) (hk ▸ smoothExtDeriv ω) =
           integrateDegree2p (n := n) (X := X) (k' + 1) (sheetUnion_real T_raw) (smoothExtDeriv ω) := by
-      subst hk
-      rfl
+      simpa using
+        (integrateDegree2p_transport (n := n) (X := X) hk (sheetUnion_real T_raw) (smoothExtDeriv ω))
     -- Now apply the Stokes-vanishing bound.
     -- `bdryMass = 0`, so the target inequality is exactly what the typeclass provides.
     simpa [hcast] using

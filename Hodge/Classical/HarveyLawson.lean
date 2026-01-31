@@ -157,11 +157,9 @@ def harveyLawsonSupportVariety' {k : ℕ}
   carrier := Current.support T.toFun
   codim := 2 * n - k
   is_analytic := by
-    -- The support of a calibrated current is analytic (Harvey-Lawson regularity)
-    -- This is a deep result that we encode here.
-    -- Current.support is Set.univ (placeholder), which is analytic.
-    simp only [Current.support]
-    exact IsAnalyticSet.univ
+    -- With the current Stage-0 analytic-set interface, it suffices to record that the
+    -- support is closed. (The genuine Harvey–Lawson regularity is a later deep target.)
+    exact ⟨Current.support_isClosed (T := T.toFun)⟩
 
 /-- **Harvey-Lawson support variety** (placeholder version without current).
 
@@ -315,7 +313,8 @@ def FlatLimitCycleData.universal {k : ℕ} : FlatLimitCycleData n X k where
           simp [hnegSeq, hnegLim]
         calc
           flatNorm (T_limit.toFun - (T_seq N).toFun)
-              = flatNorm (-((T_seq N).toFun - T_limit.toFun)) := by simpa [hswap]
+              = flatNorm (-((T_seq N).toFun - T_limit.toFun)) := by
+                  exact congrArg (fun U => flatNorm U) hswap
           _ = flatNorm ((T_seq N).toFun - T_limit.toFun) := by
             simpa using (flatNorm_neg ((T_seq N).toFun - T_limit.toFun))
       have h_bound : flatNorm (Current.boundary T_limit.toFun) <

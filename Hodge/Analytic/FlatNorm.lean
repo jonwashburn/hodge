@@ -457,6 +457,92 @@ theorem eval_le_mass {k : ℕ} (T : Current n X k) (ψ : SmoothForm n X k) :
       _ ≤ comass ψ * Current.mass T := mul_le_mul_of_nonneg_left h_le_mass (le_of_lt h_pos)
       _ = Current.mass T * comass ψ := mul_comm _ _
 
+/-! ## Finite-sum flat-norm bounds (TeX “transport ⇒ flat control” scaffolding)
+
+These lemmas are purely formal consequences of:
+- the definition of `flatNorm` as an infimum over decompositions `T = S + ∂R`
+- the triangle inequality `flatNorm_add_le`
+
+They are the Lean core needed for TeX Proposition `prop:transport-flat-glue-weighted`:
+given a matching of pieces across a face and a per-piece flat decomposition estimate,
+one gets a bound on the flat norm of the total mismatch current.
+-/
+
+namespace Hodge.FlatNormFinite
+
+/-- A recursion-only “sum over `Fin N`” that avoids requiring algebraic instances on `Current`. -/
+def finSum {k : ℕ} : ∀ (N : ℕ), (Fin N → Current n X k) → Current n X k
+  | 0, _ => 0
+  | N + 1, f => f 0 + finSum N (fun i => f i.succ)
+
+/-- A recursion-only “sum over `Fin N`” for real costs. -/
+def finSumℝ : ∀ (N : ℕ), (Fin N → ℝ) → ℝ
+  | 0, _ => 0
+  | N + 1, f => f 0 + finSumℝ N (fun i => f i.succ)
+
+@[simp] theorem finSum_zero {k : ℕ} (f : Fin 0 → Current n X k) : finSum (n := n) (X := X) 0 f = 0 := rfl
+@[simp] theorem finSumℝ_zero (f : Fin 0 → ℝ) : finSumℝ 0 f = 0 := rfl
+
+@[simp] theorem finSum_succ {k : ℕ} (N : ℕ) (f : Fin (N + 1) → Current n X k) :
+    finSum (n := n) (X := X) (N + 1) f = f 0 + finSum (n := n) (X := X) N (fun i => f i.succ) := rfl
+
+@[simp] theorem finSumℝ_succ (N : ℕ) (f : Fin (N + 1) → ℝ) :
+    finSumℝ (N + 1) f = f 0 + finSumℝ N (fun i => f i.succ) := rfl
+
+/-- If `T = S + ∂R`, then `flatNorm T ≤ mass S + mass R` (by definition of infimum). -/
+theorem flatNorm_le_mass_add_mass_of_decomp {k : ℕ}
+    (T : Current n X k) (S : Current n X k) (R : Current n X (k + 1))
+    (hT : T = S + Current.boundary R) :
+    _root_.flatNorm (n := n) (X := X) (k := k) T ≤ Current.mass S + Current.mass R := by
+  -- `flatNorm T` is the infimum over all such decomposition costs.
+  unfold _root_.flatNorm
+  refine csInf_le (_root_.flatNormDecompSet_bddBelow (n := n) (X := X) (k := k) T) ?_
+  refine ⟨S, R, hT, rfl⟩
+
+/-- If `T` has a decomposition with total cost ≤ `c`, then `flatNorm T ≤ c`. -/
+theorem flatNorm_le_of_exists_decomp_le {k : ℕ}
+    (T : Current n X k) (c : ℝ)
+    (h : ∃ (S : Current n X k) (R : Current n X (k + 1)),
+      T = S + Current.boundary R ∧ Current.mass S + Current.mass R ≤ c) :
+    _root_.flatNorm (n := n) (X := X) (k := k) T ≤ c := by
+  rcases h with ⟨S, R, hT, hcost⟩
+  exact le_trans (flatNorm_le_mass_add_mass_of_decomp (n := n) (X := X) (k := k) T S R hT) hcost
+
+/-- Finite-sum bound: if each term has `flatNorm ≤ cost`, then the whole sum does too. -/
+theorem flatNorm_finSum_le_of_forall {k : ℕ} :
+    ∀ (N : ℕ) (T : Fin N → Current n X k) (cost : Fin N → ℝ),
+      (∀ i, _root_.flatNorm (n := n) (X := X) (k := k) (T i) ≤ cost i) →
+      _root_.flatNorm (n := n) (X := X) (k := k) (finSum (n := n) (X := X) (k := k) N T)
+        ≤ finSumℝ N cost
+  | 0, T, cost, _h => by
+      simp [finSum, finSumℝ, _root_.flatNorm_zero (n := n) (X := X) (k := k)]
+  | N + 1, T, cost, h => by
+      -- Split off the head and apply triangle inequality.
+      have h0 : _root_.flatNorm (n := n) (X := X) (k := k) (T 0) ≤ cost 0 := h 0
+      have htail :
+          _root_.flatNorm (n := n) (X := X) (k := k)
+              (finSum (n := n) (X := X) (k := k) N (fun i => T i.succ))
+            ≤ finSumℝ N (fun i => cost i.succ) :=
+        flatNorm_finSum_le_of_forall N (fun i => T i.succ) (fun i => cost i.succ) (fun i => h i.succ)
+      calc
+        _root_.flatNorm (n := n) (X := X) (k := k)
+            (finSum (n := n) (X := X) (k := k) (N + 1) T)
+            = _root_.flatNorm (n := n) (X := X) (k := k)
+                (T 0 + finSum (n := n) (X := X) (k := k) N (fun i => T i.succ)) := by
+                  simp [finSum]
+        _ ≤ _root_.flatNorm (n := n) (X := X) (k := k) (T 0) +
+              _root_.flatNorm (n := n) (X := X) (k := k)
+                (finSum (n := n) (X := X) (k := k) N (fun i => T i.succ)) := by
+                  simpa using
+                    (_root_.flatNorm_add_le (n := n) (X := X) (k := k)
+                      (T 0) (finSum (n := n) (X := X) (k := k) N (fun i => T i.succ)))
+        _ ≤ cost 0 + finSumℝ N (fun i => cost i.succ) := by
+              exact add_le_add h0 htail
+        _ = finSumℝ (N + 1) cost := by
+              simp [finSumℝ]
+
+end Hodge.FlatNormFinite
+
 /-- Helper: For any decomposition T = S + ∂R, evaluation is bounded by
     (mass(S) + mass(R)) × max(comass ψ, comass dψ). -/
 theorem eval_le_decomp_cost {k : ℕ} (T S : Current n X k) (R : Current n X (k + 1))

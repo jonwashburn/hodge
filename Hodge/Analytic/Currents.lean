@@ -5,6 +5,8 @@ import Hodge.Analytic.Integration.HausdorffMeasure
 import Mathlib.MeasureTheory.Measure.Hausdorff
 import Mathlib.Data.Complex.Basic
 import Mathlib.Analysis.Normed.Operator.ContinuousLinearMap
+import Mathlib.Topology.Algebra.Support
+import Mathlib.Algebra.Group.Defs
 
 /-!
 # Currents on Kähler Manifolds
@@ -86,9 +88,9 @@ Reference: [Federer, "Geometric Measure Theory", 1969, §4.1.7].
     The support of a current T is the smallest closed set Z ⊆ X such that
     T(ω) = 0 whenever supp(ω) ∩ Z = ∅.
 
-    **Implementation Note**: This is defined as Set.univ as a placeholder.
-    In the full GMT implementation, this would be computed from the current's
-    action on test forms via a proper localization procedure.
+    **Implementation Note**: We use the standard distribution-theoretic definition:
+    `support T` is the complement of the largest open set on which `T` vanishes on all
+    compactly supported smooth forms.
 
     Reference: [Federer, "Geometric Measure Theory", 1969, §4.1.7]. -/
 def support {n k : ℕ} {X : Type*}
@@ -96,7 +98,14 @@ def support {n k : ℕ} {X : Type*}
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
     [MeasurableSpace X] [BorelSpace X]
     (T : Current n X k) : Set X :=
-  Set.univ  -- Placeholder: support is contained in X
+  -- Union of all open sets on which the current vanishes on compactly supported forms,
+  -- then take the complement.
+  (⋃ (U : Set X) (_hU : IsOpen U)
+      (_hzero :
+        ∀ ω : SmoothForm n X k,
+          HasCompactSupport ω.as_alternating →
+            tsupport ω.as_alternating ⊆ U → T.toFun ω = 0),
+      U)ᶜ
 
 /-- The support of a current is closed (placeholder). -/
 theorem support_isClosed {n k : ℕ} {X : Type*}
@@ -104,8 +113,24 @@ theorem support_isClosed {n k : ℕ} {X : Type*}
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [Nonempty X] [MeasurableSpace X] [BorelSpace X]
     (T : Current n X k) : IsClosed (support T) := by
-  simp only [support]
-  exact isClosed_univ
+  classical
+  -- `support T` is the complement of a union of open sets, hence closed.
+  have hopen :
+      IsOpen
+        (⋃ (U : Set X) (_hU : IsOpen U)
+            (_hzero :
+              ∀ ω : SmoothForm n X k,
+                HasCompactSupport ω.as_alternating →
+                  tsupport ω.as_alternating ⊆ U → T.toFun ω = 0),
+            U) := by
+    refine isOpen_iUnion ?_
+    intro U
+    refine isOpen_iUnion ?_
+    intro hU
+    refine isOpen_iUnion ?_
+    intro _hzero
+    exact hU
+  simpa [support] using hopen.isClosed_compl
 
 /-- Extensionality for currents: two currents are equal iff they agree on all forms. -/
 @[ext]
@@ -217,6 +242,56 @@ theorem neg_zero_current : -(0 : Current n X k) = 0 := by
   ring
 
 instance : Sub (Current n X k) := ⟨fun T₁ T₂ => T₁ + -T₂⟩
+
+/-! ### Additive commutative group structure
+
+We will need permutation-invariant finite sums of currents (TeX “matching over permutations”),
+so we register `AddCommGroup` on `Current n X k`, with `nsmul`/`zsmul`/`sub` set to the
+standard recursion-based definitions.
+-/
+
+instance instAddCommGroup : AddCommGroup (Current n X k) where
+  add := (· + ·)
+  add_assoc := by
+    intro A B C
+    ext ω
+    change (A.toFun ω + B.toFun ω) + C.toFun ω = A.toFun ω + (B.toFun ω + C.toFun ω)
+    exact add_assoc _ _ _
+  zero := 0
+  zero_add := by
+    intro A
+    ext ω
+    change (0 : Current n X k).toFun ω + A.toFun ω = A.toFun ω
+    have h0 : (0 : Current n X k).toFun ω = 0 := rfl
+    simp [h0]
+  add_zero := by
+    intro A
+    ext ω
+    change A.toFun ω + (0 : Current n X k).toFun ω = A.toFun ω
+    have h0 : (0 : Current n X k).toFun ω = 0 := rfl
+    simp [h0]
+  nsmul := nsmulRec
+  neg := Neg.neg
+  sub := fun a b => a + -b
+  sub_eq_add_neg := by
+    intro a b
+    rfl
+  zsmul := zsmulRec (nsmul := nsmulRec)
+  neg_add_cancel := by
+    intro A
+    ext ω
+    -- rewrite everything down to a ring identity in `ℝ`.
+    have hneg : (-A).toFun ω = -(A.toFun ω) := rfl
+    have h0 : (0 : Current n X k).toFun ω = 0 := rfl
+    -- goal: (-A)(ω) + A(ω) = 0(ω)
+    change (-A).toFun ω + A.toFun ω = (0 : Current n X k).toFun ω
+    rw [hneg, h0]
+    ring
+  add_comm := by
+    intro A B
+    ext ω
+    change A.toFun ω + B.toFun ω = B.toFun ω + A.toFun ω
+    exact add_comm _ _
 
 /-- Scalar multiplication of currents: (r • T)(ω) = r * T(ω). -/
 def smul_curr (r : ℝ) (T : Current n X k) : Current n X k where

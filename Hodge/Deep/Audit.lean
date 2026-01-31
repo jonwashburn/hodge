@@ -14,7 +14,7 @@ This module performs compile-time checks on the deep track formalization.
 
 When this file compiles, it reports the axiom dependencies of the `.real` instances.
 Once all `sorry` goals are proved, the `.real` instances should have the same
-axiom dependencies as the stub `.universal` instances (only `propext`, `Classical.choice`,
+kernel-axiom dependencies as the stub `.universal` instances (only `propext`, `Classical.choice`,
 `Quot.sound`).
 
 ## Usage
@@ -41,9 +41,9 @@ open Lean Meta Elab Command
 
 #print axioms Hodge.Deep.Stokes.SubmanifoldIntegration.real
 #print axioms Hodge.Deep.GAGA.ChowGAGAData.real
-#print axioms Hodge.Deep.Microstructure.AutomaticSYRData.real
+#print axioms Hodge.Deep.Microstructure.AutomaticSYRData.real'
 #print axioms Hodge.Deep.HarveyLawson.HarveyLawsonKingData.real
-#print axioms Hodge.Deep.FedererFleming.FlatLimitCycleData.real
+#print axioms Hodge.Deep.FedererFleming.FlatLimitCycleData.real'
 #print axioms Hodge.Deep.PoincareDuality.SpineBridgeData.real
 
 -- ═══════════════════════════════════════════════════════════════════════════

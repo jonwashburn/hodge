@@ -5,6 +5,7 @@ Authors: Deep Track Formalization
 -/
 import Hodge.Classical.FedererFleming
 import Hodge.Classical.HarveyLawson
+import Hodge.Analytic.FlatNorm
 import Hodge.GMT.IntegralCurrentSpace
 
 /-!
@@ -51,20 +52,22 @@ The current `flatNorm` is defined as `0` (stub). We need the real definition:
     **Mathematical content**: The flat norm of T is the infimum over all
     decompositions T = R + ∂S of mass(R) + mass(S).
 
-    **Status**: PLACEHOLDER - defined as 0. Real definition needs GMT infrastructure. -/
-def flatNormReal' {k : ℕ} (_T : Current n X k) : ℝ := 0
+    **Status**: Implemented by re-exporting the proof-track `flatNorm` from `Hodge/Analytic/FlatNorm.lean`. -/
+def flatNormReal' {k : ℕ} (T : Current n X k) : ℝ :=
+  _root_.flatNorm (n := n) (X := X) (k := k) T
 
 /-- **DEEP GOAL 1.2**: Flat norm is nonnegative.
     With placeholder definition = 0, this is trivial. -/
 theorem flatNormReal'_nonneg {k : ℕ} (T : Current n X k) :
     flatNormReal' T ≥ 0 := by
-  simp only [flatNormReal', ge_iff_le, le_refl]
+  -- `flatNorm` is nonnegative.
+  simpa [flatNormReal', ge_iff_le] using (_root_.flatNorm_nonneg (n := n) (X := X) (k := k) T)
 
 /-- **DEEP GOAL 1.3**: Flat norm satisfies triangle inequality.
     With placeholder definition = 0, this is trivial. -/
 theorem flatNormReal'_triangle {k : ℕ} (T₁ T₂ : Current n X k) :
     flatNormReal' (T₁ + T₂) ≤ flatNormReal' T₁ + flatNormReal' T₂ := by
-  simp only [flatNormReal', add_zero, le_refl]
+  simpa [flatNormReal'] using (_root_.flatNorm_add_le (n := n) (X := X) (k := k) T₁ T₂)
 
 /-! ## Goal 2: Compactness Theorem -/
 
@@ -118,8 +121,10 @@ theorem flat_limit_of_cycles_is_cycle_real {k : ℕ}
     (h_conv : Tendsto (fun j => _root_.flatNorm ((T_seq j).toFun - T_limit.toFun))
               atTop (nhds 0)) :
     T_limit.isCycleAt := by
-  -- Reuse the existing proof-track theorem (`FlatLimitCycleData.universal`)
-  -- from `Hodge.Classical.HarveyLawson`.
+  classical
+  -- Reuse the existing proof-track theorem (proved in `Hodge.Classical.HarveyLawson`).
+  letI : FlatLimitCycleData n X k :=
+    FlatLimitCycleData.universal (n := n) (X := X) (k := k)
   simpa using
     (_root_.flat_limit_of_cycles_is_cycle (n := n) (X := X) (k := k) T_seq T_limit h_cycles h_conv)
 
