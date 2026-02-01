@@ -25,7 +25,10 @@ variable {n : ℕ} {X : Type u}
   [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [CompactSpace X]
 
 /-- The standard model for ℂ as a complex manifold. -/
-def 𝓒_ℂ : ModelWithCorners ℂ ℂ ℂ := modelWithCornersSelf ℂ ℂ
+--
+-- NOTE: This repository treats all smoothness as **real-smooth** (base field `ℝ`), even for complex
+-- manifolds. So the correct codomain model is `modelWithCornersSelf ℝ ℂ`, not the `ℂ`-smooth one.
+def 𝓒_ℂ : ModelWithCorners ℝ ℂ ℂ := modelWithCornersSelf ℝ ℂ
 
 /-- A local trivialization of a bundle with fiber F over U. -/
 def LocalTrivialization {X : Type*} [TopologicalSpace X] (Fiber : X → Type*)
@@ -162,7 +165,11 @@ theorem IsHolomorphic_smul (L : HolomorphicLineBundle n X) (c : ℂ) (s : Sectio
     ext y
     show t.val.2 y.val y.property (c • s y.val) = c * t.val.2 y.val y.property (s y.val)
     rw [LinearEquiv.map_smul, smul_eq_mul]
-  rw [h_eq]; exact MDifferentiableAt.const_smul hφ c
+  -- In our development, smoothness is over `ℝ`, so we cannot use `const_smul` with a complex scalar.
+  -- Instead, use the product rule: `y ↦ c * f(y)` is differentiable as the product of the constant
+  -- function `c` and the differentiable function `f`.
+  rw [h_eq]
+  simpa using (mdifferentiableAt_const.mul hφ)
 
 /-- The partial derivative operator ∂ on smooth forms. -/
 def partial_deriv {k : ℕ} (ω : SmoothForm n X k) : SmoothForm n X (k + 1) :=

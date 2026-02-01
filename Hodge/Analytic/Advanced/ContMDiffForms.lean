@@ -603,73 +603,77 @@ theorem extDerivAt_add (ω η : ContMDiffForm n X k) (x : X) :
   rw [hmf]
   simp
 
+set_option maxHeartbeats 800000 in
 theorem extDerivAt_smul (c : ℂ) (ω : ContMDiffForm n X k) (x : X) :
     extDerivAt (c • ω) x = c • extDerivAt ω x := by
-  -- Unfold `extDerivAt` and reduce to a statement about `mfderiv` commuting with the
-  -- constant ℂ-scalar action (viewed as an ℝ-smooth map).
+  -- Unfold `extDerivAt` and reduce to a statement about `mfderiv` commuting with
+  -- constant ℂ-scalar multiplication on the target.
   simp only [extDerivAt_def]
   have h_smul : (c • ω).as_alternating = c • ω.as_alternating := rfl
   rw [h_smul]
-  -- Let `f : X → FiberAlt n k` be the coefficient map and `g` be ℂ-scalar multiplication on the target.
+  -- Let `f : X → FiberAlt n k` be the coefficient map and `g` the ℂ-scalar multiplication map.
   let f : X → FiberAlt n k := ω.as_alternating
   let g : FiberAlt n k → FiberAlt n k := fun z => c • z
   have hf : MDifferentiableAt (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) f x :=
     ω.smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
   have hg : MDifferentiableAt 𝓘(ℝ, FiberAlt n k) 𝓘(ℝ, FiberAlt n k) g (f x) := by
-    -- Maps between vector spaces: `MDifferentiableAt` ↔ `DifferentiableAt`.
-    -- `g` is constant scalar multiplication by `c`, hence differentiable.
-    have hid : DifferentiableAt ℝ (fun z : FiberAlt n k => z) (f x) := differentiableAt_id
-    have hg' : DifferentiableAt ℝ (c • (fun z : FiberAlt n k => z)) (f x) := hid.const_smul c
-    -- `c • id = g`.
-    simpa [g, Pi.smul_apply] using hg'.mdifferentiableAt
-  -- Chain rule for `mfderiv`: `mfderiv (g ∘ f) = mfderiv g ∘ mfderiv f`.
+    -- `g` is (real-)differentiable on the vector space `FiberAlt n k`.
+    have : DifferentiableAt ℝ (fun z : FiberAlt n k => c • z) (f x) := by
+      simpa using (differentiableAt_id.const_smul c)
+    simpa [g] using this.mdifferentiableAt
+  -- Chain rule for `mfderiv`.
   have hcomp :
       mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) (g ∘ f) x =
         (mfderiv 𝓘(ℝ, FiberAlt n k) 𝓘(ℝ, FiberAlt n k) g (f x)).comp
           (mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) f x) :=
     mfderiv_comp x hg hf
-  -- Compute `mfderiv` of the ℂ-scalar multiplication map `g` using `mfderiv_eq_fderiv`.
+  -- Compute `mfderiv g` (maps between vector spaces: `mfderiv = fderiv`).
   have h_mfderiv_g :
       mfderiv 𝓘(ℝ, FiberAlt n k) 𝓘(ℝ, FiberAlt n k) g (f x) =
         c • (1 : FiberAlt n k →L[ℝ] FiberAlt n k) := by
-    -- First compute the Fréchet derivative of `g`.
     have hid : DifferentiableAt ℝ (fun z : FiberAlt n k => z) (f x) := differentiableAt_id
     have hfd :
         fderiv ℝ (fun z : FiberAlt n k => c • z) (f x) =
           c • (1 : FiberAlt n k →L[ℝ] FiberAlt n k) := by
-      -- `fderiv` commutes with constant scalar multiplication.
       simpa [fderiv_id] using
         (fderiv_fun_const_smul (𝕜 := ℝ) (f := fun z : FiberAlt n k => z) (x := f x) (h := hid) (c := c))
-    -- Convert `mfderiv` to `fderiv` for maps between vector spaces.
     simpa [g] using (mfderiv_eq_fderiv (𝕜 := ℝ) (f := fun z : FiberAlt n k => c • z) (x := f x)).trans hfd
-  -- Rewrite `mfderiv` of `c • f` using the chain rule and simplify.
+  -- Rewrite `g ∘ f` as `c • f`.
+  have hgf : (g ∘ f) = (c • f) := by
+    funext y
+    rfl
+  -- Replace the `mfderiv` term and pull `c` out.
+  -- First, use the chain rule and `h_mfderiv_g` to get `mfderiv (c • f) = (c • 1).comp (mfderiv f)`.
   have h_mfderiv_smul :
       mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) (c • f) x =
         (c • (1 : FiberAlt n k →L[ℝ] FiberAlt n k)).comp
           (mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) f x) := by
-    -- `c • f = g ∘ f`.
-    have hgf : (g ∘ f) = (c • f) := by
-      funext y
-      rfl
-    -- Use the chain rule computed above.
-    -- Start from `hcomp` and rewrite `mfderiv g` by `h_mfderiv_g`.
-    -- Then simplify using `h_mfderiv_g`.
     simpa [hgf, h_mfderiv_g] using hcomp
-  -- Rewrite the `mfderiv` term using `h_mfderiv_smul`.
-  -- Rewrite `mfderiv (c • f)` as scalar multiplication on the resulting CLM.
-  have h_mfderiv_smul' :
-      mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) (c • f) x =
-        c • mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) f x := by
-    -- Both sides are CLMs `TangentModel n →L[ℝ] FiberAlt n k`.
-    -- The RHS scalar action is the one induced from the ℂ-normed-space structure on `FiberAlt n k`.
+  -- Rewrite the `mfderiv` terms as continuous linear maps `TangentModel n →L[ℝ] FiberAlt n k`,
+  -- so that scalar multiplication by `c : ℂ` is the standard one (scaling the output).
+  let A : TangentModel n →L[ℝ] FiberAlt n k :=
+    mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) f x
+  let A' : TangentModel n →L[ℝ] FiberAlt n k :=
+    mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) (c • f) x
+  -- Convert `h_mfderiv_smul` to an equality in this coerced type.
+  have hA' : A' = (c • (1 : FiberAlt n k →L[ℝ] FiberAlt n k)).comp A := by
+    simpa [A, A'] using h_mfderiv_smul
+  -- Now `A' = c • A` by extensionality.
+  have hA'' : A' = c • A := by
+    -- `c • (1 : F →L[ℝ] F)` is the CLM `x ↦ c • x`, and composition scales the output.
+    -- This is the standard fact `(c • 1).comp A = c • A`.
+    rw [hA']
     ext v
-    -- `h_mfderiv_smul` gives the same statement as a composition with the scaled identity.
-    simpa [h_mfderiv_smul] using rfl
-  rw [h_mfderiv_smul']
+    simp [ContinuousLinearMap.comp_apply]
+  -- Substitute and use linearity of `alternatizeUncurryFin` under scaling.
+  -- `alternatizeUncurryFin_smul` applies to `A : TangentModel n →L[ℝ] (TangentModel n [⋀^Fin k]→L[ℝ] ℂ)`.
+  -- Here `FiberAlt n k` is definitionally this codomain.
+  change ContinuousAlternatingMap.alternatizeUncurryFin A' =
+      c • ContinuousAlternatingMap.alternatizeUncurryFin A
+  rw [hA'']
   simpa using
     (ContinuousAlternatingMap.alternatizeUncurryFin_smul (𝕜 := ℝ) (E := TangentModel n) (F := ℂ)
-      (n := k) (c := c)
-      (f := mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) f x))
+      (n := k) (c := c) (f := A))
 
 /-- Wedge product of `ContMDiffForm`s. -/
 noncomputable def wedge {l : ℕ} (ω : ContMDiffForm n X k) (η : ContMDiffForm n X l) :

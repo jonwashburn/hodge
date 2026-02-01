@@ -1,5 +1,5 @@
 import Hodge.Analytic.Advanced.ContMDiffForms
-import Hodge.Analytic.DomCoprod
+import Hodge.Analytic.DomCoprodComplex
 import Mathlib.Analysis.Calculus.FDeriv.Bilinear
 import Mathlib.Analysis.Calculus.FDeriv.CompCLM
 import Mathlib.GroupTheory.Perm.Fin
@@ -27,15 +27,22 @@ introduces the sign.
 -/
 
 open Manifold Set Filter
-open scoped BigOperators
+open scoped BigOperators TensorProduct
 
 variable {n k : ℕ} {X : Type*} [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X]
 
 namespace LeibnizRule
 
-/-- Helper abbreviation for the fiber alternating maps. -/
-abbrev Alt (n k : ℕ) := ContinuousAlternatingMap ℂ (TangentModel n) ℂ (Fin k)
+/-!
+We work with complex-valued forms on a real-smooth manifold. Accordingly:
+
+- fiber objects are `ℝ`-linear alternating maps with codomain `ℂ` (i.e. `FiberAlt n k`);
+- the wedge product is `ContinuousAlternatingMap.wedgeℂ` (on a real vector space, with `ℂ` codomain).
+-/
+
+/-- Local alias used throughout this file: the fiber alternating maps are `FiberAlt`. -/
+abbrev Alt (n k : ℕ) := FiberAlt n k
 
 /-! ### Finite permutation bookkeeping
 
@@ -352,13 +359,13 @@ private noncomputable def modSumCongrSwap (k l : ℕ) :
     simp [Quotient.map'_mk'', permCongr_symm']
 
 private lemma wedge_comm_domDomCongr {k l : ℕ} (A : Alt n k) (B : Alt n l) :
-    A.wedge B =
-      (ContinuousAlternatingMap.domDomCongr (B.wedge A) (blockSwapEquiv k l).symm) := by
+    ContinuousAlternatingMap.wedgeℂ (E := TangentModel n) A B =
+      (ContinuousAlternatingMap.domDomCongr
+        (ContinuousAlternatingMap.wedgeℂ (E := TangentModel n) B A) (blockSwapEquiv k l).symm) := by
   classical
   ext v
-  simp [ContinuousAlternatingMap.wedge_apply,
-    ContinuousAlternatingMap.wedgeAlternating,
-    ContinuousAlternatingMap.wedgeAlternatingTensor,
+  simp [ContinuousAlternatingMap.wedgeℂ_apply,
+    ContinuousAlternatingMap.wedgeℂ_linear,
     ContinuousAlternatingMap.domDomCongr_apply,
     AlternatingMap.domDomCongr_apply,
     LinearMap.compAlternatingMap_apply,
@@ -367,11 +374,11 @@ private lemma wedge_comm_domDomCongr {k l : ℕ} (A : Alt n k) (B : Alt n l) :
     MultilinearMap.sum_apply]
   refine Fintype.sum_equiv (modSumCongrSwap k l)
       (fun a : Equiv.Perm.ModSumCongr (Fin k) (Fin l) =>
-        (LinearMap.mul' ℂ ℂ)
+        (LinearMap.mul' ℝ ℂ)
           ((AlternatingMap.domCoprod.summand A.toAlternatingMap B.toAlternatingMap a)
             (v ∘ finSumFinEquiv)))
       (fun a : Equiv.Perm.ModSumCongr (Fin l) (Fin k) =>
-        (LinearMap.mul' ℂ ℂ)
+        (LinearMap.mul' ℝ ℂ)
           ((AlternatingMap.domCoprod.summand B.toAlternatingMap A.toAlternatingMap a)
             ((v ∘ (blockSwapEquiv k l).symm) ∘ finSumFinEquiv)))
       ?_
@@ -528,16 +535,16 @@ private lemma decomposeFinCycleRange_symm_sign {n : ℕ} (p : Fin (n + 1)) (e : 
 /-- The wedge product is a bounded bilinear map.
 This is the key ingredient for computing derivatives of wedge products. -/
 lemma isBoundedBilinearMap_wedge {k l : ℕ} :
-    IsBoundedBilinearMap ℂ (fun p : Alt n k × Alt n l => p.1.wedge p.2) where
-  add_left := fun x₁ x₂ y => ContinuousAlternatingMap.wedge_add_left x₁ x₂ y
-  smul_left := fun c x y => ContinuousAlternatingMap.wedge_smul_left c x y
-  add_right := fun x y₁ y₂ => ContinuousAlternatingMap.wedge_add_right x y₁ y₂
-  smul_right := fun c x y => ContinuousAlternatingMap.wedge_smul_right c x y
+    IsBoundedBilinearMap ℝ (fun p : Alt n k × Alt n l => ContinuousAlternatingMap.wedgeℂ (E := TangentModel n) p.1 p.2) where
+  add_left := fun x₁ x₂ y => ContinuousAlternatingMap.wedgeℂ_add_left (E := TangentModel n) x₁ x₂ y
+  smul_left := fun c x y => ContinuousAlternatingMap.wedgeℂ_smul_left (E := TangentModel n) (c := c) x y
+  add_right := fun x y₁ y₂ => ContinuousAlternatingMap.wedgeℂ_add_right (E := TangentModel n) x y₁ y₂
+  smul_right := fun c x y => ContinuousAlternatingMap.wedgeℂ_smul_right (E := TangentModel n) (c := c) x y
   bound := by
     -- The wedge is the composition of wedgeCLM_alt with function application
     -- wedgeCLM_alt : Alt k →L[ℂ] (Alt l →L[ℂ] Alt (k+l))
     -- So (ω, η) ↦ (wedgeCLM_alt ω) η is bounded bilinear
-    let f := ContinuousAlternatingMap.wedgeCLM_alt ℂ (TangentModel n) k l
+    let f := ContinuousAlternatingMap.wedgeℂCLM_alt (E := TangentModel n) k l
     -- Use that (g, x) ↦ g x for g : E →L F, x : E is bounded bilinear
     -- with bound max ‖f‖ 1
     have h := f.isBoundedBilinearMap
@@ -550,11 +557,11 @@ If `ω : G → Alt n k` and `η : G → Alt n l` are differentiable at x, then
 `y ↦ ω(y) ∧ η(y)` is differentiable and its derivative is:
   `v ↦ (Dω(v)) ∧ η(x) + ω(x) ∧ (Dη(v))`
 -/
-theorem hasFDerivAt_wedge {G : Type*} [NormedAddCommGroup G] [NormedSpace ℂ G]
+theorem hasFDerivAt_wedge {G : Type*} [NormedAddCommGroup G] [NormedSpace ℝ G]
     {k l : ℕ} {ω : G → Alt n k} {η : G → Alt n l} {x : G}
-    {ω' : G →L[ℂ] Alt n k} {η' : G →L[ℂ] Alt n l}
+    {ω' : G →L[ℝ] Alt n k} {η' : G →L[ℝ] Alt n l}
     (hω : HasFDerivAt ω ω' x) (hη : HasFDerivAt η η' x) :
-    HasFDerivAt (fun y => (ω y).wedge (η y))
+    HasFDerivAt (fun y => ContinuousAlternatingMap.wedgeℂ (E := TangentModel n) (ω y) (η y))
       (isBoundedBilinearMap_wedge.deriv (ω x, η x) ∘L (ω'.prod η')) x := by
   -- Use the bounded bilinear map derivative rule
   have hB := isBoundedBilinearMap_wedge (n := n) (k := k) (l := l)
@@ -580,11 +587,16 @@ The technical details involve:
 4. Relating fderiv of chart representation back to mfderiv -/
 theorem mfderiv_wedge_apply {k l : ℕ} (ω : ContMDiffForm n X k) (η : ContMDiffForm n X l) (x : X)
     (v : TangentSpace (𝓒_complex n) x) :
-    mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n (k+l)) (ω.wedge η).as_alternating x v =
-    (mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n k) ω.as_alternating x v).wedge (η.as_alternating x) +
-    (ω.as_alternating x).wedge (mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n l) η.as_alternating x v) := by
+    mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n (k + l)) (ω.wedge η).as_alternating x v =
+    ContinuousAlternatingMap.wedgeℂ (E := TangentModel n)
+        (mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n k) ω.as_alternating x v) (η.as_alternating x) +
+      ContinuousAlternatingMap.wedgeℂ (E := TangentModel n)
+        (ω.as_alternating x) (mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n l) η.as_alternating x v) := by
   -- The wedge of ContMDiffForms has as_alternating = fun x => ω(x) ∧ η(x)
-  have h_eq : (ω.wedge η).as_alternating = fun y => (ω.as_alternating y).wedge (η.as_alternating y) := rfl
+  have h_eq :
+      (ω.wedge η).as_alternating =
+        fun y => ContinuousAlternatingMap.wedgeℂ (E := TangentModel n) (ω.as_alternating y) (η.as_alternating y) :=
+    rfl
   rw [h_eq]
 
   -- Step 1: Get differentiability hypotheses
@@ -594,8 +606,9 @@ theorem mfderiv_wedge_apply {k l : ℕ} (ω : ContMDiffForm n X k) (η : ContMDi
     η.smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
 
   -- Step 2: Define the bilinear wedge map on the product
-  let B : Alt n k × Alt n l → Alt n (k + l) := fun p => p.1.wedge p.2
-  have hB : IsBoundedBilinearMap ℂ B := isBoundedBilinearMap_wedge (n := n) (k := k) (l := l)
+  let B : Alt n k × Alt n l → Alt n (k + l) :=
+    fun p => ContinuousAlternatingMap.wedgeℂ (E := TangentModel n) p.1 p.2
+  have hB : IsBoundedBilinearMap ℝ B := isBoundedBilinearMap_wedge (n := n) (k := k) (l := l)
 
   -- Step 3: The pair function
   let pair : X → Alt n k × Alt n l := fun y => (ω.as_alternating y, η.as_alternating y)
@@ -604,24 +617,25 @@ theorem mfderiv_wedge_apply {k l : ℕ} (ω : ContMDiffForm n X k) (η : ContMDi
   have hpair_diff : MDifferentiableAt (𝓒_complex n) 𝓘(ℝ, Alt n k × Alt n l) pair x :=
     hω_diff.prodMk_space hη_diff
 
-  -- Step 5: B is smooth (ContDiff)
-  have hB_contDiff : ContDiff ℂ ⊤ B := hB.contDiff
-  have hB_diff : DifferentiableAt ℂ B (pair x) :=
+  -- Step 5: B is smooth (as a map between real normed spaces)
+  have hB_contDiff : ContDiff ℝ ⊤ B := hB.contDiff
+  have hB_diff : DifferentiableAt ℝ B (pair x) :=
     hB_contDiff.differentiable (by simp : (⊤ : WithTop ℕ∞) ≠ 0) (pair x)
 
   -- Step 6: The function is B ∘ pair
-  have h_comp : (fun y => (ω.as_alternating y).wedge (η.as_alternating y)) = B ∘ pair := rfl
+  have h_comp : (fun y => ContinuousAlternatingMap.wedgeℂ (E := TangentModel n) (ω.as_alternating y) (η.as_alternating y)) =
+      B ∘ pair := rfl
 
   -- Step 7: Apply the chain rule for mfderiv
   rw [h_comp]
   rw [mfderiv_comp x hB_diff.mdifferentiableAt hpair_diff]
 
-  -- Step 8: Simplify mfderiv of B using mfderiv_eq_fderiv (source is vector space)
+  -- Step 8: Simplify mfderiv of B using mfderiv_eq_fderiv (source is a vector space)
   have h_mfderiv_B : mfderiv 𝓘(ℝ, Alt n k × Alt n l) 𝓘(ℝ, Alt n (k + l)) B (pair x) =
-      fderiv ℂ B (pair x) := mfderiv_eq_fderiv
+      fderiv ℝ B (pair x) := mfderiv_eq_fderiv
 
   -- Step 9: Get fderiv of bilinear map
-  have h_fderiv_B : fderiv ℂ B (pair x) = hB.deriv (pair x) := hB.hasFDerivAt (pair x) |>.fderiv
+  have h_fderiv_B : fderiv ℝ B (pair x) = hB.deriv (pair x) := hB.hasFDerivAt (pair x) |>.fderiv
 
   -- Step 10: Simplify mfderiv of pair using mfderiv_prodMk
   -- Use modelWithCornersSelf_prod and chartedSpaceSelf_prod to unify types
@@ -636,12 +650,14 @@ theorem mfderiv_wedge_apply {k l : ℕ} (ω : ContMDiffForm n X k) (η : ContMDi
   show (hB.toContinuousLinearMap.deriv₂ (ω.as_alternating x, η.as_alternating x))
        ((mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n k) ω.as_alternating x v,
          mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n l) η.as_alternating x v)) =
-       (mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n k) ω.as_alternating x v).wedge (η.as_alternating x) +
-       (ω.as_alternating x).wedge (mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n l) η.as_alternating x v)
+       ContinuousAlternatingMap.wedgeℂ (E := TangentModel n)
+          (mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n k) ω.as_alternating x v) (η.as_alternating x) +
+       ContinuousAlternatingMap.wedgeℂ (E := TangentModel n)
+          (ω.as_alternating x) (mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n l) η.as_alternating x v)
   -- Apply coe_deriv₂
   simp only [ContinuousLinearMap.coe_deriv₂]
-  -- Goal: f (ω x) (mfderiv η v) + f (mfderiv ω v) (η x) = (mfderiv ω v).wedge (η x) + (ω x).wedge (mfderiv η v)
-  -- These are equal by add_comm
+  -- Goal: `ω ∧ (Dη v) + (Dω v) ∧ η = (Dω v) ∧ η + ω ∧ (Dη v)`
+  -- These are equal by `add_comm`.
   exact add_comm _ _
 
 -- Restore the default heartbeat budget for the rest of the file.
@@ -664,41 +680,48 @@ graded derivation, meaning `d(ω ∧ η) = dω ∧ η + (-1)^deg(ω) ω ∧ dη`
 /-! #### Helper lemmas for wedge product distribution -/
 
 /-- Wedge with zero on the left gives zero. -/
-private lemma wedge_zero_left' {k l : ℕ} (B : Alt n l) : (0 : Alt n k).wedge B = 0 := by
+private lemma wedge_zero_left' {k l : ℕ} (B : Alt n l) : (0 : Alt n k).wedgeℂ B = 0 := by
   ext v
-  simp only [ContinuousAlternatingMap.wedge_apply]
-  unfold ContinuousAlternatingMap.wedgeAlternating ContinuousAlternatingMap.wedgeAlternatingTensor
-  simp only [ContinuousAlternatingMap.toAlternatingMap_zero, TensorProduct.zero_tmul]
-  simp
+  simp [ContinuousAlternatingMap.wedgeℂ_apply, ContinuousAlternatingMap.wedgeℂ_linear]
 
 /-- Wedge distributes over finite sums in the left argument. -/
 private lemma wedge_sum_left {k l : ℕ} {ι : Type*} [Fintype ι] [DecidableEq ι]
     (f : ι → Alt n k) (B : Alt n l) (s : Finset ι) :
-    (∑ i ∈ s, f i).wedge B = ∑ i ∈ s, (f i).wedge B := by
+    (∑ i ∈ s, f i).wedgeℂ B = ∑ i ∈ s, (f i).wedgeℂ B := by
   induction s using Finset.induction_on with
   | empty => simp [wedge_zero_left']
   | @insert a s ha ih =>
     rw [Finset.sum_insert ha, Finset.sum_insert ha]
-    rw [ContinuousAlternatingMap.wedge_add_left]
-    rw [ih]
+    -- Expand the wedge of a sum, then use the induction hypothesis.
+    -- (Avoid `simpa` here: simp can rewrite the goal into a form where the term is seen as `True`.)
+    have h :=
+      ContinuousAlternatingMap.wedgeℂ_add_left (E := TangentModel n) (ω₁ := f a) (ω₂ := ∑ i ∈ s, f i) (η := B)
+    -- `h` has the desired shape after rewriting the `Finset.sum_insert`.
+    -- Now finish by rewriting the tail using `ih`.
+    -- Note: the remaining goal is exactly `h` with the tail rewritten.
+    simpa [h, ih, add_assoc, add_left_comm, add_comm]
 
 /-- Wedge distributes over finite sums (Fintype version). -/
 private lemma wedge_finsum_left {k l : ℕ} {ι : Type*} [Fintype ι] [DecidableEq ι]
     (f : ι → Alt n k) (B : Alt n l) :
-    (∑ i, f i).wedge B = ∑ i, (f i).wedge B := by
+    (∑ i, f i).wedgeℂ B = ∑ i, (f i).wedgeℂ B := by
   convert wedge_sum_left f B Finset.univ <;> simp
 
 /-- Wedge is compatible with integer scalar multiplication on the left. -/
 private lemma wedge_zsmul_left {k l : ℕ} (c : ℤ) (ω : Alt n k) (B : Alt n l) :
-    (c • ω).wedge B = c • (ω.wedge B) := by
-  rw [← Int.cast_smul_eq_zsmul ℂ c ω]
-  rw [← Int.cast_smul_eq_zsmul ℂ c (ω.wedge B)]
-  exact ContinuousAlternatingMap.wedge_smul_left _ _ _
+    (c • ω).wedgeℂ B = c • (ω.wedgeℂ B) := by
+  -- Fix the right argument; wedge is an `ℝ`-linear (hence `ℤ`-linear) map in the left argument.
+  let L : Alt n k →L[ℝ] Alt n (k + l) :=
+    (ContinuousAlternatingMap.wedgeℂCLM_alt (E := TangentModel n) k l).flip B
+  -- Rewrite both sides in terms of `L`, then apply `map_zsmul`.
+  -- (Avoid `simp [L]`: it can trigger instance search for scalar actions on linear maps.)
+  change L (c • ω) = c • L ω
+  simpa using (map_zsmul L c ω)
 
 /-- Wedge distributes over finite sums with integer scalars. -/
 private lemma wedge_zsmul_finsum_left {k l : ℕ} {ι : Type*} [Fintype ι] [DecidableEq ι]
     (c : ι → ℤ) (f : ι → Alt n k) (B : Alt n l) :
-    (∑ i, c i • f i).wedge B = ∑ i, c i • (f i).wedge B := by
+    (∑ i, c i • f i).wedgeℂ B = ∑ i, c i • (f i).wedgeℂ B := by
   rw [wedge_finsum_left]
   congr 1
   ext i
@@ -758,24 +781,134 @@ private lemma domCoprod_eq_inv_factorial_smul_alternatization {k l : ℕ}
 
 private lemma wedge_apply_eq_inv_factorial_smul_alternatization {k l : ℕ}
     (ω : Alt n k) (η : Alt n l) (v : Fin (k + l) → TangentModel n) :
-    (ω.wedge η) v =
+    (ω.wedgeℂ η) v =
       (((k.factorial * l.factorial : ℕ) : ℂ)⁻¹) •
-        (LinearMap.mul' ℂ ℂ)
+        (LinearMap.mul' ℝ ℂ)
           ((MultilinearMap.alternatization
               ((ω.toAlternatingMap.toMultilinearMap).domCoprod (η.toAlternatingMap.toMultilinearMap)))
             (v ∘ finSumFinEquiv)) := by
   classical
   -- Unfold the wedge definition down to `AlternatingMap.domCoprod`, then rewrite using the inverse-factorial lemma.
-  simp only [ContinuousAlternatingMap.wedge_apply,
-    ContinuousAlternatingMap.wedgeAlternating,
-    ContinuousAlternatingMap.wedgeAlternatingTensor]
+  simp only [ContinuousAlternatingMap.wedgeℂ_apply,
+    ContinuousAlternatingMap.wedgeℂ_linear]
   simp only [AlternatingMap.domDomCongr_apply, LinearMap.compAlternatingMap_apply,
     AlternatingMap.domCoprod'_apply]
   -- Replace the shuffle-quotient `domCoprod` by the full alternatization sum.
   -- (We keep the result *before* expanding the alternatization sum.)
   rw [domCoprod_eq_inv_factorial_smul_alternatization (n := n) (k := k) (l := l) ω η]
   -- Pull the scalar out through the linear map `LinearMap.mul'`.
-  simp [map_smul, smul_smul]
+  -- The scalar `((k! * l! : ℕ) : ℂ)⁻¹` is a real number (cast to `ℂ`), so we can
+  -- pull it out using ℝ-linearity of `LinearMap.mul'`.
+  have hmNat : (k.factorial * l.factorial : ℕ) ≠ 0 := by
+    simp [Nat.mul_ne_zero, Nat.factorial_ne_zero]
+  have hmR : ((k.factorial * l.factorial : ℕ) : ℝ) ≠ 0 := by
+    exact_mod_cast hmNat
+  have hmul : ((k.factorial * l.factorial : ℕ) : ℂ) * (((((k.factorial * l.factorial : ℕ) : ℝ)⁻¹ : ℝ)) : ℂ) = 1 := by
+    -- reduce to ℝ
+    norm_cast
+    field_simp [hmR]
+  have hinv : (((k.factorial * l.factorial : ℕ) : ℂ)⁻¹) =
+      (((((k.factorial * l.factorial : ℕ) : ℝ)⁻¹ : ℝ)) : ℂ) :=
+    inv_eq_of_mul_eq_one_right hmul
+  -- Rewrite the scalar and use `map_smul` (ℝ-linearity).
+  rw [hinv]
+  -- Avoid `simp` trying to pull the scalar out as a *multiplication* in `ℂ`:
+  -- we explicitly use the ℝ-linearity statement `map_smul`.
+  -- (The scalar is a real number, viewed inside `ℂ`.)
+  -- First rewrite the scalar-smul as an ℝ-smul.
+  -- (This is definitional for the `ℝ`-module structure on `ℂ`.)
+  -- Then apply `map_smul`.
+  -- The goal is presented in terms of the product of the two factorial inverses.
+  -- To use ℝ-linearity of `LinearMap.mul'`, we rewrite that scalar as the cast of the real inverse
+  -- of the product `(k! * l!)`.
+  -- Now finish by ℝ-linearity (the scalar is real, seen inside `ℂ`).
+  -- We avoid `simpa` here (it can simplify the proof term’s type to `True` via `eq_self_iff_true`).
+  -- Instead we rewrite the goal into an explicit `map_smul` instance.
+  -- First, rewrite the scalar into the commuting product form.
+  -- (This matches the normal form produced earlier by `domCoprod_eq_inv_factorial_smul_alternatization`.)
+  -- After that, we rewrite the ℂ-scalar multiplication by the real inverse as an ℝ-scalar multiplication.
+  -- Finally, we apply `map_smul` and re-associate multiplications.
+  -- Abbreviation for the tensor-valued alternatization term.
+  set t : (ℂ ⊗[ℝ] ℂ) :=
+    (MultilinearMap.alternatization
+        ((ω.toAlternatingMap.toMultilinearMap).domCoprod (η.toAlternatingMap.toMultilinearMap)))
+      (v ∘ finSumFinEquiv)
+  -- Replace the complex inverse scalar by the product-of-inverses form.
+  -- (Both are in `ℂ`, but come from `ℕ`-casts, hence from `ℝ`.)
+  -- Then treat the scalar as an `ℝ`-scalar and apply `map_smul`.
+  -- We do this by changing the goal rather than relying on simp.
+  -- Rewrite the scalar on the LHS.
+  have hmap :
+      (LinearMap.mul' ℝ ℂ) ((((k.factorial * l.factorial : ℕ) : ℝ)⁻¹) • t) =
+        (((k.factorial * l.factorial : ℕ) : ℝ)⁻¹) • (LinearMap.mul' ℝ ℂ) t :=
+    map_smul (LinearMap.mul' ℝ ℂ) (((k.factorial * l.factorial : ℕ) : ℝ)⁻¹) t
+  -- Rewrite the complex scalar `(↑l.factorial)⁻¹ * (↑k.factorial)⁻¹` as the cast of the real inverse
+  -- of `k.factorial * l.factorial`, so that `hmap` applies.
+  have hscalar :
+      (((l.factorial : ℕ) : ℂ)⁻¹ * ((k.factorial : ℕ) : ℂ)⁻¹) =
+        (((((k.factorial * l.factorial : ℕ) : ℝ)⁻¹ : ℝ)) : ℂ) := by
+    have hmNat : (k.factorial * l.factorial : ℕ) ≠ 0 := by
+      simp [Nat.mul_ne_zero, Nat.factorial_ne_zero]
+    have hmR : ((k.factorial * l.factorial : ℕ) : ℝ) ≠ 0 := by
+      exact_mod_cast hmNat
+    -- First identify `(k! * l! : ℂ)⁻¹` with the cast of the real inverse.
+    have hmul' :
+        ((k.factorial * l.factorial : ℕ) : ℂ) * (((((k.factorial * l.factorial : ℕ) : ℝ)⁻¹ : ℝ)) : ℂ) = 1 := by
+      norm_cast
+      field_simp [hmR]
+    have hinv' :
+        (((k.factorial * l.factorial : ℕ) : ℂ)⁻¹) =
+          (((((k.factorial * l.factorial : ℕ) : ℝ)⁻¹ : ℝ)) : ℂ) :=
+      inv_eq_of_mul_eq_one_right hmul'
+    -- Now rewrite the LHS as `(k! * l! : ℂ)⁻¹` using commutativity.
+    have hinv_mul' :
+        (((k.factorial * l.factorial : ℕ) : ℂ)⁻¹) =
+          ((l.factorial : ℕ) : ℂ)⁻¹ * ((k.factorial : ℕ) : ℂ)⁻¹ := by
+      have : ((k.factorial * l.factorial : ℕ) : ℂ) =
+          ((l.factorial : ℕ) : ℂ) * ((k.factorial : ℕ) : ℂ) := by
+        norm_cast
+        ring
+      calc
+        (((k.factorial * l.factorial : ℕ) : ℂ)⁻¹)
+            = (((((l.factorial : ℕ) : ℂ) * ((k.factorial : ℕ) : ℂ)))⁻¹) := by simpa [this]
+        _ = ((l.factorial : ℕ) : ℂ)⁻¹ * ((k.factorial : ℕ) : ℂ)⁻¹ := by
+              simpa using (mul_inv (((l.factorial : ℕ) : ℂ)) (((k.factorial : ℕ) : ℂ)))
+    -- Combine the two characterizations of the inverse.
+    -- (We rewrite the LHS using `hinv_mul'` and then use `hinv'`.)
+    calc
+      (( (l.factorial : ℕ) : ℂ)⁻¹ * ((k.factorial : ℕ) : ℂ)⁻¹)
+          = (((k.factorial * l.factorial : ℕ) : ℂ)⁻¹) := by
+              simpa [hinv_mul'] using hinv_mul'.symm
+      _ = (((((k.factorial * l.factorial : ℕ) : ℝ)⁻¹ : ℝ)) : ℂ) := hinv'
+  -- Rewrite the goal using `hscalar`, then finish with `hmap`.
+  -- We avoid `simp` here (it can loop on scalar-cast normalizations); instead we rewrite explicitly.
+  -- 1) unfold `t` where it appears;
+  -- 2) rewrite the scalar `(↑l.factorial)⁻¹ * (↑k.factorial)⁻¹` as the cast of the real inverse;
+  -- 3) use `hmap`.
+  -- Step 1: unfold `t` in the goal.
+  -- (The `set` tactic introduced a definitional equation `t = _` that `simp`/`rw` can use.)
+  -- We use `simp [t]` just to unfold `t` once.
+  -- (No scalar rewriting here.)
+  -- Step 2: rewrite scalars.
+  -- Now the goal matches `hmap` (up to definitional equality of `((r : ℂ) • ·)` with `(r • ·)`).
+  -- Step 3: exact `hmap`.
+  -- Note: we may need `smul_smul` and `mul_assoc` to match the nested scalar action presentation.
+  -- We do those rewrites explicitly.
+  -- Rewrite the product-of-inverses scalar on both sides.
+  -- (This converts the goal’s scalar to an `ℝ`-scalar, so `hmap` applies.)
+  -- Finally, close with `hmap`.
+  -- Unfold `t` in the goal.
+  -- (Using `simp [t]` avoids having to reference the generated equation name.)
+  -- Only simplify the *goal* (do not simplify hypotheses like `hscalar`, otherwise simp may turn them into `True`).
+  simp [t]
+  -- Rewrite scalar in the goal.
+  rw [hscalar]
+  -- Now close with `hmap`.
+  -- `hmap` is exactly the statement that `LinearMap.mul'` commutes with the ℝ-scalar.
+  -- Any remaining associativity is definitional for scalar multiplication on tensor products.
+  -- At this point the goal is exactly `hmap` (up to definitional equality of scalar actions),
+  -- so we can close directly without further simp-rewriting.
+  exact hmap
 
 /-! #### Core reindexing lemma for the right-constant Leibniz identity
 
@@ -790,11 +923,11 @@ set_option maxHeartbeats 800000
 
 private lemma stage1_lemma {k l : ℕ} {n : ℕ}
     (w : (Fin (k + 1) ⊕ Fin l) → TangentModel n)
-    (A : TangentModel n →L[ℂ] Alt n k)
+    (A : TangentModel n →L[ℝ] Alt n k)
     (B : Alt n l) :
     (∑ σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l),
           ((Equiv.Perm.sign σ : ℤ) : ℂ) *
-            ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A)
+            ((ContinuousAlternatingMap.alternatizeUncurryFin (𝕜 := ℝ) (F := ℂ) A)
                 (fun i : Fin (k + 1) => w (σ (Sum.inl i))) *
               B (fun j : Fin l => w (σ (Sum.inr j))))) =
       (k + 1 : ℂ) *
@@ -813,7 +946,7 @@ private lemma stage1_lemma {k l : ℕ} {n : ℕ}
   -- Step 1: Expand alternatizeUncurryFin and distribute
   have hexpand : ∀ σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l),
       ((Equiv.Perm.sign σ : ℤ) : ℂ) *
-        ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A) (left σ) * B (right σ)) =
+        ((ContinuousAlternatingMap.alternatizeUncurryFin (𝕜 := ℝ) (F := ℂ) A) (left σ) * B (right σ)) =
       ∑ i : Fin (k + 1),
         ((Equiv.Perm.sign σ : ℤ) : ℂ) * ((-1 : ℂ) ^ (i : ℕ)) *
           (A (left σ i) (i.removeNth (left σ)) * B (right σ)) := by
@@ -941,7 +1074,7 @@ private lemma stage1_lemma {k l : ℕ} {n : ℕ}
 
 private lemma stage2_lemma {k l : ℕ}
     (v : Fin (k + l + 1) → TangentModel n)
-    (A : TangentModel n →L[ℂ] Alt n k)
+    (A : TangentModel n →L[ℝ] Alt n k)
     (B : Alt n l) :
     let h : (k + 1) + l = (k + l) + 1 := by omega
     let w : (Fin (k + 1) ⊕ Fin l) → TangentModel n := (v ∘ finCongr h) ∘ finSumFinEquiv
@@ -952,7 +1085,7 @@ private lemma stage2_lemma {k l : ℕ}
               B (fun j : Fin l => w (σ (Sum.inr j))))) =
     ∑ x : Fin (k + l + 1),
           ((-1 : ℂ) ^ (x : ℕ)) *
-            (LinearMap.mul' ℂ ℂ)
+            (LinearMap.mul' ℝ ℂ)
               ((MultilinearMap.alternatization
                   ((A (v x)).toMultilinearMap.domCoprod B.toMultilinearMap))
                 ((Fin.removeNth x v) ∘ finSumFinEquiv)) := by
@@ -1004,7 +1137,7 @@ private lemma stage2_lemma {k l : ℕ}
   -- Expand RHS: alternatization is a sum over permutations; pull `mul'` inside the sum.
   -- Then reindex the permutation sum along `g.permCongr : Perm (Fin k ⊕ Fin l) ≃ Perm (Fin (k+l))`.
   have hrhs :
-      (LinearMap.mul' ℂ ℂ)
+      (LinearMap.mul' ℝ ℂ)
           ((MultilinearMap.alternatization M) u) =
         ∑ e : Equiv.Perm (Fin (k + l)),
           ((Equiv.Perm.sign e : ℤ) : ℂ) *
@@ -1019,7 +1152,7 @@ private lemma stage2_lemma {k l : ℕ}
     -- Reindex this sum to permutations of `Fin (k+l)` using `g`.
     refine Fintype.sum_equiv (Equiv.permCongr g)
         (fun σ : Equiv.Perm (Fin k ⊕ Fin l) =>
-          Equiv.Perm.sign σ • (LinearMap.mul' ℂ ℂ) (M fun i => u (σ i)))
+          Equiv.Perm.sign σ • (LinearMap.mul' ℝ ℂ) (M fun i => u (σ i)))
         (fun e : Equiv.Perm (Fin (k + l)) =>
           ((Equiv.Perm.sign e : ℤ) : ℂ) *
             (A (v x)
@@ -1037,7 +1170,7 @@ private lemma stage2_lemma {k l : ℕ}
       exact congrArg (fun u : ℤˣ => (u : ℤ)) hunit
     -- Compute the `mul'` of the domCoprod tensor and rewrite the inputs through `e`.
     have hmul :
-        (LinearMap.mul' ℂ ℂ) (M fun i => u (σ i)) =
+        (LinearMap.mul' ℝ ℂ) (M fun i => u (σ i)) =
           (A (v x)
               (fun i : Fin k => (Fin.removeNth x v) (e (g (Sum.inl i)))) *
             B (fun j : Fin l => (Fin.removeNth x v) (e (g (Sum.inr j))))) := by
@@ -1120,17 +1253,17 @@ private lemma stage2_lemma {k l : ℕ}
 
 private lemma alternatizeUncurryFin_domCoprod_alternatization_wedge_right_core {k l : ℕ}
     (v : Fin (k + l + 1) → TangentModel n)
-    (A : TangentModel n →L[ℂ] Alt n k)
+    (A : TangentModel n →L[ℝ] Alt n k)
     (B : Alt n l) :
-    (LinearMap.mul' ℂ ℂ)
+    (LinearMap.mul' ℝ ℂ)
         ((MultilinearMap.alternatization
-            ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A).toMultilinearMap.domCoprod
+            ((ContinuousAlternatingMap.alternatizeUncurryFin (𝕜 := ℝ) (F := ℂ) A).toMultilinearMap.domCoprod
               B.toMultilinearMap))
           (((v ∘ finCongr (show (k + 1) + l = (k + l) + 1 by omega)) ∘ finSumFinEquiv))) =
       (k + 1 : ℂ) *
         ∑ x : Fin (k + l + 1),
           ((-1 : ℂ) ^ (x : ℕ)) *
-            (LinearMap.mul' ℂ ℂ)
+            (LinearMap.mul' ℝ ℂ)
               ((MultilinearMap.alternatization
                   ((A (v x)).toMultilinearMap.domCoprod B.toMultilinearMap))
                 ((Fin.removeNth x v) ∘ finSumFinEquiv)) := by
@@ -1141,14 +1274,14 @@ private lemma alternatizeUncurryFin_domCoprod_alternatization_wedge_right_core {
 
   -- Expand the LHS alternatization as a permutation sum.
   have hLHS :
-      (LinearMap.mul' ℂ ℂ)
+      (LinearMap.mul' ℝ ℂ)
           ((MultilinearMap.alternatization
-              ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A).toMultilinearMap.domCoprod
+              ((ContinuousAlternatingMap.alternatizeUncurryFin (𝕜 := ℝ) (F := ℂ) A).toMultilinearMap.domCoprod
                 B.toMultilinearMap))
             w) =
         ∑ σ : Equiv.Perm (Fin (k + 1) ⊕ Fin l),
           ((Equiv.Perm.sign σ : ℤ) : ℂ) *
-            ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A)
+            ((ContinuousAlternatingMap.alternatizeUncurryFin (𝕜 := ℝ) (F := ℂ) A)
                 (fun i : Fin (k + 1) => w (σ (Sum.inl i))) *
               B (fun j : Fin l => w (σ (Sum.inr j)))) := by
     classical
@@ -1169,14 +1302,14 @@ private lemma alternatizeUncurryFin_domCoprod_alternatization_wedge_right_core {
 
   -- Now finish by rewriting the LHS to the stage1 sum, then substituting stage1+stage2.
   calc
-    (LinearMap.mul' ℂ ℂ)
+    (LinearMap.mul' ℝ ℂ)
         ((MultilinearMap.alternatization
-            ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A).toMultilinearMap.domCoprod
+            ((ContinuousAlternatingMap.alternatizeUncurryFin (𝕜 := ℝ) (F := ℂ) A).toMultilinearMap.domCoprod
               B.toMultilinearMap))
           (((v ∘ finCongr (show (k + 1) + l = (k + l) + 1 by omega)) ∘ finSumFinEquiv))) =
-        (LinearMap.mul' ℂ ℂ)
+        (LinearMap.mul' ℝ ℂ)
           ((MultilinearMap.alternatization
-              ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A).toMultilinearMap.domCoprod
+              ((ContinuousAlternatingMap.alternatizeUncurryFin (𝕜 := ℝ) (F := ℂ) A).toMultilinearMap.domCoprod
                 B.toMultilinearMap))
             w) := by
           simp [w, v', hh, h]
@@ -1192,7 +1325,7 @@ private lemma alternatizeUncurryFin_domCoprod_alternatization_wedge_right_core {
     _ = (k + 1 : ℂ) *
           ∑ x : Fin (k + l + 1),
             ((-1 : ℂ) ^ (x : ℕ)) *
-              (LinearMap.mul' ℂ ℂ)
+              (LinearMap.mul' ℝ ℂ)
                 ((MultilinearMap.alternatization
                     ((A (v x)).toMultilinearMap.domCoprod B.toMultilinearMap))
                   ((Fin.removeNth x v) ∘ finSumFinEquiv)) := by
@@ -1200,20 +1333,213 @@ private lemma alternatizeUncurryFin_domCoprod_alternatization_wedge_right_core {
           -- Apply `stage2_lemma` under the scalar factor `(k+1)`.
           simpa [w, v', h] using congrArg (fun t => (k + 1 : ℂ) * t) hstage2
 
+/-!
+#### Wedge with a 0-form
+
+`ContinuousAlternatingMap.wedgeℂ` is defined via `AlternatingMap.domCoprod`, which is a finite sum
+over the quotient `Equiv.Perm.ModSumCongr`. When one side is empty (`Fin 0`) this quotient is a
+singleton, and wedging with a 0-form reduces to scalar multiplication.
+-/
+
+private lemma sumCongrHom_surj_empty_left {l : ℕ} :
+    Function.Surjective (Equiv.Perm.sumCongrHom (Fin 0) (Fin l)) := by
+  intro σ
+  have h_pres : ∀ i : Fin l, ∃ j : Fin l, σ (Sum.inr i) = Sum.inr j := by
+    intro i
+    rcases σ (Sum.inr i) with ⟨x⟩ | ⟨j⟩
+    · exact (IsEmpty.false x).elim
+    · exact ⟨j, rfl⟩
+  let q_fun : Fin l → Fin l := fun i => (h_pres i).choose
+  have hq : ∀ i, σ (Sum.inr i) = Sum.inr (q_fun i) := fun i => (h_pres i).choose_spec
+  have q_inj : Function.Injective q_fun := by
+    intro i j hij
+    have : σ (Sum.inr i) = σ (Sum.inr j) := by simp [hq, hij]
+    exact Sum.inr_injective (σ.injective this)
+  have q_surj : Function.Surjective q_fun := by
+    intro j
+    obtain ⟨x, hx⟩ := σ.surjective (Sum.inr j)
+    rcases x with ⟨y⟩ | ⟨i⟩
+    · exact (IsEmpty.false y).elim
+    · refine ⟨i, ?_⟩
+      have h1 : σ (Sum.inr i) = (Sum.inr j : Fin 0 ⊕ Fin l) := hx
+      have h2 : σ (Sum.inr i) = (Sum.inr (q_fun i) : Fin 0 ⊕ Fin l) := hq i
+      exact Sum.inr_injective (by rw [← h2, h1])
+  let q : Equiv.Perm (Fin l) := Equiv.ofBijective q_fun ⟨q_inj, q_surj⟩
+  refine ⟨(1, q), ?_⟩
+  ext x
+  rcases x with ⟨y⟩ | ⟨i⟩
+  · exact (IsEmpty.false y).elim
+  · simp only [Equiv.Perm.sumCongrHom_apply, Equiv.Perm.sumCongr_apply, Sum.map_inr]
+    exact (hq i).symm
+
+private instance subsingleton_modSumCongr_empty_left {l : ℕ} :
+    Subsingleton (Equiv.Perm.ModSumCongr (Fin 0) (Fin l)) := by
+  constructor
+  intro σ₁ σ₂
+  induction σ₁ using Quotient.inductionOn' with
+  | h s₁ =>
+    induction σ₂ using Quotient.inductionOn' with
+    | h s₂ =>
+      apply Quotient.sound'
+      rw [QuotientGroup.leftRel_apply]
+      obtain ⟨pq, hpq⟩ := sumCongrHom_surj_empty_left (l := l) (s₁⁻¹ * s₂)
+      exact ⟨pq, hpq⟩
+
+private lemma sumCongrHom_surj_empty_right {k : ℕ} :
+    Function.Surjective (Equiv.Perm.sumCongrHom (Fin k) (Fin 0)) := by
+  intro σ
+  have h_pres : ∀ i : Fin k, ∃ j : Fin k, σ (Sum.inl i) = Sum.inl j := by
+    intro i
+    rcases σ (Sum.inl i) with ⟨j⟩ | ⟨x⟩
+    · exact ⟨j, rfl⟩
+    · exact (IsEmpty.false x).elim
+  let p_fun : Fin k → Fin k := fun i => (h_pres i).choose
+  have hp : ∀ i, σ (Sum.inl i) = Sum.inl (p_fun i) := fun i => (h_pres i).choose_spec
+  have p_inj : Function.Injective p_fun := by
+    intro i j hij
+    have : σ (Sum.inl i) = σ (Sum.inl j) := by simp [hp, hij]
+    exact Sum.inl_injective (σ.injective this)
+  have p_surj : Function.Surjective p_fun := by
+    intro j
+    obtain ⟨x, hx⟩ := σ.surjective (Sum.inl j)
+    rcases x with ⟨i⟩ | ⟨y⟩
+    · refine ⟨i, ?_⟩
+      have h1 : σ (Sum.inl i) = (Sum.inl j : Fin k ⊕ Fin 0) := hx
+      have h2 : σ (Sum.inl i) = (Sum.inl (p_fun i) : Fin k ⊕ Fin 0) := hp i
+      exact Sum.inl_injective (by rw [← h2, h1])
+    · exact (IsEmpty.false y).elim
+  let p : Equiv.Perm (Fin k) := Equiv.ofBijective p_fun ⟨p_inj, p_surj⟩
+  refine ⟨(p, 1), ?_⟩
+  ext x
+  rcases x with ⟨i⟩ | ⟨y⟩
+  · simp only [Equiv.Perm.sumCongrHom_apply, Equiv.Perm.sumCongr_apply, Sum.map_inl]
+    exact (hp i).symm
+  · exact (IsEmpty.false y).elim
+
+private instance subsingleton_modSumCongr_empty_right {k : ℕ} :
+    Subsingleton (Equiv.Perm.ModSumCongr (Fin k) (Fin 0)) := by
+  constructor
+  intro σ₁ σ₂
+  induction σ₁ using Quotient.inductionOn' with
+  | h s₁ =>
+    induction σ₂ using Quotient.inductionOn' with
+    | h s₂ =>
+      apply Quotient.sound'
+      rw [QuotientGroup.leftRel_apply]
+      obtain ⟨pq, hpq⟩ := sumCongrHom_surj_empty_right (k := k) (s₁⁻¹ * s₂)
+      exact ⟨pq, hpq⟩
+
+private lemma sum_subsingleton {α : Type*} [Fintype α] [Subsingleton α]
+    {M : Type*} [AddCommMonoid M] (f : α → M) (a : α) : ∑ x : α, f x = f a := by
+  have h : ∀ x : α, x = a := fun x => Subsingleton.elim x a
+  simp only [Finset.sum_eq_single a (fun b _ hb => absurd (h b) hb)
+    (fun ha => absurd (Finset.mem_univ a) ha)]
+
+private lemma wedgeℂ_constOfIsEmpty_right {k : ℕ} (c : ℂ) (ω : Alt n k) :
+    ContinuousAlternatingMap.wedgeℂ (E := TangentModel n) ω
+        (ContinuousAlternatingMap.constOfIsEmpty ℝ (TangentModel n) (ι := Fin 0) c) =
+      (c • ω).domDomCongr (finCongr (Nat.add_zero k).symm) := by
+  classical
+  ext v
+  simp only [ContinuousAlternatingMap.wedgeℂ_apply, ContinuousAlternatingMap.wedgeℂ_linear]
+  simp only [ContinuousAlternatingMap.domDomCongr_apply, ContinuousAlternatingMap.smul_apply]
+  simp only [AlternatingMap.domDomCongr_apply, LinearMap.compAlternatingMap_apply,
+    AlternatingMap.domCoprod'_apply, AlternatingMap.domCoprod_apply, MultilinearMap.sum_apply]
+  let σ₀ : Equiv.Perm.ModSumCongr (Fin k) (Fin 0) := ⟦1⟧
+  have hsum :
+      (∑ a : Equiv.Perm.ModSumCongr (Fin k) (Fin 0),
+          (AlternatingMap.domCoprod.summand ω.toAlternatingMap
+              (ContinuousAlternatingMap.constOfIsEmpty ℝ (TangentModel n) (ι := Fin 0) c).toAlternatingMap a)
+            (v ∘ finSumFinEquiv)) =
+        (AlternatingMap.domCoprod.summand ω.toAlternatingMap
+            (ContinuousAlternatingMap.constOfIsEmpty ℝ (TangentModel n) (ι := Fin 0) c).toAlternatingMap σ₀)
+          (v ∘ finSumFinEquiv) :=
+    sum_subsingleton (f := fun a : Equiv.Perm.ModSumCongr (Fin k) (Fin 0) =>
+      (AlternatingMap.domCoprod.summand ω.toAlternatingMap
+        (ContinuousAlternatingMap.constOfIsEmpty ℝ (TangentModel n) (ι := Fin 0) c).toAlternatingMap a)
+        (v ∘ finSumFinEquiv)) σ₀
+  rw [hsum]
+  simp only [AlternatingMap.domCoprod.summand]
+  conv_lhs => rw [show σ₀ = ⟦1⟧ from rfl]
+  simp only [Quotient.liftOn'_mk'', MultilinearMap.domDomCongr_apply, MultilinearMap.domCoprod_apply,
+    Equiv.Perm.sign_one, one_smul, LinearMap.mul'_apply, Equiv.Perm.coe_one, id_eq, Function.comp_apply]
+  have h_left :
+      (fun i₁ : Fin k => v (finSumFinEquiv (m := k) (n := 0) (Sum.inl i₁))) =
+        (v ∘ finCongr (Nat.add_zero k).symm) := by
+    funext i
+    change v (finSumFinEquiv (m := k) (n := 0) (Sum.inl i)) = v (finCongr (Nat.add_zero k).symm i)
+    have hidx :
+        (finSumFinEquiv (m := k) (n := 0) (Sum.inl i) : Fin (k + 0)) =
+          finCongr (Nat.add_zero k).symm i := by
+      have hL :
+          (finSumFinEquiv (m := k) (n := 0) (Sum.inl i) : Fin (k + 0)) = Fin.castAdd 0 i := by
+        simpa using (finSumFinEquiv_apply_left (m := k) (n := 0) i)
+      have hR : (finCongr (Nat.add_zero k).symm i : Fin (k + 0)) = Fin.castAdd 0 i := by
+        simp
+      exact hL.trans hR.symm
+    exact congrArg v hidx
+  have h_const :
+      (ContinuousAlternatingMap.constOfIsEmpty ℝ (TangentModel n) (ι := Fin 0) c).toMultilinearMap
+        (fun i₂ => v (finSumFinEquiv (m := k) (n := 0) (Sum.inr i₂))) = c := rfl
+  rw [h_left, h_const, smul_eq_mul, mul_comm]
+  rfl
+
+private lemma wedgeℂ_constOfIsEmpty_left {l : ℕ} (c : ℂ) (η : Alt n l) :
+    ContinuousAlternatingMap.wedgeℂ (E := TangentModel n)
+        (ContinuousAlternatingMap.constOfIsEmpty ℝ (TangentModel n) (ι := Fin 0) c) η =
+      (c • η).domDomCongr (finCongr (Nat.zero_add l).symm) := by
+  classical
+  ext v
+  simp only [ContinuousAlternatingMap.wedgeℂ_apply, ContinuousAlternatingMap.wedgeℂ_linear]
+  simp only [ContinuousAlternatingMap.domDomCongr_apply, ContinuousAlternatingMap.smul_apply]
+  simp only [AlternatingMap.domDomCongr_apply, LinearMap.compAlternatingMap_apply,
+    AlternatingMap.domCoprod'_apply, AlternatingMap.domCoprod_apply, MultilinearMap.sum_apply]
+  let σ₀ : Equiv.Perm.ModSumCongr (Fin 0) (Fin l) := ⟦1⟧
+  have hsum :
+      (∑ a : Equiv.Perm.ModSumCongr (Fin 0) (Fin l),
+          (AlternatingMap.domCoprod.summand
+              (ContinuousAlternatingMap.constOfIsEmpty ℝ (TangentModel n) (ι := Fin 0) c).toAlternatingMap
+              η.toAlternatingMap a) (v ∘ finSumFinEquiv)) =
+        (AlternatingMap.domCoprod.summand
+            (ContinuousAlternatingMap.constOfIsEmpty ℝ (TangentModel n) (ι := Fin 0) c).toAlternatingMap
+            η.toAlternatingMap σ₀) (v ∘ finSumFinEquiv) :=
+    sum_subsingleton (f := fun a : Equiv.Perm.ModSumCongr (Fin 0) (Fin l) =>
+      (AlternatingMap.domCoprod.summand
+        (ContinuousAlternatingMap.constOfIsEmpty ℝ (TangentModel n) (ι := Fin 0) c).toAlternatingMap
+        η.toAlternatingMap a) (v ∘ finSumFinEquiv)) σ₀
+  rw [hsum]
+  simp only [AlternatingMap.domCoprod.summand]
+  conv_lhs => rw [show σ₀ = ⟦1⟧ from rfl]
+  simp only [Quotient.liftOn'_mk'', MultilinearMap.domDomCongr_apply, MultilinearMap.domCoprod_apply,
+    Equiv.Perm.sign_one, one_smul, LinearMap.mul'_apply, Equiv.Perm.coe_one, id_eq, Function.comp_apply]
+  have h_inputs :
+      (fun i₂ : Fin l => v (finSumFinEquiv (m := 0) (n := l) (Sum.inr i₂))) =
+        (v ∘ finCongr (Nat.zero_add l).symm) := by
+    funext i
+    change v (finSumFinEquiv (m := 0) (n := l) (Sum.inr i)) = v (finCongr (Nat.zero_add l).symm i)
+    have hL :
+        (finSumFinEquiv (m := 0) (n := l) (Sum.inr i) : Fin (0 + l)) = Fin.natAdd 0 i := by
+      simpa using (finSumFinEquiv_apply_right (m := 0) (n := l) i)
+    -- both sides are definitionally `i` in `Fin (0+l)`
+    simpa [hL]
+  rw [h_inputs]
+  simp
+
 /-! #### Base cases for shuffle bijection lemmas -/
 
 /-- Base case for shuffle bijection right: when l = 0, B is a 0-form (scalar).
 The wedge with a 0-form is just scalar multiplication, making the identity simple. -/
 private lemma shuffle_bijection_right_l0 {k : ℕ}
     (v : Fin (k + 1) → TangentModel n)
-    (A : TangentModel n →L[ℂ] Alt n k)
+    (A : TangentModel n →L[ℝ] Alt n k)
     (B : Alt n 0) :
-    ∑ i : Fin (k + 1), ((-1 : ℤ)^(i : ℕ)) • ((A (v i)).wedge B) (Fin.removeNth i v) =
-    ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A).wedge B)
+    ∑ i : Fin (k + 1), ((-1 : ℤ)^(i : ℕ)) • ((A (v i)).wedgeℂ B) (Fin.removeNth i v) =
+    ((ContinuousAlternatingMap.alternatizeUncurryFin (𝕜 := ℝ) (F := ℂ) A).wedgeℂ B)
       (v ∘ finCongr (show (k+1)+0 = k+1 by omega)) := by
   -- When l = 0, B is a 0-form (scalar), so wedge with B is scalar multiplication
   -- B = constOfIsEmpty (B 0) where 0 : Fin 0 → E is the empty function
-  have hB : B = ContinuousAlternatingMap.constOfIsEmpty ℂ (TangentModel n) (ι := Fin 0) (B (fun _ => 0)) := by
+  have hB :
+      B = ContinuousAlternatingMap.constOfIsEmpty ℝ (TangentModel n) (ι := Fin 0) (B (fun _ => 0)) := by
     ext u
     simp only [ContinuousAlternatingMap.constOfIsEmpty_apply]
     congr 1
@@ -1221,8 +1547,8 @@ private lemma shuffle_bijection_right_l0 {k : ℕ}
     exact i.elim0
   -- Rewrite B as constOfIsEmpty
   rw [hB]
-  -- Use wedge_constOfIsEmpty_right: ω.wedge (const c) = c • ω.domDomCongr
-  simp only [ContinuousAlternatingMap.wedge_constOfIsEmpty_right]
+  -- Use `wedgeℂ_constOfIsEmpty_right`: ω.wedgeℂ (const c) = c • ω (up to `domDomCongr`)
+  simp only [wedgeℂ_constOfIsEmpty_right]
   simp only [ContinuousAlternatingMap.smul_apply, ContinuousAlternatingMap.domDomCongr_apply]
   -- Both sides now have the scalar B(0) factored out
   -- LHS: ∑ i, (-1)^i • (B(0) • A(v i))(removeNth i v ∘ finCongr)
@@ -1265,10 +1591,10 @@ This encodes the product rule for exterior derivatives with a constant factor.
 Reference: Bott-Tu GTM 82, Warner GTM 94 Proposition 2.14. -/
 private lemma shuffle_bijection_right {k l : ℕ}
     (v : Fin ((k+l)+1) → TangentModel n)
-    (A : TangentModel n →L[ℂ] Alt n k)
+    (A : TangentModel n →L[ℝ] Alt n k)
     (B : Alt n l) :
-    ∑ i : Fin ((k+l)+1), ((-1 : ℤ)^(i : ℕ)) • ((A (v i)).wedge B) (Fin.removeNth i v) =
-    ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A).wedge B)
+    ∑ i : Fin ((k+l)+1), ((-1 : ℤ)^(i : ℕ)) • ((A (v i)).wedgeℂ B) (Fin.removeNth i v) =
+    ((ContinuousAlternatingMap.alternatizeUncurryFin (𝕜 := ℝ) (F := ℂ) A).wedgeℂ B)
       (v ∘ finCongr (show (k+1)+l = (k+l)+1 by omega)) := by
   -- Base case: when l = 0, B is a 0-form (scalar)
   cases l with
@@ -1280,9 +1606,9 @@ private lemma shuffle_bijection_right {k l : ℕ}
     -- to avoid working directly with the shuffle quotient `ModSumCongr`.
     have hw :
         ∀ i : Fin (k + (l' + 1) + 1),
-          ((A (v i)).wedge B) (Fin.removeNth i v) =
+          ((A (v i)).wedgeℂ B) (Fin.removeNth i v) =
             (((k.factorial * (l' + 1).factorial : ℕ) : ℂ)⁻¹) •
-              (LinearMap.mul' ℂ ℂ)
+              (LinearMap.mul' ℝ ℂ)
                 ((MultilinearMap.alternatization
                     (((A (v i)).toAlternatingMap.toMultilinearMap).domCoprod
                       (B.toAlternatingMap.toMultilinearMap)))
@@ -1292,18 +1618,18 @@ private lemma shuffle_bijection_right {k l : ℕ}
         (wedge_apply_eq_inv_factorial_smul_alternatization (n := n) (k := k) (l := l' + 1)
           (ω := A (v i)) (η := B) (v := Fin.removeNth i v))
     have hwR :
-        ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A).wedge B)
+        ((ContinuousAlternatingMap.alternatizeUncurryFin (𝕜 := ℝ) (F := ℂ) A).wedgeℂ B)
             (v ∘ finCongr (show (k + 1) + (l' + 1) = (k + (l' + 1)) + 1 by omega)) =
           ((((Nat.factorial (k + 1) * (l' + 1).factorial : ℕ) : ℂ)⁻¹)) •
-            (LinearMap.mul' ℂ ℂ)
+            (LinearMap.mul' ℝ ℂ)
               ((MultilinearMap.alternatization
-                  (((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A).toAlternatingMap.toMultilinearMap).domCoprod
+                  (((ContinuousAlternatingMap.alternatizeUncurryFin (𝕜 := ℝ) (F := ℂ) A).toAlternatingMap.toMultilinearMap).domCoprod
                     (B.toAlternatingMap.toMultilinearMap)))
                 (((v ∘ finCongr (show (k + 1) + (l' + 1) = (k + (l' + 1)) + 1 by omega)) ∘ finSumFinEquiv))) := by
       -- direct application of the wedge rewrite lemma
       simpa using
         (wedge_apply_eq_inv_factorial_smul_alternatization (n := n) (k := k + 1) (l := l' + 1)
-          (ω := ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A) (η := B)
+          (ω := ContinuousAlternatingMap.alternatizeUncurryFin (𝕜 := ℝ) (F := ℂ) A) (η := B)
           (v := (v ∘ finCongr (show (k + 1) + (l' + 1) = (k + (l' + 1)) + 1 by omega))))
     -- Rewrite both sides.
     simp only [hw, hwR]
@@ -1336,14 +1662,14 @@ private lemma shuffle_bijection_right {k l : ℕ}
       refine mul_ne_zero (inv_ne_zero hl0) (inv_ne_zero hk0)
     -- Package the unscaled alternatization terms.
     let tL (x : Fin (k + (l' + 1) + 1)) : ℂ :=
-      (LinearMap.mul' ℂ ℂ)
+      (LinearMap.mul' ℝ ℂ)
         ((MultilinearMap.alternatization
             ((A (v x)).toMultilinearMap.domCoprod B.toMultilinearMap))
           ((Fin.removeNth x v) ∘ finSumFinEquiv))
     let tR : ℂ :=
-      (LinearMap.mul' ℂ ℂ)
+      (LinearMap.mul' ℝ ℂ)
         ((MultilinearMap.alternatization
-            ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A).toMultilinearMap.domCoprod
+            ((ContinuousAlternatingMap.alternatizeUncurryFin (𝕜 := ℝ) (F := ℂ) A).toMultilinearMap.domCoprod
               B.toMultilinearMap))
           (((v ∘ finCongr (show (k + 1) + (l' + 1) = (k + (l' + 1)) + 1 by omega)) ∘ finSumFinEquiv)))
 
@@ -1359,16 +1685,16 @@ private lemma shuffle_bijection_right {k l : ℕ}
     -- Fold the large alternatization expressions into `tL`/`tR` without unfolding them.
     have htL' :
         ∀ x : Fin (k + (l' + 1) + 1),
-          (LinearMap.mul' ℂ ℂ)
+          (LinearMap.mul' ℝ ℂ)
               ((MultilinearMap.alternatization
                   ((A (v x)).toMultilinearMap.domCoprod B.toMultilinearMap))
                 ((Fin.removeNth x v) ∘ finSumFinEquiv)) =
             tL x := by
       intro x; rfl
     have htR' :
-        (LinearMap.mul' ℂ ℂ)
+        (LinearMap.mul' ℝ ℂ)
             ((MultilinearMap.alternatization
-                ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A).toMultilinearMap.domCoprod
+                ((ContinuousAlternatingMap.alternatizeUncurryFin (𝕜 := ℝ) (F := ℂ) A).toMultilinearMap.domCoprod
                   B.toMultilinearMap))
               (((v ∘ finCongr (show (k + 1) + (l' + 1) = (k + (l' + 1)) + 1 by omega)) ∘ finSumFinEquiv))) =
           tR := by
@@ -1440,19 +1766,19 @@ private lemma shuffle_bijection_right {k l : ℕ}
 
 /-- Main theorem: alternatization commutes with wedge when right factor is constant. -/
 theorem alternatizeUncurryFin_wedge_right {k l : ℕ}
-    (A : TangentModel n →L[ℂ] Alt n k) (B : Alt n l) :
-    let wedge_right : TangentModel n →L[ℂ] Alt n (k + l) :=
-      (ContinuousAlternatingMap.wedgeCLM_alt ℂ (TangentModel n) k l).flip B ∘L A
-    ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) wedge_right =
+    (A : TangentModel n →L[ℝ] Alt n k) (B : Alt n l) :
+    let wedge_right : TangentModel n →L[ℝ] Alt n (k + l) :=
+      (ContinuousAlternatingMap.wedgeℂCLM_alt (E := TangentModel n) k l).flip B ∘L A
+    ContinuousAlternatingMap.alternatizeUncurryFin (𝕜 := ℝ) (F := ℂ) wedge_right =
     ContinuousAlternatingMap.domDomCongr
-      ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) A).wedge B)
+      ((ContinuousAlternatingMap.alternatizeUncurryFin (𝕜 := ℝ) (F := ℂ) A).wedgeℂ B)
       (finCongr (show (k+1)+l = (k+l)+1 by omega)) := by
   intro wedge_right
   ext v
   simp only [ContinuousAlternatingMap.alternatizeUncurryFin_apply,
              ContinuousAlternatingMap.domDomCongr_apply]
   -- Use the shuffle bijection lemma
-  have h_wedge_right : ∀ w, wedge_right w = (A w).wedge B := fun _ => rfl
+  have h_wedge_right : ∀ w, wedge_right w = (A w).wedgeℂ B := fun _ => rfl
   simp only [h_wedge_right]
   exact shuffle_bijection_right v A B
 
@@ -1474,9 +1800,9 @@ the k indices of the constant k-form A. This is the standard sign in graded comm
 private lemma shuffle_bijection_left {k l : ℕ}
     (v : Fin ((k+l)+1) → TangentModel n)
     (A : Alt n k)
-    (B : TangentModel n →L[ℂ] Alt n l) :
-    ∑ i : Fin ((k+l)+1), ((-1 : ℤ)^(i : ℕ)) • (A.wedge (B (v i))) (Fin.removeNth i v) =
-    ((-1 : ℂ)^k • A.wedge (ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B))
+    (B : TangentModel n →L[ℝ] Alt n l) :
+    ∑ i : Fin ((k+l)+1), ((-1 : ℤ)^(i : ℕ)) • (A.wedgeℂ (B (v i))) (Fin.removeNth i v) =
+    ((-1 : ℂ)^k • A.wedgeℂ (ContinuousAlternatingMap.alternatizeUncurryFin (𝕜 := ℝ) (F := ℂ) B))
       (v ∘ finCongr (show k+(l+1) = (k+l)+1 by omega)) := by
   /-
   **Proof Strategy** (Bott-Tu GTM 82, Warner GTM 94 Proposition 2.14):
@@ -1499,7 +1825,9 @@ private lemma shuffle_bijection_left {k l : ℕ}
     -- When k = 0, A is a 0-form (scalar), the sign (-1)^0 = 1.
     simp only [pow_zero, one_smul]
     -- A = constOfIsEmpty (A 0)
-    have hA : A = ContinuousAlternatingMap.constOfIsEmpty ℂ (TangentModel n) (ι := Fin 0) (A (fun _ => 0)) := by
+    have hA :
+        A =
+          ContinuousAlternatingMap.constOfIsEmpty ℝ (TangentModel n) (ι := Fin 0) (A (fun _ => 0)) := by
       ext u
       simp only [ContinuousAlternatingMap.constOfIsEmpty_apply]
       congr 1
@@ -1507,7 +1835,7 @@ private lemma shuffle_bijection_left {k l : ℕ}
       exact i.elim0
     -- Rewrite both LHS and RHS using wedge_constOfIsEmpty_left
     rw [hA]
-    simp only [ContinuousAlternatingMap.wedge_constOfIsEmpty_left]
+    simp only [wedgeℂ_constOfIsEmpty_left]
     simp only [ContinuousAlternatingMap.smul_apply, ContinuousAlternatingMap.domDomCongr_apply]
     -- Factor out the scalar on LHS
     conv_lhs =>
@@ -1605,8 +1933,8 @@ private lemma shuffle_bijection_left {k l : ℕ}
     -- Step 1: swap the wedge factors inside each summand.
     have hswap :
         ∀ i : Fin ((k' + 1) + l + 1),
-          (A.wedge (B (v i))) (Fin.removeNth i v) =
-            (B (v i)).wedge A ((Fin.removeNth i v) ∘ (blockSwapEquiv (k' + 1) l).symm) := by
+          (A.wedgeℂ (B (v i))) (Fin.removeNth i v) =
+            (B (v i)).wedgeℂ A ((Fin.removeNth i v) ∘ (blockSwapEquiv (k' + 1) l).symm) := by
       intro i
       simpa [ContinuousAlternatingMap.domDomCongr_apply, Function.comp_apply] using
         congrArg (fun f => f (Fin.removeNth i v))
@@ -1620,9 +1948,9 @@ private lemma shuffle_bijection_left {k l : ℕ}
     -- picking up the sign of the block-swap permutation, i.e. `(-1)^((k'+1)*l)`.
     have hswapArg :
         ∀ i : Fin ((k' + 1) + l + 1),
-          ((B (v i)).wedge A) ((Fin.removeNth i v) ∘ (blockSwapEquiv (k' + 1) l).symm) =
+          ((B (v i)).wedgeℂ A) ((Fin.removeNth i v) ∘ (blockSwapEquiv (k' + 1) l).symm) =
             (Equiv.Perm.sign (blockSwapPerm (k' + 1) l)) •
-              ((B (v i)).wedge A)
+              ((B (v i)).wedgeℂ A)
                 ((Fin.removeNth i v) ∘ finCongr (Nat.add_comm l (k' + 1))) := by
       intro i
       let e : Fin ((k' + 1) + l) ≃ Fin (l + (k' + 1)) := finCongr (Nat.add_comm (k' + 1) l)
@@ -1637,8 +1965,8 @@ private lemma shuffle_bijection_left {k l : ℕ}
         -- and `(blockSwapEquiv (k'+1) l).symm` is the corresponding casted map.
         simp [σ, e, w0, blockSwapPerm, Function.comp_apply, Equiv.permCongr_apply]
       have hmap :
-          ((B (v i)).wedge A) (w0 ∘ σ) = (Equiv.Perm.sign σ) • ((B (v i)).wedge A) w0 := by
-        simpa [w0, σ] using (((B (v i)).wedge A).toAlternatingMap.map_perm w0 σ)
+          ((B (v i)).wedgeℂ A) (w0 ∘ σ) = (Equiv.Perm.sign σ) • ((B (v i)).wedgeℂ A) w0 := by
+        simpa [w0, σ] using (((B (v i)).wedgeℂ A).toAlternatingMap.map_perm w0 σ)
       have hsign :
           Equiv.Perm.sign σ = Equiv.Perm.sign (blockSwapPerm (k' + 1) l) := by
         have :
@@ -1648,13 +1976,13 @@ private lemma shuffle_bijection_left {k l : ℕ}
             (Equiv.Perm.sign_permCongr e ((blockSwapPerm (k' + 1) l).symm))
         simpa using this.trans (by simpa using (Equiv.Perm.sign_inv (blockSwapPerm (k' + 1) l)))
       calc
-        ((B (v i)).wedge A) ((Fin.removeNth i v) ∘ (blockSwapEquiv (k' + 1) l).symm)
-            = ((B (v i)).wedge A) (w0 ∘ σ) := by simpa [hw]
-        _ = (Equiv.Perm.sign σ) • ((B (v i)).wedge A) w0 := hmap
-        _ = (Equiv.Perm.sign (blockSwapPerm (k' + 1) l)) • ((B (v i)).wedge A) w0 := by
+        ((B (v i)).wedgeℂ A) ((Fin.removeNth i v) ∘ (blockSwapEquiv (k' + 1) l).symm)
+            = ((B (v i)).wedgeℂ A) (w0 ∘ σ) := by simpa [hw]
+        _ = (Equiv.Perm.sign σ) • ((B (v i)).wedgeℂ A) w0 := hmap
+        _ = (Equiv.Perm.sign (blockSwapPerm (k' + 1) l)) • ((B (v i)).wedgeℂ A) w0 := by
               simpa [hsign]
         _ = (Equiv.Perm.sign (blockSwapPerm (k' + 1) l)) •
-              ((B (v i)).wedge A)
+              ((B (v i)).wedgeℂ A)
                 ((Fin.removeNth i v) ∘ finCongr (Nat.add_comm l (k' + 1))) := rfl
 
     conv_lhs =>
@@ -1667,12 +1995,12 @@ private lemma shuffle_bijection_left {k l : ℕ}
         (∑ i : Fin ((k' + 1) + l + 1),
             ((-1 : ℤ) ^ (i : ℕ)) •
               ((Equiv.Perm.sign (blockSwapPerm (k' + 1) l)) •
-                ((B (v i)).wedge A)
+                ((B (v i)).wedgeℂ A)
                   ((Fin.removeNth i v) ∘ finCongr (Nat.add_comm l (k' + 1))))) =
           (Equiv.Perm.sign (blockSwapPerm (k' + 1) l)) •
             (∑ i : Fin ((k' + 1) + l + 1),
               ((-1 : ℤ) ^ (i : ℕ)) •
-                ((B (v i)).wedge A)
+                ((B (v i)).wedgeℂ A)
                   ((Fin.removeNth i v) ∘ finCongr (Nat.add_comm l (k' + 1)))) := by
       classical
       -- Convert the `ℤˣ`-action to a `ℤ`-action to commute with `(-1)^i`, then factor out.
@@ -1687,21 +2015,21 @@ private lemma shuffle_bijection_left {k l : ℕ}
     have hreindex :
         (∑ i : Fin ((k' + 1) + l + 1),
             ((-1 : ℤ) ^ (i : ℕ)) •
-              ((B (v i)).wedge A)
+              ((B (v i)).wedgeℂ A)
                 ((Fin.removeNth i v) ∘ finCongr (Nat.add_comm l (k' + 1)))) =
           ∑ j : Fin (l + (k' + 1) + 1),
             ((-1 : ℤ) ^ (j : ℕ)) •
-              ((B (v' j)).wedge A) (Fin.removeNth j v') := by
+              ((B (v' j)).wedgeℂ A) (Fin.removeNth j v') := by
       classical
       -- Reindex by the value-preserving cast `finCongr hdim1`.
       refine Fintype.sum_equiv (finCongr hdim1)
         (fun i : Fin ((k' + 1) + l + 1) =>
           ((-1 : ℤ) ^ (i : ℕ)) •
-            ((B (v i)).wedge A)
+            ((B (v i)).wedgeℂ A)
               ((Fin.removeNth i v) ∘ finCongr (Nat.add_comm l (k' + 1))))
         (fun j : Fin (l + (k' + 1) + 1) =>
           ((-1 : ℤ) ^ (j : ℕ)) •
-            ((B (v' j)).wedge A) (Fin.removeNth j v'))
+            ((B (v' j)).wedgeℂ A) (Fin.removeNth j v'))
         ?_
       intro i
       -- The `finCongr` reindexing preserves `.val`, hence preserves the `(-1)^i` factor.
@@ -1783,16 +2111,16 @@ private lemma shuffle_bijection_left {k l : ℕ}
     -- Set `altB := alternatizeUncurryFin B` to shorten notation.
     set altB : Alt n (l + 1) := ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B
 
-    -- Convert the remaining goal to one about `wedge`, so that we can use `wedge_comm_domDomCongr`.
-    -- (`wedge_apply` is `wedge = wedgeAlternating` on evaluation.)
+    -- Convert the remaining goal to one about `wedgeℂ`, so that we can use `wedge_comm_domDomCongr`.
     let w₁ : Fin ((l + 1) + (k' + 1)) → TangentModel n :=
       v' ∘ (finCongr (show (l + 1) + (k' + 1) = l + (k' + 1) + 1 by omega))
-    rw [← (ContinuousAlternatingMap.wedge_apply (ω := altB) (η := A) (v := w₁))]
-    rw [← (ContinuousAlternatingMap.wedge_apply (ω := A) (η := altB))]
+    -- Replace the `wedgeℂ_linear` evaluations by `wedgeℂ` evaluations.
+    rw [← (ContinuousAlternatingMap.wedgeℂ_apply (ω := altB) (η := A) (v := w₁))]
+    rw [← (ContinuousAlternatingMap.wedgeℂ_apply (ω := A) (η := altB))]
 
     -- Rewrite the RHS wedge using `wedge_comm_domDomCongr`.
-    have hcomm' : A.wedge altB =
-        ContinuousAlternatingMap.domDomCongr (altB.wedge A) (blockSwapEquiv (k' + 1) (l + 1)).symm :=
+    have hcomm' : A.wedgeℂ altB =
+        ContinuousAlternatingMap.domDomCongr (altB.wedgeℂ A) (blockSwapEquiv (k' + 1) (l + 1)).symm :=
       wedge_comm_domDomCongr (A := A) (B := altB)
     rw [hcomm']
     -- Evaluate the `domDomCongr`.
@@ -1829,12 +2157,12 @@ private lemma shuffle_bijection_left {k l : ℕ}
       have hx := congrArg (fun f => f (σ.symm x)) hw
       simpa [Function.comp_apply] using hx.symm
     have hperm :
-        (altB.wedge A) (v' ∘ ⇑(finCongr (show (l + 1) + (k' + 1) = l + (k' + 1) + 1 by omega))) =
+        (altB.wedgeℂ A) (v' ∘ ⇑(finCongr (show (l + 1) + (k' + 1) = l + (k' + 1) + 1 by omega))) =
           (Equiv.Perm.sign σ : ℤˣ) •
-            (altB.wedge A) (v ∘ ⇑((blockSwapEquiv (k' + 1) (l + 1)).symm)) := by
+            (altB.wedgeℂ A) (v ∘ ⇑((blockSwapEquiv (k' + 1) (l + 1)).symm)) := by
       -- Start from `map_perm` with `σ.symm`.
       have hmap :=
-        ((altB.wedge A).toAlternatingMap.map_perm
+        ((altB.wedgeℂ A).toAlternatingMap.map_perm
           (v ∘ ⇑((blockSwapEquiv (k' + 1) (l + 1)).symm))
           (σ.symm))
       -- `map_perm` gives `g (w₂ ∘ σ⁻¹) = sign σ⁻¹ • g w₂`.
@@ -1901,8 +2229,8 @@ private lemma shuffle_bijection_left {k l : ℕ}
     -- Replace `g w₁` using `hperm`, then simplify scalar factors.
     -- (All remaining work is commutative ring arithmetic in `ℂ`.)
     --
-    -- Convert both sides from `wedgeAlternating` to `wedge`.
-    rw [← (ContinuousAlternatingMap.wedge_apply (ω := altB) (η := A) (v := w₁))]
+    -- Convert `wedgeℂ_linear` evaluations to `wedgeℂ`.
+    rw [← (ContinuousAlternatingMap.wedgeℂ_apply (ω := altB) (η := A) (v := w₁))]
     -- Unfold `altB` on the LHS so both sides use `alternatizeUncurryFin B`,
     -- without rewriting `wedge` back into `wedgeAlternating`.
     dsimp [altB]
@@ -1916,31 +2244,28 @@ private lemma shuffle_bijection_left {k l : ℕ}
       funext x
       simp [w₂, Function.comp_apply]
     have hw2_val :
-        ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B).wedgeAlternating A)
+        ((ContinuousAlternatingMap.alternatizeUncurryFin (𝕜 := ℝ) (F := ℂ) B).wedgeℂ A)
             ((v ∘ ⇑(Equiv.refl (Fin (k' + 1 + (l + 1))))) ∘
               ⇑(blockSwapEquiv (k' + 1) (l + 1)).symm) =
-          ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B).wedgeAlternating A) w₂ := by
+          ((ContinuousAlternatingMap.alternatizeUncurryFin (𝕜 := ℝ) (F := ℂ) B).wedgeℂ A) w₂ := by
       simpa using
         congrArg
           (fun t =>
-            ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B).wedgeAlternating A) t)
+            ((ContinuousAlternatingMap.alternatizeUncurryFin (𝕜 := ℝ) (F := ℂ) B).wedgeℂ A) t)
           hw2
+    -- `wedgeAlternating` here refers to the *scalar-valued* wedge; we stay in `wedgeℂ`.
     have hwedge2 :
-        (ContinuousAlternatingMap.wedge
-              (ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B) A) w₂ =
-          ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B).wedgeAlternating A) w₂ := by
-      simpa [w₂] using
-        (ContinuousAlternatingMap.wedge_apply
-          (ω := ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B) (η := A) (v := w₂))
+        ContinuousAlternatingMap.wedgeℂ (E := TangentModel n)
+            (ContinuousAlternatingMap.alternatizeUncurryFin (𝕜 := ℝ) (F := ℂ) B) A w₂ =
+          (ContinuousAlternatingMap.alternatizeUncurryFin (𝕜 := ℝ) (F := ℂ) B).wedgeℂ A w₂ := by
+      rfl
     -- Rewrite the LHS using `hperm` (unfolding `altB` and rewriting the vectors to `w₁`/`w₂`).
     have hperm' :
-        (ContinuousAlternatingMap.wedge
-              (ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B) A) w₁ =
+        ((ContinuousAlternatingMap.alternatizeUncurryFin (𝕜 := ℝ) (F := ℂ) B).wedgeℂ A) w₁ =
           (Equiv.Perm.sign σ : ℤˣ) •
-            (ContinuousAlternatingMap.wedge
-                (ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B) A) w₂ := by
+            ((ContinuousAlternatingMap.alternatizeUncurryFin (𝕜 := ℝ) (F := ℂ) B).wedgeℂ A) w₂ := by
       simpa [altB, w₁, w₂] using hperm
-    -- Use `hperm'` and convert `wedge` at `w₂` to `wedgeAlternating`.
+    -- Use `hperm'` and rewrite the auxiliary definitional equality `hwedge2` (no-op).
     rw [hperm']
     rw [hwedge2]
     -- Convert the unit action and close using `hσsign`/`hpar`,
@@ -1951,9 +2276,9 @@ private lemma shuffle_bijection_left {k l : ℕ}
       simpa [Nat.mul_comm (k' + 1) l] using hpar
     have hRHS :
         (-1 : ℂ) ^ (k' + 1) *
-            ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B).wedgeAlternating A) w₂ =
+            ((ContinuousAlternatingMap.alternatizeUncurryFin (𝕜 := ℝ) (F := ℂ) B).wedgeℂ A) w₂ =
           (-1 : ℂ) ^ (k' + 1) *
-            ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B).wedgeAlternating A)
+            ((ContinuousAlternatingMap.alternatizeUncurryFin (𝕜 := ℝ) (F := ℂ) B).wedgeℂ A)
               ((v ∘ ⇑(Equiv.refl (Fin (k' + 1 + (l + 1))))) ∘
                 ⇑(blockSwapEquiv (k' + 1) (l + 1)).symm) := by
       simpa [mul_assoc] using
@@ -1961,12 +2286,12 @@ private lemma shuffle_bijection_left {k l : ℕ}
     have hLHS :
         (-1 : ℂ) ^ (l * (k' + 1)) *
             ((Equiv.Perm.sign σ : ℤˣ) •
-              ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B).wedgeAlternating A) w₂) =
+              ((ContinuousAlternatingMap.alternatizeUncurryFin (𝕜 := ℝ) (F := ℂ) B).wedgeℂ A) w₂) =
           (-1 : ℂ) ^ (k' + 1) *
-            ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B).wedgeAlternating A) w₂ := by
+            ((ContinuousAlternatingMap.alternatizeUncurryFin (𝕜 := ℝ) (F := ℂ) B).wedgeℂ A) w₂ := by
       -- Write the common factor as `z` to keep the algebra readable.
       set z : ℂ :=
-        ((ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B).wedgeAlternating A) w₂
+        ((ContinuousAlternatingMap.alternatizeUncurryFin (𝕜 := ℝ) (F := ℂ) B).wedgeℂ A) w₂
       -- Convert the unit action to multiplication, then use `hpar'` to combine the `(-1)^…` factors.
       calc
         (-1 : ℂ) ^ (l * (k' + 1)) * ((Equiv.Perm.sign σ : ℤˣ) • z)
@@ -1985,19 +2310,19 @@ private lemma shuffle_bijection_left {k l : ℕ}
 
 /-- Main theorem: alternatization commutes with wedge when left factor is constant. -/
 theorem alternatizeUncurryFin_wedge_left {k l : ℕ}
-    (A : Alt n k) (B : TangentModel n →L[ℂ] Alt n l) :
-    let wedge_left : TangentModel n →L[ℂ] Alt n (k + l) :=
-      (ContinuousAlternatingMap.wedgeCLM_alt ℂ (TangentModel n) k l A) ∘L B
-    ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) wedge_left =
+    (A : Alt n k) (B : TangentModel n →L[ℝ] Alt n l) :
+    let wedge_left : TangentModel n →L[ℝ] Alt n (k + l) :=
+      (ContinuousAlternatingMap.wedgeℂCLM_alt (E := TangentModel n) k l A) ∘L B
+    ContinuousAlternatingMap.alternatizeUncurryFin (𝕜 := ℝ) (F := ℂ) wedge_left =
     ContinuousAlternatingMap.domDomCongr
-      ((-1 : ℂ)^k • A.wedge (ContinuousAlternatingMap.alternatizeUncurryFin (F := ℂ) B))
+      ((-1 : ℂ)^k • A.wedgeℂ (ContinuousAlternatingMap.alternatizeUncurryFin (𝕜 := ℝ) (F := ℂ) B))
       (finCongr (show k+(l+1) = (k+l)+1 by omega)) := by
   intro wedge_left
   ext v
   simp only [ContinuousAlternatingMap.alternatizeUncurryFin_apply,
              ContinuousAlternatingMap.domDomCongr_apply]
   -- Use the shuffle bijection lemma
-  have h_wedge_left : ∀ w, wedge_left w = A.wedge (B w) := fun _ => rfl
+  have h_wedge_left : ∀ w, wedge_left w = A.wedgeℂ (B w) := fun _ => rfl
   simp only [h_wedge_left]
   exact shuffle_bijection_left v A B
 
@@ -2015,98 +2340,64 @@ It expresses that d is a graded derivation on the exterior algebra.
 theorem extDerivAt_wedge {k l : ℕ} (ω : ContMDiffForm n X k) (η : ContMDiffForm n X l) (x : X) :
     ContMDiffForm.extDerivAt (ω.wedge η) x =
     castAlt (show (k+1)+l = (k+l)+1 by omega)
-      ((ContMDiffForm.extDerivAt ω x).wedge (η.as_alternating x)) +
+      ((ContMDiffForm.extDerivAt ω x).wedgeℂ (η.as_alternating x)) +
     castAlt (show k+(l+1) = (k+l)+1 by omega)
-      (((-1 : ℂ)^k) • (ω.as_alternating x).wedge (ContMDiffForm.extDerivAt η x)) := by
+      (((-1 : ℂ)^k) • (ω.as_alternating x).wedgeℂ (ContMDiffForm.extDerivAt η x)) := by
   classical
-  -- 1. Unfold extDerivAt and wedge definition
+  -- Unfold `extDerivAt` and the pointwise `wedge` definition.
   simp only [ContMDiffForm.extDerivAt, ContMDiffForm.wedge]
 
-  -- 2. Define the components
-  let A_ω := mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ω.as_alternating x
-  let B_η := η.as_alternating x
-  let A_η := mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n l) η.as_alternating x
-  let B_ω := ω.as_alternating x
+  -- Abbreviate the derivative and value terms.
+  let A_ω : TangentModel n →L[ℝ] Alt n k :=
+    mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n k) ω.as_alternating x
+  let B_η : Alt n l := η.as_alternating x
+  let A_η : TangentModel n →L[ℝ] Alt n l :=
+    mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n l) η.as_alternating x
+  let B_ω : Alt n k := ω.as_alternating x
 
-  -- 3. Use mfderiv_wedge_apply
-  -- At this point, the goal's LHS has the form alternatizeUncurryFin (mfderiv ... (fun y => ω y ∧ η y) x)
-  -- mfderiv_wedge_apply ω η x provides exactly this derivative
-  have hmf : mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n (k+l)) (fun y => (ω.as_alternating y).wedge (η.as_alternating y)) x =
-      (ContinuousAlternatingMap.wedgeCLM_alt ℂ (TangentModel n) k l).flip B_η ∘L A_ω +
-      (ContinuousAlternatingMap.wedgeCLM_alt ℂ (TangentModel n) k l B_ω) ∘L A_η := by
+  -- Express the manifold derivative of the wedge as a sum of two “wedge with a fixed factor” maps.
+  let wedge_right : TangentModel n →L[ℝ] Alt n (k + l) :=
+    (ContinuousAlternatingMap.wedgeℂCLM_alt (E := TangentModel n) k l).flip B_η ∘L A_ω
+  let wedge_left : TangentModel n →L[ℝ] Alt n (k + l) :=
+    (ContinuousAlternatingMap.wedgeℂCLM_alt (E := TangentModel n) k l B_ω) ∘L A_η
+  have hmf :
+      mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n (k + l))
+          (fun y => ContinuousAlternatingMap.wedgeℂ (E := TangentModel n) (ω.as_alternating y) (η.as_alternating y))
+          x =
+        wedge_right + wedge_left := by
     ext v
-    simp only [ContinuousAlternatingMap.wedgeCLM_alt]
-    -- Inline proof of `mfderiv_wedge_apply` (avoids a kernel “unknown constant” issue).
-    -- Step 1: Get differentiability hypotheses
-    have hω_diff : MDifferentiableAt (𝓒_complex n) 𝓘(ℝ, Alt n k) ω.as_alternating x :=
-      ω.smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
-    have hη_diff : MDifferentiableAt (𝓒_complex n) 𝓘(ℝ, Alt n l) η.as_alternating x :=
-      η.smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
+    -- `mfderiv_wedge_apply` gives the Leibniz formula pointwise.
+    simpa [wedge_right, wedge_left, A_ω, A_η, B_ω, B_η, ContinuousLinearMap.add_apply,
+      ContinuousLinearMap.comp_apply, ContinuousAlternatingMap.wedgeℂCLM_alt]
+      using (mfderiv_wedge_apply (n := n) (X := X) (k := k) (l := l) ω η x v)
 
-    -- Step 2: Define the bilinear wedge map on the product
-    let B : Alt n k × Alt n l → Alt n (k + l) := fun p => p.1.wedge p.2
-    have hB : IsBoundedBilinearMap ℂ B := isBoundedBilinearMap_wedge (n := n) (k := k) (l := l)
-
-    -- Step 3: The pair function
-    let pair : X → Alt n k × Alt n l := fun y => (ω.as_alternating y, η.as_alternating y)
-
-    -- Step 4: Show the pair is differentiable
-    have hpair_diff : MDifferentiableAt (𝓒_complex n) 𝓘(ℝ, Alt n k × Alt n l) pair x :=
-      hω_diff.prodMk_space hη_diff
-
-    -- Step 5: B is smooth (ContDiff)
-    have hB_contDiff : ContDiff ℂ ⊤ B := hB.contDiff
-    have hB_diff : DifferentiableAt ℂ B (pair x) :=
-      hB_contDiff.differentiable (by simp : (⊤ : WithTop ℕ∞) ≠ 0) (pair x)
-
-    -- Step 6: The function is B ∘ pair
-    have h_comp : (fun y => (ω.as_alternating y).wedge (η.as_alternating y)) = B ∘ pair := rfl
-
-    -- Step 7: Apply the chain rule for mfderiv
-    rw [h_comp]
-    rw [mfderiv_comp x hB_diff.mdifferentiableAt hpair_diff]
-
-    -- Step 8: Simplify mfderiv of B using mfderiv_eq_fderiv (source is vector space)
-    have h_mfderiv_B :
-        mfderiv 𝓘(ℝ, Alt n k × Alt n l) 𝓘(ℝ, Alt n (k + l)) B (pair x) =
-          fderiv ℂ B (pair x) := mfderiv_eq_fderiv
-
-    -- Step 9: Get fderiv of bilinear map
-    have h_fderiv_B : fderiv ℂ B (pair x) = hB.deriv (pair x) :=
-      (hB.hasFDerivAt (pair x)).fderiv
-
-    -- Step 10: Simplify mfderiv of pair using mfderiv_prodMk
-    have h_mfderiv_pair :
-        mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n k × Alt n l) pair x =
-          (mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n k) ω.as_alternating x).prod
-            (mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n l) η.as_alternating x) := by
-      rw [modelWithCornersSelf_prod, ← chartedSpaceSelf_prod]
-      exact mfderiv_prodMk hω_diff hη_diff
-
-    -- Step 11: Compute the final form
-    simp only [h_mfderiv_B, h_fderiv_B, h_mfderiv_pair, IsBoundedBilinearMap.deriv, pair]
-    show (hB.toContinuousLinearMap.deriv₂ (ω.as_alternating x, η.as_alternating x))
-            (mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n k) ω.as_alternating x v,
-              mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n l) η.as_alternating x v)
-          =
-          (mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n k) ω.as_alternating x v).wedge (η.as_alternating x) +
-            (ω.as_alternating x).wedge
-              (mfderiv (𝓒_complex n) 𝓘(ℝ, Alt n l) η.as_alternating x v)
-    simp only [ContinuousLinearMap.coe_deriv₂]
-    -- The bilinear derivative returns the same two summands in the opposite order.
-    exact add_comm _ _
-
+  -- Rewrite the derivative using `hmf` and alternatize term-by-term.
   rw [hmf]
-
-  -- 4. Use linearity of alternatizeUncurryFin
   rw [ContinuousAlternatingMap.alternatizeUncurryFin_add]
 
-  -- 5. Apply the two combinatorial lemmas
-  rw [alternatizeUncurryFin_wedge_right A_ω B_η]
-  rw [alternatizeUncurryFin_wedge_left B_ω A_η]
+  -- Apply the two combinatorial lemmas.
+  -- Right term: dω ∧ η
+  have hR0 :=
+    alternatizeUncurryFin_wedge_right (n := n) (k := k) (l := l) (A := A_ω) (B := B_η)
+  have hR :
+      ContinuousAlternatingMap.alternatizeUncurryFin (𝕜 := ℝ) (F := ℂ) wedge_right =
+        ContinuousAlternatingMap.domDomCongr
+          ((ContinuousAlternatingMap.alternatizeUncurryFin (𝕜 := ℝ) (F := ℂ) A_ω).wedgeℂ B_η)
+          (finCongr (show (k + 1) + l = (k + l) + 1 by omega)) := by
+    simpa [wedge_right] using hR0
+  -- Left term: (-1)^k ω ∧ dη
+  have hL0 :=
+    alternatizeUncurryFin_wedge_left (n := n) (k := k) (l := l) (A := B_ω) (B := A_η)
+  have hL :
+      ContinuousAlternatingMap.alternatizeUncurryFin (𝕜 := ℝ) (F := ℂ) wedge_left =
+        ContinuousAlternatingMap.domDomCongr
+          (((-1 : ℂ) ^ k) • B_ω.wedgeℂ
+              (ContinuousAlternatingMap.alternatizeUncurryFin (𝕜 := ℝ) (F := ℂ) A_η))
+          (finCongr (show k + (l + 1) = (k + l) + 1 by omega)) := by
+    simpa [wedge_left] using hL0
 
-  -- 6. Normalize casts and signs
-  simp only [castAlt]
-  rfl
+  -- Rewrite both summands and finish: `castAlt` is `domDomCongr` along `finCongr`.
+  rw [hR, hL]
+  simp [castAlt, A_ω, A_η, B_ω, B_η]
 
 end LeibnizRule

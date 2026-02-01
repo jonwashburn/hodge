@@ -37,7 +37,7 @@ which uses the manifold derivative `mfderiv`. This is verified by the theorem
 noncomputable section
 
 open Classical Module Manifold
-open scoped Pointwise Manifold
+open scoped Pointwise Manifold TensorProduct
 
 set_option autoImplicit false
 
@@ -465,23 +465,16 @@ noncomputable def smoothWedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothFo
 notation:67 ω:68 " ⋏ " η:68 => smoothWedge ω η
 
 @[simp] lemma SmoothForm.wedge_apply {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) (x : X) :
-    (ω ⋏ η).as_alternating x = ContinuousAlternatingMap.wedge (ω.as_alternating x) (η.as_alternating x) := rfl
+    (ω ⋏ η).as_alternating x =
+      ContinuousAlternatingMap.wedgeℂ (E := TangentModel n) (ω.as_alternating x) (η.as_alternating x) := rfl
 
 @[simp] lemma zero_wedge {k l : ℕ} (η : SmoothForm n X l) : (0 : SmoothForm n X k) ⋏ η = 0 := by
   ext x v
-  simpa [smoothWedge] using
-    congrArg (fun (f : FiberAlt n (k + l)) => f v)
-      (ContinuousAlternatingMap.wedge_smul_left
-        (𝕜 := ℝ) (E := TangentModel n) (c := (0 : ℂ))
-        (ω := (0 : FiberAlt n k)) (η := η.as_alternating x))
+  simp [smoothWedge, ContinuousAlternatingMap.wedgeℂ_apply, ContinuousAlternatingMap.wedgeℂ_linear]
 
 @[simp] lemma wedge_zero {k l : ℕ} (ω : SmoothForm n X k) : ω ⋏ (0 : SmoothForm n X l) = 0 := by
   ext x v
-  simpa [smoothWedge] using
-    congrArg (fun (f : FiberAlt n (k + l)) => f v)
-      (ContinuousAlternatingMap.wedge_smul_right
-        (𝕜 := ℝ) (E := TangentModel n) (c := (0 : ℂ))
-        (ω := ω.as_alternating x) (η := (0 : FiberAlt n l)))
+  simp [smoothWedge, ContinuousAlternatingMap.wedgeℂ_apply, ContinuousAlternatingMap.wedgeℂ_linear]
 
 /-- **Nilpotency of Exterior Derivative: d² = 0** (Classical Pillar Axiom).
 
@@ -628,7 +621,8 @@ private lemma castForm_smul_as_alternating {m m' : ℕ} (h : m = m') (c : ℂ)
 -- Lemma: castForm of wedge
 private lemma castForm_wedge_as_alternating {k' l' m : ℕ} (h : k' + l' = m)
     (ω : SmoothForm n X k') (η : SmoothForm n X l') (x : X) :
-    (castForm h (ω ⋏ η)).as_alternating x = h ▸ (ω.as_alternating x).wedge (η.as_alternating x) := by
+    (castForm h (ω ⋏ η)).as_alternating x =
+      h ▸ ContinuousAlternatingMap.wedgeℂ (E := TangentModel n) (ω.as_alternating x) (η.as_alternating x) := by
   subst h; rfl
 
 theorem smoothExtDeriv_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothForm n X l) :
@@ -654,13 +648,14 @@ theorem smoothExtDeriv_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothFor
   -- First term: castForm (smoothExtDeriv ω ⋏ η)
   have h_rhs1 : (castForm (by omega : (k + 1) + l = (k + l) + 1) (smoothExtDeriv ω ⋏ η)).as_alternating x =
       (by omega : (k + 1) + l = (k + l) + 1) ▸
-        ((smoothExtDeriv ω).as_alternating x).wedge (η.as_alternating x) := by
+        ContinuousAlternatingMap.wedgeℂ (E := TangentModel n) ((smoothExtDeriv ω).as_alternating x) (η.as_alternating x) := by
     exact castForm_wedge_as_alternating _ _ _ _
   -- Second term: castForm ((-1)^k • (ω ⋏ smoothExtDeriv η))
   have h_rhs2 : (castForm (by omega : k + (l + 1) = (k + l) + 1)
       ((-1 : ℂ)^k • (ω ⋏ smoothExtDeriv η))).as_alternating x =
       (by omega : k + (l + 1) = (k + l) + 1) ▸
-        ((-1 : ℂ)^k • (ω.as_alternating x).wedge ((smoothExtDeriv η).as_alternating x)) := by
+        ((-1 : ℂ)^k •
+          ContinuousAlternatingMap.wedgeℂ (E := TangentModel n) (ω.as_alternating x) ((smoothExtDeriv η).as_alternating x)) := by
     simp only [castForm_smul_as_alternating, SmoothForm.smul_apply, SmoothForm.wedge_apply]
   rw [h_rhs1, h_rhs2]
   -- Now LHS and RHS have the same structure
@@ -705,7 +700,7 @@ At the level of `FiberAlt n 0`, a 0-form is just a scalar. -/
 def unitForm : SmoothForm n X 0 where
   as_alternating := fun _ =>
     haveI : IsEmpty (Fin 0) := Fin.isEmpty
-    ContinuousAlternatingMap.constOfIsEmpty ℂ (TangentModel n) (ι := Fin 0) (1 : ℂ)
+    ContinuousAlternatingMap.constOfIsEmpty ℝ (TangentModel n) (ι := Fin 0) (1 : ℂ)
   is_smooth := contMDiff_const
 
 /-- **The Unit Form is Closed: d(1) = 0** (Classical Pillar Axiom).
@@ -779,28 +774,290 @@ theorem isFormClosed_unitForm : IsFormClosed (unitForm (n := n) (X := X)) := by
 theorem smoothWedge_add_left {k l : ℕ} (ω₁ ω₂ : SmoothForm n X k) (η : SmoothForm n X l) :
     (ω₁ + ω₂) ⋏ η = (ω₁ ⋏ η) + (ω₂ ⋏ η) := by
   ext x v
-  simp [smoothWedge, ContinuousAlternatingMap.wedge_add_left]
+  simp [smoothWedge, ContinuousAlternatingMap.wedgeℂ_add_left]
 
 theorem smoothWedge_add_right {k l : ℕ} (ω : SmoothForm n X k) (η₁ η₂ : SmoothForm n X l) :
     ω ⋏ (η₁ + η₂) = (ω ⋏ η₁) + (ω ⋏ η₂) := by
   ext x v
-  simp [smoothWedge, ContinuousAlternatingMap.wedge_add_right]
+  simp [smoothWedge, ContinuousAlternatingMap.wedgeℂ_add_right]
+
+/-!
+### Complex scalar linearity for `wedgeℂ_linear`
+
+`wedgeℂ` is defined over the real base field `ℝ`, but our forms are `ℂ`-valued and we equip
+`SmoothForm` with a `Module ℂ` structure. For the wedge algebra on forms, we need the pointwise
+identity
+
+`(c • ω) ⋏ η = c • (ω ⋏ η)` and `ω ⋏ (c • η) = c • (ω ⋏ η)`.
+
+The core algebraic statements reduce to `wedgeℂ_linear`, and are proved by unfolding to
+`AlternatingMap.domCoprod.summand` and `LinearMap.mul'`.
+-/
+
+private lemma domCoprod_summand_smul_left_complex {k l : ℕ} (c : ℂ)
+    (ω : (TangentModel n) [⋀^Fin k]→ₗ[ℝ] ℂ) (η : (TangentModel n) [⋀^Fin l]→ₗ[ℝ] ℂ)
+    (σ : Equiv.Perm.ModSumCongr (Fin k) (Fin l))
+    (v : Fin (k + l) → TangentModel n) :
+    (AlternatingMap.domCoprod.summand (c • ω) η σ) (v ∘ finSumFinEquiv) =
+      c • (AlternatingMap.domCoprod.summand ω η σ) (v ∘ finSumFinEquiv) := by
+  classical
+  refine Quotient.inductionOn' σ ?_
+  intro σ
+  -- After unfolding, this is just bookkeeping: `TensorProduct`'s `ℂ`-smul scales the left factor.
+  simp [AlternatingMap.domCoprod.summand, TensorProduct.smul_tmul']
+  -- Commute the (±1)-action from `sign σ` with complex multiplication.
+  simp [Units.smul_def, zsmul_eq_mul, mul_left_comm, mul_comm]
+
+private lemma mul'_smul_complex (c : ℂ) (t : ℂ ⊗[ℝ] ℂ) :
+    (LinearMap.mul' ℝ ℂ) (c • t) = c * (LinearMap.mul' ℝ ℂ t) := by
+  refine t.induction_on ?hz ?ht ?ha
+  · simp
+  · intro a b
+    simp [TensorProduct.smul_tmul', mul_assoc]
+  · intro x y hx hy
+    simp [map_add, hx, hy, mul_add]
+
+private lemma wedgeℂ_linear_smul_left_complex {k l : ℕ} (c : ℂ)
+    (ω : FiberAlt n k) (η : FiberAlt n l) (v : Fin (k + l) → TangentModel n) :
+    (ContinuousAlternatingMap.wedgeℂ_linear (E := TangentModel n) (c • ω) η) v =
+      c * (ContinuousAlternatingMap.wedgeℂ_linear (E := TangentModel n) ω η) v := by
+  classical
+  simp [ContinuousAlternatingMap.wedgeℂ_linear, domCoprod_summand_smul_left_complex, mul'_smul_complex,
+    Finset.mul_sum]
+
+private lemma sign_smul_mul_left {k l : ℕ} (σ : Equiv.Perm (Fin k ⊕ Fin l)) (c a : ℂ) :
+    (Equiv.Perm.sign σ • (c * a)) = c * (Equiv.Perm.sign σ • a) := by
+  simp [Units.smul_def, zsmul_eq_mul, mul_assoc, mul_left_comm, mul_comm]
+
+private lemma mul'_domCoprod_summand_smul_right_complex {k l : ℕ} (c : ℂ)
+    (ω : (TangentModel n) [⋀^Fin k]→ₗ[ℝ] ℂ) (η : (TangentModel n) [⋀^Fin l]→ₗ[ℝ] ℂ)
+    (σ : Equiv.Perm.ModSumCongr (Fin k) (Fin l))
+    (v : Fin (k + l) → TangentModel n) :
+    (LinearMap.mul' ℝ ℂ)
+        ((AlternatingMap.domCoprod.summand ω (c • η) σ) (v ∘ finSumFinEquiv)) =
+      c * (LinearMap.mul' ℝ ℂ)
+        ((AlternatingMap.domCoprod.summand ω η σ) (v ∘ finSumFinEquiv)) := by
+  classical
+  refine Quotient.inductionOn' σ ?_
+  intro σ
+  simp [AlternatingMap.domCoprod.summand, sign_smul_mul_left, mul_assoc, mul_left_comm, mul_comm]
+
+private lemma wedgeℂ_linear_smul_right_complex {k l : ℕ} (c : ℂ)
+    (ω : FiberAlt n k) (η : FiberAlt n l) (v : Fin (k + l) → TangentModel n) :
+    (ContinuousAlternatingMap.wedgeℂ_linear (E := TangentModel n) ω (c • η)) v =
+      c * (ContinuousAlternatingMap.wedgeℂ_linear (E := TangentModel n) ω η) v := by
+  classical
+  simp [ContinuousAlternatingMap.wedgeℂ_linear, mul'_domCoprod_summand_smul_right_complex, Finset.mul_sum]
 
 theorem smoothWedge_smul_left {k l : ℕ} (c : ℂ) (ω : SmoothForm n X k) (η : SmoothForm n X l) :
     (c • ω) ⋏ η = c • (ω ⋏ η) := by
   ext x v
-  simp [smoothWedge, ContinuousAlternatingMap.wedge_smul_left]
+  -- reduce to `wedgeℂ_linear` and apply the complex scalar linearity lemma
+  simp [smoothWedge, ContinuousAlternatingMap.wedgeℂ_apply, ContinuousAlternatingMap.smul_apply,
+    wedgeℂ_linear_smul_left_complex, smul_eq_mul]
 
 theorem smoothWedge_smul_right {k l : ℕ} (c : ℂ) (ω : SmoothForm n X k) (η : SmoothForm n X l) :
     ω ⋏ (c • η) = c • (ω ⋏ η) := by
   ext x v
-  simp [smoothWedge, ContinuousAlternatingMap.wedge_smul_right]
+  simp [smoothWedge, ContinuousAlternatingMap.wedgeℂ_apply, ContinuousAlternatingMap.smul_apply,
+    wedgeℂ_linear_smul_right_complex, smul_eq_mul]
 
 theorem smoothWedge_zero_left {k l : ℕ} (η : SmoothForm n X l) :
     (0 : SmoothForm n X k) ⋏ η = 0 := zero_wedge η
 
 theorem smoothWedge_zero_right {k l : ℕ} (ω : SmoothForm n X k) :
     ω ⋏ (0 : SmoothForm n X l) = 0 := wedge_zero ω
+
+/-!
+### Wedge with a 0-form (unit laws)
+
+When one side is `Fin 0`, `Equiv.Perm.ModSumCongr` is a singleton, so wedging with a 0-form reduces
+to scalar multiplication (up to the standard `Fin`-index cast).
+-/
+
+private lemma sumCongrHom_surj_empty_left {l : ℕ} :
+    Function.Surjective (Equiv.Perm.sumCongrHom (Fin 0) (Fin l)) := by
+  intro σ
+  have h_pres : ∀ i : Fin l, ∃ j : Fin l, σ (Sum.inr i) = Sum.inr j := by
+    intro i
+    rcases σ (Sum.inr i) with ⟨x⟩ | ⟨j⟩
+    · exact (IsEmpty.false x).elim
+    · exact ⟨j, rfl⟩
+  let q_fun : Fin l → Fin l := fun i => (h_pres i).choose
+  have hq : ∀ i, σ (Sum.inr i) = Sum.inr (q_fun i) := fun i => (h_pres i).choose_spec
+  have q_inj : Function.Injective q_fun := by
+    intro i j hij
+    have : σ (Sum.inr i) = σ (Sum.inr j) := by simp [hq, hij]
+    exact Sum.inr_injective (σ.injective this)
+  have q_surj : Function.Surjective q_fun := by
+    intro j
+    obtain ⟨x, hx⟩ := σ.surjective (Sum.inr j)
+    rcases x with ⟨y⟩ | ⟨i⟩
+    · exact (IsEmpty.false y).elim
+    · refine ⟨i, ?_⟩
+      have h1 : σ (Sum.inr i) = (Sum.inr j : Fin 0 ⊕ Fin l) := hx
+      have h2 : σ (Sum.inr i) = (Sum.inr (q_fun i) : Fin 0 ⊕ Fin l) := hq i
+      exact Sum.inr_injective (by rw [← h2, h1])
+  let q : Equiv.Perm (Fin l) := Equiv.ofBijective q_fun ⟨q_inj, q_surj⟩
+  refine ⟨(1, q), ?_⟩
+  ext x
+  rcases x with ⟨y⟩ | ⟨i⟩
+  · exact (IsEmpty.false y).elim
+  · simp only [Equiv.Perm.sumCongrHom_apply, Equiv.Perm.sumCongr_apply, Sum.map_inr]
+    exact (hq i).symm
+
+private instance subsingleton_modSumCongr_empty_left {l : ℕ} :
+    Subsingleton (Equiv.Perm.ModSumCongr (Fin 0) (Fin l)) := by
+  constructor
+  intro σ₁ σ₂
+  induction σ₁ using Quotient.inductionOn' with
+  | h s₁ =>
+    induction σ₂ using Quotient.inductionOn' with
+    | h s₂ =>
+      apply Quotient.sound'
+      rw [QuotientGroup.leftRel_apply]
+      obtain ⟨pq, hpq⟩ := sumCongrHom_surj_empty_left (l := l) (s₁⁻¹ * s₂)
+      exact ⟨pq, hpq⟩
+
+private lemma sumCongrHom_surj_empty_right {k : ℕ} :
+    Function.Surjective (Equiv.Perm.sumCongrHom (Fin k) (Fin 0)) := by
+  intro σ
+  have h_pres : ∀ i : Fin k, ∃ j : Fin k, σ (Sum.inl i) = Sum.inl j := by
+    intro i
+    rcases σ (Sum.inl i) with ⟨j⟩ | ⟨x⟩
+    · exact ⟨j, rfl⟩
+    · exact (IsEmpty.false x).elim
+  let p_fun : Fin k → Fin k := fun i => (h_pres i).choose
+  have hp : ∀ i, σ (Sum.inl i) = Sum.inl (p_fun i) := fun i => (h_pres i).choose_spec
+  have p_inj : Function.Injective p_fun := by
+    intro i j hij
+    have : σ (Sum.inl i) = σ (Sum.inl j) := by simp [hp, hij]
+    exact Sum.inl_injective (σ.injective this)
+  have p_surj : Function.Surjective p_fun := by
+    intro j
+    obtain ⟨x, hx⟩ := σ.surjective (Sum.inl j)
+    rcases x with ⟨i⟩ | ⟨y⟩
+    · refine ⟨i, ?_⟩
+      have h1 : σ (Sum.inl i) = (Sum.inl j : Fin k ⊕ Fin 0) := hx
+      have h2 : σ (Sum.inl i) = (Sum.inl (p_fun i) : Fin k ⊕ Fin 0) := hp i
+      exact Sum.inl_injective (by rw [← h2, h1])
+    · exact (IsEmpty.false y).elim
+  let p : Equiv.Perm (Fin k) := Equiv.ofBijective p_fun ⟨p_inj, p_surj⟩
+  refine ⟨(p, 1), ?_⟩
+  ext x
+  rcases x with ⟨i⟩ | ⟨y⟩
+  · simp only [Equiv.Perm.sumCongrHom_apply, Equiv.Perm.sumCongr_apply, Sum.map_inl]
+    exact (hp i).symm
+  · exact (IsEmpty.false y).elim
+
+private instance subsingleton_modSumCongr_empty_right {k : ℕ} :
+    Subsingleton (Equiv.Perm.ModSumCongr (Fin k) (Fin 0)) := by
+  constructor
+  intro σ₁ σ₂
+  induction σ₁ using Quotient.inductionOn' with
+  | h s₁ =>
+    induction σ₂ using Quotient.inductionOn' with
+    | h s₂ =>
+      apply Quotient.sound'
+      rw [QuotientGroup.leftRel_apply]
+      obtain ⟨pq, hpq⟩ := sumCongrHom_surj_empty_right (k := k) (s₁⁻¹ * s₂)
+      exact ⟨pq, hpq⟩
+
+private lemma sum_subsingleton {α : Type*} [Fintype α] [Subsingleton α]
+    {M : Type*} [AddCommMonoid M] (f : α → M) (a : α) : ∑ x : α, f x = f a := by
+  have h : ∀ x : α, x = a := fun x => Subsingleton.elim x a
+  simp only [Finset.sum_eq_single a (fun b _ hb => absurd (h b) hb)
+    (fun ha => absurd (Finset.mem_univ a) ha)]
+
+private lemma wedgeℂ_constOfIsEmpty_right {k : ℕ} (c : ℂ) (ω : FiberAlt n k) :
+    ContinuousAlternatingMap.wedgeℂ (E := TangentModel n) ω
+        (ContinuousAlternatingMap.constOfIsEmpty ℝ (TangentModel n) (ι := Fin 0) c) =
+      (c • ω).domDomCongr (finCongr (Nat.add_zero k).symm) := by
+  classical
+  ext v
+  simp only [ContinuousAlternatingMap.wedgeℂ_apply, ContinuousAlternatingMap.wedgeℂ_linear]
+  simp only [ContinuousAlternatingMap.domDomCongr_apply, ContinuousAlternatingMap.smul_apply]
+  simp only [AlternatingMap.domDomCongr_apply, LinearMap.compAlternatingMap_apply,
+    AlternatingMap.domCoprod'_apply, AlternatingMap.domCoprod_apply, MultilinearMap.sum_apply]
+  let σ₀ : Equiv.Perm.ModSumCongr (Fin k) (Fin 0) := ⟦1⟧
+  have hsum :
+      (∑ a : Equiv.Perm.ModSumCongr (Fin k) (Fin 0),
+          (AlternatingMap.domCoprod.summand ω.toAlternatingMap
+              (ContinuousAlternatingMap.constOfIsEmpty ℝ (TangentModel n) (ι := Fin 0) c).toAlternatingMap a)
+            (v ∘ finSumFinEquiv)) =
+        (AlternatingMap.domCoprod.summand ω.toAlternatingMap
+            (ContinuousAlternatingMap.constOfIsEmpty ℝ (TangentModel n) (ι := Fin 0) c).toAlternatingMap σ₀)
+          (v ∘ finSumFinEquiv) :=
+    sum_subsingleton (f := fun a : Equiv.Perm.ModSumCongr (Fin k) (Fin 0) =>
+      (AlternatingMap.domCoprod.summand ω.toAlternatingMap
+        (ContinuousAlternatingMap.constOfIsEmpty ℝ (TangentModel n) (ι := Fin 0) c).toAlternatingMap a)
+        (v ∘ finSumFinEquiv)) σ₀
+  rw [hsum]
+  simp only [AlternatingMap.domCoprod.summand]
+  conv_lhs => rw [show σ₀ = ⟦1⟧ from rfl]
+  simp only [Quotient.liftOn'_mk'', MultilinearMap.domDomCongr_apply, MultilinearMap.domCoprod_apply,
+    Equiv.Perm.sign_one, one_smul, LinearMap.mul'_apply, Equiv.Perm.coe_one, id_eq, Function.comp_apply]
+  have h_left :
+      (fun i₁ : Fin k => v (finSumFinEquiv (m := k) (n := 0) (Sum.inl i₁))) =
+        (v ∘ finCongr (Nat.add_zero k).symm) := by
+    funext i
+    change v (finSumFinEquiv (m := k) (n := 0) (Sum.inl i)) = v (finCongr (Nat.add_zero k).symm i)
+    have hidx :
+        (finSumFinEquiv (m := k) (n := 0) (Sum.inl i) : Fin (k + 0)) =
+          finCongr (Nat.add_zero k).symm i := by
+      have hL :
+          (finSumFinEquiv (m := k) (n := 0) (Sum.inl i) : Fin (k + 0)) = Fin.castAdd 0 i := by
+        simpa using (finSumFinEquiv_apply_left (m := k) (n := 0) i)
+      have hR : (finCongr (Nat.add_zero k).symm i : Fin (k + 0)) = Fin.castAdd 0 i := by
+        simp
+      exact hL.trans hR.symm
+    exact congrArg v hidx
+  have h_const :
+      (ContinuousAlternatingMap.constOfIsEmpty ℝ (TangentModel n) (ι := Fin 0) c).toMultilinearMap
+        (fun i₂ => v (finSumFinEquiv (m := k) (n := 0) (Sum.inr i₂))) = c := rfl
+  rw [h_left, h_const, smul_eq_mul, mul_comm]
+  rfl
+
+private lemma wedgeℂ_constOfIsEmpty_left {l : ℕ} (c : ℂ) (η : FiberAlt n l) :
+    ContinuousAlternatingMap.wedgeℂ (E := TangentModel n)
+        (ContinuousAlternatingMap.constOfIsEmpty ℝ (TangentModel n) (ι := Fin 0) c) η =
+      (c • η).domDomCongr (finCongr (Nat.zero_add l).symm) := by
+  classical
+  ext v
+  simp only [ContinuousAlternatingMap.wedgeℂ_apply, ContinuousAlternatingMap.wedgeℂ_linear]
+  simp only [ContinuousAlternatingMap.domDomCongr_apply, ContinuousAlternatingMap.smul_apply]
+  simp only [AlternatingMap.domDomCongr_apply, LinearMap.compAlternatingMap_apply,
+    AlternatingMap.domCoprod'_apply, AlternatingMap.domCoprod_apply, MultilinearMap.sum_apply]
+  let σ₀ : Equiv.Perm.ModSumCongr (Fin 0) (Fin l) := ⟦1⟧
+  have hsum :
+      (∑ a : Equiv.Perm.ModSumCongr (Fin 0) (Fin l),
+          (AlternatingMap.domCoprod.summand
+              (ContinuousAlternatingMap.constOfIsEmpty ℝ (TangentModel n) (ι := Fin 0) c).toAlternatingMap
+              η.toAlternatingMap a) (v ∘ finSumFinEquiv)) =
+        (AlternatingMap.domCoprod.summand
+            (ContinuousAlternatingMap.constOfIsEmpty ℝ (TangentModel n) (ι := Fin 0) c).toAlternatingMap
+            η.toAlternatingMap σ₀) (v ∘ finSumFinEquiv) :=
+    sum_subsingleton (f := fun a : Equiv.Perm.ModSumCongr (Fin 0) (Fin l) =>
+      (AlternatingMap.domCoprod.summand
+        (ContinuousAlternatingMap.constOfIsEmpty ℝ (TangentModel n) (ι := Fin 0) c).toAlternatingMap
+        η.toAlternatingMap a) (v ∘ finSumFinEquiv)) σ₀
+  rw [hsum]
+  simp only [AlternatingMap.domCoprod.summand]
+  conv_lhs => rw [show σ₀ = ⟦1⟧ from rfl]
+  simp only [Quotient.liftOn'_mk'', MultilinearMap.domDomCongr_apply, MultilinearMap.domCoprod_apply,
+    Equiv.Perm.sign_one, one_smul, LinearMap.mul'_apply, Equiv.Perm.coe_one, id_eq, Function.comp_apply]
+  have h_inputs :
+      (fun i₂ : Fin l => v (finSumFinEquiv (m := 0) (n := l) (Sum.inr i₂))) =
+        (v ∘ finCongr (Nat.zero_add l).symm) := by
+    funext i
+    change v (finSumFinEquiv (m := 0) (n := l) (Sum.inr i)) = v (finCongr (Nat.zero_add l).symm i)
+    have hL :
+        (finSumFinEquiv (m := 0) (n := l) (Sum.inr i) : Fin (0 + l)) = Fin.natAdd 0 i := by
+      simpa using (finSumFinEquiv_apply_right (m := 0) (n := l) i)
+    -- both sides are definitionally `i` in `Fin (0+l)`
+    simpa [hL]
+  rw [h_inputs]
+  simp
 
 /-- Wedge of unit form with any k-form gives back the k-form (up to degree cast).
 
@@ -822,10 +1079,10 @@ theorem smoothWedge_unitForm_left {k : ℕ} (ω : SmoothForm n X k) :
   simp only [SmoothForm.wedge_apply]
   -- unitForm.as_alternating x = constOfIsEmpty ℂ (TangentModel n) 1
   have h_unit : unitForm.as_alternating x =
-      ContinuousAlternatingMap.constOfIsEmpty ℂ (TangentModel n) (ι := Fin 0) 1 := rfl
+      ContinuousAlternatingMap.constOfIsEmpty ℝ (TangentModel n) (ι := Fin 0) 1 := rfl
   rw [h_unit]
-  -- Use the lemma `wedge_constOfIsEmpty_left` from `DomCoprod.lean`.
-  rw [ContinuousAlternatingMap.wedge_constOfIsEmpty_left]
+  -- Use the `wedgeℂ`-version of the unit law.
+  rw [wedgeℂ_constOfIsEmpty_left]
   -- Now RHS: (1 • ω.as_alternating x).domDomCongr (finCongr (Nat.zero_add k).symm)
   simp only [one_smul]
   -- castForm gives h ▸ ω, and at point x: h ▸ ω.as_alternating x
@@ -845,9 +1102,9 @@ theorem smoothWedge_unitForm_right {k : ℕ} (ω : SmoothForm n X k) :
   funext x
   simp only [SmoothForm.wedge_apply]
   have h_unit : unitForm.as_alternating x =
-      ContinuousAlternatingMap.constOfIsEmpty ℂ (TangentModel n) (ι := Fin 0) 1 := rfl
+      ContinuousAlternatingMap.constOfIsEmpty ℝ (TangentModel n) (ι := Fin 0) 1 := rfl
   rw [h_unit]
-  rw [ContinuousAlternatingMap.wedge_constOfIsEmpty_right]
+  rw [wedgeℂ_constOfIsEmpty_right]
   simp only [one_smul]
   simp only [SmoothForm.castForm_as_alternating]
   rw [castAlt_eq_transport_wedge]

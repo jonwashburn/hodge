@@ -614,8 +614,8 @@ which is NOT on the proof track of hodge_conjecture'.
 The unit form in H⁰(X) satisfies `1 * a = a` and `a * 1 = a` (up to degree casts).
 
 **Note**: `unitForm` is defined as the constant-`1` 0-form in `Hodge/Analytic/Forms.lean`.
-In the proof-first regime (`smoothExtDeriv := 0`), the unit theorems below are still proved
-using the current cohomology quotient infrastructure. -/
+These unit theorems are proved using the current form-level infrastructure
+(`smoothWedge_unitForm_left/right`) and then transported to cohomology via the quotient. -/
 
 /-- The unit cohomology class in H⁰(X). -/
 def unitClass : DeRhamCohomologyClass n X 0 := ⟦unitForm, isFormClosed_unitForm⟧
@@ -626,7 +626,7 @@ The unit cohomology class acts as a left identity for the cup product.
 The cast is induced by `0 + k = k`.
 
 This follows from the form-level identity `unitForm ⋏ ω = ω`
-(via `ContinuousAlternatingMap.wedge_constOfIsEmpty_left`). -/
+(via `smoothWedge_unitForm_left`). -/
 theorem one_mul {k : ℕ} (a : DeRhamCohomologyClass n X k) :
     (unitClass (n := n) (X := X)) * a = (Nat.zero_add k).symm ▸ a := by
   refine Quotient.inductionOn a ?_
@@ -990,7 +990,8 @@ noncomputable def lefschetzL {k : ℕ} (η : SmoothForm n X k) : SmoothForm n X 
   (Nat.add_comm 2 k) ▸ (KahlerManifold.omega_form (n := n) (X := X) ⋏ η)
 
 -- lefschetzL_add, lefschetzL_smul, lefschetzL_closed removed (unused)
--- Note: These would be trivial since smoothWedge := 0, but Nat.add_comm coercion makes them complex
+-- NOTE: These lemmas are straightforward (they follow from `smoothWedge_add_*` / `smoothWedge_smul_*`)
+-- but were removed as unused; reintroducing them requires a small amount of `Nat.add_comm` casting.
 
 end Hodge
 

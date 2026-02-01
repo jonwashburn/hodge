@@ -894,7 +894,11 @@ noncomputable def HodgeStarData.fromFiber (n : ℕ) (X : Type*) (k : ℕ)
     is_smooth := by
       -- `fiberHodgeStar_construct` is (by definition) a continuous linear map on fibers, hence smooth;
       -- composing with a smooth section remains smooth.
-      simpa [fiberHodgeStar_construct] using (fiberHodgeStarCLM n k).contMDiff.comp α.is_smooth
+      -- IMPORTANT: our global smoothness is over `ℝ` (see `IsSmoothAlternating`), so we must use the
+      -- `ℝ`-linear restriction of the fiber map to get a `ContMDiff` statement with target
+      -- `𝓘(ℝ, FiberAlt n k)`.
+      simpa [fiberHodgeStar_construct] using
+        ((fiberHodgeStarCLM n k).restrictScalars ℝ).contMDiff.comp α.is_smooth
   }
   star_add := fun α β => by
     ext x v

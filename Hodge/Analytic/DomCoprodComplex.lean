@@ -109,7 +109,7 @@ theorem wedgeℂ_smul_left {k l : ℕ} (c : ℝ)
   -- Apply linearity of `domCoprod'` and then of `mul'`.
   -- `domCoprod'` is ℝ-linear: `map_smul` pulls out `c`.
   -- Evaluate at `v ∘ finSumFinEquiv` afterwards.
-  simp [ht, map_smul, LinearMap.map_smul] 
+  simp [ht, map_smul, LinearMap.map_smul]
 
 theorem wedgeℂ_smul_right {k l : ℕ} (c : ℝ)
     (ω : ContinuousAlternatingMap ℝ E ℂ (Fin k))
