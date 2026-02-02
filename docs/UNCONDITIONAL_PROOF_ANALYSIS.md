@@ -54,11 +54,10 @@ This is the key theorem of calibration theory / GMT.
 
 **Current state**: 
 - `IsAnalyticSet` is properly defined (local holomorphic zero loci) ✓
-- `IsAlgebraicSet := IsClosed` is STILL A STUB ✗
+- `IsAlgebraicSet` is defined as projective homogeneous polynomial zero loci ✓
 
-**Why it matters**: Even if we provide an instance, using `IsAlgebraicSet := IsClosed` 
-would be a semantic gotcha - it makes Chow/GAGA trivially true by weakening the notion
-of algebraic set.
+**Why it matters**: Even with proper definitions, proving analytic → algebraic is a deep
+Chow/GAGA theorem. We must still remove `ChowGAGAData` by providing a real proof.
 
 ### 4. `CalibratedCurrentRegularityData` (NOT IN AUDIT BAD LIST)
 

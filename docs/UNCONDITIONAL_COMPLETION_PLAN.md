@@ -43,9 +43,9 @@ instances:
   - Implementation: `measure2p := 0`, `integral := 0`.
   - All laws (`linear`, `union`, `empty`, `bound`, `stokes_integral_zero`) become `simp`.
 
-- **Add `ChowGAGAData.universal`** in `Hodge/Classical/GAGA.lean`.
-  - Since `IsAlgebraicSet` is currently defined as `IsClosed` and `IsAnalyticSet` packages
-    `IsClosed`, the conversion is immediate.
+- **Chow/GAGA** in `Hodge/Classical/GAGA.lean`.
+  - `IsAnalyticSet` and `IsAlgebraicSet` now have genuine definitions.
+  - Analytic → algebraic is no longer immediate and must be proved (Chow/GAGA).
 
 ### B. Remove `sorryAx` from `AutomaticSYRData.universal`
 

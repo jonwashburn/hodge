@@ -152,12 +152,8 @@ These can support:
 
 ## What is missing (must be implemented for “no gotchas”)
 
-To eliminate the explicit gotchas:
-
-- `IsAnalyticSet := IsClosed` in `Hodge/Classical/HarveyLawson.lean`
-- `IsAlgebraicSet := IsClosed` in `Hodge/Classical/GAGA.lean`
-
-we appear to need new in-repo development covering at least:
+We have removed the explicit `IsClosed` aliases for analytic/algebraic sets.
+Remaining in-repo development needed for full Chow/GAGA includes:
 
 - **Analytic sets** on a complex manifold:
   - locality (`∀ x, ∃ neighborhood U, ∃ finite family fᵢ holomorphic on U, Z ∩ U = {x | ∀ i, fᵢ x = 0}`),

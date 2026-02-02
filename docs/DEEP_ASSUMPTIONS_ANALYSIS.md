@@ -113,7 +113,7 @@ These are definitions that remain as stubs but are documented:
 
 | Definition | Status | What's Needed |
 |------------|--------|---------------|
-| `IsAlgebraicSet := IsClosed` | STUB | Proper definition using polynomial zero loci |
+| `IsAlgebraicSet` (projective polynomial zero loci) | DONE | Prove Chow/GAGA analytic → algebraic |
 | `buildSheetsFromConePositive := ∅` | STUB | Full microstructure sheet construction |
 
 These stubs are **not on the main proof track** in the sense that they don't directly appear in `hodge_conjecture'`. However, they affect the construction of cycles via `cone_positive_produces_cycle`.

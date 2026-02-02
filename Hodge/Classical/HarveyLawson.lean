@@ -373,38 +373,4 @@ instance instFlatLimitCycleData {k : ℕ} : FlatLimitCycleData n X k := by
   -- Keep `.universal` off the `instance` line (required by `audit_practical_unconditional.sh`).
   exact FlatLimitCycleData.universal (n := n) (X := X) (k := k)
 
-/-- **Universal instance of HarveyLawsonKingData**.
-
-    The Harvey-Lawson structure theorem: calibrated integral currents decompose
-    as sums of integration currents over analytic varieties.
-
-    **Phase 8 Update**: Now requires `CalibratedCurrentRegularityData` to prove
-    the support is analytically defined (local holomorphic zero locus).
-
-    Reference: [Harvey-Lawson, "Calibrated geometries", Acta Math. 1982] -/
-def HarveyLawsonKingData.universal {k : ℕ} [CalibratedCurrentRegularityData n X k] :
-    HarveyLawsonKingData n X k where
-  decompose := fun hyp => {
-    -- Return the support variety extracted from the calibrated current
-    varieties := {harveyLawsonSupportVariety' hyp.T hyp.ψ hyp.is_calibrated}
-    multiplicities := fun _ => ⟨1, Nat.one_pos⟩  -- multiplicity 1
-    codim_correct := fun v hv => by
-      simp only [Finset.mem_singleton] at hv
-      subst hv
-      rfl
-    represents := fun T => isCalibrated T hyp.ψ
-  }
-  represents_input := fun hyp => hyp.is_calibrated
-
-/-- A default `HarveyLawsonKingData` instance.
-
-**Phase 8 Update**: Now requires `CalibratedCurrentRegularityData` to ensure the support
-of calibrated currents is analytically defined (not just closed).
-
-This is backed by `HarveyLawsonKingData.universal`. -/
-instance instHarveyLawsonKingData {k : ℕ} [CalibratedCurrentRegularityData n X k] :
-    HarveyLawsonKingData n X k := by
-  -- Keep `.universal` off the `instance` line (required by `audit_practical_unconditional.sh`).
-  exact HarveyLawsonKingData.universal (n := n) (X := X) (k := k)
-
 end

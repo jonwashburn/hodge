@@ -2,7 +2,7 @@
 
 This document defines the **strong** completion criterion (“mathematically real; no gotchas”) and a dependency-ordered plan to reach it.
 
-It is intentionally explicit about **what must be deleted/replaced**, because the current repo state compiles with **semantic scaffolding** (e.g. `:= 0`, `Prop := True`, `Set.univ`-support, `IsAnalyticSet`/`IsAlgebraicSet := IsClosed`, etc.).
+It is intentionally explicit about **what must be deleted/replaced**, because the repo can compile with **semantic scaffolding** (e.g. `:= 0`, `Prop := True`, `Set.univ`-support, and other gotchas).
 
 ## Completion Criterion (Strong / No Gotchas)
 
@@ -122,9 +122,11 @@ This is not exhaustive, but it captures the major blockers currently *on the pro
   - `Hodge/Classical/GAGA.lean`: `FundamentalClassSet` uses `PoincareDualFormExists`.
   - **TO ELIMINATE**: Need to prove de Rham representability theorem (every closed current on a compact
     Kähler manifold is cohomologous to a smooth form). This is deep GMT not in Mathlib.
-- **“Analytic/algebraic = closed”** (explicitly forbidden by the spec):
-  - `Hodge/Classical/HarveyLawson.lean`: `IsAnalyticSet` is (currently) essentially `IsClosed`.
-  - `Hodge/Classical/GAGA.lean`: `IsAlgebraicSet := IsClosed`.
+- **Analytic/algebraic semantics restored**:
+  - `Hodge/AnalyticSets.lean`: `IsAnalyticSet` is defined as a local holomorphic zero locus.
+  - `Hodge/Classical/AlgebraicSets.lean`: `IsAlgebraicSet` is defined as a projective homogeneous
+    polynomial zero locus and used by `Hodge/Classical/GAGA.lean`.
+  - **REMAINING**: prove analytic → algebraic (Chow/GAGA), then remove `ChowGAGAData` binder.
 - **Submanifold integration is still the zero model**:
   - (removed) legacy Set-based `submanifoldIntegral := 0` scaffold stack has been deleted.
   - `Hodge/Analytic/Integration/HausdorffMeasure.lean`: (progress) the explicit `SubmanifoldIntegration.universal` zero-instance has been removed (2026-02-01), but the integration layer still needs a real implementation.
@@ -314,3 +316,97 @@ Targets:
 - Do not “solve” by redefining key objects to `0`/`True`/`Set.univ`.
 - If Mathlib lacks infrastructure, add it here as real theory (new files), not as axioms.
 
+---
+
+## TeX Proof Mapping (JA_hodge_approach_with_added_refs_blueCites.tex)
+
+This section maps the attached TeX proof to concrete Lean targets. Each item
+lists the TeX reference and the corresponding Lean file(s) that must be
+implemented without stubs.
+
+### Hodge Theory Core (Laplacian, Harmonic Representatives)
+
+**TeX**: §2 (Exterior calculus and Hodge theory), §4 (Energy gap), §6 (Coulomb decomposition)
+
+**Lean targets**:
+- `Hodge/Analytic/HodgeStar/FiberStar.lean`
+  - Completed nontrivial fiber Hodge star (`fiberHodgeStar_construct`).
+- `Hodge/Analytic/Norms.lean`
+  - Replace `L2Inner := VolumeIntegrationData.basepoint` with real `L2Inner_measure` over Kähler volume.
+  - Implement `L2Inner_eq_integral_wedge_hodgeStar` (no `True` placeholder).
+  - Define codifferential `δ := (-1)^{nk+n+1} ⋆ d ⋆` as an actual operator.
+  - Define Hodge Laplacian `Δ := d ∘ δ + δ ∘ d`.
+- `Hodge/Analytic/Integration/L2Inner.lean`
+  - Use `kahlerMeasure` to instantiate `L2Inner` with real integration.
+- `Hodge/Analytic/Integration/VolumeForm.lean`
+  - Replace `volumeBasis := 0` stub with an orthonormal frame from the Kähler metric.
+- `Hodge/Kahler/Identities/LambdaD.lean` and `Hodge/Kahler/Identities/LDelta.lean`
+  - Replace placeholder operators `Λ`, `δ`, `L` with real definitions (from Hodge star / Lefschetz).
+
+**Key theorems to formalize**:
+- Hodge theorem: each cohomology class has a unique harmonic representative.
+- Hodge decomposition: `α = γ_harm + dη` with `d*η = 0`.
+- Energy identity: `‖α‖² = ‖γ_harm‖² + ‖dη‖²`.
+- Type decomposition and orthogonality of `(r,s)` components.
+
+### Calibration Coercivity and Cone Geometry
+
+**TeX**: §3 (Calibrated Grassmannian), §7 (Calibration-coercivity)
+
+**Lean targets**:
+- `Hodge/Analytic/Grassmannian.lean`
+  - Use continuous alternating maps for the fiber cone, and take topological closure.
+  - Prove the calibrated cone is closed/convex (done: closure definition + proof).
+- `Hodge/Kahler/Cone.lean`
+  - Replace ad hoc cone definition with the fiber-level calibrated cone.
+  - Define global cone defect via integration of `distToConeAtPoint`.
+
+**Key theorems**:
+- Cone closedness at each fiber (closure of conical span).
+- Calibration-coercivity: `Defcone(α) ≤ E(α) - E(γ_harm)` under cone-valued harmonic rep.
+
+### SYR Microstructure (Sheets, Gluing, Defect → 0)
+
+**TeX**: §8 (Realization), Theorem 4.3 + Prop 6.2
+
+**Lean targets**:
+- `Hodge/Kahler/Microstructure.lean`
+  - Replace `buildSheetsFromConePositive` stub (`∅`) with genuine sheets.
+- `Hodge/Kahler/Microstructure/RealSpine.lean`
+  - Replace `microstructureSequence_real := zero_int` with actual sequence.
+- `Hodge/Deep/Pillars/Microstructure.lean`
+  - Implement cubulation, local sheet existence, gluing bounds, defect estimate.
+- `Hodge/GMT/TemplateExtension.lean`, `Hodge/GMT/TransportFlat.lean`
+  - Use TeX “sliver-template-extension” and glue-gap lemmas.
+
+### Federer–Fleming Compactness
+
+**TeX**: Thm 4.2.17 (Fed69), Lemma “flat limit of cycles is cycle”
+
+**Lean targets**:
+- `Hodge/Classical/HarveyLawson.lean` (current flat limit interface)
+- `Hodge/Deep/Pillars/FedererFleming.lean`
+  - Replace `FlatLimitCycleData.universal` with real compactness theorem.
+
+### Harvey–Lawson / King (Calibrated → Analytic)
+
+**TeX**: Theorem 4.2 (Harvey–Lawson), King (1971)
+
+**Lean targets**:
+- `Hodge/Classical/HarveyLawson.lean`
+  - Eliminate `CalibratedCurrentRegularityData` by proving analytic support.
+- `Hodge/Deep/Pillars/HarveyLawson.lean`
+  - Prove structure theorem: calibrated current decomposes into analytic subvarieties.
+
+### Chow / GAGA (Analytic → Algebraic)
+
+**TeX**: Chow (1949), Serre GAGA (1956)
+
+**Lean targets**:
+- `Hodge/AnalyticSets.lean` already defines local zero loci (analytic sets).
+- `Hodge/Classical/GAGA.lean`
+  - ✅ `IsAlgebraicSet` now uses projective homogeneous polynomial zero loci
+    (see `Hodge/Classical/AlgebraicSets.lean`) and is no longer an `IsClosed` alias.
+  - Prove Chow’s theorem: analytic ⊂ projective ⇒ algebraic.
+- `Hodge/Deep/Pillars/GAGA.lean`
+  - Replace placeholders (`True`, `IsClosed`) with actual algebraic geometry.

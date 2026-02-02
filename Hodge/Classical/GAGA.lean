@@ -4,10 +4,12 @@ import Hodge.Classical.SerreVanishing
 -- NOTE: Lefschetz.lean moved to archive - not on proof track for hodge_conjecture'
 import Hodge.Classical.CycleClass
 import Hodge.Analytic.Currents
+import Hodge.Classical.AlgebraicSets
 
 noncomputable section
 
 open Classical Hodge
+open Hodge.AlgGeom
 
 set_option autoImplicit false
 
@@ -15,42 +17,13 @@ universe u
 
 /-!
 # Track A.3: Serre's GAGA Theorem and Algebraic Subvarieties
--/
 
-/-
-## Algebraic sets (Phase 8: Semantic Stub Documented)
+## Algebraic sets (projective zero loci)
 
-**STATUS**: `IsAlgebraicSet := IsClosed` is still a semantic stub.
-
-The proper definition of an algebraic set in projective space is:
-> A set Z is algebraic if it is locally the zero locus of finitely many polynomial functions.
-
-Implementing this properly requires:
-1. An embedding X ↪ ℙⁿ(ℂ) via the `ProjectiveComplexManifold` structure
-2. Defining polynomial functions on affine patches
-3. Proving closure under unions, intersections, etc.
-
-This is substantial algebraic geometry infrastructure not in Mathlib.
-
-**CURRENT APPROACH**: We keep `IsAlgebraicSet := IsClosed` as a placeholder but:
-1. Remove `ChowGAGAData.universal` so GAGA is not trivially true
-2. Make `ChowGAGAData` an explicit deep assumption
-3. Document this as a semantic stub to be resolved
-
+We use the definition from `Hodge.Classical.AlgebraicSets`: a set is algebraic if it is the
+pullback of the common zero locus of finitely many homogeneous polynomials in projective space.
 Reference: [R. Hartshorne, "Algebraic Geometry", Springer, 1977, Chapter I.1]
 -/
-
-/-- **Algebraic Subsets** (SEMANTIC STUB - Phase 8 documented).
-
-**WARNING**: This is still defined as `IsClosed`, NOT "local polynomial zero locus".
-
-The proper definition requires projective embedding infrastructure. We keep this
-stub but make `ChowGAGAData` explicit (no universal instance). -/
-def IsAlgebraicSet (n : ℕ) (X : Type u)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-    [ProjectiveComplexManifold n X] [K : KahlerManifold n X] (Z : Set X) : Prop :=
-  IsClosed Z
 
 /-- An algebraic subvariety of a projective variety X. -/
 structure AlgebraicSubvariety (n : ℕ) (X : Type u)
@@ -68,58 +41,12 @@ def isAlgebraicSubvariety (n : ℕ) (X : Type u)
     [ProjectiveComplexManifold n X] [K : KahlerManifold n X] (Z : Set X) : Prop :=
   ∃ (W : AlgebraicSubvariety n X), W.carrier = Z
 
-/-- The empty set is algebraic. -/
-theorem IsAlgebraicSet_empty (n : ℕ) (X : Type u)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-    [ProjectiveComplexManifold n X] [K : KahlerManifold n X] : IsAlgebraicSet n X (∅ : Set X) :=
-  by
-    simpa [IsAlgebraicSet] using (isClosed_empty : IsClosed (∅ : Set X))
-
 /-- The empty set is an algebraic subvariety. -/
 theorem isAlgebraicSubvariety_empty (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [K : KahlerManifold n X] : isAlgebraicSubvariety n X (∅ : Set X) :=
   ⟨⟨∅, 0, IsAlgebraicSet_empty n X⟩, rfl⟩
-
-/-- The entire manifold is algebraic. -/
-theorem IsAlgebraicSet_univ (n : ℕ) (X : Type u)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-    [ProjectiveComplexManifold n X] [K : KahlerManifold n X] : IsAlgebraicSet n X (Set.univ : Set X) :=
-  by
-    simpa [IsAlgebraicSet] using (isClosed_univ : IsClosed (Set.univ : Set X))
-
-/-- The union of two algebraic sets is algebraic. -/
-theorem IsAlgebraicSet_union (n : ℕ) (X : Type u)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-    [ProjectiveComplexManifold n X] [K : KahlerManifold n X] {Z₁ Z₂ : Set X} :
-    IsAlgebraicSet n X Z₁ → IsAlgebraicSet n X Z₂ → IsAlgebraicSet n X (Z₁ ∪ Z₂) :=
-by
-  intro h1 h2
-  -- algebraic ≈ closed, and unions of closed sets are closed
-  simpa [IsAlgebraicSet] using (IsClosed.union h1 h2)
-
-/-- The intersection of two algebraic sets is algebraic. -/
-theorem IsAlgebraicSet_intersection (n : ℕ) (X : Type u)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-    [ProjectiveComplexManifold n X] [K : KahlerManifold n X] {Z₁ Z₂ : Set X} :
-    IsAlgebraicSet n X Z₁ → IsAlgebraicSet n X Z₂ → IsAlgebraicSet n X (Z₁ ∩ Z₂) :=
-by
-  intro h1 h2
-  -- intersections of closed sets are closed
-  simpa [IsAlgebraicSet] using (IsClosed.inter h1 h2)
-
-theorem IsAlgebraicSet_isClosed (n : ℕ) (X : Type u)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-    [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
-    (S : Set X) : IsAlgebraicSet n X S → IsClosed S := by
-  intro h
-  simpa [IsAlgebraicSet] using h
 
 variable {n : ℕ} {X : Type u}
   [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
@@ -155,8 +82,8 @@ a deep result that requires:
 
 **Current Status**:
 - `IsAnalyticSet` is now properly defined (local holomorphic zero loci)
-- `IsAlgebraicSet` is still a stub (`IsClosed`)
-- Even with proper definitions, proving analytic → algebraic requires GAGA
+- `IsAlgebraicSet` is defined as projective homogeneous polynomial zero loci
+- Proving analytic → algebraic still requires Chow/GAGA
 
 **Consequence**: `ChowGAGAData` must be provided explicitly as a typeclass assumption
 in theorems that need Chow/GAGA. This makes the deep assumption visible.
@@ -221,7 +148,7 @@ theorem isAlgebraicSubvariety_union {Z₁ Z₂ : Set X}
   exact ⟨{
     carrier := W1.carrier ∪ W2.carrier,
     codim := min W1.codim W2.codim,
-    is_algebraic := IsAlgebraicSet_union n X W1.is_algebraic W2.is_algebraic,
+    is_algebraic := IsAlgebraicSet_union n X W1.carrier W2.carrier W1.is_algebraic W2.is_algebraic,
   }, rfl⟩
 
 /-- **Theorem: Empty Set is Algebraic** -/
@@ -252,7 +179,7 @@ theorem isAlgebraicSubvariety_intersection {Z₁ Z₂ : Set X}
   exact ⟨{
     carrier := W1.carrier ∩ W2.carrier,
     codim := W1.codim + W2.codim,
-    is_algebraic := IsAlgebraicSet_intersection n X W1.is_algebraic W2.is_algebraic,
+    is_algebraic := IsAlgebraicSet_inter n X W1.carrier W2.carrier W1.is_algebraic W2.is_algebraic,
   }, rfl⟩
 
 /-! ## Fundamental Class for Sets -/
@@ -376,19 +303,56 @@ theorem exists_fundamental_form (W : AlgebraicSubvariety n X)
     ∃ (η : SmoothForm n X (2 * W.codim)), IsFormClosed η :=
   ⟨FundamentalClass (n := n) (X := X) W, FundamentalClass_isClosed (n := n) (X := X) W⟩
 
-/-! ## ω^p is Algebraic (Complete Intersections) -/
+/-! ## Hyperplane sections and complete intersections (algebraic) -/
 
-/-- **Existence of Algebraic Hyperplane Sections** (Hartshorne, 1977). -/
+open Hodge.AlgGeom
+
+/-- A concrete hyperplane section of `X` in the fixed projective embedding:
+the preimage of the coordinate hyperplane `{[v] | v₀ = 0}`. -/
+def hyperplaneSection : Set X :=
+  {x : X | HomogeneousPolynomial.projVanishes
+      (HomogeneousPolynomial.coord (N := ProjectiveComplexManifold.embedding_dim (n := n) (X := X)) 0)
+      (ProjectiveComplexManifold.embedding (n := n) (X := X) x)}
+
+/-- The coordinate hyperplane section is algebraic (by definition of `IsAlgebraicSet`). -/
+theorem hyperplaneSection_isAlgebraic :
+    IsAlgebraicSet n X (hyperplaneSection (n := n) (X := X)) := by
+  classical
+  refine ⟨PUnit, inferInstance, (fun _ => HomogeneousPolynomial.coord
+      (N := ProjectiveComplexManifold.embedding_dim (n := n) (X := X)) 0), ?_⟩
+  ext x
+  simp [hyperplaneSection]
+
+/-- Existence of an algebraic hyperplane section of `X`. -/
 theorem exists_hyperplane_algebraic :
-    isAlgebraicSubvariety n X (Set.univ : Set X) := by
-  -- The whole projective variety is algebraic (trivially)
-  exact ⟨⟨Set.univ, 1, IsAlgebraicSet_univ n X⟩, rfl⟩
+    isAlgebraicSubvariety n X (hyperplaneSection (n := n) (X := X)) := by
+  exact ⟨⟨hyperplaneSection (n := n) (X := X), 1, hyperplaneSection_isAlgebraic (n := n) (X := X)⟩, rfl⟩
 
 /-- **Theorem: Existence of Complete Intersections** -/
+def completeIntersectionSection (p : ℕ) : Set X :=
+  {x : X | ∀ i : Fin p,
+    HomogeneousPolynomial.projVanishes
+      (HomogeneousPolynomial.coord
+        (N := ProjectiveComplexManifold.embedding_dim (n := n) (X := X))
+        ⟨i.1 % (ProjectiveComplexManifold.embedding_dim (n := n) (X := X) + 1),
+          Nat.mod_lt _ (Nat.succ_pos _)⟩)
+      (ProjectiveComplexManifold.embedding (n := n) (X := X) x)}
+
+theorem completeIntersectionSection_isAlgebraic (p : ℕ) :
+    IsAlgebraicSet n X (completeIntersectionSection (n := n) (X := X) p) := by
+  classical
+  refine ⟨Fin p, inferInstance,
+    (fun i => HomogeneousPolynomial.coord
+      (N := ProjectiveComplexManifold.embedding_dim (n := n) (X := X))
+      ⟨i.1 % (ProjectiveComplexManifold.embedding_dim (n := n) (X := X) + 1),
+        Nat.mod_lt _ (Nat.succ_pos _)⟩), ?_⟩
+  ext x
+  simp [completeIntersectionSection]
+
 theorem exists_complete_intersection (p : ℕ) :
-    isAlgebraicSubvariety n X (Set.univ : Set X) := by
-  -- The whole projective variety is algebraic (trivially)
-  exact ⟨⟨Set.univ, p, IsAlgebraicSet_univ n X⟩, rfl⟩
+    isAlgebraicSubvariety n X (completeIntersectionSection (n := n) (X := X) p) := by
+  exact ⟨⟨completeIntersectionSection (n := n) (X := X) p, p,
+    completeIntersectionSection_isAlgebraic (n := n) (X := X) p⟩, rfl⟩
 
 /-- Intersection power of an algebraic set (e.g. iterated hyperplane section). -/
 def algebraic_intersection_power (Z : Set X) (k : ℕ) : Set X :=

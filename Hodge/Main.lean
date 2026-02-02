@@ -50,8 +50,10 @@ variable {n : ℕ} {X : Type*}
 
     See `hodge_conjecture_kernel` for the equivalent kernel-only version. -/
 theorem hodge_conjecture {p : ℕ}
+    [AutomaticSYRData n X]
     [CycleClass.PoincareDualFormExists n X p] [SpineBridgeData n X p]
     [CalibratedCurrentRegularityData n X (2 * (n - p))]
+    [HarveyLawsonKingData n X (2 * (n - p))]
     [ChowGAGAData n X]
     (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
     (h_rational : isRationalClass (ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :

@@ -1,4 +1,6 @@
 import Hodge.Analytic.HodgeStar.FiberStar
+import Mathlib.Algebra.BigOperators.Group.Finset.Basic
+import Mathlib.Data.Finset.Prod
 
 /-!
 # Hodge Star Involution
@@ -32,17 +34,106 @@ set_option autoImplicit false
 
 /-! ## Shuffle Sign Lemmas -/
 
-/-- Data interface for the complement shuffle-sign count. -/
-class ShuffleSignCountComplementData (n : ℕ) : Prop where
-  shuffleSignCount_add_complement :
-    ∀ s : Finset (Fin n),
-      shuffleSignCount n s + shuffleSignCount n (finsetComplement n s) =
-        s.card * (finsetComplement n s).card
-
 /-- Helper: double complement equals self. -/
 private theorem finsetComplement_finsetComplement' (n : ℕ) (s : Finset (Fin n)) :
     finsetComplement n (finsetComplement n s) = s := by
   simp only [finsetComplement, sdiff_sdiff_eq_self (subset_univ s)]
+
+/-- Re-express the inversion-count filter on a product as a `biUnion` over the first coordinate. -/
+private theorem filter_product_lt_eq_biUnion (n : ℕ) (A B : Finset (Fin n)) :
+    ((A ×ˢ B).filter fun p : Fin n × Fin n => p.2 < p.1) =
+      A.biUnion (fun i => (B.filter (fun j : Fin n => j < i)).image (fun j => (i, j))) := by
+  classical
+  ext p
+  rcases p with ⟨i, j⟩
+  simp [Finset.mem_biUnion, and_assoc, and_left_comm, and_comm]
+
+/-- The fiber sets indexed by the first coordinate are pairwise disjoint (since `fst` differs). -/
+private theorem pairwiseDisjoint_fibers (n : ℕ) (A B : Finset (Fin n)) :
+    (A : Set (Fin n)).PairwiseDisjoint
+      (fun i => (B.filter (fun j : Fin n => j < i)).image (fun j => (i, j))) := by
+  classical
+  intro i hi j hj hij
+  refine Finset.disjoint_left.2 ?_
+  intro x hxi hxj
+  rcases Finset.mem_image.1 hxi with ⟨a, ha, rfl⟩
+  rcases Finset.mem_image.1 hxj with ⟨b, hb, hEq⟩
+  have : i = j := (congrArg Prod.fst hEq).symm
+  exact hij this
+
+/-- Count inversions in `A × B` as a sum of fiber cardinalities. -/
+private theorem card_filter_product_lt (n : ℕ) (A B : Finset (Fin n)) :
+    ((A ×ˢ B).filter fun p : Fin n × Fin n => p.2 < p.1).card =
+      ∑ i ∈ A, (B.filter fun j : Fin n => j < i).card := by
+  classical
+  rw [filter_product_lt_eq_biUnion (n := n) (A := A) (B := B)]
+  have hdisj := pairwiseDisjoint_fibers (n := n) (A := A) (B := B)
+  rw [Finset.card_biUnion (s := A)
+    (t := fun i => (B.filter (fun j : Fin n => j < i)).image (fun j => (i, j))) hdisj]
+  refine Finset.sum_congr rfl ?_
+  intro i hi
+  have hinj : Function.Injective (fun j : Fin n => (i, j)) := by
+    intro a b hab
+    exact congrArg Prod.snd hab
+  simpa [hinj] using
+    (Finset.card_image_of_injective (s := B.filter (fun j : Fin n => j < i)) hinj)
+
+/-- `shuffleSignCount` counts the inversion pairs in `s × sᶜ`. -/
+private theorem shuffleSignCount_eq_card_filter (n : ℕ) (s : Finset (Fin n)) :
+    shuffleSignCount n s =
+      ((s ×ˢ finsetComplement n s).filter fun p : Fin n × Fin n => p.2 < p.1).card := by
+  classical
+  -- `shuffleSignCount` is a fiberwise inversion count; `card_filter_product_lt` packages the same count.
+  unfold shuffleSignCount
+  simpa using
+    (card_filter_product_lt (n := n) (A := s) (B := finsetComplement n s)).symm
+
+/-- The complement inversion-count is the opposite inequality, via swapping coordinates. -/
+private theorem shuffleSignCount_complement_eq_card_filter (n : ℕ) (s : Finset (Fin n)) :
+    shuffleSignCount n (finsetComplement n s) =
+      ((s ×ˢ finsetComplement n s).filter fun p : Fin n × Fin n => p.1 < p.2).card := by
+  classical
+  -- Start from the product characterization for `sᶜ`.
+  have h :=
+    shuffleSignCount_eq_card_filter (n := n) (s := finsetComplement n s)
+  -- Rewrite the double complement.
+  have hcc : finsetComplement n (finsetComplement n s) = s :=
+    finsetComplement_finsetComplement' n s
+  have h' :
+      shuffleSignCount n (finsetComplement n s) =
+        ((finsetComplement n s ×ˢ s).filter fun p : Fin n × Fin n => p.2 < p.1).card := by
+    simpa [hcc] using h
+  -- Use the swap equivalence on pairs.
+  let σ : (Fin n × Fin n) ≃ (Fin n × Fin n) := Equiv.prodComm (Fin n) (Fin n)
+  have hσ : σ = fun p : Fin n × Fin n => (p.2, p.1) := rfl
+  -- Transport the filtered set along `σ` (card preserved), and simplify the predicate.
+  -- The swap takes `p.2 < p.1` to `p.1 < p.2`.
+  have :
+      ((finsetComplement n s ×ˢ s).filter fun p : Fin n × Fin n => p.2 < p.1).card =
+        ((s ×ˢ finsetComplement n s).filter fun p : Fin n × Fin n => p.1 < p.2).card := by
+    -- Map by `σ`.
+    have hmap :
+        ((finsetComplement n s ×ˢ s).filter fun p : Fin n × Fin n => p.2 < p.1).map σ.toEmbedding =
+          ((s ×ˢ finsetComplement n s).filter fun p : Fin n × Fin n => p.1 < p.2) := by
+      -- `map_filter` moves filters across an equivalence.
+      -- Then `σ` swaps the product and flips the inequality.
+      ext p
+      rcases p with ⟨i, j⟩
+      simp [σ, and_comm, and_assoc]
+    -- Take cardinalities (card is preserved under `map` by an embedding).
+    have hcard :
+        ((finsetComplement n s ×ˢ s).filter fun p : Fin n × Fin n => p.2 < p.1).card =
+          (((finsetComplement n s ×ˢ s).filter fun p : Fin n × Fin n => p.2 < p.1).map σ.toEmbedding).card := by
+      -- `card_map` says `card (map f S) = card S`.
+      simpa using
+        (Finset.card_map (s := ((finsetComplement n s ×ˢ s).filter fun p : Fin n × Fin n => p.2 < p.1))
+          (f := σ.toEmbedding)).symm
+    simpa [hmap] using hcard
+  -- Finish by rewriting `h` using `hcc` and `this`.
+  -- `h` gives shuffleSignCount(sᶜ) = card of the filter on (sᶜ × s) with `p.2 < p.1`.
+  -- Replace that card using `this`.
+  -- Note: the RHS already matches the desired statement.
+  exact h'.trans this
 
 /-- The sum of shuffle sign counts for s and sᶜ equals |s| × |sᶜ|.
 
@@ -56,7 +147,70 @@ This is a standard double-counting / partition argument. -/
 theorem shuffleSignCount_add_complement (n : ℕ) (s : Finset (Fin n)) :
     shuffleSignCount n s + shuffleSignCount n (finsetComplement n s) =
       s.card * (finsetComplement n s).card := by
-  simpa using (ShuffleSignCountComplementData.shuffleSignCount_add_complement (n := n) s)
+  classical
+  let sc : Finset (Fin n) := finsetComplement n s
+  -- Rewrite both inversion counts as cardinalities of filtered products.
+  have hs :
+      shuffleSignCount n s =
+        ((s ×ˢ sc).filter fun p : Fin n × Fin n => p.2 < p.1).card :=
+    shuffleSignCount_eq_card_filter (n := n) (s := s)
+  have hsc :
+      shuffleSignCount n sc =
+        ((s ×ˢ sc).filter fun p : Fin n × Fin n => p.1 < p.2).card :=
+    shuffleSignCount_complement_eq_card_filter (n := n) (s := s)
+  -- Now these two filters partition `s × sc` (since the coordinates cannot be equal).
+  have hdisj :
+      Disjoint
+        ((s ×ˢ sc).filter fun p : Fin n × Fin n => p.2 < p.1)
+        ((s ×ˢ sc).filter fun p : Fin n × Fin n => p.1 < p.2) := by
+    refine Finset.disjoint_left.2 ?_
+    intro x hx1 hx2
+    have hx1' : x.2 < x.1 := (Finset.mem_filter.1 hx1).2
+    have hx2' : x.1 < x.2 := (Finset.mem_filter.1 hx2).2
+    exact lt_asymm hx2' hx1'
+  have hunion :
+      ((s ×ˢ sc).filter fun p : Fin n × Fin n => p.2 < p.1) ∪
+          ((s ×ˢ sc).filter fun p : Fin n × Fin n => p.1 < p.2) =
+        (s ×ˢ sc) := by
+    ext x
+    constructor
+    · intro hx
+      rcases Finset.mem_union.1 hx with hx | hx
+      · exact (Finset.mem_filter.1 hx).1
+      · exact (Finset.mem_filter.1 hx).1
+    · intro hx
+      have hx1 : x.1 ∈ s := (Finset.mem_product.1 hx).1
+      have hx2 : x.2 ∈ sc := (Finset.mem_product.1 hx).2
+      have hx2not : x.2 ∉ s := by
+        have hx2' : x.2 ∈ (univ : Finset (Fin n)) \ s := by
+          simpa [sc, finsetComplement] using hx2
+        exact (Finset.mem_sdiff.1 hx2').2
+      have hne : x.1 ≠ x.2 := by
+        intro hEq
+        have : x.2 ∈ s := by simpa [hEq] using hx1
+        exact hx2not this
+      -- Strict linear order gives the dichotomy.
+      rcases lt_or_gt_of_ne hne with hlt | hgt
+      · -- x.1 < x.2
+        exact Finset.mem_union.2 <| Or.inr <| Finset.mem_filter.2 ⟨hx, hlt⟩
+      · -- x.2 < x.1
+        exact Finset.mem_union.2 <| Or.inl <| Finset.mem_filter.2 ⟨hx, hgt⟩
+  -- Convert partition-of-product to a cardinality identity.
+  have hcard :
+      ((s ×ˢ sc).filter fun p : Fin n × Fin n => p.2 < p.1).card +
+          ((s ×ˢ sc).filter fun p : Fin n × Fin n => p.1 < p.2).card =
+        (s ×ˢ sc).card := by
+    -- `card_union_of_disjoint` gives card(union)=sum; rewrite using `hunion`.
+    simpa [hunion] using (Finset.card_union_of_disjoint hdisj).symm
+  -- Finish by rewriting the inversion counts and the card of the product.
+  -- `card (s ×ˢ sc) = card s * card sc`.
+  calc
+    shuffleSignCount n s + shuffleSignCount n sc
+        = ((s ×ˢ sc).filter fun p : Fin n × Fin n => p.2 < p.1).card +
+            ((s ×ˢ sc).filter fun p : Fin n × Fin n => p.1 < p.2).card := by
+            simpa [hs, hsc]
+    _ = (s ×ˢ sc).card := hcard
+    _ = s.card * sc.card := by simpa [Finset.card_product]
 
 /-- The product of shuffle signs for s and sᶜ equals (-1)^{|s|·|sᶜ|}. -/
 theorem shuffleSign_mul_complement (n : ℕ) (s : Finset (Fin n)) :
@@ -128,12 +282,15 @@ theorem fiberHodgeStar_involution (n k : ℕ) (hk : k ≤ n) (α : FiberAlt n k)
   exact FiberHodgeStarInvolutionData.fiberHodgeStar_involution (n := n) (k := k) hk α
 
 /-- The double star equals the sign times identity. -/
-theorem fiberHodgeStar_compose_eq (n k : ℕ) (hk : k ≤ n) :
+theorem fiberHodgeStar_compose_eq (n k : ℕ) (hk : k ≤ n) [FiberHodgeStarInvolutionData n k] :
     ∀ α : FiberAlt n k,
       (nat_sub_sub_self n k hk) ▸
         fiberHodgeStar_construct n (n - k) (fiberHodgeStar_construct n k α) =
           involutionSign n k • α :=
-  fiberHodgeStar_involution n k hk
+by
+  intro α
+  -- This lemma is derived from `FiberHodgeStarInvolutionData`.
+  simpa using fiberHodgeStar_involution n k hk α
 
 /-! ## N2: Hodge Star Isometry -/
 
@@ -203,7 +360,8 @@ theorem fiberHodgeStar_isometry (n k : ℕ) (hk : k ≤ n) (α β : FiberAlt n k
   exact FiberHodgeStarIsometryData.fiberHodgeStar_isometry (n := n) (k := k) hk α β
 
 /-- Corollary: The Hodge star preserves the norm. -/
-theorem fiberHodgeStar_norm_eq (n k : ℕ) (hk : k ≤ n) (α : FiberAlt n k) :
+theorem fiberHodgeStar_norm_eq (n k : ℕ) (hk : k ≤ n) (α : FiberAlt n k)
+    [FiberHodgeStarIsometryData n k] :
     (fiberAltInner n (n - k) (fiberHodgeStar_construct n k α)
         (fiberHodgeStar_construct n k α)).re =
       (fiberAltInner n k α α).re := by

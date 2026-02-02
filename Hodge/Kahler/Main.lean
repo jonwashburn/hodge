@@ -189,73 +189,6 @@ theorem calibrationDefect_zero (ψ : CalibratingForm n X k) : calibrationDefect 
   have h2 : (0 : Current n X k).toFun ψ.form = 0 := rfl
   rw [h1, h2, sub_zero]
 
-/-- **Universal instance of AutomaticSYRData** (Automatic SYR Construction).
-
-    The SYR (Siu-Yau-Ran) construction builds a sequence of integral currents from a
-    cone-positive form γ, with calibration defect converging to zero.
-
-    **Current Implementation**: Uses the zero current as a placeholder. In the full
-    GMT formalization, this would use `microstructureSequence` which builds actual
-    currents from holomorphic sheets over a cubulation.
-
-    **Mathematical Content**: The sequence {T_k} is constructed via:
-    1. Cubulation with mesh h_k = 1/(k+1) (finer as k → ∞)
-    2. Holomorphic sheets in each cube from the cone-positive form γ
-    3. Gluing to form T_k = ∑ [sheet integration currents]
-
-    The calibration defect bound is: |defect(T_k)| ≤ C · h_k → 0 as k → ∞.
-
-    Reference: [TeX Proposition 4.3] -/
-def AutomaticSYRData.universal : AutomaticSYRData n X where
-  microstructure_construction_core := fun {p} γ hγ ψ => by
-    -- Proof-track-safe unconditional implementation: use the zero integral current.
-    -- (This will be replaced by `microstructureSequence` once the GMT defect bound is formalized.)
-    let T0 : IntegralCurrent n X (2 * (n - p)) := zero_int n X (2 * (n - p))
-    -- make the sequence domain explicit (ℕ) so binders are inferred cleanly
-    refine ⟨(fun (_i : ℕ) => T0), T0, ?_, ?_, ?_⟩
-    · intro _i
-      simpa [T0] using (zero_current_isCycle (n := n) (X := X) (k := 2 * (n - p)))
-    · -- flatNorm(T_i - T0) = 0 for all i
-      have h_norm_zero : ∀ i : ℕ, flatNorm (((fun (_i : ℕ) => T0) i).toFun - T0.toFun) = 0 := by
-        intro i
-        -- both currents are definitionally equal
-        have hsub :
-            ((fun (_i : ℕ) => T0) i).toFun - T0.toFun = (0 : Current n X (2 * (n - p))) := by
-          -- ((fun (_i : ℕ) => T0) i) = T0, so this is T0.toFun - T0.toFun
-          simpa [T0] using (Current.sub_self (n := n) (X := X) (k := 2 * (n - p)) T0.toFun)
-        -- conclude by `flatNorm_zero`
-        simpa [hsub] using (flatNorm_zero (n := n) (X := X) (k := 2 * (n - p)))
-      -- rewrite the function pointwise to the constant 0 function, then apply `tendsto_const_nhds`
-      have h_fn :
-          (fun i => flatNorm (((fun (_i : ℕ) => T0) i).toFun - T0.toFun)) = fun _i : ℕ => (0 : ℝ) := by
-        funext i
-        simpa using h_norm_zero i
-      -- a constant sequence converges to its value
-      -- `simp` can turn `Tendsto (fun _ => 0) _ (nhds 0)` into `True` (since it has a `[simp]` proof),
-      -- so avoid `simp/simpa` here and just rewrite directly.
-      rw [h_fn]
-      exact (tendsto_const_nhds : Filter.Tendsto (fun _i : ℕ => (0 : ℝ)) Filter.atTop (nhds 0))
-    · -- calibrationDefect(T_i) = 0 for all i
-      have h_defect_zero : ∀ i : ℕ, calibrationDefect (((fun (_i : ℕ) => T0) i).toFun) ψ = 0 := by
-        intro _i
-        -- `(zero_int ...).toFun = 0` by definition, so this reduces to `calibrationDefect_zero`.
-        simpa [T0, zero_int] using
-          (calibrationDefect_zero (n := n) (X := X) (k := 2 * (n - p)) ψ)
-      have h_fn :
-          (fun i => calibrationDefect (((fun (_i : ℕ) => T0) i).toFun) ψ) = fun _i : ℕ => (0 : ℝ) := by
-        funext i
-        simpa using h_defect_zero i
-      simpa [h_fn] using (tendsto_const_nhds : Filter.Tendsto (fun _i : ℕ => (0 : ℝ)) Filter.atTop (nhds 0))
-
-/-- A default `AutomaticSYRData` instance.
-
-This is currently backed by `AutomaticSYRData.universal` (still a semantic placeholder: it uses the
-zero microstructure current). We install it as an instance so the main proof spine does not need
-a local `letI := ...` injection. -/
-instance instAutomaticSYRData : AutomaticSYRData n X := by
-  -- Keep `.universal` off the `instance` line (required by `audit_practical_unconditional.sh`).
-  exact AutomaticSYRData.universal (n := n) (X := X)
-
 /-- **Theorem: Microstructure Construction Core** (Automatic SYR Theorem).
 
     Constructs a sequence of integral cycles with vanishing calibration defect
@@ -296,7 +229,7 @@ instance instAutomaticSYRData : AutomaticSYRData n X := by
       Annals of Mathematics 72 (1960), 458-520, Theorem 6.8]
     - [H. Federer, "Geometric Measure Theory", Springer, 1969, Section 4.2.17] -/
 theorem microstructure_construction_core {p : ℕ}
-    [AutomaticSYRData n X] [FlatLimitCycleData n X (2 * (n - p))] (γ : SmoothForm n X (2 * p))
+    [AutomaticSYRData n X] (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
     ∃ (T_seq : ℕ → IntegralCurrent n X (2 * (n - p)))
       (T_limit : IntegralCurrent n X (2 * (n - p))),
@@ -309,7 +242,7 @@ theorem microstructure_construction_core {p : ℕ}
     (AutomaticSYRData.microstructure_construction_core (n := n) (X := X) (p := p) γ hγ ψ)
 
 theorem microstructure_approximation {p : ℕ}
-    [AutomaticSYRData n X] [FlatLimitCycleData n X (2 * (n - p))] (γ : SmoothForm n X (2 * p))
+    [AutomaticSYRData n X] (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))) :
     ∃ (T_seq : ℕ → IntegralCurrent n X (2 * (n - p)))
       (T_limit : IntegralCurrent n X (2 * (n - p))),
@@ -324,7 +257,7 @@ theorem microstructure_approximation {p : ℕ}
   exact ⟨T_seq, T_limit, h_cycles, h_flat_conv, h_calib⟩
 
 theorem automatic_syr {p : ℕ}
-    [AutomaticSYRData n X] [FlatLimitCycleData n X (2 * (n - p))] (γ : SmoothForm n X (2 * p))
+    [AutomaticSYRData n X] (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ)
     (ψ : CalibratingForm n X (2 * (n - p))) :
     ∃ (T : IntegralCurrent n X (2 * (n - p))),
@@ -382,7 +315,7 @@ so the “represents class” relation becomes definitional (`rfl`).
     `SignedAlgebraicCycle`. The cycle class is now defined directly via `representingForm`,
     making `cycleClass_eq_representingForm` trivially true (rfl). -/
 theorem cone_positive_produces_cycle {p : ℕ}
-    [AutomaticSYRData n X] [FlatLimitCycleData n X (2 * (n - p))]
+    [AutomaticSYRData n X]
     [CalibratedCurrentRegularityData n X (2 * (n - p))]
     [HarveyLawsonKingData n X (2 * (n - p))] [ChowGAGAData n X]
     (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
@@ -468,7 +401,7 @@ theorem omega_isPP_via_J : isPPForm' n X 1 ((Nat.two_mul 1).symm ▸ K.omega_for
     - [C. Voisin, "Hodge Theory and Complex Algebraic Geometry I",
       Cambridge University Press, 2002, Chapter 11] -/
 theorem omega_pow_algebraic {p : ℕ}
-    [AutomaticSYRData n X] [FlatLimitCycleData n X (2 * (n - p))]
+    [AutomaticSYRData n X]
     [CalibratedCurrentRegularityData n X (2 * (n - p))]
     [HarveyLawsonKingData n X (2 * (n - p))] [ChowGAGAData n X]
     (c : ℚ) (hc : c > 0) :
@@ -605,14 +538,16 @@ Clay Mathematics Institute in 2000, with a prize of $1,000,000 for a correct sol
       `[FundamentalClassSet(support)] = [representingForm]` in cohomology.
       This should eventually be proved from GMT + Stokes + Poincaré duality. -/
 theorem hodge_conjecture' {p : ℕ}
+    [AutomaticSYRData n X]
     [CycleClass.PoincareDualFormExists n X p] [SpineBridgeData n X p]
     [CalibratedCurrentRegularityData n X (2 * (n - p))]
+    [HarveyLawsonKingData n X (2 * (n - p))]
     [ChowGAGAData n X]
     (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
     (h_rational : isRationalClass (ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :
     ∃ (Z : SignedAlgebraicCycle n X p), Z.cycleClass_geom = ofForm γ h_closed := by
   classical
-  -- Deep-track interfaces are provided via global instances.
+  -- Deep-track interfaces are explicit assumptions here (no hidden `.universal` instances).
   -- Signed decomposition of the (p,p) rational class: γ = γplus - γminus
   let sd := signed_decomposition (n := n) (X := X) γ h_closed h_p_p h_rational
 
@@ -657,7 +592,7 @@ theorem hodge_conjecture' {p : ℕ}
 
     See `hodge_conjecture'` for the TeX-faithful version with geometric cycle class. -/
 theorem hodge_conjecture_kernel {p : ℕ}
-    [AutomaticSYRData n X] [FlatLimitCycleData n X (2 * (n - p))]
+    [AutomaticSYRData n X]
     [CalibratedCurrentRegularityData n X (2 * (n - p))]
     [HarveyLawsonKingData n X (2 * (n - p))] [ChowGAGAData n X]
     (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
