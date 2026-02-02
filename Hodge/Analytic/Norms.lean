@@ -746,9 +746,8 @@ structure HodgeStarData (n : ℕ) (X : Type*) (k : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] where
-  /-- The Hodge star operator maps k-forms to (n-k)-forms (the natural degree target in our
-  `FiberAlt` model on `ℂⁿ`). -/
-  star : SmoothForm n X k → SmoothForm n X (n - k)
+  /-- The Hodge star operator maps k-forms to (2n-k)-forms. -/
+  star : SmoothForm n X k → SmoothForm n X (2 * n - k)
   /-- Additivity: ⋆(α + β) = ⋆α + ⋆β -/
   star_add : ∀ (α β : SmoothForm n X k), star (α + β) = star α + star β
   /-- ℂ-linearity: ⋆(c • α) = c • ⋆α -/
@@ -765,9 +764,8 @@ structure HodgeStarData (n : ℕ) (X : Type*) (k : ℕ)
 
     **Implementation**: At each point x, applies the fiber Hodge star to α(x).
 
-    **Status**: Currently uses the fiber-level construction which returns 0.
-    Once `fiberHodgeStar_construct` is upgraded to use basis decomposition,
-    this will automatically return non-trivial values. -/
+    **Status**: Uses the fiber-level construction based on real coordinate basis
+    decomposition. -/
 noncomputable def HodgeStarData.fromFiber (n : ℕ) (X : Type*) (k : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
@@ -834,7 +832,7 @@ noncomputable def hodgeStar {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    {k : ℕ} (α : SmoothForm n X k) : SmoothForm n X (n - k) :=
+    {k : ℕ} (α : SmoothForm n X k) : SmoothForm n X (2 * n - k) :=
   (HodgeStarData.fromFiber n X k).star α
 
 /-- Notation for Hodge star operator. -/

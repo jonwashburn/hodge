@@ -181,6 +181,17 @@ noncomputable def kahlerMeasure [MeasurableSpace X] [Nonempty X]
     [SubmanifoldIntegration n X] : Measure X :=
   hausdorffMeasure2p (n := n) (X := X) n
 
+theorem kahlerMeasure_univ_lt_top [MeasurableSpace X] [Nonempty X]
+    [SubmanifoldIntegration n X] :
+    (kahlerMeasure (n := n) (X := X) : Measure X) Set.univ < ∞ := by
+  -- Directly from the SubmanifoldIntegration finiteness field.
+  simpa [kahlerMeasure, hausdorffMeasure2p] using
+    (SubmanifoldIntegration.measure2p_finite (n := n) (X := X) n)
+
+instance instIsFiniteMeasure_kahlerMeasure [MeasurableSpace X] [Nonempty X]
+    [SubmanifoldIntegration n X] : IsFiniteMeasure (kahlerMeasure (n := n) (X := X)) := by
+  exact ⟨kahlerMeasure_univ_lt_top (n := n) (X := X)⟩
+
 /-- Build `VolumeIntegrationData` from the Kähler measure. -/
 noncomputable def volumeIntegrationData_kahlerMeasure
     [MeasurableSpace X] [BorelSpace X] [Nonempty X] [CompactSpace X]

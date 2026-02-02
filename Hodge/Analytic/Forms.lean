@@ -131,6 +131,17 @@ def castForm {k k' : ℕ} (h : k = k') (ω : SmoothForm n X k) : SmoothForm n X 
     (castForm h ω).as_alternating x = h ▸ ω.as_alternating x := by
   subst h; rfl
 
+theorem castForm_tsupport_eq {k k' : ℕ} (h : k = k') (ω : SmoothForm n X k) :
+    tsupport (castForm h ω).as_alternating = tsupport ω.as_alternating := by
+  subst h; rfl
+
+theorem castForm_hasCompactSupport {k k' : ℕ} (h : k = k') (ω : SmoothForm n X k) :
+    HasCompactSupport ω.as_alternating →
+      HasCompactSupport (castForm h ω).as_alternating := by
+  intro hcomp
+  subst h
+  simpa using hcomp
+
 instance (k : ℕ) : AddCommGroup (SmoothForm n X k) where
   add := (· + ·)
   zero := 0
@@ -929,6 +940,110 @@ theorem smoothWedge_zero_left {k l : ℕ} (η : SmoothForm n X l) :
 
 theorem smoothWedge_zero_right {k l : ℕ} (ω : SmoothForm n X k) :
     ω ⋏ (0 : SmoothForm n X l) = 0 := wedge_zero ω
+
+theorem smoothWedge_eq_zero_of_left_eq_zero_on {k l : ℕ} (ω : SmoothForm n X k)
+    (η : SmoothForm n X l) {U : Set X} (hU : IsOpen U)
+    (hzero : ∀ x ∈ U, ω.as_alternating x = 0) :
+    ∀ x ∈ U, (ω ⋏ η).as_alternating x = 0 := by
+  intro x hx
+  have hzero' : ω.as_alternating x = 0 := hzero x hx
+  have hzero_wedge :
+      ContinuousAlternatingMap.wedgeℂ (0 : FiberAlt n k) (η.as_alternating x) = 0 := by
+    ext v
+    simp [ContinuousAlternatingMap.wedgeℂ_apply, ContinuousAlternatingMap.wedgeℂ_linear]
+  simp [SmoothForm.wedge_apply, hzero', hzero_wedge]
+
+theorem smoothWedge_eq_zero_of_right_eq_zero_on {k l : ℕ} (ω : SmoothForm n X k)
+    (η : SmoothForm n X l) {U : Set X} (hU : IsOpen U)
+    (hzero : ∀ x ∈ U, η.as_alternating x = 0) :
+    ∀ x ∈ U, (ω ⋏ η).as_alternating x = 0 := by
+  intro x hx
+  have hzero' : η.as_alternating x = 0 := hzero x hx
+  have hzero_wedge :
+      ContinuousAlternatingMap.wedgeℂ (ω.as_alternating x) (0 : FiberAlt n l) = 0 := by
+    ext v
+    simp [ContinuousAlternatingMap.wedgeℂ_apply, ContinuousAlternatingMap.wedgeℂ_linear]
+  simp [SmoothForm.wedge_apply, hzero', hzero_wedge]
+
+private lemma smoothWedge_eventuallyEq_zero_of_left_eventuallyEq_zero {k l : ℕ}
+    (ω : SmoothForm n X k) (η : SmoothForm n X l) {x : X}
+    (hzero : ω.as_alternating =ᶠ[nhds x] 0) :
+    (ω ⋏ η).as_alternating =ᶠ[nhds x] 0 := by
+  rcases (Filter.eventuallyEq_iff_exists_mem).1 hzero with ⟨s, hs, hEq⟩
+  rcases mem_nhds_iff.mp hs with ⟨U, hUsub, hUopen, hxU⟩
+  have hEqU : Set.EqOn ω.as_alternating (fun _ : X => (0 : FiberAlt n k)) U := by
+    intro y hy
+    exact hEq (hUsub hy)
+  have hzeroU :
+      ∀ y ∈ U, (ω ⋏ η).as_alternating y = 0 :=
+    smoothWedge_eq_zero_of_left_eq_zero_on (ω := ω) (η := η) hUopen hEqU
+  exact Filter.eventuallyEq_of_mem (hUopen.mem_nhds hxU) hzeroU
+
+private lemma smoothWedge_eventuallyEq_zero_of_right_eventuallyEq_zero {k l : ℕ}
+    (ω : SmoothForm n X k) (η : SmoothForm n X l) {x : X}
+    (hzero : η.as_alternating =ᶠ[nhds x] 0) :
+    (ω ⋏ η).as_alternating =ᶠ[nhds x] 0 := by
+  rcases (Filter.eventuallyEq_iff_exists_mem).1 hzero with ⟨s, hs, hEq⟩
+  rcases mem_nhds_iff.mp hs with ⟨U, hUsub, hUopen, hxU⟩
+  have hEqU : Set.EqOn η.as_alternating (fun _ : X => (0 : FiberAlt n l)) U := by
+    intro y hy
+    exact hEq (hUsub hy)
+  have hzeroU :
+      ∀ y ∈ U, (ω ⋏ η).as_alternating y = 0 :=
+    smoothWedge_eq_zero_of_right_eq_zero_on (ω := ω) (η := η) hUopen hEqU
+  exact Filter.eventuallyEq_of_mem (hUopen.mem_nhds hxU) hzeroU
+
+theorem smoothWedge_tsupport_subset_left {k l : ℕ} (ω : SmoothForm n X k)
+    (η : SmoothForm n X l) :
+    tsupport (ω ⋏ η).as_alternating ⊆ tsupport ω.as_alternating := by
+  intro x hx
+  by_contra hx'
+  have hzero : ω.as_alternating =ᶠ[nhds x] 0 :=
+    (notMem_tsupport_iff_eventuallyEq).1 hx'
+  have hzero' :
+      (ω ⋏ η).as_alternating =ᶠ[nhds x] 0 :=
+    smoothWedge_eventuallyEq_zero_of_left_eventuallyEq_zero (ω := ω) (η := η) hzero
+  have hxnot : x ∉ tsupport (ω ⋏ η).as_alternating :=
+    (notMem_tsupport_iff_eventuallyEq).2 hzero'
+  exact hxnot hx
+
+theorem smoothWedge_tsupport_subset_right {k l : ℕ} (ω : SmoothForm n X k)
+    (η : SmoothForm n X l) :
+    tsupport (ω ⋏ η).as_alternating ⊆ tsupport η.as_alternating := by
+  intro x hx
+  by_contra hx'
+  have hzero : η.as_alternating =ᶠ[nhds x] 0 :=
+    (notMem_tsupport_iff_eventuallyEq).1 hx'
+  have hzero' :
+      (ω ⋏ η).as_alternating =ᶠ[nhds x] 0 :=
+    smoothWedge_eventuallyEq_zero_of_right_eventuallyEq_zero (ω := ω) (η := η) hzero
+  have hxnot : x ∉ tsupport (ω ⋏ η).as_alternating :=
+    (notMem_tsupport_iff_eventuallyEq).2 hzero'
+  exact hxnot hx
+
+theorem smoothWedge_hasCompactSupport_left {k l : ℕ} (ω : SmoothForm n X k)
+    (η : SmoothForm n X l) :
+    HasCompactSupport ω.as_alternating →
+      HasCompactSupport (ω ⋏ η).as_alternating := by
+  intro hcomp
+  have hcompact : IsCompact (tsupport ω.as_alternating) := by
+    simpa [HasCompactSupport] using hcomp
+  have hcompact' : IsCompact (tsupport (ω ⋏ η).as_alternating) :=
+    IsCompact.of_isClosed_subset hcompact (isClosed_tsupport _)
+      (smoothWedge_tsupport_subset_left (ω := ω) (η := η))
+  simpa [HasCompactSupport] using hcompact'
+
+theorem smoothWedge_hasCompactSupport_right {k l : ℕ} (ω : SmoothForm n X k)
+    (η : SmoothForm n X l) :
+    HasCompactSupport η.as_alternating →
+      HasCompactSupport (ω ⋏ η).as_alternating := by
+  intro hcomp
+  have hcompact : IsCompact (tsupport η.as_alternating) := by
+    simpa [HasCompactSupport] using hcomp
+  have hcompact' : IsCompact (tsupport (ω ⋏ η).as_alternating) :=
+    IsCompact.of_isClosed_subset hcompact (isClosed_tsupport _)
+      (smoothWedge_tsupport_subset_right (ω := ω) (η := η))
+  simpa [HasCompactSupport] using hcompact'
 
 /-!
 ### Wedge with a 0-form (unit laws)

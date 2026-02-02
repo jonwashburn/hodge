@@ -12,14 +12,14 @@ This file introduces *fiber/model-space* definitions needed to build a Hodge sta
 
 In this codebase, the "fiber" of `k`-forms is represented as
 
-`FiberAlt n k := (TangentModel n) [⋀^Fin k]→L[ℂ] ℂ`.
+`FiberAlt n k := (TangentModel n) [⋀^Fin k]→L[ℝ] ℂ`.
 
 ## Main Definitions
 
 * `fiberBasisVector`: Standard basis vector e_i in TangentModel n
 * `fiberFrame`: A k-tuple of basis vectors for indices in a Finset
 * `fiberAltInner`: Inner product on FiberAlt n k via basis evaluation
-* `fiberHodgeStar_construct`: Placeholder Hodge star (to be upgraded)
+* `fiberHodgeStar_construct`: Fiber-level Hodge star
 
 ## Implementation Notes
 
@@ -39,17 +39,25 @@ set_option autoImplicit false
 
 /-! ## Basis Vectors -/
 
-/-- Standard basis vector e_i in the tangent model space. -/
-noncomputable def fiberBasisVector (n : ℕ) (i : Fin n) : TangentModel n :=
-  EuclideanSpace.single i (1 : ℂ)
+/-- Standard real basis vector in the tangent model space.
+
+We view `ℂⁿ` as a real vector space of dimension `2n`, with basis
+`{e₁, …, eₙ, i e₁, …, i eₙ}`. -/
+noncomputable def fiberBasisVector (n : ℕ) (i : Fin (2 * n)) : TangentModel n := by
+  classical
+  have h : 2 * n = n + n := by simpa [two_mul]
+  exact (Fin.addCases
+    (fun j : Fin n => EuclideanSpace.single j (1 : ℂ))
+    (fun j : Fin n => EuclideanSpace.single j (Complex.I))
+    (Fin.cast h i))
 
 /-- Convert a Finset to an ordered list (sorted). -/
-noncomputable def finsetToSortedList (n : ℕ) (s : Finset (Fin n)) : List (Fin n) :=
+noncomputable def finsetToSortedList (n : ℕ) (s : Finset (Fin (2 * n))) : List (Fin (2 * n)) :=
   s.sort (· ≤ ·)
 
 /-- Build a frame (tuple of basis vectors) from a sorted list of indices.
     If the list has fewer than k elements, pad with zeros. -/
-noncomputable def listToFrame (n k : ℕ) (l : List (Fin n)) : Fin k → TangentModel n :=
+noncomputable def listToFrame (n k : ℕ) (l : List (Fin (2 * n))) : Fin k → TangentModel n :=
   fun i =>
     if h : i.val < l.length then
       fiberBasisVector n (l.get ⟨i.val, h⟩)
@@ -57,7 +65,7 @@ noncomputable def listToFrame (n k : ℕ) (l : List (Fin n)) : Fin k → Tangent
       0
 
 /-- A frame of k basis vectors indexed by a k-element Finset. -/
-noncomputable def fiberFrame (n k : ℕ) (s : Finset (Fin n)) : Fin k → TangentModel n :=
+noncomputable def fiberFrame (n k : ℕ) (s : Finset (Fin (2 * n))) : Fin k → TangentModel n :=
   listToFrame n k (finsetToSortedList n s)
 
 /-! ## Fiber Inner Product -/
@@ -67,14 +75,14 @@ noncomputable def fiberFrame (n k : ℕ) (s : Finset (Fin n)) : Fin k → Tangen
 For k-forms α, β, the inner product is:
   ⟨α, β⟩ = Σ_{|I|=k} α(e_I) * conj(β(e_I))
 
-where the sum is over all k-element subsets I of {0,...,n-1}.
+where the sum is over all k-element subsets I of {0,...,2n-1}.
 
 **Properties** (proved below):
 - Hermitian: ⟨α, β⟩ = conj(⟨β, α⟩)
 - Positive: ⟨α, α⟩ ≥ 0
 - Linear in first argument -/
 noncomputable def fiberAltInner (n k : ℕ) (α β : FiberAlt n k) : ℂ :=
-  ∑ s ∈ powersetCard k (univ : Finset (Fin n)),
+  ∑ s ∈ powersetCard k (univ : Finset (Fin (2 * n))),
     α (fiberFrame n k s) * starRingEnd ℂ (β (fiberFrame n k s))
 
 /-- The fiber inner product is Hermitian symmetric. -/
@@ -111,7 +119,7 @@ theorem fiberAltInner_self_nonneg (n k : ℕ) (α : FiberAlt n k) :
 /-- For the self-inner-product, the real part is the sum of squared norms of the basis coefficients. -/
 theorem fiberAltInner_self_re_eq_sum_normSq (n k : ℕ) (α : FiberAlt n k) :
     (fiberAltInner n k α α).re =
-      ∑ s ∈ powersetCard k (univ : Finset (Fin n)),
+      ∑ s ∈ powersetCard k (univ : Finset (Fin (2 * n))),
         Complex.normSq (α (fiberFrame n k s)) := by
   simp only [fiberAltInner]
   -- Move `re` inside the finite sum.
@@ -124,17 +132,17 @@ theorem fiberAltInner_self_re_eq_sum_normSq (n k : ℕ) (α : FiberAlt n k) :
 /-- Definiteness on basis coefficients: if `Re ⟨α,α⟩ = 0`, then all basis evaluations vanish. -/
 theorem fiberAltInner_self_re_eq_zero_iff (n k : ℕ) (α : FiberAlt n k) :
     (fiberAltInner n k α α).re = 0 ↔
-      ∀ s ∈ powersetCard k (univ : Finset (Fin n)),
+      ∀ s ∈ powersetCard k (univ : Finset (Fin (2 * n))),
         α (fiberFrame n k s) = 0 := by
   -- Rewrite in terms of a sum of nonnegative real terms.
   rw [fiberAltInner_self_re_eq_sum_normSq (n := n) (k := k) (α := α)]
   constructor
   · intro hsum
     have hnorm :
-        ∀ s ∈ powersetCard k (univ : Finset (Fin n)),
+        ∀ s ∈ powersetCard k (univ : Finset (Fin (2 * n))),
           Complex.normSq (α (fiberFrame n k s)) = 0 := by
       have h :=
-        (Finset.sum_eq_zero_iff_of_nonneg (s := powersetCard k (univ : Finset (Fin n)))
+        (Finset.sum_eq_zero_iff_of_nonneg (s := powersetCard k (univ : Finset (Fin (2 * n))))
             (f := fun s => Complex.normSq (α (fiberFrame n k s)))
             (by
               intro s hs
@@ -165,29 +173,30 @@ theorem fiberAltInner_smul_left (n k : ℕ) (c : ℂ) (α β : FiberAlt n k) :
 
 /-! ## Complement and Sign -/
 
-/-- The complement of a k-element subset in Fin n (as a Finset). -/
-def finsetComplement (n : ℕ) (s : Finset (Fin n)) : Finset (Fin n) :=
+/-- The complement of a k-element subset in Fin (2n) (as a Finset). -/
+def finsetComplement (n : ℕ) (s : Finset (Fin (2 * n))) : Finset (Fin (2 * n)) :=
   univ \ s
 
 /-- Count inversions when concatenating sorted lists from sets s and sᶜ.
     This gives the shuffle sign: (-1)^{inversions}. -/
-noncomputable def shuffleSignCount (n : ℕ) (s : Finset (Fin n)) : ℕ :=
+noncomputable def shuffleSignCount (n : ℕ) (s : Finset (Fin (2 * n))) : ℕ :=
   -- Number of pairs (i, j) where i ∈ s, j ∈ sᶜ, and i > j
   (s.sum fun i => (finsetComplement n s).filter (fun j => j < i) |>.card)
 
 /-- The shuffle sign for concatenating s and sᶜ into the standard ordering. -/
-noncomputable def shuffleSign (n : ℕ) (s : Finset (Fin n)) : ℤ :=
+noncomputable def shuffleSign (n : ℕ) (s : Finset (Fin (2 * n))) : ℤ :=
   (-1 : ℤ) ^ shuffleSignCount n s
 
 /-! ## Volume Form -/
 
-/-- The standard basis frame: all indices from 0 to n-1. -/
-noncomputable def fullFrame (n : ℕ) : Fin n → TangentModel n :=
+/-- The standard basis frame: all indices from 0 to 2n-1. -/
+noncomputable def fullFrame (n : ℕ) : Fin (2 * n) → TangentModel n :=
   fun i => fiberBasisVector n i
 
 /-- Check if a frame v matches the standard frame for indices in s (up to reordering).
     Returns the coefficient (0, 1, or -1) based on matching and permutation sign. -/
-noncomputable def frameMatchCoeff (n k : ℕ) (s : Finset (Fin n)) (v : Fin k → TangentModel n) : ℂ :=
+noncomputable def frameMatchCoeff (n k : ℕ) (s : Finset (Fin (2 * n)))
+    (v : Fin k → TangentModel n) : ℂ :=
   -- For the standard orthonormal basis, this checks if v is a permutation of (e_{i₁}, ..., e_{iₖ})
   -- where {i₁, ..., iₖ} = s
   -- This is complex to implement fully; for now we use a simplified version
@@ -220,55 +229,63 @@ For α : FiberAlt n k, the Hodge star ⋆α : FiberAlt n (2n-k) is defined by:
 
 where δ(v, e_{Iᶜ}) is 1 if v matches the frame for Iᶜ, 0 otherwise.
 
-**Status**: Returns 0 - full implementation requires ContinuousAlternatingMap construction API.
+**Implementation**:
 
-**Dimension Analysis**:
-- FiberAlt n k is non-trivial only for k ≤ n (complex dimension)
-- For k > n, FiberAlt n k = 0
-- The Hodge star maps k → (2n-k), so target is non-trivial when 2n-k ≤ n, i.e., k ≥ n
-- The only case where both source and target are non-trivial is k = n
-
-**Implementation (Round 11 upgrade)**:
-
-In this repo, `FiberAlt n k` models **complex-linear** alternating `k`-forms on `ℂⁿ`.
-Accordingly, the natural fiber-level Hodge star maps
-
-`⋆ : Λ^k → Λ^{n-k}`.
-
-We implement this by expanding `α` in the standard coordinate basis and sending each
-basis element to its complementary basis element with the appropriate shuffle sign.
-
-This makes `⋆` **non-degenerate** on all degrees `k ≤ n` in this model (unlike the old
-`2n-k`-targeted placeholder, which was forced to be degenerate).
+We use the real basis `{e₁, …, eₙ, i e₁, …, i eₙ}` of `ℂⁿ` (viewed as a real vector space)
+to expand `α` in coordinate basis forms, and send each basis element to its complementary
+basis element with the appropriate shuffle sign.
 -/
 
 /-!
 ### Coordinate-basis k-forms
 
-We define, for a `k`-subset `s ⊆ Fin n`, a canonical basis `k`-form `fiberBasisForm n k s`
-as the determinant of the `k×k` matrix of the selected coordinates. Concretely, it is
-the wedge of the coordinate covectors indexed by `s`.
+We define, for a `k`-subset `s ⊆ Fin (2n)`, a canonical basis `k`-form `fiberBasisForm n k s`
+as the determinant of the `k×k` matrix of the selected **real** coordinates. Concretely,
+it is the wedge of the real coordinate covectors indexed by `s`.
 -/
 
-/-- The coordinate map `ℂⁿ → (Fin n → ℂ)` as a linear map. -/
-noncomputable def coordLM (n : ℕ) : TangentModel n →ₗ[ℂ] (Fin n → ℂ) :=
-  (EuclideanSpace.equiv (ι := Fin n) (𝕜 := ℂ)).toLinearEquiv.toLinearMap
+/-- Real coordinate projection onto the real part of the i-th complex coordinate. -/
+noncomputable def coordRe (n : ℕ) (i : Fin n) : TangentModel n →ₗ[ℝ] ℝ where
+  toFun := fun x => (x i).re
+  map_add' := by
+    intro x y
+    simp [Pi.add_apply, Complex.add_re]
+  map_smul' := by
+    intro r x
+    simp [Pi.smul_apply, Complex.smul_re]
 
-/-- Project `ℂⁿ` to the `k` coordinates indexed by a finset `s`.
+/-- Real coordinate projection onto the imaginary part of the i-th complex coordinate. -/
+noncomputable def coordIm (n : ℕ) (i : Fin n) : TangentModel n →ₗ[ℝ] ℝ where
+  toFun := fun x => (x i).im
+  map_add' := by
+    intro x y
+    simp [Pi.add_apply, Complex.add_im]
+  map_smul' := by
+    intro r x
+    simp [Pi.smul_apply, Complex.smul_im]
+
+/-- The real coordinate map `ℂⁿ → (Fin (2n) → ℝ)` as an ℝ-linear map. -/
+noncomputable def coordLM (n : ℕ) : TangentModel n →ₗ[ℝ] (Fin (2 * n) → ℝ) := by
+  classical
+  have h : 2 * n = n + n := by simpa [two_mul]
+  refine LinearMap.pi (fun i : Fin (2 * n) => ?_)
+  exact (Fin.addCases (fun j : Fin n => coordRe n j) (fun j : Fin n => coordIm n j) (Fin.cast h i))
+
+/-- Project `ℂⁿ` to the `k` real coordinates indexed by a finset `s`.
 
 If `s` has fewer than `k` elements, we pad with zero coordinates (so the result is still a
-`Fin k → ℂ`). This keeps the definition non-dependent (no `s.card = k` argument).
+`Fin k → ℝ`). This keeps the definition non-dependent (no `s.card = k` argument).
 -/
-noncomputable def projCoords (n k : ℕ) (s : Finset (Fin n)) :
-    TangentModel n →ₗ[ℂ] (Fin k → ℂ) := by
+noncomputable def projCoords (n k : ℕ) (s : Finset (Fin (2 * n))) :
+    TangentModel n →ₗ[ℝ] (Fin k → ℝ) := by
   classical
-  let coord : TangentModel n →ₗ[ℂ] (Fin n → ℂ) := coordLM n
-  let l : List (Fin n) := s.sort (· ≤ ·)
+  let coord : TangentModel n →ₗ[ℝ] (Fin (2 * n) → ℝ) := coordLM n
+  let l : List (Fin (2 * n)) := s.sort (· ≤ ·)
   refine LinearMap.pi (fun i : Fin k => by
     classical
     by_cases h : i.1 < l.length
     · -- x ↦ (coord x) (l.get i)
-      exact (LinearMap.proj (R := ℂ) (ι := Fin n) (φ := fun _ => ℂ)
+      exact (LinearMap.proj (R := ℝ) (ι := Fin (2 * n)) (φ := fun _ => ℝ)
         (l.get ⟨i.1, h⟩)).comp coord
     · -- padding coordinate
       exact 0)
@@ -279,19 +296,20 @@ If `s` does not have exactly `k` elements, this still returns a well-typed alter
 from the first `k` sorted indices, padded by zeros as needed). In the intended uses below, we apply
 it to `s ∈ powersetCard k univ`, so it agrees with the usual basis form indexed by `s`.
 -/
-noncomputable def fiberBasisForm (n k : ℕ) (s : Finset (Fin n)) : FiberAlt n k := by
+noncomputable def fiberBasisForm (n k : ℕ) (s : Finset (Fin (2 * n))) : FiberAlt n k := by
   classical
-  let det : (Fin k → ℂ) [⋀^Fin k]→ₗ[ℂ] ℂ := Matrix.detRowAlternating
-  let lin : (TangentModel n) [⋀^Fin k]→ₗ[ℂ] ℂ := det.compLinearMap (projCoords n k s)
+  let det : (Fin k → ℝ) [⋀^Fin k]→ₗ[ℝ] ℝ := Matrix.detRowAlternating
+  let lin : (TangentModel n) [⋀^Fin k]→ₗ[ℝ] ℝ := det.compLinearMap (projCoords n k s)
+  let linC : (TangentModel n) [⋀^Fin k]→ₗ[ℝ] ℂ :=
+    (Complex.ofRealCLM.toLinearMap).compAlternatingMap lin
   -- Make it continuous using the finite-dimensional bound lemma from `DomCoprod.lean`.
   have h_ex :
-      ∃ C : ℝ, ∀ v : Fin k → TangentModel n, ‖lin v‖ ≤ C * ∏ i, ‖v i‖ :=
-    AlternatingMap.exists_bound_fin_dim (𝕜 := ℂ) (E := TangentModel n) (F := ℂ) (ι := Fin k) lin
+      ∃ C : ℝ, ∀ v : Fin k → TangentModel n, ‖linC v‖ ≤ C * ∏ i, ‖v i‖ :=
+    AlternatingMap.exists_bound_fin_dim (𝕜 := ℝ) (E := TangentModel n) (F := ℂ) (ι := Fin k) linC
   let C : ℝ := Classical.choose h_ex
-  have hC : ∀ v : Fin k → TangentModel n, ‖lin v‖ ≤ C * ∏ i, ‖v i‖ :=
+  have hC : ∀ v : Fin k → TangentModel n, ‖linC v‖ ≤ C * ∏ i, ‖v i‖ :=
     Classical.choose_spec h_ex
-  -- Convert the resulting ℂ-alternating continuous map to an ℝ-alternating one by restricting scalars.
-  exact (lin.mkContinuous C hC).restrictScalars ℝ
+  exact (linC.mkContinuous C hC)
 
 /-- Evaluation at a fixed frame, as a continuous linear functional on `FiberAlt`. -/
 noncomputable def fiberEvalCLM (n k : ℕ) (v : Fin k → TangentModel n) : FiberAlt n k →L[ℂ] ℂ := by
@@ -305,18 +323,18 @@ noncomputable def fiberEvalCLM (n k : ℕ) (v : Fin k → TangentModel n) : Fibe
 
 /-- Fiber-level Hodge star as a bundled continuous linear map. -/
 noncomputable def fiberHodgeStarCLM (n k : ℕ) :
-    FiberAlt n k →L[ℂ] FiberAlt n (n - k) := by
+    FiberAlt n k →L[ℂ] FiberAlt n (2 * n - k) := by
   classical
-  let S : Finset (Finset (Fin n)) := powersetCard k (univ : Finset (Fin n))
+  let S : Finset (Finset (Fin (2 * n))) := powersetCard k (univ : Finset (Fin (2 * n)))
   -- Sum the rank-1 operators `α ↦ (shuffleSign*s * α(e_s)) • e_{sᶜ}`.
   refine S.sum (fun s => ?_)
   let ev : FiberAlt n k →L[ℂ] ℂ := fiberEvalCLM n k (fiberFrame n k s)
   let coeff : FiberAlt n k →L[ℂ] ℂ := (shuffleSign n s : ℂ) • ev
-  exact ContinuousLinearMap.smulRight coeff (fiberBasisForm n (n - k) (finsetComplement n s))
+  exact ContinuousLinearMap.smulRight coeff (fiberBasisForm n (2 * n - k) (finsetComplement n s))
 
-/-- Fiber-level Hodge star in the `ℂⁿ`-model: `k`-forms to `(n-k)`-forms. -/
+/-- Fiber-level Hodge star in the real `ℂⁿ`-model: `k`-forms to `(2n-k)`-forms. -/
 noncomputable def fiberHodgeStar_construct (n k : ℕ) (α : FiberAlt n k) :
-    FiberAlt n (n - k) := by
+    FiberAlt n (2 * n - k) := by
   classical
   exact fiberHodgeStarCLM n k α
 

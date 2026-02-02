@@ -275,6 +275,155 @@ noncomputable def intersectionPairing {p : ℕ} (_hp : p ≤ n)
   have hdeg : 2 * p + 2 * (n - p) = 2 * n := by omega
   topFormIntegral_real' (castForm hdeg (α ⋏ β))
 
+theorem intersectionPairing_add_left {p : ℕ} (hp : p ≤ n)
+    (α₁ α₂ : SmoothForm n X (2 * p)) (β : SmoothForm n X (2 * (n - p))) :
+    intersectionPairing (n := n) (X := X) hp (α₁ + α₂) β =
+      intersectionPairing (n := n) (X := X) hp α₁ β +
+        intersectionPairing (n := n) (X := X) hp α₂ β := by
+  classical
+  unfold intersectionPairing
+  have hdeg : 2 * p + 2 * (n - p) = 2 * n := by omega
+  have hcast :
+      castForm hdeg ((α₁ + α₂) ⋏ β) =
+        castForm hdeg (α₁ ⋏ β) + castForm hdeg (α₂ ⋏ β) := by
+    subst hdeg
+    simpa [smoothWedge_add_left]
+  simpa [hcast] using
+    (topFormIntegral_real'_add (n := n) (X := X)
+      (η₁ := castForm hdeg (α₁ ⋏ β)) (η₂ := castForm hdeg (α₂ ⋏ β)))
+
+theorem intersectionPairing_add_right {p : ℕ} (hp : p ≤ n)
+    (α : SmoothForm n X (2 * p)) (β₁ β₂ : SmoothForm n X (2 * (n - p))) :
+    intersectionPairing (n := n) (X := X) hp α (β₁ + β₂) =
+      intersectionPairing (n := n) (X := X) hp α β₁ +
+        intersectionPairing (n := n) (X := X) hp α β₂ := by
+  classical
+  unfold intersectionPairing
+  have hdeg : 2 * p + 2 * (n - p) = 2 * n := by omega
+  have hcast :
+      castForm hdeg (α ⋏ (β₁ + β₂)) =
+        castForm hdeg (α ⋏ β₁) + castForm hdeg (α ⋏ β₂) := by
+    subst hdeg
+    simpa [smoothWedge_add_right]
+  simpa [hcast] using
+    (topFormIntegral_real'_add (n := n) (X := X)
+      (η₁ := castForm hdeg (α ⋏ β₁)) (η₂ := castForm hdeg (α ⋏ β₂)))
+
+theorem intersectionPairing_smul_left {p : ℕ} (hp : p ≤ n) (r : ℝ)
+    (α : SmoothForm n X (2 * p)) (β : SmoothForm n X (2 * (n - p))) :
+    intersectionPairing (n := n) (X := X) hp (r • α) β =
+      r * intersectionPairing (n := n) (X := X) hp α β := by
+  classical
+  unfold intersectionPairing
+  have hdeg : 2 * p + 2 * (n - p) = 2 * n := by omega
+  have hcast :
+      castForm hdeg ((r • α) ⋏ β) = r • castForm hdeg (α ⋏ β) := by
+    subst hdeg
+    apply SmoothForm.ext
+    funext x
+    simp [SmoothForm.wedge_apply, SmoothForm.smul_real_apply,
+      ContinuousAlternatingMap.wedgeℂ_smul_left]
+  simpa [hcast] using
+    (topFormIntegral_real'_smul (n := n) (X := X) (c := r)
+      (η := castForm hdeg (α ⋏ β)))
+
+theorem intersectionPairing_smul_right {p : ℕ} (hp : p ≤ n) (r : ℝ)
+    (α : SmoothForm n X (2 * p)) (β : SmoothForm n X (2 * (n - p))) :
+    intersectionPairing (n := n) (X := X) hp α (r • β) =
+      r * intersectionPairing (n := n) (X := X) hp α β := by
+  classical
+  unfold intersectionPairing
+  have hdeg : 2 * p + 2 * (n - p) = 2 * n := by omega
+  have hcast :
+      castForm hdeg (α ⋏ (r • β)) = r • castForm hdeg (α ⋏ β) := by
+    subst hdeg
+    apply SmoothForm.ext
+    funext x
+    simp [SmoothForm.wedge_apply, SmoothForm.smul_real_apply,
+      ContinuousAlternatingMap.wedgeℂ_smul_right]
+  simpa [hcast] using
+    (topFormIntegral_real'_smul (n := n) (X := X) (c := r)
+      (η := castForm hdeg (α ⋏ β)))
+
+/-! ## L2 Inner Product via Hodge Star -/
+
+/-- **L2 inner product via Hodge star**.
+
+    For k-forms α, β, define:
+    `⟪α, β⟫ = ∫_X α ∧ ⋆β`.
+    This matches the usual L2 pairing once the metric/volume-form normalization is aligned. -/
+noncomputable def L2Inner_wedge {k : ℕ} (α β : SmoothForm n X k) : ℝ :=
+  have hdeg : k + (2 * n - k) = 2 * n := by omega
+  topFormIntegral_real' (castForm hdeg (α ⋏ ⋆β))
+
+theorem L2Inner_wedge_add_left {k : ℕ} (α₁ α₂ β : SmoothForm n X k) :
+    L2Inner_wedge (n := n) (X := X) (k := k) (α₁ + α₂) β =
+      L2Inner_wedge (n := n) (X := X) (k := k) α₁ β +
+        L2Inner_wedge (n := n) (X := X) (k := k) α₂ β := by
+  classical
+  unfold L2Inner_wedge
+  have hdeg : k + (2 * n - k) = 2 * n := by omega
+  have hcast :
+      castForm hdeg ((α₁ + α₂) ⋏ ⋆β) =
+        castForm hdeg (α₁ ⋏ ⋆β) + castForm hdeg (α₂ ⋏ ⋆β) := by
+    subst hdeg
+    simpa [smoothWedge_add_left]
+  simpa [hcast] using
+    (topFormIntegral_real'_add (n := n) (X := X)
+      (η₁ := castForm hdeg (α₁ ⋏ ⋆β)) (η₂ := castForm hdeg (α₂ ⋏ ⋆β)))
+
+theorem L2Inner_wedge_add_right {k : ℕ} (α : SmoothForm n X k) (β₁ β₂ : SmoothForm n X k) :
+    L2Inner_wedge (n := n) (X := X) (k := k) α (β₁ + β₂) =
+      L2Inner_wedge (n := n) (X := X) (k := k) α β₁ +
+        L2Inner_wedge (n := n) (X := X) (k := k) α β₂ := by
+  classical
+  unfold L2Inner_wedge
+  have hdeg : k + (2 * n - k) = 2 * n := by omega
+  have hcast :
+      castForm hdeg (α ⋏ ⋆(β₁ + β₂)) =
+        castForm hdeg (α ⋏ ⋆β₁) + castForm hdeg (α ⋏ ⋆β₂) := by
+    subst hdeg
+    simpa [hodgeStar_add, smoothWedge_add_right]
+  simpa [hcast] using
+    (topFormIntegral_real'_add (n := n) (X := X)
+      (η₁ := castForm hdeg (α ⋏ ⋆β₁)) (η₂ := castForm hdeg (α ⋏ ⋆β₂)))
+
+theorem L2Inner_wedge_smul_left {k : ℕ} (r : ℝ) (α : SmoothForm n X k)
+    (β : SmoothForm n X k) :
+    L2Inner_wedge (n := n) (X := X) (k := k) (r • α) β =
+      r * L2Inner_wedge (n := n) (X := X) (k := k) α β := by
+  classical
+  unfold L2Inner_wedge
+  have hdeg : k + (2 * n - k) = 2 * n := by omega
+  have hcast :
+      castForm hdeg ((r • α) ⋏ ⋆β) = r • castForm hdeg (α ⋏ ⋆β) := by
+    subst hdeg
+    apply SmoothForm.ext
+    funext x
+    simp [SmoothForm.wedge_apply, SmoothForm.smul_real_apply,
+      ContinuousAlternatingMap.wedgeℂ_smul_left]
+  simpa [hcast] using
+    (topFormIntegral_real'_smul (n := n) (X := X) (c := r)
+      (η := castForm hdeg (α ⋏ ⋆β)))
+
+theorem L2Inner_wedge_smul_right {k : ℕ} (r : ℝ) (α : SmoothForm n X k)
+    (β : SmoothForm n X k) :
+    L2Inner_wedge (n := n) (X := X) (k := k) α (r • β) =
+      r * L2Inner_wedge (n := n) (X := X) (k := k) α β := by
+  classical
+  unfold L2Inner_wedge
+  have hdeg : k + (2 * n - k) = 2 * n := by omega
+  have hcast :
+      castForm hdeg (α ⋏ ⋆(r • β)) = r • castForm hdeg (α ⋏ ⋆β) := by
+    subst hdeg
+    apply SmoothForm.ext
+    funext x
+    simp [hodgeStar_smul_real, SmoothForm.wedge_apply, SmoothForm.smul_real_apply,
+      ContinuousAlternatingMap.wedgeℂ_smul_right]
+  simpa [hcast] using
+    (topFormIntegral_real'_smul (n := n) (X := X) (c := r)
+      (η := castForm hdeg (α ⋏ ⋆β)))
+
 /-! **Intersection pairing is bilinear in the first argument** (documentation-only).
 
     Full bilinearity requires wedge product linearity combined with integration linearity.
