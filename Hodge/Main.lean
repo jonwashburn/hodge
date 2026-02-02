@@ -38,17 +38,21 @@ variable {n : ℕ} {X : Type*}
     and a bridge assumption `SpineBridgeData` relating that geometric class to the carried
     `representingForm` class.
 
+    **Phase 7 Update (2026-02-01)**: `cycleClass_geom` is now the REAL geometric class
+    from `FundamentalClassSet(support)`. Requires:
+    - `PoincareDualFormExists` for fundamental class construction
+    - `SpineBridgeData` for the bridge theorem
+
     **Mathematical Content**:
     - The cycle Z is constructed via SYR → Harvey-Lawson → GAGA
-    - Its geometric cycle class (from representingForm) equals [γ] in cohomology
-    - The representingForm came from the spine construction (SYR theorem)
+    - Its geometric cycle class (from FundamentalClassSet) equals [γ] in cohomology
+    - The bridge theorem connects the fundamental class to the representing form
 
     See `hodge_conjecture_kernel` for the equivalent kernel-only version. -/
 theorem hodge_conjecture {p : ℕ}
-    [SubmanifoldIntegration n X]
-    [AutomaticSYRData n X] [FlatLimitCycleData n X (2 * (n - p))]
-    [HarveyLawsonKingData n X (2 * (n - p))] [ChowGAGAData n X]
-    [CycleClass.PoincareDualFormExists n X p] [SpineBridgeData n X]
+    [CycleClass.PoincareDualFormExists n X p] [SpineBridgeData n X p]
+    [CalibratedCurrentRegularityData n X (2 * (n - p))]
+    [ChowGAGAData n X]
     (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
     (h_rational : isRationalClass (ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :
     ∃ (Z : SignedAlgebraicCycle n X p), Z.cycleClass_geom = ofForm γ h_closed :=

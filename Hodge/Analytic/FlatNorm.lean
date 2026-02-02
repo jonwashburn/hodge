@@ -1,6 +1,7 @@
 import Hodge.Analytic.Currents
 import Hodge.Analytic.Norms
 import Hodge.Cohomology.Basic
+import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 import Mathlib.Order.ConditionallyCompleteLattice.Basic
 
 /-!
@@ -29,6 +30,7 @@ The flat norm is the natural metric for the space of integral currents.
 noncomputable section
 
 open Classical Set Hodge
+open scoped BigOperators
 
 set_option autoImplicit false
 
@@ -489,6 +491,25 @@ def finSumℝ : ∀ (N : ℕ), (Fin N → ℝ) → ℝ
 @[simp] theorem finSumℝ_succ (N : ℕ) (f : Fin (N + 1) → ℝ) :
     finSumℝ (N + 1) f = f 0 + finSumℝ N (fun i => f i.succ) := rfl
 
+/-- `finSum` agrees with the standard `Fintype` sum over `Fin N`. -/
+theorem finSum_eq_sum_univ {k : ℕ} :
+    ∀ (N : ℕ) (T : Fin N → Current n X k),
+      finSum (n := n) (X := X) (k := k) N T = ∑ i : Fin N, T i
+  | 0, T => by
+      simp [finSum]
+  | N + 1, T => by
+      -- `∑ i : Fin (N+1), T i = T 0 + ∑ i : Fin N, T i.succ`
+      simpa [finSum, Fin.sum_univ_succ, finSum_eq_sum_univ (N := N) (T := fun i => T i.succ)]
+
+/-- `finSumℝ` agrees with the standard `Fintype` sum over `Fin N`. -/
+theorem finSumℝ_eq_sum_univ :
+    ∀ (N : ℕ) (cost : Fin N → ℝ),
+      finSumℝ N cost = ∑ i : Fin N, cost i
+  | 0, cost => by
+      simp [finSumℝ]
+  | N + 1, cost => by
+      simpa [finSumℝ, Fin.sum_univ_succ, finSumℝ_eq_sum_univ (N := N) (cost := fun i => cost i.succ)]
+
 /-- If `T = S + ∂R`, then `flatNorm T ≤ mass S + mass R` (by definition of infimum). -/
 theorem flatNorm_le_mass_add_mass_of_decomp {k : ℕ}
     (T : Current n X k) (S : Current n X k) (R : Current n X (k + 1))
@@ -542,6 +563,36 @@ theorem flatNorm_finSum_le_of_forall {k : ℕ} :
               simp [finSumℝ]
 
 end Hodge.FlatNormFinite
+
+/-!
+## Finset-sum triangle inequality for `flatNorm`
+
+This is a convenience wrapper around `flatNorm_add_le`, allowing later TeX-spine code to use the
+standard `Finset.sum` API directly.
+-/
+
+theorem flatNorm_sum_le_sum_flatNorm {ι : Type*} {k : ℕ}
+    (s : Finset ι) (T : ι → Current n X k) :
+    flatNorm (n := n) (X := X) (k := k) (∑ i ∈ s, T i)
+      ≤ ∑ i ∈ s, flatNorm (n := n) (X := X) (k := k) (T i) := by
+  classical
+  refine Finset.induction_on s ?_ ?_
+  · simp [flatNorm_zero]
+  · intro a s ha ih
+    have h1 :
+        flatNorm (n := n) (X := X) (k := k) (T a + ∑ i ∈ s, T i)
+          ≤ flatNorm (n := n) (X := X) (k := k) (T a) +
+              flatNorm (n := n) (X := X) (k := k) (∑ i ∈ s, T i) := by
+      simpa using
+        (flatNorm_add_le (n := n) (X := X) (k := k) (T a) (∑ i ∈ s, T i))
+    have h2 :
+        flatNorm (n := n) (X := X) (k := k) (T a) +
+            flatNorm (n := n) (X := X) (k := k) (∑ i ∈ s, T i)
+          ≤ flatNorm (n := n) (X := X) (k := k) (T a) +
+              ∑ i ∈ s, flatNorm (n := n) (X := X) (k := k) (T i) :=
+      add_le_add_right ih (flatNorm (n := n) (X := X) (k := k) (T a))
+    have h := le_trans h1 h2
+    simpa [Finset.sum_insert ha] using h
 
 /-- Helper: For any decomposition T = S + ∂R, evaluation is bounded by
     (mass(S) + mass(R)) × max(comass ψ, comass dψ). -/

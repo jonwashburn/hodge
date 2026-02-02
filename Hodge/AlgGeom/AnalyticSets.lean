@@ -60,7 +60,7 @@ class IsAnalyticSetZeroLocus (S : Set X) : Prop where
   locally_eq_zeroLocus :
     ∀ x ∈ S, ∃ (U : Set X), IsOpen U ∧ x ∈ U ∧
       ∃ (m : ℕ) (f : Fin m → X → ℂ),
-        (∀ i, MDifferentiableOn (𝓒_complex n) (𝓘(ℂ, ℂ)) (f i) U) ∧
+        (∀ i, MDifferentiableOn (𝓒_complex n) 𝓘(ℝ, ℂ) (f i) U) ∧
           S ∩ U = commonZeroLocus (X := X) U m f
 
 namespace IsAnalyticSetZeroLocus
@@ -91,7 +91,7 @@ instance instInter (S T : Set X)
       by_cases hi : (i.1 < mS)
       · -- use the S-equations, restricted to `U ∩ V`
         have hmono : U ∩ V ⊆ U := by intro y hy; exact hy.1
-        have hf' : MDifferentiableOn (𝓒_complex n) 𝓘(ℂ) (fS ⟨i.1, hi⟩) (U ∩ V) :=
+        have hf' : MDifferentiableOn (𝓒_complex n) 𝓘(ℝ, ℂ) (fS ⟨i.1, hi⟩) (U ∩ V) :=
           (hfS ⟨i.1, hi⟩).mono hmono
         simpa [hi] using hf'
       · -- use the T-equations, restricted to `U ∩ V`
@@ -100,7 +100,7 @@ instance instInter (S T : Set X)
           have hi' : i.1 < mS + mT := i.2
           have hmS : mS ≤ i.1 := le_of_not_gt hi
           exact Nat.sub_lt_left_of_lt_add hmS hi'
-        have hf' : MDifferentiableOn (𝓒_complex n) 𝓘(ℂ) (fT ⟨i.1 - mS, hidx⟩) (U ∩ V) :=
+        have hf' : MDifferentiableOn (𝓒_complex n) 𝓘(ℝ, ℂ) (fT ⟨i.1 - mS, hidx⟩) (U ∩ V) :=
           (hfT ⟨i.1 - mS, hidx⟩).mono hmono
         simpa [hi] using hf'
     · -- Set-theoretic identification of the local intersection with the combined zero locus.

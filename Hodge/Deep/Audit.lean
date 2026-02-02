@@ -39,12 +39,18 @@ open Lean Meta Elab Command
 
 -- These will show `sorryAx` until the deep track is complete.
 
-#print axioms Hodge.Deep.Stokes.SubmanifoldIntegration.real
+-- Stokes/integration infrastructure now lives in the data-based layer:
+-- `OrientedRectifiableSetData` / `ClosedSubmanifoldData` in `Hodge/Analytic/Currents.lean`.
+-- (We no longer maintain a stubby Set-based `SubmanifoldIntegration.real`.)
+#print axioms Hodge.Deep.Stokes.hausdorffIntegrate_linear'
+#print axioms Hodge.Deep.Stokes.hausdorffIntegrate_bound'
 #print axioms Hodge.Deep.GAGA.ChowGAGAData.real
 #print axioms Hodge.Deep.Microstructure.AutomaticSYRData.real'
 #print axioms Hodge.Deep.HarveyLawson.HarveyLawsonKingData.real
 #print axioms Hodge.Deep.FedererFleming.FlatLimitCycleData.real'
-#print axioms Hodge.Deep.PoincareDuality.SpineBridgeData.real
+-- PD / fundamental class / spine bridge is currently represented by the explicit interface
+-- `SpineBridgeData` (see `Hodge/Classical/GAGA.lean`), re-exported in the deep pillar:
+#print axioms Hodge.Deep.PoincareDuality.cycleClass_geom_eq_representingForm
 
 -- ═══════════════════════════════════════════════════════════════════════════
 -- SORRY COUNT: Deep Track Pillars

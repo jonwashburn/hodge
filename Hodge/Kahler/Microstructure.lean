@@ -29,14 +29,16 @@ integral currents with calibration defect tending to zero.
 
 ## Implementation Notes
 
-**Phase 4 Status**: `RawSheetSum.toIntegrationData` integrates using `setIntegral`
-over the sheet-union support.
+**Current status (work-in-progress semantics)**:
+- `RawSheetSum.toIntegrationData` now evaluates by a **finite sum of genuine sheet integrals**
+  (via `ClosedSubmanifoldData.toIntegrationData` / `hausdorffIntegrate`), rather than by
+  `setIntegral` on a bare `Set X`.
+- The packaged Stokes/boundary control is currently “closed sheet ⇒ bdryMass = 0”, and the
+  sheet-sum Stokes bound is derived by summing the per-sheet bounds.
 
-The Stokes bound is obtained from the Stokes field packaged in `SubmanifoldIntegration`
-plus the fact that the sheet-union support is closed.
-
-**Dependencies**: Relies on `setIntegral` from `Hodge.Analytic.Currents` and the
-`SubmanifoldIntegration` interface (including its Stokes field).
+**Remaining semantic blocker**: `buildSheetsFromConePositive` still returns **no sheets**
+and `support := Set.univ`, so the resulting microstructure current is still identically `0`.
+Replacing that stub is the next deep step of the microstructure pillar.
 
 ## References
 
@@ -58,7 +60,7 @@ variable {n : ℕ} {X : Type u}
   [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
-  [MeasurableSpace X] [BorelSpace X] [Nonempty X] [SubmanifoldIntegration n X]
+  [MeasurableSpace X] [BorelSpace X] [Nonempty X]
 
 /-- Integral current data with a cycle intent (wrapper for integration data). -/
 structure CycleIntegralCurrent (n : ℕ) (X : Type u) (k : ℕ)
@@ -250,71 +252,124 @@ structure RawSheetSum (n : ℕ) (X : Type u) (p : ℕ) (hscale : ℝ)
     Complex submanifolds of compact Kähler manifolds are closed (no boundary),
     so bdryMass = 0 and Stokes' theorem gives |∫_Z dω| = 0.
 
-    **Implementation Status**: Uses `setIntegral` (requires `SubmanifoldIntegration` instance).
+    **Implementation Status**: The integration functional is a **finite sum of sheet integrals**
+    (each sheet uses `ClosedSubmanifoldData.toIntegrationData` / `hausdorffIntegrate`).
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", Ch. 0]. -/
 noncomputable def RawSheetSum.toIntegrationData {p : ℕ} {hscale : ℝ}
     {C : Cubulation n X hscale} (T_raw : RawSheetSum n X p hscale C) :
     IntegrationData n X (2 * (n - p)) where
   carrier := T_raw.support
-  integrate := setIntegral (2 * (n - p)) T_raw.support
-  integrate_linear := fun c ω₁ ω₂ => setIntegral_linear (2 * (n - p)) T_raw.support c ω₁ ω₂
-  integrate_bound := setIntegral_bound (2 * (n - p)) T_raw.support
-  bdryMass := 0
-  bdryMass_nonneg := le_refl 0
-  stokes_bound := fun {k'} hk' ω => by
-    simp only [MulZeroClass.zero_mul]
-    -- Use setIntegral_transport to remove the cast
-    rw [setIntegral_transport hk']
-    -- Goal: |setIntegral (k'+1) T_raw.support (smoothExtDeriv ω)| ≤ 0
-    -- This is Stokes on the (closed) sheet union support.
-    simp only [setIntegral, integrateDegree2p]
-    by_cases hEven : 2 ∣ (k' + 1)
-    · -- Even case: use `SubmanifoldIntegration.stokes_integral_zero` on the closed support.
-      simp only [hEven, dite_true]
-      let p0 : ℕ := (k' + 1) / 2
-      have hk0 : k' + 1 = 2 * p0 := Nat.eq_mul_of_div_eq_right hEven rfl
-      have h0 :
-          submanifoldIntegral (n := n) (X := X) (p := p0)
-              (castForm hk0 (smoothExtDeriv ω)) T_raw.support = 0 := by
-        simpa [submanifoldIntegral, p0, hk0] using
-          (SubmanifoldIntegration.stokes_integral_zero (n := n) (X := X)
-            (k := k') (p := p0) hk0 ω T_raw.support T_raw.support_closed)
-      simpa [h0, abs_zero]
-    · -- Odd case: integrateDegree2p returns 0 by definition.
-      simp only [hEven, dite_false, abs_zero]
-      linarith
-
-/-- **Real Integration Data for RawSheetSum** (Phase 2)
-    Uses actual `setIntegral` instead of zero stub.
-    Requires `ClosedSubmanifoldStokesData` typeclass for Stokes property.
-
-    **Note**: This version requires a Stokes instance. The stub version
-    `RawSheetSum.toIntegrationData` is used on the main proof track. -/
-noncomputable def RawSheetSum.toIntegrationData_real {p : ℕ} {hscale : ℝ}
-    {C : Cubulation n X hscale} (T_raw : RawSheetSum n X p hscale C)
-    (hStokes : ∀ (k : ℕ), ∀ ω : SmoothForm n X k,
-      |setIntegral (k + 1) T_raw.support (smoothExtDeriv ω)| ≤ 0) :
-    IntegrationData n X (2 * (n - p)) where
-  carrier := T_raw.support
-  integrate := setIntegral (2 * (n - p)) T_raw.support
-  integrate_linear := fun c ω₁ ω₂ => setIntegral_linear (2 * (n - p)) T_raw.support c ω₁ ω₂
-  integrate_bound := setIntegral_bound (2 * (n - p)) T_raw.support
-  bdryMass := 0
-  bdryMass_nonneg := le_refl 0
-  stokes_bound := fun {k'} hk' ω => by
-    -- Here bdryMass = 0, so it suffices to show the Stokes integral is ≤ 0.
-    simp only [MulZeroClass.zero_mul]
-    -- Rewrite away the transported form using a general transport lemma (avoids
-    -- dependent elimination on the nontrivial expression `2 * (n - p)`).
-    have htrans :
-        setIntegral (2 * (n - p)) T_raw.support (hk' ▸ smoothExtDeriv ω) =
-          setIntegral (k' + 1) T_raw.support (smoothExtDeriv ω) := by
+  -- The integration functional for a sheet sum: sum the genuine sheet integrals.
+  integrate := fun ω =>
+    (C.cubes.attach).sum (fun Q =>
+      (T_raw.sheets Q.1 Q.2).sum (fun s =>
+        s.data.toIntegrationData.integrate ω))
+  integrate_linear := by
+    intro c ω₁ ω₂
+    classical
+    -- push linearity inside both finite sums (each sheet integral is linear)
+    have hlin_sheet :
+        ∀ s : HolomorphicSheet n X p,
+          s.data.toIntegrationData.integrate (c • ω₁ + ω₂) =
+            c * s.data.toIntegrationData.integrate ω₁ + s.data.toIntegrationData.integrate ω₂ := by
+      intro s
+      simpa using (s.data.toIntegrationData.integrate_linear c ω₁ ω₂)
+    -- avoid commutativity rewriting so `hlin_sheet` matches directly
+    simp [hlin_sheet, Finset.sum_add_distrib, Finset.mul_sum, _root_.mul_add]
+  integrate_bound := by
+    classical
+    -- Use the sum of sheet masses as a global bound.
+    refine ⟨(C.cubes.attach).sum (fun Q =>
+        (T_raw.sheets Q.1 Q.2).sum (fun s => s.data.toOrientedData.mass)), ?_⟩
+    intro ω
+    -- triangle inequality, then per-sheet bound, then factor out `‖ω‖`
+    have h_outer :
+        |(C.cubes.attach).sum (fun Q =>
+            (T_raw.sheets Q.1 Q.2).sum (fun s => s.data.toIntegrationData.integrate ω))|
+          ≤ (C.cubes.attach).sum (fun Q =>
+            |(T_raw.sheets Q.1 Q.2).sum (fun s => s.data.toIntegrationData.integrate ω)|) := by
       simpa using
-        (setIntegral_transport (n := n) (X := X) (k := 2 * (n - p)) (k' := k' + 1)
-          hk' T_raw.support (smoothExtDeriv ω))
-    -- Now apply the provided Stokes bound and rewrite back.
-    simpa [htrans] using (hStokes k' ω)
+        (Finset.abs_sum_le_sum_abs (s := C.cubes.attach)
+          (f := fun Q : {x // x ∈ C.cubes} =>
+            (T_raw.sheets Q.1 Q.2).sum (fun s => s.data.toIntegrationData.integrate ω)))
+    have h_inner_bound :
+        ∀ Q : {x // x ∈ C.cubes},
+          |(T_raw.sheets Q.1 Q.2).sum (fun s => s.data.toIntegrationData.integrate ω)|
+            ≤ ((T_raw.sheets Q.1 Q.2).sum (fun s => s.data.toOrientedData.mass)) * ‖ω‖ := by
+      intro Q
+      -- inner triangle inequality
+      have h_tri :
+          |(T_raw.sheets Q.1 Q.2).sum (fun s => s.data.toIntegrationData.integrate ω)|
+            ≤ (T_raw.sheets Q.1 Q.2).sum (fun s => |s.data.toIntegrationData.integrate ω|) := by
+        simpa using
+          (Finset.abs_sum_le_sum_abs (s := T_raw.sheets Q.1 Q.2)
+            (f := fun s => s.data.toIntegrationData.integrate ω))
+      -- per-sheet bound + factor out `‖ω‖`
+      have hterm :
+          ∀ s ∈ T_raw.sheets Q.1 Q.2,
+            |s.data.toIntegrationData.integrate ω| ≤ s.data.toOrientedData.mass * ‖ω‖ := by
+        intro s hs
+        -- This is the mass–comass bound for the closed submanifold integration functional.
+        simpa [ClosedSubmanifoldData.toIntegrationData] using
+          (hausdorffIntegrate_bound (n := n) (X := X) (k := 2 * (n - p)) s.data.toOrientedData ω)
+      have h_sum :
+          (T_raw.sheets Q.1 Q.2).sum (fun s => |s.data.toIntegrationData.integrate ω|)
+            ≤ ((T_raw.sheets Q.1 Q.2).sum (fun s => s.data.toOrientedData.mass)) * ‖ω‖ := by
+        -- sum the per-sheet inequalities and factor out the constant `‖ω‖`
+        have := (Finset.sum_le_sum (fun s hs => hterm s hs))
+        simpa [Finset.mul_sum, Finset.sum_mul, mul_assoc, mul_left_comm, mul_comm] using this
+      exact le_trans h_tri h_sum
+    have h_sum_outer :
+        (C.cubes.attach).sum (fun Q =>
+            |(T_raw.sheets Q.1 Q.2).sum (fun s => s.data.toIntegrationData.integrate ω)|)
+          ≤ ((C.cubes.attach).sum (fun Q =>
+              (T_raw.sheets Q.1 Q.2).sum (fun s => s.data.toOrientedData.mass))) * ‖ω‖ := by
+      -- apply `h_inner_bound` pointwise and sum
+      -- first sum the pointwise bounds
+      have hsum :
+          (C.cubes.attach).sum (fun Q =>
+              |(T_raw.sheets Q.1 Q.2).sum (fun s => s.data.toIntegrationData.integrate ω)|)
+            ≤ (C.cubes.attach).sum (fun Q =>
+                ((T_raw.sheets Q.1 Q.2).sum (fun s => s.data.toOrientedData.mass)) * ‖ω‖) := by
+        refine Finset.sum_le_sum ?_
+        intro Q _hQ
+        exact h_inner_bound Q
+      -- then factor out the constant `‖ω‖`
+      have hfac :
+          (C.cubes.attach).sum (fun Q =>
+                ((T_raw.sheets Q.1 Q.2).sum (fun s => s.data.toOrientedData.mass)) * ‖ω‖)
+            = ((C.cubes.attach).sum (fun Q =>
+                  (T_raw.sheets Q.1 Q.2).sum (fun s => s.data.toOrientedData.mass))) * ‖ω‖ := by
+        -- pull out `‖ω‖` from the finite sum
+        simp [Finset.sum_mul, mul_assoc]
+      exact le_trans hsum (by simpa [hfac] using (le_of_eq hfac))
+    exact le_trans h_outer h_sum_outer
+  bdryMass := 0
+  bdryMass_nonneg := le_refl 0
+  stokes_bound := by
+    intro k' hk' ω
+    -- For closed sheets, each exact integral is 0, hence the total is 0.
+    simp only [MulZeroClass.zero_mul]
+    -- Reduce to showing the evaluation is 0 (since |x| ≤ 0).
+    have :
+        (C.cubes.attach).sum (fun Q =>
+          (T_raw.sheets Q.1 Q.2).sum (fun s =>
+            s.data.toIntegrationData.integrate (hk' ▸ smoothExtDeriv ω))) = 0 := by
+      classical
+      refine Finset.sum_eq_zero ?_
+      intro Q _hQ
+      refine Finset.sum_eq_zero ?_
+      intro s hs
+      have hsb := s.data.toIntegrationData.stokes_bound hk' ω
+      have hsb0 :
+          |s.data.toIntegrationData.integrate (hk' ▸ smoothExtDeriv ω)| ≤ 0 := by
+        simpa [ClosedSubmanifoldData.toIntegrationData] using hsb
+      have habs : |s.data.toIntegrationData.integrate (hk' ▸ smoothExtDeriv ω)| = 0 :=
+        le_antisymm hsb0 (abs_nonneg _)
+      exact abs_eq_zero.mp habs
+    -- Finish: |0| ≤ 0.
+    simp [this]
 
 /-!
 ### Integrality data for sheet-union currents
@@ -330,7 +385,7 @@ class RawSheetSumIntegralityData (n : ℕ) (X : Type*) (p : ℕ) (hscale : ℝ)
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [BorelSpace X] [Nonempty X] [SubmanifoldIntegration n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
     (C : Cubulation n X hscale) (T_raw : RawSheetSum n X p hscale C)
     : Prop where
   /-- The current induced by `T_raw.toIntegrationData` is integral. -/
@@ -408,16 +463,17 @@ Stokes/flat-norm infrastructure are fully formalized.
     so by the local sheet realization theorem, there exists a finite set
     of holomorphic sheets {S_i} in Q such that [∑ S_i] ≈ [γ|_Q] in cohomology.
 
-    **Implementation**: Returns the full manifold X as the support (placeholder).
-    In the full formalization, this would construct actual holomorphic sheets.
+    **Implementation**: Placeholder (no sheets constructed yet). The `support` is therefore `∅`.
+    In the full formalization, this will construct actual holomorphic sheets and set `support`
+    to (at least) the union of their carriers.
 
     Reference: [TeX Proposition 4.3] -/
 noncomputable def buildSheetsFromConePositive (p : ℕ) (hscale : ℝ) (_hpos : hscale > 0)
     (C : Cubulation n X hscale) (_γ : SmoothForm n X (2 * p))
     (_hγ : isConePositive _γ) : RawSheetSum n X p hscale C :=
   { sheets := fun _ _ => ∅  -- Placeholder: no sheets constructed yet
-    support := Set.univ     -- Support is full manifold (contains all possible sheets)
-    support_closed := isClosed_univ }
+    support := ∅
+    support_closed := isClosed_empty }
 
 /-- **Theorem: Calibration Defect from Gluing** (Proposition 4.3).
     Starting from a cone-positive form γ, construct a RawSheetSum with
@@ -460,11 +516,10 @@ noncomputable def microstructureSequence (p : ℕ) (γ : SmoothForm n X (2 * p))
   -- Step 2: Build sheets from the cone-positive form
   let T_raw := buildSheetsFromConePositive (n := n) (X := X) p hscale hpos C γ hγ
   -- Step 3: Convert to IntegralCurrent via the full infrastructure
-  -- The Stokes bound is provided by `SubmanifoldIntegration.stokes_integral_zero`
-  -- together with `T_raw.support_closed`.
   -- NOTE: The current implementation of buildSheetsFromConePositive returns
-  -- support := Set.univ with empty sheets. This gives a non-trivial support
-  -- (the full manifold), making the resulting current non-trivial.
+  -- support := Set.univ with empty sheets, so the resulting current is identically zero.
+  -- (Once sheets are implemented, the Stokes/boundary control will come from summing the
+  -- per-sheet `ClosedSubmanifoldData` Stokes bounds.)
   -- Build the integral current explicitly so the underlying `toFun` is definitionally
   -- `T_raw.toIntegrationData.toCurrent` (useful for downstream rewriting).
   { toFun := T_raw.toIntegrationData.toCurrent
@@ -474,25 +529,30 @@ noncomputable def microstructureSequence (p : ℕ) (γ : SmoothForm n X (2 * p))
         (RawSheetSumIntegralityData.universal (n := n) (X := X) (p := p) (hscale := hscale)
             (C := C) T_raw).is_integral }
 
-/-- **Key Definitional Equality**: The microstructure sequence current evaluates forms
-    via setIntegral over Set.univ.
+/-- **Evaluation Lemma**: the microstructure sequence current evaluates forms via the
+    integration functional bundled in `RawSheetSum.toIntegrationData`.
 
-    This is the chain of definitions:
-    1. microstructureSequence → T_raw.toIntegralCurrent
-    2. T_raw.toIntegralCurrent = T_raw.toCycleIntegralCurrent.toIntegralCurrent
-    3. = T_raw.toIntegrationData.toCurrent (packaged as IntegralCurrent)
-    4. T_raw.toIntegrationData.toCurrent.toFun = T_raw.toIntegrationData.integrate
-    5. = setIntegral (2*(n-p)) T_raw.support = setIntegral (2*(n-p)) Set.univ
+    Concretely, unfolding `microstructureSequence` shows that the underlying current is
+    `T_raw.toIntegrationData.toCurrent`, so evaluation reduces (definitionally) to
+    `T_raw.toIntegrationData.integrate`.
 
-    This lemma is `rfl` by definition unwinding. -/
-theorem microstructureSequence_eval_eq_setIntegral (p : ℕ) (γ : SmoothForm n X (2 * p))
+    **Note**: with the current stub `buildSheetsFromConePositive`, this evaluation is still `0`
+    (because there are no sheets). Once sheets are implemented, this lemma will remain valid and
+    is the preferred rewrite principle (it does **not** go through `setIntegral` on bare sets). -/
+theorem microstructureSequence_eval_eq_integrate (p : ℕ) (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p)))
     [CubulationExists n X] (k : ℕ) (ω : SmoothForm n X (2 * (n - p))) :
     (microstructureSequence p γ hγ ψ k).toFun.toFun ω =
-      setIntegral (2 * (n - p)) (Set.univ : Set X) ω := by
-  -- Definitional unfolding: `microstructureSequence` evaluates via `setIntegral` on `Set.univ`.
+      let hscale := 1 / (k + 1 : ℝ)
+      let hpos : hscale > 0 := by
+        simp [hscale]; positivity
+      let C := cubulationFromMesh (n := n) (X := X) hscale hpos
+      let T_raw := buildSheetsFromConePositive (n := n) (X := X) p hscale hpos C γ hγ
+      T_raw.toIntegrationData.integrate ω := by
+  -- Definitional unfolding: `microstructureSequence` evaluates via `RawSheetSum.toIntegrationData.integrate`.
   unfold microstructureSequence
-  dsimp [buildSheetsFromConePositive, RawSheetSum.toIntegrationData, IntegrationData.toCurrent]
+  -- evaluation of `IntegrationData.toCurrent.toFun` is definitional (`mkContinuousOfExistsBound_apply`)
+  simp [IntegrationData.toCurrent]
 
 /-- Zero current is a cycle (local copy for Microstructure). -/
 private theorem zero_int_isCycle (k : ℕ) : (zero_int n X k).isCycleAt := by
@@ -527,7 +587,8 @@ theorem microstructureSequence_are_cycles (p : ℕ) (γ : SmoothForm n X (2 * p)
   -- 3. The IntegrationData has bdryMass = 0, so the current is a cycle
   -- The proof uses isCycleAt = (k = 0 ∨ boundary = 0).
   -- For k = 2*(n-p) with n > p, we need to show boundary = 0.
-  -- This follows from the Stokes field bundled in `SubmanifoldIntegration`.
+  -- This follows from the Stokes/boundary control bundled in `RawSheetSum.toIntegrationData`
+  -- (bdryMass = 0). With the current stub sheet builder, it is discharged by simp.
   unfold IntegralCurrent.isCycleAt
   by_cases hk0 : 2 * (n - p) = 0
   · left; exact hk0
@@ -544,41 +605,15 @@ theorem microstructureSequence_are_cycles (p : ℕ) (γ : SmoothForm n X (2 * p)
     ext ω
     -- Now goal: (boundary (hk' ▸ T.toFun)).toFun ω = (0 : Current n X k').toFun ω
     simp only [Current.boundary_toFun, Current.zero_toFun]
-    -- Unwind `microstructureSequence` evaluation to `setIntegral` on `Set.univ`.
+    -- Unwind `microstructureSequence` evaluation (currently the sheet-sum integral; still 0 with stub sheets).
     -- First, rewrite the transported current evaluation using a general transport lemma.
     rw [current_toFun_transport (n := n) (X := X) (hk := hk')
       ((microstructureSequence p γ hγ ψ _k).toFun) (smoothExtDeriv ω)]
-    rw [microstructureSequence_eval_eq_setIntegral (n := n) (X := X)
-      (p := p) (γ := γ) (hγ := hγ) (ψ := ψ) (k := _k) (ω := hk' ▸ smoothExtDeriv ω)]
-    -- Remove the transported form using `setIntegral_transport`.
-    have htrans :
-        setIntegral (n := n) (X := X) (2 * (n - p)) (Set.univ : Set X) (hk' ▸ smoothExtDeriv ω) =
-          setIntegral (n := n) (X := X) (k' + 1) (Set.univ : Set X) (smoothExtDeriv ω) := by
-      simpa using
-        (setIntegral_transport (n := n) (X := X) (k := 2 * (n - p)) (k' := k' + 1)
-          hk' (Set.univ : Set X) (smoothExtDeriv ω))
-    rw [htrans]
-    -- Stokes on `Set.univ` is provided by `SubmanifoldIntegration.stokes_integral_zero`.
-    have h_stokes :
-        |setIntegral (n := n) (X := X) (k' + 1) (Set.univ : Set X) (smoothExtDeriv ω)| ≤ 0 := by
-      simp only [setIntegral, integrateDegree2p]
-      by_cases hEven : 2 ∣ (k' + 1)
-      · simp only [hEven, dite_true]
-        let p0 : ℕ := (k' + 1) / 2
-        have hk0 : k' + 1 = 2 * p0 := Nat.eq_mul_of_div_eq_right hEven rfl
-        have h0 :
-            submanifoldIntegral (n := n) (X := X) (p := p0)
-                (castForm hk0 (smoothExtDeriv ω)) (Set.univ : Set X) = 0 := by
-          simpa [submanifoldIntegral, p0, hk0] using
-            (SubmanifoldIntegration.stokes_integral_zero (n := n) (X := X)
-              (k := k') (p := p0) hk0 ω (Set.univ : Set X) isClosed_univ)
-        simpa [h0, abs_zero]
-      · simp only [hEven, dite_false, abs_zero]
-        linarith
-    have h_abs0 :
-        |setIntegral (n := n) (X := X) (k' + 1) (Set.univ : Set X) (smoothExtDeriv ω)| = 0 :=
-      le_antisymm h_stokes (abs_nonneg _)
-    exact (abs_eq_zero.mp h_abs0)
+    -- With the current stub `buildSheetsFromConePositive`, the evaluation is definitional `0`.
+    -- Once sheets are real, this should be replaced by a proof using the `stokes_bound` packaged
+    -- in `RawSheetSum.toIntegrationData` (bdryMass = 0).
+    simp [microstructureSequence_eval_eq_integrate, buildSheetsFromConePositive, RawSheetSum.toIntegrationData,
+      IntegrationData.toCurrent]
 
 /-!
 **Sheet sums over complex submanifolds are automatically closed** (documentation-only placeholder).
@@ -634,7 +669,7 @@ structure MicrostructureSYRData (n : ℕ) (X : Type*) (p : ℕ)
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [BorelSpace X] [Nonempty X] [SubmanifoldIntegration n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
     (γ : SmoothForm n X (2 * p)) (hγ : isConePositive γ)
     (ψ : CalibratingForm n X (2 * (n - p))) where
   /-- The sequence of almost-calibrated currents. -/
@@ -673,54 +708,19 @@ theorem microstructure_uniform_mass_bound (p : ℕ) (γ : SmoothForm n X (2 * p)
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p)))
     [CubulationExists n X] :
     ∃ M : ℝ, M > 0 ∧ ∀ k, Current.mass (microstructureSequence p γ hγ ψ k).toFun ≤ M := by
-  -- The mass of the microstructure currents is bounded.
-  -- This is deep GMT content: currents from sheet sums have mass bounded by
-  -- the integral of the calibrating form over the support.
-  -- For now, use sorry. The bound exists by the paper's Theorem 4.1.
-  -- The mass is bounded because:
-  -- 1. microstructureSequence k returns T_raw.toIntegralCurrent
-  -- 2. T_raw.toIntegrationData.toCurrent.toFun = setIntegral (2*(n-p)) Set.univ
-  -- 3. setIntegral_bound gives |setIntegral k Z ω| ≤ M * ‖ω‖ for some M
-  -- 4. The mass is sSup { |T(ω)| : ‖ω‖ ≤ 1 } ≤ M * 1 = M
-  -- Get the bound M from setIntegral_bound
-  obtain ⟨M, hM⟩ := setIntegral_bound (n := n) (X := X) (2 * (n - p)) (Set.univ : Set X)
-  -- We need M > 0 for the mass bound. If M ≤ 0, use 1 as a valid upper bound.
-  use max M 1
-  constructor
-  · -- max M 1 > 0
-    apply lt_max_of_lt_right; norm_num
-  · intro k
-    -- The mass of (microstructureSequence p γ hγ ψ k).toFun is bounded by max M 1.
-    -- By microstructureSequence_eval_eq_setIntegral:
-    --   T.toFun ω = setIntegral (2*(n-p)) Set.univ ω
-    -- By hM: |setIntegral ... ω| ≤ M * ‖ω‖
-    -- For ω with ‖ω‖ ≤ 1: |T.toFun ω| ≤ M ≤ max M 1
-    -- Mass = sSup { |T(ω)| : ‖ω‖ ≤ 1 } ≤ max M 1
-    let T := (microstructureSequence p γ hγ ψ k).toFun
-    -- Show mass T ≤ max M 1 using csSup_le
-    unfold Current.mass
-    apply csSup_le (Current.mass_set_nonempty T)
-    -- Every element r in the set satisfies r ≤ max M 1
-    rintro r ⟨ω, hω_comass, rfl⟩
-    -- |T.toFun ω| = |setIntegral ... ω| (by microstructureSequence_eval_eq_setIntegral)
-    have h_eval : T.toFun ω = setIntegral (2 * (n - p)) Set.univ ω :=
-      microstructureSequence_eval_eq_setIntegral p γ hγ ψ k ω
-    rw [h_eval]
-    -- |setIntegral ... ω| ≤ M * ‖ω‖ (by hM)
-    have h_bound := hM ω
-    -- ‖ω‖ = comass ω ≤ 1 (by hω_comass)
-    -- So |setIntegral ... ω| ≤ M * 1 = M ≤ max M 1
-    -- |setIntegral ... ω| ≤ M * ‖ω‖ ≤ M * 1 = M ≤ max M 1
-    -- The bound M from setIntegral_bound is (hausdorffMeasure2p ... Z).toReal ≥ 0.
-    -- For ω with ‖ω‖ = comass ω ≤ 1:
-    --   |setIntegral ... ω| ≤ M * ‖ω‖ ≤ M * 1 = M ≤ max M 1
-    have hω_nonneg : ‖ω‖ ≥ 0 := comass_nonneg ω
-    calc |setIntegral (2 * (n - p)) Set.univ ω|
-        ≤ M * ‖ω‖ := h_bound
-      _ ≤ max M 1 * 1 := by
-          -- M ≤ max M 1 and ‖ω‖ ≤ 1
-          apply mul_le_mul (le_max_left M 1) hω_comass hω_nonneg
-          exact le_max_of_le_right zero_le_one
-      _ = max M 1 := mul_one _
+  -- TODO (deep GMT): once `buildSheetsFromConePositive` produces genuine sheets, prove a
+  -- uniform mass bound from the sheet-mass bounds and calibration estimates.
+  --
+  -- For now, with the current stub `buildSheetsFromConePositive` (no sheets), the resulting
+  -- current is identically zero, hence has mass 0.
+  refine ⟨1, by norm_num, ?_⟩
+  intro k
+  have h_zero : (microstructureSequence p γ hγ ψ k).toFun = 0 := by
+    ext ω
+    -- evaluation is definitional 0 because there are no sheets
+    simp [microstructureSequence, buildSheetsFromConePositive, RawSheetSum.toIntegrationData,
+      IntegrationData.toCurrent, Current.zero_toFun]
+  -- hence the mass is 0
+  simpa [h_zero, Current.mass_zero] using (show (0 : ℝ) ≤ (1 : ℝ) from zero_le_one)
 
 end

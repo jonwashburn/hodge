@@ -5,7 +5,6 @@ import Hodge.Analytic.IntegralCurrents
 import Hodge.Analytic.Calibration
 import Hodge.Analytic.Grassmannian
 import Hodge.Analytic.FlatNorm
-import Hodge.Analytic.Integration
 
 /-!
 # Track B: Analytic/GMT Core

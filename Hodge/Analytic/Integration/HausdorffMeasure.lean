@@ -67,38 +67,6 @@ class SubmanifoldIntegration (n : ℕ) (X : Type u)
     ∀ {k p : ℕ} (hkp : k + 1 = 2 * p) (ω : SmoothForm n X k) (Z : Set X),
       IsClosed Z → integral p (castForm hkp (smoothExtDeriv ω)) Z = 0
 
-/-! ## Universal Instance (Phase 0 stub)
-
-This instance makes the proof-track spine **unconditional** while the real Hausdorff/submanifold
-integration layer is being developed.
-
-It intentionally chooses:
-- the zero measure in every dimension, and
-- the zero integral for every set and form.
-
-All required laws then hold by simp.
--/
-
-/-- **Universal (stub) integration theory**: all measures and integrals are zero. -/
-def SubmanifoldIntegration.universal : SubmanifoldIntegration n X where
-  measure2p := fun _p => 0
-  integral := fun _p _ω _Z => 0
-  integral_linear := by
-    intro p Z c ω₁ ω₂
-    simp
-  integral_union := by
-    intro p ω Z₁ Z₂ _hdisj _hZ₁ _hZ₂
-    simp
-  integral_empty := by
-    intro p ω
-    simp
-  integral_bound := by
-    intro p ω Z
-    simp
-  stokes_integral_zero := by
-    intro k p hkp ω Z hZ
-    simp
-
 /-! ## Hausdorff Measure on Submanifolds -/
 
 /-- The real dimension of a complex p-dimensional submanifold. -/

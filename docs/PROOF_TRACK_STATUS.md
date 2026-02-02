@@ -26,7 +26,7 @@ lake env lean Hodge/Utils/DependencyCheck.lean
 
 ---
 
-## Current kernel report (2026-01-28) - MILESTONE ACHIEVED
+## Current kernel report (2026-02-01) - MILESTONE ACHIEVED
 
 Lean prints:
 
@@ -35,7 +35,23 @@ Lean prints:
 'hodge_conjecture'' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
-**Last verified**: 2026-01-28
+**Last verified**: 2026-02-01
+
+### Update (2026-02-01) — semantic-stub cleanup progress
+
+- Removed legacy Set-based integration plumbing from `Hodge/Analytic/Currents.lean` (deleted the `setIntegral`/`integration_current` tail).
+- Deleted obsolete LF/test-form + integration-current scaffold files (the old `TestForm := Unit` stack).
+- Microstructure placeholder improved: `buildSheetsFromConePositive` now uses `support := ∅` (no more `Set.univ` by fiat).
+
+- Removed unused zero-model constructors:
+  - `SubmanifoldIntegration.universal` (deleted)
+  - `CycleClass.PoincareDualFormExists.universal` (deleted)
+  - `SpineBridgeData.universal` (deleted)
+- Reduced proof-spine “hidden power”:
+  - `hodge_conjecture'` no longer injects `SubmanifoldIntegration.universal`
+  - `FlatLimitCycleData` is now a global instance (`instFlatLimitCycleData`), so no longer injected locally
+
+Note: the TeX-faithful semantic tasks (geometric `cycleClass_geom`, real PD, real SYR/HL/GAGA) are still pending and tracked in `docs/SEMANTIC_GOTCHAS_INDEX.md`.
 
 **STATUS: KERNEL-UNCONDITIONAL** ✅
 
@@ -46,20 +62,32 @@ The main theorem `hodge_conjecture'` depends only on the three standard Lean axi
 
 There is no `sorryAx` in the *kernel dependency cone* of `hodge_conjecture'`.
 
-### Important clarification (unconditional vs. “proof-track assumptions”)
+### Important clarification (unconditional vs. "proof-track assumptions")
 
 `#print axioms` only reports **kernel axioms** used by the theorem definition. It does **not**
 list typeclass assumptions that appear in the statement of `hodge_conjecture'`.
 
-As of 2026-01-28, `hodge_conjecture'` is still stated **under** several deep typeclass
-assumptions (e.g. `AutomaticSYRData`, `HarveyLawsonKingData`, `ChowGAGAData`,
-`CycleClass.PoincareDualFormExists`, `SpineBridgeData`, `SubmanifoldIntegration`).
+### Phase 7 Update (2026-02-01) — SEMANTIC RESTORATION
 
-To make the development “unconditional” in the *critic-proof* sense (no deep assumptions hidden
-behind trivial instances), we must either:
+`hodge_conjecture'` NOW HAS deep typeclass binders in its statement:
+- `[CycleClass.PoincareDualFormExists n X p]` - Poincaré dual form existence
+- `[SpineBridgeData n X p]` - Bridge between geometric class and representing form
 
-- construct and verify **non-trivial universal instances** for these classes, or
-- fully formalize the underlying deep theorems and remove the classes entirely.
+**Why this change**: The semantic restoration (Phase 7) fixed `cycleClass_geom` to use the
+**real** `FundamentalClassSet(support)` definition instead of being an alias of `cycleClass`.
+This breaks the `rfl` tautology and makes the deep mathematical content **explicit**.
+
+The deep content is:
+1. **PoincareDualFormExists**: For any set Z, there exists a closed form η_Z representing its
+   Poincaré dual (requires de Rham representability theorem)
+2. **SpineBridgeData**: For spine-produced cycles, the fundamental class equals the representing
+   form in cohomology (requires Harvey-Lawson calibration theory)
+
+To make the development "unconditional" in the *no-gotchas* sense:
+
+- Prove de Rham representability: every closed current on compact Kähler is cohomologous to smooth form
+- Prove Harvey-Lawson bridge: calibrated currents have class = calibration form
+- These are deep GMT results not in Mathlib - would need to be built from scratch
 
 ### Remaining sorries blocking universal instances (RESOLVED 2026-01-30)
 

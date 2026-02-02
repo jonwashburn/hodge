@@ -4,8 +4,6 @@ import Hodge.Classical.SerreVanishing
 -- NOTE: Lefschetz.lean moved to archive - not on proof track for hodge_conjecture'
 import Hodge.Classical.CycleClass
 import Hodge.Analytic.Currents
-import Hodge.Analytic.Integration
-import Hodge.Analytic.Integration.TopFormIntegral
 
 noncomputable section
 
@@ -20,21 +18,34 @@ universe u
 -/
 
 /-
-## Algebraic sets (Stage 0 decontamination)
+## Algebraic sets (Phase 8: Semantic Stub Documented)
 
-We intentionally avoid an inductive “closure under ∅/univ/∪/∩” definition of Zariski-closed sets.
-That encoding makes it far too easy to “prove” Chow/GAGA by structural recursion.
+**STATUS**: `IsAlgebraicSet := IsClosed` is still a semantic stub.
 
-For now, `IsAlgebraicSet` is a minimal interface **approximated by topological closedness**.
-This keeps the proof spine honest (no toy eliminators), while deferring real algebraic geometry
-to Stage 5 (local polynomial zero sets / scheme-theoretic definitions).
+The proper definition of an algebraic set in projective space is:
+> A set Z is algebraic if it is locally the zero locus of finitely many polynomial functions.
+
+Implementing this properly requires:
+1. An embedding X ↪ ℙⁿ(ℂ) via the `ProjectiveComplexManifold` structure
+2. Defining polynomial functions on affine patches
+3. Proving closure under unions, intersections, etc.
+
+This is substantial algebraic geometry infrastructure not in Mathlib.
+
+**CURRENT APPROACH**: We keep `IsAlgebraicSet := IsClosed` as a placeholder but:
+1. Remove `ChowGAGAData.universal` so GAGA is not trivially true
+2. Make `ChowGAGAData` an explicit deep assumption
+3. Document this as a semantic stub to be resolved
+
+Reference: [R. Hartshorne, "Algebraic Geometry", Springer, 1977, Chapter I.1]
 -/
 
-/-- **Algebraic Subsets** (temporary interface).
+/-- **Algebraic Subsets** (SEMANTIC STUB - Phase 8 documented).
 
-In this development phase, we approximate algebraic subsets by *topologically closed* subsets.
-This is strictly weaker than being Zariski-closed, but it avoids the banned inductive closure trick
-and is sufficient for wiring the spine at the level of assumptions. -/
+**WARNING**: This is still defined as `IsClosed`, NOT "local polynomial zero locus".
+
+The proper definition requires projective embedding infrastructure. We keep this
+stub but make `ChowGAGAData` explicit (no universal instance). -/
 def IsAlgebraicSet (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
@@ -131,17 +142,25 @@ class ChowGAGAData (n : ℕ) (X : Type u)
   analytic_to_algebraic :
     ∀ (Z : Set X), IsAnalyticSet (n := n) (X := X) Z → IsAlgebraicSet n X Z
 
-/-- **Universal instance of Chow/GAGA** (Phase 0 interface).
+/-!
+## Note: No universal ChowGAGAData (Phase 8)
 
-In the current proof-track interface:
-- `IsAnalyticSet` packages *topological closedness*, and
-- `IsAlgebraicSet` is defined as *topological closedness*.
+We intentionally do NOT provide a universal instance of `ChowGAGAData`.
 
-So the Chow/GAGA conversion is immediate. -/
-def ChowGAGAData.universal : ChowGAGAData n X where
-  analytic_to_algebraic := by
-    intro Z hZ
-    simpa [IsAlgebraicSet] using hZ.isClosed
+**Why**: The Chow/GAGA theorem (analytic sets are algebraic on projective varieties) is
+a deep result that requires:
+1. The Chow theorem on projective varieties
+2. GAGA (comparison between analytic and algebraic coherent sheaves)
+3. Proper algebraic geometry infrastructure
+
+**Current Status**:
+- `IsAnalyticSet` is now properly defined (local holomorphic zero loci)
+- `IsAlgebraicSet` is still a stub (`IsClosed`)
+- Even with proper definitions, proving analytic → algebraic requires GAGA
+
+**Consequence**: `ChowGAGAData` must be provided explicitly as a typeclass assumption
+in theorems that need Chow/GAGA. This makes the deep assumption visible.
+-/
 
 /-- **Chow's Theorem / GAGA** (Analytic → Algebraic).
 
@@ -512,7 +531,22 @@ This section defines the geometric cycle class computed from the support,
 and the `SpineBridgeData` typeclass that bridges geometry to cohomology.
 -/
 
-/-- **Geometric cycle class** computed from the support.
+/-- The support of a signed algebraic cycle is `pos ∪ neg`. -/
+def SignedAlgebraicCycle.support' {p : ℕ} (Z : SignedAlgebraicCycle n X p) : Set X :=
+  Z.pos ∪ Z.neg
+
+/-- The support of a signed algebraic cycle is algebraic. -/
+theorem SignedAlgebraicCycle.support'_alg {p : ℕ} (Z : SignedAlgebraicCycle n X p) :
+    isAlgebraicSubvariety n X (SignedAlgebraicCycle.support' Z) := by
+  obtain ⟨W₁, hW₁⟩ := Z.pos_alg
+  obtain ⟨W₂, hW₂⟩ := Z.neg_alg
+  refine ⟨⟨Z.support', max W₁.codim W₂.codim, ?_⟩, rfl⟩
+  unfold SignedAlgebraicCycle.support'
+  apply IsAlgebraicSet_union
+  · rw [← hW₁]; exact W₁.is_algebraic
+  · rw [← hW₂]; exact W₂.is_algebraic
+
+/-- **Geometric cycle class** computed from the support (REAL DEFINITION).
 
     This is the *actual* geometric definition: the cohomology class is the class of
     the fundamental class of the support \(Z.pos ∪ Z.neg\).
@@ -522,13 +556,15 @@ and the `SpineBridgeData` typeclass that bridges geometry to cohomology.
     Concretely, the bridge asserts (for spine-produced cycles) that:
     \[
       [\mathrm{FundamentalClassSet}(\mathrm{support}(Z))] = [\mathrm{representingForm}(Z)].
-    \] -/
+    \]
+
+    **Phase 7 Update (2026-02-01)**: Definition now uses `FundamentalClassSet` from the support.
+    Requires `PoincareDualFormExists` typeclass for the fundamental class construction. -/
 noncomputable def SignedAlgebraicCycle.cycleClass_geom {p : ℕ}
-    (Z : SignedAlgebraicCycle n X p) [CycleClass.PoincareDualFormExists n X p] :
-    DeRhamCohomologyClass n X (2 * p) :=
-  ofForm (FundamentalClassSet n X p Z.support)
-    (FundamentalClassSet_isClosed (n := n) (X := X) (p := p) (Z := Z.support)
-      (Z.support_is_algebraic))
+    [CycleClass.PoincareDualFormExists n X p]
+    (Z : SignedAlgebraicCycle n X p) : DeRhamCohomologyClass n X (2 * p) :=
+  ofForm (FundamentalClassSet n X p Z.support')
+         (FundamentalClassSet_isClosed p Z.support' Z.support'_alg)
 
 /-- **Spine Bridge Data**: the deep bridge between geometry and cohomology.
 
@@ -538,29 +574,42 @@ noncomputable def SignedAlgebraicCycle.cycleClass_geom {p : ℕ}
 
     In the fully unconditional project, this should be *proved* from GMT + Stokes + PD
     (ultimately Harvey–Lawson / calibrated current theory + GAGA).
-    For now we keep it explicit as a typeclass assumption. -/
-class SpineBridgeData (n : ℕ) (X : Type u)
+    For now we keep it explicit as a typeclass assumption.
+
+    **Phase 7 Update**: Requires `PoincareDualFormExists` separately because `cycleClass_geom`
+    is defined using `FundamentalClassSet`. -/
+class SpineBridgeData (n : ℕ) (X : Type u) (p : ℕ)
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [BorelSpace X] [Nonempty X] : Prop where
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [CycleClass.PoincareDualFormExists n X p] : Prop where
   /-- For spine-produced cycles, the geometric class from support equals the class of the
       carried representing form. -/
-  fundamental_eq_representing : ∀ {p : ℕ} [CycleClass.PoincareDualFormExists n X p]
-    (Z : SignedAlgebraicCycle n X p),
+  fundamental_eq_representing :
+    ∀ (Z : SignedAlgebraicCycle n X p),
       Z.cycleClass_geom = ofForm Z.representingForm Z.representingForm_closed
+
+/-!
+## Note: no `SpineBridgeData.universal`
+
+`SpineBridgeData` is intended to be discharged by the real PD/GMT bridge (integration current + de Rham).
+We intentionally do **not** provide a trivial `.universal` constructor here, because that would reintroduce
+the "cycle class tautology" gotcha on the main proof spine.
+-/
 
 /-- The geometric class equals the representing form class (by the spine bridge). -/
 theorem SignedAlgebraicCycle.cycleClass_geom_eq_representingForm {p : ℕ}
-    [CycleClass.PoincareDualFormExists n X p] [SpineBridgeData n X]
+    [CycleClass.PoincareDualFormExists n X p] [SpineBridgeData n X p]
     (Z : SignedAlgebraicCycle n X p) :
     Z.cycleClass_geom = ofForm Z.representingForm Z.representingForm_closed :=
-  SpineBridgeData.fundamental_eq_representing (n := n) (X := X) (Z := Z)
+  SpineBridgeData.fundamental_eq_representing (n := n) (X := X) (p := p) (Z := Z)
 
 /-- The geometric class equals the shortcut class (via the bridge). -/
 theorem SignedAlgebraicCycle.cycleClass_geom_eq_cycleClass {p : ℕ}
-    [CycleClass.PoincareDualFormExists n X p] [SpineBridgeData n X]
-    (Z : SignedAlgebraicCycle n X p) : Z.cycleClass_geom = Z.cycleClass := by
+    [CycleClass.PoincareDualFormExists n X p] [SpineBridgeData n X p]
+    (Z : SignedAlgebraicCycle n X p) :
+    Z.cycleClass_geom = Z.cycleClass := by
   rw [cycleClass_geom_eq_representingForm (n := n) (X := X) (Z := Z),
     cycleClass_eq_representingForm (n := n) (X := X) (Z := Z)]
 
