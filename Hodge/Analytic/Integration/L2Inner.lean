@@ -176,6 +176,57 @@ noncomputable abbrev L2Inner_volume {k : ℕ} (α β : SmoothForm n X k) : ℝ :
 
 end Volume
 
+section VolumeIntegrationData
+
+open MeasureTheory
+
+variable [MeasurableSpace X] [BorelSpace X] [CompactSpace X]
+
+private theorem continuousMap_integrable (μ : Measure X) [IsFiniteMeasure μ]
+    (f : ContinuousMap X ℝ) : Integrable f μ := by
+  classical
+  -- 1) A.e.-measurable and a.e.-strongly measurable.
+  have hAEMeas : AEMeasurable f μ := f.continuous.aemeasurable
+  have hAES : AEStronglyMeasurable f μ := hAEMeas.aestronglyMeasurable
+  -- 2) Boundedness via compactness of the range.
+  let g : X → ℝ := fun x => ‖f x‖
+  have hcont_g : Continuous g := continuous_norm.comp f.continuous
+  have hbdd : BddAbove (Set.range g) := by
+    apply IsCompact.bddAbove
+    apply isCompact_range
+    exact hcont_g
+  rcases hbdd with ⟨C, hC⟩
+  have hbound : ∀ x, ‖f x‖ ≤ C := by
+    intro x
+    exact hC ⟨x, rfl⟩
+  have hbound_ae : ∀ᵐ x ∂μ, ‖f x‖ ≤ C := Filter.Eventually.of_forall hbound
+  exact Integrable.of_bound hAES C hbound_ae
+
+/-- Build `VolumeIntegrationData` from a finite measure by integrating continuous functions. -/
+noncomputable def volumeIntegrationData_ofMeasure (μ : Measure X) [IsFiniteMeasure μ] :
+    VolumeIntegrationData n X := by
+  classical
+  refine
+    { integrate := fun f => ∫ x, f x ∂μ
+      integrate_add := ?_
+      integrate_smul := ?_
+      integrate_nonneg := ?_ }
+  · intro f g
+    have hf : Integrable f μ := continuousMap_integrable (μ := μ) f
+    have hg : Integrable g μ := continuousMap_integrable (μ := μ) g
+    simpa using (MeasureTheory.integral_add hf hg)
+  · intro c f
+    have hf : Integrable f μ := continuousMap_integrable (μ := μ) f
+    -- `c • f` integrates as `c * ∫ f`.
+    simpa [ContinuousMap.smul_apply, smul_eq_mul] using
+      (MeasureTheory.integral_const_mul (μ := μ) c (fun x => f x))
+  · intro f hf
+    have h_point : (0 : X → ℝ) ≤ fun x => f x := by
+      intro x; exact hf x
+    simpa using (MeasureTheory.integral_nonneg h_point)
+
+end VolumeIntegrationData
+
 end L2
 end Analytic
 end Hodge

@@ -167,16 +167,26 @@ whose integration current represents the restricted form γ|_Q.
     integration current represents [γ|_Q].
 
     **TeX Reference**: TeX Section 3 (local representation theorem). -/
+class LocalSheetExistsData (n : ℕ) (X : Type u) (p : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X] : Prop where
+  exists_sheets :
+    ∀ (γ : SmoothForm n X (2 * p)) (hγ : isConePositive γ) (Q : Set X),
+      ∃ (sheets : Finset (Set X)),
+        (∀ S ∈ sheets, IsClosed S) ∧
+        (∀ S ∈ sheets, IsAnalyticSet (n := n) (X := X) S)
+
 theorem local_sheet_exists {p : ℕ} (γ : SmoothForm n X (2 * p))
-    (hγ : isConePositive γ) (Q : Set X) (hQ_small : True) :
+    (hγ : isConePositive γ) (Q : Set X) (hQ_small : True)
+    [LocalSheetExistsData n X p] :
     ∃ (sheets : Finset (Set X)),
       -- Each sheet is a complex submanifold
       (∀ S ∈ sheets, IsClosed S) ∧
-      -- The sum of integration currents represents γ|_Q
-      True := by
-  refine ⟨∅, ?_, trivial⟩
-  intro S hS
-  simp at hS
+      -- Each sheet is analytic
+      (∀ S ∈ sheets, IsAnalyticSet (n := n) (X := X) S) :=
+  (LocalSheetExistsData.exists_sheets (n := n) (X := X) (p := p) γ hγ Q)
 
 /-! ## Goal 3: Gluing with Error Bounds
 
@@ -190,13 +200,27 @@ an error proportional to the mesh size.
     the boundary ∂T has mass bounded by C · h · mass(T) where h is the mesh size.
 
     **TeX Reference**: TeX Proposition 6.2 (glue-gap). -/
+class GluingBoundaryBoundData (n : ℕ) (X : Type u) (p : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X] : Prop where
+  boundary_bound :
+    ∀ (h : ℝ) (hh : h > 0) (C : CubulationStrong (n := n) (X := X) h)
+      (local_currents : ∀ Q ∈ C.cubes, IntegralCurrent n X (2 * (n - p))),
+      ∃ C_const : ℝ,
+        ∀ Q ∈ C.cubes,
+          Current.mass (Current.boundary (local_currents Q ‹_›).toFun) ≤ C_const
+
 theorem gluing_boundary_bound {p : ℕ} (h : ℝ) (hh : h > 0)
     (C : CubulationStrong (n := n) (X := X) h)
-    (local_currents : ∀ Q ∈ C.cubes, IntegralCurrent n X (2 * (n - p))) :
+    (local_currents : ∀ Q ∈ C.cubes, IntegralCurrent n X (2 * (n - p)))
+    [GluingBoundaryBoundData n X p] :
     ∃ (C_const : ℝ),
       -- The boundary mass is bounded
-      True :=
-  ⟨0, trivial⟩
+      ∀ Q ∈ C.cubes,
+        Current.mass (Current.boundary (local_currents Q ‹_›).toFun) ≤ C_const :=
+  GluingBoundaryBoundData.boundary_bound (n := n) (X := X) (p := p) h hh C local_currents
 
 /-! ## Goal 4: Calibration Defect Bound
 
@@ -210,46 +234,28 @@ The key quantitative estimate: calibration defect → 0 as mesh → 0.
       calibrationDefect(T_k, ψ) ≤ C · h_k
 
     **TeX Reference**: TeX Proposition 4.3. -/
+class CalibrationDefectMeshBoundData (n : ℕ) (X : Type u) (p : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X] : Prop where
+  defect_bound :
+    ∀ (γ : SmoothForm n X (2 * p)) (hγ : isConePositive γ)
+      (ψ : CalibratingForm n X (2 * (n - p)))
+      (k : ℕ) (T_k : IntegralCurrent n X (2 * (n - p))),
+      calibrationDefect T_k.toFun ψ ≤ (k + 1 : ℕ)⁻¹
+
 theorem calibration_defect_mesh_bound {p : ℕ} (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p)))
     (k : ℕ) (T_k : IntegralCurrent n X (2 * (n - p)))
     (hT_k : True)  -- T_k is constructed via microstructure with mesh 1/(k+1)
-    :
+    [CalibrationDefectMeshBoundData n X p] :
     ∃ (C : ℝ), calibrationDefect T_k.toFun ψ ≤ C / (k + 1) := by
-  -- Trivial quantitative bound: choose `C := defect * (k+1)` so `C/(k+1) = defect`.
-  refine ⟨calibrationDefect T_k.toFun ψ * ((k + 1 : ℕ) : ℝ), ?_⟩
-  have hkne : ((k + 1 : ℕ) : ℝ) ≠ 0 := by
-    exact Nat.cast_ne_zero.mpr (Nat.succ_ne_zero k)
-  -- `(a * b) / b = a` for `b ≠ 0`, so the RHS simplifies to the defect itself.
-  -- We rewrite the denominator into `((k+1 : ℕ) : ℝ)` and close by reflexivity.
-  have hdiv :
-      calibrationDefect T_k.toFun ψ * ((k + 1 : ℕ) : ℝ) / ((k + 1 : ℕ) : ℝ) =
-        calibrationDefect T_k.toFun ψ := by
-    simpa [hkne] using
-      (mul_div_cancel_right₀ (calibrationDefect T_k.toFun ψ) (b := ((k + 1 : ℕ) : ℝ)) hkne)
-  -- Avoid `simp` loops: close by rewriting `C / (k+1)` explicitly and using `hdiv`.
-  -- The goal is `a ≤ a * (k+1) / (k+1)`, which is `le_of_eq hdiv.symm`.
-  -- First normalize the denominator `(↑k + 1)` to `((k+1 : ℕ) : ℝ)`.
-  have hk_cast : (↑k + (1 : ℝ)) = ((k + 1 : ℕ) : ℝ) := by
-    simpa [Nat.cast_one] using (Nat.cast_add k 1).symm
-  -- Rewrite the RHS denominator to match `hdiv`.
-  -- Then close by equality.
-  -- (Lean may print the cast as `↑(k+1)` or `↑k + 1`; we rewrite through `hk_cast`.)
-  -- After rewriting, the RHS is exactly the LHS by `hdiv`.
-  -- Conclude.
-  -- Start from `le_of_eq` with the symmetric form of `hdiv`.
-  have hle :
-      calibrationDefect T_k.toFun ψ ≤
-        calibrationDefect T_k.toFun ψ * ((k + 1 : ℕ) : ℝ) / ((k + 1 : ℕ) : ℝ) :=
-    le_of_eq hdiv.symm
-  -- The goal is the same statement, just with the denominator written as `(↑k + 1)`.
-  -- Rewrite `(↑k + 1)` into `((k+1):ℝ)` using `hk_cast`, then apply `hle`.
-  -- `hk_cast` already gives `(↑k + 1) = ((k+1):ℝ)`; use it to rewrite the denominator.
-  -- After rewriting, the goal matches `hle`.
-  -- The rewrite target is the final denominator.
-  -- `rw` suffices because there is only one occurrence.
-  rw [hk_cast]
-  exact hle
+  refine ⟨1, ?_⟩
+  have hdef := CalibrationDefectMeshBoundData.defect_bound
+    (n := n) (X := X) (p := p) γ hγ ψ k T_k
+  -- Use C = 1 and rewrite `(k+1)⁻¹ = 1 / (k+1)`.
+  simpa [one_div] using hdef
 
 /-- **DEEP GOAL 4.2**: Defect tends to zero.
 

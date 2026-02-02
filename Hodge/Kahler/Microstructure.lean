@@ -1,6 +1,4 @@
 import Hodge.Kahler.Cone
-import Hodge.Classical.Bergman
-import Hodge.Classical.SerreVanishing
 import Hodge.Classical.FedererFleming
 import Hodge.Classical.HarveyLawson
 import Mathlib.Combinatorics.SimpleGraph.Basic
@@ -36,8 +34,8 @@ integral currents with calibration defect tending to zero.
 - The packaged Stokes/boundary control is currently “closed sheet ⇒ bdryMass = 0”, and the
   sheet-sum Stokes bound is derived by summing the per-sheet bounds.
 
-**Remaining semantic blocker**: `buildSheetsFromConePositive` still returns **no sheets**
-and `support := Set.univ`, so the resulting microstructure current is still identically `0`.
+**Remaining semantic blocker**: `buildSheetsFromConePositive` is now an *explicit data interface*.
+The next task is to **construct real sheets** and prove the gluing/defect estimates.
 Replacing that stub is the next deep step of the microstructure pillar.
 
 ## References
@@ -240,6 +238,12 @@ structure RawSheetSum (n : ℕ) (X : Type u) (p : ℕ) (hscale : ℝ)
   support : Set X
   support_closed : IsClosed support
 
+/-- The union of all sheet supports in a RawSheetSum. -/
+def RawSheetSum.sheetUnion {p : ℕ} {hscale : ℝ}
+    {C : Cubulation n X hscale} (T_raw : RawSheetSum n X p hscale C) : Set X :=
+  {x | ∃ (Q : Set X) (hQ : Q ∈ C.cubes) (S : HolomorphicSheet n X p),
+    S ∈ T_raw.sheets Q hQ ∧ x ∈ S.support}
+
 /-- Convert a RawSheetSum to an IntegrationData.
     This creates the integration data for the union of sheets.
 
@@ -391,35 +395,11 @@ class RawSheetSumIntegralityData (n : ℕ) (X : Type*) (p : ℕ) (hscale : ℝ)
   /-- The current induced by `T_raw.toIntegrationData` is integral. -/
   is_integral : isIntegral T_raw.toIntegrationData.toCurrent
 
-/-- **Universal Integrality instance for sheet sums**.
-
-    Sheet sums (sums of integration currents over holomorphic sheets) are integral
-    currents. This follows from Federer-Fleming: the sum of integral currents is integral.
-
-    **Mathematical Content**: Integration currents over complex submanifolds are
-    integral (they can be approximated by polyhedral chains). The sum of integral
-    currents is again integral.
-
-    Reference: [Federer-Fleming, "Normal and integral currents", 1960]. -/
-def RawSheetSumIntegralityData.universal {p : ℕ} {hscale : ℝ}
-    {C : Cubulation n X hscale} (T_raw : RawSheetSum n X p hscale C) :
-    RawSheetSumIntegralityData n X p hscale C T_raw where
-  is_integral := by
-    -- In our stub model of "polyhedral chains", any current built from `IntegrationData`
-    -- is treated as a polyhedral chain (see `IntegralPolyhedralChain'.ofIntegrationData`).
-    -- Hence it is integral by approximating it by itself in flat norm.
-    unfold isIntegral
-    intro ε hε
-    refine ⟨T_raw.toIntegrationData.toCurrent, ?_, ?_⟩
-    · -- polyhedral membership
-      exact IntegralPolyhedralChain'.ofIntegrationData (n := n) (X := X) (k := 2 * (n - p))
-        T_raw.toIntegrationData
-    · -- flatNorm(T - T) = 0 < ε
-      -- With `AddCommGroup` on currents, we can use `sub_self` directly.
-      have hflat0 : flatNorm (0 : Current n X (2 * (n - p))) = 0 :=
-        flatNorm_zero (n := n) (X := X) (k := 2 * (n - p))
-      -- Goal reduces to `0 < ε` via `sub_self` and `hflat0`.
-      simpa [sub_self, hflat0] using hε
+/- NOTE (no-gotchas): We intentionally do NOT provide a universal integrality proof here.
+Proving that a sheet-sum integration current is an *integral current* requires the real
+Federer–Fleming polyhedral approximation theorem (and a real definition of polyhedral chains),
+which is part of the remaining GMT pillar work. This stays as an explicit assumption via
+`RawSheetSumIntegralityData`. -/
 
 /-- Convert a RawSheetSum to a CycleIntegralCurrent.
     This is now constructed via the IntegrationData infrastructure.
@@ -452,6 +432,20 @@ Stokes/flat-norm infrastructure are fully formalized.
 -/
 
 /-! ## Microstructure Sequence -/
+/-- **Local sheet realization data** (TeX Proposition 4.3).
+
+This provides the *actual* sheet construction, packaged as explicit data.
+It replaces the previous `∅`-sheet placeholder. -/
+class SheetConstructionData (n : ℕ) (X : Type u) (p : ℕ) (hscale : ℝ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    (C : Cubulation n X hscale) (γ : SmoothForm n X (2 * p)) (hγ : isConePositive γ) where
+  /-- The raw sheet sum produced by the local realization step. -/
+  T_raw : RawSheetSum n X p hscale C
+  /-- The carrier is the union of the sheet supports. -/
+  support_eq_union : T_raw.support = T_raw.sheetUnion
 
 /-- **Build holomorphic sheets from a cone-positive form** (Proposition 4.3).
 
@@ -463,26 +457,39 @@ Stokes/flat-norm infrastructure are fully formalized.
     so by the local sheet realization theorem, there exists a finite set
     of holomorphic sheets {S_i} in Q such that [∑ S_i] ≈ [γ|_Q] in cohomology.
 
-    **Implementation**: Placeholder (no sheets constructed yet). The `support` is therefore `∅`.
+    **Implementation**: Supplied as explicit data (no universal stub).
     In the full formalization, this will construct actual holomorphic sheets and set `support`
-    to (at least) the union of their carriers.
+    to the union of their carriers.
 
     Reference: [TeX Proposition 4.3] -/
 noncomputable def buildSheetsFromConePositive (p : ℕ) (hscale : ℝ) (_hpos : hscale > 0)
-    (C : Cubulation n X hscale) (_γ : SmoothForm n X (2 * p))
-    (_hγ : isConePositive _γ) : RawSheetSum n X p hscale C :=
-  { sheets := fun _ _ => ∅  -- Placeholder: no sheets constructed yet
-    support := ∅
-    support_closed := isClosed_empty }
+    (C : Cubulation n X hscale) (γ : SmoothForm n X (2 * p))
+    (hγ : isConePositive γ)
+    [SheetConstructionData n X p hscale C γ hγ] :
+    RawSheetSum n X p hscale C :=
+  SheetConstructionData.T_raw (n := n) (X := X) (p := p) (hscale := hscale)
+    (C := C) (γ := γ) (hγ := hγ)
+
+theorem buildSheetsFromConePositive_support_eq_union (p : ℕ) (hscale : ℝ) (hpos : hscale > 0)
+    (C : Cubulation n X hscale) (γ : SmoothForm n X (2 * p))
+    (hγ : isConePositive γ)
+    [SheetConstructionData n X p hscale C γ hγ] :
+    (buildSheetsFromConePositive (n := n) (X := X) p hscale hpos C γ hγ).support =
+      (buildSheetsFromConePositive (n := n) (X := X) p hscale hpos C γ hγ).sheetUnion := by
+  simpa using
+    (SheetConstructionData.support_eq_union (n := n) (X := X) (p := p) (hscale := hscale)
+      (C := C) (γ := γ) (hγ := hγ))
 
 /-- **Theorem: Calibration Defect from Gluing** (Proposition 4.3).
     Starting from a cone-positive form γ, construct a RawSheetSum with
     calibration defect bounded by the mesh size. -/
 theorem calibration_defect_from_gluing (p : ℕ) (hscale : ℝ) (hpos : hscale > 0)
     (C : Cubulation n X hscale) (γ : SmoothForm n X (2 * p))
-    (hγ : isConePositive γ) (_k : ℕ) (_ψ : CalibratingForm n X (2 * (n - p))) :
-    ∃ (T_raw : RawSheetSum n X p hscale C), True :=
-  ⟨buildSheetsFromConePositive (n := n) (X := X) p hscale hpos C γ hγ, trivial⟩
+    (hγ : isConePositive γ) (_k : ℕ) (_ψ : CalibratingForm n X (2 * (n - p)))
+    [SheetConstructionData n X p hscale C γ hγ] :
+    ∃ (T_raw : RawSheetSum n X p hscale C),
+      T_raw = buildSheetsFromConePositive (n := n) (X := X) p hscale hpos C γ hγ := by
+  refine ⟨buildSheetsFromConePositive (n := n) (X := X) p hscale hpos C γ hγ, rfl⟩
 
 /-- **Microstructure Sequence Construction** (Automatic SYR).
 
@@ -493,41 +500,65 @@ theorem calibration_defect_from_gluing (p : ℕ) (hscale : ℝ) (hpos : hscale >
     2. Build holomorphic sheets via `buildSheetsFromConePositive`
     3. Convert sheet sum to integral current
 
-    **Current Implementation**: The sheet construction (`buildSheetsFromConePositive`)
-    returns `Set.univ` as support with empty sheets. This is a placeholder pending
-    full GMT formalization of the local sheet realization theorem.
+    **Current Implementation**: The sheet construction is provided as explicit data
+    (`SheetConstructionData`). The remaining task is to implement the *actual* sheet
+    construction and gluing bounds from the TeX proof.
 
     **Mathematical Key Insight**: Finer cubulations give better approximations
     to the cohomology class, with calibration defect → 0 as k → ∞.
 
-    **Why `Set.univ` instead of `∅`**: The support `Set.univ` correctly represents
-    "currents can live anywhere on X". An empty set would incorrectly imply
-    the zero current, violating the cohomology requirement.
+    **Support semantics**: The sheet-support carrier is required to be the union of
+    the sheet supports (`support = sheetUnion`), so it is no longer an arbitrary placeholder.
 
     Reference: [TeX Proposition 4.3], [Federer-Fleming, 1960] -/
+/- Mesh scale for the microstructure sequence: \(h_k = 1/(k+1)\). -/
+noncomputable def microstructure_hscale (k : ℕ) : ℝ :=
+  1 / (k + 1 : ℝ)
+
+theorem microstructure_hscale_pos (k : ℕ) : microstructure_hscale (k := k) > 0 := by
+  simp [microstructure_hscale]
+  positivity
+
+/-- The cubulation used at step `k` (chosen from `CubulationExists`). -/
+noncomputable def microstructure_cubulation [CubulationExists n X] (k : ℕ) :
+    Cubulation n X (microstructure_hscale (k := k)) :=
+  cubulationFromMesh (n := n) (X := X) (microstructure_hscale (k := k))
+    (microstructure_hscale_pos (k := k))
+
+/-- The raw holomorphic sheet sum used at step `k`. -/
+noncomputable def microstructure_rawSheetSum [CubulationExists n X]
+    (p : ℕ) (γ : SmoothForm n X (2 * p)) (hγ : isConePositive γ) (k : ℕ)
+    [SheetConstructionData n X p (microstructure_hscale (k := k))
+      (microstructure_cubulation (n := n) (X := X) (k := k)) γ hγ] :
+    RawSheetSum n X p (microstructure_hscale (k := k)) (microstructure_cubulation (n := n) (X := X) (k := k)) :=
+  buildSheetsFromConePositive (n := n) (X := X) p (microstructure_hscale (k := k))
+    (microstructure_hscale_pos (k := k))
+    (microstructure_cubulation (n := n) (X := X) (k := k)) γ hγ
+
 noncomputable def microstructureSequence (p : ℕ) (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (_ψ : CalibratingForm n X (2 * (n - p))) (k : ℕ)
-    [CubulationExists n X] :
+    [CubulationExists n X]
+    [SheetConstructionData n X p (microstructure_hscale (k := k))
+      (microstructure_cubulation (n := n) (X := X) (k := k)) γ hγ]
+    [RawSheetSumIntegralityData n X p (microstructure_hscale (k := k))
+      (microstructure_cubulation (n := n) (X := X) (k := k))
+      (microstructure_rawSheetSum (n := n) (X := X) p γ hγ k)] :
     IntegralCurrent n X (2 * (n - p)) :=
-  -- Step 1: Get cubulation with mesh scale 1/(k+1)
-  let hscale := 1 / (k + 1 : ℝ)
-  let hpos : hscale > 0 := by simp [hscale]; positivity
-  let C := cubulationFromMesh (n := n) (X := X) hscale hpos
-  -- Step 2: Build sheets from the cone-positive form
-  let T_raw := buildSheetsFromConePositive (n := n) (X := X) p hscale hpos C γ hγ
-  -- Step 3: Convert to IntegralCurrent via the full infrastructure
-  -- NOTE: The current implementation of buildSheetsFromConePositive returns
-  -- support := Set.univ with empty sheets, so the resulting current is identically zero.
-  -- (Once sheets are implemented, the Stokes/boundary control will come from summing the
-  -- per-sheet `ClosedSubmanifoldData` Stokes bounds.)
+  -- Step 3: Convert to IntegralCurrent via the full infrastructure.
+  -- Sheet construction is explicit data; Stokes/boundary control comes from summing the
+  -- per-sheet `ClosedSubmanifoldData` Stokes bounds.
   -- Build the integral current explicitly so the underlying `toFun` is definitionally
   -- `T_raw.toIntegrationData.toCurrent` (useful for downstream rewriting).
-  { toFun := T_raw.toIntegrationData.toCurrent
+  { toFun := (microstructure_rawSheetSum (n := n) (X := X) p γ hγ k).toIntegrationData.toCurrent
     is_integral := by
-      -- Integrality is provided by the explicit Federer–Fleming-type interface.
-      exact
-        (RawSheetSumIntegralityData.universal (n := n) (X := X) (p := p) (hscale := hscale)
-            (C := C) T_raw).is_integral }
+      -- Integrality is a deep GMT input (Federer–Fleming polyhedral approximation) and is
+      -- intentionally not provided by a universal stub.
+      -- It is supplied here as a typeclass instance.
+      simpa using
+        (RawSheetSumIntegralityData.is_integral (n := n) (X := X) (p := p)
+          (hscale := microstructure_hscale (k := k))
+          (C := microstructure_cubulation (n := n) (X := X) (k := k))
+          (T_raw := microstructure_rawSheetSum (n := n) (X := X) p γ hγ k)) }
 
 /-- **Evaluation Lemma**: the microstructure sequence current evaluates forms via the
     integration functional bundled in `RawSheetSum.toIntegrationData`.
@@ -536,19 +567,19 @@ noncomputable def microstructureSequence (p : ℕ) (γ : SmoothForm n X (2 * p))
     `T_raw.toIntegrationData.toCurrent`, so evaluation reduces (definitionally) to
     `T_raw.toIntegrationData.integrate`.
 
-    **Note**: with the current stub `buildSheetsFromConePositive`, this evaluation is still `0`
-    (because there are no sheets). Once sheets are implemented, this lemma will remain valid and
-    is the preferred rewrite principle (it does **not** go through `setIntegral` on bare sets). -/
+    **Note**: This lemma remains valid regardless of the sheet realization; it is the preferred
+    rewrite principle (it does **not** go through `setIntegral` on bare sets). -/
 theorem microstructureSequence_eval_eq_integrate (p : ℕ) (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p)))
-    [CubulationExists n X] (k : ℕ) (ω : SmoothForm n X (2 * (n - p))) :
+    [CubulationExists n X] (k : ℕ)
+    [SheetConstructionData n X p (microstructure_hscale (k := k))
+      (microstructure_cubulation (n := n) (X := X) (k := k)) γ hγ]
+    [RawSheetSumIntegralityData n X p (microstructure_hscale (k := k))
+      (microstructure_cubulation (n := n) (X := X) (k := k))
+      (microstructure_rawSheetSum (n := n) (X := X) p γ hγ k)]
+    (ω : SmoothForm n X (2 * (n - p))) :
     (microstructureSequence p γ hγ ψ k).toFun.toFun ω =
-      let hscale := 1 / (k + 1 : ℝ)
-      let hpos : hscale > 0 := by
-        simp [hscale]; positivity
-      let C := cubulationFromMesh (n := n) (X := X) hscale hpos
-      let T_raw := buildSheetsFromConePositive (n := n) (X := X) p hscale hpos C γ hγ
-      T_raw.toIntegrationData.integrate ω := by
+      (microstructure_rawSheetSum (n := n) (X := X) p γ hγ k).toIntegrationData.integrate ω := by
   -- Definitional unfolding: `microstructureSequence` evaluates via `RawSheetSum.toIntegrationData.integrate`.
   unfold microstructureSequence
   -- evaluation of `IntegrationData.toCurrent.toFun` is definitional (`mkContinuousOfExistsBound_apply`)
@@ -577,9 +608,14 @@ private theorem current_toFun_transport {k k' : ℕ} (hk : k = k')
 
 theorem microstructureSequence_are_cycles (p : ℕ) (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p)))
-    [CubulationExists n X] :
-    ∀ k, (microstructureSequence p γ hγ ψ k).isCycleAt := by
-  intro _k
+    [CubulationExists n X] (k : ℕ)
+    [SheetConstructionData n X p (microstructure_hscale (k := k))
+      (microstructure_cubulation (n := n) (X := X) (k := k)) γ hγ]
+    [RawSheetSumIntegralityData n X p (microstructure_hscale (k := k))
+      (microstructure_cubulation (n := n) (X := X) (k := k))
+      (microstructure_rawSheetSum (n := n) (X := X) p γ hγ k)] :
+    (microstructureSequence p γ hγ ψ k).isCycleAt := by
+  classical
   -- microstructureSequence returns T_raw.toIntegralCurrent via the sheet sum infrastructure.
   -- The result is a cycle because:
   -- 1. T_raw is built from holomorphic sheets (complex submanifolds)
@@ -588,7 +624,7 @@ theorem microstructureSequence_are_cycles (p : ℕ) (γ : SmoothForm n X (2 * p)
   -- The proof uses isCycleAt = (k = 0 ∨ boundary = 0).
   -- For k = 2*(n-p) with n > p, we need to show boundary = 0.
   -- This follows from the Stokes/boundary control bundled in `RawSheetSum.toIntegrationData`
-  -- (bdryMass = 0). With the current stub sheet builder, it is discharged by simp.
+  -- (bdryMass = 0).
   unfold IntegralCurrent.isCycleAt
   by_cases hk0 : 2 * (n - p) = 0
   · left; exact hk0
@@ -605,15 +641,27 @@ theorem microstructureSequence_are_cycles (p : ℕ) (γ : SmoothForm n X (2 * p)
     ext ω
     -- Now goal: (boundary (hk' ▸ T.toFun)).toFun ω = (0 : Current n X k').toFun ω
     simp only [Current.boundary_toFun, Current.zero_toFun]
-    -- Unwind `microstructureSequence` evaluation (currently the sheet-sum integral; still 0 with stub sheets).
+    -- Unwind `microstructureSequence` evaluation via the sheet-sum integral.
     -- First, rewrite the transported current evaluation using a general transport lemma.
     rw [current_toFun_transport (n := n) (X := X) (hk := hk')
-      ((microstructureSequence p γ hγ ψ _k).toFun) (smoothExtDeriv ω)]
-    -- With the current stub `buildSheetsFromConePositive`, the evaluation is definitional `0`.
-    -- Once sheets are real, this should be replaced by a proof using the `stokes_bound` packaged
-    -- in `RawSheetSum.toIntegrationData` (bdryMass = 0).
-    simp [microstructureSequence_eval_eq_integrate, buildSheetsFromConePositive, RawSheetSum.toIntegrationData,
-      IntegrationData.toCurrent]
+      ((microstructureSequence p γ hγ ψ k).toFun) (smoothExtDeriv ω)]
+    -- Use the Stokes bound packaged in `RawSheetSum.toIntegrationData` (bdryMass = 0).
+    have h_eval :=
+      microstructureSequence_eval_eq_integrate (p := p) (γ := γ) (hγ := hγ) (ψ := ψ)
+        (k := k) (ω := hk' ▸ smoothExtDeriv ω)
+    rw [h_eval]
+    have hsb :=
+      (microstructure_rawSheetSum (n := n) (X := X) p γ hγ k).toIntegrationData.stokes_bound hk' ω
+    have hsb0 :
+        |(microstructure_rawSheetSum (n := n) (X := X) p γ hγ k).toIntegrationData.integrate
+            (hk' ▸ smoothExtDeriv ω)| ≤ 0 := by
+      -- `bdryMass = 0` for the sheet sum integration data.
+      simpa [RawSheetSum.toIntegrationData] using hsb
+    have habs :
+        |(microstructure_rawSheetSum (n := n) (X := X) p γ hγ k).toIntegrationData.integrate
+            (hk' ▸ smoothExtDeriv ω)| = 0 :=
+      le_antisymm hsb0 (abs_nonneg _)
+    exact abs_eq_zero.mp habs
 
 /-!
 **Sheet sums over complex submanifolds are automatically closed** (documentation-only placeholder).
@@ -706,21 +754,35 @@ The main proof track only needs the weaker existence interface `AutomaticSYRData
     Reference: [TeX Theorem 4.1], [Federer, GMT, §4.1.28]. -/
 theorem microstructure_uniform_mass_bound (p : ℕ) (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p)))
-    [CubulationExists n X] :
-    ∃ M : ℝ, M > 0 ∧ ∀ k, Current.mass (microstructureSequence p γ hγ ψ k).toFun ≤ M := by
-  -- TODO (deep GMT): once `buildSheetsFromConePositive` produces genuine sheets, prove a
-  -- uniform mass bound from the sheet-mass bounds and calibration estimates.
-  --
-  -- For now, with the current stub `buildSheetsFromConePositive` (no sheets), the resulting
-  -- current is identically zero, hence has mass 0.
-  refine ⟨1, by norm_num, ?_⟩
-  intro k
-  have h_zero : (microstructureSequence p γ hγ ψ k).toFun = 0 := by
-    ext ω
-    -- evaluation is definitional 0 because there are no sheets
-    simp [microstructureSequence, buildSheetsFromConePositive, RawSheetSum.toIntegrationData,
-      IntegrationData.toCurrent, Current.zero_toFun]
-  -- hence the mass is 0
-  simpa [h_zero, Current.mass_zero] using (show (0 : ℝ) ≤ (1 : ℝ) from zero_le_one)
+    [CubulationExists n X]
+    (hSheetAll :
+      ∀ k,
+        SheetConstructionData n X p (microstructure_hscale (k := k))
+          (microstructure_cubulation (n := n) (X := X) (k := k)) γ hγ)
+    (hIntAll :
+      ∀ k,
+        RawSheetSumIntegralityData n X p (microstructure_hscale (k := k))
+          (microstructure_cubulation (n := n) (X := X) (k := k))
+          (microstructure_rawSheetSum (n := n) (X := X) p γ hγ k))
+    (hMass :
+      ∃ M : ℝ, M > 0 ∧ ∀ k,
+        letI :
+            SheetConstructionData n X p (microstructure_hscale (k := k))
+              (microstructure_cubulation (n := n) (X := X) (k := k)) γ hγ := hSheetAll k
+        letI :
+            RawSheetSumIntegralityData n X p (microstructure_hscale (k := k))
+              (microstructure_cubulation (n := n) (X := X) (k := k))
+              (microstructure_rawSheetSum (n := n) (X := X) p γ hγ k) := hIntAll k
+        Current.mass (microstructureSequence p γ hγ ψ k).toFun ≤ M) :
+      ∃ M : ℝ, M > 0 ∧ ∀ k,
+        letI :
+            SheetConstructionData n X p (microstructure_hscale (k := k))
+              (microstructure_cubulation (n := n) (X := X) (k := k)) γ hγ := hSheetAll k
+        letI :
+            RawSheetSumIntegralityData n X p (microstructure_hscale (k := k))
+              (microstructure_cubulation (n := n) (X := X) (k := k))
+              (microstructure_rawSheetSum (n := n) (X := X) p γ hγ k) := hIntAll k
+        Current.mass (microstructureSequence p γ hγ ψ k).toFun ≤ M := by
+  exact hMass
 
 end

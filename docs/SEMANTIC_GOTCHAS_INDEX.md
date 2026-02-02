@@ -50,6 +50,26 @@ This change is deep and will require a staged migration (new `FiberAltR` / `Smoo
 
 ---
 
+## H. Hodge theory / L2 integration
+
+- **Basepoint L2 stub removed**
+  - File: `Hodge/Analytic/Norms.lean`
+  - `L2Inner` now depends on explicit `VolumeIntegrationData` (no basepoint/zero integration).
+  - Cauchy–Schwarz is now an explicit interface (`L2InnerCauchySchwarzData`).
+  - `Hodge/Analytic/Integration/L2Inner.lean` now provides
+    `volumeIntegrationData_ofMeasure` (measure-based integration of continuous functions).
+  - `Hodge/Analytic/Integration/VolumeForm.lean` provides
+    `volumeIntegrationData_kahlerMeasure` (Kähler-measure wrapper).
+  - Remaining: construct the *Kähler* volume measure + prove L2 properties and the ⋆–wedge relation.
+
+- **Volume basis stub removed**
+  - File: `Hodge/Analytic/Integration/VolumeForm.lean`
+  - `volumeBasis` now depends on explicit `VolumeBasisData` (no zero-vector placeholder).
+
+- **Placeholder `True` removed from cohomology representative lemma**
+  - File: `Hodge/Analytic/Norms.lean`
+  - `energy_minimizer_trivial` now states only the definitional existence of a representative.
+
 ## B. Submanifold integration / Stokes (deep GMT layer)
 
 - **`SubmanifoldIntegration.universal` (the zero-measure/zero-integral model) has been removed**
@@ -79,68 +99,71 @@ This change is deep and will require a staged migration (new `FiberAltR` / `Smoo
 
 ---
 
+## B1. Integral currents / polyhedral chains (GMT core)
+
+- **Polyhedral chains are now an explicit data interface**
+  - File: `Hodge/Analytic/IntegralCurrents.lean`
+  - `IntegralPolyhedralChain'` now has a nontrivial generator:
+    - `PolyhedralCurrentData` + constructor `ofPolyhedralData`.
+  - This removes the (wrong) “all polyhedral chains are 0” consequence.
+  - Remaining blocker: formalize actual simplicial/polyhedral geometry and
+    prove Federer–Fleming approximation (no current instance yet).
+
+---
+
 ## C. SYR microstructure (deep construction)
 
-- **Microstructure sequence is still the zero current (because no sheets are constructed)**
+- **Sheet construction is now an explicit data interface (no empty-sheet stub)**
   - File: `Hodge/Kahler/Microstructure.lean`
-    - `buildSheetsFromConePositive`: `sheets := ∅`, `support := ∅` (`:471-476`)
-    - `microstructureSequence` evaluates by summing sheet integrals, hence is `0` with empty sheets (`:508-530`)
-  - Note: `Hodge/Kahler/Microstructure/RealSpine.lean` still contains an older `zero_int`-based stub, but it is not currently imported by the proof spine.
-  - Required fix: implement actual sheets + gluing + defect bound.
+    - `SheetConstructionData` provides the actual sheet construction.
+    - `buildSheetsFromConePositive` now *requires* `SheetConstructionData` and no longer returns `∅` by definition.
+    - The carrier is required to be the union of sheet supports (`support = sheetUnion`).
+  - Remaining blocker: **implement real sheet construction + gluing/defect estimates** (TeX Proposition 4.3 / Theorem 4.1).
 
-- **Sheet construction is still empty (support placeholder improved)**
-  - File: `Hodge/Kahler/Microstructure.lean`
-    - `buildSheetsFromConePositive`: `sheets := ∅` (still a semantic blocker)
-    - `support := ∅` now (the former `support := Set.univ` placeholder was removed)
-  - Required fix: nontrivial holomorphic sheet construction and support as the union of sheet carriers.
+- **Real spine sequence is now an explicit data interface (no zero sequence stub)**
+  - File: `Hodge/Kahler/Microstructure/RealSpine.lean`
+    - `RealMicrostructureSequenceData` packages a concrete sequence with defect → 0.
+    - `microstructureSequence_real` now depends on this data.
 
 ---
 
 ## D. Harvey–Lawson / King
 
-- **`IsAnalyticSet` is semantic stub (closedness-only)**
-  - Location: `Hodge/Classical/HarveyLawson.lean:38-41`
-  - Current definition:
-    ```lean
-    class IsAnalyticSet ... (S : Set X) : Prop where
-      isClosed : IsClosed S
-    ```
-  - **FORBIDDEN by playbook**: should be "local holomorphic zero locus"
-  - Required fix: Define as sets locally defined by holomorphic functions
-  - Blocked by: Need complex-analytic geometry infrastructure (not in Mathlib)
+- **`IsAnalyticSet` (closed + local holomorphic zero locus) is now real**
+  - Status: ✅ FIXED
+  - Location: `Hodge/AnalyticSets.lean` (`IsAnalyticSetZeroLocus`)
+  - Integrated into the spine at: `Hodge/Classical/HarveyLawson.lean` (`IsAnalyticSet := IsAnalyticSetZeroLocus`)
+  - Remaining deep blocker: **Harvey–Lawson regularity**
+    (`CalibratedCurrentRegularityData.support_is_analytic_zero_locus`) is still an explicit typeclass binder.
 
 ---
 
 ## E. Chow / GAGA
 
-- **`IsAlgebraicSet` is semantic stub (closedness-only)**
-  - Location: `Hodge/Classical/GAGA.lean:36-40`
-  - Current definition:
-    ```lean
-    def IsAlgebraicSet ... (Z : Set X) : Prop :=
-      IsClosed Z
-    ```
-  - **FORBIDDEN by playbook**: should be "polynomial zero locus" (Zariski-closed)
-  - Required fix: Define as sets cut out by polynomial equations
-  - Additionally need: Chow's theorem (analytic → algebraic on projective manifolds)
+- **`IsAlgebraicSet` (homogeneous polynomial zero loci pulled back from ℙ^N) is now real**
+  - Status: ✅ FIXED
+  - Location: `Hodge/Classical/AlgebraicSets.lean`
+  - Used by: `Hodge/Classical/GAGA.lean` (algebraic subvarieties, closure lemmas, hyperplane/CI examples)
+  - Remaining deep blocker: **Chow/GAGA theorem** itself (`ChowGAGAData`) is still an explicit typeclass binder.
 
 ---
 
 ## F. Proof-track state: global instances and deep typeclasses
 
-**Current state (2026-02-01)**:
+**Current state (2026-02-02)**:
 
 - `hodge_conjecture'` DOES use deep typeclass parameters (NOT hidden):
-  - `[CycleClass.PoincareDualFormExists n X p]` - explicit in signature
-  - `[SpineBridgeData n X p]` - explicit in signature
+  - `[AutomaticSYRData n X]`
+  - `[CycleClass.PoincareDualFormExists n X p]`
+  - `[SpineBridgeData n X p]`
+  - `[CalibratedCurrentRegularityData n X (2*(n-p))]`
+  - `[HarveyLawsonKingData n X (2*(n-p))]`
+  - `[ChowGAGAData n X]`
   - These encode **real mathematical content** (de Rham representability + Harvey-Lawson bridge)
   - **No `.universal` instances exist for these** - intentionally kept as open requirements
 
-- The spine is powered by global instances that use `.universal` constructors:
-  - `instAutomaticSYRData` (backed by `AutomaticSYRData.universal`) in `Hodge/Kahler/Main.lean`
-  - `instHarveyLawsonKingData` (backed by `HarveyLawsonKingData.universal`) in `Hodge/Classical/HarveyLawson.lean`
-  - `instChowGAGAData` (backed by `ChowGAGAData.universal`) in `Hodge/Classical/GAGA.lean`
-  - `instFlatLimitCycleData` (backed by `FlatLimitCycleData.universal`) in `Hodge/Classical/HarveyLawson.lean`
+- `FlatLimitCycleData` is now treated as a proved infrastructure lemma (an `instance` exists),
+  and it has been removed from the statement of `hodge_conjecture'` and its downstream theorems.
 
 - The proof of `hodge_conjecture'` now uses `SpineBridgeData.fundamental_eq_representing` (NOT `rfl`):
   - `Hodge/Kahler/Main.lean:642` uses `SignedAlgebraicCycle.cycleClass_geom_eq_representingForm`
@@ -171,4 +194,4 @@ These are purely formal (no geometry cheated) and will be used when replacing th
     - `RawSheetSum.toIntegrationData` now sums `ClosedSubmanifoldData.toIntegrationData` over sheets (`:256-351`)
     - `microstructureSequence_eval_eq_integrate` rewrites evaluation to that functional (`:572-589`)
     - As a result, the microstructure layer no longer needs `[SubmanifoldIntegration n X]` in its core definitions.
-  - Remaining blocker: `buildSheetsFromConePositive` is still empty (so the resulting current is still `0`).
+  - Remaining blocker: provide actual sheet constructions (no instance yet for `SheetConstructionData`).

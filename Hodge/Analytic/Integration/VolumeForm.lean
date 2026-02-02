@@ -2,6 +2,7 @@ import Hodge.Analytic.Forms
 import Hodge.Analytic.Norms
 import Hodge.Cohomology.Basic
 import Hodge.Analytic.Integration.HausdorffMeasure
+import Hodge.Analytic.Integration.L2Inner
 import Mathlib.MeasureTheory.Measure.Hausdorff
 import Mathlib.Geometry.Manifold.MFDeriv.Basic
 
@@ -188,6 +189,15 @@ theorem kahlerMeasure_finite [MeasurableSpace X] [Nonempty X]
     [SubmanifoldIntegration n X] [IsFiniteMeasure (kahlerMeasure (n := n) (X := X))] :
     IsFiniteMeasure (kahlerMeasure (n := n) (X := X)) := inferInstance
 
+/-- Build `VolumeIntegrationData` from the Kähler measure. -/
+noncomputable def volumeIntegrationData_kahlerMeasure
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X] [CompactSpace X]
+    [SubmanifoldIntegration n X]
+    [IsFiniteMeasure (kahlerMeasure (n := n) (X := X))] :
+    VolumeIntegrationData n X :=
+  Hodge.Analytic.L2.volumeIntegrationData_ofMeasure (n := n) (X := X)
+    (μ := kahlerMeasure (n := n) (X := X))
+
 /-- **Total volume of X** (the Kähler volume).
 
     vol(X) = ∫_X ω^n / n! = (1/n!) · ∫_X ω^n
@@ -212,16 +222,22 @@ noncomputable def totalVolume [MeasurableSpace X] [Nonempty X] [SubmanifoldInteg
     at each point. This is the oriented frame that makes the volume form = 1.
 -/
 
-/-- **Volume basis** at a point.
+/-- **Volume basis data** at a point (explicit interface).
 
     A function that gives a basis of 2n tangent vectors at x such that
     `vol(e_1, ..., e_{2n}) = 1`.
 
-    **Off Proof Track**: Stub implementation returning zero vectors.
-
     Reference: [Lee, "Riemannian Manifolds", Chapter 3]. -/
-noncomputable def volumeBasis (_x : X) : Fin (2 * n) → TangentSpace (𝓒_complex n) _x :=
-  fun _ => 0  -- Stub: would need orthonormal frame from Kähler metric
+class VolumeBasisData (n : ℕ) (X : Type u)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] where
+  basis : ∀ x : X, Fin (2 * n) → TangentSpace (𝓒_complex n) x
+
+/-- **Volume basis** at a point, provided as explicit data. -/
+noncomputable def volumeBasis (x : X)
+    [VolumeBasisData n X] : Fin (2 * n) → TangentSpace (𝓒_complex n) x :=
+  VolumeBasisData.basis (n := n) (X := X) x
 
 /-! **Volume form evaluates to 1 on volume basis** (documentation-only).
 

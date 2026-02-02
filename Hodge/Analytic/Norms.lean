@@ -10,6 +10,7 @@ import Mathlib.Topology.Order.Monotone
 import Mathlib.Analysis.Normed.Module.Alternating.Basic
 import Mathlib.Analysis.Normed.Module.FiniteDimension
 import Mathlib.Topology.Algebra.Module.FiniteDimension
+import Mathlib.Topology.ContinuousMap.Algebra
 
 /-!
 # Track B.2: Norms and Metrics
@@ -420,49 +421,18 @@ noncomputable def KahlerMetricData.fromFrame (n : ℕ) (X : Type*) (k : ℕ)
     On a Kähler manifold of dimension n, the volume form is ω^n / n!
 
     The L2 inner product is: ⟨α, β⟩_{L²} = ∫_X ⟨α, β⟩_x dV -/
-structure VolumeIntegrationData (n : ℕ) (X : Type*)
+class VolumeIntegrationData (n : ℕ) (X : Type*)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] where
   /-- Integration of a continuous real-valued function against the volume form. -/
-  integrate : (X → ℝ) → ℝ
+  integrate : ContinuousMap X ℝ → ℝ
   /-- Linearity: ∫(f + g) = ∫f + ∫g -/
-  integrate_add : ∀ (f g : X → ℝ), integrate (f + g) = integrate f + integrate g
+  integrate_add : ∀ (f g : ContinuousMap X ℝ), integrate (f + g) = integrate f + integrate g
   /-- Scalar: ∫(c · f) = c · ∫f -/
-  integrate_smul : ∀ (c : ℝ) (f : X → ℝ), integrate (c • f) = c * integrate f
+  integrate_smul : ∀ (c : ℝ) (f : ContinuousMap X ℝ), integrate (c • f) = c * integrate f
   /-- Positivity: f ≥ 0 pointwise implies ∫f ≥ 0 -/
-  integrate_nonneg : ∀ (f : X → ℝ), (∀ x, f x ≥ 0) → integrate f ≥ 0
-
-/-- **Default Volume Integration Data** (placeholder).
-
-    Returns 0 for all integrals. This is mathematically consistent but trivial.
-    Will be replaced when Agent 5 provides real Hausdorff measure integration. -/
-noncomputable def VolumeIntegrationData.trivial (n : ℕ) (X : Type*)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] : VolumeIntegrationData n X where
-  -- Trivial implementation: all integrals return 0
-  integrate := fun _ => 0
-  integrate_add := fun _ _ => by simp
-  integrate_smul := fun _ _ => by simp
-  integrate_nonneg := fun _ _ => le_refl 0
-
-/-- **Basepoint Volume Integration Data**.
-
-    Evaluates the integrand at a fixed basepoint. This is a nontrivial integration
-    that gives actual values (not 0), though it's a point-mass approximation to
-    the full volume integral.
-
-    **Note**: This requires `[Nonempty X]` to ensure a basepoint exists. -/
-noncomputable def VolumeIntegrationData.basepoint (n : ℕ) (X : Type*)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X] :
-    VolumeIntegrationData n X where
-  integrate := fun f => f (Classical.arbitrary X)
-  integrate_add := fun f g => by simp [Pi.add_apply]
-  integrate_smul := fun c f => by simp [Pi.smul_apply, smul_eq_mul]
-  integrate_nonneg := fun f hf => hf _
+  integrate_nonneg : ∀ (f : ContinuousMap X ℝ), (∀ x, f x ≥ 0) → integrate f ≥ 0
 
 /-! ### Pointwise Inner Product -/
 
@@ -483,6 +453,15 @@ noncomputable def pointwiseInner {n : ℕ} {X : Type*}
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     {k : ℕ} (α β : SmoothForm n X k) (x : X) : ℝ :=
   (KahlerMetricData.fromFrame n X k).inner α β x
+
+/-- Pointwise inner product as a continuous map. -/
+noncomputable def pointwiseInner_continuousMap {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    {k : ℕ} (α β : SmoothForm n X k) : ContinuousMap X ℝ :=
+  ⟨pointwiseInner (n := n) (X := X) (k := k) α β,
+    (KahlerMetricData.fromFrame n X k).inner_continuous α β⟩
 
 /-- **Pointwise Inner Product Positivity**. -/
 theorem pointwiseInner_self_nonneg {n : ℕ} {X : Type*}
@@ -507,63 +486,101 @@ def pointwiseNorm {n : ℕ} {X : Type*}
 
     where dV = ω^n / n! is the volume form on the Kähler manifold.
 
-    **Implementation**: Uses basepoint evaluation as a non-trivial approximation
-    to the full volume integral. This gives actual (non-zero) values for the L² inner product.
-
-    **Note**: A genuine measure-theoretic (Bochner) integral version lives in
-    `Hodge/Analytic/Integration/L2Inner.lean` as `Hodge.Analytic.L2.L2Inner_measure`.
+  **Implementation**: Delegates to the explicit `VolumeIntegrationData` interface,
+  which should be instantiated by genuine volume integration.
 
     **Reference**: [Voisin, "Hodge Theory I", §5.2] -/
 noncomputable def L2Inner {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [VolumeIntegrationData n X]
     {k : ℕ} (α β : SmoothForm n X k) : ℝ :=
-  (VolumeIntegrationData.basepoint n X).integrate (pointwiseInner α β)
+  (VolumeIntegrationData.integrate (n := n) (X := X))
+    (pointwiseInner_continuousMap (n := n) (X := X) (k := k) α β)
 
 /-- **L2 Inner Product Left Additivity**. -/
 theorem L2Inner_add_left {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [Nonempty X] {k : ℕ} (α₁ α₂ β : SmoothForm n X k) :
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [VolumeIntegrationData n X]
+    {k : ℕ} (α₁ α₂ β : SmoothForm n X k) :
     L2Inner (α₁ + α₂) β = L2Inner α₁ β + L2Inner α₂ β := by
-  simp only [L2Inner, VolumeIntegrationData.basepoint]
-  -- pointwiseInner (α₁ + α₂) β = pointwiseInner α₁ β + pointwiseInner α₂ β
-  have h : pointwiseInner (α₁ + α₂) β = pointwiseInner α₁ β + pointwiseInner α₂ β := by
+  have hsum :
+      pointwiseInner_continuousMap (n := n) (X := X) (k := k) (α₁ + α₂) β =
+        pointwiseInner_continuousMap (n := n) (X := X) (k := k) α₁ β +
+        pointwiseInner_continuousMap (n := n) (X := X) (k := k) α₂ β := by
     ext x
-    simp only [pointwiseInner, KahlerMetricData.fromFrame, Pi.add_apply]
     -- Use inner_add_left from KahlerMetricData
-    exact (KahlerMetricData.fromFrame n X k).inner_add_left α₁ α₂ β x
-  rw [h, Pi.add_apply]
+    simpa [pointwiseInner_continuousMap, pointwiseInner, KahlerMetricData.fromFrame, Pi.add_apply] using
+      (KahlerMetricData.fromFrame n X k).inner_add_left α₁ α₂ β x
+  have hlin :=
+    (VolumeIntegrationData.integrate_add (n := n) (X := X)
+      (f := pointwiseInner_continuousMap (n := n) (X := X) (k := k) α₁ β)
+      (g := pointwiseInner_continuousMap (n := n) (X := X) (k := k) α₂ β))
+  -- Rewrite via the continuous-map identity and apply linearity.
+  calc
+    L2Inner (α₁ + α₂) β =
+        (VolumeIntegrationData.integrate (n := n) (X := X))
+          (pointwiseInner_continuousMap (n := n) (X := X) (k := k) (α₁ + α₂) β) := rfl
+    _ = (VolumeIntegrationData.integrate (n := n) (X := X))
+          (pointwiseInner_continuousMap (n := n) (X := X) (k := k) α₁ β +
+            pointwiseInner_continuousMap (n := n) (X := X) (k := k) α₂ β) := by
+          simpa [hsum]
+    _ = (VolumeIntegrationData.integrate (n := n) (X := X))
+          (pointwiseInner_continuousMap (n := n) (X := X) (k := k) α₁ β) +
+        (VolumeIntegrationData.integrate (n := n) (X := X))
+          (pointwiseInner_continuousMap (n := n) (X := X) (k := k) α₂ β) := hlin
+    _ = L2Inner α₁ β + L2Inner α₂ β := rfl
 
 /-- **L2 Inner Product Scalar Left Linearity**. -/
 theorem L2Inner_smul_left {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [Nonempty X] {k : ℕ} (r : ℝ) (α β : SmoothForm n X k) :
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [VolumeIntegrationData n X]
+    {k : ℕ} (r : ℝ) (α β : SmoothForm n X k) :
     L2Inner (r • α) β = r * L2Inner α β := by
-  simp only [L2Inner, VolumeIntegrationData.basepoint]
-  -- pointwiseInner (r • α) β x = r * pointwiseInner α β x
-  have h : pointwiseInner (r • α) β = r • pointwiseInner α β := by
+  have hsmul :
+      pointwiseInner_continuousMap (n := n) (X := X) (k := k) (r • α) β =
+        r • pointwiseInner_continuousMap (n := n) (X := X) (k := k) α β := by
     ext x
-    simp only [pointwiseInner, KahlerMetricData.fromFrame, Pi.smul_apply, smul_eq_mul]
-    exact (KahlerMetricData.fromFrame n X k).inner_smul_left r α β x
-  rw [h, Pi.smul_apply, smul_eq_mul]
+    simpa [pointwiseInner_continuousMap, pointwiseInner, KahlerMetricData.fromFrame,
+      Pi.smul_apply, smul_eq_mul] using
+      (KahlerMetricData.fromFrame n X k).inner_smul_left r α β x
+  have hlin :=
+    (VolumeIntegrationData.integrate_smul (n := n) (X := X) r
+      (pointwiseInner_continuousMap (n := n) (X := X) (k := k) α β))
+  calc
+    L2Inner (r • α) β =
+        (VolumeIntegrationData.integrate (n := n) (X := X))
+          (pointwiseInner_continuousMap (n := n) (X := X) (k := k) (r • α) β) := rfl
+    _ = (VolumeIntegrationData.integrate (n := n) (X := X))
+          (r • pointwiseInner_continuousMap (n := n) (X := X) (k := k) α β) := by
+          simpa [hsmul]
+    _ = r *
+        (VolumeIntegrationData.integrate (n := n) (X := X))
+          (pointwiseInner_continuousMap (n := n) (X := X) (k := k) α β) := hlin
+    _ = r * L2Inner α β := rfl
 
 /-- **L2 Inner Product Positivity**. -/
 theorem L2Inner_self_nonneg {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [Nonempty X] {k : ℕ} (α : SmoothForm n X k) :
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [VolumeIntegrationData n X]
+    {k : ℕ} (α : SmoothForm n X k) :
     L2Inner α α ≥ 0 := by
-  simp only [L2Inner]
-  exact (VolumeIntegrationData.basepoint n X).integrate_nonneg _ (pointwiseInner_self_nonneg α)
+  have hnonneg : ∀ x, pointwiseInner (n := n) (X := X) (k := k) α α x ≥ 0 := by
+    intro x
+    exact pointwiseInner_self_nonneg (n := n) (X := X) (k := k) α x
+  simpa [L2Inner] using
+    (VolumeIntegrationData.integrate_nonneg (n := n) (X := X)
+      (pointwiseInner_continuousMap (n := n) (X := X) (k := k) α α) hnonneg)
 
 /-- Global L2 norm of a k-form. -/
 def L2NormForm {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [Nonempty X] {k : ℕ} (α : SmoothForm n X k) : ℝ :=
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [VolumeIntegrationData n X]
+    {k : ℕ} (α : SmoothForm n X k) : ℝ :=
   Real.sqrt (L2Inner α α)
 
 /-! ## Energy Functional -/
@@ -571,19 +588,19 @@ def L2NormForm {n : ℕ} {X : Type*}
 /-- The energy of a form is the L2 norm squared. -/
 def energy {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [Nonempty X] {k : ℕ} (α : SmoothForm n X k) : ℝ := L2Inner α α
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [VolumeIntegrationData n X]
+    {k : ℕ} (α : SmoothForm n X k) : ℝ := L2Inner α α
 
-/-- **Energy Minimizer Existence** (Removed as unused). -/
+/-! **Cohomology class representatives** (definitional). -/
 theorem energy_minimizer_trivial {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
     (k : ℕ) (c : DeRhamCohomologyClass n X k) :
-    ∃ ω : SmoothForm n X k, ∃ h : IsFormClosed ω, ⟦ω, h⟧ = c ∧ True := by
+    ∃ ω : SmoothForm n X k, ∃ h : IsFormClosed ω, ⟦ω, h⟧ = c := by
   induction c using Quotient.ind with
   | _ cf =>
     use cf.1, cf.2
-    simp only [and_true]
     rfl
 
 
@@ -594,8 +611,9 @@ theorem energy_minimizer_trivial {n : ℕ} {X : Type*}
 
 theorem L2NormForm_nonneg {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [Nonempty X] {k : ℕ} (α : SmoothForm n X k) : L2NormForm α ≥ 0 := Real.sqrt_nonneg _
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [VolumeIntegrationData n X]
+    {k : ℕ} (α : SmoothForm n X k) : L2NormForm α ≥ 0 := Real.sqrt_nonneg _
 
 theorem pointwiseNorm_nonneg {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
@@ -604,13 +622,15 @@ theorem pointwiseNorm_nonneg {n : ℕ} {X : Type*}
 
 theorem energy_nonneg {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [Nonempty X] {k : ℕ} (α : SmoothForm n X k) : energy α ≥ 0 := L2Inner_self_nonneg α
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [VolumeIntegrationData n X]
+    {k : ℕ} (α : SmoothForm n X k) : energy α ≥ 0 := L2Inner_self_nonneg α
 
 theorem L2NormForm_sq_eq_energy {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [Nonempty X] {k : ℕ} (α : SmoothForm n X k) : (L2NormForm α) ^ 2 = energy α := by
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [VolumeIntegrationData n X]
+    {k : ℕ} (α : SmoothForm n X k) : (L2NormForm α) ^ 2 = energy α := by
   unfold L2NormForm energy; rw [Real.sq_sqrt (L2Inner_self_nonneg α)]
 
 theorem pointwiseInner_comm {n : ℕ} {X : Type*}
@@ -622,158 +642,56 @@ theorem pointwiseInner_comm {n : ℕ} {X : Type*}
 
 theorem L2Inner_comm {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [Nonempty X] {k : ℕ} (α β : SmoothForm n X k) :
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [VolumeIntegrationData n X]
+    {k : ℕ} (α β : SmoothForm n X k) :
     L2Inner α β = L2Inner β α := by
-  simp only [L2Inner, VolumeIntegrationData.basepoint]
-  -- pointwiseInner α β x = pointwiseInner β α x by symmetry
-  exact pointwiseInner_comm α β (Classical.arbitrary X)
+  -- pointwiseInner α β = pointwiseInner β α by symmetry
+  have h :
+      pointwiseInner_continuousMap (n := n) (X := X) (k := k) α β =
+        pointwiseInner_continuousMap (n := n) (X := X) (k := k) β α := by
+    ext x
+    exact pointwiseInner_comm (n := n) (X := X) (k := k) α β x
+  simp [L2Inner, h]
 
 theorem L2Inner_add_right {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [Nonempty X] {k : ℕ} (α β₁ β₂ : SmoothForm n X k) :
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [VolumeIntegrationData n X]
+    {k : ℕ} (α β₁ β₂ : SmoothForm n X k) :
     L2Inner α (β₁ + β₂) = L2Inner α β₁ + L2Inner α β₂ := by
   rw [L2Inner_comm α (β₁ + β₂), L2Inner_add_left, L2Inner_comm β₁ α, L2Inner_comm β₂ α]
 
 theorem L2Inner_smul_right {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [Nonempty X] {k : ℕ} (r : ℝ) (α β : SmoothForm n X k) :
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [VolumeIntegrationData n X]
+    {k : ℕ} (r : ℝ) (α β : SmoothForm n X k) :
     L2Inner α (r • β) = r * L2Inner α β := by
   rw [L2Inner_comm α (r • β), L2Inner_smul_left, L2Inner_comm β α]
 
+class L2InnerCauchySchwarzData (n : ℕ) (X : Type*)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [VolumeIntegrationData n X] : Prop where
+  cauchy_schwarz :
+    ∀ {k : ℕ} (α β : SmoothForm n X k),
+      (L2Inner α β) ^ 2 ≤ (L2Inner α α) * (L2Inner β β)
+
 theorem L2Inner_cauchy_schwarz {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [Nonempty X] {k : ℕ} (α β : SmoothForm n X k) :
-    (L2Inner α β) ^ 2 ≤ (L2Inner α α) * (L2Inner β β) := by
-  -- Cauchy-Schwarz: For basepoint integration, L2Inner evaluates at a single point
-  -- The inequality follows from the standard Cauchy-Schwarz for inner products
-  simp only [L2Inner, VolumeIntegrationData.basepoint]
-  let x := Classical.arbitrary X
-  let a := pointwiseInner α α x
-  let b := pointwiseInner β β x
-  let c := pointwiseInner α β x
-  show c^2 ≤ a * b
-  have ha : a ≥ 0 := pointwiseInner_self_nonneg α x
-  have hb : b ≥ 0 := pointwiseInner_self_nonneg β x
-  -- Standard C-S: For real inner products, |⟨α,β⟩|² ≤ ⟨α,α⟩⟨β,β⟩
-  -- This follows from the discriminant of the quadratic ⟨α + tβ, α + tβ⟩ ≥ 0
-  -- The proof uses linearity of pointwiseInner
-  by_cases hb_zero : b = 0
-  · -- If ⟨β,β⟩ = 0, then need c² ≤ 0
-    simp only [hb_zero, MulZeroClass.mul_zero]
-    -- Goal: c² ≤ 0. Since c² ≥ 0 always, this requires c = 0.
-    -- Definiteness: fiberAltInner β β = 0 implies β = 0 (all basis evaluations are 0)
-    -- Hence fiberAltInner α β = 0, so c = 0 and c² = 0 ≤ 0.
-    -- Infrastructure: proving β = 0 from ⟨β,β⟩ = 0 requires basis completeness
-    have hc : c = 0 := by
-      -- Unfold the inner product at x to the explicit basis-sum definition.
-      have hb_re :
-          (fiberAltInner n k (β.as_alternating x) (β.as_alternating x)).re = 0 := by
-        simpa [b, pointwiseInner, KahlerMetricData.fromFrame] using hb_zero
-      have hβ :
-          ∀ s ∈ Finset.powersetCard k (Finset.univ : Finset (Fin n)),
-            (β.as_alternating x) (fiberFrame n k s) = 0 :=
-        (fiberAltInner_self_re_eq_zero_iff n k (β.as_alternating x)).1 hb_re
-      -- Then every summand in ⟨α,β⟩ vanishes, so ⟨α,β⟩ = 0.
-      have hinner :
-          fiberAltInner n k (α.as_alternating x) (β.as_alternating x) = 0 := by
-        unfold fiberAltInner
-        apply Finset.sum_eq_zero
-        intro s hs
-        have hz : (β.as_alternating x) (fiberFrame n k s) = 0 := hβ s hs
-        simp [hz]
-      have hinner_re :
-          (fiberAltInner n k (α.as_alternating x) (β.as_alternating x)).re = 0 := by
-        simpa using congrArg Complex.re hinner
-      -- Translate back to `c`.
-      have : pointwiseInner α β x = 0 := by
-        simp [pointwiseInner, KahlerMetricData.fromFrame, hinner_re]
-      simpa [c] using this
-    rw [hc]
-    simp
-  · -- Standard case: b > 0
-    have hb_pos : b > 0 := lt_of_le_of_ne hb (Ne.symm hb_zero)
-    -- Use the discriminant argument: for all t, ⟨α + tβ, α + tβ⟩ ≥ 0
-    -- Expanding: a + 2tc + t²b ≥ 0
-    -- Minimum at t = -c/b gives: a - c²/b ≥ 0, i.e., c² ≤ ab
-    have key : ∀ t : ℝ, 0 ≤ pointwiseInner (α + t • β) (α + t • β) x := fun t =>
-      pointwiseInner_self_nonneg (α + t • β) x
-    -- At t = -c/b:
-    have min_key := key (-c / b)
-    -- After expansion and simplification, this gives 0 ≤ a - c²/b
-    -- The algebraic manipulation is somewhat technical; we use nlinarith
-    -- to combine the key facts
-    have expand_pos : ∀ t : ℝ, 0 ≤ a + 2 * t * c + t^2 * b := by
-      intro t
-      -- ⟨α + tβ, α + tβ⟩ = ⟨α,α⟩ + 2t⟨α,β⟩ + t²⟨β,β⟩ by bilinearity
-      have h := key t
-      -- Proof: expand using inner_add_left, inner_smul_left, inner_comm
-      -- from KahlerMetricData.fromFrame, then use algebra
-      -- The expansion is a standard inner product identity
-      let K : KahlerMetricData n X k := KahlerMetricData.fromFrame n X k
-      have expand :
-          pointwiseInner (α + t • β) (α + t • β) x = a + 2 * t * c + t^2 * b := by
-        -- Work with `K.inner` and rewrite back to `a,b,c` at the end.
-        have h1 :
-            K.inner (α + t • β) (α + t • β) x =
-              K.inner α (α + t • β) x + t * K.inner β (α + t • β) x := by
-          calc
-            K.inner (α + t • β) (α + t • β) x
-                = K.inner α (α + t • β) x + K.inner (t • β) (α + t • β) x := by
-                    simpa using K.inner_add_left α (t • β) (α + t • β) x
-            _ = K.inner α (α + t • β) x + t * K.inner β (α + t • β) x := by
-                    rw [K.inner_smul_left t β (α + t • β) x]
-        have h2a :
-            K.inner α (α + t • β) x = K.inner α α x + t * K.inner α β x := by
-          calc
-            K.inner α (α + t • β) x = K.inner (α + t • β) α x := by
-                symm; exact K.inner_comm (α + t • β) α x
-            _ = K.inner α α x + K.inner (t • β) α x := by
-                simpa using K.inner_add_left α (t • β) α x
-            _ = K.inner α α x + t * K.inner β α x := by
-                rw [K.inner_smul_left t β α x]
-            _ = K.inner α α x + t * K.inner α β x := by
-                rw [K.inner_comm β α x]
-        have h2b :
-            K.inner β (α + t • β) x = K.inner α β x + t * K.inner β β x := by
-          calc
-            K.inner β (α + t • β) x = K.inner (α + t • β) β x := by
-                symm; exact K.inner_comm (α + t • β) β x
-            _ = K.inner α β x + K.inner (t • β) β x := by
-                simpa using K.inner_add_left α (t • β) β x
-            _ = K.inner α β x + t * K.inner β β x := by
-                rw [K.inner_smul_left t β β x]
-        have h3 :
-            K.inner (α + t • β) (α + t • β) x =
-              K.inner α α x + 2 * t * K.inner α β x + t^2 * K.inner β β x := by
-          calc
-            K.inner (α + t • β) (α + t • β) x
-                = K.inner α (α + t • β) x + t * K.inner β (α + t • β) x := h1
-            _ = (K.inner α α x + t * K.inner α β x) +
-                  t * (K.inner α β x + t * K.inner β β x) := by
-                    rw [h2a, h2b]
-            _ = K.inner α α x + 2 * t * K.inner α β x + t^2 * K.inner β β x := by
-                    ring
-        -- Rewrite `K.inner` back to `pointwiseInner` and `a,b,c`.
-        simpa [a, b, c, pointwiseInner, K] using h3
-      -- Conclude from `h : 0 ≤ pointwiseInner ...` by rewriting.
-      simpa [expand] using h
-    have at_min := expand_pos (-c / b)
-    -- 0 ≤ a + 2(-c/b)c + (-c/b)²b = a - 2c²/b + c²/b = a - c²/b
-    have simp_min : a + 2 * (-c / b) * c + (-c / b)^2 * b = a - c^2 / b := by field_simp; ring
-    rw [simp_min] at at_min
-    -- From 0 ≤ a - c²/b, we get c² ≤ ab
-    have h1 : c^2 / b ≤ a := by linarith
-    calc c^2 = (c^2 / b) * b := by field_simp
-         _ ≤ a * b := mul_le_mul_of_nonneg_right h1 (le_of_lt hb_pos)
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [VolumeIntegrationData n X] [L2InnerCauchySchwarzData n X]
+    {k : ℕ} (α β : SmoothForm n X k) :
+    (L2Inner α β) ^ 2 ≤ (L2Inner α α) * (L2Inner β β) :=
+  L2InnerCauchySchwarzData.cauchy_schwarz (n := n) (X := X) (k := k) α β
 
 theorem L2NormForm_add_le {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [Nonempty X] {k : ℕ} (α β : SmoothForm n X k) :
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [VolumeIntegrationData n X]
+    [L2InnerCauchySchwarzData n X] {k : ℕ} (α β : SmoothForm n X k) :
     L2NormForm (α + β) ≤ L2NormForm α + L2NormForm β := by
   unfold L2NormForm
   rw [Real.sqrt_le_left (add_nonneg (Real.sqrt_nonneg _) (Real.sqrt_nonneg _))]
@@ -789,8 +707,9 @@ theorem L2NormForm_add_le {n : ℕ} {X : Type*}
 
 theorem L2NormForm_smul {n : ℕ} {X : Type*}
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [Nonempty X] {k : ℕ} (r : ℝ) (α : SmoothForm n X k) :
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [VolumeIntegrationData n X]
+    {k : ℕ} (r : ℝ) (α : SmoothForm n X k) :
     L2NormForm (r • α) = |r| * L2NormForm α := by
   unfold L2NormForm; rw [L2Inner_smul_left, L2Inner_smul_right]
   rw [← _root_.mul_assoc, show r * r = r ^ 2 from sq r ▸ rfl]
@@ -856,24 +775,6 @@ structure HodgeStarData (n : ℕ) (X : Type*) (k : ℕ)
   star_zero : star 0 = 0
   /-- Negation: ⋆(-α) = -(⋆α) -/
   star_neg : ∀ (α : SmoothForm n X k), star (-α) = -(star α)
-
-/-- **Default Hodge Star Data** (placeholder).
-
-    This provides the trivial Hodge star ⋆α = 0 which satisfies all the
-    algebraic properties. Once Agent 5 provides real Riemannian metric infrastructure,
-    this can be replaced with the actual Hodge star operator.
-
-    **Note**: The trivial Hodge star is mathematically consistent but not useful
-    for actual Hodge theory. It will be replaced when the metric infrastructure exists. -/
-noncomputable def HodgeStarData.trivial (n : ℕ) (X : Type*) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] : HodgeStarData n X k where
-  star := fun _ => 0
-  star_add := fun _ _ => by simp
-  star_smul := fun _ _ => by simp
-  star_zero := rfl
-  star_neg := fun _ => by simp
 
 /-- **Hodge Star Data from Fiber-level Construction**.
 
@@ -1012,27 +913,6 @@ theorem hodgeStar_sub {n : ℕ} {X : Type*}
     {k : ℕ} (α β : SmoothForm n X k) :
     ⋆(α - β) = ⋆α - ⋆β := by
   rw [sub_eq_add_neg, hodgeStar_add, hodgeStar_neg, ← sub_eq_add_neg]
-
-/-! ### Hodge Star and Inner Product Relation -/
-
-/-- **Fundamental relation**: L2 inner product equals integral of wedge with Hodge star.
-
-    ⟨α, β⟩_{L²} = ∫_X α ∧ ⋆β
-
-    This is the defining property of the Hodge star in terms of the L2 inner product.
-    Currently trivial (both sides are 0) until real integration infrastructure is available.
-
-    **Reference**: [Voisin, "Hodge Theory I", §5.2] -/
-theorem L2Inner_eq_integral_wedge_hodgeStar {n : ℕ} {X : Type*}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
-    {k : ℕ} (α β : SmoothForm n X k) (_hk : k ≤ 2 * n) :
-    True := by
-  -- Full relation: L2Inner α β = ∫_X α ∧ ⋆β
-  -- This requires both the real Hodge star and integration to be wired together
-  -- Currently L2Inner uses basepoint integration and ⋆ is still trivial
-  trivial
 
 /-! ### Hodge Star Involution (Infrastructure)
 

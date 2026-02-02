@@ -1,6 +1,7 @@
 import Hodge.Analytic.Currents
 import Hodge.Analytic.FlatNorm
 import Mathlib.MeasureTheory.Measure.Hausdorff
+import Mathlib.Topology.MetricSpace.Lipschitz
 
 /-!
 # Track B.4: Integral Currents
@@ -25,34 +26,96 @@ variable {n : ℕ} {X : Type*}
     A set S ⊆ X is k-rectifiable if it can be covered (up to measure zero)
     by countably many Lipschitz images of subsets of ℝ^k.
     Reference: [H. Federer, "Geometric Measure Theory", 1969, Section 3.2]. -/
-def isRectifiable (_k : ℕ) (_S : Set X) : Prop :=
-  -- Tier-3 stub: a concrete, total definition. This removes the `opaque` while keeping
-  -- the rest of the development lightweight.
-  True
+def isRectifiable (k : ℕ) (S : Set X) : Prop :=
+  ∃ (f : ℕ → (EuclideanSpace ℝ (Fin k) → X))
+    (A : ℕ → Set (EuclideanSpace ℝ (Fin k)))
+    (N : Set X),
+    (∀ i, ∃ K : NNReal, LipschitzWith K (f i)) ∧
+    (MeasureTheory.Measure.hausdorffMeasure (X := X) (k : ℝ) N = 0) ∧
+    S ⊆ N ∪ ⋃ i : ℕ, (f i) '' (A i)
 
 theorem isRectifiable_empty (k : ℕ) : isRectifiable (X := X) k (∅ : Set X) := by
-  simp [isRectifiable]
+  classical
+  refine ⟨fun _ => fun _ => Classical.arbitrary X, fun _ => (∅ : Set (EuclideanSpace ℝ (Fin k))), ∅, ?_, ?_, ?_⟩
+  · intro i
+    refine ⟨0, ?_⟩
+    -- Make `α` explicit so typeclass search doesn't get stuck.
+    simpa using (LipschitzWith.const (α := EuclideanSpace ℝ (Fin k)) (β := X) (Classical.arbitrary X))
+  · simp
+  · intro x hx
+    cases hx
 
 theorem isRectifiable_union (k : ℕ) (S₁ S₂ : Set X) :
     isRectifiable (X := X) k S₁ → isRectifiable (X := X) k S₂ → isRectifiable (X := X) k (S₁ ∪ S₂) := by
-  intro _ _
-  simp [isRectifiable]
+  intro h₁ h₂
+  classical
+  rcases h₁ with ⟨f₁, A₁, N₁, hf₁, hN₁, hcov₁⟩
+  rcases h₂ with ⟨f₂, A₂, N₂, hf₂, hN₂, hcov₂⟩
+  -- Interleave the two coverings along even/odd indices.
+  let f : ℕ → (EuclideanSpace ℝ (Fin k) → X) := fun i =>
+    if Even i then f₁ (i / 2) else f₂ (i / 2)
+  let A : ℕ → Set (EuclideanSpace ℝ (Fin k)) := fun i =>
+    if Even i then A₁ (i / 2) else A₂ (i / 2)
+  let N : Set X := N₁ ∪ N₂
+  refine ⟨f, A, N, ?_, ?_, ?_⟩
+  · intro i
+    by_cases hi : Even i
+    · rcases hf₁ (i / 2) with ⟨K, hK⟩
+      exact ⟨K, by simpa [f, hi] using hK⟩
+    · have hOdd : ¬Even i := hi
+      rcases hf₂ (i / 2) with ⟨K, hK⟩
+      exact ⟨K, by simpa [f, hOdd] using hK⟩
+  · -- Hausdorff measure of a union of null sets is null.
+    have : MeasureTheory.Measure.hausdorffMeasure (X := X) (k : ℝ) (N₁ ∪ N₂) = 0 :=
+      MeasureTheory.measure_union_null hN₁ hN₂
+    simpa [N] using this
+  · -- Cover the union using the interleaved cover.
+    intro x hx
+    rcases hx with hx | hx
+    · have hx' : x ∈ N₁ ∪ ⋃ i, f₁ i '' A₁ i := hcov₁ hx
+      rcases hx' with hxN | hxU
+      · exact Or.inl (Or.inl hxN)
+      · rcases Set.mem_iUnion.1 hxU with ⟨i, hxi⟩
+        refine Or.inr (Set.mem_iUnion.2 ?_)
+        refine ⟨2 * i, ?_⟩
+        have hEven : Even (2 * i) := even_two_mul i
+        have hdiv : (2 * i) / 2 = i := by simp
+        simpa [f, A, hEven, hdiv] using hxi
+    · have hx' : x ∈ N₂ ∪ ⋃ i, f₂ i '' A₂ i := hcov₂ hx
+      rcases hx' with hxN | hxU
+      · exact Or.inl (Or.inr hxN)
+      · rcases Set.mem_iUnion.1 hxU with ⟨i, hxi⟩
+        refine Or.inr (Set.mem_iUnion.2 ?_)
+        refine ⟨2 * i + 1, ?_⟩
+        have hOdd : ¬Even (2 * i + 1) := by
+          simpa using Nat.not_even_bit1 (n := i)
+        have hdiv : (2 * i + 1) / 2 = i := by
+          calc
+            (2 * i + 1) / 2 = (1 + 2 * i) / 2 := by ac_rfl
+            _ = 1 / 2 + i := Nat.add_mul_div_left 1 i zero_lt_two
+            _ = i := by simp
+        simpa [f, A, hOdd, hdiv] using hxi
 
 /-- **Integral Polyhedral Chains** (Federer-Fleming, 1960).
     The set of currents that are finite sums of oriented simplices
     with integer multiplicities. Defined inductively with explicit closure properties.
     Reference: [H. Federer and W.H. Fleming, "Normal and integral currents", 1960]. -/
+structure PolyhedralCurrentData (n : ℕ) (X : Type*) (k : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [Nonempty X] [MeasurableSpace X] [BorelSpace X] where
+  /-- The underlying polyhedral current. This is a placeholder data structure
+      to be replaced by actual simplicial/polyhedral geometry. -/
+  toCurrent : Current n X k
+
 inductive IntegralPolyhedralChain' {n : ℕ} {X : Type*}
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
     [MeasurableSpace X] [BorelSpace X] :
     ∀ {k : ℕ}, Current n X k → Prop where
   | zero {k : ℕ} : IntegralPolyhedralChain' (0 : Current n X k)
-  /-- Treat any `IntegrationData`-built current as a (stub) polyhedral chain.
-
-  This matches how the rest of the development constructs the concrete currents we care about
-  (integration currents, sheet sums, etc.), without formalizing simplices/polyhedral geometry yet. -/
-  | ofIntegrationData {k : ℕ} (data : IntegrationData n X k) : IntegralPolyhedralChain' data.toCurrent
+  | ofPolyhedralData {k : ℕ} (data : PolyhedralCurrentData n X k) :
+      IntegralPolyhedralChain' data.toCurrent
   | add {k : ℕ} {S T : Current n X k} : IntegralPolyhedralChain' S → IntegralPolyhedralChain' T →
       IntegralPolyhedralChain' (S + T)
   | neg {k : ℕ} {T : Current n X k} : IntegralPolyhedralChain' T → IntegralPolyhedralChain' (-T)

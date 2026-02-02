@@ -54,10 +54,12 @@ Calibrated integral currents have analytic (smooth away from singular set) suppo
     **TeX Reference**: Harvey-Lawson, "Calibrated Geometries", Theorem 4.2. -/
 theorem calibrated_current_support_analytic {k : ℕ}
     (T : IntegralCurrent n X k) (ψ : CalibratingForm n X k)
-    (hcal : isCalibrated T.toFun ψ) :
+    (hcal : isCalibrated T.toFun ψ)
+    [CalibratedCurrentRegularityData n X k] :
     IsAnalyticSet (n := n) (X := X) (Current.support T.toFun) := by
-  -- Stage-0 analytic-set interface: analytic sets are (at least) closed.
-  exact ⟨Current.support_isClosed (T := T.toFun)⟩
+  -- Use the explicit Harvey–Lawson regularity data.
+  exact (CalibratedCurrentRegularityData.support_is_analytic_zero_locus
+    (n := n) (X := X) (k := k) T ψ hcal)
 
 /-! ## Goal 2: Decomposition into Irreducible Components -/
 
@@ -70,16 +72,23 @@ theorem calibrated_current_support_analytic {k : ℕ}
     **TeX Reference**: Harvey-Lawson, "Calibrated Geometries", Theorem 5.1. -/
 theorem harvey_lawson_decomposition {k : ℕ}
     (T : IntegralCurrent n X k) (ψ : CalibratingForm n X k)
-    (hcal : isCalibrated T.toFun ψ) :
+    (hcycle : T.isCycleAt) (hcal : isCalibrated T.toFun ψ)
+    [HarveyLawsonKingData n X k] :
     ∃ (varieties : Finset (AnalyticSubvariety n X))
       (multiplicities : ∀ v ∈ varieties, ℕ+),
       -- Each variety has the correct codimension
       (∀ v ∈ varieties, v.codim = 2 * n - k) ∧
-      -- The current T equals the sum of integration currents
-      True := by
-  refine ⟨∅, fun v hv => by simp at hv, ?_, trivial⟩
-  intro v hv
-  simp at hv
+      -- The decomposition represents the input current
+      (HarveyLawsonKingData.decompose
+        (hyp := { T := T, ψ := ψ, is_cycle := hcycle, is_calibrated := hcal })).represents T.toFun := by
+  classical
+  let hyp : HarveyLawsonHypothesis n X k :=
+    { T := T, ψ := ψ, is_cycle := hcycle, is_calibrated := hcal }
+  let concl := HarveyLawsonKingData.decompose (n := n) (X := X) (k := k) hyp
+  refine ⟨concl.varieties, ?_, concl.codim_correct, ?_⟩
+  · intro v hv
+    exact concl.multiplicities ⟨v, hv⟩
+  · exact HarveyLawsonKingData.represents_input (n := n) (X := X) (k := k) hyp
 
 /-! ## Goal 3: King's Theorem (ω^p-Calibrated = Algebraic)
 
@@ -96,9 +105,15 @@ For Kähler manifolds, ω^p-calibrated currents are algebraic cycles.
 theorem king_algebraicity {p : ℕ}
     (T : IntegralCurrent n X (2 * (n - p)))
     (ψ : CalibratingForm n X (2 * (n - p)))
-    (hcal : isCalibrated T.toFun ψ) :
-    IsClosed (Current.support T.toFun) := by
-  exact Current.support_isClosed (T := T.toFun)
+    (hcal : isCalibrated T.toFun ψ)
+    [CalibratedCurrentRegularityData n X (2 * (n - p))]
+    [ChowGAGAData n X] :
+    IsAlgebraicSet n X (Current.support T.toFun) := by
+  have hAnalytic :
+      IsAnalyticSet (n := n) (X := X) (Current.support T.toFun) :=
+    (CalibratedCurrentRegularityData.support_is_analytic_zero_locus
+      (n := n) (X := X) (k := 2 * (n - p)) T ψ hcal)
+  exact ChowGAGAData.analytic_to_algebraic (n := n) (X := X) (Current.support T.toFun) hAnalytic
 
 /-! ## Goal 4: Real HarveyLawsonKingData Instance -/
 

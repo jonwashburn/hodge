@@ -29,7 +29,7 @@ We are **done** only when all of the following hold:
 
 ## Baseline (What’s Broken Today)
 
-### Baseline verification (2026-02-01 - updated)
+### Baseline verification (2026-02-02 - updated)
 
 Reproduced from repo root:
 
@@ -43,18 +43,21 @@ grep -RIn --include="*.lean" -E '^[[:space:]]*axiom\b' Hodge/
 grep -RIn --include="*.lean" -E '^[[:space:]]*opaque\b' Hodge/
 ```
 
-Observed outputs:
+Observed outputs (high-signal):
 
 - ✅ **No `axiom` / `opaque` / `sorry`** in `Hodge/` (full scan)
 - ✅ **Kernel dependency cone**:
   - `'hodge_conjecture' depends on axioms: [propext, Classical.choice, Quot.sound]`
   - `'hodge_conjecture'' depends on axioms: [propext, Classical.choice, Quot.sound]`
 - ✅ **No `instance … .universal` declarations** in `Hodge/`
-- ❌ **Deep typeclass binders in `hodge_conjecture'` signature**:
-  - `[CycleClass.PoincareDualFormExists n X p]`
-  - `[SpineBridgeData n X p]`
-  - These represent **real mathematical theorems** that need to be proved to complete the formalization
-  - Eliminating them requires **de Rham representability** (not in Mathlib)
+- ❌ **Deep typeclass binders in `hodge_conjecture'` signature** (still present):
+  - `[AutomaticSYRData n X]` (SYR/microstructure realization scheme)
+  - `[CycleClass.PoincareDualFormExists n X p]` (Poincaré dual form existence / de Rham representability)
+  - `[SpineBridgeData n X p]` (Harvey–Lawson bridge: fundamental class = representing form)
+  - `[CalibratedCurrentRegularityData n X (2 * (n - p))]` (HL regularity: calibrated support is analytic)
+  - `[HarveyLawsonKingData n X (2 * (n - p))]` (HL/King structure theorem)
+  - `[ChowGAGAData n X]` (Chow/GAGA: analytic → algebraic)
+  - **Note**: `FlatLimitCycleData` was removed from the theorem statements (it exists as an `instance`), so it is no longer a binder.
 - ⚠️ **Semantic gotchas still present** (tracked in `docs/SEMANTIC_GOTCHAS_INDEX.md`)
 
 Current audits show:
@@ -67,31 +70,40 @@ Current audits show:
 But the repo still contains **semantic placeholders** ("gotchas") that make the present proof track *not* mathematically genuine
 even though it compiles.
 
-## ⚠️ BLOCKING ISSUE: Deep Typeclass Binders
+## ⚠️ BLOCKING ISSUE: Deep Typeclass Binders (the real “pillars”)
 
-**The `audit_practical_unconditional.sh` audit FAILS** because `hodge_conjecture'` mentions:
+**The `audit_practical_unconditional.sh` audit FAILS** because `hodge_conjecture'` still mentions deep binders:
+- `[AutomaticSYRData n X]`
 - `[CycleClass.PoincareDualFormExists n X p]`
 - `[SpineBridgeData n X p]`
+- `[CalibratedCurrentRegularityData n X (2 * (n - p))]`
+- `[HarveyLawsonKingData n X (2 * (n - p))]`
+- `[ChowGAGAData n X]`
 
-These are **not semantic stubs** - they represent real mathematical content:
+These are **not kernel axioms**, but they *are* missing real mathematics. Eliminating them requires proving:
 
-1. **`PoincareDualFormExists`**: Asserts that for every algebraic set Z, there exists a closed (p,p)-form
-   representing the integration current [Z] in de Rham cohomology. This is **de Rham representability**.
+1. **De Rham representability / Poincaré dual forms** (`PoincareDualFormExists`):
+   Construct, for each (co)dimension‑\(p\) geometric cycle/current, a smooth closed \(2p\)-form representing its de Rham class.
 
-2. **`SpineBridgeData`**: Asserts that for cycles constructed by the spine (Harvey-Lawson + GAGA),
-   the geometric fundamental class equals the representing form class. This is the **Harvey-Lawson bridge**.
+2. **Harvey–Lawson bridge** (`SpineBridgeData`):
+   For spine-produced cycles, prove the equality of cohomology classes
+   \([ \mathrm{FundamentalClassSet}(\mathrm{support}) ] = [\mathrm{representingForm}]\).
+
+3. **Harvey–Lawson/King structure + regularity** (`HarveyLawsonKingData`, `CalibratedCurrentRegularityData`):
+   Calibrated integral currents have analytic support and decompose as positive combinations of analytic varieties.
+
+4. **Chow/GAGA** (`ChowGAGAData`):
+   Analytic subsets of projective manifolds are algebraic (analytic → polynomial zero locus).
 
 ### Why these cannot be eliminated without massive new infrastructure
 
-To provide global instances for these typeclasses (removing them from the signature), we need to PROVE:
+To provide global instances for these typeclasses (removing them from the signature), we need to PROVE (for real):
 
-- **De Rham representability**: Every closed current on a compact Kähler manifold is cohomologous to a smooth form.
-  This requires: Sobolev spaces on manifolds, elliptic regularity, Hodge theory for currents.
-  **This infrastructure is NOT in Mathlib.**
+- **De Rham representability / Hodge theorem**: harmonic representatives, elliptic regularity, finite-dimensionality.
+  Requires substantial PDE/functional analysis on manifolds; not available out-of-the-box in this Mathlib snapshot.
 
-- **Harvey-Lawson bridge**: For calibrated integral currents, the cycle class equals the calibration form class.
-  This requires: GMT regularity theory, structure theorems for calibrated currents.
-  **This infrastructure is NOT in Mathlib.**
+- **Harvey–Lawson/King**: calibrated-current regularity and decomposition into analytic varieties.
+  Requires deep GMT + complex analytic geometry.
 
 ### Current state is mathematically honest
 
@@ -122,28 +134,37 @@ This is not exhaustive, but it captures the major blockers currently *on the pro
   - `Hodge/Classical/GAGA.lean`: `FundamentalClassSet` uses `PoincareDualFormExists`.
   - **TO ELIMINATE**: Need to prove de Rham representability theorem (every closed current on a compact
     Kähler manifold is cohomologous to a smooth form). This is deep GMT not in Mathlib.
-- **Analytic/algebraic semantics restored**:
-  - `Hodge/AnalyticSets.lean`: `IsAnalyticSet` is defined as a local holomorphic zero locus.
-  - `Hodge/Classical/AlgebraicSets.lean`: `IsAlgebraicSet` is defined as a projective homogeneous
-    polynomial zero locus and used by `Hodge/Classical/GAGA.lean`.
-  - **REMAINING**: prove analytic → algebraic (Chow/GAGA), then remove `ChowGAGAData` binder.
+- **Analytic/algebraic semantics restored (done; not a blocker anymore)**:
+  - ✅ `Hodge/AnalyticSets.lean`: analytic sets = local holomorphic zero loci
+  - ✅ `Hodge/Classical/AlgebraicSets.lean`: algebraic sets = projective homogeneous polynomial zero loci
+  - Remaining: theorems (Chow/GAGA), not definitions.
 - **Submanifold integration is still the zero model**:
   - (removed) legacy Set-based `submanifoldIntegral := 0` scaffold stack has been deleted.
   - `Hodge/Analytic/Integration/HausdorffMeasure.lean`: (progress) the explicit `SubmanifoldIntegration.universal` zero-instance has been removed (2026-02-01), but the integration layer still needs a real implementation.
   - (updated 2026-02-01) `Hodge/Deep/Pillars/Stokes.lean` no longer defines a stubby Set-based `SubmanifoldIntegration.real`.
     Remaining work is to retire the legacy Set-based interface entirely and construct real integration currents from
     `OrientedRectifiableSetData` / `ClosedSubmanifoldData` (see `Hodge/Analytic/Currents.lean`).
-- **Microstructure/SYR is still fake**:
+- **Microstructure/SYR is still incomplete** (semantic blocker):
   - `Hodge/Kahler/Microstructure.lean`:
     - `RawSheetSum.toIntegrationData` has been rewired to a **sheet-sum** of genuine `ClosedSubmanifoldData` integrals
       (no longer `setIntegral` on a bare set), but
-    - `buildSheetsFromConePositive` still returns `sheets := ∅` and `support := ∅`.
-  - `Hodge/Kahler/Microstructure/RealSpine.lean`: `microstructureSequence_real := fun _k => zero_int ...`.
+    - `buildSheetsFromConePositive` is now an **explicit data interface** (`SheetConstructionData`); it no longer returns `∅`.
+      Remaining: implement real sheet construction + gluing/defect estimates.
+  - `Hodge/Kahler/Microstructure/RealSpine.lean`: `microstructureSequence_real` is now an explicit data interface
+    (`RealMicrostructureSequenceData`), no longer the zero sequence.
 - **(Removed) legacy boundary-mass placeholder**:
   - The Set-based `boundaryMass := 0` stub (and its dependent Stokes plumbing) was removed from `Hodge/Analytic/Currents.lean`.
-- **Hodge-theoretic operators are still stubbed**:
-  - `Hodge/Analytic/Norms.lean`: `HodgeStarData.trivial` defines ⋆ as `0`, etc.
-  - `Hodge/Kahler/Identities/*.lean`: several operators are `:= 0`.
+- **Hodge-theoretic operators still need real analytic proofs**:
+  - `Hodge/Analytic/Norms.lean`: `L2Inner` now depends on explicit `VolumeIntegrationData`
+    (no basepoint/zero stub). `Hodge/Analytic/Integration/L2Inner.lean` now provides
+    `volumeIntegrationData_ofMeasure`, and `Hodge/Analytic/Integration/VolumeForm.lean`
+    provides `volumeIntegrationData_kahlerMeasure`. The *Kähler* volume construction is still missing.
+  - `Hodge/Kahler/Identities/*.lean`: several operators are still `:= 0`.
+
+- **Integral currents semantics still need upgrading**:
+  - ✅ `isRectifiable` is no longer `True` (now a genuine Lipschitz-cover definition) in `Hodge/Analytic/IntegralCurrents.lean`.
+  - ✅ `IntegralPolyhedralChain'.ofIntegrationData` shortcut removed.
+  - Remaining: real polyhedral chain definition + Federer–Fleming approximation.
 
 ### Notes on resolved baseline items
 

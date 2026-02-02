@@ -58,7 +58,7 @@ The goal is to connect it to the proof track.
 theorem isAnalyticSetZeroLocus_implies_isAnalyticSet (Z : Set X)
     (hZ : Hodge.AlgGeom.IsAnalyticSetZeroLocus (n := n) (X := X) Z) :
     IsAnalyticSet (n := n) (X := X) Z := by
-  exact ⟨hZ.isClosed⟩
+  exact hZ
 
 /-- **DEEP GOAL 1.2**: The converse should be provable for projective manifolds (hard).
 
@@ -70,36 +70,13 @@ theorem isAnalyticSetZeroLocus_implies_isAnalyticSet (Z : Set X)
     **Status**: NEEDS PROOF (very hard) -/
 theorem isAnalyticSet_implies_isAnalyticSetZeroLocus (Z : Set X)
     (hZ : IsAnalyticSet (n := n) (X := X) Z)
-    [hZ0 : Hodge.AlgGeom.IsAnalyticSetZeroLocus (n := n) (X := X) Z] :
-    ∃ (_inst : Hodge.AlgGeom.IsAnalyticSetZeroLocus (n := n) (X := X) Z), True := by
-  exact ⟨hZ0, trivial⟩
+    : Hodge.AlgGeom.IsAnalyticSetZeroLocus (n := n) (X := X) Z := by
+  exact hZ
 
 /-! ## Goal 2: Strong Algebraic Set Definition
 
-The current `IsAlgebraicSet` is just `IsClosed`. We need: the set is the zero locus
-of homogeneous polynomials in the projective embedding.
--/
-
-/-- **DEEP GOAL 2.1**: Polynomial zero locus definition.
-
-    **Mathematical content**: For X ⊂ ℙ^N a projective variety, a subset Z ⊂ X
-    is algebraic if Z = X ∩ V(F₁, ..., Fₘ) for homogeneous polynomials Fᵢ.
-
-    **Status**: NEEDS CONSTRUCTION -/
-structure IsAlgebraicSetStrong (Z : Set X) : Prop where
-  /-- Z is closed in the Zariski topology -/
-  isClosed : IsClosed Z
-  /-- Z is locally the zero locus of regular functions -/
-  isPolynomialZeroLocus : True  -- placeholder for real definition
-  -- Full definition would involve:
-  -- exists m : ℕ, exists F : Fin m → (homogeneous polynomial on embedding),
-  --   Z = X ∩ {x | ∀ i, F i x = 0}
-
-/-- **DEEP GOAL 2.2**: Strong algebraic implies current algebraic (trivial). -/
-theorem isAlgebraicSetStrong_implies_isAlgebraicSet (Z : Set X)
-    (hZ : IsAlgebraicSetStrong Z) :
-    IsAlgebraicSet n X Z := by
-  exact hZ.isClosed
+`IsAlgebraicSet` is already defined as projective homogeneous polynomial zero loci
+in `Hodge/Classical/AlgebraicSets.lean`. -/
 
 /-! ## Goal 3: Chow's Theorem
 
@@ -115,11 +92,10 @@ The key result: on a projective variety, analytic = algebraic.
 
     **Status**: NEEDS PROOF (research-level) -/
 theorem chow_theorem_strong (Z : Set X)
-    (hZ : Hodge.AlgGeom.IsAnalyticSetZeroLocus (n := n) (X := X) Z) :
-    IsAlgebraicSetStrong Z := by
-  -- In this staged interface, `IsAlgebraicSetStrong` only records closedness
-  -- plus a placeholder `True` predicate.
-  refine ⟨hZ.isClosed, trivial⟩
+    (hZ : Hodge.AlgGeom.IsAnalyticSetZeroLocus (n := n) (X := X) Z)
+    [ChowGAGAData n X] :
+    IsAlgebraicSet n X Z := by
+  exact ChowGAGAData.analytic_to_algebraic (n := n) (X := X) Z hZ
 
 /-! ## Goal 4: Real ChowGAGAData Instance
 
