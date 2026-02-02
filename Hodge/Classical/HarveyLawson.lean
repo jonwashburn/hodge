@@ -76,13 +76,15 @@ theorem inter {n : ℕ} {X : Type*} [TopologicalSpace X]
 theorem union {n : ℕ} {X : Type*} [TopologicalSpace X]
     [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-    [AlgGeom.IsAnalyticSetZeroLocus.AnalyticSetUnionData n X]
     (S T : Set X) :
     IsAnalyticSet (n := n) (X := X) S →
       IsAnalyticSet (n := n) (X := X) T →
         IsAnalyticSet (n := n) (X := X) (S ∪ T) := by
   intro hS hT
-  exact AlgGeom.IsAnalyticSetZeroLocus.union_isAnalytic (n := n) (X := X) S T
+  classical
+  letI : AlgGeom.IsAnalyticSetZeroLocus (n := n) (X := X) S := hS
+  letI : AlgGeom.IsAnalyticSetZeroLocus (n := n) (X := X) T := hT
+  exact (by infer_instance : AlgGeom.IsAnalyticSetZeroLocus (n := n) (X := X) (S ∪ T))
 
 end IsAnalyticSet
 

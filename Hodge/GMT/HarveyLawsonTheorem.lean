@@ -39,11 +39,13 @@ abbrev HarveyLawsonHypothesis (k : ℕ) := _root_.HarveyLawsonHypothesis n X k
 abbrev HarveyLawsonConclusion (k : ℕ) := _root_.HarveyLawsonConclusion n X k
 
 /-- Harvey–Lawson structure theorem (semantic stub), as provided in `Hodge/Classical/HarveyLawson.lean`. -/
-def harveyLawsonTheorem {k : ℕ} (hyp : _root_.HarveyLawsonHypothesis n X k) :
+def harveyLawsonTheorem {k : ℕ} [HarveyLawsonKingData n X k]
+    (hyp : _root_.HarveyLawsonHypothesis n X k) :
     _root_.HarveyLawsonConclusion n X k :=
   harvey_lawson_theorem hyp
 
-theorem harveyLawson_represents {k : ℕ} (hyp : _root_.HarveyLawsonHypothesis n X k) :
+theorem harveyLawson_represents {k : ℕ} [HarveyLawsonKingData n X k]
+    (hyp : _root_.HarveyLawsonHypothesis n X k) :
     (harveyLawsonTheorem hyp).represents hyp.T.toFun :=
   harvey_lawson_represents hyp
 

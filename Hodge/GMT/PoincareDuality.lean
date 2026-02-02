@@ -91,15 +91,17 @@ abbrev poincareDualForm_construct_cycleClass := CycleClass.poincareDualForm
 This matches the operational plan sketch:
 `regularizeCurrentToForm (integrationCurrent p Z)`.
 
-**Round 10 Note**: The integration current is now real (via Hausdorff measure), but
-`regularizeCurrentToForm` is still a placeholder (returns 0). When regularization
-is implemented, this will produce the actual Poincaré dual form. -/
+**Round 10 Note**: The integration current is now real (via Hausdorff measure), and
+`regularizeCurrentToForm` is exposed as an explicit regularization interface.
+When regularization is implemented, this will produce the actual Poincaré dual form. -/
 noncomputable def poincareDualForm_construct_fromCurrent {n : ℕ} {X : Type*} {p : ℕ}
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [MeasurableSpace X] [BorelSpace X] [Nonempty X]
-    (Z : Set X) : SmoothForm n X (2 * p) :=
+    [CurrentRegularizationData n X (2 * p)]
+    (Z : Set X) [ClosedSubmanifoldStokesData n X (2 * p) Z] :
+    SmoothForm n X (2 * p) :=
   regularizeCurrentToForm (n := n) (X := X) (k := 2 * p)
     (integrationCurrent (n := n) (X := X) p Z)
 
@@ -156,7 +158,7 @@ cohomology classes. This is the "M4 bridge" that connects:
 | Step | Status | Implementation |
 |------|--------|---------------|
 | Z → [Z] (current) | ✅ Real | `integration_current` via `setIntegral` |
-| [Z] → η_Z (form) | ⚠️ Placeholder | `regularizeCurrentToForm` returns 0 |
+| [Z] → η_Z (form) | ⚠️ Interface | `regularizeCurrentToForm` (explicit data, no stub) |
 | η_Z → [η_Z] (class) | ✅ Real | `ofForm` with closedness proof |
 | Direct: Z → [Z] | ✅ Placeholder | `poincareDualForm` (Kähler powers) |
 

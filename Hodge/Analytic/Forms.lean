@@ -1,5 +1,6 @@
 import Mathlib.LinearAlgebra.StdBasis
 import Mathlib.Geometry.Manifold.Algebra.Monoid
+import Mathlib.Topology.Algebra.Support
 import Hodge.Analytic.DomCoprod
 import Hodge.Analytic.DomCoprodComplex
 import Hodge.Analytic.FormType
@@ -329,6 +330,67 @@ theorem smoothExtDeriv_nontrivial {k : ℕ} :
 
 @[simp] theorem smoothExtDeriv_zero {k : ℕ} : smoothExtDeriv (0 : SmoothForm n X k) = 0 := by
   simp only [smoothExtDeriv, map_zero]
+
+theorem smoothExtDeriv_eq_zero_of_eq_zero_on {k : ℕ} (ω : SmoothForm n X k) {U : Set X}
+    (hU : IsOpen U) (hzero : ∀ x ∈ U, ω.as_alternating x = 0) :
+    ∀ x ∈ U, (smoothExtDeriv ω).as_alternating x = 0 := by
+  intro x hx
+  have hzero' : ω.as_alternating =ᶠ[nhds x] 0 := by
+    refine Filter.eventuallyEq_of_mem (hU.mem_nhds hx) ?_
+    intro y hy
+    exact hzero y hy
+  have hmf :
+      mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ω.as_alternating x = 0 := by
+    have hmf_eq :
+        mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ω.as_alternating x =
+          mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) (fun _ : X => (0 : FiberAlt n k)) x :=
+      Filter.EventuallyEq.mfderiv_eq (I := 𝓒_complex n) (I' := 𝓘(ℝ, FiberAlt n k)) hzero'
+    simpa using hmf_eq
+  -- Expand `smoothExtDeriv` to the pointwise alternating map.
+  unfold smoothExtDeriv extDerivLinearMap
+  simp only [LinearMap.coe_mk, AddHom.coe_mk, ContMDiffForm.toSmoothForm_as_alternating,
+    ContMDiffForm.extDerivForm_as_alternating, ContMDiffForm.extDeriv_as_alternating,
+    ContMDiffForm.extDerivAt_def, SmoothForm.toContMDiffForm_as_alternating, hmf]
+  simp only [ContinuousAlternatingMap.alternatizeUncurryFin]
+  exact (ContinuousAlternatingMap.alternatizeUncurryFinCLM ℝ (TangentModel n) ℂ (n := k)).map_zero
+
+private lemma smoothExtDeriv_eventuallyEq_zero_of_eventuallyEq_zero {k : ℕ} (ω : SmoothForm n X k)
+    {x : X} (hzero : ω.as_alternating =ᶠ[nhds x] 0) :
+    (smoothExtDeriv ω).as_alternating =ᶠ[nhds x] 0 := by
+  rcases (Filter.eventuallyEq_iff_exists_mem).1 hzero with ⟨s, hs, hEq⟩
+  rcases mem_nhds_iff.mp hs with ⟨U, hUsub, hUopen, hxU⟩
+  have hEqU : Set.EqOn ω.as_alternating (fun _ : X => (0 : FiberAlt n k)) U := by
+    intro y hy
+    exact hEq (hUsub hy)
+  have hzeroU :
+      ∀ y ∈ U, (smoothExtDeriv ω).as_alternating y = 0 :=
+    smoothExtDeriv_eq_zero_of_eq_zero_on (ω := ω) hUopen hEqU
+  exact Filter.eventuallyEq_of_mem (hUopen.mem_nhds hxU) hzeroU
+
+theorem smoothExtDeriv_tsupport_subset {k : ℕ} (ω : SmoothForm n X k) :
+    tsupport (smoothExtDeriv ω).as_alternating ⊆ tsupport ω.as_alternating := by
+  intro x hx
+  by_contra hx'
+  have hzero : ω.as_alternating =ᶠ[nhds x] 0 :=
+    (notMem_tsupport_iff_eventuallyEq).1 hx'
+  have hzero' :
+      (smoothExtDeriv ω).as_alternating =ᶠ[nhds x] 0 :=
+    smoothExtDeriv_eventuallyEq_zero_of_eventuallyEq_zero (ω := ω) hzero
+  have hxnot : x ∉ tsupport (smoothExtDeriv ω).as_alternating :=
+    (notMem_tsupport_iff_eventuallyEq).2 hzero'
+  exact hxnot hx
+
+theorem smoothExtDeriv_hasCompactSupport {k : ℕ} (ω : SmoothForm n X k) :
+    HasCompactSupport ω.as_alternating →
+      HasCompactSupport (smoothExtDeriv ω).as_alternating := by
+  intro hcomp
+  have hcompact : IsCompact (tsupport ω.as_alternating) := by
+    simpa [HasCompactSupport] using hcomp
+  have hcompact' :
+      IsCompact (tsupport (smoothExtDeriv ω).as_alternating) :=
+    IsCompact.of_isClosed_subset hcompact (isClosed_tsupport _)
+      (smoothExtDeriv_tsupport_subset (ω := ω))
+  simpa [HasCompactSupport] using hcompact'
 
 def IsFormClosed {k : ℕ} (ω : SmoothForm n X k) : Prop := smoothExtDeriv ω = 0
 

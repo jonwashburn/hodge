@@ -86,13 +86,8 @@ structure PoincareDualFormData (n : ℕ) (X : Type u) (p : ℕ) (Z : Set X)
   is_closed : IsFormClosed form
   /-- Zero set gives zero form -/
   empty_vanishes : Z = ∅ → form = 0
-  /-- Non-empty sets give potentially non-zero forms.
-      Real statement: Z ≠ ∅ → form ≠ 0 (under appropriate conditions). -/
-  nonzero_possible : Prop := Z.Nonempty
-  /-- **Geometric Characterization** placeholder.
-      Intended statement: ∫_X η_Z ∧ α = ∫_Z α for closed (2n-2p)-forms α.
-      This is the defining property of Poincaré duality. -/
-  geometric_characterization : Prop := form = form
+-- (Future) Geometric characterization: ∫_X η_Z ∧ α = ∫_Z α for closed (2n-2p)-forms α.
+-- This is the defining property of Poincaré duality.
 
 /-! ## Existence Interface -/
 

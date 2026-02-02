@@ -69,29 +69,34 @@ The full theorem produces:
 3. Current equality: T = ∑ᵢ mᵢ [Vᵢ]
 -/
 
-/-- **Integration current over an analytic variety**.
+/-! ### Integration currents of analytic varieties (explicit interface)
 
-    For an analytic subvariety V ⊂ X, the integration current [V] acts on forms ω by:
-    `[V](ω) = ∫_V ω`
+These are deep GMT objects; we make them explicit as data instead of stubs. -/
 
-    This uses the Hausdorff measure on V. -/
-def integrationCurrentOfVariety (_V : AnalyticSubvariety n X) (k : ℕ) :
-    Current n X k :=
-  -- Semantic stub: returns zero current
-  -- Real implementation: [V](ω) = ∫_V ω using Hausdorff measure
-  0
+class VarietyIntegrationCurrentData (n : ℕ) (X : Type*) (k : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X] : Prop where
+  /-- Integration current of an analytic subvariety. -/
+  current_of_variety : AnalyticSubvariety n X → Current n X k
+
+/-- **Integration current over an analytic variety**. -/
+def integrationCurrentOfVariety {k : ℕ} [VarietyIntegrationCurrentData n X k]
+    (V : AnalyticSubvariety n X) : Current n X k :=
+  VarietyIntegrationCurrentData.current_of_variety (n := n) (X := X) (k := k) V
 
 /-- **Weighted sum of integration currents**.
 
     Given varieties Vᵢ with multiplicities mᵢ, form ∑ᵢ mᵢ [Vᵢ].
 
     **Implementation**: Uses a fold over the varieties. -/
-def weightedCurrentSum {ι : Type*} [Fintype ι] (k : ℕ)
-    (_varieties : ι → AnalyticSubvariety n X)
-    (_multiplicities : ι → ℕ+) : Current n X k :=
-  -- Semantic stub: returns zero current
-  -- Real implementation: ∑ᵢ mᵢ [Vᵢ] using Finset.sum
-  0
+def weightedCurrentSum {ι : Type*} [Fintype ι] {k : ℕ}
+    [VarietyIntegrationCurrentData n X k]
+    (varieties : ι → AnalyticSubvariety n X)
+    (multiplicities : ι → ℕ+) : Current n X k :=
+  Finset.univ.sum (fun i =>
+    ((multiplicities i : ℕ) : ℤ) • integrationCurrentOfVariety (n := n) (X := X) (k := k) (varieties i))
 
 /-- **Real Harvey-Lawson Conclusion** with current decomposition.
 
@@ -227,8 +232,8 @@ Using the `HarveyLawsonKingData` typeclass (defined above at line 120).
     - King's theorem for holomorphic cycles -/
 theorem harvey_lawson_king_decomposition [HarveyLawsonKingData n X k]
     (hyp : HarveyLawsonHypothesis n X k) :
-    ∃ (concl : HarveyLawsonConclusion_real n X k hyp.T.toFun), True :=
-  ⟨HarveyLawsonKingData.decompose hyp, trivial⟩
+    ∃ (concl : HarveyLawsonConclusion_real n X k hyp.T.toFun), concl.current_eq :=
+  ⟨HarveyLawsonKingData.decompose hyp, (HarveyLawsonKingData.decompose hyp).current_eq⟩
 
 end Hodge.TexSpine.HarveyLawsonKing
 

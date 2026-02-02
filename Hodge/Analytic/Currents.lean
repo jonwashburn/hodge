@@ -192,6 +192,51 @@ def zero (n : ℕ) (X : Type*) (k : ℕ)
 instance instInhabited : Inhabited (Current n X k) := ⟨zero n X k⟩
 instance instZero : Zero (Current n X k) := ⟨zero n X k⟩
 
+@[simp] theorem support_zero {n k : ℕ} {X : Type*}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [Nonempty X] [MeasurableSpace X] [BorelSpace X] :
+    support (n := n) (X := X) (k := k) (Zero.zero : Current n X k) = (∅ : Set X) := by
+  classical
+  let T0 : Current n X k := (Zero.zero : Current n X k)
+  have hUnion :
+      (⋃ (U : Set X) (_hU : IsOpen U)
+          (_hzero :
+            ∀ ω : SmoothForm n X k,
+              HasCompactSupport ω.as_alternating →
+                tsupport ω.as_alternating ⊆ U → T0.toFun ω = 0),
+          U) = (Set.univ : Set X) := by
+    ext x
+    constructor
+    · intro _; simp
+    · intro _hx
+      refine Set.mem_iUnion_of_mem (Set.univ : Set X) ?_
+      refine Set.mem_iUnion_of_mem isOpen_univ ?_
+      have hzero :
+          ∀ ω : SmoothForm n X k,
+            HasCompactSupport ω.as_alternating →
+              tsupport ω.as_alternating ⊆ (Set.univ : Set X) →
+                T0.toFun ω = 0 := by
+        intro ω _ _
+        rfl
+      refine Set.mem_iUnion_of_mem hzero ?_
+      simp
+  ext x
+  constructor
+  · intro hx
+    have hx' : x ∈ (⋃ (U : Set X) (_hU : IsOpen U)
+        (_hzero :
+          ∀ ω : SmoothForm n X k,
+            HasCompactSupport ω.as_alternating →
+              tsupport ω.as_alternating ⊆ U → T0.toFun ω = 0),
+        U)ᶜ := by
+      simpa [support] using hx
+    have hx'' : x ∉ (Set.univ : Set X) := by
+      simpa [hUnion] using hx'
+    simpa using hx''
+  · intro hx
+    simpa using hx
+
 /-- Addition of currents: (T₁ + T₂)(ω) = T₁(ω) + T₂(ω). -/
 def add_curr (T₁ T₂ : Current n X k) : Current n X k where
   toFun := T₁.toFun + T₂.toFun
@@ -311,6 +356,184 @@ def smul_curr (r : ℝ) (T : Current n X k) : Current n X k where
 
 instance : HSMul ℝ (Current n X k) (Current n X k) := ⟨smul_curr⟩
 instance : HSMul ℤ (Current n X k) (Current n X k) := ⟨fun z T => (z : ℝ) • T⟩
+
+theorem support_add_subset {n k : ℕ} {X : Type*}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [Nonempty X] [MeasurableSpace X] [BorelSpace X]
+    (T₁ T₂ : Current n X k) :
+    support (n := n) (X := X) (k := k) (T₁ + T₂) ⊆ support T₁ ∪ support T₂ := by
+  classical
+  intro x hx
+  by_contra h
+  have hx' : ¬ (x ∈ support T₁ ∨ x ∈ support T₂) := by
+    simpa using h
+  have hx1 : x ∉ support T₁ := (not_or.mp hx').1
+  have hx2 : x ∉ support T₂ := (not_or.mp hx').2
+  rcases (by
+    simpa [support] using hx1) with ⟨U₁, hU₁, hzero₁, hxU₁⟩
+  rcases (by
+    simpa [support] using hx2) with ⟨U₂, hU₂, hzero₂, hxU₂⟩
+  let U : Set X := U₁ ∩ U₂
+  have hU : IsOpen U := hU₁.inter hU₂
+  have hxU : x ∈ U := ⟨hxU₁, hxU₂⟩
+  have hzero :
+      ∀ ω : SmoothForm n X k,
+        HasCompactSupport ω.as_alternating →
+          tsupport ω.as_alternating ⊆ U → (T₁ + T₂).toFun ω = 0 := by
+    intro ω hcomp hsub
+    have hsub₁ : tsupport ω.as_alternating ⊆ U₁ := by
+      intro y hy
+      exact (hsub hy).1
+    have hsub₂ : tsupport ω.as_alternating ⊆ U₂ := by
+      intro y hy
+      exact (hsub hy).2
+    have h₁ := hzero₁ ω hcomp hsub₁
+    have h₂ := hzero₂ ω hcomp hsub₂
+    change (T₁.toFun + T₂.toFun) ω = 0
+    simp [h₁, h₂]
+  have hxUnion :
+      x ∈ ⋃ (U : Set X) (_hU : IsOpen U)
+        (_hzero :
+          ∀ ω : SmoothForm n X k,
+            HasCompactSupport ω.as_alternating →
+              tsupport ω.as_alternating ⊆ U → (T₁ + T₂).toFun ω = 0),
+        U := by
+    refine Set.mem_iUnion_of_mem U ?_
+    refine Set.mem_iUnion_of_mem hU ?_
+    refine Set.mem_iUnion_of_mem hzero ?_
+    exact hxU
+  have hxNot : x ∉ support (n := n) (X := X) (k := k) (T₁ + T₂) := by
+    intro hxSupp
+    exact hxSupp hxUnion
+  exact hxNot hx
+
+theorem support_smul_subset {n k : ℕ} {X : Type*}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [Nonempty X] [MeasurableSpace X] [BorelSpace X]
+    (r : ℝ) (T : Current n X k) :
+    support (n := n) (X := X) (k := k) (r • T) ⊆ support T := by
+  classical
+  intro x hx
+  by_contra h
+  have hxT : x ∉ support T := by simpa using h
+  rcases (by
+    simpa [support] using hxT) with ⟨U, hU, hzero, hxU⟩
+  have hzero' :
+      ∀ ω : SmoothForm n X k,
+        HasCompactSupport ω.as_alternating →
+          tsupport ω.as_alternating ⊆ U → (r • T).toFun ω = 0 := by
+    intro ω hcomp hsub
+    have hT0 := hzero ω hcomp hsub
+    change (r • T.toFun) ω = 0
+    simp [hT0]
+  have hxUnion :
+      x ∈ ⋃ (U : Set X) (_hU : IsOpen U)
+        (_hzero :
+          ∀ ω : SmoothForm n X k,
+            HasCompactSupport ω.as_alternating →
+              tsupport ω.as_alternating ⊆ U → (r • T).toFun ω = 0),
+        U := by
+    refine Set.mem_iUnion_of_mem U ?_
+    refine Set.mem_iUnion_of_mem hU ?_
+    refine Set.mem_iUnion_of_mem hzero' ?_
+    exact hxU
+  have hxNot : x ∉ support (n := n) (X := X) (k := k) (r • T) := by
+    intro hxSupp
+    exact hxSupp hxUnion
+  exact hxNot hx
+
+theorem support_smul_eq {n k : ℕ} {X : Type*}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [Nonempty X] [MeasurableSpace X] [BorelSpace X]
+    (r : ℝ) (hr : r ≠ 0) (T : Current n X k) :
+    support (n := n) (X := X) (k := k) (r • T) = support T := by
+  apply Set.Subset.antisymm
+  · exact support_smul_subset (n := n) (X := X) (k := k) r T
+  · have hsubset :
+      support (n := n) (X := X) (k := k) ((r⁻¹) • (r • T)) ⊆
+        support (n := n) (X := X) (k := k) (r • T) :=
+      support_smul_subset (n := n) (X := X) (k := k) (r := r⁻¹) (T := r • T)
+    have hrep : (r⁻¹) • (r • T) = T := by
+      ext ω
+      simpa [smul_curr, smul_eq_mul, mul_assoc] using
+        (inv_mul_cancel_left₀ hr (T.toFun ω))
+    simpa [hrep] using hsubset
+
+theorem support_neg_subset {n k : ℕ} {X : Type*}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [Nonempty X] [MeasurableSpace X] [BorelSpace X]
+    (T : Current n X k) :
+    support (n := n) (X := X) (k := k) (-T) ⊆ support T := by
+  classical
+  intro x hx
+  by_contra h
+  have hxT : x ∉ support T := by simpa using h
+  rcases (by
+    simpa [support] using hxT) with ⟨U, hU, hzero, hxU⟩
+  have hzero' :
+      ∀ ω : SmoothForm n X k,
+        HasCompactSupport ω.as_alternating →
+          tsupport ω.as_alternating ⊆ U → (-T).toFun ω = 0 := by
+    intro ω hcomp hsub
+    have hT0 := hzero ω hcomp hsub
+    change (-T.toFun) ω = 0
+    simp [hT0]
+  have hxUnion :
+      x ∈ ⋃ (U : Set X) (_hU : IsOpen U)
+        (_hzero :
+          ∀ ω : SmoothForm n X k,
+            HasCompactSupport ω.as_alternating →
+              tsupport ω.as_alternating ⊆ U → (-T).toFun ω = 0),
+        U := by
+    refine Set.mem_iUnion_of_mem U ?_
+    refine Set.mem_iUnion_of_mem hU ?_
+    refine Set.mem_iUnion_of_mem hzero' ?_
+    exact hxU
+  have hxNot : x ∉ support (n := n) (X := X) (k := k) (-T) := by
+    intro hxSupp
+    exact hxSupp hxUnion
+  exact hxNot hx
+
+theorem support_neg_eq {n k : ℕ} {X : Type*}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [Nonempty X] [MeasurableSpace X] [BorelSpace X]
+    (T : Current n X k) :
+    support (n := n) (X := X) (k := k) (-T) = support T := by
+  apply Set.Subset.antisymm
+  · exact support_neg_subset (n := n) (X := X) (k := k) T
+  · have hsubset :
+      support (n := n) (X := X) (k := k) (-(-T)) ⊆
+        support (n := n) (X := X) (k := k) (-T) :=
+      support_neg_subset (n := n) (X := X) (k := k) (-T)
+    simpa using hsubset
+
+theorem support_sub_subset {n k : ℕ} {X : Type*}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [Nonempty X] [MeasurableSpace X] [BorelSpace X]
+    (T₁ T₂ : Current n X k) :
+    support (n := n) (X := X) (k := k) (T₁ - T₂) ⊆ support T₁ ∪ support T₂ := by
+  have hadd :
+      support (n := n) (X := X) (k := k) (T₁ + (-T₂)) ⊆ support T₁ ∪ support (-T₂) := by
+    simpa using (support_add_subset (n := n) (X := X) (k := k) T₁ (-T₂))
+  have hneg : support (n := n) (X := X) (k := k) (-T₂) ⊆ support T₂ :=
+    support_neg_subset (n := n) (X := X) (k := k) T₂
+  have hsubset : support T₁ ∪ support (-T₂) ⊆ support T₁ ∪ support T₂ := by
+    intro x hx
+    rcases hx with hx | hx
+    · exact Or.inl hx
+    · exact Or.inr (hneg hx)
+  intro x hx
+  have hx' : x ∈ support T₁ ∪ support (-T₂) := by
+    have hx'' : x ∈ support (n := n) (X := X) (k := k) (T₁ + (-T₂)) := by
+      simpa [sub_eq_add_neg] using hx
+    exact hadd hx''
+  exact hsubset hx'
 
 /-- Zero current evaluates to zero. -/
 theorem zero_toFun (ω : SmoothForm n X k) : (0 : Current n X k).toFun ω = 0 := rfl
@@ -575,6 +798,52 @@ theorem boundary_sub (S T : Current n X (k + 1)) : boundary (S - T) = boundary S
     (boundary T).toFun ω = T.toFun (smoothExtDeriv ω) := by
   rfl
 
+theorem support_boundary_subset {n k : ℕ} {X : Type*}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [Nonempty X] [MeasurableSpace X] [BorelSpace X]
+    (T : Current n X (k + 1)) :
+    support (n := n) (X := X) (k := k) (boundary T) ⊆ support T := by
+  classical
+  intro x hx
+  by_contra h
+  have hxT : x ∉ support T := by simpa using h
+  rcases (by
+    simpa [support] using hxT) with ⟨U, hU, hzero, hxU⟩
+  have hzero' :
+      ∀ ω : SmoothForm n X k,
+        HasCompactSupport ω.as_alternating →
+          tsupport ω.as_alternating ⊆ U → (boundary T).toFun ω = 0 := by
+    intro ω hcomp hsub
+    have hcompact : IsCompact (tsupport ω.as_alternating) := by
+      simpa [HasCompactSupport] using hcomp
+    have hcompact' :
+        IsCompact (tsupport (smoothExtDeriv ω).as_alternating) :=
+      IsCompact.of_isClosed_subset hcompact (isClosed_tsupport _)
+        (smoothExtDeriv_tsupport_subset (ω := ω))
+    have hcomp' : HasCompactSupport (smoothExtDeriv ω).as_alternating := by
+      simpa [HasCompactSupport] using hcompact'
+    have hsub' :
+        tsupport (smoothExtDeriv ω).as_alternating ⊆ U :=
+      (smoothExtDeriv_tsupport_subset (ω := ω)).trans hsub
+    have hT0 := hzero (smoothExtDeriv ω) hcomp' hsub'
+    simpa [boundary_toFun] using hT0
+  have hxUnion :
+      x ∈ ⋃ (U : Set X) (_hU : IsOpen U)
+        (_hzero :
+          ∀ ω : SmoothForm n X k,
+            HasCompactSupport ω.as_alternating →
+              tsupport ω.as_alternating ⊆ U → (boundary T).toFun ω = 0),
+        U := by
+    refine Set.mem_iUnion_of_mem U ?_
+    refine Set.mem_iUnion_of_mem hU ?_
+    refine Set.mem_iUnion_of_mem hzero' ?_
+    exact hxU
+  have hxNot : x ∉ support (n := n) (X := X) (k := k) (boundary T) := by
+    intro hxSupp
+    exact hxSupp hxUnion
+  exact hxNot hx
+
 end Current
 
 /-! ## Integration Currents via Hausdorff Measure
@@ -699,6 +968,21 @@ theorem formVectorPairing_smul {n : ℕ} {X : Type*} {k : ℕ}
   simp only [formVectorPairing, SmoothForm.smul_apply]
   rfl
 
+theorem formVectorPairing_eq_zero_of_not_mem_tsupport {n : ℕ} {X : Type*} {k : ℕ}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    (ω : SmoothForm n X k) (τ : OrientingKVector n X k) {x : X}
+    (hx : x ∉ tsupport ω.as_alternating) : formVectorPairing ω τ x = 0 := by
+  have hx_support : x ∉ Function.support ω.as_alternating := by
+    intro hx_support
+    exact hx (subset_tsupport _ hx_support)
+  have hzero : ω.as_alternating x = 0 := by
+    by_contra h
+    have : x ∈ Function.support ω.as_alternating := by
+      simpa [Function.mem_support, h] using h
+    exact hx_support this
+  simp [formVectorPairing, hzero]
+
 /-- **Oriented Rectifiable Set Data** (Federer-Fleming, 1960).
     Bundles a k-dimensional rectifiable set with its orientation and Hausdorff measure.
 
@@ -775,6 +1059,38 @@ noncomputable def hausdorffIntegrate {n : ℕ} {X : Type*} {k : ℕ}
   -- Real implementation: ∫_Z ⟨ω(x), τ(x)⟩ dH^k(x)
   -- We take the real part since Currents are defined as real-valued functionals
   (∫ x in data.carrier, formVectorPairing ω data.orientation x ∂data.measure).re
+
+theorem hausdorffIntegrate_eq_zero_of_tsupport_subset {n : ℕ} {X : Type*} {k : ℕ}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X]
+    (data : OrientedRectifiableSetData n X k) {U : Set X} (ω : SmoothForm n X k)
+    (hU : tsupport ω.as_alternating ⊆ U) (hdis : Disjoint U data.carrier) :
+    hausdorffIntegrate (n := n) (X := X) (k := k) data ω = 0 := by
+  have hzero : ∀ x, x ∈ data.carrier → formVectorPairing ω data.orientation x = 0 := by
+    intro x hxC
+    have hxU : x ∉ U := by
+      intro hxU
+      exact (Set.disjoint_left.mp hdis) hxU hxC
+    have hx_tsupp : x ∉ tsupport ω.as_alternating := by
+      intro hx
+      exact hxU (hU hx)
+    simpa using (formVectorPairing_eq_zero_of_not_mem_tsupport (ω := ω) (τ := data.orientation) (x := x) hx_tsupp)
+  have hzero_ae :
+      ∀ᵐ x ∂data.measure, x ∈ data.carrier → formVectorPairing ω data.orientation x = 0 := by
+    exact Filter.Eventually.of_forall hzero
+  have hzero_restrict :
+      ∀ᵐ x ∂data.measure.restrict data.carrier,
+        formVectorPairing ω data.orientation x = 0 := by
+    exact
+      (MeasureTheory.ae_restrict_iff'
+        (μ := data.measure) (s := data.carrier)
+        (p := fun x => formVectorPairing ω data.orientation x = 0)
+        data.carrier_measurable).2 hzero_ae
+  have hzero_int :
+      (∫ x in data.carrier, formVectorPairing ω data.orientation x ∂data.measure) = 0 := by
+    simpa using (MeasureTheory.integral_eq_zero_of_ae hzero_restrict)
+  simp [hausdorffIntegrate, hzero_int]
 
 /-- **Mass of an Oriented Rectifiable Set**.
     The k-dimensional Hausdorff measure of the set.
@@ -1274,6 +1590,63 @@ noncomputable def OrientedRectifiableSetData.toIntegrationData {n : ℕ} {X : Ty
     cases hk_succ
     simpa [hausdorffIntegrate, OrientedRectifiableSetData.bdryMass] using data.stokes_bound ω
 
+theorem support_orientedRectifiableCurrent_subset_closure {n : ℕ} {X : Type*} {k : ℕ}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    (data : OrientedRectifiableSetData n X k) :
+    Current.support (n := n) (X := X) (k := k) (data.toIntegrationData.toCurrent) ⊆
+      closure data.carrier := by
+  classical
+  intro x hx
+  by_contra hx'
+  let U : Set X := (closure data.carrier)ᶜ
+  have hUopen : IsOpen U := isClosed_closure.isOpen_compl
+  have hxU : x ∈ U := by
+    simpa [U] using hx'
+  have hdis : Disjoint U data.carrier := by
+    refine Set.disjoint_left.mpr ?_
+    intro y hyU hyC
+    have hyC' : y ∈ closure data.carrier := subset_closure hyC
+    exact hyU hyC'
+  have hzero :
+      ∀ ω : SmoothForm n X k,
+        HasCompactSupport ω.as_alternating →
+          tsupport ω.as_alternating ⊆ U →
+            (data.toIntegrationData.toCurrent).toFun ω = 0 := by
+    intro ω _hcomp hsub
+    have h :=
+      hausdorffIntegrate_eq_zero_of_tsupport_subset (n := n) (X := X) (k := k)
+        data ω hsub hdis
+    -- unfold the current evaluation
+    simp [IntegrationData.toCurrent, OrientedRectifiableSetData.toIntegrationData, h]
+  have hxUnion :
+      x ∈ ⋃ (U : Set X) (_hU : IsOpen U)
+        (_hzero :
+          ∀ ω : SmoothForm n X k,
+            HasCompactSupport ω.as_alternating →
+              tsupport ω.as_alternating ⊆ U → (data.toIntegrationData.toCurrent).toFun ω = 0),
+        U := by
+    refine Set.mem_iUnion_of_mem U ?_
+    refine Set.mem_iUnion_of_mem hUopen ?_
+    refine Set.mem_iUnion_of_mem hzero ?_
+    exact hxU
+  have hxNot : x ∉ Current.support (n := n) (X := X) (k := k) (data.toIntegrationData.toCurrent) := by
+    intro hxSupp
+    exact hxSupp hxUnion
+  exact hxNot hx
+
+theorem support_orientedRectifiableCurrent_subset {n : ℕ} {X : Type*} {k : ℕ}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    (data : OrientedRectifiableSetData n X k) (hclosed : IsClosed data.carrier) :
+    Current.support (n := n) (X := X) (k := k) (data.toIntegrationData.toCurrent) ⊆
+      data.carrier := by
+  have h :=
+    support_orientedRectifiableCurrent_subset_closure (n := n) (X := X) (k := k) data
+  simpa [hclosed.closure_eq] using h
+
 /-- **Closed Submanifold to IntegrationData with Zero Boundary Mass**.
     The Stokes bound holds trivially with M = 0. -/
 noncomputable def ClosedSubmanifoldData.toIntegrationData {n : ℕ} {X : Type*} {k : ℕ}
@@ -1320,12 +1693,133 @@ noncomputable def ClosedSubmanifoldData.toIntegrationData {n : ℕ} {X : Type*} 
     rw [hz]
     simp only [abs_zero, le_refl]
 
+theorem support_closedSubmanifoldCurrent_subset_closure {n : ℕ} {X : Type*} {k : ℕ}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    (data : ClosedSubmanifoldData n X k) :
+    Current.support (n := n) (X := X) (k := k) (data.toIntegrationData.toCurrent) ⊆
+      closure data.carrier := by
+  classical
+  intro x hx
+  by_contra hx'
+  let U : Set X := (closure data.carrier)ᶜ
+  have hUopen : IsOpen U := isClosed_closure.isOpen_compl
+  have hxU : x ∈ U := by
+    simpa [U] using hx'
+  have hdis : Disjoint U data.carrier := by
+    refine Set.disjoint_left.mpr ?_
+    intro y hyU hyC
+    have hyC' : y ∈ closure data.carrier := subset_closure hyC
+    exact hyU hyC'
+  have hzero :
+      ∀ ω : SmoothForm n X k,
+        HasCompactSupport ω.as_alternating →
+          tsupport ω.as_alternating ⊆ U →
+            (data.toIntegrationData.toCurrent).toFun ω = 0 := by
+    intro ω _hcomp hsub
+    -- integrate over a set disjoint from the support of ω
+    have h :=
+      hausdorffIntegrate_eq_zero_of_tsupport_subset (n := n) (X := X) (k := k)
+        data.toOrientedData ω hsub hdis
+    -- unfold the current evaluation
+    simp [IntegrationData.toCurrent, ClosedSubmanifoldData.toIntegrationData, h]
+  have hxUnion :
+      x ∈ ⋃ (U : Set X) (_hU : IsOpen U)
+        (_hzero :
+          ∀ ω : SmoothForm n X k,
+            HasCompactSupport ω.as_alternating →
+              tsupport ω.as_alternating ⊆ U → (data.toIntegrationData.toCurrent).toFun ω = 0),
+        U := by
+    refine Set.mem_iUnion_of_mem U ?_
+    refine Set.mem_iUnion_of_mem hUopen ?_
+    refine Set.mem_iUnion_of_mem hzero ?_
+    exact hxU
+  have hxNot : x ∉ Current.support (n := n) (X := X) (k := k) (data.toIntegrationData.toCurrent) := by
+    intro hxSupp
+    exact hxSupp hxUnion
+  exact hxNot hx
+
+theorem support_closedSubmanifoldCurrent_subset {n : ℕ} {X : Type*} {k : ℕ}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    (data : ClosedSubmanifoldData n X k) (hclosed : IsClosed data.carrier) :
+    Current.support (n := n) (X := X) (k := k) (data.toIntegrationData.toCurrent) ⊆
+      data.carrier := by
+  have h :=
+    support_closedSubmanifoldCurrent_subset_closure (n := n) (X := X) (k := k) data
+  simpa [hclosed.closure_eq] using h
+
+/-- **Closed submanifold Stokes data** for a concrete carrier `Z`.
+
+This packages a `ClosedSubmanifoldData` instance whose carrier is `Z`,
+so integration currents can be built without falling back to `0`. -/
+class ClosedSubmanifoldStokesData (n : ℕ) (X : Type*) (k : ℕ) (Z : Set X)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X] where
+  data : ClosedSubmanifoldData n X k
+  carrier_eq : data.carrier = Z
+
+noncomputable def ClosedSubmanifoldStokesData.ofData {n : ℕ} {X : Type*} {k : ℕ}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    (data : ClosedSubmanifoldData n X k) :
+    ClosedSubmanifoldStokesData n X k data.carrier :=
+  ⟨data, rfl⟩
+
+noncomputable def ClosedSubmanifoldStokesData.toIntegrationData {n : ℕ} {X : Type*} {k : ℕ}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    {Z : Set X} [ClosedSubmanifoldStokesData n X k Z] : IntegrationData n X k :=
+  (ClosedSubmanifoldStokesData.data (n := n) (X := X) (k := k) (Z := Z)).toIntegrationData
+
+theorem ClosedSubmanifoldStokesData.carrier_eq' {n : ℕ} {X : Type*} {k : ℕ}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    {Z : Set X} [ClosedSubmanifoldStokesData n X k Z] :
+    (ClosedSubmanifoldStokesData.toIntegrationData (n := n) (X := X) (k := k) (Z := Z)).carrier = Z := by
+  simpa [ClosedSubmanifoldStokesData.toIntegrationData] using
+    (ClosedSubmanifoldStokesData.carrier_eq (n := n) (X := X) (k := k) (Z := Z))
+
+theorem ClosedSubmanifoldStokesData.support_subset_closure {n : ℕ} {X : Type*} {k : ℕ}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    {Z : Set X} [ClosedSubmanifoldStokesData n X k Z] :
+    Current.support (n := n) (X := X) (k := k)
+        (ClosedSubmanifoldStokesData.toIntegrationData (n := n) (X := X) (k := k) (Z := Z)).toCurrent ⊆
+      closure Z := by
+  have h :=
+    support_closedSubmanifoldCurrent_subset_closure (n := n) (X := X) (k := k)
+      (ClosedSubmanifoldStokesData.data (n := n) (X := X) (k := k) (Z := Z))
+  simpa [ClosedSubmanifoldStokesData.toIntegrationData,
+    ClosedSubmanifoldStokesData.carrier_eq (n := n) (X := X) (k := k) (Z := Z)] using h
+
+theorem ClosedSubmanifoldStokesData.support_subset {n : ℕ} {X : Type*} {k : ℕ}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    {Z : Set X} [ClosedSubmanifoldStokesData n X k Z] (hclosed : IsClosed Z) :
+    Current.support (n := n) (X := X) (k := k)
+        (ClosedSubmanifoldStokesData.toIntegrationData (n := n) (X := X) (k := k) (Z := Z)).toCurrent ⊆
+      Z := by
+  have h :=
+    ClosedSubmanifoldStokesData.support_subset_closure (n := n) (X := X) (k := k) (Z := Z)
+  simpa [hclosed.closure_eq] using h
+
 /-!
 NOTE (no-gotchas): The legacy Set-based integration plumbing (`setIntegral`,
-`ClosedSubmanifoldStokesData`, `StokesTheoremData`, `integration_current`, and related
-boundary-mass blueprint stubs) was removed. The proof track uses the data-based
-integration layer (`OrientedRectifiableSetData` / `ClosedSubmanifoldData` →
-`IntegrationData` → `Current`).
--/
+`StokesTheoremData`, `integration_current`, and related boundary-mass blueprint stubs)
+was removed. The proof track uses the data-based integration layer
+(`OrientedRectifiableSetData` / `ClosedSubmanifoldData` → `IntegrationData` → `Current`).
+
+The `ClosedSubmanifoldStokesData` defined above is a **data wrapper** around
+`ClosedSubmanifoldData` that records the carrier set explicitly; it is *not* the
+old Set-based stub interface. -/
 
 end

@@ -1,6 +1,8 @@
 import Hodge.Basic
 
 import Mathlib.Geometry.Manifold.Complex
+import Mathlib.Geometry.Manifold.MFDeriv.SpecificFunctions
+import Mathlib.Logic.Equiv.Fin.Basic
 
 /-!
 # Stage 5A (Track B): Analytic sets as local holomorphic zero loci
@@ -178,6 +180,195 @@ instance instInter (S T : Set X)
           exact this.1
         exact ⟨⟨hyS, hyT⟩, ⟨hyU, hyV⟩⟩
 
+private lemma commonZeroLocus_inter {S U V : Set X} {m : ℕ} {f : Fin m → X → ℂ}
+    (hSU : S ∩ U = commonZeroLocus (X := X) U m f) :
+    S ∩ (U ∩ V) = commonZeroLocus (X := X) (U ∩ V) m f := by
+  ext y
+  constructor
+  · intro hy
+    rcases hy with ⟨hyS, ⟨hyU, hyV⟩⟩
+    have hySU : y ∈ S ∩ U := ⟨hyS, hyU⟩
+    have hyZ : y ∈ commonZeroLocus (X := X) U m f := by
+      simpa [hSU] using hySU
+    rcases hyZ with ⟨_hyU, hyZero⟩
+    exact ⟨⟨hyU, hyV⟩, hyZero⟩
+  · intro hy
+    rcases hy with ⟨⟨hyU, hyV⟩, hyZero⟩
+    have hyZ : y ∈ commonZeroLocus (X := X) U m f := ⟨hyU, hyZero⟩
+    have hySU : y ∈ S ∩ U := by
+      simpa [hSU] using hyZ
+    exact ⟨hySU.1, ⟨hyU, hyV⟩⟩
+
+instance instUnion (S T : Set X)
+    [hS : IsAnalyticSetZeroLocus (n := n) (X := X) S]
+    [hT : IsAnalyticSetZeroLocus (n := n) (X := X) T] :
+    IsAnalyticSetZeroLocus (n := n) (X := X) (S ∪ T) where
+  isClosed := hS.isClosed.union hT.isClosed
+  locally_eq_zeroLocus := by
+    classical
+    intro x hx
+    have both_case (hxS : x ∈ S) (hxT : x ∈ T) :
+        ∃ (U : Set X), IsOpen U ∧ x ∈ U ∧
+          ∃ (m : ℕ) (f : Fin m → X → ℂ),
+            (∀ i, MDifferentiableOn (𝓒_complex n) 𝓘(ℝ, ℂ) (f i) U) ∧
+              (S ∪ T) ∩ U = commonZeroLocus (X := X) U m f := by
+      rcases hS.locally_eq_zeroLocus x hxS with ⟨U, hUo, hxU, mS, fS, hfS, hSU⟩
+      rcases hT.locally_eq_zeroLocus x hxT with ⟨V, hVo, hxV, mT, fT, hfT, hTV⟩
+      let U' : Set X := U ∩ V
+      have hU'open : IsOpen U' := hUo.inter hVo
+      have hxU' : x ∈ U' := ⟨hxU, hxV⟩
+      have hS' : S ∩ U' = commonZeroLocus (X := X) U' mS fS := by
+        simpa [U'] using
+          (commonZeroLocus_inter (X := X) (S := S) (U := U) (V := V) (m := mS) (f := fS) hSU)
+      have hT' : T ∩ U' = commonZeroLocus (X := X) U' mT fT := by
+        have hTV' :=
+          commonZeroLocus_inter (X := X) (S := T) (U := V) (V := U) (m := mT) (f := fT) hTV
+        simpa [U', Set.inter_comm, Set.inter_left_comm, Set.inter_right_comm, Set.inter_assoc] using hTV'
+      let fProd : Fin (mS * mT) → X → ℂ := fun i x =>
+        fS ((finProdFinEquiv (m := mS) (n := mT)).symm i).1 x *
+          fT ((finProdFinEquiv (m := mS) (n := mT)).symm i).2 x
+      have hfProd :
+          ∀ i, MDifferentiableOn (𝓒_complex n) 𝓘(ℝ, ℂ) (fProd i) U' := by
+        intro i
+        have hfS' :
+            MDifferentiableOn (𝓒_complex n) 𝓘(ℝ, ℂ)
+              (fS ((finProdFinEquiv (m := mS) (n := mT)).symm i).1) U' :=
+          (hfS ((finProdFinEquiv (m := mS) (n := mT)).symm i).1).mono
+            (by intro y hy; exact hy.1)
+        have hfT' :
+            MDifferentiableOn (𝓒_complex n) 𝓘(ℝ, ℂ)
+              (fT ((finProdFinEquiv (m := mS) (n := mT)).symm i).2) U' :=
+          (hfT ((finProdFinEquiv (m := mS) (n := mT)).symm i).2).mono
+            (by intro y hy; exact hy.2)
+        simpa [fProd] using (MDifferentiableOn.mul hfS' hfT')
+      have hZeroUnion :
+          commonZeroLocus (X := X) U' mS fS ∪ commonZeroLocus (X := X) U' mT fT =
+            commonZeroLocus (X := X) U' (mS * mT) fProd := by
+        ext y
+        constructor
+        · intro hy
+          rcases hy with hyS | hyT
+          · rcases hyS with ⟨hyU, hyS0⟩
+            refine ⟨hyU, ?_⟩
+            intro i
+            have hzero :
+                fS ((finProdFinEquiv (m := mS) (n := mT)).symm i).1 y = 0 :=
+              hyS0 ((finProdFinEquiv (m := mS) (n := mT)).symm i).1
+            dsimp [fProd]
+            exact mul_eq_zero.mpr (Or.inl hzero)
+          · rcases hyT with ⟨hyU, hyT0⟩
+            refine ⟨hyU, ?_⟩
+            intro i
+            have hzero :
+                fT ((finProdFinEquiv (m := mS) (n := mT)).symm i).2 y = 0 :=
+              hyT0 ((finProdFinEquiv (m := mS) (n := mT)).symm i).2
+            dsimp [fProd]
+            exact mul_eq_zero.mpr (Or.inr hzero)
+        · intro hy
+          rcases hy with ⟨hyU, hyProd⟩
+          by_cases hS0 : ∀ i, fS i y = 0
+          · exact Or.inl ⟨hyU, hS0⟩
+          · -- choose a nonzero fS index, force all fT to vanish
+            obtain ⟨iS, hiS⟩ := not_forall.mp hS0
+            have hT0 : ∀ j, fT j y = 0 := by
+              intro j
+              have hprod :=
+                hyProd ((finProdFinEquiv (m := mS) (n := mT)) ⟨iS, j⟩)
+              have hdiv :
+                  (finProdFinEquiv (m := mS) (n := mT) ⟨iS, j⟩).divNat = iS := by
+                exact congrArg Prod.fst
+                  ((finProdFinEquiv (m := mS) (n := mT)).left_inv ⟨iS, j⟩)
+              have hmod :
+                  (finProdFinEquiv (m := mS) (n := mT) ⟨iS, j⟩).modNat = j := by
+                exact congrArg Prod.snd
+                  ((finProdFinEquiv (m := mS) (n := mT)).left_inv ⟨iS, j⟩)
+              have hprod' : fS iS y * fT j y = 0 := by
+                simpa [fProd, hdiv, hmod, -mul_eq_zero] using hprod
+              rcases (mul_eq_zero.mp hprod') with hzero | hzero
+              · exact (hiS hzero).elim
+              · exact hzero
+            exact Or.inr ⟨hyU, hT0⟩
+      have hUnion :
+          (S ∪ T) ∩ U' = commonZeroLocus (X := X) U' (mS * mT) fProd := by
+        have hST :
+            (S ∪ T) ∩ U' = (S ∩ U') ∪ (T ∩ U') := by
+          ext y
+          constructor
+          · intro hy
+            rcases hy with ⟨hyST, hyU⟩
+            rcases hyST with hyS | hyT
+            · exact Or.inl ⟨hyS, hyU⟩
+            · exact Or.inr ⟨hyT, hyU⟩
+          · intro hy
+            rcases hy with hyS | hyT
+            · exact ⟨Or.inl hyS.1, hyS.2⟩
+            · exact ⟨Or.inr hyT.1, hyT.2⟩
+        calc
+          (S ∪ T) ∩ U' = (S ∩ U') ∪ (T ∩ U') := hST
+          _ = commonZeroLocus (X := X) U' mS fS ∪ commonZeroLocus (X := X) U' mT fT := by
+            simp [hS', hT']
+          _ = commonZeroLocus (X := X) U' (mS * mT) fProd := hZeroUnion
+      exact ⟨U', hU'open, hxU', mS * mT, fProd, hfProd, hUnion⟩
+    rcases hx with hxS | hxT
+    · by_cases hxT' : x ∈ T
+      · exact both_case hxS hxT'
+      · -- x ∈ S, x ∉ T: shrink to an open set disjoint from T
+        rcases hS.locally_eq_zeroLocus x hxS with ⟨U, hUo, hxU, mS, fS, hfS, hSU⟩
+        let U' : Set X := U ∩ Tᶜ
+        have hU'open : IsOpen U' := hUo.inter hT.isClosed.isOpen_compl
+        have hxU' : x ∈ U' := ⟨hxU, hxT'⟩
+        have hS' : S ∩ U' = commonZeroLocus (X := X) U' mS fS := by
+          simpa [U'] using
+            (commonZeroLocus_inter (X := X) (S := S) (U := U) (V := Tᶜ) (m := mS) (f := fS) hSU)
+        have hfS' :
+            ∀ i, MDifferentiableOn (𝓒_complex n) 𝓘(ℝ, ℂ) (fS i) U' := by
+          intro i
+          exact (hfS i).mono (by intro y hy; exact hy.1)
+        have hUnion : (S ∪ T) ∩ U' = commonZeroLocus (X := X) U' mS fS := by
+          have hST : (S ∪ T) ∩ U' = S ∩ U' := by
+            ext y
+            constructor
+            · intro hy
+              rcases hy with ⟨hyST, hyU⟩
+              rcases hyST with hyS | hyT
+              · exact ⟨hyS, hyU⟩
+              · exact (False.elim (by exact hyU.2 hyT))
+            · intro hy
+              exact ⟨Or.inl hy.1, hy.2⟩
+          calc
+            (S ∪ T) ∩ U' = S ∩ U' := hST
+            _ = commonZeroLocus (X := X) U' mS fS := hS'
+        exact ⟨U', hU'open, hxU', mS, fS, hfS', hUnion⟩
+    · -- x ∈ T, x ∉ S: symmetric
+      by_cases hxS' : x ∈ S
+      · exact both_case hxS' hxT
+      · rcases hT.locally_eq_zeroLocus x hxT with ⟨V, hVo, hxV, mT, fT, hfT, hTV⟩
+        let U' : Set X := V ∩ Sᶜ
+        have hU'open : IsOpen U' := hVo.inter hS.isClosed.isOpen_compl
+        have hxU' : x ∈ U' := ⟨hxV, hxS'⟩
+        have hT' : T ∩ U' = commonZeroLocus (X := X) U' mT fT := by
+          simpa [U'] using
+            (commonZeroLocus_inter (X := X) (S := T) (U := V) (V := Sᶜ) (m := mT) (f := fT) hTV)
+        have hfT' :
+            ∀ i, MDifferentiableOn (𝓒_complex n) 𝓘(ℝ, ℂ) (fT i) U' := by
+          intro i
+          exact (hfT i).mono (by intro y hy; exact hy.1)
+        have hUnion : (S ∪ T) ∩ U' = commonZeroLocus (X := X) U' mT fT := by
+          have hST : (S ∪ T) ∩ U' = T ∩ U' := by
+            ext y
+            constructor
+            · intro hy
+              rcases hy with ⟨hyST, hyU⟩
+              rcases hyST with hyS | hyT'
+              · exact (False.elim (by exact hyU.2 hyS))
+              · exact ⟨hyT', hyU⟩
+            · intro hy
+              exact ⟨Or.inr hy.1, hy.2⟩
+          calc
+            (S ∪ T) ∩ U' = T ∩ U' := hST
+            _ = commonZeroLocus (X := X) U' mT fT := hT'
+        exact ⟨U', hU'open, hxU', mT, fT, hfT', hUnion⟩
+
 /-- The universal set is an analytic set (it's the zero locus of the empty family of functions). -/
 instance instUniv : IsAnalyticSetZeroLocus (n := n) (X := X) Set.univ where
   isClosed := isClosed_univ
@@ -205,33 +396,6 @@ instance instEmpty : IsAnalyticSetZeroLocus (n := n) (X := X) ∅ where
     intro x hx
     -- This is vacuous since x ∉ ∅
     exact False.elim hx
-
-/-- **Union of Analytic Sets Data** (deep assumption).
-
-The union of two analytic sets is analytic. This requires proving that products of
-holomorphic functions are holomorphic (true, from `MDifferentiableOn.mul`), but the
-combinatorial bookkeeping is substantial.
-
-We make this a typeclass rather than attempt a proof that would be fragile to
-Mathlib version changes.
-
-Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", Ch. 0]. -/
-class AnalyticSetUnionData (n : ℕ) (X : Type*) [TopologicalSpace X]
-    [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X] : Prop where
-  /-- Union of analytic sets is analytic. -/
-  union_isAnalytic :
-    ∀ (S T : Set X),
-      IsAnalyticSetZeroLocus (n := n) (X := X) S →
-      IsAnalyticSetZeroLocus (n := n) (X := X) T →
-      IsAnalyticSetZeroLocus (n := n) (X := X) (S ∪ T)
-
-/-- The union of two analytic sets is analytic (requires `AnalyticSetUnionData`). -/
-theorem union_isAnalytic [AnalyticSetUnionData n X] (S T : Set X)
-    [hS : IsAnalyticSetZeroLocus (n := n) (X := X) S]
-    [hT : IsAnalyticSetZeroLocus (n := n) (X := X) T] :
-    IsAnalyticSetZeroLocus (n := n) (X := X) (S ∪ T) :=
-  AnalyticSetUnionData.union_isAnalytic S T hS hT
 
 end IsAnalyticSetZeroLocus
 

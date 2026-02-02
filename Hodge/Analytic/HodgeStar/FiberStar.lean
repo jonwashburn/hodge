@@ -320,6 +320,10 @@ noncomputable def fiberHodgeStar_construct (n k : ℕ) (α : FiberAlt n k) :
   classical
   exact fiberHodgeStarCLM n k α
 
+@[simp] theorem fiberHodgeStar_construct_zero (n k : ℕ) :
+    fiberHodgeStar_construct n k (0 : FiberAlt n k) = 0 := by
+  simpa [fiberHodgeStar_construct] using (fiberHodgeStarCLM n k).map_zero
+
 /-- Helper: eqRec distributes over add for FiberAlt -/
 theorem fiberAlt_eqRec_add {n k k' : ℕ} (h : k = k') (α β : FiberAlt n k) :
     h ▸ (α + β) = (h ▸ α) + (h ▸ β) := by

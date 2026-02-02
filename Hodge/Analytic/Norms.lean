@@ -11,6 +11,7 @@ import Mathlib.Analysis.Normed.Module.Alternating.Basic
 import Mathlib.Analysis.Normed.Module.FiniteDimension
 import Mathlib.Topology.Algebra.Module.FiniteDimension
 import Mathlib.Topology.ContinuousMap.Algebra
+import Mathlib.Topology.Algebra.Support
 
 /-!
 # Track B.2: Norms and Metrics
@@ -330,25 +331,6 @@ structure KahlerMetricData (n : ℕ) (X : Type*) (k : ℕ)
     inner (r • α) β x = r * inner α β x
   /-- Continuity: the inner product varies continuously in x -/
   inner_continuous : ∀ (α β : SmoothForm n X k), Continuous (inner α β)
-
-/-- **Default Kähler Metric Data** (placeholder).
-
-    This provides the trivial inner product ⟨α, β⟩_x = 0 which satisfies all the
-    algebraic properties. Once Agent 5 provides real Riemannian metric infrastructure,
-    this can be replaced with the actual Kähler-induced inner product.
-
-    **Note**: The trivial inner product is mathematically consistent but not useful
-    for actual Hodge theory. It will be replaced when the metric infrastructure exists. -/
-noncomputable def KahlerMetricData.trivial (n : ℕ) (X : Type*) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X] : KahlerMetricData n X k where
-  inner := fun _ _ _ => 0
-  inner_self_nonneg := fun _ _ => le_refl 0
-  inner_comm := fun _ _ _ => rfl
-  inner_add_left := fun _ _ _ _ => by simp
-  inner_smul_left := fun _ _ _ _ => by simp
-  inner_continuous := fun _ _ => continuous_const
 
 /-- Standard basis vector in the tangent model space (for inner products). -/
 noncomputable def innerProdBasisVector (n : ℕ) (i : Fin n) : TangentModel n :=
@@ -913,6 +895,66 @@ theorem hodgeStar_sub {n : ℕ} {X : Type*}
     {k : ℕ} (α β : SmoothForm n X k) :
     ⋆(α - β) = ⋆α - ⋆β := by
   rw [sub_eq_add_neg, hodgeStar_add, hodgeStar_neg, ← sub_eq_add_neg]
+
+theorem hodgeStar_eq_zero_of_eq_zero_on {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    {k : ℕ} (α : SmoothForm n X k) {U : Set X} (hU : IsOpen U)
+    (hzero : ∀ x ∈ U, α.as_alternating x = 0) :
+    ∀ x ∈ U, (⋆α).as_alternating x = 0 := by
+  intro x hx
+  have hzero' : α.as_alternating x = 0 := hzero x hx
+  simp [hodgeStar, HodgeStarData.fromFiber, hzero']
+
+private lemma hodgeStar_eventuallyEq_zero_of_eventuallyEq_zero {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    {k : ℕ} (α : SmoothForm n X k) {x : X}
+    (hzero : α.as_alternating =ᶠ[nhds x] 0) :
+    (⋆α).as_alternating =ᶠ[nhds x] 0 := by
+  rcases (Filter.eventuallyEq_iff_exists_mem).1 hzero with ⟨s, hs, hEq⟩
+  rcases mem_nhds_iff.mp hs with ⟨U, hUsub, hUopen, hxU⟩
+  have hEqU : Set.EqOn α.as_alternating (fun _ : X => (0 : FiberAlt n k)) U := by
+    intro y hy
+    exact hEq (hUsub hy)
+  have hzeroU :
+      ∀ y ∈ U, (⋆α).as_alternating y = 0 :=
+    hodgeStar_eq_zero_of_eq_zero_on (α := α) hUopen hEqU
+  exact Filter.eventuallyEq_of_mem (hUopen.mem_nhds hxU) hzeroU
+
+theorem hodgeStar_tsupport_subset {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    {k : ℕ} (α : SmoothForm n X k) :
+    tsupport (⋆α).as_alternating ⊆ tsupport α.as_alternating := by
+  intro x hx
+  by_contra hx'
+  have hzero : α.as_alternating =ᶠ[nhds x] 0 :=
+    (notMem_tsupport_iff_eventuallyEq).1 hx'
+  have hzero' :
+      (⋆α).as_alternating =ᶠ[nhds x] 0 :=
+    hodgeStar_eventuallyEq_zero_of_eventuallyEq_zero (α := α) hzero
+  have hxnot : x ∉ tsupport (⋆α).as_alternating :=
+    (notMem_tsupport_iff_eventuallyEq).2 hzero'
+  exact hxnot hx
+
+theorem hodgeStar_hasCompactSupport {n : ℕ} {X : Type*}
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    {k : ℕ} (α : SmoothForm n X k) :
+    HasCompactSupport α.as_alternating →
+      HasCompactSupport (⋆α).as_alternating := by
+  intro hcomp
+  have hcompact : IsCompact (tsupport α.as_alternating) := by
+    simpa [HasCompactSupport] using hcomp
+  have hcompact' : IsCompact (tsupport (⋆α).as_alternating) :=
+    IsCompact.of_isClosed_subset hcompact (isClosed_tsupport _)
+      (hodgeStar_tsupport_subset (α := α))
+  simpa [HasCompactSupport] using hcompact'
 
 /-! ### Hodge Star Involution (Infrastructure)
 

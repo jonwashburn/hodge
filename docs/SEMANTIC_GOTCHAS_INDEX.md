@@ -22,6 +22,7 @@ The intent is to make it easy for the integrator (and bounded agents) to find an
   - Location: `Hodge/Classical/GAGA.lean:282-289` (`FundamentalClassSet`)
   - Location: `Hodge/Classical/CycleClass.lean:103-108` (`CycleClass.PoincareDualFormExists`)
   - Status: The interface is correct; no `.universal` stub exists.
+  - `PoincareDualFormData` no longer carries stub fields (`nonzero_possible`, `geometric_characterization`).
   - **REMAINING**: Need to provide global instances by proving:
     1. De Rham representability theorem (every closed current is cohomologous to a smooth form)
     2. Harvey-Lawson bridge theorem (for calibrated currents, the form equals the calibration)
@@ -59,8 +60,18 @@ This change is deep and will require a staged migration (new `FiberAltR` / `Smoo
   - `Hodge/Analytic/Integration/L2Inner.lean` now provides
     `volumeIntegrationData_ofMeasure` (measure-based integration of continuous functions).
   - `Hodge/Analytic/Integration/VolumeForm.lean` provides
-    `volumeIntegrationData_kahlerMeasure` (Kähler-measure wrapper).
+    `volumeIntegrationData_kahlerMeasure` (Kähler-measure wrapper); finiteness now
+    comes from the `SubmanifoldIntegration.measure2p_finite` field.
   - Remaining: construct the *Kähler* volume measure + prove L2 properties and the ⋆–wedge relation.
+  - `KahlerMetricData.trivial` removed (no zero inner-product placeholder).
+  - Removed the tautological `kahlerMeasure_finite` lemma; finiteness is now an explicit
+    assumption for `volumeIntegrationData_kahlerMeasure`.
+
+- **Hodge Laplacian / harmonic forms definitions added**
+  - Files: `Hodge/Analytic/Laplacian/HodgeLaplacian.lean`,
+    `Hodge/Analytic/Laplacian/HarmonicForms.lean`
+  - Added structural definition `Δ := d ∘ δ + δ ∘ d` and kernel-based harmonic submodule.
+  - Remaining: elliptic regularity + finite-dimensionality + Hodge decomposition theorems.
 
 - **Volume basis stub removed**
   - File: `Hodge/Analytic/Integration/VolumeForm.lean`
@@ -69,6 +80,11 @@ This change is deep and will require a staged migration (new `FiberAltR` / `Smoo
 - **Placeholder `True` removed from cohomology representative lemma**
   - File: `Hodge/Analytic/Norms.lean`
   - `energy_minimizer_trivial` now states only the definitional existence of a representative.
+
+- **Kähler identity placeholder operators removed**
+  - Files: `Hodge/Kahler/Identities/LambdaD.lean`, `Hodge/Kahler/Identities/LDelta.lean`
+  - Replaced `:= 0` operators with explicit data interfaces
+    (`KahlerIdentityLambdaDData`, `KahlerIdentityLDeltaData`).
 
 ## B. Submanifold integration / Stokes (deep GMT layer)
 
@@ -96,6 +112,14 @@ This change is deep and will require a staged migration (new `FiberAltR` / `Smoo
   - Location: `Hodge/Analytic/Currents.lean`
   - Change: removed the entire legacy `setIntegral` / `ClosedSubmanifoldStokesData` / `StokesTheoremData` / `integration_current` tail.
   - Current direction: integration currents should be constructed from `ClosedSubmanifoldData` / `OrientedRectifiableSetData` via `...toIntegrationData.toCurrent`.
+
+- **Current regularization stub removed**
+  - Files: `Hodge/GMT/CurrentToForm.lean`, `Hodge/GMT/PoincareDuality.lean`
+  - `regularizeCurrentToForm` is now an explicit data interface
+    (`CurrentRegularizationData`), not a zero-form stub.
+  - `ClosedSubmanifoldStokesData` is now a data wrapper around `ClosedSubmanifoldData`
+    (in `Hodge/Analytic/Currents.lean`), and `integrationCurrent` requires it
+    instead of falling back to zero.
 
 ---
 
@@ -125,6 +149,11 @@ This change is deep and will require a staged migration (new `FiberAltR` / `Smoo
     - `RealMicrostructureSequenceData` packages a concrete sequence with defect → 0.
     - `microstructureSequence_real` now depends on this data.
 
+- **Deep microstructure pillar stubs removed (now explicit data interfaces)**
+  - File: `Hodge/Deep/Pillars/Microstructure.lean`
+    - `LocalSheetExistsData`, `GluingBoundaryBoundData`, `CalibrationDefectMeshBoundData`.
+    - `AutomaticSYRData.real'` now takes an explicit construction argument (no universal stub).
+
 ---
 
 ## D. Harvey–Lawson / King
@@ -136,6 +165,17 @@ This change is deep and will require a staged migration (new `FiberAltR` / `Smoo
   - Remaining deep blocker: **Harvey–Lawson regularity**
     (`CalibratedCurrentRegularityData.support_is_analytic_zero_locus`) is still an explicit typeclass binder.
 
+- **Deep Harvey–Lawson pillar stubs removed**
+  - File: `Hodge/Deep/Pillars/HarveyLawson.lean`
+    - Theorems now rely on `CalibratedCurrentRegularityData`, `HarveyLawsonKingData`,
+      and `ChowGAGAData` instead of closedness/`True` placeholders.
+
+- **Harvey–Lawson real bridge placeholder tightened**
+  - File: `Hodge/Classical/HarveyLawsonReal.lean`
+    - `harvey_lawson_king_decomposition` now returns the explicit `current_eq` witness.
+  - Integration currents of analytic varieties are now explicit data
+    (`VarietyIntegrationCurrentData`) instead of zero-current stubs.
+
 ---
 
 ## E. Chow / GAGA
@@ -145,6 +185,10 @@ This change is deep and will require a staged migration (new `FiberAltR` / `Smoo
   - Location: `Hodge/Classical/AlgebraicSets.lean`
   - Used by: `Hodge/Classical/GAGA.lean` (algebraic subvarieties, closure lemmas, hyperplane/CI examples)
   - Remaining deep blocker: **Chow/GAGA theorem** itself (`ChowGAGAData`) is still an explicit typeclass binder.
+
+- **Deep GAGA pillar stubs removed**
+  - File: `Hodge/Deep/Pillars/GAGA.lean`
+    - Removed `IsAlgebraicSetStrong` placeholder and `True` stubs; now uses `ChowGAGAData`.
 
 ---
 

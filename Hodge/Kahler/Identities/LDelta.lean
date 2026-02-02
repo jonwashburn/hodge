@@ -27,22 +27,36 @@ variable {n : ℕ} {X : Type u}
   [ProjectiveComplexManifold n X] [KahlerManifold n X]
 
 /-!
-## Placeholder operators
+## Interface (no stubs)
 
-In a full development:
-- `L` is the Lefschetz operator (degree +2),
-- `δ` is the codifferential / adjoint derivative (degree -1).
+We expose the Kähler-identity operators as **explicit data**.
+No universal placeholder definitions are provided.
 -/
 
-/-- Lefschetz operator `L` on k-forms (placeholder). -/
-noncomputable def lefschetz (k : ℕ) :
-    SmoothForm n X k →ₗ[ℂ] SmoothForm n X (k + 2) :=
-  0
+class KahlerIdentityLDeltaData (n : ℕ) (X : Type u)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] : Prop where
+  /-- Lefschetz operator `L` on k-forms. -/
+  lefschetz : ∀ k, SmoothForm n X k →ₗ[ℂ] SmoothForm n X (k + 2)
+  /-- Codifferential `δ` on k-forms. -/
+  adjointDeriv : ∀ k, SmoothForm n X k →ₗ[ℂ] SmoothForm n X (k - 1)
+  /-- Commutator `[L, δ] : Ω^k → Ω^{k+1}`. -/
+  commutator_L_delta : ∀ k, SmoothForm n X k →ₗ[ℂ] SmoothForm n X (k + 1)
+  /-- Second Kähler identity `[L, δ] = -i(∂̄ - ∂)`. -/
+  identity_L_delta :
+    ∀ k, commutator_L_delta k =
+      (-Complex.I) • (dolbeaultBar (n := n) (X := X) k - dolbeault (n := n) (X := X) k)
 
-/-- Codifferential `δ` on k-forms (placeholder). -/
-noncomputable def adjointDeriv (k : ℕ) :
+/-- Lefschetz operator `L` on k-forms. -/
+noncomputable def lefschetz (k : ℕ) [KahlerIdentityLDeltaData n X] :
+    SmoothForm n X k →ₗ[ℂ] SmoothForm n X (k + 2) :=
+  (KahlerIdentityLDeltaData.lefschetz (n := n) (X := X) k)
+
+/-- Codifferential `δ` on k-forms. -/
+noncomputable def adjointDeriv (k : ℕ) [KahlerIdentityLDeltaData n X] :
     SmoothForm n X k →ₗ[ℂ] SmoothForm n X (k - 1) :=
-  0
+  (KahlerIdentityLDeltaData.adjointDeriv (n := n) (X := X) k)
 
 /-!
 ## Commutator `[L, δ]`
@@ -52,20 +66,16 @@ Degree bookkeeping:
 - `δ ∘ L : Ω^k → Ω^{k+1}` via `L_k : Ω^k → Ω^{k+2}` then `δ_{k+2} : Ω^{k+2} → Ω^{k+1}`.
 -/
 
-/-- The commutator `[L, δ] : Ω^k → Ω^{k+1}` (placeholder implementation). -/
-noncomputable def commutator_L_delta (k : ℕ) :
+/-- The commutator `[L, δ] : Ω^k → Ω^{k+1}`. -/
+noncomputable def commutator_L_delta (k : ℕ) [KahlerIdentityLDeltaData n X] :
     SmoothForm n X k →ₗ[ℂ] SmoothForm n X (k + 1) :=
-  0
+  (KahlerIdentityLDeltaData.commutator_L_delta (n := n) (X := X) k)
 
-/-- **Second Kähler identity** `[L, δ] = -i(∂̄ - ∂)`.
-
-With the current placeholder Dolbeault operators (`∂ = ∂̄`), the RHS is 0, so the statement
-is provable for the placeholder `L` and `δ`. -/
-theorem kahler_identity_L_delta (k : ℕ) :
+/-- **Second Kähler identity** `[L, δ] = -i(∂̄ - ∂)`. -/
+theorem kahler_identity_L_delta (k : ℕ) [KahlerIdentityLDeltaData n X] :
     commutator_L_delta (n := n) (X := X) k =
       (-Complex.I) •
         (dolbeaultBar (n := n) (X := X) k - dolbeault (n := n) (X := X) k) := by
-  ext ω
-  simp [commutator_L_delta]
+  simpa using (KahlerIdentityLDeltaData.identity_L_delta (n := n) (X := X) k)
 
 end

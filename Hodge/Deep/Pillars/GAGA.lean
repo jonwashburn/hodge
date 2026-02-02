@@ -45,8 +45,8 @@ variable {n : ℕ} {X : Type u}
 
 /-! ## Goal 1: Strong Analytic Set Definition
 
-The current `IsAnalyticSet` is just `IsClosed`. We need the real definition:
-a set is analytic if it's locally the common zero locus of holomorphic functions.
+`IsAnalyticSet` is now the real definition: locally the common zero locus of
+holomorphic functions.
 
 We already have `Hodge.AlgGeom.IsAnalyticSetZeroLocus` in `Hodge/AnalyticSets.lean`.
 The goal is to connect it to the proof track.
@@ -54,7 +54,7 @@ The goal is to connect it to the proof track.
 
 /-- **DEEP GOAL 1.1**: Every set satisfying `IsAnalyticSetZeroLocus` satisfies `IsAnalyticSet`.
 
-    This is immediate since `IsAnalyticSet` currently only requires closedness. -/
+    This is immediate since `IsAnalyticSet` is definitional. -/
 theorem isAnalyticSetZeroLocus_implies_isAnalyticSet (Z : Set X)
     (hZ : Hodge.AlgGeom.IsAnalyticSetZeroLocus (n := n) (X := X) Z) :
     IsAnalyticSet (n := n) (X := X) Z := by
@@ -105,11 +105,11 @@ Once Goal 3 is complete, this replaces `ChowGAGAData.universal`.
 /-- **DEEP GOAL 4**: The real ChowGAGAData instance.
 
     **Status**: Depends on Goals 1-3 above. -/
-def ChowGAGAData.real : ChowGAGAData n X where
-  analytic_to_algebraic := fun Z hZ => by
-    -- In the current proof-track interface, both analytic and algebraic sets are
-    -- approximated by topological closedness.
-    simpa [IsAlgebraicSet] using hZ.isClosed
+def ChowGAGAData.real
+    (analytic_to_algebraic :
+      ∀ (Z : Set X), IsAnalyticSet (n := n) (X := X) Z → IsAlgebraicSet n X Z) :
+    ChowGAGAData n X where
+  analytic_to_algebraic := analytic_to_algebraic
 
 end Hodge.Deep.GAGA
 

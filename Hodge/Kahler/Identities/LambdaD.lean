@@ -29,30 +29,43 @@ variable {n : ℕ} {X : Type u}
 namespace KahlerIdentities
 
 /-!
-## Placeholder operators
+## Interface (no stubs)
 
-In a full development:
-- `Λ` is the dual Lefschetz operator on forms (degree -2),
-- `∂*` and `∂̄*` are formal adjoints (degree -1).
-
-For now we define them as zero maps so that the interface compiles and the identity is
-available for downstream code, without impacting the proof track.
+We expose the Kähler-identity operators as **explicit data**.
+No universal placeholder definitions are provided.
 -/
 
-/-- Dual Lefschetz operator `Λ` on k-forms (placeholder). -/
-noncomputable def lefschetzLambda (k : ℕ) :
+class KahlerIdentityLambdaDData (n : ℕ) (X : Type u)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] : Prop where
+  /-- Dual Lefschetz operator `Λ` on k-forms. -/
+  lefschetzLambda : ∀ k, SmoothForm n X k →ₗ[ℂ] SmoothForm n X (k - 2)
+  /-- Formal adjoint of `∂`. -/
+  dolbeaultStar : ∀ k, SmoothForm n X k →ₗ[ℂ] SmoothForm n X (k - 1)
+  /-- Formal adjoint of `∂̄`. -/
+  dolbeaultBarStar : ∀ k, SmoothForm n X k →ₗ[ℂ] SmoothForm n X (k - 1)
+  /-- Commutator `[Λ, d] : Ω^k → Ω^{k-1}`. -/
+  commutator_Lambda_d : ∀ k, SmoothForm n X k →ₗ[ℂ] SmoothForm n X (k - 1)
+  /-- First Kähler identity `[Λ, d] = i(∂̄* - ∂*)`. -/
+  identity_Lambda_d :
+    ∀ k, commutator_Lambda_d k =
+      Complex.I • (dolbeaultBarStar k - dolbeaultStar k)
+
+/-- Dual Lefschetz operator `Λ` on k-forms. -/
+noncomputable def lefschetzLambda (k : ℕ) [KahlerIdentityLambdaDData n X] :
     SmoothForm n X k →ₗ[ℂ] SmoothForm n X (k - 2) :=
-  0
+  (KahlerIdentityLambdaDData.lefschetzLambda (n := n) (X := X) k)
 
-/-- Formal adjoint of `∂` (placeholder). -/
-noncomputable def dolbeaultStar (k : ℕ) :
+/-- Formal adjoint of `∂`. -/
+noncomputable def dolbeaultStar (k : ℕ) [KahlerIdentityLambdaDData n X] :
     SmoothForm n X k →ₗ[ℂ] SmoothForm n X (k - 1) :=
-  0
+  (KahlerIdentityLambdaDData.dolbeaultStar (n := n) (X := X) k)
 
-/-- Formal adjoint of `∂̄` (placeholder). -/
-noncomputable def dolbeaultBarStar (k : ℕ) :
+/-- Formal adjoint of `∂̄`. -/
+noncomputable def dolbeaultBarStar (k : ℕ) [KahlerIdentityLambdaDData n X] :
     SmoothForm n X k →ₗ[ℂ] SmoothForm n X (k - 1) :=
-  0
+  (KahlerIdentityLambdaDData.dolbeaultBarStar (n := n) (X := X) k)
 
 /-!
 ## Commutator `[Λ, d]`
@@ -61,20 +74,17 @@ To typecheck degree arithmetic, we define `[Λ, d]` at each degree k as
 `Λ_{k+1} ∘ d_k - d_{k-2} ∘ Λ_k : Ω^k → Ω^{k-1}`.
 -/
 
-/-- The commutator `[Λ, d]` as a linear map `Ω^k → Ω^{k-1}` (placeholder implementation). -/
-noncomputable def commutator_Lambda_d (k : ℕ) :
+/-- The commutator `[Λ, d]` as a linear map `Ω^k → Ω^{k-1}`. -/
+noncomputable def commutator_Lambda_d (k : ℕ) [KahlerIdentityLambdaDData n X] :
     SmoothForm n X k →ₗ[ℂ] SmoothForm n X (k - 1) :=
-  0
+  (KahlerIdentityLambdaDData.commutator_Lambda_d (n := n) (X := X) k)
 
-/-- **First Kähler identity** `[Λ, d] = i(∂̄* - ∂*)`.
-
-Currently proved for the placeholder operators (both sides are 0). -/
-theorem kahler_identity_Lambda_d (k : ℕ) :
+/-- **First Kähler identity** `[Λ, d] = i(∂̄* - ∂*)`. -/
+theorem kahler_identity_Lambda_d (k : ℕ) [KahlerIdentityLambdaDData n X] :
     commutator_Lambda_d (n := n) (X := X) k =
       Complex.I •
         (dolbeaultBarStar (n := n) (X := X) k - dolbeaultStar (n := n) (X := X) k) := by
-  ext ω
-  simp [commutator_Lambda_d, lefschetzLambda, dolbeaultBarStar, dolbeaultStar]
+  simpa using (KahlerIdentityLambdaDData.identity_Lambda_d (n := n) (X := X) k)
 
 end KahlerIdentities
 

@@ -42,6 +42,8 @@ class SubmanifoldIntegration (n : ℕ) (X : Type u)
     [MeasurableSpace X] [Nonempty X] where
   /-- Hausdorff measure of dimension 2p -/
   measure2p : ℕ → Measure X
+  /-- Finiteness of the Hausdorff measure on compact Kähler manifolds. -/
+  measure2p_finite : ∀ p, (measure2p p) Set.univ < ∞
   /-- Integration functional: ω ↦ ∫_Z ω -/
   integral : ∀ (p : ℕ), SmoothForm n X (2 * p) → Set X → ℝ
   /-- Linearity -/
@@ -75,6 +77,10 @@ def realDimension (p : ℕ) : ℕ := 2 * p
 /-- Hausdorff measure of dimension 2p on X. -/
 noncomputable def hausdorffMeasure2p (p : ℕ) [SubmanifoldIntegration n X] : Measure X :=
   SubmanifoldIntegration.measure2p (n := n) (X := X) p
+
+instance instIsFiniteMeasure_hausdorffMeasure2p (p : ℕ) [SubmanifoldIntegration n X] :
+    IsFiniteMeasure (hausdorffMeasure2p (n := n) (X := X) p) :=
+  ⟨SubmanifoldIntegration.measure2p_finite (n := n) (X := X) p⟩
 
 /-- **Submanifold integration** (nontrivial implementation). -/
 noncomputable def submanifoldIntegral {p : ℕ} [SubmanifoldIntegration n X]

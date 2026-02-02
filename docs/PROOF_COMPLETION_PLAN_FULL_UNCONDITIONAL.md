@@ -152,6 +152,8 @@ This is not exhaustive, but it captures the major blockers currently *on the pro
       Remaining: implement real sheet construction + gluing/defect estimates.
   - `Hodge/Kahler/Microstructure/RealSpine.lean`: `microstructureSequence_real` is now an explicit data interface
     (`RealMicrostructureSequenceData`), no longer the zero sequence.
+  - `Hodge/Deep/Pillars/Microstructure.lean`: deep-goal theorems are now explicit data interfaces
+    (no `True` placeholders), but still require real proofs.
 - **(Removed) legacy boundary-mass placeholder**:
   - The Set-based `boundaryMass := 0` stub (and its dependent Stokes plumbing) was removed from `Hodge/Analytic/Currents.lean`.
 - **Hodge-theoretic operators still need real analytic proofs**:
@@ -355,8 +357,12 @@ implemented without stubs.
 - `Hodge/Analytic/Norms.lean`
   - Replace `L2Inner := VolumeIntegrationData.basepoint` with real `L2Inner_measure` over Kähler volume.
   - Implement `L2Inner_eq_integral_wedge_hodgeStar` (no `True` placeholder).
-  - Define codifferential `δ := (-1)^{nk+n+1} ⋆ d ⋆` as an actual operator.
-  - Define Hodge Laplacian `Δ := d ∘ δ + δ ∘ d`.
+- `Hodge/Analytic/Laplacian/Codifferential.lean`
+  - Codifferential `δ := (-1)^{nk+n+1} ⋆ d ⋆` implemented as a real linear map.
+- `Hodge/Analytic/Laplacian/HodgeLaplacian.lean`
+  - Hodge Laplacian `Δ := d ∘ δ + δ ∘ d` defined (structural operator).
+- `Hodge/Analytic/Laplacian/HarmonicForms.lean`
+  - Harmonic forms defined as `ker(Δ)` (kernel submodule).
 - `Hodge/Analytic/Integration/L2Inner.lean`
   - Use `kahlerMeasure` to instantiate `L2Inner` with real integration.
 - `Hodge/Analytic/Integration/VolumeForm.lean`

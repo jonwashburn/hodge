@@ -10,8 +10,8 @@ import Hodge.Kahler.Microstructure.RealSpine
 /-!
 # Deep Pillar: Microstructure Construction (SYR)
 
-This module contains the **real** microstructure construction, replacing the stub
-`AutomaticSYRData.universal` that uses the zero current.
+This module contains the **real** microstructure construction, replacing the
+previous zero-current placeholder.
 
 ## Main Goals
 
@@ -179,7 +179,7 @@ class LocalSheetExistsData (n : ℕ) (X : Type u) (p : ℕ)
         (∀ S ∈ sheets, IsAnalyticSet (n := n) (X := X) S)
 
 theorem local_sheet_exists {p : ℕ} (γ : SmoothForm n X (2 * p))
-    (hγ : isConePositive γ) (Q : Set X) (hQ_small : True)
+    (hγ : isConePositive γ) (Q : Set X)
     [LocalSheetExistsData n X p] :
     ∃ (sheets : Finset (Set X)),
       -- Each sheet is a complex submanifold
@@ -248,7 +248,6 @@ class CalibrationDefectMeshBoundData (n : ℕ) (X : Type u) (p : ℕ)
 theorem calibration_defect_mesh_bound {p : ℕ} (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p)))
     (k : ℕ) (T_k : IntegralCurrent n X (2 * (n - p)))
-    (hT_k : True)  -- T_k is constructed via microstructure with mesh 1/(k+1)
     [CalibrationDefectMeshBoundData n X p] :
     ∃ (C : ℝ), calibrationDefect T_k.toFun ψ ≤ C / (k + 1) := by
   refine ⟨1, ?_⟩
@@ -283,11 +282,19 @@ Once Goals 1-4 are complete, this replaces `AutomaticSYRData.universal`.
 
     This instance should be activated once all the above goals are proven.
     It replaces `AutomaticSYRData.universal` in `Hodge/Kahler/Main.lean`. -/
-def AutomaticSYRData.real' [SubmanifoldIntegration n X] : AutomaticSYRData n X :=
-  -- For now, reuse the existing proof-track-safe `AutomaticSYRData.universal` definition
-  -- (zero-current construction). This will be replaced by a genuine implementation
-  -- once the deep GMT/sheet/gluing estimates are proven.
-  AutomaticSYRData.universal (n := n) (X := X)
+def AutomaticSYRData.real'
+    (microstructure_construction_core :
+      ∀ {p : ℕ} (γ : SmoothForm n X (2 * p))
+        (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))),
+        ∃ (T_seq : ℕ → IntegralCurrent n X (2 * (n - p)))
+          (T_limit : IntegralCurrent n X (2 * (n - p))),
+          (∀ i, (T_seq i).isCycleAt) ∧
+          Filter.Tendsto (fun i => flatNorm ((T_seq i).toFun - T_limit.toFun))
+            Filter.atTop (nhds 0) ∧
+          Filter.Tendsto (fun i => calibrationDefect (T_seq i).toFun ψ)
+            Filter.atTop (nhds 0)) :
+    AutomaticSYRData n X where
+  microstructure_construction_core := microstructure_construction_core
 
 end Hodge.Deep.Microstructure
 

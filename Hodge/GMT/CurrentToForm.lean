@@ -1,11 +1,10 @@
 import Hodge.Analytic.Currents
 
 /-!
-# GMT: Current → Smooth Form (placeholder)
+# GMT: Current → Smooth Form (interface)
 
 In classical GMT/Hodge theory one often “regularizes” a current to a smooth form.
-This project does not yet implement that analytic regularization machinery; for now
-we provide a **total placeholder** so downstream code can depend on a stable interface.
+We expose this as an explicit data interface (no stub implementation).
 
 This file is intentionally **off-proof-track**: it should not be imported by `Hodge`
 (the proof-track entry point) until a real construction is provided.
@@ -19,16 +18,25 @@ set_option autoImplicit false
 
 namespace Hodge.GMT
 
-/-- Placeholder regularization: returns the zero form. -/
+/-- **Regularization data**: a way to associate a smooth form to a current.
+
+This is a deep analytic construction (mollification / heat flow) and is kept explicit. -/
+class CurrentRegularizationData (n : ℕ) (X : Type*) (k : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X] where
+  /-- Regularize a current to a smooth form. -/
+  regularize : Current n X k → SmoothForm n X k
+
+/-- Regularize a current to a smooth form (explicit data interface). -/
 noncomputable def regularizeCurrentToForm {n : ℕ} {X : Type*} {k : ℕ}
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
     [MeasurableSpace X] [BorelSpace X]
-    (_T : Current n X k) : SmoothForm n X k :=
-  -- Semantic stub: returns zero form
-  -- Real implementation: Mollification of the current T to a smooth form
-  -- T_ε(ω) = T(φ_ε * ω) where φ_ε is a mollifier
-  0
+    [CurrentRegularizationData n X k]
+    (T : Current n X k) : SmoothForm n X k :=
+  CurrentRegularizationData.regularize (n := n) (X := X) (k := k) T
 
 end Hodge.GMT

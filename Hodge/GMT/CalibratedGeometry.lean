@@ -23,6 +23,7 @@ variable {n : ℕ} {X : Type*}
   [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X]
   [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+  [MeasurableSpace X] [BorelSpace X]
 
 abbrev CalibratingForm (k : ℕ) : Type _ :=
   _root_.CalibratingForm n X k

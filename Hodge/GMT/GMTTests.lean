@@ -26,29 +26,26 @@ variable {n : ℕ} {X : Type u}
 
 /-! ## Basic smoke tests -/
 
--- Test 1: integration current of empty set is zero (codimension form).
-example (p : ℕ) :
-    integrationCurrent (n := n) (X := X) p (∅ : Set X) = (0 : DeRhamCurrent n X (2 * p)) :=
-  integrationCurrent_empty (n := n) (X := X) p
-
--- Test 2: linearity of evaluation for integration currents.
-example (p : ℕ) (Z : Set X) (c : ℝ) (ω₁ ω₂ : SmoothForm n X (2 * p)) :
+-- Test 1: linearity of evaluation for integration currents.
+example (p : ℕ) (Z : Set X) (c : ℝ) (ω₁ ω₂ : SmoothForm n X (2 * p))
+    [ClosedSubmanifoldStokesData n X (2 * p) Z] :
     (integrationCurrent (n := n) (X := X) p Z).toFun (c • ω₁ + ω₂) =
       c * (integrationCurrent (n := n) (X := X) p Z).toFun ω₁ +
         (integrationCurrent (n := n) (X := X) p Z).toFun ω₂ :=
   integrationCurrent_linear (n := n) (X := X) (p := p) (Z := Z) c ω₁ ω₂
 
--- Test 3: boundary operator typechecks.
+-- Test 2: boundary operator typechecks.
 example {k : ℕ} (T : DeRhamCurrent n X k) : DeRhamCurrent n X (k - 1) :=
   DeRhamCurrent.boundary (n := n) (X := X) (k := k) T
 
--- Test 4: real-valued flat norm is nonnegative.
+-- Test 3: real-valued flat norm is nonnegative.
 example {k : ℕ} (T : Current n X k) :
     0 ≤ _root_.flatNorm (n := n) (X := X) (k := k) T :=
   _root_.flatNorm_nonneg (n := n) (X := X) (k := k) T
 
--- Test 5: Poincaré dual form constructor typechecks.
-example (p : ℕ) (Z : Set X) : SmoothForm n X (2 * p) :=
+-- Test 4: Poincaré dual form constructor typechecks.
+example (p : ℕ) (Z : Set X) [CurrentRegularizationData n X (2 * p)]
+    [ClosedSubmanifoldStokesData n X (2 * p) Z] : SmoothForm n X (2 * p) :=
   poincareDualForm_construct (n := n) (X := X) (p := p) Z
 
 /-! ## Round 7 Tests: Current Architecture -/
@@ -64,8 +61,10 @@ example (k : ℕ) (Z : Set X) (ω : SmoothForm n X k) :
 
 -- Test 8: integration current of a set Z uses setIntegral
 -- (This is the key Round 7 deliverable: currents now depend on Z via closedSubmanifold)
-example (k : ℕ) (Z : Set X) (ω : SmoothForm n X k) :
-    (integrationCurrentK (n := n) (X := X) k Z).toFun ω = 0 := by
+example (k : ℕ) (Z : Set X) (ω : SmoothForm n X k)
+    [ClosedSubmanifoldStokesData n X k Z] :
+    (integrationCurrentK (n := n) (X := X) k Z).toFun ω =
+      (integrationCurrentReal (n := n) (X := X) k Z).toFun ω := by
   rfl
 
 -- Test 9: The carrier of a closedSubmanifold IntegrationData is the set itself

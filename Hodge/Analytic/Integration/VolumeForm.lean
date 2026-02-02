@@ -170,33 +170,30 @@ noncomputable def kahlerVolumeForm : SmoothForm n X (2 * n) :=
     This is the Riemannian measure μ such that for any measurable f:
     `∫ f dμ = ∫_X f · vol`
 
-    **Mathematical Properties**:
-    - μ(X) = ∫_X vol < ∞ (since X is compact)
-    - μ is the same as Hausdorff measure H^{2n} on the Riemannian manifold
+    **Mathematical Properties** (to be proved in the GMT layer):
+    - μ(X) < ∞ on compact Kähler manifolds
+    - μ agrees with Hausdorff measure H^{2n}
 
-    **Implementation**: For a compact Kähler manifold, this agrees with the
-    Riemannian volume measure induced by the Kähler metric.
+    **Implementation**: Provided as a measure from the submanifold integration data.
 
     Reference: [Voisin, "Hodge Theory and Complex Algebraic Geometry I", §5.2]. -/
 noncomputable def kahlerMeasure [MeasurableSpace X] [Nonempty X]
     [SubmanifoldIntegration n X] : Measure X :=
   hausdorffMeasure2p (n := n) (X := X) n
 
-/-- **The Kähler measure is finite** (since X is compact).
-
-    **Proof**: X is compact (from `ProjectiveComplexManifold`), hence has finite measure. -/
-theorem kahlerMeasure_finite [MeasurableSpace X] [Nonempty X]
-    [SubmanifoldIntegration n X] [IsFiniteMeasure (kahlerMeasure (n := n) (X := X))] :
-    IsFiniteMeasure (kahlerMeasure (n := n) (X := X)) := inferInstance
-
 /-- Build `VolumeIntegrationData` from the Kähler measure. -/
 noncomputable def volumeIntegrationData_kahlerMeasure
     [MeasurableSpace X] [BorelSpace X] [Nonempty X] [CompactSpace X]
-    [SubmanifoldIntegration n X]
-    [IsFiniteMeasure (kahlerMeasure (n := n) (X := X))] :
+    [SubmanifoldIntegration n X] :
     VolumeIntegrationData n X :=
   Hodge.Analytic.L2.volumeIntegrationData_ofMeasure (n := n) (X := X)
     (μ := kahlerMeasure (n := n) (X := X))
+
+instance instVolumeIntegrationData_kahlerMeasure
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X] [CompactSpace X]
+    [SubmanifoldIntegration n X] :
+    VolumeIntegrationData n X :=
+  volumeIntegrationData_kahlerMeasure (n := n) (X := X)
 
 /-- **Total volume of X** (the Kähler volume).
 

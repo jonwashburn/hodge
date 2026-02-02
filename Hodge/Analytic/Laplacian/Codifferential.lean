@@ -42,4 +42,19 @@ noncomputable def codifferential (k : ℕ) :
     hodgeStarLinear (n := n) (X := X) (k := n - k + 1)
   exact (codifferentialSign n k : ℂ) • (star_nk1.comp (d_nk.comp star_k))
 
+@[simp] theorem codifferential_zero (k : ℕ) :
+    codifferential (n := n) (X := X) (k := k) 0 = 0 := by
+  simpa using (codifferential (n := n) (X := X) (k := k)).map_zero
+
+@[simp] theorem codifferential_add {k : ℕ} (α β : SmoothForm n X k) :
+    codifferential (n := n) (X := X) (k := k) (α + β) =
+      codifferential (n := n) (X := X) (k := k) α +
+      codifferential (n := n) (X := X) (k := k) β := by
+  simpa using (codifferential (n := n) (X := X) (k := k)).map_add α β
+
+@[simp] theorem codifferential_smul {k : ℕ} (c : ℂ) (α : SmoothForm n X k) :
+    codifferential (n := n) (X := X) (k := k) (c • α) =
+      c • codifferential (n := n) (X := X) (k := k) α := by
+  simpa using (codifferential (n := n) (X := X) (k := k)).map_smul c α
+
 end
