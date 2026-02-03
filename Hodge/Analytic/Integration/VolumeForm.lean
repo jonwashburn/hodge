@@ -174,9 +174,9 @@ arbitrary sets and is not yet mathematically realized).
 class KahlerVolumeMeasureData (n : ℕ) (X : Type u)
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-    [ProjectiveComplexManifold n X] [MeasurableSpace X] [BorelSpace X] where
+  [ProjectiveComplexManifold n X] [MeasurableSpace X] [BorelSpace X] where
   measure : Measure X
-  finite : measure Set.univ < ∞
+  finite : measure Set.univ < (⊤ : ENNReal)
 
 /-- **The Kähler measure** on X induced by the volume form.
 
@@ -190,17 +190,17 @@ class KahlerVolumeMeasureData (n : ℕ) (X : Type u)
     **Implementation**: Provided by the explicit `KahlerVolumeMeasureData` interface.
 
     Reference: [Voisin, "Hodge Theory and Complex Algebraic Geometry I", §5.2]. -/
-noncomputable def kahlerMeasure [MeasurableSpace X] [Nonempty X]
+noncomputable def kahlerMeasure [MeasurableSpace X] [BorelSpace X] [Nonempty X]
     [KahlerVolumeMeasureData n X] : Measure X :=
   KahlerVolumeMeasureData.measure (n := n) (X := X)
 
-theorem kahlerMeasure_univ_lt_top [MeasurableSpace X] [Nonempty X]
+theorem kahlerMeasure_univ_lt_top [MeasurableSpace X] [BorelSpace X] [Nonempty X]
     [KahlerVolumeMeasureData n X] :
-    (kahlerMeasure (n := n) (X := X) : Measure X) Set.univ < ∞ := by
+    (kahlerMeasure (n := n) (X := X) : Measure X) Set.univ < (⊤ : ENNReal) := by
   -- Directly from the explicit volume-measure data.
   simpa [kahlerMeasure] using (KahlerVolumeMeasureData.finite (n := n) (X := X))
 
-instance instIsFiniteMeasure_kahlerMeasure [MeasurableSpace X] [Nonempty X]
+instance instIsFiniteMeasure_kahlerMeasure [MeasurableSpace X] [BorelSpace X] [Nonempty X]
     [KahlerVolumeMeasureData n X] : IsFiniteMeasure (kahlerMeasure (n := n) (X := X)) := by
   exact ⟨kahlerMeasure_univ_lt_top (n := n) (X := X)⟩
 
@@ -227,7 +227,8 @@ instance instVolumeIntegrationData_kahlerMeasure
     **Sprint 1 Status**: Type signature only.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.2]. -/
-noncomputable def totalVolume [MeasurableSpace X] [Nonempty X] [KahlerVolumeMeasureData n X] : ℝ :=
+noncomputable def totalVolume [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [KahlerVolumeMeasureData n X] : ℝ :=
   ((kahlerMeasure (n := n) (X := X) : Measure X) Set.univ).toReal
 
 /-! ## Compatibility with Submanifold Integration -/
@@ -249,6 +250,13 @@ class KahlerMeasureCompatibilityData (n : ℕ) (X : Type u)
     [KahlerVolumeMeasureData n X] where
   submanifold : SubmanifoldIntegrationData n X
   measure2p_eq_kahler : submanifold.measure2p n = kahlerMeasure (n := n) (X := X)
+
+/-! ### Convenience accessors -/
+
+noncomputable def kahlerSubmanifoldIntegrationData [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [KahlerVolumeMeasureData n X] [KahlerMeasureCompatibilityData n X] :
+    SubmanifoldIntegrationData n X :=
+  KahlerMeasureCompatibilityData.submanifold (n := n) (X := X)
 
 /-! **Total volume is positive** (for nonempty compact Kähler manifolds; documentation-only).
 

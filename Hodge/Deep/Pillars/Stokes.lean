@@ -93,8 +93,9 @@ theorem ClosedSubmanifoldData.stokes_integral_exact_zero_succ {k' : ℕ}
 ### Note on the legacy Set-based `SubmanifoldIntegration`
 
 We intentionally do **not** provide a `SubmanifoldIntegration.real` instance here.
-The Set-based interface in `Hodge/Analytic/Integration/HausdorffMeasure.lean` is legacy plumbing and
-will be retired in favor of structured integration data (`OrientedRectifiableSetData` / `ClosedSubmanifoldData`).
+The Set-based interface in `Hodge/Analytic/Integration/HausdorffMeasure.lean` is now a
+thin wrapper over explicit `SubmanifoldIntegrationData`, and will be retired in favor of
+structured integration data (`OrientedRectifiableSetData` / `ClosedSubmanifoldData`).
 -/
 
 end Hodge.Deep.Stokes

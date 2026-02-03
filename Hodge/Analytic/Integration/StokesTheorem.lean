@@ -81,13 +81,21 @@ Currently kept as documentation (no semantic stub theorem). -/
 Stokes' theorem implies that integration descends to cohomology.
 -/
 
+/-- **Cohomology integral data** (explicit interface).
+
+This packages the linear functional on top-degree de Rham cohomology. -/
+class CohomologyIntegralData (n : ℕ) (X : Type u)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] where
+  integral : DeRhamCohomologyClass n X (2 * n) →ₗ[ℂ] ℂ
+
 /-- Integration defines a linear functional on top-degree cohomology.
 
-This is currently a stub (zero map). Once Stokes is connected to the explicit
-integration data (`topFormIntegral_real'`), this will become nontrivial. -/
-noncomputable def cohomologyIntegral :
+This is provided by explicit data until Stokes is fully connected. -/
+noncomputable def cohomologyIntegral [CohomologyIntegralData n X] :
     DeRhamCohomologyClass n X (2 * n) →ₗ[ℂ] ℂ :=
-  0  -- Stub: not yet wired to top‑form integration
+  CohomologyIntegralData.integral (n := n) (X := X)
 
 /-!
 ## Boundary Operator (for manifolds with boundary)
@@ -113,7 +121,7 @@ Currently kept as documentation (no semantic stub theorem). -/
 
 ### Notes
 - The Stokes statements in this file are currently documentation-only placeholders.
-- `cohomologyIntegral` is still defined (as a stub) elsewhere in the integration stack.
+- `cohomologyIntegral` is now an explicit data interface, pending a real Stokes proof.
 
 ### Note on Current Status:
 The integration layer now exists (data-based), but Stokes is still not

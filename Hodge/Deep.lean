@@ -30,7 +30,7 @@ The deep track has 6 pillars, each containing explicit `sorry` goals:
 
 | Stub | Replaced By | Pillar |
 |------|-------------|--------|
-| `SubmanifoldIntegration.universal` | `SubmanifoldIntegration.real` | Stokes |
+| `SubmanifoldIntegrationData` (explicit data) | real Hausdorff integration data | Stokes |
 | `ChowGAGAData.universal` | `ChowGAGAData.real` | GAGA |
 | `AutomaticSYRData.universal` | `AutomaticSYRData.real` | Microstructure |
 | `HarveyLawsonKingData.universal` | `HarveyLawsonKingData.real` | Harvey-Lawson |

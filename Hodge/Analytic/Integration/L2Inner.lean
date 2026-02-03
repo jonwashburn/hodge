@@ -229,8 +229,9 @@ noncomputable def volumeIntegrationData_ofMeasure (μ : Measure X) [IsFiniteMeas
 
 theorem L2Inner_eq_L2Inner_measure_ofMeasure {k : ℕ} (μ : Measure X) [IsFiniteMeasure μ]
     (α β : SmoothForm n X k) :
-    (letI : VolumeIntegrationData n X := volumeIntegrationData_ofMeasure (n := n) (X := X) μ
-      in _root_.L2Inner (n := n) (X := X) (k := k) α β) =
+    (letI : VolumeIntegrationData n X :=
+        volumeIntegrationData_ofMeasure (n := n) (X := X) μ
+      ; _root_.L2Inner (n := n) (X := X) (k := k) α β) =
       L2Inner_measure (n := n) (X := X) (k := k) μ α β := by
   rfl
 

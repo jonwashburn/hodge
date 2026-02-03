@@ -72,8 +72,29 @@ even though it compiles.
 
 ## Reference TeX Proof (Newest) and Lean Spine Map
 
-- **Newest proof narrative (TeX)**: `JA_hodge_approach_with_added_refs_blueCites.tex` (timestamp 2026-01-11).
+- **Newest proof narrative (TeX)**: `final-1-15-milan-05.tex` (timestamp 2026-01-15).
+- **Secondary reference (requested prompt)**: `JA_hodge_approach_with_added_refs_blueCites.tex` (timestamp 2026-01-11).
 - **Older proof drafts**: `Hodge_REFEREE_Amir-v1*.tex` (2026-01-06), `Hodge-v6-w-Jon-Update-MERGED.tex` (2025-12-29).
+
+## Recent Deltas (2026-02-03)
+
+- **Integration data refactor**:
+  - `SubmanifoldIntegration` is now data-first via `SubmanifoldIntegrationData` in `Hodge/Analytic/Integration/HausdorffMeasure.lean`.
+  - A thin legacy wrapper remains only for compatibility; new call sites take explicit data.
+- **Top-form integration migrated**:
+  - `Hodge/Analytic/Integration/TopFormIntegral.lean` now takes `SubmanifoldIntegrationData` everywhere.
+  - Added local `castForm_*` helpers and real-scalar wedge lemmas to avoid dependent-elim pitfalls.
+  - `L2Inner_wedge` now carries the necessary degree hypothesis `k ≤ 2 * n` (no silent truncation).
+- **Kähler volume measure bridge**:
+  - `KahlerVolumeMeasureData` is a **Type**-class (no Prop-collapsing of data).
+  - `KahlerMeasureCompatibilityData` links `kahlerMeasure` with submanifold integration data.
+  - Convenience accessor `kahlerSubmanifoldIntegrationData` threads the compatibility data.
+- **Explicit compatibility layer**:
+  - New `Hodge/Analytic/Integration/Compatibility.lean` introduces
+    `TopFormIntegralCompatibilityData` (ties `topFormIntegral_real'` to `kahlerMeasure`).
+- **Documentation refresh**:
+  - Updated GMT/integration docstrings to reflect `ClosedSubmanifoldData`/`OrientedRectifiableSetData`
+    and the removal of legacy Set-based stubs.
 
 **TeX → Lean module map (proof spine):**
 
@@ -179,7 +200,7 @@ This is not exhaustive, but it captures the major blockers currently *on the pro
   - Remaining: theorems (Chow/GAGA), not definitions.
 - **Submanifold integration is still only an abstract interface**:
   - (removed) legacy Set-based `submanifoldIntegral := 0` scaffold stack has been deleted.
-  - `Hodge/Analytic/Integration/HausdorffMeasure.lean`: the explicit `SubmanifoldIntegration.universal` zero-instance has been removed (2026-02-01), but there is still **no concrete instance** with real integration/Stokes.
+  - `Hodge/Analytic/Integration/HausdorffMeasure.lean`: the interface is now **data‑first** (`SubmanifoldIntegrationData`) and `SubmanifoldIntegration` is only a thin legacy wrapper. The old `SubmanifoldIntegration.universal` stub is removed, but there is still **no concrete data** with real integration/Stokes.
   - (updated 2026-02-01) `Hodge/Deep/Pillars/Stokes.lean` no longer defines a stubby Set-based `SubmanifoldIntegration.real`.
     Remaining work is to retire the legacy Set-based interface entirely and construct real integration currents from
     `OrientedRectifiableSetData` / `ClosedSubmanifoldData` (see `Hodge/Analytic/Currents.lean`).
@@ -207,6 +228,9 @@ This is not exhaustive, but it captures the major blockers currently *on the pro
     (data, not `Prop`), and `KahlerMeasureCompatibilityData` records compatibility between
     `kahlerMeasure` and top-dimensional Hausdorff measure. Remaining: add top-form integration
     compatibility needed for `L2Inner` ↔ `L2Inner_wedge`.
+  - `Hodge/Analytic/Integration/Compatibility.lean`: `TopFormIntegralCompatibilityData` now
+    makes the top‑form compatibility explicit; still needs a real proof once top‑form evaluation
+    is fully tied to the Kähler volume form.
   - `Hodge/Analytic/Integration/TopFormIntegral.lean`: `L2Inner_wedge := ∫ α ∧ ⋆β` is now defined with
     bilinearity lemmas; it still needs to be related to `L2Inner`.
   - `Hodge/Kahler/Identities/*.lean`: several operators are still `:= 0`.

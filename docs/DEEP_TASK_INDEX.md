@@ -10,7 +10,7 @@ Agents should work through these in dependency order.
 ## Priority 1: Stokes (Submanifold Integration)
 
 **File**: `Hodge/Deep/Pillars/Stokes.lean`
-**Replaces**: `SubmanifoldIntegration.universal`
+**Replaces**: explicit `SubmanifoldIntegrationData` (data‑first integration layer)
 
 | Goal | Type | Dependencies |
 |------|------|--------------|

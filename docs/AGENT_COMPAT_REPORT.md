@@ -6,13 +6,24 @@
 - `Hodge/Analytic/Integration/TopFormIntegral.lean`
 
 ## Findings (to fill)
-- Missing compatibility assumptions between `kahlerMeasure` and top‑form integration:
-  - (list)
-- Candidate interface fields / lemma statements:
-  - (list)
+### Missing compatibility assumptions
+- No lemma yet connecting `topFormIntegral_real'` (Hausdorff‑style data integration)
+  with `kahlerMeasure` (used by L² integration).
+- This blocks a real proof of `L2Inner_measure` ↔ `L2Inner_wedge`.
+
+### Candidate interface fields / lemma statements
+- `KahlerMeasureCompatibilityData` now records:
+  - `submanifold : SubmanifoldIntegrationData n X`
+  - `measure2p_eq_kahler : submanifold.measure2p n = kahlerMeasure`
+- `TopFormIntegralCompatibilityData` now records:
+  - `topFormIntegral_eq :` for all top forms `η`,
+    `topFormIntegral_real' (kahlerSubmanifoldIntegrationData) η = ∫ x, topFormEval_real η x ∂kahlerMeasure`
+    (requires a concrete top‑form evaluation functional).
 
 ## Risks / Notes
-- (fill)
+- Need a clean definition of “top‑form evaluation to a function” to state the compatibility lemma.
+  This may live near `VolumeForm.lean` once basis/volume form evaluation is fixed.
 
 ## Next steps
-- (fill)
+- Add a precise compatibility lemma once the evaluation map is formalized.
+- Thread `KahlerMeasureCompatibilityData` into the future L² ↔ wedge proof.

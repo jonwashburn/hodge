@@ -55,6 +55,30 @@ variable {n : ℕ} {X : Type u}
 variable [K : KahlerManifold n X]
 -- Explicit integration data (legacy SubmanifoldIntegration refactored to data object).
 
+private lemma castForm_add {k k' : ℕ} (h : k = k') (ω₁ ω₂ : SmoothForm n X k) :
+    castForm h (ω₁ + ω₂) = castForm h ω₁ + castForm h ω₂ := by
+  subst h
+  simp
+
+private lemma castForm_smul {k k' : ℕ} (h : k = k') (c : ℝ) (ω : SmoothForm n X k) :
+    castForm h (c • ω) = c • castForm h ω := by
+  subst h
+  simp
+
+private lemma smoothWedge_smul_left_real {k l : ℕ} (r : ℝ)
+    (ω : SmoothForm n X k) (η : SmoothForm n X l) :
+    (r • ω) ⋏ η = r • (ω ⋏ η) := by
+  ext x v
+  simp [SmoothForm.wedge_apply, SmoothForm.smul_real_apply,
+    ContinuousAlternatingMap.wedgeℂ_smul_left]
+
+private lemma smoothWedge_smul_right_real {k l : ℕ} (r : ℝ)
+    (ω : SmoothForm n X k) (η : SmoothForm n X l) :
+    ω ⋏ (r • η) = r • (ω ⋏ η) := by
+  ext x v
+  simp [SmoothForm.wedge_apply, SmoothForm.smul_real_apply,
+    ContinuousAlternatingMap.wedgeℂ_smul_right]
+
 /-! ## Real-Valued Integration of Top Forms -/
 
 /-- **Integration of a top-form over X** (Real-valued).
@@ -305,8 +329,8 @@ theorem intersectionPairing_add_left {p : ℕ} (hp : p ≤ n)
   have hcast :
       castForm hdeg ((α₁ + α₂) ⋏ β) =
         castForm hdeg (α₁ ⋏ β) + castForm hdeg (α₂ ⋏ β) := by
-    subst hdeg
-    simpa [smoothWedge_add_left]
+    simpa [smoothWedge_add_left] using
+      (castForm_add (h := hdeg) (ω₁ := α₁ ⋏ β) (ω₂ := α₂ ⋏ β))
   simpa [hcast] using
     (topFormIntegral_real'_add (n := n) (X := X) data
       (η₁ := castForm hdeg (α₁ ⋏ β)) (η₂ := castForm hdeg (α₂ ⋏ β)))
@@ -323,8 +347,8 @@ theorem intersectionPairing_add_right {p : ℕ} (hp : p ≤ n)
   have hcast :
       castForm hdeg (α ⋏ (β₁ + β₂)) =
         castForm hdeg (α ⋏ β₁) + castForm hdeg (α ⋏ β₂) := by
-    subst hdeg
-    simpa [smoothWedge_add_right]
+    simpa [smoothWedge_add_right] using
+      (castForm_add (h := hdeg) (ω₁ := α ⋏ β₁) (ω₂ := α ⋏ β₂))
   simpa [hcast] using
     (topFormIntegral_real'_add (n := n) (X := X) data
       (η₁ := castForm hdeg (α ⋏ β₁)) (η₂ := castForm hdeg (α ⋏ β₂)))
@@ -339,11 +363,8 @@ theorem intersectionPairing_smul_left {p : ℕ} (hp : p ≤ n)
   have hdeg : 2 * p + 2 * (n - p) = 2 * n := by omega
   have hcast :
       castForm hdeg ((r • α) ⋏ β) = r • castForm hdeg (α ⋏ β) := by
-    subst hdeg
-    apply SmoothForm.ext
-    funext x
-    simp [SmoothForm.wedge_apply, SmoothForm.smul_real_apply,
-      ContinuousAlternatingMap.wedgeℂ_smul_left]
+    simpa [smoothWedge_smul_left_real] using
+      (castForm_smul (h := hdeg) (c := r) (ω := α ⋏ β))
   simpa [hcast] using
     (topFormIntegral_real'_smul (n := n) (X := X) data (c := r)
       (η := castForm hdeg (α ⋏ β)))
@@ -358,11 +379,8 @@ theorem intersectionPairing_smul_right {p : ℕ} (hp : p ≤ n)
   have hdeg : 2 * p + 2 * (n - p) = 2 * n := by omega
   have hcast :
       castForm hdeg (α ⋏ (r • β)) = r • castForm hdeg (α ⋏ β) := by
-    subst hdeg
-    apply SmoothForm.ext
-    funext x
-    simp [SmoothForm.wedge_apply, SmoothForm.smul_real_apply,
-      ContinuousAlternatingMap.wedgeℂ_smul_right]
+    simpa [smoothWedge_smul_right_real] using
+      (castForm_smul (h := hdeg) (c := r) (ω := α ⋏ β))
   simpa [hcast] using
     (topFormIntegral_real'_smul (n := n) (X := X) data (c := r)
       (η := castForm hdeg (α ⋏ β)))
@@ -374,79 +392,83 @@ theorem intersectionPairing_smul_right {p : ℕ} (hp : p ≤ n)
     For k-forms α, β, define:
     `⟪α, β⟫ = ∫_X α ∧ ⋆β`.
     This matches the usual L2 pairing once the metric/volume-form normalization is aligned. -/
-noncomputable def L2Inner_wedge {k : ℕ} (data : SubmanifoldIntegrationData n X)
+noncomputable def L2Inner_wedge {k : ℕ} (hk : k ≤ 2 * n)
+    (data : SubmanifoldIntegrationData n X)
     (α β : SmoothForm n X k) : ℝ :=
-  have hdeg : k + (2 * n - k) = 2 * n := by omega
+  have hdeg : k + (2 * n - k) = 2 * n := by
+    exact Nat.add_sub_of_le hk
   topFormIntegral_real' (n := n) (X := X) data (castForm hdeg (α ⋏ ⋆β))
 
-theorem L2Inner_wedge_add_left {k : ℕ} (data : SubmanifoldIntegrationData n X)
+theorem L2Inner_wedge_add_left {k : ℕ} (hk : k ≤ 2 * n)
+    (data : SubmanifoldIntegrationData n X)
     (α₁ α₂ β : SmoothForm n X k) :
-    L2Inner_wedge (n := n) (X := X) (k := k) data (α₁ + α₂) β =
-      L2Inner_wedge (n := n) (X := X) (k := k) data α₁ β +
-        L2Inner_wedge (n := n) (X := X) (k := k) data α₂ β := by
+    L2Inner_wedge (n := n) (X := X) (k := k) hk data (α₁ + α₂) β =
+      L2Inner_wedge (n := n) (X := X) (k := k) hk data α₁ β +
+        L2Inner_wedge (n := n) (X := X) (k := k) hk data α₂ β := by
   classical
   unfold L2Inner_wedge
-  have hdeg : k + (2 * n - k) = 2 * n := by omega
+  have hdeg : k + (2 * n - k) = 2 * n := by
+    exact Nat.add_sub_of_le hk
   have hcast :
       castForm hdeg ((α₁ + α₂) ⋏ ⋆β) =
         castForm hdeg (α₁ ⋏ ⋆β) + castForm hdeg (α₂ ⋏ ⋆β) := by
-    subst hdeg
-    simpa [smoothWedge_add_left]
+    simpa [smoothWedge_add_left] using
+      (castForm_add (h := hdeg) (ω₁ := α₁ ⋏ ⋆β) (ω₂ := α₂ ⋏ ⋆β))
   simpa [hcast] using
     (topFormIntegral_real'_add (n := n) (X := X) data
       (η₁ := castForm hdeg (α₁ ⋏ ⋆β)) (η₂ := castForm hdeg (α₂ ⋏ ⋆β)))
 
-theorem L2Inner_wedge_add_right {k : ℕ} (data : SubmanifoldIntegrationData n X)
+theorem L2Inner_wedge_add_right {k : ℕ} (hk : k ≤ 2 * n)
+    (data : SubmanifoldIntegrationData n X)
     (α : SmoothForm n X k) (β₁ β₂ : SmoothForm n X k) :
-    L2Inner_wedge (n := n) (X := X) (k := k) data α (β₁ + β₂) =
-      L2Inner_wedge (n := n) (X := X) (k := k) data α β₁ +
-        L2Inner_wedge (n := n) (X := X) (k := k) data α β₂ := by
+    L2Inner_wedge (n := n) (X := X) (k := k) hk data α (β₁ + β₂) =
+      L2Inner_wedge (n := n) (X := X) (k := k) hk data α β₁ +
+        L2Inner_wedge (n := n) (X := X) (k := k) hk data α β₂ := by
   classical
   unfold L2Inner_wedge
-  have hdeg : k + (2 * n - k) = 2 * n := by omega
+  have hdeg : k + (2 * n - k) = 2 * n := by
+    exact Nat.add_sub_of_le hk
   have hcast :
       castForm hdeg (α ⋏ ⋆(β₁ + β₂)) =
         castForm hdeg (α ⋏ ⋆β₁) + castForm hdeg (α ⋏ ⋆β₂) := by
-    subst hdeg
-    simpa [hodgeStar_add, smoothWedge_add_right]
+    simpa [hodgeStar_add, smoothWedge_add_right] using
+      (castForm_add (h := hdeg) (ω₁ := α ⋏ ⋆β₁) (ω₂ := α ⋏ ⋆β₂))
   simpa [hcast] using
     (topFormIntegral_real'_add (n := n) (X := X) data
       (η₁ := castForm hdeg (α ⋏ ⋆β₁)) (η₂ := castForm hdeg (α ⋏ ⋆β₂)))
 
-theorem L2Inner_wedge_smul_left {k : ℕ} (data : SubmanifoldIntegrationData n X)
+theorem L2Inner_wedge_smul_left {k : ℕ} (hk : k ≤ 2 * n)
+    (data : SubmanifoldIntegrationData n X)
     (r : ℝ) (α : SmoothForm n X k)
     (β : SmoothForm n X k) :
-    L2Inner_wedge (n := n) (X := X) (k := k) data (r • α) β =
-      r * L2Inner_wedge (n := n) (X := X) (k := k) data α β := by
+    L2Inner_wedge (n := n) (X := X) (k := k) hk data (r • α) β =
+      r * L2Inner_wedge (n := n) (X := X) (k := k) hk data α β := by
   classical
   unfold L2Inner_wedge
-  have hdeg : k + (2 * n - k) = 2 * n := by omega
+  have hdeg : k + (2 * n - k) = 2 * n := by
+    exact Nat.add_sub_of_le hk
   have hcast :
       castForm hdeg ((r • α) ⋏ ⋆β) = r • castForm hdeg (α ⋏ ⋆β) := by
-    subst hdeg
-    apply SmoothForm.ext
-    funext x
-    simp [SmoothForm.wedge_apply, SmoothForm.smul_real_apply,
-      ContinuousAlternatingMap.wedgeℂ_smul_left]
+    simpa [smoothWedge_smul_left_real] using
+      (castForm_smul (h := hdeg) (c := r) (ω := α ⋏ ⋆β))
   simpa [hcast] using
     (topFormIntegral_real'_smul (n := n) (X := X) data (c := r)
       (η := castForm hdeg (α ⋏ ⋆β)))
 
-theorem L2Inner_wedge_smul_right {k : ℕ} (data : SubmanifoldIntegrationData n X)
+theorem L2Inner_wedge_smul_right {k : ℕ} (hk : k ≤ 2 * n)
+    (data : SubmanifoldIntegrationData n X)
     (r : ℝ) (α : SmoothForm n X k)
     (β : SmoothForm n X k) :
-    L2Inner_wedge (n := n) (X := X) (k := k) data α (r • β) =
-      r * L2Inner_wedge (n := n) (X := X) (k := k) data α β := by
+    L2Inner_wedge (n := n) (X := X) (k := k) hk data α (r • β) =
+      r * L2Inner_wedge (n := n) (X := X) (k := k) hk data α β := by
   classical
   unfold L2Inner_wedge
-  have hdeg : k + (2 * n - k) = 2 * n := by omega
+  have hdeg : k + (2 * n - k) = 2 * n := by
+    exact Nat.add_sub_of_le hk
   have hcast :
       castForm hdeg (α ⋏ ⋆(r • β)) = r • castForm hdeg (α ⋏ ⋆β) := by
-    subst hdeg
-    apply SmoothForm.ext
-    funext x
-    simp [hodgeStar_smul_real, SmoothForm.wedge_apply, SmoothForm.smul_real_apply,
-      ContinuousAlternatingMap.wedgeℂ_smul_right]
+    simpa [hodgeStar_smul_real, smoothWedge_smul_right_real] using
+      (castForm_smul (h := hdeg) (c := r) (ω := α ⋏ ⋆β))
   simpa [hcast] using
     (topFormIntegral_real'_smul (n := n) (X := X) data (c := r)
       (η := castForm hdeg (α ⋏ ⋆β)))

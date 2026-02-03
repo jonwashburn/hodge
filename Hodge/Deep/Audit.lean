@@ -41,7 +41,8 @@ open Lean Meta Elab Command
 
 -- Stokes/integration infrastructure now lives in the data-based layer:
 -- `OrientedRectifiableSetData` / `ClosedSubmanifoldData` in `Hodge/Analytic/Currents.lean`.
--- (We no longer maintain a stubby Set-based `SubmanifoldIntegration.real`.)
+-- The legacy `SubmanifoldIntegration` class is now a thin wrapper over explicit
+-- `SubmanifoldIntegrationData` (no `.real` instance is maintained).
 #print axioms Hodge.Deep.Stokes.hausdorffIntegrate_linear'
 #print axioms Hodge.Deep.Stokes.hausdorffIntegrate_bound'
 #print axioms Hodge.Deep.GAGA.ChowGAGAData.real
@@ -69,7 +70,7 @@ grep -r "sorry" Hodge/Deep/Pillars/ | grep -v "\.olean" | grep -v "Status" | wc 
 ### Target: 0 sorries
 
 When all pillars are complete:
-- `SubmanifoldIntegration.real` can replace `SubmanifoldIntegration.universal`
+- `SubmanifoldIntegrationData` should be realized concretely (no legacy universal/real instances)
 - `ChowGAGAData.real` can replace `ChowGAGAData.universal`
 - etc.
 

@@ -30,41 +30,28 @@ explicitly called out in `docs/PROOF_TRACK_STATUS.md`):
 Additionally, to actually *use* `hodge_conjecture'` without assumptions, we need missing universal
 instances:
 
-3. **`Hodge/Analytic/Integration/HausdorffMeasure.lean`**: no `SubmanifoldIntegration.universal`
-   instance exists.
+3. **`Hodge/Analytic/Integration/HausdorffMeasure.lean`**: no concrete
+   `SubmanifoldIntegrationData` exists yet (data‑first integration is still an interface).
 4. **`Hodge/Classical/GAGA.lean`**: no `ChowGAGAData.universal` instance exists.
 
 ## Execution plan
 
-### A. Provide missing universal instances (no sorries, no axioms)
+### A. Provide **real** instances (no stubs, no axioms)
 
-- **Add `SubmanifoldIntegration.universal`** in
-  `Hodge/Analytic/Integration/HausdorffMeasure.lean`.
-  - Implementation: `measure2p := 0`, `integral := 0`.
-  - All laws (`linear`, `union`, `empty`, `bound`, `stokes_integral_zero`) become `simp`.
+- **Submanifold integration** in
+  `Hodge/Analytic/Integration/HausdorffMeasure.lean` must be realized with genuine
+  Hausdorff integration data (no `:= 0` placeholders).
 
-- **Chow/GAGA** in `Hodge/Classical/GAGA.lean`.
-  - `IsAnalyticSet` and `IsAlgebraicSet` now have genuine definitions.
-  - Analytic → algebraic is no longer immediate and must be proved (Chow/GAGA).
+- **Chow/GAGA** in `Hodge/Classical/GAGA.lean` must be proved (analytic → algebraic).
 
 ### B. Remove `sorryAx` from `AutomaticSYRData.universal`
 
-- Edit `Hodge/Kahler/Main.lean`:
-  - Replace the current `microstructureSequence`-based implementation with a provably-correct
-    placeholder implementation using the **zero integral current** sequence and zero limit.
-  - This discharges:
-    - cycle property (`zero_current_isCycle`)
-    - flat-norm convergence (constant-zero sequence)
-    - calibration defect convergence (defect of zero current is `0`)
+- Must be replaced by a **real microstructure construction** (no zero‑current shortcut).
 
 ### C. Remove the custom axiom from `SpineBridgeData.universal`
 
-- Edit `Hodge/Classical/GAGA.lean`:
-  - Remove `axiom fundamental_eq_representing_axiom`.
-  - Make `SignedAlgebraicCycle.cycleClass_geom` a **proof-track alias** of
-    `SignedAlgebraicCycle.cycleClass` (i.e. computed from `representingForm`), matching the
-    “semantically correct” design note earlier in the file.
-  - Then `SpineBridgeData.universal` is definable with `rfl` (no axiom).
+- Prove the real bridge (fundamental class equals representing form) via
+  de Rham representability + Harvey–Lawson (no axioms, no aliases).
 
 ### D. Make the public theorem statement truly unconditional
 
@@ -86,4 +73,3 @@ And sanity-check:
 - `#print axioms hodge_conjecture` contains **no** `sorryAx`
 - `#print axioms AutomaticSYRData.universal` contains **no** `sorryAx`
 - no custom axioms remain on the `hodge_conjecture` dependency cone
-

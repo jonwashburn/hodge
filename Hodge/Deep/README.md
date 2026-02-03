@@ -14,7 +14,7 @@ that don't do real mathematical work:
 | `AutomaticSYRData.universal` | Real microstructure: sheets, gluing, defect→0 | `Hodge/Kahler/Main.lean:210` |
 | `ChowGAGAData.universal` | Real Chow/GAGA: analytic→algebraic | `Hodge/Classical/GAGA.lean:141` |
 | `SpineBridgeData.universal` | Real spine: fundamental class = representing form | `Hodge/Classical/GAGA.lean:555` |
-| `SubmanifoldIntegration.universal` | Real Hausdorff integration | `Hodge/Analytic/Integration/HausdorffMeasure.lean:83` |
+| `SubmanifoldIntegrationData` (explicit data) | Real Hausdorff integration | `Hodge/Analytic/Integration/HausdorffMeasure.lean:24` |
 | `CubulationExists.universal` | Real cubulation with mesh bounds | `Hodge/Kahler/Microstructure.lean:117` |
 
 Additionally, the **definitions** are too weak:
@@ -67,7 +67,7 @@ lake build Hodge.Deep.Audit
 
 ## Priority Order
 
-1. **Submanifold Integration** — needed by everything else
+1. **Submanifold Integration (data‑first)** — needed by everything else
 2. **Microstructure (sheets + gluing)** — the geometric core
 3. **Stokes** — needed for calibration defect bounds
 4. **Harvey-Lawson** — calibrated → analytic variety

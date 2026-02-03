@@ -5,6 +5,7 @@ import Hodge.Analytic.Integration.ExtDerivCohomology
 import Hodge.Analytic.Integration.StokesTheorem
 import Hodge.Analytic.Integration.PairingConnection
 import Hodge.Analytic.Integration.HausdorffMeasure
+import Hodge.Analytic.Integration.Compatibility
 
 /-!
 # Integration Theory for Kähler Manifolds

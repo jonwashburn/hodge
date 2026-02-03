@@ -96,15 +96,25 @@ This change is deep and will require a staged migration (new `FiberAltR` / `Smoo
     instead of returning `0`.
   - Remaining: provide a genuine pairing via Stokes + Poincaré duality.
 
+- **Cohomology integral stub removed**
+  - File: `Hodge/Analytic/Integration/StokesTheorem.lean`
+  - `cohomologyIntegral` now depends on explicit `CohomologyIntegralData`
+    instead of returning `0`.
+
 - **Kähler volume measure data is now real data (not Prop)**
   - File: `Hodge/Analytic/Integration/VolumeForm.lean`
   - `KahlerVolumeMeasureData` no longer lives in `Prop` (avoids proof-irrelevance collapse).
 
-- **Explicit compatibility binder introduced for L² vs top-form integration**
+- **Explicit compatibility binder introduced for L² vs top‑form integration**
   - File: `Hodge/Analytic/Integration/VolumeForm.lean`
   - `KahlerMeasureCompatibilityData` records agreement between `kahlerMeasure` and
     the top-dimensional Hausdorff measure coming from `SubmanifoldIntegrationData`.
   - Remaining: strengthen this with a top-form integration compatibility lemma.
+
+- **Top‑form compatibility interface added**
+  - File: `Hodge/Analytic/Integration/Compatibility.lean`
+  - `TopFormIntegralCompatibilityData` records the explicit equality needed to bridge
+    `topFormIntegral_real'` with the `kahlerMeasure` integral of the top‑form evaluation.
 
 ## B. Submanifold integration / Stokes (deep GMT layer)
 
