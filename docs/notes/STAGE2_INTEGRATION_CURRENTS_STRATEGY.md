@@ -85,7 +85,8 @@ Stage 2 completion means:
 
 - remove `SubmanifoldIntegration` as an *assumption interface* from the proof track,
 - replace it by actual constructions + theorems (Stokes etc),
-- then define integration currents `integrationCurrent` as a special case of `Current` on test forms.
+- then define integration currents `integrationCurrent_data` (from `ClosedSubmanifoldData`)
+  as a special case of `Current` on test forms.
 
 ## 4. Recommended next Lean files (new, off proof track first)
 
@@ -108,4 +109,3 @@ first milestone is to get:
 - compact boundaryless Stokes: \(\int_X d\omega = 0\)
 
 then extend outward.
-

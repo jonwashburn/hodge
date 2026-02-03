@@ -103,7 +103,7 @@ Agents should work through these in dependency order.
 
 | Goal | Type | Dependencies |
 |------|------|--------------|
-| `integrationCurrent` | def | Stokes pillar |
+| `integrationCurrent_data` | def | Stokes pillar (explicit `ClosedSubmanifoldData`) |
 | `integrationCurrent_isCycle` | theorem | Goal 1.1 |
 | `poincare_dual_form_exists` | theorem | Goals 1.1-1.2 |
 | `spine_bridge` | theorem | Harvey-Lawson, GAGA |

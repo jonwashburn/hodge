@@ -291,16 +291,20 @@ It will be reinstated as an actual theorem on the unconditional track.
 **Historical note**: the former `HarveyLawsonRepresentsWitness` typeclass was removed.
 
 The prior architecture attempted to relate an arbitrary form-class `[γ]` to a (placeholder)
-`FundamentalClassSet(Z)`, which is semantically incorrect while `FundamentalClassSet`/PD are still
-stub-level.
+`FundamentalClassSet(Z)`, which is semantically incorrect while the set-based PD layer is still
+stub-level. The data-first spine now routes through `FundamentalClassSet_data`, built from
+explicit `ClosedSubmanifoldData` and `poincareDualForm_data` (regularization of
+`integrationCurrent_data`).
 
 **Current stopgap**: `SignedAlgebraicCycle.cycleClass` is defined as `ofForm representingForm`,
 so the “represents class” relation becomes definitional (`rfl`).
 
 **No-gotchas requirement**: this stopgap must be removed by:
-- redefining `SignedAlgebraicCycle.cycleClass_geom` from the **support/fundamental class** (not the carried form),
+- redefining `SignedAlgebraicCycle.cycleClass_geom_data` from the **support/fundamental class**
+  (not the carried form),
 - replacing placeholder PD/fundamental-class infrastructure with a real GMT/PD bridge, and
-- proving the TeX spine bridge theorem (SYR → HL → GAGA preserves the geometric class).
+- proving the TeX spine bridge theorem (SYR → HL → GAGA preserves the geometric class) on the
+  data-first pipeline.
 -/
 
 
@@ -360,6 +364,49 @@ theorem cone_positive_produces_cycle {p : ℕ}
     exact Z.cycleClass_eq_representingForm
   · -- Z.representingForm = γ by construction (it's set to γ above)
     rfl
+
+/-- Data-first variant: cone-positive produces a cycle with explicit support data.
+
+    The support data is obtained from the Harvey–Lawson/GAGA algebraic support
+    via `SignedAlgebraicCycle.support_data`. -/
+theorem cone_positive_produces_cycle_support_data {p : ℕ}
+    [AutomaticSYRData n X]
+    [CalibratedCurrentRegularityData n X (2 * (n - p))]
+    [HarveyLawsonKingData n X (2 * (n - p))] [ChowGAGAData n X]
+    [AlgebraicSubvarietyClosedSubmanifoldData n X]
+    [SignedAlgebraicCycleSupportCodimData n X p]
+    (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
+    (_h_rational : isRationalClass (ofForm γ h_closed))
+    (h_cone : isConePositive γ) :
+    ∃ (Z : SignedAlgebraicCycle n X p) (dataZ : ClosedSubmanifoldData n X (2 * p)),
+      Z.RepresentsClass (ofForm γ h_closed) ∧ Z.representingForm = γ ∧
+        dataZ.carrier = Z.support := by
+  letI : SignedAlgebraicCycleSupportData n X p :=
+    instSignedAlgebraicCycleSupportData_ofAlgebraic (n := n) (X := X) (p := p)
+  obtain ⟨Z, hZ_rep, hZ_form⟩ := cone_positive_produces_cycle γ h_closed _h_rational h_cone
+  refine ⟨Z, SignedAlgebraicCycle.support_data (n := n) (X := X) (p := p) Z,
+    hZ_rep, hZ_form, ?_⟩
+  exact SignedAlgebraicCycle.support_data_carrier (n := n) (X := X) (p := p) Z
+
+/-- Explicit support data returned by `cone_positive_produces_cycle_support_data`
+    is definitionally the canonical `SignedAlgebraicCycle.support_data`. -/
+theorem cone_positive_produces_cycle_support_data_eq {p : ℕ}
+    [AutomaticSYRData n X]
+    [CalibratedCurrentRegularityData n X (2 * (n - p))]
+    [HarveyLawsonKingData n X (2 * (n - p))] [ChowGAGAData n X]
+    [AlgebraicSubvarietyClosedSubmanifoldData n X]
+    [SignedAlgebraicCycleSupportCodimData n X p]
+    (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
+    (h_rational : isRationalClass (ofForm γ h_closed))
+    (h_cone : isConePositive γ) :
+    ∃ (Z : SignedAlgebraicCycle n X p) (dataZ : ClosedSubmanifoldData n X (2 * p)),
+      Z.RepresentsClass (ofForm γ h_closed) ∧ Z.representingForm = γ ∧
+        dataZ = SignedAlgebraicCycle.support_data (n := n) (X := X) (p := p) Z := by
+  letI : SignedAlgebraicCycleSupportData n X p :=
+    instSignedAlgebraicCycleSupportData_ofAlgebraic (n := n) (X := X) (p := p)
+  obtain ⟨Z, hZ_rep, hZ_form⟩ := cone_positive_produces_cycle γ h_closed h_rational h_cone
+  refine ⟨Z, SignedAlgebraicCycle.support_data (n := n) (X := X) (p := p) Z,
+    hZ_rep, hZ_form, rfl⟩
 
 /-! ## Non-Triviality of (p,p)-Forms
 
@@ -528,15 +575,31 @@ Clay Mathematics Institute in 2000, with a prize of $1,000,000 for a correct sol
 
     ## Phase 7 Update (2026-02-01): No-Gotchas Semantics RESTORED
 
-    - `cycleClass_geom` is now the REAL geometric class from `FundamentalClassSet(support)`.
-    - Requires `PoincareDualFormExists` for fundamental class construction.
-    - Requires `SpineBridgeData` for the bridge theorem (fundamental class = representing form).
-    - The proof no longer uses `rfl` - it uses the spine bridge theorem.
+    - **Data-first track**: `cycleClass_geom_data` is the REAL geometric class from
+      `FundamentalClassSet_data(support_data)`, built from explicit `ClosedSubmanifoldData`.
+    - Requires `PoincareDualFormFromCurrentData` for the PD form (current → regularize).
+    - Requires `SpineBridgeData_data` for the bridge theorem (fundamental class = representing form).
+    - The data-first proof no longer uses `rfl`; it uses the spine bridge theorem.
+
+    - **Set-based track**: `cycleClass_geom` remains as a compatibility wrapper for legacy call sites.
 
     **Deep Assumptions (to be eliminated)**:
-    - `SpineBridgeData n X p`: The deep geometric content that
-      `[FundamentalClassSet(support)] = [representingForm]` in cohomology.
-      This should eventually be proved from GMT + Stokes + Poincaré duality. -/
+    - `SpineBridgeData_data n X`: The deep geometric content that
+      `[FundamentalClassSet_data(support_data)] = [representingForm]` in cohomology.
+      This should eventually be proved from GMT + Stokes + Poincaré duality.
+    - The set-based `SpineBridgeData n X p` remains compatibility-only.
+
+    **Compatibility Note**: This set-based bridge is retained for legacy call sites.
+    Prefer the data-first variant `hodge_conjecture'_data` when explicit
+    `ClosedSubmanifoldData` is available. -/
+/-! ## Compatibility (Set‑Based) -/
+
+/-- **Hodge Conjecture (TeX‑faithful, set‑based compatibility)**.
+
+    This theorem keeps the legacy set‑based geometric class `cycleClass_geom`
+    for external call sites. The proof‑track should prefer
+    `hodge_conjecture'_data`, which threads explicit `ClosedSubmanifoldData`
+    and forces the PD form to come from `integrationCurrent_data`. -/
 theorem hodge_conjecture' {p : ℕ}
     [AutomaticSYRData n X]
     [CycleClass.PoincareDualFormExists n X p] [SpineBridgeData n X p]
@@ -552,12 +615,14 @@ theorem hodge_conjecture' {p : ℕ}
   let sd := signed_decomposition (n := n) (X := X) γ h_closed h_p_p h_rational
 
   -- γplus is cone positive, so it has an algebraic representative Zplus
-  obtain ⟨Zplus, hZplus_rep, _⟩ := cone_positive_produces_cycle
-    sd.γplus sd.h_plus_closed sd.h_plus_rat sd.h_plus_cone
+  obtain ⟨Zplus, hZplus_rep, _hZplus_form⟩ :=
+    cone_positive_produces_cycle (n := n) (X := X) (p := p)
+      sd.γplus sd.h_plus_closed sd.h_plus_rat sd.h_plus_cone
 
   -- γminus is also cone positive, so it has an algebraic representative Zminus
-  obtain ⟨Zminus, hZminus_rep, _⟩ := cone_positive_produces_cycle
-    sd.γminus sd.h_minus_closed sd.h_minus_rat sd.h_minus_cone
+  obtain ⟨Zminus, hZminus_rep, _hZminus_form⟩ :=
+    cone_positive_produces_cycle (n := n) (X := X) (p := p)
+      sd.γminus sd.h_minus_closed sd.h_minus_rat sd.h_minus_cone
 
   -- Build the combined signed cycle for γ = γplus - γminus
   let Z_pos := Zplus.pos ∪ Zminus.neg
@@ -575,7 +640,7 @@ theorem hodge_conjecture' {p : ℕ}
 
   use Z
   -- Phase 7: Use the spine bridge theorem instead of rfl.
-  -- cycleClass_geom Z = ofForm (FundamentalClassSet support) ...
+  -- (compatibility) cycleClass_geom Z = ofForm (FundamentalClassSet support) ...
   -- By SpineBridgeData: ... = ofForm Z.representingForm Z.representingForm_closed
   -- Since Z.representingForm = γ: ... = ofForm γ h_closed
   have hbridge := SignedAlgebraicCycle.cycleClass_geom_eq_representingForm (n := n) (X := X) Z
@@ -584,6 +649,67 @@ theorem hodge_conjecture' {p : ℕ}
   simp only [hbridge]
   -- Goal: ofForm γ h_closed = ofForm γ h_closed
   rfl
+
+/-- **Hodge Conjecture (Data-First Spine Bridge)**.
+
+    This variant uses the data-first PD/spine bridge assumptions:
+    `PoincareDualFormFromCurrentData`, algebraic support data
+    (`AlgebraicSubvarietyClosedSubmanifoldData` + `SignedAlgebraicCycleSupportCodimData`),
+    and `SpineBridgeData_data`.
+
+    It yields the geometric class computed from explicit `ClosedSubmanifoldData`. -/
+theorem hodge_conjecture'_data {p : ℕ}
+    [AutomaticSYRData n X]
+    [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
+    [CycleClass.PoincareDualFormFromCurrentData n X p]
+    [AlgebraicSubvarietyClosedSubmanifoldData n X]
+    [SignedAlgebraicCycleSupportCodimData n X p]
+    [SpineBridgeData_data n X p]
+    [CalibratedCurrentRegularityData n X (2 * (n - p))]
+    [HarveyLawsonKingData n X (2 * (n - p))]
+    [ChowGAGAData n X]
+    (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
+    (h_rational : isRationalClass (ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :
+    ∃ (Z : SignedAlgebraicCycle n X p),
+      Z.cycleClass_geom_data = ofForm γ h_closed := by
+  classical
+  letI : SignedAlgebraicCycleSupportData n X p :=
+    instSignedAlgebraicCycleSupportData_ofAlgebraic (n := n) (X := X) (p := p)
+  -- Signed decomposition of the (p,p) rational class: γ = γplus - γminus
+  let sd := signed_decomposition (n := n) (X := X) γ h_closed h_p_p h_rational
+
+  -- γplus is cone positive, so it has an algebraic representative Zplus (data-first)
+  obtain ⟨Zplus, _dataZplus, hZplus_rep, _hZplus_form, _hZplus_data⟩ :=
+    cone_positive_produces_cycle_support_data
+      sd.γplus sd.h_plus_closed sd.h_plus_rat sd.h_plus_cone
+
+  -- γminus is also cone positive, so it has an algebraic representative Zminus (data-first)
+  obtain ⟨Zminus, _dataZminus, hZminus_rep, _hZminus_form, _hZminus_data⟩ :=
+    cone_positive_produces_cycle_support_data
+      sd.γminus sd.h_minus_closed sd.h_minus_rat sd.h_minus_cone
+
+  -- Build the combined signed cycle for γ = γplus - γminus
+  let Z_pos := Zplus.pos ∪ Zminus.neg
+  let Z_neg := Zplus.neg ∪ Zminus.pos
+  let Z_pos_alg := isAlgebraicSubvariety_union Zplus.pos_alg Zminus.neg_alg
+  let Z_neg_alg := isAlgebraicSubvariety_union Zplus.neg_alg Zminus.pos_alg
+  let Z : SignedAlgebraicCycle n X p := {
+    pos := Z_pos,
+    neg := Z_neg,
+    pos_alg := Z_pos_alg,
+    neg_alg := Z_neg_alg,
+    representingForm := γ,
+    representingForm_closed := h_closed,
+  }
+
+  use Z
+  -- Data-first spine bridge: cycleClass_geom_data = ofForm representingForm.
+  have hbridge :=
+    SignedAlgebraicCycle.cycleClass_geom_eq_representingForm_data (n := n) (X := X) Z
+  calc
+    Z.cycleClass_geom_data =
+        ofForm Z.representingForm Z.representingForm_closed := hbridge
+    _ = ofForm γ h_closed := rfl
 
 /-- **Hodge Conjecture (Kernel-Only Version)**.
 
@@ -641,17 +767,21 @@ SignedAlgebraicCycle.lefschetz_lift was moved to archive/Hodge/Kahler/LefschetzL
 
 /-! ## TeX-Faithful Version (Phase 7)
 
-The TeX-faithful version `hodge_conjecture_tex_faithful` is in a separate file
-`Hodge/Kahler/TexFaithful.lean` to avoid circular dependencies.
+The TeX-faithful version lives in `Hodge/Kahler/TexFaithful.lean` to avoid circular
+dependencies.
 
-It uses the geometric cycle class `cycleClass_geom` computed from the fundamental class
-of the support, with universal instances for:
+**Proof‑track guidance**: prefer the data‑first theorem
+`hodge_conjecture_tex_faithful_data`, which uses `cycleClass_geom_data` computed from
+explicit support data.
 
-- Stokes theorem (via `StokesTheoremData`)
+It uses the geometric cycle class computed from the fundamental class of the support,
+with explicit data‑first instances for:
+
+- Stokes theorem (via `ClosedSubmanifoldData` / `IntegrationData`)
 - GMT compactness and flat norm decomposition
 - Harvey-Lawson structure theorem (`HarveyLawsonKingData`)
-- Chow/GAGA theorem (`ChowGAGAData.universal`)
-- Poincaré duality bridge (`SpineBridgeData.universal`)
+- Chow/GAGA theorem (`ChowGAGAData`)
+- Poincaré duality bridge (`SpineBridgeData_data` on the data‑first track)
 
 To verify the TeX-faithful proof:
 ```bash

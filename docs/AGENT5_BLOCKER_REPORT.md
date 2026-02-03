@@ -33,8 +33,8 @@ without introducing conflicting duplicate definitions.
   - Defines `DeRhamCurrent.boundary` using `Current.boundary` (successor case)
 
 - `Hodge/GMT/IntegrationCurrent.lean`
-  - Defines `Hodge.GMT.integrationCurrent` as a wrapper of `_root_.integration_current`
-  - Provides `integrationCurrent_empty`
+  - Defines `integrationCurrent_data` as the **data‑first** constructor
+  - Keeps `integrationCurrent` as a **compatibility wrapper** (legacy)
 
 - `Hodge/GMT/FlatNormTopology.lean`
   - Re-exports `_root_.flatNorm` as `Hodge.GMT.flatNorm`
@@ -97,4 +97,3 @@ These are the items the operational plan labels as Sprint 2+ Agent 5 work:
 
 These are not needed for the current proof-track status (which is already axiom-minimal),
 but are required if/when the development replaces the remaining semantic stubs with real GMT.
-

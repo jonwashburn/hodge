@@ -34,6 +34,52 @@ structure AlgebraicSubvariety (n : ℕ) (X : Type u)
   codim : ℕ
   is_algebraic : IsAlgebraicSet n X carrier
 
+/-! ### Data-first closed-submanifold data for algebraic subvarieties -/
+
+/-- **Closed-submanifold data for algebraic subvarieties** (data-first interface).
+
+This packages a genuine `ClosedSubmanifoldData` object for each algebraic subvariety,
+including its carrier, orientation, Hausdorff measure, and Stokes data.
+
+**Proof-track guidance**: prefer this interface when constructing integration currents
+or Poincaré dual forms. -/
+class AlgebraicSubvarietyClosedSubmanifoldData (n : ℕ) (X : Type u)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X] where
+  data_of : (V : AlgebraicSubvariety n X) →
+    ClosedSubmanifoldData n X (2 * (n - (AlgebraicSubvariety.codim V)))
+  carrier_eq : ∀ V, (data_of V).carrier = V.carrier
+
+variable {n : ℕ} {X : Type u}
+  [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+  [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+  [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
+  [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+
+/-- Extract the closed-submanifold data from an algebraic subvariety. -/
+noncomputable def closedSubmanifoldData_ofAlgebraic
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [AlgebraicSubvarietyClosedSubmanifoldData n X]
+    (V : AlgebraicSubvariety n X) :
+    ClosedSubmanifoldData n X (2 * (n - V.codim)) :=
+  AlgebraicSubvarietyClosedSubmanifoldData.data_of (n := n) (X := X) V
+
+/-- The extracted data has the correct carrier. -/
+theorem closedSubmanifoldData_ofAlgebraic_carrier
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [AlgebraicSubvarietyClosedSubmanifoldData n X]
+    (V : AlgebraicSubvariety n X) :
+    (closedSubmanifoldData_ofAlgebraic (n := n) (X := X) V).carrier = V.carrier :=
+  AlgebraicSubvarietyClosedSubmanifoldData.carrier_eq (n := n) (X := X) V
+
 /-- Predicate for a set being an algebraic subvariety. -/
 def isAlgebraicSubvariety (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
@@ -48,12 +94,7 @@ theorem isAlgebraicSubvariety_empty (n : ℕ) (X : Type u)
     [ProjectiveComplexManifold n X] [K : KahlerManifold n X] : isAlgebraicSubvariety n X (∅ : Set X) :=
   ⟨⟨∅, 0, IsAlgebraicSet_empty n X⟩, rfl⟩
 
-variable {n : ℕ} {X : Type u}
-  [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-  [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-  [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
-  [MeasurableSpace X] [BorelSpace X] [Nonempty X]
-  -- NOTE: SubmanifoldIntegration removed from proof track (had sorry-containing instance)
+-- NOTE: SubmanifoldIntegration removed from proof track (had sorry-containing instance)
 
 /-- **Chow/GAGA Data** (Analytic → Algebraic), as an explicit proof-track assumption.
 
@@ -139,6 +180,58 @@ theorem serre_gaga [ChowGAGAData n X] {p : ℕ} (V : AnalyticSubvariety n X) (hV
   refine ⟨W, rfl, ?_⟩
   simpa [hV_codim]
 
+/-! ### Analytic → Algebraic support bridge (data-first) -/
+
+/-- Choose an algebraic subvariety with the same carrier and codimension as an analytic one
+    (Chow/GAGA). -/
+noncomputable def algebraicSubvariety_of_analytic
+    [ChowGAGAData n X] (V : AnalyticSubvariety n X) : AlgebraicSubvariety n X :=
+  Classical.choose (serre_gaga (n := n) (X := X) (p := V.codim) V rfl)
+
+theorem algebraicSubvariety_of_analytic_carrier
+    [ChowGAGAData n X] (V : AnalyticSubvariety n X) :
+    (algebraicSubvariety_of_analytic (n := n) (X := X) V).carrier = V.carrier :=
+  (Classical.choose_spec (serre_gaga (n := n) (X := X) (p := V.codim) V rfl)).1
+
+theorem algebraicSubvariety_of_analytic_codim
+    [ChowGAGAData n X] (V : AnalyticSubvariety n X) :
+    (algebraicSubvariety_of_analytic (n := n) (X := X) V).codim = V.codim :=
+  (Classical.choose_spec (serre_gaga (n := n) (X := X) (p := V.codim) V rfl)).2
+
+/-- Closed-submanifold data for the algebraic subvariety obtained from an analytic one.
+
+    This lets analytic variety data feed the algebraic support pipeline. -/
+noncomputable def closedSubmanifoldData_of_analytic_to_algebraic
+    [ChowGAGAData n X]
+    [AnalyticSubvarietyClosedSubmanifoldData n X]
+    (V : AnalyticSubvariety n X) :
+    ClosedSubmanifoldData n X (2 * (n - (algebraicSubvariety_of_analytic (n := n) (X := X) V).codim)) := by
+  -- Start from analytic subvariety data and cast to the algebraic codimension.
+  let dataV : ClosedSubmanifoldData n X (2 * (n - V.codim)) :=
+    closedSubmanifoldData_ofAnalytic (n := n) (X := X) V
+  have hcodim :
+      (algebraicSubvariety_of_analytic (n := n) (X := X) V).codim = V.codim :=
+    algebraicSubvariety_of_analytic_codim (n := n) (X := X) V
+  have hdeg :
+      2 * (n - V.codim) =
+        2 * (n - (algebraicSubvariety_of_analytic (n := n) (X := X) V).codim) := by
+    simpa [hcodim]
+  exact ClosedSubmanifoldData.cast (n := n) (X := X)
+    (k := 2 * (n - V.codim))
+    (k' := 2 * (n - (algebraicSubvariety_of_analytic (n := n) (X := X) V).codim))
+    hdeg dataV
+
+theorem closedSubmanifoldData_of_analytic_to_algebraic_carrier
+    [ChowGAGAData n X]
+    [AnalyticSubvarietyClosedSubmanifoldData n X]
+    (V : AnalyticSubvariety n X) :
+    (closedSubmanifoldData_of_analytic_to_algebraic (n := n) (X := X) V).carrier =
+      (algebraicSubvariety_of_analytic (n := n) (X := X) V).carrier := by
+  -- Reduce to the analytic carrier via cast.
+  have hV := closedSubmanifoldData_ofAnalytic_carrier (n := n) (X := X) V
+  simp [closedSubmanifoldData_of_analytic_to_algebraic, ClosedSubmanifoldData.cast_carrier, hV,
+    algebraicSubvariety_of_analytic_carrier]
+
 /-- The union of two algebraic subvarieties is algebraic. -/
 theorem isAlgebraicSubvariety_union {Z₁ Z₂ : Set X}
     (h1 : isAlgebraicSubvariety n X Z₁) (h2 : isAlgebraicSubvariety n X Z₂) :
@@ -217,7 +310,23 @@ def FundamentalClassSet_impl : (n : ℕ) → (X : Type u) →
     Set X → SmoothForm n X (2 * p) :=
   fun n X _ _ _ _ _ _ _ _ p _ Z => fundamentalClassImpl n X p Z
 
-/-- The fundamental class map from algebraic subvarieties to closed (p,p)-forms. -/
+/-- Data-first fundamental class implementation (ClosedSubmanifoldData). -/
+def FundamentalClassSet_impl_data : (n : ℕ) → (X : Type u) →
+    [MetricSpace X] → [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] →
+    [IsManifold (𝓒_complex n) ⊤ X] → [HasLocallyConstantCharts n X] →
+    [ProjectiveComplexManifold n X] → [KahlerManifold n X] →
+    [MeasurableSpace X] → [BorelSpace X] → [Nonempty X] →
+    (p : ℕ) →
+    [Hodge.GMT.CurrentRegularizationData n X (2 * p)] →
+    [CycleClass.PoincareDualFormFromCurrentData n X p] →
+    ClosedSubmanifoldData n X (2 * p) → SmoothForm n X (2 * p) :=
+  fun n X _ _ _ _ _ _ _ _ _ p _ _ data =>
+    fundamentalClassImpl_data n X p data
+
+/-- The fundamental class map from algebraic subvarieties to closed (p,p)-forms.
+
+Compatibility wrapper: prefer `FundamentalClassSet_data` when explicit
+`ClosedSubmanifoldData` is available. -/
 noncomputable def FundamentalClassSet (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
@@ -226,6 +335,19 @@ noncomputable def FundamentalClassSet (n : ℕ) (X : Type u)
     (p : ℕ) [CycleClass.PoincareDualFormExists n X p]
     (Z : Set X) : SmoothForm n X (2 * p) :=
   FundamentalClassSet_impl n X p Z
+
+/-! ### Data-first fundamental class (ClosedSubmanifoldData) -/
+
+noncomputable def FundamentalClassSet_data (n : ℕ) (X : Type u)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    (p : ℕ)
+    [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
+    [CycleClass.PoincareDualFormFromCurrentData n X p]
+    (data : ClosedSubmanifoldData n X (2 * p)) : SmoothForm n X (2 * p) :=
+  FundamentalClassSet_impl_data n X p data
 
 /-- **Theorem: The fundamental class of an algebraic subvariety is closed.**
     This is a fundamental property from Hodge theory: integration currents over
@@ -241,6 +363,21 @@ theorem FundamentalClassSet_isClosed (p : ℕ) (Z : Set X) (_h : isAlgebraicSubv
   show IsFormClosed (FundamentalClassSet_impl n X p Z)
   simp only [FundamentalClassSet_impl]
   exact fundamentalClassImpl_isClosed p Z
+
+/-! ### Data-first closedness -/
+
+theorem FundamentalClassSet_data_isClosed (p : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
+    [CycleClass.PoincareDualFormFromCurrentData n X p]
+    (data : ClosedSubmanifoldData n X (2 * p)) :
+    IsFormClosed (FundamentalClassSet_data n X p data) := by
+  show IsFormClosed (FundamentalClassSet_impl_data n X p data)
+  simp only [FundamentalClassSet_impl_data]
+  exact fundamentalClassImpl_data_isClosed (n := n) (X := X) (p := p) data
 
 /-- **Theorem: The fundamental class of the empty set is zero.**
     The empty subvariety carries no homology class, hence its Poincaré dual is 0.
@@ -381,13 +518,16 @@ theorem isAlgebraicSubvariety_intersection_power {Z : Set X} {k : ℕ}
     2. Proofs that these sets are algebraic subvarieties
     3. A representing form AND a witness that this form's class equals [Z.support]
 
-    **Key Change**: `cycleClass` is now computed via `FundamentalClassSet` of the support,
-    NOT just the quotient of `representingForm`. The `represents_witness` field proves
-    that these are equal, making `RepresentsClass` non-trivial (not just `rfl`).
+    **Key Change**: The **geometric** class is now tracked via
+    `cycleClass_geom_data` (computed from explicit support data using
+    `FundamentalClassSet_data`). The shortcut `cycleClass` remains
+    `ofForm representingForm` for compatibility, while the proof spine
+    uses the data-first bridge to relate the geometric class to the
+    representing form.
 
-    Mathematically, for a cycle Z constructed from a form γ via Harvey-Lawson,
+    Mathematically, for a cycle Z constructed from a form γ via Harvey–Lawson,
     the fundamental class [Z] equals [γ] by the theory of calibrated currents.
-    The `represents_witness` field encodes this relationship explicitly. -/
+    The data-first bridge encodes this relationship explicitly. -/
 structure SignedAlgebraicCycle (n : ℕ) (X : Type u) (p : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
@@ -406,9 +546,12 @@ structure SignedAlgebraicCycle (n : ℕ) (X : Type u) (p : ℕ)
 **Construction Note (2026-01-24)**: The previous `represents_witness` field was removed.
 
 The old field required proving `[γ] = [FundamentalClassSet(Z)]` which was semantically
-problematic because `FundamentalClassSet` is a stub. The correct semantics is that the
-cycle's cohomology class IS defined by `representingForm`, not by a separate geometric
-fundamental class computation.
+problematic because the set-based `FundamentalClassSet` is a compatibility stub.
+The data-first spine instead uses `FundamentalClassSet_data` from explicit support
+data and proves the bridge there.
+
+The compatibility semantics for `cycleClass` remain: it is defined by `representingForm`,
+not by a separate set-based fundamental class computation.
 
 The algebraic sets `pos` and `neg` encode the geometric realization of the class,
 and the construction (via Harvey-Lawson) ensures they represent [γ].
@@ -423,6 +566,124 @@ theorem SignedAlgebraicCycle.support_is_algebraic {p : ℕ} (Z : SignedAlgebraic
     isAlgebraicSubvariety n X Z.support :=
   isAlgebraicSubvariety_union Z.pos_alg Z.neg_alg
 
+/-! ### Data-first support data for signed cycles -/
+
+/-- **Closed-submanifold data for the support of a signed algebraic cycle**.
+
+This is the data-first bridge from spine-produced cycles to GMT integration data. -/
+class SignedAlgebraicCycleSupportData (n : ℕ) (X : Type u) (p : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X] where
+  data : SignedAlgebraicCycle n X p → ClosedSubmanifoldData n X (2 * p)
+  carrier_eq : ∀ Z, (data Z).carrier = Z.support
+
+/-- Extract support data for a signed cycle. -/
+noncomputable def SignedAlgebraicCycle.support_data {p : ℕ}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [SignedAlgebraicCycleSupportData n X p]
+    (Z : SignedAlgebraicCycle n X p) : ClosedSubmanifoldData n X (2 * p) :=
+  SignedAlgebraicCycleSupportData.data (n := n) (X := X) (p := p) Z
+
+/-- The extracted support data has the correct carrier. -/
+theorem SignedAlgebraicCycle.support_data_carrier {p : ℕ}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [SignedAlgebraicCycleSupportData n X p]
+    (Z : SignedAlgebraicCycle n X p) :
+    (SignedAlgebraicCycle.support_data (n := n) (X := X) (p := p) Z).carrier = Z.support :=
+  SignedAlgebraicCycleSupportData.carrier_eq (n := n) (X := X) (p := p) Z
+
+/-! ### Support data from algebraic subvariety data -/
+
+/-- Dimension compatibility for signed-cycle supports.
+
+This records that the algebraic support of a signed cycle of parameter `p`
+has complex dimension `p`, i.e. `n - codim = p`, so the associated
+closed-submanifold data lives in degree `2 * p`. -/
+class SignedAlgebraicCycleSupportCodimData (n : ℕ) (X : Type u) (p : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X] : Prop where
+  support_dim :
+    ∀ (Z : SignedAlgebraicCycle n X p) (W : AlgebraicSubvariety n X),
+      W.carrier = Z.support → n - W.codim = p
+
+/-- Build explicit support data for a signed cycle from algebraic subvariety data. -/
+noncomputable def SignedAlgebraicCycle.support_data_of_algebraic {p : ℕ}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [AlgebraicSubvarietyClosedSubmanifoldData n X]
+    [SignedAlgebraicCycleSupportCodimData n X p]
+    (Z : SignedAlgebraicCycle n X p) : ClosedSubmanifoldData n X (2 * p) := by
+  classical
+  -- Choose an algebraic subvariety with carrier = support
+  let W : AlgebraicSubvariety n X :=
+    Classical.choose (SignedAlgebraicCycle.support_is_algebraic (n := n) (X := X) (p := p) Z)
+  have hW : W.carrier = Z.support :=
+    Classical.choose_spec (SignedAlgebraicCycle.support_is_algebraic (n := n) (X := X) (p := p) Z)
+  -- Get closed-submanifold data for W
+  let dataW : ClosedSubmanifoldData n X (2 * (n - W.codim)) :=
+    closedSubmanifoldData_ofAlgebraic (n := n) (X := X) W
+  -- Align degrees using the codimension compatibility
+  have hdim : n - W.codim = p :=
+    SignedAlgebraicCycleSupportCodimData.support_dim (n := n) (X := X) (p := p) Z W hW
+  have hdeg : 2 * (n - W.codim) = 2 * p := by
+    simpa [hdim]
+  exact ClosedSubmanifoldData.cast (n := n) (X := X) (k := 2 * (n - W.codim)) (k' := 2 * p)
+    hdeg dataW
+
+@[simp] theorem SignedAlgebraicCycle.support_data_of_algebraic_carrier {p : ℕ}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [AlgebraicSubvarietyClosedSubmanifoldData n X]
+    [SignedAlgebraicCycleSupportCodimData n X p]
+    (Z : SignedAlgebraicCycle n X p) :
+    (SignedAlgebraicCycle.support_data_of_algebraic (n := n) (X := X) (p := p) Z).carrier =
+      Z.support := by
+  classical
+  -- Unfold and reduce to the carrier of the chosen algebraic subvariety.
+  unfold SignedAlgebraicCycle.support_data_of_algebraic
+  simpa [ClosedSubmanifoldData.cast_carrier, closedSubmanifoldData_ofAlgebraic_carrier] using
+    (Classical.choose_spec
+      (SignedAlgebraicCycle.support_is_algebraic (n := n) (X := X) (p := p) Z))
+
+/-- Build `SignedAlgebraicCycleSupportData` from algebraic subvariety data.
+
+This is the non-stub, data-first path from algebraic subvarieties to signed-cycle supports. -/
+noncomputable def signedAlgebraicCycleSupportData_ofAlgebraic {p : ℕ}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [AlgebraicSubvarietyClosedSubmanifoldData n X]
+    [SignedAlgebraicCycleSupportCodimData n X p] :
+    SignedAlgebraicCycleSupportData n X p :=
+  { data := SignedAlgebraicCycle.support_data_of_algebraic (n := n) (X := X) (p := p)
+    carrier_eq := fun Z =>
+      SignedAlgebraicCycle.support_data_of_algebraic_carrier (n := n) (X := X) (p := p) Z }
+
+noncomputable instance instSignedAlgebraicCycleSupportData_ofAlgebraic {p : ℕ}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [AlgebraicSubvarietyClosedSubmanifoldData n X]
+    [SignedAlgebraicCycleSupportCodimData n X p] :
+    SignedAlgebraicCycleSupportData n X p :=
+  signedAlgebraicCycleSupportData_ofAlgebraic (n := n) (X := X) (p := p)
+
 /-- The cohomology class represented by a signed algebraic cycle.
 
     **Definition**: The cycle class is defined as the de Rham cohomology class of
@@ -432,9 +693,13 @@ theorem SignedAlgebraicCycle.support_is_algebraic {p : ℕ} (Z : SignedAlgebraic
     2. By construction, the calibrated currents are in homology class PD([γ])
     3. The algebraic sets (pos/neg) are the geometric realization of this class
 
-    **Note (2026-01-24)**: Previously this used `FundamentalClassSet` of the support,
-    but since `FundamentalClassSet` is a stub, that was semantically incorrect.
-    The representing form IS the intrinsic cohomology class of the cycle. -/
+    **Note (2026-01-24)**: Previously this used set‑based `FundamentalClassSet` of the support,
+    but since that interface is a compatibility stub, it was semantically incorrect on the
+    proof track. The data‑first geometric class is now `cycleClass_geom_data`, built from
+    explicit support data via `FundamentalClassSet_data`.
+
+    The compatibility semantics for `cycleClass` remain: it is defined by `representingForm`.
+    The proof spine relates the geometric class to this form via `SpineBridgeData_data`. -/
 noncomputable def SignedAlgebraicCycle.cycleClass {p : ℕ}
     (Z : SignedAlgebraicCycle n X p) : DeRhamCohomologyClass n X (2 * p) :=
   ofForm Z.representingForm Z.representingForm_closed
@@ -455,14 +720,33 @@ noncomputable def SignedAlgebraicCycle.cycleClass_eq_representingForm {p : ℕ}
     (Z : SignedAlgebraicCycle n X p) :
     Z.cycleClass = ofForm Z.representingForm Z.representingForm_closed := rfl
 
+/-! ### Data-first geometric cycle class (support data) -/
+
+/-- Data-first geometric cycle class of a signed algebraic cycle. -/
+noncomputable def SignedAlgebraicCycle.cycleClass_geom_data {p : ℕ}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [SignedAlgebraicCycleSupportData n X p]
+    [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
+    [CycleClass.PoincareDualFormFromCurrentData n X p]
+    (Z : SignedAlgebraicCycle n X p) : DeRhamCohomologyClass n X (2 * p) :=
+  ofForm
+      (FundamentalClassSet_data n X p
+        (SignedAlgebraicCycle.support_data (n := n) (X := X) (p := p) Z))
+      (FundamentalClassSet_data_isClosed (n := n) (X := X) (p := p)
+        (data := SignedAlgebraicCycle.support_data (n := n) (X := X) (p := p) Z))
+
 /-!
 **Intersection Semantics (2026-01-24)**: For Lefschetz-type operations, the representing
 form is inherited by the intersection. The geometric intersection with H corresponds
 to the same cohomology class (in appropriate degree considerations).
 
 The previous `intersection_represents_witness_axiom` was removed because it relied on
-`FundamentalClassSet` which is a stub. The intersection now simply inherits the
-representing form, which is semantically correct.
+set‑based `FundamentalClassSet` (compatibility stub). The data‑first geometric class
+now routes through `FundamentalClassSet_data` from explicit support data. The
+intersection simply inherits the representing form for the compatibility class.
 -/
 
 /-- The intersection of a signed cycle with an algebraic subvariety.
@@ -510,20 +794,24 @@ theorem SignedAlgebraicCycle.support'_alg {p : ℕ} (Z : SignedAlgebraicCycle n 
   · rw [← hW₁]; exact W₁.is_algebraic
   · rw [← hW₂]; exact W₂.is_algebraic
 
-/-- **Geometric cycle class** computed from the support (REAL DEFINITION).
+/-- **Geometric cycle class** computed from the support (set‑based compatibility).
 
-    This is the *actual* geometric definition: the cohomology class is the class of
+    This is the *set‑based* geometric definition: the cohomology class is the class of
     the fundamental class of the support \(Z.pos ∪ Z.neg\).
 
-    This **breaks the cycle-class tautology** (previously `cycleClass_geom := ofForm representingForm`),
-    and forces the deep comparison theorem onto the proof track via `SpineBridgeData`.
-    Concretely, the bridge asserts (for spine-produced cycles) that:
+    **Proof‑track guidance**: prefer the **data‑first** definition
+    `SignedAlgebraicCycle.cycleClass_geom_data`, which computes the class from explicit
+    `ClosedSubmanifoldData` via the current‑regularization pipeline.
+
+    This set‑based definition **breaks the cycle‑class tautology** and forces the deep
+    comparison theorem onto the proof track via `SpineBridgeData`. Concretely, the
+    bridge asserts (for spine‑produced cycles) that:
     \[
       [\mathrm{FundamentalClassSet}(\mathrm{support}(Z))] = [\mathrm{representingForm}(Z)].
     \]
 
-    **Phase 7 Update (2026-02-01)**: Definition now uses `FundamentalClassSet` from the support.
-    Requires `PoincareDualFormExists` typeclass for the fundamental class construction. -/
+    **Phase 7 Update (2026-02-01)**: Definition uses `FundamentalClassSet` from the support.
+    Requires `PoincareDualFormExists` for the fundamental class construction. -/
 noncomputable def SignedAlgebraicCycle.cycleClass_geom {p : ℕ}
     [CycleClass.PoincareDualFormExists n X p]
     (Z : SignedAlgebraicCycle n X p) : DeRhamCohomologyClass n X (2 * p) :=
@@ -540,8 +828,10 @@ noncomputable def SignedAlgebraicCycle.cycleClass_geom {p : ℕ}
     (ultimately Harvey–Lawson / calibrated current theory + GAGA).
     For now we keep it explicit as a typeclass assumption.
 
-    **Phase 7 Update**: Requires `PoincareDualFormExists` separately because `cycleClass_geom`
-    is defined using `FundamentalClassSet`. -/
+    **Phase 7 Update**: Requires `PoincareDualFormExists` because `cycleClass_geom`
+    is defined using `FundamentalClassSet`.
+
+    **Proof‑track guidance**: prefer `SpineBridgeData_data` (data‑first). -/
 class SpineBridgeData (n : ℕ) (X : Type u) (p : ℕ)
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
@@ -553,6 +843,26 @@ class SpineBridgeData (n : ℕ) (X : Type u) (p : ℕ)
   fundamental_eq_representing :
     ∀ (Z : SignedAlgebraicCycle n X p),
       Z.cycleClass_geom = ofForm Z.representingForm Z.representingForm_closed
+
+-- Compatibility note: `SpineBridgeData` is the set-based bridge; prefer
+-- `SpineBridgeData_data` when explicit `ClosedSubmanifoldData` is available.
+
+/-- **Data-first Spine Bridge Data** (ClosedSubmanifoldData).
+
+This is the data-first variant of the bridge, using explicit support data. -/
+class SpineBridgeData_data (n : ℕ) (X : Type u) (p : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
+    [CycleClass.PoincareDualFormFromCurrentData n X p]
+    [SignedAlgebraicCycleSupportData n X p] : Prop where
+  /-- For spine-produced cycles, the data-first geometric class equals the class of the
+      carried representing form. -/
+  fundamental_eq_representing :
+    ∀ (Z : SignedAlgebraicCycle n X p),
+      Z.cycleClass_geom_data = ofForm Z.representingForm Z.representingForm_closed
 
 /-!
 ## Note: no `SpineBridgeData.universal`
@@ -568,6 +878,27 @@ theorem SignedAlgebraicCycle.cycleClass_geom_eq_representingForm {p : ℕ}
     (Z : SignedAlgebraicCycle n X p) :
     Z.cycleClass_geom = ofForm Z.representingForm Z.representingForm_closed :=
   SpineBridgeData.fundamental_eq_representing (n := n) (X := X) (p := p) (Z := Z)
+
+/-! ### Data-first bridge corollary -/
+
+theorem SignedAlgebraicCycle.cycleClass_geom_eq_representingForm_data {p : ℕ}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
+    [CycleClass.PoincareDualFormFromCurrentData n X p]
+    [AlgebraicSubvarietyClosedSubmanifoldData n X]
+    [SignedAlgebraicCycleSupportCodimData n X p]
+    [SpineBridgeData_data n X p]
+    (Z : SignedAlgebraicCycle n X p) :
+    Z.cycleClass_geom_data = ofForm Z.representingForm Z.representingForm_closed :=
+by
+  -- Derive support data from algebraic subvariety data.
+  letI : SignedAlgebraicCycleSupportData n X p :=
+    instSignedAlgebraicCycleSupportData_ofAlgebraic (n := n) (X := X) (p := p)
+  exact SpineBridgeData_data.fundamental_eq_representing
+    (n := n) (X := X) (p := p) (Z := Z)
 
 /-- The geometric class equals the shortcut class (via the bridge). -/
 theorem SignedAlgebraicCycle.cycleClass_geom_eq_cycleClass {p : ℕ}

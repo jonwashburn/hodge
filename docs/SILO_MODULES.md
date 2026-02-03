@@ -1,7 +1,7 @@
 # Siloed / Off‑Track Modules
 
 This document records Lean modules that are **intentionally not required** for the main theorem
-(`hodge_conjecture` / `hodge_conjecture'`) and therefore may contain:
+(`hodge_conjecture_data` / legacy `hodge_conjecture'`) and therefore may contain:
 
 - `sorry` statements
 - additional “Classical Pillar” axioms
@@ -11,7 +11,7 @@ This document records Lean modules that are **intentionally not required** for t
 
 For this repository, the **proof track** is the import graph of:
 
-- `Hodge.Main` (public theorem `hodge_conjecture`)
+- `Hodge.Main` (public theorem `hodge_conjecture_data`)
 
 The root module `Hodge` is intentionally minimal and imports only `Hodge.Main`.
 
@@ -87,4 +87,3 @@ considered “siloed” (even if the `sorry` occurs in a lemma that the main the
 - `Hodge/Analytic/Currents.lean`
 - `Hodge/Cohomology/Basic.lean`
 - `Hodge/Kahler/Manifolds.lean`
-

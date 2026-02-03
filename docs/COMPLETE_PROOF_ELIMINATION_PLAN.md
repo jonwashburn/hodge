@@ -5,7 +5,7 @@
 - ✅ ZERO `sorry` statements
 - ✅ Full verification from Mathlib foundations
 
-**Current Status**: 8 custom axioms + 1 sorry on proof track
+**Current Status**: proof‑track is kernel‑clean, but deep binders remain (data‑first PD + spine bridge)
 
 ---
 
@@ -18,8 +18,8 @@
 | 3 | `isSmoothAlternating_wedge` | axiom | 🟡 Medium | 4-8 hours |
 | 4 | `smoothExtDeriv_extDeriv` | axiom | 🔴 Hard | 16-32 hours |
 | 5 | `smoothExtDeriv_wedge` | axiom | 🔴 Hard | 16-32 hours |
-| 6 | `poincareDualFormExists` | axiom | 🔴 Very Hard | 40-80 hours |
-| 7 | `FundamentalClassSet_represents_class` | axiom | 🔴 Very Hard | 40-80 hours |
+| 6 | `CurrentRegularizationData` / `PoincareDualFormFromCurrentData` | binder | 🔴 Very Hard | 40-80 hours |
+| 7 | `SpineBridgeData_data` (data‑first bridge) | binder | 🔴 Very Hard | 40-80 hours |
 | 8 | `SignedAlgebraicCycle.lefschetz_lift` | axiom | 🔴 Hard | 24-48 hours |
 | 9 | `omega_pow_algebraic` | sorry | 🔴 Hard | 16-32 hours |
 
@@ -168,13 +168,15 @@ theorem smoothExtDeriv_wedge {k l : ℕ} (ω : SmoothForm n X k) (η : SmoothFor
 
 These are the hardest tasks, requiring significant GMT infrastructure.
 
-### Task 6: Poincaré Dual Form Existence
-**File**: `Hodge/Classical/CycleClass.lean`  
-**Current**: `axiom poincareDualFormExists`  
-**Target**: Construct from integration currents
+### Task 6: PD Regularization (Current → Smooth Form)
+**File**: `Hodge/Classical/CycleClass.lean`, `Hodge/Classical/PoincareDualityFromCurrents.lean`,
+`Hodge/GMT/HeatKernelRegularization.lean`, `Hodge/GMT/RegularizationLemmas.lean`
+**Current**: `PoincareDualFormFromCurrentData` is an explicit binder  
+**Target**: Construct from integration currents + regularization
 
 **Mathematical Content**:
-For an algebraic subvariety Z ⊂ X of codimension p, the Poincaré dual form η_Z is the unique closed (p,p)-form such that for all (n-p,n-p)-forms φ:
+For an algebraic subvariety Z ⊂ X of codimension p, the Poincaré dual form η_Z is
+defined as the regularization of the integration current, and should satisfy:
 ```
 ∫_X η_Z ∧ φ = ∫_Z φ|_Z
 ```
@@ -183,7 +185,9 @@ For an algebraic subvariety Z ⊂ X of codimension p, the Poincaré dual form η
 - Integration of differential forms on manifolds
 - de Rham theorem (isomorphism between de Rham and singular cohomology)
 - Current theory (dual to differential forms)
-- Regularization of currents to smooth forms
+- Regularization of currents to smooth forms (heat kernel / mollifier on charts)
+- Implement `Hodge.GMT.CurrentRegularizationLemmas` and use it to build
+  `CycleClass.PoincareDualityFromCurrentsData` (then `PoincareDualFormFromCurrentData`).
 
 **Approach Options**:
 
@@ -208,10 +212,10 @@ For an algebraic subvariety Z ⊂ X of codimension p, the Poincaré dual form η
 
 ---
 
-### Task 7: Fundamental Class Represents Cohomology
+### Task 7: Data‑First Fundamental Class Bridge
 **File**: `Hodge/Classical/GAGA.lean`  
-**Current**: `axiom FundamentalClassSet_represents_class`  
-**Target**: Prove from Poincaré duality
+**Current**: `SpineBridgeData_data` is an explicit binder (no axiom)  
+**Target**: Prove from PD regularization + Harvey–Lawson + Chow/GAGA
 
 ```lean
 -- This theorem says: If γ is a rational (p,p)-class represented by
@@ -223,9 +227,10 @@ This is the comparison between:
 - Algebraic definition: Z is an algebraic subvariety
 - Analytic definition: γ is a closed form
 - The theorem says they give the same cohomology class
+- **Data‑first**: `[η_Z]` is computed via `FundamentalClassSet_data` from explicit support data
 
 **Required Infrastructure**:
-- Task 6 complete (Poincaré duality)
+- Task 6 complete (current → form regularization)
 - Harvey-Lawson theorem (calibrated currents)
 - King's theorem (positive holomorphic chains are algebraic)
 
@@ -266,9 +271,8 @@ The Hard Lefschetz isomorphism L^k : H^{n-k}(X) → H^{n+k}(X) preserves algebra
 
 ```lean
 theorem omega_pow_algebraic {p : ℕ} (c : ℚ) (_hc : c > 0) :
-    ∃ (Z : Set X), isAlgebraicSubvariety n X Z ∧
-    ∃ (hZ : IsFormClosed (FundamentalClassSet n X p Z)),
-      ⟦FundamentalClassSet n X p Z, hZ⟧ =
+    ∃ (Z : SignedAlgebraicCycle n X p),
+      Z.cycleClass_geom_data =
         (c : ℝ) • ⟦kahlerPow (n := n) (X := X) p, omega_pow_IsFormClosed p⟧
 ```
 
@@ -307,8 +311,8 @@ Build on `ProjectiveComplexManifold` which already provides embedding into ℙ�
 
 | Agent | Task | Dependencies | Deliverable |
 |-------|------|--------------|-------------|
-| 2A | Poincaré duality | Phase 1 | `poincareDualFormExists` as def/theorem |
-| 2B | Fundamental class | Task 2A | `FundamentalClassSet_represents_class` theorem |
+| 2A | PD regularization | Phase 1 | `CurrentRegularizationData` + `PoincareDualFormFromCurrentData` instance |
+| 2B | Data‑first bridge | Task 2A | `SpineBridgeData_data` (geometric class = representing form) |
 
 ### Phase 3: Lefschetz (Week 2-3, parallel with Phase 2)
 **2 agents working in parallel**
@@ -356,12 +360,13 @@ ACCEPTANCE:
 - `#print axioms smoothExtDeriv` shows only standard axioms
 ```
 
-### Prompt for Agent 2A: Poincaré Duality
+### Prompt for Agent 2A: PD Regularization (Current → Form)
 
 ```
-TASK: Construct or justify poincareDualFormExists
+TASK: Construct `CurrentRegularizationData` and discharge `PoincareDualFormFromCurrentData`
 
-FILE: Hodge/Classical/CycleClass.lean
+FILES: Hodge/GMT/HeatKernelRegularization.lean, Hodge/GMT/RegularizationLemmas.lean,
+       Hodge/Classical/PoincareDualityFromCurrents.lean
 
 OPTION A (Full Construction):
 1. Define integration currents T_Z for algebraic Z
@@ -369,8 +374,8 @@ OPTION A (Full Construction):
 3. Prove the smooth form is closed and of type (p,p)
 4. Prove rationality using comparison isomorphism
 
-OPTION B (Justified Axiom):
-1. Keep as axiom but enhance documentation
+OPTION B (Scoped Interface):
+1. Keep `CurrentRegularizationData` as an explicit binder (no axioms)
 2. Add full mathematical statement with quantifiers
 3. Reference: [de Rham, "Variétés Différentiables"]
 4. Reference: [Griffiths-Harris, Ch. 0-1]
@@ -379,7 +384,7 @@ OPTION B (Justified Axiom):
 ACCEPTANCE:
 - `lake build Hodge.Classical.CycleClass` succeeds
 - Clear documentation of mathematical content
-- If axiom: referee would accept as "Classical Pillar"
+- If interface: referee would accept as "Classical Pillar"
 ```
 
 ### Prompt for Agent 3B: omega_pow_algebraic

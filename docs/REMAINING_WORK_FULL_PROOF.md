@@ -275,15 +275,15 @@ theorem hard_lefschetz_bijective : Function.Bijective (lefschetz_power n X p k)
 
 **Key Definitions**:
 ```lean
--- Integration current
-def integrationCurrent (Z : Set X) : Current n X k := {
-    toFun := fun ω => ∫ z in Z, ω.restrict Z ∂μ_Z,
+-- Integration current (data‑first)
+def integrationCurrent_data (data : ClosedSubmanifoldData n X k) : Current n X k := {
+    toFun := fun ω => ∫ z in data.carrier, ω.restrict data.carrier ∂data.measure,
     is_continuous := ...
 }
 
--- Poincaré dual form
-def poincareDualForm (Z : Set X) : SmoothForm n X (2 * p) :=
-    regularize (integrationCurrent Z)
+-- Poincaré dual form (data‑first)
+def poincareDualForm (data : ClosedSubmanifoldData n X (2 * p)) : SmoothForm n X (2 * p) :=
+    regularize (integrationCurrent_data data)
 ```
 
 **Dependencies**: Integration (1.2), Hausdorff measure, regularity theory
@@ -333,7 +333,7 @@ theorem federer_fleming_compactness :
 ```lean
 theorem harvey_lawson_structure :
     isCalibrated T ψ → ∃ (varieties : List AnalyticSubvariety), 
-        T = ∑ v ∈ varieties, integrationCurrent v.carrier
+        T = ∑ v ∈ varieties, integrationCurrent_data (varietyData v)
 ```
 
 **Dependencies**: Calibration theory, GMT compactness

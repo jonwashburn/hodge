@@ -1,4 +1,6 @@
 import Hodge.Analytic.Currents
+import Hodge.GMT.IntegrationCurrent
+import Hodge.GMT.CurrentToForm
 import Hodge.Cohomology.Basic
 import Mathlib.Analysis.Complex.Basic
 import Mathlib.Topology.Sets.Opens
@@ -31,6 +33,11 @@ This approach:
 1. Keeps the proof pipeline type-correct while the GMT layer is under construction
 2. Documents exactly what needs to be proved in a full implementation
 3. Allows the proof-track axiom audit to focus on the remaining genuine gaps
+
+**Data-first update**: the PD interface is now `ClosedSubmanifoldData`-first.
+`PoincareDualFormFromCurrentData` fixes the proof-track PD form to be the
+regularization of `integrationCurrent_data`, while `PoincareDualFormExists_data`
+is retained only as a compatibility layer for legacy call sites.
 
 Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry",
 Wiley, 1978, Chapter 1].
@@ -91,10 +98,14 @@ structure PoincareDualFormData (n : ℕ) (X : Type u) (p : ℕ) (Z : Set X)
 
 /-! ## Existence Interface -/
 
-/-- **Poincaré Dual Form Existence**.
+/-- **Poincaré Dual Form Existence** (set-based).
 
-    This typeclass packages the existence of Poincaré dual form data for *all* sets Z.
-    It removes `by rfl` from the proof track while keeping the assumption explicit. -/
+    Compatibility interface for legacy call sites: this packages the existence of
+    Poincaré dual form data for *all* sets `Z`.
+
+    **Proof-track guidance**: prefer the data-first interface
+    `PoincareDualFormFromCurrentData` (explicit current → form) when
+    `ClosedSubmanifoldData` is available. -/
 class PoincareDualFormExists (n : ℕ) (X : Type u) (p : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
@@ -223,6 +234,213 @@ theorem poincareDualForm_empty (n : ℕ) (X : Type u) (p : ℕ)
     poincareDualForm n X p (∅ : Set X) = 0 :=
   (poincareDualFormExists n X p ∅).empty_vanishes rfl
 
+/-! ## Data-first Poincaré dual form interface (ClosedSubmanifoldData)
+
+This interface shifts the PD-form existence assumption to an **explicit**
+`ClosedSubmanifoldData` input. The set-based interface remains available as a
+compatibility wrapper for legacy call sites.
+
+**Tightening**: `PoincareDualFormFromCurrentData` strengthens this interface by
+requiring the PD form to be obtained from `integrationCurrent_data` via
+regularization. -/
+
+section DataFirst
+
+omit [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+  [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+  [ProjectiveComplexManifold n X] K [MeasurableSpace X] [Nonempty X]
+
+variable {n : ℕ} {X : Type u}
+  [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+  [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+  [ProjectiveComplexManifold n X] [KahlerManifold n X]
+  [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+
+/-- **Poincaré Dual Form Data** (data-first).
+
+    This packages a PD form attached to explicit `ClosedSubmanifoldData`. -/
+structure PoincareDualFormData_data (n : ℕ) (X : Type u) (p : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    (data : ClosedSubmanifoldData n X (2 * p)) where
+  /-- The Poincaré dual form representing the integration current. -/
+  form : SmoothForm n X (2 * p)
+  /-- The form is closed. -/
+  is_closed : IsFormClosed form
+  /-- Empty carrier gives the zero form. -/
+  empty_vanishes : data.carrier = ∅ → form = 0
+
+/-- **Poincaré Dual Form Existence** (data-first).
+
+Compatibility-only: the proof track should prefer `PoincareDualFormFromCurrentData`
+which forces the PD form to be obtained from `integrationCurrent_data`. -/
+class PoincareDualFormExists_data (n : ℕ) (X : Type u) (p : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X] where
+  choose : (data : ClosedSubmanifoldData n X (2 * p)) →
+    PoincareDualFormData_data n X p data
+
+/-- Project the data-first PD form data. -/
+noncomputable def poincareDualFormExists_data (n : ℕ) (X : Type u) (p : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [inst : PoincareDualFormExists_data n X p]
+    (data : ClosedSubmanifoldData n X (2 * p)) :
+    PoincareDualFormData_data n X p data :=
+  inst.choose data
+
+/-- Compatibility PD form attached to explicit `ClosedSubmanifoldData`. -/
+noncomputable def poincareDualForm_data_compat (n : ℕ) (X : Type u) (p : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [inst : PoincareDualFormExists_data n X p]
+    (data : ClosedSubmanifoldData n X (2 * p)) : SmoothForm n X (2 * p) :=
+  (poincareDualFormExists_data n X p data).form
+
+/-- Compatibility PD form is closed. -/
+theorem poincareDualForm_data_compat_isClosed (n : ℕ) (X : Type u) (p : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [inst : PoincareDualFormExists_data n X p]
+    (data : ClosedSubmanifoldData n X (2 * p)) :
+    IsFormClosed (poincareDualForm_data_compat n X p data) :=
+  (poincareDualFormExists_data n X p data).is_closed
+
+/-- Empty carrier gives the zero compatibility PD form. -/
+theorem poincareDualForm_data_compat_empty (n : ℕ) (X : Type u) (p : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [inst : PoincareDualFormExists_data n X p]
+    (data : ClosedSubmanifoldData n X (2 * p)) :
+    data.carrier = ∅ → poincareDualForm_data_compat n X p data = 0 :=
+  (poincareDualFormExists_data n X p data).empty_vanishes
+
+/-! ### Explicit PD form from integration current -/
+
+/-- Define the PD form directly as regularization of the integration current. -/
+noncomputable def poincareDualForm_data_fromCurrent (n : ℕ) (X : Type u) (p : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
+    (data : ClosedSubmanifoldData n X (2 * p)) : SmoothForm n X (2 * p) :=
+  Hodge.GMT.regularizeCurrentToForm (n := n) (X := X) (k := 2 * p)
+    (Hodge.GMT.integrationCurrent_data (n := n) (X := X) p data)
+
+/-- Data-first PD form defined via integration-current regularization. -/
+noncomputable def poincareDualForm_data (n : ℕ) (X : Type u) (p : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
+    (data : ClosedSubmanifoldData n X (2 * p)) : SmoothForm n X (2 * p) :=
+  poincareDualForm_data_fromCurrent n X p data
+
+/-! ### Tightened PD interface: PD form from integration current -/
+
+/-- **Poincaré Dual Form via Integration Current** (data-first).
+
+This strengthens `PoincareDualFormExists_data` by requiring the PD form to be obtained by
+regularizing the integration current `integrationCurrent_data`.
+This is the tightened pipeline used on the proof track. -/
+class PoincareDualFormFromCurrentData (n : ℕ) (X : Type u) (p : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
+    extends PoincareDualFormExists_data n X p where
+  /-- The PD form is obtained by regularizing the integration current. -/
+  from_current :
+    ∀ data : ClosedSubmanifoldData n X (2 * p),
+      poincareDualForm_data_compat n X p data =
+        poincareDualForm_data_fromCurrent n X p data
+
+/-! ### Tightened PD pipeline lemma -/
+
+theorem poincareDualForm_data_compat_eq (n : ℕ) (X : Type u) (p : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
+    [PoincareDualFormFromCurrentData n X p]
+    (data : ClosedSubmanifoldData n X (2 * p)) :
+    poincareDualForm_data_compat n X p data =
+      poincareDualForm_data n X p data := by
+  simpa [poincareDualForm_data] using
+    (PoincareDualFormFromCurrentData.from_current (n := n) (X := X) (p := p) data)
+
+theorem poincareDualForm_data_isClosed (n : ℕ) (X : Type u) (p : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
+    [PoincareDualFormFromCurrentData n X p]
+    (data : ClosedSubmanifoldData n X (2 * p)) :
+    IsFormClosed (poincareDualForm_data n X p data) := by
+  have hcompat := poincareDualForm_data_compat_isClosed (n := n) (X := X) (p := p) data
+  simpa [poincareDualForm_data_compat_eq (n := n) (X := X) (p := p) data] using hcompat
+
+theorem poincareDualForm_data_empty (n : ℕ) (X : Type u) (p : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
+    [PoincareDualFormFromCurrentData n X p]
+    (data : ClosedSubmanifoldData n X (2 * p)) :
+    data.carrier = ∅ → poincareDualForm_data n X p data = 0 := by
+  intro h
+  have hcompat := poincareDualForm_data_compat_empty (n := n) (X := X) (p := p) data h
+  simpa [poincareDualForm_data_compat_eq (n := n) (X := X) (p := p) data] using hcompat
+
+theorem poincareDualForm_data_eq_regularizeCurrent (n : ℕ) (X : Type u) (p : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
+    (data : ClosedSubmanifoldData n X (2 * p)) :
+    poincareDualForm_data n X p data =
+      Hodge.GMT.regularizeCurrentToForm (n := n) (X := X) (k := 2 * p)
+        (Hodge.GMT.integrationCurrent_data (n := n) (X := X) p data) := rfl
+
+/-- Compatibility: package data-first PD form as set-based PD form data. -/
+noncomputable def poincareDualFormData_of_data (n : ℕ) (X : Type u) (p : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [inst : PoincareDualFormExists_data n X p]
+    {Z : Set X} (data : ClosedSubmanifoldData n X (2 * p)) (hZ : data.carrier = Z) :
+    PoincareDualFormData n X p Z := by
+  refine
+    { form := poincareDualForm_data_compat n X p data
+      is_closed := poincareDualForm_data_compat_isClosed n X p data
+      empty_vanishes := ?_ }
+  intro hZempty
+  have hcarrier : data.carrier = ∅ := by
+    simpa [hZ] using hZempty
+  exact poincareDualForm_data_compat_empty n X p data hcarrier
+
+end DataFirst
+
 /-!
 ══════════════════════════════════════════════════════════════════════════════════════════
 NOTE: The off-track axioms (poincareDualForm_isPP, _isRational, _additive) were archived to
@@ -245,7 +463,7 @@ end CycleClass
 This section provides the implementation that will be used by GAGA.lean
 to define `FundamentalClassSet_impl`. -/
 
-/-- **The Fundamental Class Form Implementation**
+/-- **The Fundamental Class Form Implementation** (set-based).
 
     Given a set Z and codimension p, return the Poincaré dual form η_Z.
 
@@ -258,7 +476,10 @@ to define `FundamentalClassSet_impl`. -/
 
     The form satisfies:
     1. Closedness (by `poincareDualForm_isClosed`)
-    2. Z-dependence (different Z give different forms) -/
+    2. Z-dependence (different Z give different forms)
+
+    **Compatibility note**: prefer `fundamentalClassImpl_data` when explicit
+    `ClosedSubmanifoldData` is available. -/
 def fundamentalClassImpl (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
@@ -279,6 +500,37 @@ theorem fundamentalClassImpl_isClosed (p : ℕ) (Z : Set X)
     [inst : CycleClass.PoincareDualFormExists n X p] :
     IsFormClosed (fundamentalClassImpl n X p Z) :=
   CycleClass.poincareDualForm_isClosed n X p Z
+
+/-! ### Data-first fundamental class (ClosedSubmanifoldData) -/
+
+section DataFirstFundamental
+
+/-- Data-first fundamental class form, built from explicit `ClosedSubmanifoldData`. -/
+def fundamentalClassImpl_data (n : ℕ) (X : Type u)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    (p : ℕ)
+    [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
+    [CycleClass.PoincareDualFormFromCurrentData n X p]
+    (data : ClosedSubmanifoldData n X (2 * p)) :
+    SmoothForm n X (2 * p) :=
+  CycleClass.poincareDualForm_data n X p data
+
+/-- Data-first fundamental class is closed. -/
+theorem fundamentalClassImpl_data_isClosed (n : ℕ) (X : Type u) (p : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
+    [CycleClass.PoincareDualFormFromCurrentData n X p]
+    (data : ClosedSubmanifoldData n X (2 * p)) :
+    IsFormClosed (fundamentalClassImpl_data n X p data) :=
+  CycleClass.poincareDualForm_data_isClosed n X p data
+
+end DataFirstFundamental
 
 /-!
 **Z-dependence of Poincaré dual forms** (M2 semantic property).

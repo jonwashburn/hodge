@@ -265,7 +265,8 @@ Eliminate the remaining “always-0” stubs that block meaningful integration/L
 - `topFormIntegral_real' := 0` and `topFormIntegral_complex := 0` (`Hodge/Analytic/Integration/TopFormIntegral.lean`)
 - `setIntegral := 0` (`Hodge/Analytic/Currents.lean`) so currents actually evaluate forms
 - `L2InnerProductData.trivial.inner := 0` (`Hodge/Analytic/HodgeLaplacian.lean`)
-- `integrationCurrentHL` still `toFun := 0` (`Hodge/Classical/HarveyLawson.lean`)
+- `integrationCurrentHL` was removed alongside the legacy set‑integral stubs; proof‑track now uses
+  `integrationCurrent_data` via explicit `ClosedSubmanifoldData` (`Hodge/GMT/IntegrationCurrent.lean`)
 
 ## Round 8 Success Criteria
 
@@ -275,6 +276,11 @@ Eliminate the remaining “always-0” stubs that block meaningful integration/L
 - [x] Proof track remains unchanged/clean (same axiom list: `[propext, Classical.choice, Quot.sound]`)
 
 ---
+
+## Long-Session Autonomy
+
+For extended autonomous work, see `docs/AUTONOMY_RUNWAY.md`. This is the
+live execution map for data‑first tightening and binder elimination.
 
 ## Agent 1: Make top-form integration nontrivial
 
@@ -1646,7 +1652,7 @@ Document and structure the Classical Pillar axioms. Prove what's provable.
    - `bounded_currents_nonempty`
 
 3. **Connect GMT to proof track**
-   - Verify `integrationCurrent` path works
+   - Verify `integrationCurrent_data` path works (data-first)
    - Verify `poincareDualForm_construct` path works
 
 4. **Create summary document** for Classical Pillars
@@ -2054,8 +2060,8 @@ Complete GMT infrastructure. Document all Classical Pillars. Create comprehensiv
    - Add mathematical references
 
 2. **Strengthen GMT infrastructure**
-   - In `IntegrationCurrent.lean`: prove `integrationCurrent_empty = 0`
-   - In `IntegrationCurrent.lean`: prove `integrationCurrent_linear`
+   - In `IntegrationCurrent.lean`: prove `integrationCurrent_linear_data`
+   - In `IntegrationCurrent.lean`: document wrapper variants as compatibility-only
    - In `Current.lean`: add `current_eval_linear`
    - In `PoincareDuality.lean`: add documentation
 
@@ -2072,7 +2078,7 @@ Complete GMT infrastructure. Document all Classical Pillars. Create comprehensiv
    - Document any gaps
 
 5. **Create comprehensive tests** `Hodge/GMT/GMTTests.lean`
-   - Test: Integration current of empty set is zero
+   - Test: Integration current linearity (data-first)
    - Test: Current boundary operator type-checks
    - Test: Flat norm is non-negative
    - Test: Poincaré duality types work
@@ -2395,7 +2401,7 @@ Create GMTTests.lean and finalize GMT documentation.
 ### Deliverables
 
 1. **Create `Hodge/GMT/GMTTests.lean`**
-   - Test: `integrationCurrent_empty = 0`
+   - Test: `integrationCurrent_linear_data`
    - Test: Current boundary operator type-checks
    - Test: Flat norm non-negative
    - Test: Poincaré duality statement compiles
@@ -3362,9 +3368,10 @@ theorem sl2_representation_bijectivity (hk : k ≤ n) :
 #### Key Theorems & Definitions
 
 ```lean
--- Integration current
-noncomputable def integrationCurrent (Z : Set X) : DeRhamCurrent n X (2 * p) := {
-  toFun := fun ω => ∫ z in Z, (ω.restrict Z) z ∂(hausdorffMeasure (2 * p) Z),
+-- Integration current (data‑first)
+noncomputable def integrationCurrent_data
+    (data : ClosedSubmanifoldData n X (2 * p)) : DeRhamCurrent n X (2 * p) := {
+  toFun := fun ω => ∫ z in data.carrier, (ω.restrict data.carrier) z ∂data.measure,
   is_linear := ...,
   is_continuous := ...
 }
@@ -3380,16 +3387,18 @@ theorem federer_fleming_compactness :
 
 -- Harvey-Lawson structure (CLASSICAL PILLAR)
 theorem harvey_lawson_structure :
-    isCalibrated T ψ → ∃ (varieties : List AnalyticSubvariety), 
-        T = ∑ v ∈ varieties, integrationCurrent v.carrier
+    isCalibrated T ψ → ∃ (varieties : List AnalyticSubvariety),
+        T = ∑ v ∈ varieties, integrationCurrent_data (varietyData v)
+-- (where `varietyData` packages an analytic variety as `ClosedSubmanifoldData`)
 
 -- GAGA (CLASSICAL PILLAR)
 theorem gaga_analytic_is_algebraic :
     isAnalyticSubvariety Z → isAlgebraicSubvariety n X Z
 
 -- Poincaré duality (construction replaces axiom)
-noncomputable def poincareDualForm_construct (Z : Set X) : SmoothForm n X (2 * p) :=
-    regularizeCurrentToForm (integrationCurrent n X p Z)
+noncomputable def poincareDualForm_construct (data : ClosedSubmanifoldData n X (2 * p)) :
+    SmoothForm n X (2 * p) :=
+    regularizeCurrentToForm (integrationCurrent_data data)
 ```
 
 #### Mathlib Prerequisites
@@ -3441,7 +3450,7 @@ noncomputable def poincareDualForm_construct (Z : Set X) : SmoothForm n X (2 * p
 
 #### Success Criteria
 
-- [ ] `integrationCurrent` uses real Hausdorff integration (not IntegrationData.empty)
+- [ ] `integrationCurrent_data` uses real Hausdorff integration (not IntegrationData.empty)
 - [ ] `regularizeCurrentToForm` has mathematical construction
 - [ ] `poincareDualFormExists` becomes construction, not axiom
 - [ ] `flatNorm` induces actual metric topology
@@ -3749,13 +3758,13 @@ def DeRhamCurrent.boundary (T : DeRhamCurrent n X k) :
 
 -- In IntegrationCurrent.lean:
 
-/-- Integration current T_Z for a submanifold Z. -/
-noncomputable def integrationCurrent (n : ℕ) (X : Type*) ... 
-    (p : ℕ) (Z : Set X) : DeRhamCurrent n X (2 * p) := sorry
+/-- Integration current for a closed submanifold (data‑first). -/
+noncomputable def integrationCurrent_data (n : ℕ) (X : Type*) ...
+    (p : ℕ) (data : ClosedSubmanifoldData n X (2 * p)) : DeRhamCurrent n X (2 * p) := sorry
 
-/-- Integration current of empty set is zero. -/
-theorem integrationCurrent_empty : 
-    integrationCurrent n X p ∅ = 0 := sorry
+/-- Linearity of the integration current (data‑first). -/
+theorem integrationCurrent_linear_data :
+    ... := sorry
 ```
 
 ### Acceptance Criteria
@@ -4028,9 +4037,10 @@ Implement integration currents for submanifolds.
 ### Key Implementations
 
 ```lean
--- In IntegrationCurrent.lean:
-noncomputable def integrationCurrent (Z : Set X) : DeRhamCurrent n X (2 * p) := {
-  toFun := fun ω => ∫ z in Z, (ω.restrict Z) z ∂(hausdorffMeasure (2 * p) Z),
+-- In IntegrationCurrent.lean (data‑first):
+noncomputable def integrationCurrent_data (data : ClosedSubmanifoldData n X (2 * p)) :
+    DeRhamCurrent n X (2 * p) := {
+  toFun := fun ω => ∫ z in data.carrier, (ω.restrict data.carrier) z ∂data.measure,
   is_linear := by ...,
   is_continuous := by ...
 }
@@ -4051,7 +4061,7 @@ theorem regularize_represents_current :
 ### Acceptance Criteria
 
 - [x] `DeRhamCurrent` structure complete (wrapper over existing `Hodge.Analytic.Currents`)
-- [ ] `integrationCurrent` uses real integration (still a semantic stub via `IntegrationData.empty`)
+- [ ] `integrationCurrent_data` uses real integration (still a semantic stub via `IntegrationData.empty`)
 - [x] `CurrentToForm.lean` has regularization signature
 - [x] Clear documentation of what remains axiomatized / placeholder
 
@@ -4241,9 +4251,10 @@ def poincareDualityIso (n p : ℕ) :
   -- Use integration pairing
   ...
 
-/-- Poincaré dual form from current. -/
-noncomputable def poincareDualForm_construct (Z : Set X) : SmoothForm n X (2 * p) :=
-  regularizeCurrentToForm (integrationCurrent n X p Z)
+/-- Poincaré dual form from current (data‑first). -/
+noncomputable def poincareDualForm_construct (data : ClosedSubmanifoldData n X (2 * p)) :
+    SmoothForm n X (2 * p) :=
+  regularizeCurrentToForm (integrationCurrent_data data)
 ```
 
 ### Acceptance Criteria

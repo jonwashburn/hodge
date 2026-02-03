@@ -274,7 +274,7 @@ The current `isRationalClass` definition, while imperfect, serves its purpose in
 - **Current `isRationalClass`**: Functional but axiomatically based
 - **Mathlib singular cohomology**: Not available (major gap)
 - **De Rham comparison**: Not formalized (major gap)
-- **Geometric cycle classes**: Partially available via `integrationCurrent` infrastructure
+- **Geometric cycle classes**: Partially available via `integrationCurrent_data` infrastructure
 - **Recommendation**: Proceed with Option 2 (lattice-based improvement) as a practical next step
 
 ---

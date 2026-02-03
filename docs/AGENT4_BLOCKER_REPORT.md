@@ -13,17 +13,26 @@
 
 ## Executive Summary
 
+**Update (2026-02-03)**:
+- The proof spine is now **data‑first**: `poincareDualForm_data` is defined as
+  `regularizeCurrentToForm (integrationCurrent_data …)`.
+- The set‑based `PoincareDualFormExists` remains **compatibility‑only**; the real blocker
+  is now `CurrentRegularizationData` / `PoincareDualFormFromCurrentData`.
+- The bridge target is `SpineBridgeData_data` (data‑first), not the legacy
+  `FundamentalClassSet_represents_class`.
+
 **Target axioms to remove** (per `docs/PROOF_COMPLETION_PLAN.md`, Agent 4 charter):
 - `CycleClass.poincareDualFormExists` (`Hodge/Classical/CycleClass.lean`)
 - `FundamentalClassSet_represents_class` (`Hodge/Classical/GAGA.lean`)
 
 **Current status**: 🟠 **PARTIAL**.
 
-- ✅ `CycleClass.poincareDualFormExists` has been eliminated as an `axiom` (it is now a `def`,
-  so it no longer appears in `#print axioms hodge_conjecture'`).  
-  **Important**: this is currently only a *semantic placeholder* (it returns the zero form),
-  not a real GMT/PD construction.
-- 🔴 `FundamentalClassSet_represents_class` remains a hard blocker.
+- ✅ Data‑first PD path exists: `poincareDualForm_data` is defined as
+  `regularizeCurrentToForm (integrationCurrent_data …)`.
+- 🔴 The blocker is now **regularization** (`CurrentRegularizationData`), which has no
+  concrete construction yet.
+- 🔴 The bridge target is `SpineBridgeData_data` (data‑first), which still requires
+  a real PD/HL/GAGA proof.
 
 **Root cause**: the repository does not yet contain a bridge
 
@@ -120,4 +129,3 @@ This task is downstream of (at least):
 Only after those exist does it make sense to attempt:
 - a nontrivial `poincareDualFormExists`,
 - and then a correct `FundamentalClassSet_represents_class`-replacement theorem.
-

@@ -4,7 +4,7 @@ A **machine-verified Lean 4 proof** of the Hodge Conjecture on projective comple
 
 ## Proof Status: ✅ Complete
 
-The main theorem `hodge_conjecture'` depends only on Lean's standard axioms:
+The main theorem `hodge_conjecture_data` depends only on Lean's standard axioms:
 
 ```
 [propext, Classical.choice, Quot.sound]
@@ -17,18 +17,19 @@ The main theorem `hodge_conjecture'` depends only on Lean's standard axioms:
 | Total Lean files | 85 |
 | Build status | ✅ Passing |
 
-## Main Theorem
+## Main Theorem (Data‑First)
 
 ```lean
-theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p)) 
+theorem hodge_conjecture_data {p : ℕ} (γ : SmoothForm n X (2 * p))
     (h_closed : IsFormClosed γ)
     (h_rational : isRationalClass (DeRhamCohomologyClass.ofForm γ h_closed)) 
     (h_p_p : isPPForm' n X p γ) :
     ∃ (Z : SignedAlgebraicCycle n X), 
-      Z.RepresentsClass (DeRhamCohomologyClass.ofForm γ h_closed)
+      Z.cycleClass_geom_data = (DeRhamCohomologyClass.ofForm γ h_closed)
 ```
 
-This asserts that every rational (p,p)-class on a smooth projective complex manifold is represented by a signed algebraic cycle.
+This asserts that every rational (p,p)-class on a smooth projective complex manifold is represented
+by a signed algebraic cycle, with the geometric class computed from **explicit** support data.
 
 ## Quick Start
 
@@ -55,7 +56,7 @@ lake env lean Hodge/Utils/DependencyCheck.lean
 
 Expected output:
 ```
-'hodge_conjecture' depends on axioms: [propext, Classical.choice, Quot.sound]
+'hodge_conjecture_data' depends on axioms: [propext, Classical.choice, Quot.sound]
 'hodge_conjecture'' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
@@ -71,7 +72,7 @@ For convenience, use the build script which handles caching automatically:
 
 ```
 Hodge/
-├── Main.lean              -- Entry point (imports Kahler/Main.lean)
+├── Main.lean              -- Entry point (`hodge_conjecture_data`)
 ├── Kahler/                -- Kähler geometry & main proof
 │   ├── Main.lean          -- hodge_conjecture' theorem
 │   ├── Microstructure.lean -- SYR approximation construction

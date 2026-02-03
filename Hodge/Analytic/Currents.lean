@@ -1317,6 +1317,26 @@ structure ClosedSubmanifoldData (n : ℕ) (X : Type*) (k : ℕ)
           (∫ x in carrier,
               formVectorPairing (smoothExtDeriv ω) orientation x ∂measure).re = 0
 
+/-- Transport `ClosedSubmanifoldData` across a degree equality. -/
+noncomputable def ClosedSubmanifoldData.cast {n : ℕ} {X : Type*} {k k' : ℕ}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X]
+    (h : k = k') (data : ClosedSubmanifoldData n X k) :
+    ClosedSubmanifoldData n X k' := by
+  cases h
+  exact data
+
+@[simp] theorem ClosedSubmanifoldData.cast_carrier {n : ℕ} {X : Type*} {k k' : ℕ}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X]
+    (h : k = k') (data : ClosedSubmanifoldData n X k) :
+    (ClosedSubmanifoldData.cast (n := n) (X := X) (k := k) (k' := k') h data).carrier =
+      data.carrier := by
+  cases h
+  rfl
+
 /-- Convert closed submanifold data to oriented rectifiable set data.
     The key point: boundary_carrier = ∅ and boundary_measure = 0. -/
 noncomputable def ClosedSubmanifoldData.toOrientedData {n : ℕ} {X : Type*} {k : ℕ}
@@ -1753,8 +1773,11 @@ theorem support_closedSubmanifoldCurrent_subset {n : ℕ} {X : Type*} {k : ℕ}
 
 /-- **Closed submanifold Stokes data** for a concrete carrier `Z`.
 
-This packages a `ClosedSubmanifoldData` instance whose carrier is `Z`,
-so integration currents can be built without falling back to `0`. -/
+Compatibility-only wrapper: this packages a `ClosedSubmanifoldData` instance whose
+carrier is `Z`, so older call sites can pass a set and a typeclass instance.
+
+**Proof-track guidance**: prefer `ClosedSubmanifoldData` directly and thread it
+explicitly through integration/Stokes arguments. -/
 class ClosedSubmanifoldStokesData (n : ℕ) (X : Type*) (k : ℕ) (Z : Set X)
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
@@ -1762,6 +1785,7 @@ class ClosedSubmanifoldStokesData (n : ℕ) (X : Type*) (k : ℕ) (Z : Set X)
   data : ClosedSubmanifoldData n X k
   carrier_eq : data.carrier = Z
 
+/-- Compatibility-only constructor for `ClosedSubmanifoldStokesData`. -/
 noncomputable def ClosedSubmanifoldStokesData.ofData {n : ℕ} {X : Type*} {k : ℕ}
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]
@@ -1770,6 +1794,7 @@ noncomputable def ClosedSubmanifoldStokesData.ofData {n : ℕ} {X : Type*} {k : 
     ClosedSubmanifoldStokesData n X k data.carrier :=
   ⟨data, rfl⟩
 
+/-- Compatibility-only conversion to `IntegrationData` (proof-track uses `data.toIntegrationData`). -/
 noncomputable def ClosedSubmanifoldStokesData.toIntegrationData {n : ℕ} {X : Type*} {k : ℕ}
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [ProjectiveComplexManifold n X] [KahlerManifold n X]

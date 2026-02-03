@@ -3,7 +3,7 @@
 This document tracks **what remains after** the proof-track kernel report is clean:
 
 ```
-'hodge_conjecture'' depends on axioms: [propext, Classical.choice, Quot.sound]
+'hodge_conjecture_data' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
 When that happens, the project will be **Lean-kernel checked** and **sorry-free** (in the proof track),
@@ -41,4 +41,3 @@ intentional *semantic stubs* / placeholder definitions.
 1. Run `./scripts/verify_proof_track.sh` and confirm the kernel report is clean.
 2. Run `./scripts/audit_stubs.sh --full` and record the remaining placeholders.
 3. Replace placeholders **one module at a time**, keeping `lake build Hodge.Kahler.Main` green.
-

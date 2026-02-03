@@ -3167,7 +3167,7 @@ Total files: 32
    125| 
    126| /-- The current of integration along an analytic subvariety.
    127|     Reference: [H. Federer, "Geometric Measure Theory", 1969, Section 4.1]. -/
-   128| opaque integrationCurrent {p k : ℕ} (V : AnalyticSubvariety n X) (hV : V.codim = p)
+   128| opaque integrationCurrent_data {p k : ℕ} (V : AnalyticSubvariety n X) (hV : V.codim = p)
    129|     (mult : ℤ) : IntegralCurrent n X k
    130| 
    131| /-! ## Harvey-Lawson Hypothesis and Conclusion -/

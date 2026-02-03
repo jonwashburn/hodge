@@ -4,6 +4,7 @@ Released under Apache 2.0 license.
 Authors: TeX Spine Semantic Closure Implementation
 -/
 import Hodge.Classical.HarveyLawson
+import Hodge.Classical.GAGA
 import Hodge.Analytic.IntegralCurrents
 
 /-!
@@ -213,6 +214,55 @@ theorem HarveyLawsonConclusion_real.support_isAnalytic
   apply isAnalyticSet_iUnion_fin
   intro i
   exact (concl.varieties i).is_analytic
+
+/-! ### Analytic → Algebraic support bridge (Chow/GAGA) -/
+
+/-- The support is an algebraic set (via Chow/GAGA). -/
+theorem HarveyLawsonConclusion_real.support_isAlgebraic
+    [ChowGAGAData n X]
+    {T : Current n X k} (concl : HarveyLawsonConclusion_real n X k T) :
+    isAlgebraicSubvariety n X concl.support := by
+  -- Chow/GAGA: analytic sets are algebraic.
+  refine ⟨{ carrier := concl.support
+            codim := 2 * n - k
+            is_algebraic := ?_ }, rfl⟩
+  exact chow_gaga_analytic_to_algebraic (n := n) (X := X)
+    concl.support (HarveyLawsonConclusion_real.support_isAnalytic (n := n) (X := X) (k := k) concl)
+
+/-- An algebraic subvariety witness for the support (Chow/GAGA). -/
+noncomputable def HarveyLawsonConclusion_real.support_algebraic
+    [ChowGAGAData n X]
+    {T : Current n X k} (concl : HarveyLawsonConclusion_real n X k T) :
+    AlgebraicSubvariety n X :=
+  Classical.choose (HarveyLawsonConclusion_real.support_isAlgebraic (n := n) (X := X) (k := k) concl)
+
+theorem HarveyLawsonConclusion_real.support_algebraic_carrier
+    [ChowGAGAData n X]
+    {T : Current n X k} (concl : HarveyLawsonConclusion_real n X k T) :
+    (HarveyLawsonConclusion_real.support_algebraic (n := n) (X := X) (k := k) concl).carrier =
+      concl.support :=
+  Classical.choose_spec (HarveyLawsonConclusion_real.support_isAlgebraic (n := n) (X := X) (k := k) concl)
+
+/-- Closed-submanifold data for the Harvey–Lawson support, via algebraic subvariety data. -/
+noncomputable def HarveyLawsonConclusion_real.support_data
+    [ChowGAGAData n X]
+    [AlgebraicSubvarietyClosedSubmanifoldData n X]
+    {T : Current n X k} (concl : HarveyLawsonConclusion_real n X k T) :
+    ClosedSubmanifoldData n X (2 * (n - (HarveyLawsonConclusion_real.support_algebraic
+      (n := n) (X := X) (k := k) concl).codim)) :=
+  closedSubmanifoldData_ofAlgebraic (n := n) (X := X)
+    (HarveyLawsonConclusion_real.support_algebraic (n := n) (X := X) (k := k) concl)
+
+theorem HarveyLawsonConclusion_real.support_data_carrier
+    [ChowGAGAData n X]
+    [AlgebraicSubvarietyClosedSubmanifoldData n X]
+    {T : Current n X k} (concl : HarveyLawsonConclusion_real n X k T) :
+    (HarveyLawsonConclusion_real.support_data (n := n) (X := X) (k := k) concl).carrier =
+      concl.support := by
+  -- Reduce to the carrier of the chosen algebraic subvariety.
+  simpa [HarveyLawsonConclusion_real.support_data,
+    closedSubmanifoldData_ofAlgebraic_carrier,
+    HarveyLawsonConclusion_real.support_algebraic_carrier] 
 
 /-! ## Harvey-Lawson Structure Theorem
 

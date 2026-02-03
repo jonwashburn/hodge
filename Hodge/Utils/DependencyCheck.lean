@@ -3,8 +3,8 @@ import Hodge.Main
 /-!
 # Dependency Check Utility
 
-This file prints the axioms used by the main theorem `hodge_conjecture`
-and its variant `hodge_conjecture'`.
+This file prints the axioms used by the **data‑first** main theorem
+`hodge_conjecture_data` and the legacy compatibility variant `hodge_conjecture'`.
 
 ## Usage
 
@@ -15,5 +15,5 @@ the proof track only depends on standard Lean axioms:
 - `Quot.sound` (quotient soundness)
 -/
 
-#print axioms hodge_conjecture
+#print axioms hodge_conjecture_data
 #print axioms hodge_conjecture'

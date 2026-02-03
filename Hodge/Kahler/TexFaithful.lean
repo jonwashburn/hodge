@@ -19,22 +19,25 @@ SignedAlgebraicCycle.cycleClass := ofForm representingForm representingForm_clos
 
 This makes the cohomology relationship trivially true by construction.
 
-The **TeX-faithful** version here uses the geometric cycle class:
+The **TeX-faithful** version here uses the geometric cycle class. On the
+data-first track this is:
 ```
-cycleClass_geom := ofForm (FundamentalClassSet support) ...
+cycleClass_geom_data := ofForm (FundamentalClassSet_data support_data) ...
 ```
 
-And proves the bridge theorem:
+and the bridge theorem becomes:
 ```
-cycleClass_geom(Z_from_spine(γ)) = [γ]
+cycleClass_geom_data(Z_from_spine(γ)) = [γ]
 ```
+
+The set-based `cycleClass_geom` remains as a compatibility wrapper.
 
 ## Typeclass Assumptions
 
 The proof uses explicit typeclass assumptions for deep mathematical results:
 
 - `ChowGAGAData` - Chow's theorem / GAGA
-- `SpineBridgeData` - Poincaré duality: fundamental class = representing form in cohomology
+- `SpineBridgeData_data` - Poincaré duality: fundamental class = representing form in cohomology
 
 These make the mathematical assumptions explicit and transparent.
 
@@ -71,7 +74,9 @@ variable {n : ℕ} {X : Type u}
 open Hodge.TexSpine.GeometricCycleClass
 open Hodge.TexSpine.ChowGAGA
 
-/-- **TeX-Faithful Hodge Conjecture**.
+/-! ## Compatibility (Set‑Based) -/
+
+/-- **TeX‑Faithful Hodge Conjecture (set‑based compatibility)**.
 
     This version uses the geometric cycle class `cycleClass_geom` computed from the
     fundamental class of the support, not the shortcut `cycleClass := ofForm representingForm`.
@@ -87,6 +92,10 @@ open Hodge.TexSpine.ChowGAGA
     **Typeclass Assumptions**:
     - `ChowGAGAData` - Chow's theorem: analytic subvarieties are algebraic
     - `SpineBridgeData` - Fundamental class equals representing form in cohomology
+
+    **Compatibility Note**: This set‑based bridge is retained for legacy call sites.
+    Prefer the data‑first variant `hodge_conjecture_tex_faithful_data` when
+    explicit `ClosedSubmanifoldData` is available. -/
 
     **References**:
     - [Hodge, 1950] Original Hodge Conjecture
@@ -132,19 +141,79 @@ theorem hodge_conjecture_tex_faithful {p : ℕ}
   -- This follows from SpineBridgeData.fundamental_eq_representing
   unfold cycleClass_geom
   have h := SpineBridgeData.fundamental_eq_representing (n := n) (X := X) Z
-  -- h : ofForm (FundamentalClassSet ...) = ofForm Z.representingForm Z.representingForm_closed
+  -- (compatibility, set-based) h :
+  --   ofForm (FundamentalClassSet ...) = ofForm Z.representingForm Z.representingForm_closed
   -- Goal: ofForm (FundamentalClassSet ...) = ofForm γ h_closed
   -- Z.representingForm = γ, so use proof irrelevance
   rw [h]
+
+/-- **TeX-Faithful Hodge Conjecture (Data-First Spine)**.
+
+    This variant threads explicit `ClosedSubmanifoldData` through the spine bridge
+    and yields the data-first geometric class `cycleClass_geom_data`.
+    It is the preferred formulation when support data is available, and it
+    forces the PD form to come from the current-regularization pipeline
+    (`PoincareDualFormFromCurrentData`). -/
+/-! ## Data‑First (Preferred) -/
+
+theorem hodge_conjecture_tex_faithful_data {p : ℕ}
+    [MetricSpace X] [BorelSpace X]
+    -- Deep typeclass assumptions (data-first bridge)
+    [ChowGAGAData n X]
+    [SpineBridgeData_data n X]
+    [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
+    [CycleClass.PoincareDualFormFromCurrentData n X p]
+    [AlgebraicSubvarietyClosedSubmanifoldData n X]
+    [SignedAlgebraicCycleSupportCodimData n X p]
+    -- Input form and hypotheses
+    (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
+    (h_rational : isRationalClass (ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :
+    ∃ (Z : SignedAlgebraicCycle n X p),
+      cycleClass_geom_data (n := n) (X := X)
+        (data := SignedAlgebraicCycle.support_data (n := n) (X := X) (p := p) Z) =
+        ofForm γ h_closed := by
+  letI : SignedAlgebraicCycleSupportData n X p :=
+    instSignedAlgebraicCycleSupportData_ofAlgebraic (n := n) (X := X) (p := p)
+  -- Use the signed decomposition
+  let sd := signed_decomposition (n := n) (X := X) γ h_closed h_p_p h_rational
+
+  -- Use tex_spine_full_data for γplus
+  obtain ⟨Zplus, hZplus_geom⟩ := tex_spine_full_data
+    (n := n) (X := X) sd.γplus sd.h_plus_closed sd.h_plus_rat sd.h_plus_cone
+
+  -- Use tex_spine_full_data for γminus
+  obtain ⟨Zminus, hZminus_geom⟩ := tex_spine_full_data
+    (n := n) (X := X) sd.γminus sd.h_minus_closed sd.h_minus_rat sd.h_minus_cone
+
+  -- Build the combined signed cycle for γ = γplus - γminus
+  let Z_pos := Zplus.pos ∪ Zminus.neg
+  let Z_neg := Zplus.neg ∪ Zminus.pos
+  let Z_pos_alg := isAlgebraicSubvariety_union Zplus.pos_alg Zminus.neg_alg
+  let Z_neg_alg := isAlgebraicSubvariety_union Zplus.neg_alg Zminus.pos_alg
+  let Z : SignedAlgebraicCycle n X p := {
+    pos := Z_pos,
+    neg := Z_neg,
+    pos_alg := Z_pos_alg,
+    neg_alg := Z_neg_alg,
+    representingForm := γ,
+    representingForm_closed := h_closed,
+  }
+
+  use Z
+  -- Data-first bridge: cycleClass_geom_data = ofForm representingForm
+  have hbridge := SpineBridgeData_data.fundamental_eq_representing (n := n) (X := X) (Z := Z)
+  simpa [hbridge]
 
 /-- **Corollary**: The TeX-faithful proof implies the main theorem's conclusion.
 
     Both versions produce cycles that represent the cohomology class of γ.
     The difference is HOW the cycle class is computed:
     - Main proof: cycleClass := ofForm representingForm (definitional)
-    - TeX-faithful: cycleClass_geom := ofForm (FundamentalClassSet support) (geometric)
+    - TeX-faithful (set-based): cycleClass_geom := ofForm (FundamentalClassSet support) (geometric)
+    - TeX-faithful (data-first): cycleClass_geom_data := ofForm (FundamentalClassSet_data support_data)
 
-    This corollary shows they agree for spine-produced cycles. -/
+    This corollary shows they agree for spine-produced cycles. The data-first variant
+    `tex_faithful_implies_main_data` is preferred on the proof track. -/
 theorem tex_faithful_implies_main {p : ℕ}
     [ChowGAGAData n X] [SpineBridgeData n X]
     (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
@@ -156,7 +225,8 @@ theorem tex_faithful_implies_main {p : ℕ}
   -- Z.RepresentsClass means Z.cycleClass = ofForm γ h_closed
   unfold SignedAlgebraicCycle.RepresentsClass
   -- hZ_geom : cycleClass_geom Z = ofForm γ h_closed
-  -- cycleClass_geom Z is defined as ofForm (FundamentalClassSet support') _
+  -- (compatibility, set-based) cycleClass_geom Z is defined as
+  --   ofForm (FundamentalClassSet support') _
   -- SpineBridgeData.fundamental_eq_representing gives:
   --   ofForm (FundamentalClassSet support') _ = ofForm Z.representingForm _
   -- Z.cycleClass = ofForm Z.representingForm _ (by cycleClass_eq_representingForm)
@@ -169,10 +239,36 @@ theorem tex_faithful_implies_main {p : ℕ}
   have hBridge := SpineBridgeData.fundamental_eq_representing (n := n) (X := X) Z
   -- hBridge : ofForm (FundamentalClassSet ...) ... = ofForm Z.representingForm ...
   -- hZ_geom : cycleClass_geom Z = ofForm γ h_closed
-  -- cycleClass_geom Z = ofForm (FundamentalClassSet ...) ... (by definition)
+  -- cycleClass_geom Z = ofForm (FundamentalClassSet ...) ... (compatibility definition)
   calc ofForm Z.representingForm Z.representingForm_closed
       = ofForm (FundamentalClassSet n X p (support' Z)) _ := hBridge.symm
     _ = cycleClass_geom Z := rfl
+    _ = ofForm γ h_closed := hZ_geom
+
+/-- **Data-first corollary**: TeX-faithful data-first proof implies the main conclusion. -/
+theorem tex_faithful_implies_main_data {p : ℕ}
+    [MetricSpace X] [BorelSpace X]
+    [ChowGAGAData n X] [SpineBridgeData_data n X]
+    [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
+    [CycleClass.PoincareDualFormFromCurrentData n X p]
+    [AlgebraicSubvarietyClosedSubmanifoldData n X]
+    [SignedAlgebraicCycleSupportCodimData n X p]
+    (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
+    (h_rational : isRationalClass (ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :
+    ∃ (Z : SignedAlgebraicCycle n X p), Z.RepresentsClass (ofForm γ h_closed) := by
+  letI : SignedAlgebraicCycleSupportData n X p :=
+    instSignedAlgebraicCycleSupportData_ofAlgebraic (n := n) (X := X) (p := p)
+  obtain ⟨Z, hZ_geom⟩ :=
+    hodge_conjecture_tex_faithful_data (n := n) (X := X)
+      γ h_closed h_rational h_p_p
+  use Z
+  unfold SignedAlgebraicCycle.RepresentsClass
+  rw [Z.cycleClass_eq_representingForm]
+  have hBridge := SpineBridgeData_data.fundamental_eq_representing
+    (n := n) (X := X) (p := p) (Z := Z)
+  calc ofForm Z.representingForm Z.representingForm_closed
+      = cycleClass_geom_data (n := n) (X := X)
+          (data := SignedAlgebraicCycle.support_data (n := n) (X := X) (p := p) Z) := hBridge.symm
     _ = ofForm γ h_closed := hZ_geom
 
 end Hodge.TexFaithful

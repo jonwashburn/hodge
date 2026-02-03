@@ -59,7 +59,8 @@ structure SubmanifoldIntegrationData (n : ℕ) (X : Type u)
     |integral p ω Z| ≤ (measure2p p Z).toReal * ‖ω‖
   /-- **Stokes' theorem for this integration theory**: exact forms integrate to zero on closed sets.
 
-  This is the key GMT input behind `StokesTheoremData.universal` in `Currents.lean`.
+  This is the key GMT input behind the data‑first Stokes bounds in `Currents.lean`
+  (legacy `StokesTheoremData` is no longer used on the proof track).
 
   We phrase it in a way that matches the `integrateDegree2p` dispatcher:
   when `k+1` is even and `k+1 = 2*p`, the casted exterior derivative integrates to zero.

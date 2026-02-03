@@ -9,12 +9,17 @@ The full proof logic is contained in `Hodge/Kahler/Main.lean`.
 
 ## Two Versions
 
-1. **`hodge_conjecture`** (TeX-faithful): Uses geometric cycle class `cycleClass_geom`
-   computed from the fundamental class of the support, together with an explicit
-   bridge assumption `SpineBridgeData`.
+1. **`hodge_conjecture_data`** (TeX-faithful, data-first): Uses the *geometric* cycle
+   class computed from explicit `ClosedSubmanifoldData` and forces the PD form to
+   come from `integrationCurrent_data` via regularization.
 
 2. **`hodge_conjecture_kernel`** (kernel-only): Uses definitional shortcut
    `cycleClass := ofForm representingForm`. No custom axioms, but not TeX-faithful.
+
+## Compatibility Section
+
+The set-based `hodge_conjecture` is kept only for legacy call sites; the proof track
+should prefer `hodge_conjecture_data`.
 -/
 
 noncomputable section
@@ -29,26 +34,49 @@ variable {n : ℕ} {X : Type*}
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
   [MeasurableSpace X] [BorelSpace X] [Nonempty X]
 
-/-- **The Hodge Conjecture** (Hodge, 1950; Millennium Prize Problem).
+/-- **The Hodge Conjecture (Data‑First)** (Hodge, 1950; Millennium Prize Problem).
 
     For a smooth projective complex algebraic variety X, every rational Hodge class
     is algebraic (i.e., the GEOMETRIC cycle class equals the cohomology class).
 
-    **TeX-Faithful**: Uses `cycleClass_geom` defined from the support (fundamental class),
-    and a bridge assumption `SpineBridgeData` relating that geometric class to the carried
+    **TeX-Faithful (data-first)**: Uses the geometric cycle class computed from
+    explicit `ClosedSubmanifoldData`, and a data-first bridge assumption
+    `SpineBridgeData_data` relating the fundamental class to the carried
     `representingForm` class.
 
-    **Phase 7 Update (2026-02-01)**: `cycleClass_geom` is now the REAL geometric class
-    from `FundamentalClassSet(support)`. Requires:
-    - `PoincareDualFormExists` for fundamental class construction
-    - `SpineBridgeData` for the bridge theorem
+    **Phase 7 Update (2026-02-01)**: the proof track uses the **data‑first**
+    fundamental class `FundamentalClassSet_data(support_data)`. Requires:
+    - `PoincareDualFormFromCurrentData` for the PD form (current → regularize)
+    - `SpineBridgeData_data` for the bridge theorem
 
     **Mathematical Content**:
     - The cycle Z is constructed via SYR → Harvey-Lawson → GAGA
-    - Its geometric cycle class (from FundamentalClassSet) equals [γ] in cohomology
+    - Its geometric cycle class (from `FundamentalClassSet_data`) equals [γ] in cohomology
     - The bridge theorem connects the fundamental class to the representing form
 
-    See `hodge_conjecture_kernel` for the equivalent kernel-only version. -/
+    See `hodge_conjecture_kernel` for the kernel-only version. -/
+theorem hodge_conjecture_data {p : ℕ}
+    [AutomaticSYRData n X]
+    [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
+    [CycleClass.PoincareDualFormFromCurrentData n X p]
+    [AlgebraicSubvarietyClosedSubmanifoldData n X]
+    [SignedAlgebraicCycleSupportCodimData n X p]
+    [SpineBridgeData_data n X p]
+    [CalibratedCurrentRegularityData n X (2 * (n - p))]
+    [HarveyLawsonKingData n X (2 * (n - p))]
+    [ChowGAGAData n X]
+    (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
+    (h_rational : isRationalClass (ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :
+    ∃ (Z : SignedAlgebraicCycle n X p), Z.cycleClass_geom_data = ofForm γ h_closed :=
+  hodge_conjecture'_data γ h_closed h_rational h_p_p
+
+/-! ## Compatibility (Set‑Based) -/
+
+/-- **The Hodge Conjecture** (set‑based compatibility wrapper).
+
+    This theorem keeps the legacy set‑based `cycleClass_geom` interface for
+    external call sites. It is not the preferred proof‑track entry point.
+    Use `hodge_conjecture_data` for the data‑first pipeline. -/
 theorem hodge_conjecture {p : ℕ}
     [AutomaticSYRData n X]
     [CycleClass.PoincareDualFormExists n X p] [SpineBridgeData n X p]

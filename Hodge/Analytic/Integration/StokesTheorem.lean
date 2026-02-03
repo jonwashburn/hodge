@@ -121,8 +121,10 @@ Currently kept as documentation (no semantic stub theorem). -/
 ## Summary
 
 ### Notes
-- The Stokes statements in this file are currently documentation-only placeholders.
-- `cohomologyIntegral` is now an explicit data interface, pending a real Stokes proof.
+- The **global** Stokes statements in this file are still documentation-only placeholders.
+- The **data‑first** closed‑submanifold Stokes lemma is implemented below
+  (`closedSubmanifold_integral_extDeriv_eq_zero`) and is used by the proof track.
+- `cohomologyIntegral` is now an explicit data interface, pending a real global Stokes proof.
 
 ### Note on Current Status:
 The integration layer now exists (data-based), but Stokes is still not
@@ -149,7 +151,7 @@ universe u
 variable {n : ℕ} {X : Type u}
   [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-  [ProjectiveComplexManifold n X] [KahlerManifold n X]
+  [ProjectiveComplexManifold n X] [Hodge.KahlerManifold n X]
   [MeasurableSpace X] [BorelSpace X] [Nonempty X]
 
 /-!

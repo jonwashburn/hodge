@@ -107,6 +107,38 @@ structure AnalyticSubvariety (n : ℕ) (X : Type*)
 instance : CoeTC (AnalyticSubvariety n X) (Set X) where
   coe := AnalyticSubvariety.carrier
 
+/-! ### Data-first closed-submanifold data for analytic subvarieties -/
+
+/-- **Closed-submanifold data for analytic subvarieties** (data-first interface).
+
+This packages a genuine `ClosedSubmanifoldData` object for each analytic subvariety,
+including its carrier, orientation, Hausdorff measure, and Stokes data.
+
+**Proof-track guidance**: prefer this interface when constructing integration currents
+or Poincaré dual forms. -/
+class AnalyticSubvarietyClosedSubmanifoldData (n : ℕ) (X : Type*)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X] where
+  data_of : (V : AnalyticSubvariety n X) →
+    ClosedSubmanifoldData n X (2 * (n - (AnalyticSubvariety.codim V)))
+  carrier_eq : ∀ V, (data_of V).carrier = V.carrier
+
+/-- Extract the closed-submanifold data from the analytic subvariety interface. -/
+noncomputable def closedSubmanifoldData_ofAnalytic
+    [AnalyticSubvarietyClosedSubmanifoldData n X]
+    (V : AnalyticSubvariety n X) :
+    ClosedSubmanifoldData n X (2 * (n - V.codim)) :=
+  AnalyticSubvarietyClosedSubmanifoldData.data_of (n := n) (X := X) V
+
+/-- The extracted data has the correct carrier. -/
+theorem closedSubmanifoldData_ofAnalytic_carrier
+    [AnalyticSubvarietyClosedSubmanifoldData n X]
+    (V : AnalyticSubvariety n X) :
+    (closedSubmanifoldData_ofAnalytic (n := n) (X := X) V).carrier = V.carrier :=
+  AnalyticSubvarietyClosedSubmanifoldData.carrier_eq (n := n) (X := X) V
+
 /-- The hypothesis structure for the Harvey-Lawson theorem. -/
 structure HarveyLawsonHypothesis (n : ℕ) (X : Type*) (k : ℕ)
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]

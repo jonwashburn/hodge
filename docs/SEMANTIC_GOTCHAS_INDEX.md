@@ -8,29 +8,39 @@ The intent is to make it easy for the integrator (and bounded agents) to find an
 
 ## A. Cycle class / fundamental class
 
-- **`SignedAlgebraicCycle.cycleClass_geom` is NOW CORRECT (Phase 7, 2026-02-01)**
+- **`SignedAlgebraicCycle.cycleClass_geom_data` is NOW CORRECT (Phase 7, 2026-02-01)**
   - Status: ✅ FIXED
   - Location: `Hodge/Classical/GAGA.lean:522-555`
-  - Change: `cycleClass_geom` is now defined using `FundamentalClassSet(Z.support')`, NOT as `Z.cycleClass`.
-  - The proof in `hodge_conjecture'` now uses `SpineBridgeData.fundamental_eq_representing` (not `rfl`).
+  - Change: `cycleClass_geom_data` is defined using `FundamentalClassSet_data(support_data)`, NOT as `Z.cycleClass`.
+  - The proof spine uses `SpineBridgeData_data` (data‑first), not `rfl`.
   - **REMAINING**: The theorem `hodge_conjecture'` requires typeclass parameters:
-    - `[CycleClass.PoincareDualFormExists n X p]` - Poincaré dual form existence
-    - `[SpineBridgeData n X p]` - Bridge between geometric class and representing form
+    - `[CycleClass.PoincareDualFormFromCurrentData n X p]` - Poincaré dual form from integration current
+    - `[SpineBridgeData_data n X]` - Bridge between geometric class and representing form
   - These encode **real mathematical content** that requires de Rham representability + Harvey-Lawson.
 
-- **`FundamentalClassSet` requires `PoincareDualFormExists`**
-  - Location: `Hodge/Classical/GAGA.lean:282-289` (`FundamentalClassSet`)
-  - Location: `Hodge/Classical/CycleClass.lean:103-108` (`CycleClass.PoincareDualFormExists`)
+- **`FundamentalClassSet_data` requires `PoincareDualFormFromCurrentData`**
+  - Location: `Hodge/Classical/GAGA.lean:337-370` (`FundamentalClassSet_data`)
+  - Location: `Hodge/Classical/CycleClass.lean:330-410` (`CycleClass.PoincareDualFormFromCurrentData`)
   - Status: The interface is correct; no `.universal` stub exists.
   - `PoincareDualFormData` no longer carries stub fields (`nonzero_possible`, `geometric_characterization`).
+  - **Data-first update**: `poincareDualForm_data` is **definitionally** the regularization of
+    `integrationCurrent_data`. The set-based `PoincareDualFormExists` remains only as a compatibility wrapper.
+  - **Subvariety data-first bridge**: analytic/algebraic subvarieties now have
+    explicit interfaces (`AnalyticSubvarietyClosedSubmanifoldData`,
+    `AlgebraicSubvarietyClosedSubmanifoldData`) producing `ClosedSubmanifoldData`.
+  - **Signed cycle support data**: `SignedAlgebraicCycleSupportData` provides
+    `ClosedSubmanifoldData` for the support of a signed algebraic cycle, enabling
+    data‑first `cycleClass_geom_data` and `SpineBridgeData_data`.
   - **REMAINING**: Need to provide global instances by proving:
     1. De Rham representability theorem (every closed current is cohomologous to a smooth form)
     2. Harvey-Lawson bridge theorem (for calibrated currents, the form equals the calibration)
   - These are deep results not in Mathlib - would need to be built from scratch.
-- **`PoincareDualFormExists` currently uses a Kähler-power placeholder for arbitrary sets**
+- **`PoincareDualFormExists` (set‑based) still uses a Kähler‑power placeholder**
   - Location: `Hodge/Classical/CycleClass.lean:140-210` (`omegaPower` + `poincareDualFormData_of_set`)
-  - Status: The placeholder is nonzero but **not** the true Poincaré dual of an arbitrary set.
+  - Status: Compatibility‑only; not used on the data‑first proof spine.
   - **REMAINING**: Replace with real integration-current construction and de Rham representability.
+  - **Note**: the data-first PD interface still awaits a real construction; it simply
+    moves the assumption to explicit `ClosedSubmanifoldData`.
 
 ---
 
@@ -148,8 +158,8 @@ This change is deep and will require a staged migration (new `FiberAltR` / `Smoo
   - `regularizeCurrentToForm` is now an explicit data interface
     (`CurrentRegularizationData`), not a zero-form stub.
   - `ClosedSubmanifoldStokesData` is now a data wrapper around `ClosedSubmanifoldData`
-    (in `Hodge/Analytic/Currents.lean`), and `integrationCurrent` requires it
-    instead of falling back to zero.
+    (in `Hodge/Analytic/Currents.lean`), and the proof‑track uses `integrationCurrent_data`
+    (explicit `ClosedSubmanifoldData`) rather than wrapper‑based `integrationCurrent`.
 
 ---
 

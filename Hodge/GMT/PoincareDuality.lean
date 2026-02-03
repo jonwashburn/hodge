@@ -106,7 +106,9 @@ noncomputable def poincareDualForm_construct_fromCurrentData {n : ℕ} {X : Type
   regularizeCurrentToForm (n := n) (X := X) (k := 2 * p)
     (integrationCurrent_data (n := n) (X := X) p data)
 
-/-- Same constructor, but using a `ClosedSubmanifoldStokesData` instance for a carrier set. -/
+/-- Same constructor, but using a `ClosedSubmanifoldStokesData` instance for a carrier set.
+
+Compatibility-only: prefer `poincareDualForm_construct_fromCurrentData` with explicit data. -/
 noncomputable def poincareDualForm_construct_fromCurrent {n : ℕ} {X : Type*} {p : ℕ}
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
@@ -136,7 +138,7 @@ variable {n : ℕ} {X : Type u}
   [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
   [MeasurableSpace X] [BorelSpace X]
 
-/-- A cohomology class associated to a set `Z`, using the *current proof-track* PD-form interface.
+/-- A cohomology class associated to a set `Z`, using the *current* set-based PD-form interface.
 
 This uses the `CycleClass.poincareDualForm` interface (which provides closedness), so it
 produces a well-typed de Rham class.
@@ -144,9 +146,19 @@ produces a well-typed de Rham class.
 **Mathematical Content**: This is the cycle class `[Z] ∈ H^{2p}(X, ℝ)`.
 
 **Implementation**: Uses `ofForm` with the PD form and its closedness proof. -/
+-- Compatibility wrapper: prefer `gmt_cycle_to_cohomology_path_data` with
+-- explicit `ClosedSubmanifoldData` when available.
 noncomputable def gmt_cycle_to_cohomology_path (p : ℕ) [CycleClass.PoincareDualFormExists n X p] (Z : Set X) :
     DeRhamCohomologyClass n X (2 * p) :=
   Hodge.ofForm (CycleClass.poincareDualForm n X p Z) (CycleClass.poincareDualForm_isClosed n X p Z)
+
+/-- Data-first cohomology class associated to explicit `ClosedSubmanifoldData`. -/
+noncomputable def gmt_cycle_to_cohomology_path_data (p : ℕ)
+    [CycleClass.PoincareDualFormFromCurrentData n X p]
+    (data : ClosedSubmanifoldData n X (2 * p)) :
+    DeRhamCohomologyClass n X (2 * p) :=
+  Hodge.ofForm (CycleClass.poincareDualForm_data n X p data)
+    (CycleClass.poincareDualForm_data_isClosed n X p data)
 
 /-- The cycle class of the empty set is the zero cohomology class. -/
 theorem gmt_cycle_to_cohomology_empty (p : ℕ) [CycleClass.PoincareDualFormExists n X p] :
@@ -155,6 +167,18 @@ theorem gmt_cycle_to_cohomology_empty (p : ℕ) [CycleClass.PoincareDualFormExis
   unfold gmt_cycle_to_cohomology_path
   congr 1
   exact CycleClass.poincareDualForm_empty n X p
+
+/-! ### Data-first empty-set compatibility -/
+
+theorem gmt_cycle_to_cohomology_empty_data (p : ℕ)
+    [CycleClass.PoincareDualFormFromCurrentData n X p]
+    (data : ClosedSubmanifoldData n X (2 * p)) (h : data.carrier = ∅) :
+    gmt_cycle_to_cohomology_path_data (n := n) (X := X) p data =
+      Hodge.ofForm 0 (isFormClosed_zero (n := n) (X := X) (k := 2 * p)) := by
+  unfold gmt_cycle_to_cohomology_path_data
+  -- Reduce to the empty-carrier property from the data-first PD form interface.
+  congr 1
+  exact CycleClass.poincareDualForm_data_empty n X p data h
 
 /-! ## The Full Poincaré Duality Pipeline (Documentation)
 
@@ -170,16 +194,17 @@ cohomology classes. This is the "M4 bridge" that connects:
 
 | Step | Status | Implementation |
 |------|--------|---------------|
-| Z → [Z] (current) | ✅ Real | `integrationCurrent` via `ClosedSubmanifoldData` / `hausdorffIntegrate` |
+| Z → [Z] (current) | ✅ Real | `integrationCurrent_data` via `ClosedSubmanifoldData` / `hausdorffIntegrate` |
 | [Z] → η_Z (form) | ⚠️ Interface | `regularizeCurrentToForm` (explicit data, no stub) |
 | η_Z → [η_Z] (class) | ✅ Real | `ofForm` with closedness proof |
 | Direct: Z → [Z] | ✅ Placeholder | `poincareDualForm` (Kähler powers) |
 
 ### Mathematical Validation
 
-The current bridge relies on the **explicit existence interface**
-`PoincareDualFormExists`. There is **no** universal construction in the codebase;
-any concrete instance must provide a genuine Poincaré dual form.
+The data-first bridge now defines `poincareDualForm_data` **explicitly** as
+regularization of the integration current. Closedness/empty-carrier properties
+are tracked via `PoincareDualFormFromCurrentData`. The set-based interface
+`PoincareDualFormExists` remains a compatibility layer for legacy call sites.
 
 This keeps the proof track honest while the regularization machinery is under
 development.

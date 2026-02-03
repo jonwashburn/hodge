@@ -1,6 +1,7 @@
 import Hodge.GMT.Current
 import Hodge.Analytic.Currents
 import Hodge.Analytic.Integration.HausdorffMeasure
+import Hodge.Analytic.Integration.StokesTheorem
 
 /-!
 # GMT: Integration Currents
@@ -30,7 +31,7 @@ where the integral is with respect to the 2p-dimensional Hausdorff measure.
 
 - `integrationCurrentReal_data`: the data‑first integration current constructor
 - `integrationCurrent_data`: codimension‑parameterized data‑first constructor
-- `integrationCurrentReal` / `integrationCurrent`: legacy wrappers (compatibility only)
+- `integrationCurrentReal` / `integrationCurrent`: legacy wrappers (compatibility only; do not use on proof track)
 
 ## Connection to Cohomology
 
@@ -75,10 +76,12 @@ noncomputable def integrationCurrentReal_data (k : ℕ)
     (data : ClosedSubmanifoldData n X k) : DeRhamCurrent n X k :=
   data.toIntegrationData.toCurrent
 
-/-- **Real Integration Current** (compatibility wrapper; prefer `*_data`).
+/-- **Real Integration Current** (compatibility-only wrapper; prefer `*_data`).
 
     For a set `Z` with Stokes data, this produces a `Current` that genuinely
-    integrates forms over `Z` using the Hausdorff measure infrastructure. -/
+    integrates forms over `Z` using the Hausdorff measure infrastructure.
+
+    **Proof-track guidance**: do not use this in new lemmas; pass `ClosedSubmanifoldData` directly. -/
 noncomputable def integrationCurrentReal (k : ℕ) (Z : Set X)
     [ClosedSubmanifoldStokesData n X k Z] : DeRhamCurrent n X k :=
   integrationCurrentReal_data (n := n) (X := X) k
@@ -89,12 +92,12 @@ noncomputable def integrationCurrentK_data (k : ℕ)
     (data : ClosedSubmanifoldData n X k) : DeRhamCurrent n X k :=
   integrationCurrentReal_data (n := n) (X := X) k data
 
-/-- Integration current in degree `k` over a set `Z` (compatibility wrapper; prefer `*_data`). -/
+/-- Integration current in degree `k` over a set `Z` (compatibility-only wrapper; prefer `*_data`). -/
 noncomputable def integrationCurrentK (k : ℕ) (Z : Set X)
     [ClosedSubmanifoldStokesData n X k Z] : DeRhamCurrent n X k :=
   integrationCurrentReal (n := n) (X := X) k Z
 
-/-- Integration current with Stokes data (compatibility wrapper; prefer `*_data`). -/
+/-- Integration current with Stokes data (compatibility-only wrapper; prefer `*_data`). -/
 noncomputable def integrationCurrentWithStokes (k : ℕ) (Z : Set X)
     [ClosedSubmanifoldStokesData n X k Z] : DeRhamCurrent n X k :=
   integrationCurrentReal (n := n) (X := X) k Z
@@ -109,7 +112,8 @@ noncomputable def integrationCurrent_data (p : ℕ)
     (data : ClosedSubmanifoldData n X (2 * p)) : DeRhamCurrent n X (2 * p) :=
   integrationCurrentK_data (n := n) (X := X) (k := 2 * p) data
 
-/-- Integration current for a codimension parameter `p` (compatibility wrapper; prefer `*_data`). -/
+/-- Integration current for a codimension parameter `p`
+    (compatibility-only wrapper; prefer `*_data`). -/
 noncomputable def integrationCurrent (p : ℕ) (Z : Set X)
     [ClosedSubmanifoldStokesData n X (2 * p) Z] : DeRhamCurrent n X (2 * p) :=
   integrationCurrentK (n := n) (X := X) (k := 2 * p) Z
@@ -123,7 +127,10 @@ theorem integrationCurrentK_linear_data (k : ℕ) (c : ℝ)
   simpa [DeRhamCurrent] using
     (Hodge.GMT.current_eval_linear (T := integrationCurrentK_data (n := n) (X := X) k data) c ω₁ ω₂)
 
-/-- Linearity of the integration current evaluation (degree-`k` form, wrapper). -/
+/-- Linearity of the integration current evaluation (degree-`k` form, wrapper).
+
+Compatibility-only: prefer `integrationCurrentK_linear_data` with explicit
+`ClosedSubmanifoldData`. -/
 theorem integrationCurrentK_linear (k : ℕ) (Z : Set X) (c : ℝ)
     [ClosedSubmanifoldStokesData n X k Z]
     (ω₁ ω₂ : SmoothForm n X k) :
@@ -144,7 +151,9 @@ theorem integrationCurrent_linear_data (p : ℕ) (c : ℝ)
   simpa [DeRhamCurrent] using
     (Hodge.GMT.current_eval_linear (T := integrationCurrent_data (n := n) (X := X) p data) c ω₁ ω₂)
 
-/-- Linearity of the integration current evaluation (wrapper). -/
+/-- Linearity of the integration current evaluation (wrapper).
+
+Compatibility-only: prefer `integrationCurrent_linear_data`. -/
 theorem integrationCurrent_linear (p : ℕ) (Z : Set X) (c : ℝ)
     [ClosedSubmanifoldStokesData n X (2 * p) Z]
     (ω₁ ω₂ : SmoothForm n X (2 * p)) :
@@ -164,6 +173,7 @@ theorem integrationCurrentReal_data_toFun_eq (k : ℕ)
       data.toIntegrationData.integrate ω := by
   rfl
 
+/- Compatibility-only: prefer `integrationCurrentReal_data_toFun_eq`. -/
 theorem integrationCurrentReal_toFun_eq (k : ℕ) (Z : Set X)
     [ClosedSubmanifoldStokesData n X k Z] (ω : SmoothForm n X k) :
     (integrationCurrentReal (n := n) (X := X) k Z).toFun ω =
@@ -188,17 +198,12 @@ This is the foundation for the cycle class map `Z ↦ [Z]`. -/
 theorem integration_descends_to_cohomology_data (k : ℕ)
     (data : ClosedSubmanifoldData n X (k + 1)) (η : SmoothForm n X k) :
     (integrationCurrentReal_data (n := n) (X := X) (k + 1) data).toFun (smoothExtDeriv η) = 0 := by
-  -- Use the Stokes bound from the closed-submanifold integration data.
-  let dataI := data.toIntegrationData
-  have h := dataI.stokes_bound (k' := k) rfl η
-  -- Since bdryMass = 0 for closed submanifolds, the bound forces the integral to be 0.
-  have hbdry : dataI.bdryMass = 0 := by
-    simp [dataI, ClosedSubmanifoldData.toIntegrationData]
-  have h0 :
-      |dataI.integrate (smoothExtDeriv η)| ≤ 0 := by
-    simpa [hbdry, MulZeroClass.zero_mul] using h
-  exact abs_nonpos_iff.mp h0
+  -- Use the data-first Stokes lemma specialized to closed submanifold data.
+  simpa [integrationCurrentReal_data_toFun_eq] using
+    (StokesTheorem.closedSubmanifold_integral_extDeriv_eq_zero (n := n) (X := X)
+      (data := data) (ω := η))
 
+/-- Compatibility-only wrapper: prefer `integration_descends_to_cohomology_data`. -/
 theorem integration_descends_to_cohomology (k : ℕ) (Z : Set X)
     [ClosedSubmanifoldStokesData n X (k + 1) Z]
     (η : SmoothForm n X k) :

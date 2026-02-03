@@ -96,8 +96,8 @@ and makes “boundary” definitional:
 
 Stage 2 wants “integration currents” to be actual integrals over submanifolds, and Stage 3 wants Stokes to be a theorem. Concretely:
 
-- define `integrationCurrent Z : Current`
-- prove `∂[Z] = [∂Z]`
+- define `integrationCurrent_data : ClosedSubmanifoldData → Current`
+- prove `∂[Z] = [∂Z]` (data‑first)
 - for closed `Z`, deduce `∂[Z] = 0`
 
 The current repo still relies on the `SubmanifoldIntegration` interface (a class of axioms) to get Stokes-like statements. That must be deleted/replaced by real theorems during Stages 2–3.
@@ -168,4 +168,3 @@ Keep the existing `CalibratingForm` API but migrate its theorems to the new curr
   - `Hodge/Analytic/TestForms.lean`
 
 The remaining work in Stages 3–4 is large and will require dedicated development and (likely) upstream Mathlib contributions for LF topologies and current/rectifiability infrastructure.
-
