@@ -102,8 +102,9 @@ even though it compiles.
   - `poincareDualForm_construct` now uses the explicit data-based constructor (wrapper retained).
 - **L² vs wedge compatibility**:
   - `Hodge/Analytic/Integration/Compatibility.lean` now defines
-    `L2InnerWedgeCompatibilityData` plus the bridge lemma
-    `L2Inner_wedge_eq_L2Inner_measure` (assumption‑based, no stubs).
+    `L2InnerWedgeCompatibilityData` plus bridge lemmas
+    `L2Inner_wedge_eq_L2Inner_measure` and
+    `L2Inner_wedge_eq_L2Inner` (assumption‑based, no stubs).
 - **Data-first tightening (Stokes/GMT)**:
   - `Hodge/GMT/GMTTests.lean` switched to `ClosedSubmanifoldData`-based constructors.
   - Stale `setIntegral` references removed from `Hodge/GMT/PoincareDuality.lean`

@@ -251,6 +251,25 @@ class KahlerMeasureCompatibilityData (n : ℕ) (X : Type u)
   submanifold : SubmanifoldIntegrationData n X
   measure2p_eq_kahler : submanifold.measure2p n = kahlerMeasure (n := n) (X := X)
 
+/-! ### Concrete compatibility constructor -/
+
+/-- Build `KahlerVolumeMeasureData` by choosing the top-dimensional Hausdorff measure
+from explicit submanifold integration data. -/
+noncomputable def kahlerVolumeMeasureData_ofSubmanifold
+    (data : SubmanifoldIntegrationData n X) : KahlerVolumeMeasureData n X :=
+  { measure := data.measure2p n
+    finite := data.measure2p_finite n }
+
+/-- Build `KahlerMeasureCompatibilityData` from explicit submanifold integration data.
+
+This is a concrete compatibility instance: the Kähler measure is taken to be
+the top-dimensional Hausdorff measure supplied by the integration data. -/
+noncomputable def kahlerMeasureCompatibilityData_ofSubmanifold
+    (data : SubmanifoldIntegrationData n X) : KahlerMeasureCompatibilityData n X := by
+  letI : KahlerVolumeMeasureData n X :=
+    kahlerVolumeMeasureData_ofSubmanifold (n := n) (X := X) data
+  exact { submanifold := data, measure2p_eq_kahler := rfl }
+
 /-! ### Convenience accessors -/
 
 noncomputable def kahlerSubmanifoldIntegrationData [MeasurableSpace X] [BorelSpace X] [Nonempty X]
