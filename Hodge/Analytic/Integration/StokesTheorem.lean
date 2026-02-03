@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jonathan Washburn
 -/
 import Hodge.Analytic.Integration.TopFormIntegral
+import Hodge.Analytic.Currents
 import Hodge.Analytic.Forms
 
 /-!
@@ -138,3 +139,33 @@ remain axiomatized if the proof is too large.
 end StokesTheorem
 
 end
+
+/-! ## Data-first Stokes for closed submanifolds -/
+
+namespace StokesTheorem
+
+universe u
+
+variable {n : ℕ} {X : Type u}
+  [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+  [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+  [ProjectiveComplexManifold n X] [KahlerManifold n X]
+  [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+
+/-!
+For a closed submanifold, the boundary mass is zero, so the Stokes bound forces
+the integral of any exact form to vanish. This is the data-first, GMT-aligned
+version of Stokes used by the integration pillar.
+-/
+theorem closedSubmanifold_integral_extDeriv_eq_zero {k' : ℕ}
+    (data : ClosedSubmanifoldData n X (k' + 1)) (ω : SmoothForm n X k') :
+    data.toIntegrationData.integrate (smoothExtDeriv ω) = 0 := by
+  have h := data.toIntegrationData.stokes_bound (k' := k') rfl ω
+  have hbdry : data.toIntegrationData.bdryMass = 0 := by
+    simp [ClosedSubmanifoldData.toIntegrationData]
+  have h0 :
+      |data.toIntegrationData.integrate (smoothExtDeriv ω)| ≤ 0 := by
+    simpa [hbdry, MulZeroClass.zero_mul] using h
+  exact abs_nonpos_iff.mp h0
+
+end StokesTheorem

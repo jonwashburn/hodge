@@ -95,6 +95,29 @@ even though it compiles.
 - **Documentation refresh**:
   - Updated GMT/integration docstrings to reflect `ClosedSubmanifoldData`/`OrientedRectifiableSetData`
     and the removal of legacy Set-based stubs.
+- **Integration currents (data-first)**:
+  - `Hodge/GMT/IntegrationCurrent.lean` now exposes `integrationCurrentReal_data` /
+    `integrationCurrent_data` constructors that take `ClosedSubmanifoldData` explicitly.
+  - Existing `ClosedSubmanifoldStokesData`-based constructors remain only as thin wrappers.
+  - `poincareDualForm_construct` now uses the explicit data-based constructor (wrapper retained).
+- **L² vs wedge compatibility**:
+  - `Hodge/Analytic/Integration/Compatibility.lean` now defines
+    `L2InnerWedgeCompatibilityData` plus the bridge lemma
+    `L2Inner_wedge_eq_L2Inner_measure` (assumption‑based, no stubs).
+- **Data-first tightening (Stokes/GMT)**:
+  - `Hodge/GMT/GMTTests.lean` switched to `ClosedSubmanifoldData`-based constructors.
+  - Stale `setIntegral` references removed from `Hodge/GMT/PoincareDuality.lean`
+    and `Hodge/Analytic/Integration/HausdorffMeasure.lean` comments.
+- **Data-first docs (integration currents)**:
+  - `Hodge/GMT/IntegrationCurrent.lean` now explicitly documents the data-first
+    constructors as the primary interface, and marks set-based wrappers as
+    compatibility only.
+- **Data-bearing class fix (Harvey–Lawson real)**:
+  - `Hodge/Classical/HarveyLawsonReal.lean` changes `VarietyIntegrationCurrentData`
+    from `Prop` to `Type` to avoid proof-irrelevance collapsing distinct currents.
+- **Stokes pillar tightening (data-first lemma)**:
+  - `Hodge/Analytic/Integration/StokesTheorem.lean` now includes a
+    `ClosedSubmanifoldData`-based Stokes lemma showing exact forms integrate to zero.
 
 **TeX → Lean module map (proof spine):**
 

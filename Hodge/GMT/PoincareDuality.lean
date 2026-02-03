@@ -90,11 +90,23 @@ abbrev poincareDualForm_construct_cycleClass := CycleClass.poincareDualForm
 /-- Poincaré dual form constructed from the (integration current) → (regularization) pipeline.
 
 This matches the operational plan sketch:
-`regularizeCurrentToForm (integrationCurrent p Z)`.
+`regularizeCurrentToForm (integrationCurrent_data p data)`.
 
 **Round 10 Note**: The integration current is now real (via Hausdorff measure), and
 `regularizeCurrentToForm` is exposed as an explicit regularization interface.
 When regularization is implemented, this will produce the actual Poincaré dual form. -/
+noncomputable def poincareDualForm_construct_fromCurrentData {n : ℕ} {X : Type*} {p : ℕ}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [CurrentRegularizationData n X (2 * p)]
+    (data : ClosedSubmanifoldData n X (2 * p)) :
+    SmoothForm n X (2 * p) :=
+  regularizeCurrentToForm (n := n) (X := X) (k := 2 * p)
+    (integrationCurrent_data (n := n) (X := X) p data)
+
+/-- Same constructor, but using a `ClosedSubmanifoldStokesData` instance for a carrier set. -/
 noncomputable def poincareDualForm_construct_fromCurrent {n : ℕ} {X : Type*} {p : ℕ}
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
@@ -103,13 +115,13 @@ noncomputable def poincareDualForm_construct_fromCurrent {n : ℕ} {X : Type*} {
     [CurrentRegularizationData n X (2 * p)]
     (Z : Set X) [ClosedSubmanifoldStokesData n X (2 * p) Z] :
     SmoothForm n X (2 * p) :=
-  regularizeCurrentToForm (n := n) (X := X) (k := 2 * p)
-    (integrationCurrent (n := n) (X := X) p Z)
+  poincareDualForm_construct_fromCurrentData (n := n) (X := X) (p := p)
+    (data := ClosedSubmanifoldStokesData.data (n := n) (X := X) (k := 2 * p) (Z := Z))
 
 /-- Construct the Poincaré dual form via the "current → regularize" pipeline.
 
 This matches the operational plan naming (`poincareDualForm_construct`). -/
-noncomputable abbrev poincareDualForm_construct := @poincareDualForm_construct_fromCurrent
+noncomputable abbrev poincareDualForm_construct := @poincareDualForm_construct_fromCurrentData
 
 /-! ## Connection to cohomology
 
@@ -158,7 +170,7 @@ cohomology classes. This is the "M4 bridge" that connects:
 
 | Step | Status | Implementation |
 |------|--------|---------------|
-| Z → [Z] (current) | ✅ Real | `integration_current` via `setIntegral` |
+| Z → [Z] (current) | ✅ Real | `integrationCurrent` via `ClosedSubmanifoldData` / `hausdorffIntegrate` |
 | [Z] → η_Z (form) | ⚠️ Interface | `regularizeCurrentToForm` (explicit data, no stub) |
 | η_Z → [η_Z] (class) | ✅ Real | `ofForm` with closedness proof |
 | Direct: Z → [Z] | ✅ Placeholder | `poincareDualForm` (Kähler powers) |

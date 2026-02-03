@@ -77,7 +77,7 @@ class VarietyIntegrationCurrentData (n : ℕ) (X : Type*) (k : ℕ)
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [BorelSpace X] [Nonempty X] : Prop where
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X] where
   /-- Integration current of an analytic subvariety. -/
   current_of_variety : AnalyticSubvariety n X → Current n X k
 

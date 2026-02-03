@@ -65,7 +65,7 @@ This change is deep and will require a staged migration (new `FiberAltR` / `Smoo
     `volumeIntegrationData_ofMeasure` (measure-based integration of continuous functions).
   - `Hodge/Analytic/Integration/VolumeForm.lean` provides
     `volumeIntegrationData_kahlerMeasure` (Kähler-measure wrapper); finiteness now
-    comes from the `SubmanifoldIntegration.measure2p_finite` field.
+    comes from `KahlerVolumeMeasureData.finite` (explicit data).
   - Remaining: construct the *Kähler* volume measure + prove L2 properties and the ⋆–wedge relation.
   - `KahlerMetricData.trivial` removed (no zero inner-product placeholder).
   - Removed the tautological `kahlerMeasure_finite` lemma; finiteness is now an explicit

@@ -146,7 +146,7 @@ theorem integrationCurrentValue_linear {p : ℕ} (data : SubmanifoldIntegrationD
         integrationCurrentValue (n := n) (X := X) (p := p) data Z ω₂ :=
   submanifoldIntegral_linear (n := n) (X := X) (p := p) data Z c ω₁ ω₂
 
-/-! ## Round 8: Helper Lemmas for Agent 4's `setIntegral` Implementation -/
+/-! ## Helper Lemmas for Explicit Submanifold Integration -/
 
 /-- Submanifold integration is additive in the form. -/
 theorem submanifoldIntegral_add {p : ℕ} (data : SubmanifoldIntegrationData n X) (Z : Set X)
