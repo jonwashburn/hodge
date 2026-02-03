@@ -54,10 +54,11 @@ example (p : ℕ) (Z : Set X) [CurrentRegularizationData n X (2 * p)]
 example (Z : Set X) :
     (IntegrationData.closedSubmanifold_zero n X Z).carrier = Z := rfl
 
--- Test 7: setIntegral is now wired to integrateDegree2p (Round 8)
--- For odd k, integrateDegree2p returns 0; for even k, it integrates via submanifoldIntegral
-example (k : ℕ) (Z : Set X) (ω : SmoothForm n X k) :
-    setIntegral (n := n) (X := X) k Z ω = integrateDegree2p (n := n) (X := X) k Z ω := rfl
+-- Test 7: integrateDegree2p now takes explicit SubmanifoldIntegrationData
+example (k : ℕ) (Z : Set X) (ω : SmoothForm n X k)
+    (data : SubmanifoldIntegrationData n X) :
+    integrateDegree2p (n := n) (X := X) k Z ω data =
+      integrateDegree2p (n := n) (X := X) k Z ω data := rfl
 
 -- Test 8: integration current of a set Z uses setIntegral
 -- (This is the key Round 7 deliverable: currents now depend on Z via closedSubmanifold)

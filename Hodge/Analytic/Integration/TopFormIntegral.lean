@@ -53,7 +53,7 @@ variable {n : ℕ} {X : Type u}
   [MeasurableSpace X] [BorelSpace X] [Nonempty X]
 
 variable [K : KahlerManifold n X]
-variable [SubmanifoldIntegration n X]
+-- Explicit integration data (legacy SubmanifoldIntegration refactored to data object).
 
 /-! ## Real-Valued Integration of Top Forms -/
 
@@ -73,37 +73,42 @@ variable [SubmanifoldIntegration n X]
     `integrateDegree2p` over the whole manifold `Set.univ`.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
-noncomputable def topFormIntegral_real' (η : SmoothForm n X (2 * n)) : ℝ :=
-  integrateDegree2p (n := n) (X := X) (k := 2 * n) Set.univ η
+noncomputable def topFormIntegral_real' (data : SubmanifoldIntegrationData n X)
+    (η : SmoothForm n X (2 * n)) : ℝ :=
+  integrateDegree2p (n := n) (X := X) (k := 2 * n) Set.univ η data
 
 /-- **Integration is linear**.
 
     **Proof Status**: Proved via `integrateDegree2p_linear`.
 
     Reference: [Warner, "Foundations of Differentiable Manifolds", §4.8]. -/
-theorem topFormIntegral_real'_linear (c : ℝ) (η₁ η₂ : SmoothForm n X (2 * n)) :
-    topFormIntegral_real' (c • η₁ + η₂) =
-      c * topFormIntegral_real' η₁ + topFormIntegral_real' η₂ := by
+theorem topFormIntegral_real'_linear (data : SubmanifoldIntegrationData n X)
+    (c : ℝ) (η₁ η₂ : SmoothForm n X (2 * n)) :
+    topFormIntegral_real' (n := n) (X := X) data (c • η₁ + η₂) =
+      c * topFormIntegral_real' (n := n) (X := X) data η₁ +
+        topFormIntegral_real' (n := n) (X := X) data η₂ := by
   unfold topFormIntegral_real'
-  exact integrateDegree2p_linear (n := n) (X := X) (k := 2 * n) Set.univ c η₁ η₂
+  exact integrateDegree2p_linear (n := n) (X := X) (k := 2 * n) Set.univ data c η₁ η₂
 
 /-- **Integration of zero form is zero**.
 
     **Proof Status**: Proved via `integrateDegree2p_linear`.
 
     Reference: [Warner, "Foundations of Differentiable Manifolds", §4.8]. -/
-theorem topFormIntegral_real'_zero :
-    topFormIntegral_real' (0 : SmoothForm n X (2 * n)) = 0 := by
+theorem topFormIntegral_real'_zero (data : SubmanifoldIntegrationData n X) :
+    topFormIntegral_real' (n := n) (X := X) data (0 : SmoothForm n X (2 * n)) = 0 := by
   unfold topFormIntegral_real'
   -- Use the fact that integrateDegree2p is linear: ∫(0•0 + 0) = 0*∫0 + ∫0
-  have h := integrateDegree2p_linear (n := n) (X := X) (k := 2 * n) Set.univ 0 0 0
+  have h :=
+    integrateDegree2p_linear (n := n) (X := X) (k := 2 * n) Set.univ data 0 0 0
   simp only [zero_smul, zero_add, MulZeroClass.zero_mul] at h
   -- Now h : integrateDegree2p ... 0 = integrateDegree2p ... 0, which is reflexive
   -- We need to show integrateDegree2p ... 0 = 0 directly
   -- Use: 2*∫0 = ∫(1•0 + 0) = 1*∫0 + ∫0 = 2*∫0, so we need another approach
   -- Better: ∫(0•η + 0) = 0*∫η + ∫0 for any η, which gives ∫0 = ∫0
   -- Actually: ∫(0 + 0) = ∫0 + ∫0, so ∫0 = 2*∫0, hence ∫0 = 0
-  have h2 := integrateDegree2p_linear (n := n) (X := X) (k := 2 * n) Set.univ 1 0 0
+  have h2 :=
+    integrateDegree2p_linear (n := n) (X := X) (k := 2 * n) Set.univ data 1 0 0
   simp only [one_smul, add_zero, _root_.one_mul] at h2
   linarith
 
@@ -112,10 +117,12 @@ theorem topFormIntegral_real'_zero :
     **Proof Status**: Proved via linearity with c=1.
 
     Reference: [Warner, "Foundations of Differentiable Manifolds", §4.8]. -/
-theorem topFormIntegral_real'_add (η₁ η₂ : SmoothForm n X (2 * n)) :
-    topFormIntegral_real' (η₁ + η₂) =
-      topFormIntegral_real' η₁ + topFormIntegral_real' η₂ := by
-  have h := topFormIntegral_real'_linear (n := n) (X := X) 1 η₁ η₂
+theorem topFormIntegral_real'_add (data : SubmanifoldIntegrationData n X)
+    (η₁ η₂ : SmoothForm n X (2 * n)) :
+    topFormIntegral_real' (n := n) (X := X) data (η₁ + η₂) =
+      topFormIntegral_real' (n := n) (X := X) data η₁ +
+        topFormIntegral_real' (n := n) (X := X) data η₂ := by
+  have h := topFormIntegral_real'_linear (n := n) (X := X) data 1 η₁ η₂
   simp only [one_smul, _root_.one_mul] at h
   exact h
 
@@ -124,11 +131,13 @@ theorem topFormIntegral_real'_add (η₁ η₂ : SmoothForm n X (2 * n)) :
     **Proof Status**: Proved via linearity with η₂=0.
 
     Reference: [Warner, "Foundations of Differentiable Manifolds", §4.8]. -/
-theorem topFormIntegral_real'_smul (c : ℝ) (η : SmoothForm n X (2 * n)) :
-    topFormIntegral_real' (c • η) = c * topFormIntegral_real' η := by
-  have h := topFormIntegral_real'_linear (n := n) (X := X) c η 0
+theorem topFormIntegral_real'_smul (data : SubmanifoldIntegrationData n X)
+    (c : ℝ) (η : SmoothForm n X (2 * n)) :
+    topFormIntegral_real' (n := n) (X := X) data (c • η) =
+      c * topFormIntegral_real' (n := n) (X := X) data η := by
+  have h := topFormIntegral_real'_linear (n := n) (X := X) data c η 0
   simp only [add_zero] at h
-  rw [topFormIntegral_real'_zero] at h
+  rw [topFormIntegral_real'_zero (n := n) (X := X) data] at h
   simp only [add_zero] at h
   exact h
 
@@ -141,10 +150,12 @@ theorem topFormIntegral_real'_smul (c : ℝ) (η : SmoothForm n X (2 * n)) :
     **Proof Status**: Proved via `integrateDegree2p_bound`.
 
     Reference: [Federer, "Geometric Measure Theory", §4.1.7]. -/
-theorem topFormIntegral_real'_bound (η : SmoothForm n X (2 * n)) :
-    |topFormIntegral_real' (n := n) (X := X) η| ≤ (hausdorffMeasure2p (n := n) (X := X) n Set.univ).toReal * ‖η‖ := by
+theorem topFormIntegral_real'_bound (data : SubmanifoldIntegrationData n X)
+    (η : SmoothForm n X (2 * n)) :
+    |topFormIntegral_real' (n := n) (X := X) data η| ≤
+      (hausdorffMeasure2p (n := n) (X := X) n data Set.univ).toReal * ‖η‖ := by
   unfold topFormIntegral_real'
-  have h := integrateDegree2p_bound (n := n) (X := X) (k := 2 * n) Set.univ η
+  have h := integrateDegree2p_bound (n := n) (X := X) (k := 2 * n) Set.univ η data
   have hdim : (2 * n) / 2 = n := by
     simpa [Nat.mul_comm] using (Nat.mul_div_right n 2)
   rw [hdim] at h
@@ -160,8 +171,9 @@ theorem topFormIntegral_real'_bound (η : SmoothForm n X (2 * n)) :
     `Complex.ofReal ∘ topFormIntegral_real'`.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
-noncomputable def topFormIntegral_complex (η : SmoothForm n X (2 * n)) : ℂ :=
-  Complex.ofReal (topFormIntegral_real' η)
+noncomputable def topFormIntegral_complex (data : SubmanifoldIntegrationData n X)
+    (η : SmoothForm n X (2 * n)) : ℂ :=
+  Complex.ofReal (topFormIntegral_real' (n := n) (X := X) data η)
 
 /-- **Complex integration is ℂ-linear** (in restricted sense).
 
@@ -171,18 +183,22 @@ noncomputable def topFormIntegral_complex (η : SmoothForm n X (2 * n)) : ℂ :=
     **Proof Status**: Proved via real linearity.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
-theorem topFormIntegral_complex_add (η₁ η₂ : SmoothForm n X (2 * n)) :
-    topFormIntegral_complex (η₁ + η₂) =
-      topFormIntegral_complex η₁ + topFormIntegral_complex η₂ := by
+theorem topFormIntegral_complex_add (data : SubmanifoldIntegrationData n X)
+    (η₁ η₂ : SmoothForm n X (2 * n)) :
+    topFormIntegral_complex (n := n) (X := X) data (η₁ + η₂) =
+      topFormIntegral_complex (n := n) (X := X) data η₁ +
+        topFormIntegral_complex (n := n) (X := X) data η₂ := by
   unfold topFormIntegral_complex
-  rw [topFormIntegral_real'_add]
+  rw [topFormIntegral_real'_add (n := n) (X := X) data]
   push_cast
   ring
 
-theorem topFormIntegral_complex_smul_real (c : ℝ) (η : SmoothForm n X (2 * n)) :
-    topFormIntegral_complex (c • η) = c * topFormIntegral_complex η := by
+theorem topFormIntegral_complex_smul_real (data : SubmanifoldIntegrationData n X)
+    (c : ℝ) (η : SmoothForm n X (2 * n)) :
+    topFormIntegral_complex (n := n) (X := X) data (c • η) =
+      c * topFormIntegral_complex (n := n) (X := X) data η := by
   unfold topFormIntegral_complex
-  rw [topFormIntegral_real'_smul]
+  rw [topFormIntegral_real'_smul (n := n) (X := X) data]
   push_cast
   ring
 
@@ -196,13 +212,13 @@ theorem topFormIntegral_complex_smul_real (c : ℝ) (η : SmoothForm n X (2 * n)
     **Implementation Status**: Complete using topFormIntegral_real'.
 
     Reference: [Warner, "Foundations of Differentiable Manifolds", §4.8]. -/
-noncomputable def topFormIntegral_linearMap :
+noncomputable def topFormIntegral_linearMap (data : SubmanifoldIntegrationData n X) :
     SmoothForm n X (2 * n) →ₗ[ℝ] ℝ where
-  toFun := topFormIntegral_real'
-  map_add' := topFormIntegral_real'_add
+  toFun := topFormIntegral_real' (n := n) (X := X) data
+  map_add' := topFormIntegral_real'_add (n := n) (X := X) data
   map_smul' := fun r η => by
     simp only [RingHom.id_apply]
-    exact topFormIntegral_real'_smul r η
+    exact topFormIntegral_real'_smul (n := n) (X := X) data r η
 
 /-- **Integration is continuous**.
 
@@ -212,19 +228,20 @@ noncomputable def topFormIntegral_linearMap :
     **Proof Status**: Proved (trivial since SmoothForm has discrete topology).
 
     Reference: [Warner, "Foundations of Differentiable Manifolds", §4.8]. -/
-theorem topFormIntegral_continuous :
-    Continuous (topFormIntegral_real' (n := n) (X := X)) :=
+theorem topFormIntegral_continuous (data : SubmanifoldIntegrationData n X) :
+    Continuous (topFormIntegral_real' (n := n) (X := X) data) :=
 by
   -- `topFormIntegral_real'` is ℝ-linear and bounded by `topFormIntegral_real'_bound`,
   -- hence continuous in the comass seminorm topology on forms.
   classical
-  let f : SmoothForm n X (2 * n) →ₗ[ℝ] ℝ := topFormIntegral_linearMap (n := n) (X := X)
+  let f : SmoothForm n X (2 * n) →ₗ[ℝ] ℝ :=
+    topFormIntegral_linearMap (n := n) (X := X) data
   have hbound : ∃ C, ∀ η, ‖f η‖ ≤ C * ‖η‖ := by
-    refine ⟨(hausdorffMeasure2p (n := n) (X := X) n Set.univ).toReal, ?_⟩
+    refine ⟨(hausdorffMeasure2p (n := n) (X := X) n data Set.univ).toReal, ?_⟩
     intro η
     -- `‖f η‖ = |f η|` for ℝ, and `f η = topFormIntegral_real' η` by definition.
     simpa [f, topFormIntegral_linearMap, Real.norm_eq_abs] using
-      (topFormIntegral_real'_bound (n := n) (X := X) η)
+      (topFormIntegral_real'_bound (n := n) (X := X) data η)
   -- Build the associated continuous linear map, then extract continuity of the underlying function.
   simpa [f, topFormIntegral_linearMap] using (f.mkContinuousOfExistsBound hbound).continuous
 
@@ -270,16 +287,18 @@ by
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
 noncomputable def intersectionPairing {p : ℕ} (_hp : p ≤ n)
+    (data : SubmanifoldIntegrationData n X)
     (α : SmoothForm n X (2 * p)) (β : SmoothForm n X (2 * (n - p))) : ℝ :=
   -- α ∧ β has degree 2p + 2(n-p) = 2n
   have hdeg : 2 * p + 2 * (n - p) = 2 * n := by omega
-  topFormIntegral_real' (castForm hdeg (α ⋏ β))
+  topFormIntegral_real' (n := n) (X := X) data (castForm hdeg (α ⋏ β))
 
 theorem intersectionPairing_add_left {p : ℕ} (hp : p ≤ n)
+    (data : SubmanifoldIntegrationData n X)
     (α₁ α₂ : SmoothForm n X (2 * p)) (β : SmoothForm n X (2 * (n - p))) :
-    intersectionPairing (n := n) (X := X) hp (α₁ + α₂) β =
-      intersectionPairing (n := n) (X := X) hp α₁ β +
-        intersectionPairing (n := n) (X := X) hp α₂ β := by
+    intersectionPairing (n := n) (X := X) hp data (α₁ + α₂) β =
+      intersectionPairing (n := n) (X := X) hp data α₁ β +
+        intersectionPairing (n := n) (X := X) hp data α₂ β := by
   classical
   unfold intersectionPairing
   have hdeg : 2 * p + 2 * (n - p) = 2 * n := by omega
@@ -289,14 +308,15 @@ theorem intersectionPairing_add_left {p : ℕ} (hp : p ≤ n)
     subst hdeg
     simpa [smoothWedge_add_left]
   simpa [hcast] using
-    (topFormIntegral_real'_add (n := n) (X := X)
+    (topFormIntegral_real'_add (n := n) (X := X) data
       (η₁ := castForm hdeg (α₁ ⋏ β)) (η₂ := castForm hdeg (α₂ ⋏ β)))
 
 theorem intersectionPairing_add_right {p : ℕ} (hp : p ≤ n)
+    (data : SubmanifoldIntegrationData n X)
     (α : SmoothForm n X (2 * p)) (β₁ β₂ : SmoothForm n X (2 * (n - p))) :
-    intersectionPairing (n := n) (X := X) hp α (β₁ + β₂) =
-      intersectionPairing (n := n) (X := X) hp α β₁ +
-        intersectionPairing (n := n) (X := X) hp α β₂ := by
+    intersectionPairing (n := n) (X := X) hp data α (β₁ + β₂) =
+      intersectionPairing (n := n) (X := X) hp data α β₁ +
+        intersectionPairing (n := n) (X := X) hp data α β₂ := by
   classical
   unfold intersectionPairing
   have hdeg : 2 * p + 2 * (n - p) = 2 * n := by omega
@@ -306,13 +326,14 @@ theorem intersectionPairing_add_right {p : ℕ} (hp : p ≤ n)
     subst hdeg
     simpa [smoothWedge_add_right]
   simpa [hcast] using
-    (topFormIntegral_real'_add (n := n) (X := X)
+    (topFormIntegral_real'_add (n := n) (X := X) data
       (η₁ := castForm hdeg (α ⋏ β₁)) (η₂ := castForm hdeg (α ⋏ β₂)))
 
-theorem intersectionPairing_smul_left {p : ℕ} (hp : p ≤ n) (r : ℝ)
+theorem intersectionPairing_smul_left {p : ℕ} (hp : p ≤ n)
+    (data : SubmanifoldIntegrationData n X) (r : ℝ)
     (α : SmoothForm n X (2 * p)) (β : SmoothForm n X (2 * (n - p))) :
-    intersectionPairing (n := n) (X := X) hp (r • α) β =
-      r * intersectionPairing (n := n) (X := X) hp α β := by
+    intersectionPairing (n := n) (X := X) hp data (r • α) β =
+      r * intersectionPairing (n := n) (X := X) hp data α β := by
   classical
   unfold intersectionPairing
   have hdeg : 2 * p + 2 * (n - p) = 2 * n := by omega
@@ -324,13 +345,14 @@ theorem intersectionPairing_smul_left {p : ℕ} (hp : p ≤ n) (r : ℝ)
     simp [SmoothForm.wedge_apply, SmoothForm.smul_real_apply,
       ContinuousAlternatingMap.wedgeℂ_smul_left]
   simpa [hcast] using
-    (topFormIntegral_real'_smul (n := n) (X := X) (c := r)
+    (topFormIntegral_real'_smul (n := n) (X := X) data (c := r)
       (η := castForm hdeg (α ⋏ β)))
 
-theorem intersectionPairing_smul_right {p : ℕ} (hp : p ≤ n) (r : ℝ)
+theorem intersectionPairing_smul_right {p : ℕ} (hp : p ≤ n)
+    (data : SubmanifoldIntegrationData n X) (r : ℝ)
     (α : SmoothForm n X (2 * p)) (β : SmoothForm n X (2 * (n - p))) :
-    intersectionPairing (n := n) (X := X) hp α (r • β) =
-      r * intersectionPairing (n := n) (X := X) hp α β := by
+    intersectionPairing (n := n) (X := X) hp data α (r • β) =
+      r * intersectionPairing (n := n) (X := X) hp data α β := by
   classical
   unfold intersectionPairing
   have hdeg : 2 * p + 2 * (n - p) = 2 * n := by omega
@@ -342,7 +364,7 @@ theorem intersectionPairing_smul_right {p : ℕ} (hp : p ≤ n) (r : ℝ)
     simp [SmoothForm.wedge_apply, SmoothForm.smul_real_apply,
       ContinuousAlternatingMap.wedgeℂ_smul_right]
   simpa [hcast] using
-    (topFormIntegral_real'_smul (n := n) (X := X) (c := r)
+    (topFormIntegral_real'_smul (n := n) (X := X) data (c := r)
       (η := castForm hdeg (α ⋏ β)))
 
 /-! ## L2 Inner Product via Hodge Star -/
@@ -352,14 +374,16 @@ theorem intersectionPairing_smul_right {p : ℕ} (hp : p ≤ n) (r : ℝ)
     For k-forms α, β, define:
     `⟪α, β⟫ = ∫_X α ∧ ⋆β`.
     This matches the usual L2 pairing once the metric/volume-form normalization is aligned. -/
-noncomputable def L2Inner_wedge {k : ℕ} (α β : SmoothForm n X k) : ℝ :=
+noncomputable def L2Inner_wedge {k : ℕ} (data : SubmanifoldIntegrationData n X)
+    (α β : SmoothForm n X k) : ℝ :=
   have hdeg : k + (2 * n - k) = 2 * n := by omega
-  topFormIntegral_real' (castForm hdeg (α ⋏ ⋆β))
+  topFormIntegral_real' (n := n) (X := X) data (castForm hdeg (α ⋏ ⋆β))
 
-theorem L2Inner_wedge_add_left {k : ℕ} (α₁ α₂ β : SmoothForm n X k) :
-    L2Inner_wedge (n := n) (X := X) (k := k) (α₁ + α₂) β =
-      L2Inner_wedge (n := n) (X := X) (k := k) α₁ β +
-        L2Inner_wedge (n := n) (X := X) (k := k) α₂ β := by
+theorem L2Inner_wedge_add_left {k : ℕ} (data : SubmanifoldIntegrationData n X)
+    (α₁ α₂ β : SmoothForm n X k) :
+    L2Inner_wedge (n := n) (X := X) (k := k) data (α₁ + α₂) β =
+      L2Inner_wedge (n := n) (X := X) (k := k) data α₁ β +
+        L2Inner_wedge (n := n) (X := X) (k := k) data α₂ β := by
   classical
   unfold L2Inner_wedge
   have hdeg : k + (2 * n - k) = 2 * n := by omega
@@ -369,13 +393,14 @@ theorem L2Inner_wedge_add_left {k : ℕ} (α₁ α₂ β : SmoothForm n X k) :
     subst hdeg
     simpa [smoothWedge_add_left]
   simpa [hcast] using
-    (topFormIntegral_real'_add (n := n) (X := X)
+    (topFormIntegral_real'_add (n := n) (X := X) data
       (η₁ := castForm hdeg (α₁ ⋏ ⋆β)) (η₂ := castForm hdeg (α₂ ⋏ ⋆β)))
 
-theorem L2Inner_wedge_add_right {k : ℕ} (α : SmoothForm n X k) (β₁ β₂ : SmoothForm n X k) :
-    L2Inner_wedge (n := n) (X := X) (k := k) α (β₁ + β₂) =
-      L2Inner_wedge (n := n) (X := X) (k := k) α β₁ +
-        L2Inner_wedge (n := n) (X := X) (k := k) α β₂ := by
+theorem L2Inner_wedge_add_right {k : ℕ} (data : SubmanifoldIntegrationData n X)
+    (α : SmoothForm n X k) (β₁ β₂ : SmoothForm n X k) :
+    L2Inner_wedge (n := n) (X := X) (k := k) data α (β₁ + β₂) =
+      L2Inner_wedge (n := n) (X := X) (k := k) data α β₁ +
+        L2Inner_wedge (n := n) (X := X) (k := k) data α β₂ := by
   classical
   unfold L2Inner_wedge
   have hdeg : k + (2 * n - k) = 2 * n := by omega
@@ -385,13 +410,14 @@ theorem L2Inner_wedge_add_right {k : ℕ} (α : SmoothForm n X k) (β₁ β₂ :
     subst hdeg
     simpa [hodgeStar_add, smoothWedge_add_right]
   simpa [hcast] using
-    (topFormIntegral_real'_add (n := n) (X := X)
+    (topFormIntegral_real'_add (n := n) (X := X) data
       (η₁ := castForm hdeg (α ⋏ ⋆β₁)) (η₂ := castForm hdeg (α ⋏ ⋆β₂)))
 
-theorem L2Inner_wedge_smul_left {k : ℕ} (r : ℝ) (α : SmoothForm n X k)
+theorem L2Inner_wedge_smul_left {k : ℕ} (data : SubmanifoldIntegrationData n X)
+    (r : ℝ) (α : SmoothForm n X k)
     (β : SmoothForm n X k) :
-    L2Inner_wedge (n := n) (X := X) (k := k) (r • α) β =
-      r * L2Inner_wedge (n := n) (X := X) (k := k) α β := by
+    L2Inner_wedge (n := n) (X := X) (k := k) data (r • α) β =
+      r * L2Inner_wedge (n := n) (X := X) (k := k) data α β := by
   classical
   unfold L2Inner_wedge
   have hdeg : k + (2 * n - k) = 2 * n := by omega
@@ -403,13 +429,14 @@ theorem L2Inner_wedge_smul_left {k : ℕ} (r : ℝ) (α : SmoothForm n X k)
     simp [SmoothForm.wedge_apply, SmoothForm.smul_real_apply,
       ContinuousAlternatingMap.wedgeℂ_smul_left]
   simpa [hcast] using
-    (topFormIntegral_real'_smul (n := n) (X := X) (c := r)
+    (topFormIntegral_real'_smul (n := n) (X := X) data (c := r)
       (η := castForm hdeg (α ⋏ ⋆β)))
 
-theorem L2Inner_wedge_smul_right {k : ℕ} (r : ℝ) (α : SmoothForm n X k)
+theorem L2Inner_wedge_smul_right {k : ℕ} (data : SubmanifoldIntegrationData n X)
+    (r : ℝ) (α : SmoothForm n X k)
     (β : SmoothForm n X k) :
-    L2Inner_wedge (n := n) (X := X) (k := k) α (r • β) =
-      r * L2Inner_wedge (n := n) (X := X) (k := k) α β := by
+    L2Inner_wedge (n := n) (X := X) (k := k) data α (r • β) =
+      r * L2Inner_wedge (n := n) (X := X) (k := k) data α β := by
   classical
   unfold L2Inner_wedge
   have hdeg : k + (2 * n - k) = 2 * n := by omega
@@ -421,7 +448,7 @@ theorem L2Inner_wedge_smul_right {k : ℕ} (r : ℝ) (α : SmoothForm n X k)
     simp [hodgeStar_smul_real, SmoothForm.wedge_apply, SmoothForm.smul_real_apply,
       ContinuousAlternatingMap.wedgeℂ_smul_right]
   simpa [hcast] using
-    (topFormIntegral_real'_smul (n := n) (X := X) (c := r)
+    (topFormIntegral_real'_smul (n := n) (X := X) data (c := r)
       (η := castForm hdeg (α ⋏ ⋆β)))
 
 /-! **Intersection pairing is bilinear in the first argument** (documentation-only).

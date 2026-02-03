@@ -33,7 +33,7 @@ universe u
       [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
       [ProjectiveComplexManifold n X] [KahlerManifold n X]
       [MeasurableSpace X] [BorelSpace X] [Nonempty X]
-      [SubmanifoldIntegration n X] [CubulationExists n X]
+      [CubulationExists n X]
       (p : ℕ) (γ : SmoothForm n X (2 * p))
       (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p))),
         Filter.Tendsto

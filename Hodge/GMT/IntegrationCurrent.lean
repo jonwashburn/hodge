@@ -13,9 +13,9 @@ to the real integration machinery in `Hodge.Analytic.Currents`.
 The integration current is now **properly wired** to the `Hodge.Analytic.Currents`
 infrastructure:
 
-- `integrationCurrentReal` uses `IntegrationData.closedSubmanifold` which connects to
-  `setIntegral` → `integrateDegree2p` → `submanifoldIntegral`
-- The underlying integration uses Hausdorff measure (via the Dirac proxy in Round 7-8)
+-- `integrationCurrentReal` uses `ClosedSubmanifoldStokesData.toIntegrationData`,
+  which connects a concrete `ClosedSubmanifoldData` to `IntegrationData → Current`.
+-- The underlying integration uses Hausdorff integration on oriented rectifiable data.
 - Linearity, boundedness, and Stokes bounds are proven (not axiomatized)
 
 ## Mathematical Content
@@ -58,12 +58,13 @@ variable {n : ℕ} {X : Type*}
   [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
   [ProjectiveComplexManifold n X] [KahlerManifold n X]
-  [MeasurableSpace X] [BorelSpace X] [Nonempty X] [SubmanifoldIntegration n X]
+  [MeasurableSpace X] [BorelSpace X] [Nonempty X]
 
 /-! ## Integration Current (Real Implementation)
 
 The following definitions wire to the actual integration infrastructure in
-`Hodge.Analytic.Currents`, which uses `setIntegral` and `submanifoldIntegral`. -/
+`Hodge.Analytic.Currents`, which uses `ClosedSubmanifoldData` /
+`OrientedRectifiableSetData` and `hausdorffIntegrate`. -/
 
 /-- **Real Integration Current** (from closed submanifold data).
 

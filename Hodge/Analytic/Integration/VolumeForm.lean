@@ -1,8 +1,8 @@
 import Hodge.Analytic.Forms
 import Hodge.Analytic.Norms
 import Hodge.Cohomology.Basic
-import Hodge.Analytic.Integration.HausdorffMeasure
 import Hodge.Analytic.Integration.L2Inner
+import Hodge.Analytic.Integration.HausdorffMeasure
 import Mathlib.MeasureTheory.Measure.Hausdorff
 import Mathlib.Geometry.Manifold.MFDeriv.Basic
 
@@ -163,7 +163,20 @@ noncomputable def kahlerVolumeForm : SmoothForm n X (2 * n) :=
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.2]. -/
 
-/-! ## Kähler Measure -/
+/-! ## Kähler Volume Measure (Explicit Data Interface) -/
+
+/-- **Kähler volume measure data**.
+
+This isolates the choice of a finite volume measure on a compact Kähler manifold,
+without tying it to the `SubmanifoldIntegration` interface (which integrates over
+arbitrary sets and is not yet mathematically realized).
+-/
+class KahlerVolumeMeasureData (n : ℕ) (X : Type u)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [MeasurableSpace X] [BorelSpace X] where
+  measure : Measure X
+  finite : measure Set.univ < ∞
 
 /-- **The Kähler measure** on X induced by the volume form.
 
@@ -174,35 +187,34 @@ noncomputable def kahlerVolumeForm : SmoothForm n X (2 * n) :=
     - μ(X) < ∞ on compact Kähler manifolds
     - μ agrees with Hausdorff measure H^{2n}
 
-    **Implementation**: Provided as a measure from the submanifold integration data.
+    **Implementation**: Provided by the explicit `KahlerVolumeMeasureData` interface.
 
     Reference: [Voisin, "Hodge Theory and Complex Algebraic Geometry I", §5.2]. -/
 noncomputable def kahlerMeasure [MeasurableSpace X] [Nonempty X]
-    [SubmanifoldIntegration n X] : Measure X :=
-  hausdorffMeasure2p (n := n) (X := X) n
+    [KahlerVolumeMeasureData n X] : Measure X :=
+  KahlerVolumeMeasureData.measure (n := n) (X := X)
 
 theorem kahlerMeasure_univ_lt_top [MeasurableSpace X] [Nonempty X]
-    [SubmanifoldIntegration n X] :
+    [KahlerVolumeMeasureData n X] :
     (kahlerMeasure (n := n) (X := X) : Measure X) Set.univ < ∞ := by
-  -- Directly from the SubmanifoldIntegration finiteness field.
-  simpa [kahlerMeasure, hausdorffMeasure2p] using
-    (SubmanifoldIntegration.measure2p_finite (n := n) (X := X) n)
+  -- Directly from the explicit volume-measure data.
+  simpa [kahlerMeasure] using (KahlerVolumeMeasureData.finite (n := n) (X := X))
 
 instance instIsFiniteMeasure_kahlerMeasure [MeasurableSpace X] [Nonempty X]
-    [SubmanifoldIntegration n X] : IsFiniteMeasure (kahlerMeasure (n := n) (X := X)) := by
+    [KahlerVolumeMeasureData n X] : IsFiniteMeasure (kahlerMeasure (n := n) (X := X)) := by
   exact ⟨kahlerMeasure_univ_lt_top (n := n) (X := X)⟩
 
 /-- Build `VolumeIntegrationData` from the Kähler measure. -/
 noncomputable def volumeIntegrationData_kahlerMeasure
     [MeasurableSpace X] [BorelSpace X] [Nonempty X] [CompactSpace X]
-    [SubmanifoldIntegration n X] :
+    [KahlerVolumeMeasureData n X] :
     VolumeIntegrationData n X :=
   Hodge.Analytic.L2.volumeIntegrationData_ofMeasure (n := n) (X := X)
     (μ := kahlerMeasure (n := n) (X := X))
 
 instance instVolumeIntegrationData_kahlerMeasure
     [MeasurableSpace X] [BorelSpace X] [Nonempty X] [CompactSpace X]
-    [SubmanifoldIntegration n X] :
+    [KahlerVolumeMeasureData n X] :
     VolumeIntegrationData n X :=
   volumeIntegrationData_kahlerMeasure (n := n) (X := X)
 
@@ -215,8 +227,28 @@ instance instVolumeIntegrationData_kahlerMeasure
     **Sprint 1 Status**: Type signature only.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.2]. -/
-noncomputable def totalVolume [MeasurableSpace X] [Nonempty X] [SubmanifoldIntegration n X] : ℝ :=
+noncomputable def totalVolume [MeasurableSpace X] [Nonempty X] [KahlerVolumeMeasureData n X] : ℝ :=
   ((kahlerMeasure (n := n) (X := X) : Measure X) Set.univ).toReal
+
+/-! ## Compatibility with Submanifold Integration -/
+
+/-- **Compatibility data** linking the Kähler volume measure to submanifold integration.
+
+This provides an explicit bridge between:
+- the measure used for L² integration (`kahlerMeasure`)
+- the Hausdorff-style integration data used by `topFormIntegral_real'` (via explicit data).
+
+At minimum, we record agreement of the top-dimensional Hausdorff measure with
+`kahlerMeasure`. Further compatibility (e.g., exact agreement of top-form integrals)
+should be added here as additional fields when the analytic layer is built. -/
+class KahlerMeasureCompatibilityData (n : ℕ) (X : Type u)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [KahlerVolumeMeasureData n X] where
+  submanifold : SubmanifoldIntegrationData n X
+  measure2p_eq_kahler : submanifold.measure2p n = kahlerMeasure (n := n) (X := X)
 
 /-! **Total volume is positive** (for nonempty compact Kähler manifolds; documentation-only).
 

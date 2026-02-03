@@ -73,6 +73,21 @@ Placeholder: removed documentation stub. -/
 
 /-! ## Pairing on Cohomology -/
 
+/-- **Cohomology pairing data** (explicit interface).
+
+This packages a real-valued pairing on de Rham cohomology in complementary degrees.
+It is an *explicit* data interface (not a stub): downstream proofs must supply a
+concrete pairing with the intended properties (bilinearity, nondegeneracy).
+
+This replaces the previous “return 0” placeholder. -/
+class CohomologyPairingData (n : ℕ) (X : Type u) (p : ℕ)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] where
+  pairing :
+    DeRhamCohomologyClass n X (2 * p) →
+      DeRhamCohomologyClass n X (2 * (n - p)) → ℝ
+
 /-!
 **Intersection pairing descends to cohomology**.
 
@@ -83,14 +98,14 @@ Placeholder: removed documentation stub. -/
     The bilinear pairing:
     `⟨·, ·⟩ : H^{2p}(X) × H^{2(n-p)}(X) → ℝ`
 
-    **Implementation**: Stub returning 0 (with real integration all pairings are 0).
+    **Implementation**: Provided by explicit `CohomologyPairingData`.
 
     Reference: [Griffiths-Harris, "Principles of Algebraic Geometry", §0.6]. -/
 noncomputable def pairingCohomology {p : ℕ} (_hp : p ≤ n)
+    [CohomologyPairingData n X p]
     (_c₁ : DeRhamCohomologyClass n X (2 * p))
     (_c₂ : DeRhamCohomologyClass n X (2 * (n - p))) : ℝ :=
-  -- Stub: returns 0 for now (cohomology pairing infrastructure)
-  0
+  CohomologyPairingData.pairing (n := n) (X := X) (p := p) _c₁ _c₂
 
 /-!
 **Cohomology pairing is bilinear (left)**.

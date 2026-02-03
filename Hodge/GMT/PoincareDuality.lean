@@ -31,11 +31,12 @@ The Poincaré duality interface now documents the **full mathematical pipeline**
 ## Current Implementation Status
 
 1. **Integration current** (`Hodge.GMT.IntegrationCurrent`): ✅ Connected to real
-   Hausdorff measure infrastructure via `setIntegral` → `submanifoldIntegral`
+   Hausdorff integration infrastructure via `ClosedSubmanifoldData` →
+   `IntegrationData` → `Current`
 
-2. **Poincaré dual form** (`Hodge.Classical.CycleClass`): ⚠️ Placeholder using
-   Kähler wedge powers. The mathematical pipeline is documented but the actual
-   form construction requires the current→form regularization.
+2. **Poincaré dual form** (`Hodge.Classical.CycleClass`): ⚠️ Deep interface
+   `PoincareDualFormExists` (no universal instance). The mathematical pipeline is
+   documented but the actual form construction requires the current→form regularization.
 
 3. **Cohomology class**: ✅ Correctly constructed from the PD form using `ofForm`
 
@@ -78,12 +79,12 @@ abbrev PoincareDualFormData := CycleClass.PoincareDualFormData
 abbrev poincareDualFormExists := CycleClass.poincareDualFormExists
 abbrev poincareDualForm := CycleClass.poincareDualForm
 
-/-- Construct the Poincaré dual form via the `CycleClass` placeholder interface.
+/-- Construct the Poincaré dual form via the `CycleClass` interface.
 
 This is the *current* bridge used by the proof-track development.
 
-**Status**: Returns a closed 2p-form (Kähler wedge power for Z ≠ ∅).
-See `Hodge.Classical.CycleClass` for the implementation. -/
+**Status**: Requires an explicit `PoincareDualFormExists` instance (no universal placeholder).
+See `Hodge.Classical.CycleClass` for the interface. -/
 abbrev poincareDualForm_construct_cycleClass := CycleClass.poincareDualForm
 
 /-- Poincaré dual form constructed from the (integration current) → (regularization) pipeline.
@@ -125,7 +126,7 @@ variable {n : ℕ} {X : Type u}
 
 /-- A cohomology class associated to a set `Z`, using the *current proof-track* PD-form interface.
 
-This uses the `CycleClass.poincareDualForm` placeholder (which provides closedness), so it
+This uses the `CycleClass.poincareDualForm` interface (which provides closedness), so it
 produces a well-typed de Rham class.
 
 **Mathematical Content**: This is the cycle class `[Z] ∈ H^{2p}(X, ℝ)`.
@@ -164,14 +165,12 @@ cohomology classes. This is the "M4 bridge" that connects:
 
 ### Mathematical Validation
 
-The placeholder `poincareDualForm` is **not** the true Poincaré dual, but it has
-the correct algebraic properties:
-- Closed (proven)
-- Non-zero for non-empty Z (uses ω^p which is non-degenerate)
-- Of type (p,p) (inherited from ω being (1,1))
+The current bridge relies on the **explicit existence interface**
+`PoincareDualFormExists`. There is **no** universal construction in the codebase;
+any concrete instance must provide a genuine Poincaré dual form.
 
-This makes the proof-track semantically meaningful while the regularization
-machinery is under development.
+This keeps the proof track honest while the regularization machinery is under
+development.
 
 ### Gap Analysis (for future work)
 

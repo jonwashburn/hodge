@@ -30,12 +30,11 @@ variable {n : ℕ} {X : Type u}
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
   [MeasurableSpace X] [BorelSpace X] [Nonempty X]
 
-/-! ## Submanifold Integration Typeclass -/
+/-! ## Submanifold Integration Data (Explicit, No Typeclass) -/
 
-/-- **SubmanifoldIntegration**: typeclass packaging the deep GMT integration infrastructure.
-    This allows us to use integration on submanifolds without `sorry` by making the
-    mathematical assumptions explicit as class fields. -/
-class SubmanifoldIntegration (n : ℕ) (X : Type u)
+/-- **SubmanifoldIntegrationData**: explicit data packaging the deep GMT integration infrastructure.
+    This refactors the legacy typeclass into a concrete object to avoid hidden assumptions. -/
+structure SubmanifoldIntegrationData (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
@@ -69,115 +68,129 @@ class SubmanifoldIntegration (n : ℕ) (X : Type u)
     ∀ {k p : ℕ} (hkp : k + 1 = 2 * p) (ω : SmoothForm n X k) (Z : Set X),
       IsClosed Z → integral p (castForm hkp (smoothExtDeriv ω)) Z = 0
 
+/-- Legacy typeclass wrapper for backward compatibility.
+
+Prefer using explicit `SubmanifoldIntegrationData` instead of this class. -/
+class SubmanifoldIntegration (n : ℕ) (X : Type u)
+    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [Nonempty X] where
+  data : SubmanifoldIntegrationData n X
+
+/-- Extract explicit data from the legacy typeclass wrapper. -/
+noncomputable def submanifoldIntegrationDataOf
+    [SubmanifoldIntegration n X] : SubmanifoldIntegrationData n X :=
+  SubmanifoldIntegration.data (n := n) (X := X)
+
 /-! ## Hausdorff Measure on Submanifolds -/
 
 /-- The real dimension of a complex p-dimensional submanifold. -/
 def realDimension (p : ℕ) : ℕ := 2 * p
 
 /-- Hausdorff measure of dimension 2p on X. -/
-noncomputable def hausdorffMeasure2p (p : ℕ) [SubmanifoldIntegration n X] : Measure X :=
-  SubmanifoldIntegration.measure2p (n := n) (X := X) p
+noncomputable def hausdorffMeasure2p (p : ℕ) (data : SubmanifoldIntegrationData n X) : Measure X :=
+  data.measure2p p
 
-instance instIsFiniteMeasure_hausdorffMeasure2p (p : ℕ) [SubmanifoldIntegration n X] :
-    IsFiniteMeasure (hausdorffMeasure2p (n := n) (X := X) p) :=
-  ⟨SubmanifoldIntegration.measure2p_finite (n := n) (X := X) p⟩
+theorem hausdorffMeasure2p_finite (p : ℕ) (data : SubmanifoldIntegrationData n X) :
+    (hausdorffMeasure2p (n := n) (X := X) p data) Set.univ < ∞ :=
+  data.measure2p_finite p
 
-/-- **Submanifold integration** (nontrivial implementation). -/
-noncomputable def submanifoldIntegral {p : ℕ} [SubmanifoldIntegration n X]
+/-- **Submanifold integration** (explicit data). -/
+noncomputable def submanifoldIntegral {p : ℕ} (data : SubmanifoldIntegrationData n X)
     (ω : SmoothForm n X (2 * p)) (Z : Set X) : ℝ :=
-  SubmanifoldIntegration.integral (n := n) (X := X) p ω Z
+  data.integral p ω Z
 
 /-- Submanifold integration is linear in the form. -/
-theorem submanifoldIntegral_linear {p : ℕ} [SubmanifoldIntegration n X] (Z : Set X)
+theorem submanifoldIntegral_linear {p : ℕ} (data : SubmanifoldIntegrationData n X) (Z : Set X)
     (c : ℝ) (ω₁ ω₂ : SmoothForm n X (2 * p)) :
-    submanifoldIntegral (n := n) (X := X) (p := p) (c • ω₁ + ω₂) Z =
-      c * submanifoldIntegral (n := n) (X := X) (p := p) ω₁ Z +
-        submanifoldIntegral (n := n) (X := X) (p := p) ω₂ Z := by
-  simp only [submanifoldIntegral]
-  exact SubmanifoldIntegration.integral_linear (n := n) (X := X) p Z c ω₁ ω₂
+    submanifoldIntegral (n := n) (X := X) (p := p) data (c • ω₁ + ω₂) Z =
+      c * submanifoldIntegral (n := n) (X := X) (p := p) data ω₁ Z +
+        submanifoldIntegral (n := n) (X := X) (p := p) data ω₂ Z := by
+  simp [submanifoldIntegral, data.integral_linear p Z c ω₁ ω₂]
 
 /-- Submanifold integration is additive in the set for disjoint sets. -/
-theorem submanifoldIntegral_union {p : ℕ} [SubmanifoldIntegration n X]
+theorem submanifoldIntegral_union {p : ℕ} (data : SubmanifoldIntegrationData n X)
     (ω : SmoothForm n X (2 * p))
     (Z₁ Z₂ : Set X) (hZ : Disjoint Z₁ Z₂) (hZ₁ : MeasurableSet Z₁) (hZ₂ : MeasurableSet Z₂) :
-    submanifoldIntegral ω (Z₁ ∪ Z₂) =
-      submanifoldIntegral ω Z₁ + submanifoldIntegral ω Z₂ := by
-  simp only [submanifoldIntegral]
-  exact SubmanifoldIntegration.integral_union (n := n) (X := X) p ω Z₁ Z₂ hZ hZ₁ hZ₂
+    submanifoldIntegral (n := n) (X := X) (p := p) data ω (Z₁ ∪ Z₂) =
+      submanifoldIntegral (n := n) (X := X) (p := p) data ω Z₁ +
+        submanifoldIntegral (n := n) (X := X) (p := p) data ω Z₂ := by
+  simp [submanifoldIntegral, data.integral_union p ω Z₁ Z₂ hZ hZ₁ hZ₂]
 
 /-- Integration over the empty set is zero. -/
-theorem submanifoldIntegral_empty {p : ℕ} [SubmanifoldIntegration n X]
+theorem submanifoldIntegral_empty {p : ℕ} (data : SubmanifoldIntegrationData n X)
     (ω : SmoothForm n X (2 * p)) :
-    submanifoldIntegral ω ∅ = 0 := by
-  simp only [submanifoldIntegral]
-  exact SubmanifoldIntegration.integral_empty (n := n) (X := X) p ω
+    submanifoldIntegral (n := n) (X := X) (p := p) data ω ∅ = 0 := by
+  simp [submanifoldIntegral, data.integral_empty p ω]
 
 /-- Submanifold integration is bounded by the form norm. -/
-theorem submanifoldIntegral_abs_le {p : ℕ} [SubmanifoldIntegration n X]
+theorem submanifoldIntegral_abs_le {p : ℕ} (data : SubmanifoldIntegrationData n X)
     (ω : SmoothForm n X (2 * p)) (Z : Set X) :
-    |submanifoldIntegral (n := n) (X := X) ω Z| ≤ (hausdorffMeasure2p (n := n) (X := X) p Z).toReal * ‖ω‖ := by
-  simp only [submanifoldIntegral, hausdorffMeasure2p]
-  exact SubmanifoldIntegration.integral_bound (n := n) (X := X) p ω Z
+    |submanifoldIntegral (n := n) (X := X) (p := p) data ω Z| ≤
+      (hausdorffMeasure2p (n := n) (X := X) p data Z).toReal * ‖ω‖ := by
+  simp [submanifoldIntegral, hausdorffMeasure2p, data.integral_bound p ω Z]
 
 /-! ## Integration Currents -/
 
 /-- **Integration current** associated to a submanifold. -/
-noncomputable def integrationCurrentValue {p : ℕ} [SubmanifoldIntegration n X]
+noncomputable def integrationCurrentValue {p : ℕ} (data : SubmanifoldIntegrationData n X)
     (Z : Set X) (ω : SmoothForm n X (2 * p)) : ℝ :=
-  submanifoldIntegral ω Z
+  submanifoldIntegral (n := n) (X := X) (p := p) data ω Z
 
 /-- Integration current is linear. -/
-theorem integrationCurrentValue_linear {p : ℕ} [SubmanifoldIntegration n X] (Z : Set X)
+theorem integrationCurrentValue_linear {p : ℕ} (data : SubmanifoldIntegrationData n X) (Z : Set X)
     (c : ℝ) (ω₁ ω₂ : SmoothForm n X (2 * p)) :
-    integrationCurrentValue (n := n) (X := X) (p := p) Z (c • ω₁ + ω₂) =
-      c * integrationCurrentValue (n := n) (X := X) (p := p) Z ω₁ +
-        integrationCurrentValue (n := n) (X := X) (p := p) Z ω₂ :=
-  submanifoldIntegral_linear (n := n) (X := X) (p := p) Z c ω₁ ω₂
+    integrationCurrentValue (n := n) (X := X) (p := p) data Z (c • ω₁ + ω₂) =
+      c * integrationCurrentValue (n := n) (X := X) (p := p) data Z ω₁ +
+        integrationCurrentValue (n := n) (X := X) (p := p) data Z ω₂ :=
+  submanifoldIntegral_linear (n := n) (X := X) (p := p) data Z c ω₁ ω₂
 
 /-! ## Round 8: Helper Lemmas for Agent 4's `setIntegral` Implementation -/
 
 /-- Submanifold integration is additive in the form. -/
-theorem submanifoldIntegral_add {p : ℕ} [SubmanifoldIntegration n X] (Z : Set X)
+theorem submanifoldIntegral_add {p : ℕ} (data : SubmanifoldIntegrationData n X) (Z : Set X)
     (ω₁ ω₂ : SmoothForm n X (2 * p)) :
-    submanifoldIntegral (n := n) (X := X) (p := p) (ω₁ + ω₂) Z =
-      submanifoldIntegral (n := n) (X := X) (p := p) ω₁ Z +
-        submanifoldIntegral (n := n) (X := X) (p := p) ω₂ Z := by
-  have h := submanifoldIntegral_linear (n := n) (X := X) (p := p) Z 1 ω₁ ω₂
+    submanifoldIntegral (n := n) (X := X) (p := p) data (ω₁ + ω₂) Z =
+      submanifoldIntegral (n := n) (X := X) (p := p) data ω₁ Z +
+        submanifoldIntegral (n := n) (X := X) (p := p) data ω₂ Z := by
+  have h := submanifoldIntegral_linear (n := n) (X := X) (p := p) data Z 1 ω₁ ω₂
   simp only [one_smul, _root_.one_mul] at h
   exact h
 
 /-- Submanifold integration of zero is zero. -/
-theorem submanifoldIntegral_zero {p : ℕ} [SubmanifoldIntegration n X] (Z : Set X) :
-    submanifoldIntegral (n := n) (X := X) (p := p) (0 : SmoothForm n X (2 * p)) Z = 0 := by
-  have h := submanifoldIntegral_linear (n := n) (X := X) (p := p) Z 1
+theorem submanifoldIntegral_zero {p : ℕ} (data : SubmanifoldIntegrationData n X) (Z : Set X) :
+    submanifoldIntegral (n := n) (X := X) (p := p) data (0 : SmoothForm n X (2 * p)) Z = 0 := by
+  have h := submanifoldIntegral_linear (n := n) (X := X) (p := p) data Z 1
     (0 : SmoothForm n X (2 * p)) 0
   have h' :
-      submanifoldIntegral (n := n) (X := X) (p := p) (0 : SmoothForm n X (2 * p)) Z =
-      2 * submanifoldIntegral (n := n) (X := X) (p := p) (0 : SmoothForm n X (2 * p)) Z := by
+      submanifoldIntegral (n := n) (X := X) (p := p) data (0 : SmoothForm n X (2 * p)) Z =
+      2 * submanifoldIntegral (n := n) (X := X) (p := p) data (0 : SmoothForm n X (2 * p)) Z := by
     simpa [one_smul, two_mul, add_comm, add_left_comm, add_assoc] using h
   linarith
 
 /-- Submanifold integration commutes with scalar multiplication. -/
-theorem submanifoldIntegral_smul {p : ℕ} [SubmanifoldIntegration n X] (Z : Set X)
+theorem submanifoldIntegral_smul {p : ℕ} (data : SubmanifoldIntegrationData n X) (Z : Set X)
     (c : ℝ) (ω : SmoothForm n X (2 * p)) :
-    submanifoldIntegral (n := n) (X := X) (p := p) (c • ω) Z =
-      c * submanifoldIntegral (n := n) (X := X) (p := p) ω Z := by
-  have h := submanifoldIntegral_linear (n := n) (X := X) (p := p) Z c ω 0
+    submanifoldIntegral (n := n) (X := X) (p := p) data (c • ω) Z =
+      c * submanifoldIntegral (n := n) (X := X) (p := p) data ω Z := by
+  have h := submanifoldIntegral_linear (n := n) (X := X) (p := p) data Z c ω 0
   simp only [add_zero] at h
   have hz :
-      submanifoldIntegral (n := n) (X := X) (p := p) (0 : SmoothForm n X (2 * p)) Z = 0 :=
-    submanifoldIntegral_zero (n := n) (X := X) Z
+      submanifoldIntegral (n := n) (X := X) (p := p) data (0 : SmoothForm n X (2 * p)) Z = 0 :=
+    submanifoldIntegral_zero (n := n) (X := X) data Z
   simp only [hz, add_zero] at h
   exact h
 
 /-- Submanifold integration packaged as a linear map. -/
-noncomputable def submanifoldIntegral_asLinearMap {p : ℕ} [SubmanifoldIntegration n X] (Z : Set X) :
+noncomputable def submanifoldIntegral_asLinearMap {p : ℕ}
+    (data : SubmanifoldIntegrationData n X) (Z : Set X) :
     SmoothForm n X (2 * p) →ₗ[ℝ] ℝ where
-  toFun := fun ω => submanifoldIntegral (n := n) (X := X) (p := p) ω Z
-  map_add' := fun ω₁ ω₂ => submanifoldIntegral_add (n := n) (X := X) Z ω₁ ω₂
+  toFun := fun ω => submanifoldIntegral (n := n) (X := X) (p := p) data ω Z
+  map_add' := fun ω₁ ω₂ => submanifoldIntegral_add (n := n) (X := X) data Z ω₁ ω₂
   map_smul' := fun c ω => by
     simp only [RingHom.id_apply]
-    exact submanifoldIntegral_smul (n := n) (X := X) Z c ω
+    exact submanifoldIntegral_smul (n := n) (X := X) data Z c ω
 
 private lemma castForm_add {k k' : ℕ} (h : k = k') (ω₁ ω₂ : SmoothForm n X k) :
     castForm h (ω₁ + ω₂) = castForm h ω₁ + castForm h ω₂ := by
@@ -196,21 +209,21 @@ private lemma castForm_norm {k k' : ℕ} (h : k = k') (ω : SmoothForm n X k) :
 
 /-- **Degree-dispatch integration**. -/
 noncomputable def integrateDegree2p (k : ℕ) (Z : Set X) (ω : SmoothForm n X k)
-    [SubmanifoldIntegration n X] : ℝ :=
+    (data : SubmanifoldIntegrationData n X) : ℝ :=
   if hk : 2 ∣ k then
     let p := k / 2
     have hkp : k = 2 * p := Nat.eq_mul_of_div_eq_right hk rfl
-    submanifoldIntegral (n := n) (X := X) (p := p)
+    submanifoldIntegral (n := n) (X := X) (p := p) data
       (castForm hkp ω) Z
   else
     0
 
 /-- Integration of degree-2p forms is linear. -/
-theorem integrateDegree2p_linear (k : ℕ) (Z : Set X) [SubmanifoldIntegration n X]
+theorem integrateDegree2p_linear (k : ℕ) (Z : Set X) (data : SubmanifoldIntegrationData n X)
     (c : ℝ) (ω₁ ω₂ : SmoothForm n X k) :
-    integrateDegree2p (n := n) (X := X) k Z (c • ω₁ + ω₂) =
-      c * integrateDegree2p (n := n) (X := X) k Z ω₁ +
-        integrateDegree2p (n := n) (X := X) k Z ω₂ := by
+    integrateDegree2p (n := n) (X := X) k Z (c • ω₁ + ω₂) data =
+      c * integrateDegree2p (n := n) (X := X) k Z ω₁ data +
+        integrateDegree2p (n := n) (X := X) k Z ω₂ data := by
   unfold integrateDegree2p
   split_ifs with hk
   · have hkp : k = 2 * (k / 2) := Nat.eq_mul_of_div_eq_right hk rfl
@@ -224,17 +237,18 @@ theorem integrateDegree2p_linear (k : ℕ) (Z : Set X) [SubmanifoldIntegration n
         _ = c • castForm hkp ω₁ + castForm hkp ω₂ := by
               simp [castForm_smul]
     have h :=
-      submanifoldIntegral_linear (n := n) (X := X) (p := k / 2) Z c
+      submanifoldIntegral_linear (n := n) (X := X) (p := k / 2) data Z c
         (castForm hkp ω₁) (castForm hkp ω₂)
     simpa [hcast] using h
   · simp only [MulZeroClass.mul_zero, add_zero]
 
 /-- Integration on the empty set is zero. -/
-theorem integrateDegree2p_empty (k : ℕ) (ω : SmoothForm n X k) [SubmanifoldIntegration n X] :
-    integrateDegree2p (n := n) (X := X) k (∅ : Set X) ω = 0 := by
+theorem integrateDegree2p_empty (k : ℕ) (ω : SmoothForm n X k)
+    (data : SubmanifoldIntegrationData n X) :
+    integrateDegree2p (n := n) (X := X) k (∅ : Set X) ω data = 0 := by
   unfold integrateDegree2p
   split_ifs with hk
-  · apply submanifoldIntegral_empty
+  · apply submanifoldIntegral_empty (n := n) (X := X) (p := k / 2) data
   · rfl
 
 /-!
@@ -245,26 +259,28 @@ This was previously tracked as a documentation stub; it will be reinstated
 as an actual lemma once the degree-cast bookkeeping is stabilized in the integration layer. -/
 
 /-- Integration of zero on the empty set is zero. -/
-theorem submanifoldIntegral_zero_empty {p : ℕ} [SubmanifoldIntegration n X] :
-    submanifoldIntegral (n := n) (X := X) (p := p) (0 : SmoothForm n X (2 * p)) ∅ = 0 := by
-  apply submanifoldIntegral_empty
+theorem submanifoldIntegral_zero_empty {p : ℕ} (data : SubmanifoldIntegrationData n X) :
+    submanifoldIntegral (n := n) (X := X) (p := p) data (0 : SmoothForm n X (2 * p)) ∅ = 0 := by
+  apply submanifoldIntegral_empty (n := n) (X := X) (p := p) data
 
 /-- **Submanifold integration is bounded**. -/
-theorem submanifoldIntegral_bound {p : ℕ} [SubmanifoldIntegration n X]
+theorem submanifoldIntegral_bound {p : ℕ} (data : SubmanifoldIntegrationData n X)
     (Z : Set X) (ω : SmoothForm n X (2 * p)) :
-    |submanifoldIntegral (n := n) (X := X) ω Z| ≤ (hausdorffMeasure2p (n := n) (X := X) p Z).toReal * ‖ω‖ := by
-  apply submanifoldIntegral_abs_le
+    |submanifoldIntegral (n := n) (X := X) (p := p) data ω Z| ≤
+      (hausdorffMeasure2p (n := n) (X := X) p data Z).toReal * ‖ω‖ := by
+  apply submanifoldIntegral_abs_le (n := n) (X := X) (p := p) data
 
 /-- **Degree-2p integration is bounded**. -/
 theorem integrateDegree2p_bound (k : ℕ) (Z : Set X) (ω : SmoothForm n X k)
-    [SubmanifoldIntegration n X] :
-    |integrateDegree2p (n := n) (X := X) k Z ω| ≤ (hausdorffMeasure2p (n := n) (X := X) (k / 2) Z).toReal * ‖ω‖ := by
+    (data : SubmanifoldIntegrationData n X) :
+    |integrateDegree2p (n := n) (X := X) k Z ω data| ≤
+      (hausdorffMeasure2p (n := n) (X := X) (k / 2) data Z).toReal * ‖ω‖ := by
   unfold integrateDegree2p
   by_cases hk : 2 ∣ k
   · simp only [hk, ↓reduceDIte]
     have hkp : k = 2 * (k / 2) := Nat.eq_mul_of_div_eq_right hk rfl
     have h :=
-      submanifoldIntegral_abs_le (n := n) (X := X) (p := k / 2) (ω := castForm hkp ω) Z
+      submanifoldIntegral_abs_le (n := n) (X := X) (p := k / 2) data (ω := castForm hkp ω) Z
     have hnorm : ‖castForm hkp ω‖ = ‖ω‖ := castForm_norm hkp ω
     simpa [hnorm] using h
   · simp only [hk, ↓reduceDIte, abs_zero]

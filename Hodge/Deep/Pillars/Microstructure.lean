@@ -263,7 +263,7 @@ theorem calibration_defect_mesh_bound {p : ℕ} (γ : SmoothForm n X (2 * p))
     **Status**: Follows from Goal 4.1. -/
 theorem calibration_defect_tends_to_zero {p : ℕ} (γ : SmoothForm n X (2 * p))
     (hγ : isConePositive γ) (ψ : CalibratingForm n X (2 * (n - p)))
-    [SubmanifoldIntegration n X] [CubulationExists n X] :
+    [CubulationExists n X] :
     Tendsto
       (fun (k : ℕ) =>
         calibrationDefect (Hodge.TexSpine.microstructureSequence_real (n := n) (X := X) p γ hγ ψ k).toFun ψ)

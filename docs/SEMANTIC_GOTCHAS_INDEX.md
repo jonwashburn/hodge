@@ -27,6 +27,10 @@ The intent is to make it easy for the integrator (and bounded agents) to find an
     1. De Rham representability theorem (every closed current is cohomologous to a smooth form)
     2. Harvey-Lawson bridge theorem (for calibrated currents, the form equals the calibration)
   - These are deep results not in Mathlib - would need to be built from scratch.
+- **`PoincareDualFormExists` currently uses a Kähler-power placeholder for arbitrary sets**
+  - Location: `Hodge/Classical/CycleClass.lean:140-210` (`omegaPower` + `poincareDualFormData_of_set`)
+  - Status: The placeholder is nonzero but **not** the true Poincaré dual of an arbitrary set.
+  - **REMAINING**: Replace with real integration-current construction and de Rham representability.
 
 ---
 
@@ -85,6 +89,22 @@ This change is deep and will require a staged migration (new `FiberAltR` / `Smoo
   - Files: `Hodge/Kahler/Identities/LambdaD.lean`, `Hodge/Kahler/Identities/LDelta.lean`
   - Replaced `:= 0` operators with explicit data interfaces
     (`KahlerIdentityLambdaDData`, `KahlerIdentityLDeltaData`).
+
+- **Cohomology pairing stub removed**
+  - File: `Hodge/Analytic/Integration/PairingConnection.lean`
+  - `pairingCohomology` now depends on explicit `CohomologyPairingData`
+    instead of returning `0`.
+  - Remaining: provide a genuine pairing via Stokes + Poincaré duality.
+
+- **Kähler volume measure data is now real data (not Prop)**
+  - File: `Hodge/Analytic/Integration/VolumeForm.lean`
+  - `KahlerVolumeMeasureData` no longer lives in `Prop` (avoids proof-irrelevance collapse).
+
+- **Explicit compatibility binder introduced for L² vs top-form integration**
+  - File: `Hodge/Analytic/Integration/VolumeForm.lean`
+  - `KahlerMeasureCompatibilityData` records agreement between `kahlerMeasure` and
+    the top-dimensional Hausdorff measure coming from `SubmanifoldIntegrationData`.
+  - Remaining: strengthen this with a top-form integration compatibility lemma.
 
 ## B. Submanifold integration / Stokes (deep GMT layer)
 

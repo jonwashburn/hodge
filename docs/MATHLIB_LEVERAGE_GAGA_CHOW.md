@@ -1,3 +1,29 @@
+# Mathlib leverage survey (GAGA / Chow / analytic sets) — 2026-02-03 update
+
+## Update (2026‑02‑03)
+
+Searches were re‑run against the **vendored Mathlib snapshot** in
+`.lake/packages/mathlib/Mathlib`:
+
+```bash
+grep -RIn "GAGA\\|Chow" .lake/packages/mathlib/Mathlib | head
+grep -RIn "AnalyticSet" .lake/packages/mathlib/Mathlib | head
+ls .lake/packages/mathlib/Mathlib/AlgebraicGeometry/ProjectiveSpectrum
+grep -RIn "holomorphic" .lake/packages/mathlib/Mathlib/Geometry/Manifold/Complex.lean | head
+```
+
+Results:
+- **No `GAGA` or `Chow` hits** in Mathlib.
+- **Projective scheme infrastructure exists**:
+  `Mathlib/AlgebraicGeometry/ProjectiveSpectrum/{Basic,Scheme,Topology,StructureSheaf,Proper}.lean`.
+- **Holomorphic manifold API exists** in `Mathlib/Geometry/Manifold/Complex.lean`.
+- **“AnalyticSet” in Mathlib is descriptive‑set theory**:
+  `Mathlib/MeasureTheory/Constructions/Polish/Basic.lean` defines `MeasureTheory.AnalyticSet`,
+  which is *not* the complex analytic‑geometry notion needed here.
+
+Conclusion: **Chow/GAGA and complex analytic sets must be built in‑repo** using the
+manifold/holomorphic infrastructure, not imported from Mathlib.
+
 # Mathlib leverage survey (GAGA / Chow / analytic sets) — 2026-02-01
 
 This note answers the playbook task **AG-05**: “what (if anything) exists in bundled Mathlib for
@@ -260,4 +286,3 @@ If we want agents to help **without gotchas**, a safe near-term bounded task is:
 - create a doc-level map of candidate Mathlib algebraic geometry entry points (`Mathlib/AlgebraicGeometry/*`) and assess whether any existing “projective variety”/“closed immersion” infrastructure can be repurposed.
 
 This avoids touching proof-track semantics until the integrator is ready to do the (necessarily cross-cutting) refactor.
-

@@ -83,11 +83,11 @@ Stokes' theorem implies that integration descends to cohomology.
 
 /-- Integration defines a linear functional on top-degree cohomology.
 
-With trivial integration (∫ = 0), this is the zero functional.
-When real integration is available, this will be nontrivial. -/
+This is currently a stub (zero map). Once Stokes is connected to the explicit
+integration data (`topFormIntegral_real'`), this will become nontrivial. -/
 noncomputable def cohomologyIntegral :
     DeRhamCohomologyClass n X (2 * n) →ₗ[ℂ] ℂ :=
-  0  -- Trivial for now since topFormIntegral_real' = 0
+  0  -- Stub: not yet wired to top‑form integration
 
 /-!
 ## Boundary Operator (for manifolds with boundary)
@@ -116,9 +116,9 @@ Currently kept as documentation (no semantic stub theorem). -/
 - `cohomologyIntegral` is still defined (as a stub) elsewhere in the integration stack.
 
 ### Note on Current Status:
-With placeholder integration (∫ = 0), Stokes' theorem holds trivially.
-When Agent 2 provides real integration infrastructure, these proofs will
-need to be updated to use:
+The integration layer now exists (data-based), but Stokes is still not
+connected to a concrete proof. When the GMT integration infrastructure is
+fully realized, these proofs will need to be updated to use:
 1. Partition of unity arguments
 2. Local Stokes on coordinate charts
 3. Orientation and globalization

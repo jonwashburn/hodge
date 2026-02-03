@@ -70,6 +70,45 @@ Current audits show:
 But the repo still contains **semantic placeholders** ("gotchas") that make the present proof track *not* mathematically genuine
 even though it compiles.
 
+## Reference TeX Proof (Newest) and Lean Spine Map
+
+- **Newest proof narrative (TeX)**: `JA_hodge_approach_with_added_refs_blueCites.tex` (timestamp 2026-01-11).
+- **Older proof drafts**: `Hodge_REFEREE_Amir-v1*.tex` (2026-01-06), `Hodge-v6-w-Jon-Update-MERGED.tex` (2025-12-29).
+
+**TeX → Lean module map (proof spine):**
+
+1. **Main reduction + signed decomposition + algebraicity of ω^p**
+   - TeX: `thm:main-hodge`, Lemma `signed-decomp`, Lefschetz reduction.
+   - Lean: `Hodge/Kahler/Main.lean`, `Hodge/Kahler/HardLefschetz.lean`.
+2. **Calibration–coercivity + spine theorem (quantitative)**
+   - TeX: Theorem `thm:spine-quantitative`, H1/H2 packages.
+   - Lean: `Hodge/Kahler/Microstructure.lean`, `Hodge/GMT/TransportFlat.lean`, `Hodge/GMT/GlueGap.lean`.
+3. **SYR microstructure (local sheets → global currents)**
+   - TeX: Theorem B/C/D (Steps 3–6 in Section 9).
+   - Lean: `Hodge/Kahler/Microstructure.lean`, `Hodge/Kahler/Microstructure/RealSpine.lean`.
+4. **Federer–Fleming compactness / flat norm closure**
+   - TeX: Lemma `flat_limit_of_cycles_is_cycle`, compactness substeps.
+   - Lean: `Hodge/GMT/FedererFleming.lean`, `Hodge/GMT/FlatNorm.lean`.
+5. **Harvey–Lawson / King (calibrated currents → analytic varieties)**
+   - TeX: `thm:syr` + Harvey–Lawson structure theorem.
+   - Lean: `Hodge/Classical/HarveyLawson.lean`, `Hodge/Classical/HarveyLawsonReal.lean`.
+6. **Chow/GAGA (analytic → algebraic on projective manifolds)**
+   - TeX: Remark `chow-gaga`.
+   - Lean: `Hodge/Classical/GAGA.lean`, `Hodge/Classical/AlgebraicSets.lean`.
+7. **Cycle class / fundamental class bridge**
+   - TeX: Fundamental class + PD identification.
+   - Lean: `Hodge/Classical/GeometricCycleClass.lean`, `Hodge/Classical/CycleClass.lean`, `Hodge/Classical/GAGA.lean`.
+
+## Agent Report Index (2026‑02‑03)
+
+These reports capture the current “deep pillar” gaps before semantic restoration:
+
+- `docs/AGENT_HODGE_REPORT.md` — Laplacian/harmonic forms; missing elliptic regularity + Hodge theorem.
+- `docs/AGENT_STOKES_REPORT.md` — Submanifold integration & Stokes remain purely interface‑based.
+- `docs/AGENT_FF_REPORT.md` — Federer–Fleming compactness still an interface; flat‑norm lemmas already present.
+- `docs/AGENT_HL_REPORT.md` — Harvey–Lawson regularity + decomposition are deep binders in `Main.lean`.
+- `docs/AGENT_GAGA_REPORT.md` — Chow/GAGA still a binder; Mathlib has projective schemes but no Chow/GAGA theorems.
+
 ## ⚠️ BLOCKING ISSUE: Deep Typeclass Binders (the real “pillars”)
 
 **The `audit_practical_unconditional.sh` audit FAILS** because `hodge_conjecture'` still mentions deep binders:
@@ -138,9 +177,9 @@ This is not exhaustive, but it captures the major blockers currently *on the pro
   - ✅ `Hodge/AnalyticSets.lean`: analytic sets = local holomorphic zero loci
   - ✅ `Hodge/Classical/AlgebraicSets.lean`: algebraic sets = projective homogeneous polynomial zero loci
   - Remaining: theorems (Chow/GAGA), not definitions.
-- **Submanifold integration is still the zero model**:
+- **Submanifold integration is still only an abstract interface**:
   - (removed) legacy Set-based `submanifoldIntegral := 0` scaffold stack has been deleted.
-  - `Hodge/Analytic/Integration/HausdorffMeasure.lean`: (progress) the explicit `SubmanifoldIntegration.universal` zero-instance has been removed (2026-02-01), but the integration layer still needs a real implementation.
+  - `Hodge/Analytic/Integration/HausdorffMeasure.lean`: the explicit `SubmanifoldIntegration.universal` zero-instance has been removed (2026-02-01), but there is still **no concrete instance** with real integration/Stokes.
   - (updated 2026-02-01) `Hodge/Deep/Pillars/Stokes.lean` no longer defines a stubby Set-based `SubmanifoldIntegration.real`.
     Remaining work is to retire the legacy Set-based interface entirely and construct real integration currents from
     `OrientedRectifiableSetData` / `ClosedSubmanifoldData` (see `Hodge/Analytic/Currents.lean`).
@@ -157,10 +196,19 @@ This is not exhaustive, but it captures the major blockers currently *on the pro
 - **(Removed) legacy boundary-mass placeholder**:
   - The Set-based `boundaryMass := 0` stub (and its dependent Stokes plumbing) was removed from `Hodge/Analytic/Currents.lean`.
 - **Hodge-theoretic operators still need real analytic proofs**:
+  - `Hodge/Analytic/HodgeStar/FiberStar.lean`: fiber Hodge star now uses the real 2n‑basis (degree `k ↦ 2n−k`).
+  - `Hodge/Analytic/Laplacian/Codifferential.lean` + `Hodge/Analytic/Laplacian/HodgeLaplacian.lean`:
+    codifferential/Laplacian updated to the real `2n` degree conventions.
   - `Hodge/Analytic/Norms.lean`: `L2Inner` now depends on explicit `VolumeIntegrationData`
-    (no basepoint/zero stub). `Hodge/Analytic/Integration/L2Inner.lean` now provides
+    (no basepoint/zero stub). `Hodge/Analytic/Integration/L2Inner.lean` provides
     `volumeIntegrationData_ofMeasure`, and `Hodge/Analytic/Integration/VolumeForm.lean`
     provides `volumeIntegrationData_kahlerMeasure`. The *Kähler* volume construction is still missing.
+  - `Hodge/Analytic/Integration/VolumeForm.lean`: `KahlerVolumeMeasureData` is now **Type‑valued**
+    (data, not `Prop`), and `KahlerMeasureCompatibilityData` records compatibility between
+    `kahlerMeasure` and top-dimensional Hausdorff measure. Remaining: add top-form integration
+    compatibility needed for `L2Inner` ↔ `L2Inner_wedge`.
+  - `Hodge/Analytic/Integration/TopFormIntegral.lean`: `L2Inner_wedge := ∫ α ∧ ⋆β` is now defined with
+    bilinearity lemmas; it still needs to be related to `L2Inner`.
   - `Hodge/Kahler/Identities/*.lean`: several operators are still `:= 0`.
 
 - **Integral currents semantics still need upgrading**:
@@ -355,10 +403,10 @@ implemented without stubs.
 - `Hodge/Analytic/HodgeStar/FiberStar.lean`
   - Completed nontrivial fiber Hodge star (`fiberHodgeStar_construct`).
 - `Hodge/Analytic/Norms.lean`
-  - Replace `L2Inner := VolumeIntegrationData.basepoint` with real `L2Inner_measure` over Kähler volume.
-  - Implement `L2Inner_eq_integral_wedge_hodgeStar` (no `True` placeholder).
+  - `L2Inner` already uses `VolumeIntegrationData`; remaining: relate it to `L2Inner_wedge` (`∫ α ∧ ⋆β`)
+    and prove the metric/volume normalization needed for the TeX proof.
 - `Hodge/Analytic/Laplacian/Codifferential.lean`
-  - Codifferential `δ := (-1)^{nk+n+1} ⋆ d ⋆` implemented as a real linear map.
+  - Codifferential `δ := (-1)^{(2n)k+2n+1} ⋆ d ⋆` implemented as a real linear map (2n‑degree conventions).
 - `Hodge/Analytic/Laplacian/HodgeLaplacian.lean`
   - Hodge Laplacian `Δ := d ∘ δ + δ ∘ d` defined (structural operator).
 - `Hodge/Analytic/Laplacian/HarmonicForms.lean`
@@ -366,7 +414,7 @@ implemented without stubs.
 - `Hodge/Analytic/Integration/L2Inner.lean`
   - Use `kahlerMeasure` to instantiate `L2Inner` with real integration.
 - `Hodge/Analytic/Integration/VolumeForm.lean`
-  - Replace `volumeBasis := 0` stub with an orthonormal frame from the Kähler metric.
+  - Replace any placeholder volume-basis data with an orthonormal frame from the Kähler metric.
 - `Hodge/Kahler/Identities/LambdaD.lean` and `Hodge/Kahler/Identities/LDelta.lean`
   - Replace placeholder operators `Λ`, `δ`, `L` with real definitions (from Hodge star / Lefschetz).
 
