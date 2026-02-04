@@ -14,9 +14,9 @@ We are formalizing the Hodge Conjecture in Lean 4. The goal is a **machine-check
 
 ## 📊 Current Axiom Breakdown
 
-### Proof Chain for `hodge_conjecture'`
+### Proof Chain for `hodge_conjecture_data`
 
-When we run `#print axioms hodge_conjecture'`, Lean reports:
+When we run `#print axioms hodge_conjecture_data`, Lean reports:
 
 ```
 Classical Pillars (8):          ← Keep as axioms
@@ -190,7 +190,7 @@ As the point agent, I coordinate the formalization effort:
 - [ ] All opaques eliminated ✅
 - [ ] Only classical pillars remain as axioms
 - [ ] `lake build Hodge` passes ✅
-- [ ] Main theorem `hodge_conjecture'` verified
+- [ ] Main theorem `hodge_conjecture_data` verified
 
 ### Stretch Goals
 - [ ] Reduce classical pillars to 5-6
@@ -229,7 +229,7 @@ As the point agent, I coordinate the formalization effort:
 | `Hodge/Analytic/Currents.lean` | Currents, boundary operator |
 | `Hodge/Kahler/Manifolds.lean` | Kähler manifold structure |
 | `Hodge/Kahler/TypeDecomposition.lean` | (p,q)-forms, Kähler powers |
-| `Hodge/Kahler/Main.lean` | Main theorem `hodge_conjecture'` |
+| `Hodge/Main.lean` | Main theorem `hodge_conjecture_data` |
 | `DependencyCheck.lean` | Axiom dependency checker |
 
 ---
@@ -266,4 +266,3 @@ grep -rn "\bsorry\b" Hodge/ --include="*.lean" | wc -l
 
 *Last updated: January 2, 2026*
 *Point Agent: Claude (Anthropic)*
-

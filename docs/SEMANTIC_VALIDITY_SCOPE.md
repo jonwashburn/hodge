@@ -35,7 +35,7 @@ These are the main “degenerate model” points referenced by Section **E** of 
 - **Impact**: “closed/exact” and de Rham cohomology are not the intended mathematics yet.
 
 ### Fundamental class stub (`Hodge/Classical/GAGA.lean`)
-- `FundamentalClassSet_impl := 0` (cycle class map returns the zero form)
+- `FundamentalClassSet_data_impl := 0` (cycle class map returns the zero form)
 - **Impact**: algebraic-cycle → cohomology comparisons are presently vacuous.
 
 ### Current/integration stubs (`Hodge/Analytic/Currents.lean`)
@@ -102,7 +102,7 @@ These are documentation comments, not actual sorry usage in proofs.
 ### Main theorem status (`hodge_conjecture`)
 The theorem statement type-checks and builds, but **the current proof is not Clay-standard**
 because it depends on the semantic stubs listed above (in particular `d := 0` and
-`FundamentalClassSet := 0`).
+`FundamentalClassSet_data := 0`).
 
 This repo is explicitly in a staged “proof-first” mode; the referee remediation plan documents
 the work needed to replace these stubs with real mathematics.

@@ -110,8 +110,8 @@ This is exactly the argument on lines 2604-2607 of the written proof.
 ### Axioms in Proof Track
 
 ```
-'hodge_conjecture'' depends on axioms:
-- FundamentalClassSet_represents_class  (Agent 4)
+'hodge_conjecture_data' depends on axioms:
+- FundamentalClassSet_data_represents_class  (Agent 4)
 - isFormClosed_unitForm                 (Agent 1 - NOW PROVED)
 - smoothExtDeriv_extDeriv               (Agent 1 - NOW PROVED)
 - smoothExtDeriv_wedge                  (Agent 1 - NOW PROVED)

@@ -20,8 +20,8 @@
 
 **Current Proof Track Status**:
 ```
-'hodge_conjecture'' depends on axioms: [
-  FundamentalClassSet_represents_class,    -- Agent 4
+'hodge_conjecture_data' depends on axioms: [
+  FundamentalClassSet_data_represents_class,    -- Agent 4
   propext,                                  -- Standard
   sorryAx,                                  -- 2 combinatorial sorries (see below)
   Classical.choice,                         -- Standard

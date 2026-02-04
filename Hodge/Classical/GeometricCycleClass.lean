@@ -5,6 +5,7 @@ Authors: TeX Spine Semantic Closure Implementation
 -/
 import Hodge.Quarantine.Classical.ChowGAGA
 import Hodge.Kahler.Main
+import Hodge.Classical.PoincareDualityFromCurrents
 
 /-!
 # Geometric Cycle Class (TeX Spine Step 6)
@@ -116,7 +117,7 @@ def cycleClass_geom {p : ℕ} [CycleClass.PoincareDualFormExists n X p]
 /-- Geometric cycle class from explicit `ClosedSubmanifoldData`. -/
 def cycleClass_geom_data {p : ℕ} [MetricSpace X] [BorelSpace X]
     [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
-    [CycleClass.PoincareDualFormFromCurrentData n X p]
+    [CycleClass.PoincareDualityFromCurrentsData n X p]
     (data : ClosedSubmanifoldData n X (2 * p)) :
     DeRhamCohomologyClass n X (2 * p) :=
   ofForm (FundamentalClassSet_data n X p data)
@@ -186,7 +187,7 @@ class SpineBridgeData_data (n : ℕ) (X : Type u)
   fundamental_eq_representing :
     ∀ {p : ℕ}
       [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
-      [CycleClass.PoincareDualFormFromCurrentData n X p]
+      [CycleClass.PoincareDualityFromCurrentsData n X p]
       [SignedAlgebraicCycleSupportData n X p]
       (Z : SignedAlgebraicCycle n X p),
       cycleClass_geom_data (n := n) (X := X)
@@ -248,7 +249,7 @@ theorem cycleClass_eq_geom_for_spine [ChowGAGA.ChowGAGAData n X] [SpineBridgeDat
 theorem spine_bridge_data [MetricSpace X] [BorelSpace X]
     [ChowGAGA.ChowGAGAData n X] [SpineBridgeData_data n X] {p : ℕ}
     [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
-    [CycleClass.PoincareDualFormFromCurrentData n X p]
+    [CycleClass.PoincareDualityFromCurrentsData n X p]
     [AlgebraicSubvarietyClosedSubmanifoldData n X]
     [SignedAlgebraicCycleSupportCodimData n X p]
     (γ : SmoothForm n X (2 * p)) (hγ_closed : IsFormClosed γ)
@@ -271,7 +272,7 @@ theorem spine_bridge_data [MetricSpace X] [BorelSpace X]
 theorem spine_bridge_data_with_data [MetricSpace X] [BorelSpace X]
     [ChowGAGA.ChowGAGAData n X] [SpineBridgeData_data n X] {p : ℕ}
     [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
-    [CycleClass.PoincareDualFormFromCurrentData n X p]
+    [CycleClass.PoincareDualityFromCurrentsData n X p]
     [AlgebraicSubvarietyClosedSubmanifoldData n X]
     [SignedAlgebraicCycleSupportCodimData n X p]
     (γ : SmoothForm n X (2 * p)) (hγ_closed : IsFormClosed γ)
@@ -301,7 +302,7 @@ Putting it all together: the complete TeX spine proof.
 theorem tex_spine_full_data [MetricSpace X] [BorelSpace X]
     [ChowGAGA.ChowGAGAData n X] [SpineBridgeData_data n X] {p : ℕ}
     [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
-    [CycleClass.PoincareDualFormFromCurrentData n X p]
+    [CycleClass.PoincareDualityFromCurrentsData n X p]
     [AlgebraicSubvarietyClosedSubmanifoldData n X]
     [SignedAlgebraicCycleSupportCodimData n X p]
     (γ : SmoothForm n X (2 * p)) (hγ_closed : IsFormClosed γ)

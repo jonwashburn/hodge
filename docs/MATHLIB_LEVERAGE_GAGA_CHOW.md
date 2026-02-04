@@ -88,7 +88,7 @@ development of:
 - Poincaré duality in a form that produces a representing differential form from a cycle/current.
 
 Practical takeaway:
-- The “cycleClass_geom from support via fundamental class / integration current” pillar will require
+- The “cycleClass_geom_data from support via fundamental class / integration current” pillar will require
   substantial new infrastructure inside this repo (or a different formalization approach).
 
 ---

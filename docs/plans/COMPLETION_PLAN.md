@@ -1,7 +1,7 @@
 # Hodge Conjecture Formalization: Completion Plan
 
 ## Goal
-Prove all axioms in the `hodge_conjecture'` proof chain, leaving only Lean system axioms (propext, Classical.choice, Quot.sound) and the 13 authoritative classical pillars.
+Prove all axioms in the `hodge_conjecture_data` proof chain, leaving only Lean system axioms (propext, Classical.choice, Quot.sound) and the 13 authoritative classical pillars.
 
 ---
 
@@ -52,7 +52,7 @@ These are the deep theorems intentionally kept as axioms in the final state of t
 ## Success Criteria
 
 - [ ] `lake build Hodge` passes (Coordinator only)
-- [ ] `#print axioms hodge_conjecture'` shows only Lean system axioms and the 13 classical pillars.
+- [ ] `#print axioms hodge_conjecture_data` shows only Lean system axioms and the 13 classical pillars.
 
 ---
 

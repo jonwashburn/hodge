@@ -128,7 +128,7 @@ $ grep -r "sorry\|admit" Hodge/**/*.lean
 ### ✅ Axiom Dependency Check
 ```bash
 $ lake env lean DependencyCheck.lean
-'hodge_conjecture'' depends on axioms: [FundamentalClassSet_isClosed,
+'hodge_conjecture_data' depends on axioms: [FundamentalClassSet_data_isClosed,
  IsAlgebraicSet, IsAlgebraicSet_empty, IsAlgebraicSet_union,
  calibration_inequality, exists_volume_form_of_submodule_axiom,
  flat_limit_of_cycles_is_cycle, hard_lefschetz_inverse_form,

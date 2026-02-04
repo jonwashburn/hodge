@@ -633,8 +633,8 @@ axiom IsAlgebraicSet_isAnalyticSet (n X Z) : IsAlgebraicSet Z → IsAnalyticSet 
 axiom serre_gaga {p} (V : AnalyticSubvariety n X) (hV_codim : V.codim = p) : ∃ W : AlgebraicSubvariety n X, ...
 
 -- Lines 167-172: Fundamental class
-axiom FundamentalClassSet_additive (p Z₁ Z₂) (h_disjoint) : FundamentalClassSet p (Z₁ ∪ Z₂) = ...
-axiom FundamentalClassSet_rational (p Z) (h : isAlgebraicSubvariety n X Z) : isRationalClass ⟦FundamentalClassSet p Z, ...⟧
+axiom FundamentalClassSet_data_additive (p Z₁ Z₂) (h_disjoint) : FundamentalClassSet_data p (Z₁ ∪ Z₂) = ...
+axiom FundamentalClassSet_data_rational (p Z) (h : isAlgebraicSubvariety n X Z) : isRationalClass ⟦FundamentalClassSet_data p Z, ...⟧
 ```
 
 ### Hodge/Classical/HarveyLawson.lean (10 items)
@@ -1134,8 +1134,8 @@ Line 67: axiom IsAlgebraicSet_intersection → prove intersection of algebraic
 Line 74: axiom IsAlgebraicSet_isClosed → prove algebraic sets are closed
 Line 81: axiom IsAlgebraicSet_isAnalyticSet → prove algebraic ⊂ analytic
 Line 93: axiom serre_gaga → ⚠️ KEEP AS AXIOM
-Line 167: axiom FundamentalClassSet_additive → prove additivity
-Line 172: axiom FundamentalClassSet_rational → prove rationality
+Line 167: axiom FundamentalClassSet_data_additive → prove additivity
+Line 172: axiom FundamentalClassSet_data_rational → prove rationality
 
 ### Hodge/Classical/HarveyLawson.lean (10 items, KEEP hl_theorem/represents)
 Line 24: opaque IsAnalyticSet → def using local analytic equations

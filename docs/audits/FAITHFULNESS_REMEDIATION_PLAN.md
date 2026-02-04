@@ -31,7 +31,7 @@ The authoritative “what this proof assumes” list is the output of `Dependenc
 
 File: `Hodge/Kahler/Main.lean`
 
-- `hodge_conjecture'` takes:
+- `hodge_conjecture_data` takes:
   - a smooth \(2p\)-form `γ`,
   - a proof it is **closed** (`IsFormClosed γ`),
   - a proof its **cohomology class is rational** (`isRationalClass (ofForm γ h_closed)`),
@@ -49,12 +49,12 @@ Reproduce:
 lake env lean DependencyCheck.lean
 ```
 
-This prints the exact axiom list that `hodge_conjecture'` depends on (plus Lean’s standard classical axioms like `Classical.choice`, `propext`, etc.).
+This prints the exact axiom list that `hodge_conjecture_data` depends on (plus Lean’s standard classical axioms like `Classical.choice`, `propext`, etc.).
 
 Current output (verbatim, 2025-12-30):
 
 ```text
-'hodge_conjecture'' depends on axioms: [FundamentalClassSet_isClosed,
+'hodge_conjecture_data' depends on axioms: [FundamentalClassSet_data_isClosed,
  IsAlgebraicSet,
  IsAlgebraicSet_empty,
  IsAlgebraicSet_union,
@@ -164,10 +164,9 @@ This is considered acceptable under the project goal (“faithful modulo classic
 
 ## 4. Success criterion (what we now claim)
 
-**Claim**: The repository contains a **machine-checked Lean proof** of `hodge_conjecture'` that is faithful to the classical Hodge Conjecture statement **modulo the explicit axiom set printed by `DependencyCheck.lean`** (and Lean’s standard classical axioms).
+**Claim**: The repository contains a **machine-checked Lean proof** of `hodge_conjecture_data` that is faithful to the classical Hodge Conjecture statement **modulo the explicit axiom set printed by `DependencyCheck.lean`** (and Lean’s standard classical axioms).
 
 In particular:
 - there are **no** hidden holes (`sorry`/`admit`),
-- the only assumptions are those enumerated by `#print axioms hodge_conjecture'`.
-
+- the only assumptions are those enumerated by `#print axioms hodge_conjecture_data`.
 

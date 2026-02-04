@@ -11,11 +11,11 @@ The Hodge Conjecture formalization has the following status:
 | No custom `opaque` declarations | ✅ PASS |
 | No `instance … .universal` on instance line | ✅ PASS |
 | Kernel axioms | ✅ Only `propext`, `Classical.choice`, `Quot.sound` |
-| Deep typeclass binders in `hodge_conjecture'` | ❌ FAIL (4 binders) |
+| Deep typeclass binders in `hodge_conjecture_data` | ❌ FAIL (4 binders) |
 
-The audit `./scripts/audit_practical_unconditional.sh` **fails** because `hodge_conjecture'` requires **four** deep typeclasses:
-1. `[CycleClass.PoincareDualFormExists n X p]` - de Rham representability
-2. `[SpineBridgeData n X p]` - Harvey-Lawson bridge theorem
+The audit `./scripts/audit_practical_unconditional.sh` **fails** because `hodge_conjecture_data` requires **four** deep typeclasses:
+1. `[CycleClass.PoincareDualityFromCurrentsData n X p]` - de Rham representability (yields `PoincareDualFormFromCurrentData`)
+2. `[SpineBridgeData_data n X p]` - Harvey-Lawson bridge theorem
 3. `[CalibratedCurrentRegularityData n X (2 * (n - p))]` - Harvey-Lawson regularity
 4. `[ChowGAGAData n X]` - Chow/GAGA theorem
 
@@ -24,7 +24,7 @@ The audit `./scripts/audit_practical_unconditional.sh` **fails** because `hodge_
 | Definition | Before | After |
 |------------|--------|-------|
 | `IsAnalyticSet` | `IsClosed` (stub) | `IsAnalyticSetZeroLocus` (local holomorphic zero locus) |
-| `cycleClass_geom` | Alias of `cycleClass` | `ofForm (FundamentalClassSet support)` |
+| `cycleClass_geom_data` | Alias of `cycleClass` | `ofForm (FundamentalClassSet_data support)` |
 | `ChowGAGAData` | Trivial universal instance | Explicit typeclass (no instance) |
 | `CalibratedCurrentRegularityData` | N/A | New explicit typeclass |
 
@@ -39,7 +39,7 @@ The deep typeclass binders are NOT semantic stubs. They represent genuine mathem
 
 These are **not semantic stubs**. They represent genuine mathematical content:
 
-### `PoincareDualFormExists`
+### `PoincareDualityFromCurrentsData`
 
 **Mathematical Content**: For every algebraic set Z of codimension p on a compact Kähler manifold X, there exists a closed (2p)-form η_Z (the "Poincaré dual form") such that:
 
@@ -56,12 +56,12 @@ This is the **de Rham representability theorem** for integration currents. It sa
 
 None of these are in Mathlib for general Kähler manifolds.
 
-### `SpineBridgeData`
+### `SpineBridgeData_data`
 
 **Mathematical Content**: For algebraic cycles Z constructed by the proof spine (via Harvey-Lawson + GAGA), the geometric fundamental class of Z's support equals the representing form class:
 
 ```
-[FundamentalClassSet(Z.support)] = [Z.representingForm]
+[FundamentalClassSet_data(Z.support)] = [Z.representingForm]
 ```
 
 This is the **Harvey-Lawson bridge theorem**. It connects the geometric cycle class (from integration) with the algebraic cycle class (from the representing form).
@@ -116,7 +116,7 @@ These are definitions that remain as stubs but are documented:
 | `IsAlgebraicSet` (projective polynomial zero loci) | DONE | Prove Chow/GAGA analytic → algebraic |
 | `buildSheetsFromConePositive := ∅` | STUB | Full microstructure sheet construction |
 
-These stubs are **not on the main proof track** in the sense that they don't directly appear in `hodge_conjecture'`. However, they affect the construction of cycles via `cone_positive_produces_cycle`.
+These stubs are **not on the main proof track** in the sense that they don't directly appear in `hodge_conjecture_data`. However, they affect the construction of cycles via `cone_positive_produces_cycle`.
 
 ## What Would Be Needed
 
@@ -172,32 +172,33 @@ SignedAlgebraicCycle
     |-- cycleClass : DeRhamCohomologyClass
     |       := ofForm(representingForm)      ← algebraic
     |
-    |-- cycleClass_geom : DeRhamCohomologyClass
-    |       := ofForm(FundamentalClassSet(support))  ← geometric
+    |-- cycleClass_geom_data : DeRhamCohomologyClass
+    |       := ofForm(FundamentalClassSet_data(support))  ← geometric
     |           ↑
-    |           requires PoincareDualFormExists
+    |           requires PoincareDualityFromCurrentsData
 ```
 
-The bridge between `cycleClass` and `cycleClass_geom` is `SpineBridgeData`:
+The bridge between `cycleClass` and `cycleClass_geom_data` is `SpineBridgeData_data`:
 ```
-SpineBridgeData.fundamental_eq_representing:
-    cycleClass_geom = cycleClass
+SpineBridgeData_data.fundamental_eq_representing:
+    cycleClass_geom_data = cycleClass
 ```
 
 ## Recommendation
 
 The formalization is in a **mathematically honest state**:
 - The deep assumptions are explicit, not hidden
-- The proof uses `SpineBridgeData.fundamental_eq_representing` (not `rfl`)
-- The semantic definition of `cycleClass_geom` is correct
+- The proof uses `SpineBridgeData_data.fundamental_eq_representing` (not `rfl`)
+- The semantic definition of `cycleClass_geom_data` is correct
 
 The audit failure correctly indicates that these deep theorems haven't been proved. This is the expected outcome without building significant new infrastructure.
 
 **To complete the formalization fully**, one would need to:
 1. Choose one of the three paths above
 2. Build the required infrastructure (months of work)
-3. Prove `PoincareDualFormExists` and `SpineBridgeData` from the developed theory
-4. Remove them as explicit parameters from `hodge_conjecture'`
+3. Prove `PoincareDualityFromCurrentsData` (then `PoincareDualFormFromCurrentData`) and
+   `SpineBridgeData_data` from the developed theory
+4. Remove them as explicit parameters from `hodge_conjecture_data`
 
 ## References
 

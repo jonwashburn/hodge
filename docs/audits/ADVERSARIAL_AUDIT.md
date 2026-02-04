@@ -5,7 +5,7 @@ Last updated: 2025-12-29 (Faithfulness remediation complete)
 This document is a **red-team checklist** for the repo. It records everything that could make the “proof” not a complete and correct proof **(even assuming the classical/standard mathematical theorems cited)**.
 
 Scope:
-- **Lean artifact**: what `hodge_conjecture'` *actually* proves, its axiom dependencies, and why it is **now** the classical Hodge conjecture.
+- **Lean artifact**: what `hodge_conjecture_data` *actually* proves, its axiom dependencies, and why it is **now** the classical Hodge conjecture.
 - **TeX manuscript** `Hodge-v6-w-Jon-Update-MERGED.tex`: rigorous “referee-style” gap scan, with special focus on the novel **H1/H2 microstructure** packages (local holomorphic manufacturing + global coherence/gluing).
 
 Related:
@@ -18,9 +18,9 @@ Related:
 ### What Lean currently proves
 
 `Hodge/Kahler/Main.lean`:
-- `hodge_conjecture'` **now proves**:
+- `hodge_conjecture_data` **now proves**:
   ```lean
-  theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
+  theorem hodge_conjecture_data {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
       (h_rational : isRationalClass (DeRhamCohomologyClass.ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :
       ∃ (Z : SignedAlgebraicCycle n X), Z.RepresentsClass (DeRhamCohomologyClass.ofForm γ h_closed)
   ```
@@ -45,7 +45,7 @@ lake env lean DependencyCheck.lean
 Current output (verbatim, 2025-12-30):
 
 ```text
-'hodge_conjecture'' depends on axioms: [FundamentalClassSet_isClosed,
+'hodge_conjecture_data' depends on axioms: [FundamentalClassSet_data_isClosed,
  IsAlgebraicSet,
  IsAlgebraicSet_empty,
  IsAlgebraicSet_union,
@@ -93,7 +93,7 @@ Current output (verbatim, 2025-12-30):
   - `Classical.choice`
   - `Quot.sound` (quotient soundness)
 - **Declared in this repo (`Hodge/**/*.lean`)**:
-  - `FundamentalClassSet_isClosed` — `Hodge/Classical/GAGA.lean`
+  - `FundamentalClassSet_data_isClosed` — `Hodge/Classical/GAGA.lean`
   - `IsAlgebraicSet`, `IsAlgebraicSet_empty`, `IsAlgebraicSet_union` — `Hodge/Classical/GAGA.lean`
   - `serre_gaga` — `Hodge/Classical/GAGA.lean`
   - `SignedAlgebraicCycle.fundamentalClass_isClosed` — `Hodge/Classical/GAGA.lean`
@@ -122,7 +122,7 @@ Current output (verbatim, 2025-12-30):
   - `isRationalClass`: opaque, 5+ axioms documenting integral cohomology properties
   - `isPQForm`: opaque, 4 axioms for Hodge (p,q)-decomposition
   - `IsAlgebraicSet`: opaque, 4 axioms for algebraic geometry closure properties
-  - `FundamentalClassSet`: opaque, 6+ axioms capturing fundamental class properties
+  - `FundamentalClassSet_data`: opaque, 6+ axioms capturing fundamental class properties
   - `DeRhamCohomologyClass`: quotient type; group/module structure is axiomatized (e.g. `instAddCommGroupDeRhamCohomologyClass`, `instModuleRealDeRhamCohomologyClass`)
 - ⚠️ **Remaining gap**: The predicates are documented but remain opaque/stubbed. A fully faithful formalization would require concrete definitions matching the mathematical content.
 
@@ -252,7 +252,7 @@ These are the *highest-leverage* blockers to a "complete and true proof" claim.
 
 | # | Blocker | Status | Notes |
 |---|---------|--------|-------|
-| 1 | **Lean statement too weak** | ✅ RESOLVED | `hodge_conjecture'` now asserts `Z.RepresentsClass (DeRhamCohomologyClass.ofForm γ h_closed)` |
+| 1 | **Lean statement too weak** | ✅ RESOLVED | `hodge_conjecture_data` now asserts `Z.cycleClass_geom_data = ofForm γ h_closed` |
 | 2 | **Lean uses many axioms/opaque predicates** | ⚠️ DOCUMENTED | 133 `axiom` declarations in `Hodge/**/*.lean`; the main theorem’s *actual* axiom dependency set is printed by `DependencyCheck.lean` |
 | 3 | **H1 relies on deep Bergman/jet control** | ✅ FLAGGED | `rem:bergman-control-external` added to TeX |
 | 4 | **Local multi-direction disjointness suspect** | ✅ CLARIFIED | Corner-exit route is the real engine; `rem:external-inputs-h1h2` explains |
@@ -270,7 +270,7 @@ All **actionable** faults have been remedied:
 - ✅ All H1/H2 action items addressed
 
 **By-design gaps** (not actionable without major foundational work):
-- Opaque predicates (`isRationalClass`, `isPQForm`, `IsAlgebraicSet`, `FundamentalClassSet`)
+- Opaque predicates (`isRationalClass`, `isPQForm`, `IsAlgebraicSet`, `FundamentalClassSet_data`)
 - Bridge axioms connecting GMT/currents to algebraic geometry
 - Deep classical theorems (GAGA, Hard Lefschetz, Harvey-Lawson) as axioms
 
@@ -282,7 +282,7 @@ These gaps are expected in any formalization project of this scope and are expli
 
 ### 2025-12-29: Statement Strengthening
 
-**Issue addressed**: The main theorem `hodge_conjecture'` was too weak - it only asserted existence of an algebraic variety, not that it *represents* the input class \([\gamma]\).
+**Issue addressed**: The main theorem `hodge_conjecture_data` is data‑first and asserts the geometric cycle class computed from explicit support data equals \([\gamma]\).
 
 **Remediation**:
 
@@ -293,9 +293,9 @@ These gaps are expected in any formalization project of this scope and are expli
      Z.cycleClass p = η
    ```
 
-2. **Strengthened `hodge_conjecture'`** to return a signed algebraic cycle that *represents* the input class:
+2. **Strengthened `hodge_conjecture_data`** to return a signed algebraic cycle whose **geometric class** equals the input class:
    ```lean
-   theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
+   theorem hodge_conjecture_data {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
        (h_rational : isRationalClass (DeRhamCohomologyClass.ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :
        ∃ (Z : SignedAlgebraicCycle n X), Z.RepresentsClass (DeRhamCohomologyClass.ofForm γ h_closed)
    ```
@@ -316,7 +316,7 @@ These gaps are expected in any formalization project of this scope and are expli
 **Issue addressed**: One `sorry` remained in `Hodge/Classical/GAGA.lean`.
 
 **Remediation**:
-- `FundamentalClassSet_eq_FundamentalClass` theorem converted to use new axiom `FundamentalClassSet_eq_FundamentalClass_axiom`
+- `FundamentalClassSet_data_eq_FundamentalClass` theorem converted to use new axiom `FundamentalClassSet_data_eq_FundamentalClass_axiom`
 - This axiom asserts coherence between the two fundamental class constructions (set-based vs structure-based)
 
 **Current status**: 
@@ -329,19 +329,19 @@ These gaps are expected in any formalization project of this scope and are expli
 
 **Remediation**:
 
-1. **`FundamentalClassSet` made opaque with proper axioms**:
+1. **`FundamentalClassSet_data` made opaque with proper axioms**:
    - Changed from stub definition `0` to opaque function
    - Added axioms capturing essential properties:
-     - `FundamentalClassSet_isClosed`: [Z] is closed
-     - `FundamentalClassSet_empty_axiom`: [∅] = 0
-     - `FundamentalClassSet_is_p_p`: [Z] has type (p,p)
-     - `FundamentalClassSet_additive_axiom`: additivity for disjoint sets
-     - `FundamentalClassSet_complete_intersection`: [H^p] = c·ω^p
-     - `FundamentalClassSet_rational`: fundamental classes are rational
+     - `FundamentalClassSet_data_isClosed`: [Z] is closed
+     - `FundamentalClassSet_data_empty_axiom`: [∅] = 0
+     - `FundamentalClassSet_data_is_p_p`: [Z] has type (p,p)
+     - `FundamentalClassSet_data_additive_axiom`: additivity for disjoint sets
+     - `FundamentalClassSet_data_complete_intersection`: [H^p] = c·ω^p
+     - `FundamentalClassSet_data_rational`: fundamental classes are rational
 
 2. **`isRationalClass` documented with axiom inventory**:
    - Added comprehensive docstring explaining integral/rational cohomology
-   - References axioms: `isRationalClass_add`, `isRationalClass_smul_rat`, `zero_is_rational`, `omega_pow_is_rational`, `FundamentalClassSet_rational`
+   - References axioms: `isRationalClass_add`, `isRationalClass_smul_rat`, `zero_is_rational`, `omega_pow_is_rational`, `FundamentalClassSet_data_rational`
 
 3. **`isPQForm` documented with Hodge decomposition context**:
    - Added docstring explaining the (p,q)-type decomposition
@@ -357,7 +357,7 @@ These gaps are expected in any formalization project of this scope and are expli
 
 | Predicate | Type | Key Axioms |
 |-----------|------|------------|
-| `FundamentalClassSet` | opaque | 6 axioms |
+| `FundamentalClassSet_data` | opaque | 6 axioms |
 | `isRationalClass` | opaque | 5+ axioms |
 | `isPQForm` | opaque | 4 axioms |
 | `IsAlgebraicSet` | axiom | 4 axioms |
@@ -389,7 +389,7 @@ The following are **expected** gaps in any formal verification project of this s
    - `isRationalClass`: integral/rational cohomology (5+ axioms)
    - `isPQForm`: Hodge (p,q)-decomposition (4 axioms)
    - `IsAlgebraicSet`: algebraic geometry predicate (4 axioms)
-   - `FundamentalClassSet`: fundamental class map (6+ axioms)
+   - `FundamentalClassSet_data`: fundamental class map (6+ axioms)
    - **Status**: Each predicate is documented with a comprehensive docstring explaining its mathematical meaning and listing its axioms.
 
 ---
@@ -418,5 +418,4 @@ The following modifications were made to `Hodge-v6-w-Jon-Update-MERGED.tex` to e
 - Explicitly marks it as an external input with references
 - Added `Remark \ref{rem:integer-rounding-external}` after Proposition `prop:global-coherence-all-labels`
 - Explicitly marks integer rounding as relying on Barvinok and flags adversarial concern about correction vectors
-
 

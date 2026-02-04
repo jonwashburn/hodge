@@ -9,7 +9,7 @@
 ## Executive Summary
 
 The primary referee doc focuses on:
-- FundamentalClassSet axioms/opaques (Phase 1)
+- FundamentalClassSet_data axioms/opaques (Phase 1)
 - Exterior derivative d=0 stub (Phase 2)
 - Quantitative bottleneck formalization (Phase 3)
 - Harvey-Lawson bridge (Phase 6)
@@ -37,7 +37,7 @@ hodge_conjecture depends on:
 **Status**:
 - ✅ No project-local `axiom` declarations remain in `Hodge/`
 - ✅ `exists_uniform_interior_radius` eliminated (now a theorem in `Hodge/Kahler/Cone.lean`)
-- ✅ `FundamentalClassSet_represents_class` eliminated (now a theorem / stubbed via `FundamentalClassSet := 0`)
+- ✅ `FundamentalClassSet_data_represents_class` eliminated (now a theorem / stubbed via `FundamentalClassSet_data := 0`)
 - ✅ `lake env lean Hodge/Utils/AuditAxioms.lean` reports only core Lean axioms (above)
 
 ---
@@ -261,7 +261,7 @@ grep -r ":= 0\|toFun := 0" Hodge/ --include="*.lean" | grep -v test
 3. **Axiom regression test**:
 ```lean
 -- In AuditAxioms.lean, add expected axiom count check
-#guard (axiomList.length == 1)  -- Only FundamentalClassSet_represents_class
+#guard (axiomList.length == 1)  -- Only FundamentalClassSet_data_represents_class
 ```
 
 ---
@@ -299,7 +299,7 @@ grep -r ":= 0\|toFun := 0" Hodge/ --include="*.lean" | grep -v test
 
 | File | Primary Agent | Notes |
 |------|---------------|-------|
-| `GAGA.lean` | Agent 1 | FundamentalClassSet work |
+| `GAGA.lean` | Agent 1 | FundamentalClassSet_data work |
 | `Currents.lean` | Agent 1 | integration_current |
 | `Forms.lean` | Agent 1 | extDerivLinearMap |
 | `Cone.lean` | Agent 2 | ✅ Done + refinements |

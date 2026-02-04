@@ -3,17 +3,29 @@
 This note exists because "how many axioms/sorries remain?" is easy to misstate unless we fix the metric.
 The only metric that matters for the final proof is **Lean's kernel dependency report**:
 
-- `#print axioms hodge_conjecture'`
+- `#print axioms hodge_conjecture_data`
 
 That command reports exactly the *global* axioms that the theorem's definition depends on.
 It does **not** list:
 
 - assumptions in the statement (e.g. typeclass parameters like `[KahlerManifold n X]`),
-- axioms/sorries that exist elsewhere in the repo but are not used by `hodge_conjecture'`.
+- axioms/sorries that exist elsewhere in the repo but are not used by `hodge_conjecture_data`.
 
 So, whenever there is disagreement about "where we are", we treat this output as the ground truth.
 
 ---
+
+## Update (2026-02-04) — Data‑First Proof Track
+
+- Proof‑track entry point is `hodge_conjecture_data` in `Hodge/Main.lean` (via
+  `Hodge/Kahler/Main.lean:hodge_conjecture'_data`).
+- Data‑first dependencies now include `CurrentRegularizationData`,
+  `PoincareDualityFromCurrentsData` (→ `PoincareDualFormFromCurrentData`), `SpineBridgeData_data`,
+  and the explicit
+  support‑data binders (`AlgebraicSubvarietyClosedSubmanifoldData`,
+  `SignedAlgebraicCycleSupportCodimData`).
+- Legacy set‑based `hodge_conjecture` remains for compatibility only.
+- Historical notes below may refer to the legacy names or earlier stub stages.
 
 ## How to reproduce the current status
 
@@ -31,8 +43,8 @@ lake env lean Hodge/Utils/DependencyCheck.lean
 Lean prints:
 
 ```
-'hodge_conjecture' depends on axioms: [propext, Classical.choice, Quot.sound]
-'hodge_conjecture'' depends on axioms: [propext, Classical.choice, Quot.sound]
+'hodge_conjecture_data depends on axioms: [propext, Classical.choice, Quot.sound]
+'hodge_conjecture_data' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
 **Last verified**: 2026-02-01
@@ -45,42 +57,42 @@ Lean prints:
 
 - Removed unused zero-model constructors:
   - `SubmanifoldIntegration.universal` (deleted)
-  - `CycleClass.PoincareDualFormExists.universal` (deleted)
-  - `SpineBridgeData.universal` (deleted)
+  - Legacy: `CycleClass.PoincareDualFormFromCurrentData.universal` (deleted)
+  - `SpineBridgeData_data.universal` (deleted)
 - Reduced proof-spine “hidden power”:
-  - `hodge_conjecture'` no longer injects `SubmanifoldIntegration.universal`
+  - `hodge_conjecture_data` no longer injects `SubmanifoldIntegration.universal`
   - `FlatLimitCycleData` is now a global instance (`instFlatLimitCycleData`), so no longer injected locally
 
-Note: the TeX-faithful semantic tasks (geometric `cycleClass_geom`, real PD, real SYR/HL/GAGA) are still pending and tracked in `docs/SEMANTIC_GOTCHAS_INDEX.md`.
+Note: the TeX-faithful semantic tasks (geometric `cycleClass_geom_data`, real PD, real SYR/HL/GAGA) are still pending and tracked in `docs/SEMANTIC_GOTCHAS_INDEX.md`.
 
 **STATUS: KERNEL-UNCONDITIONAL** ✅
 
-The main theorem `hodge_conjecture'` depends only on the three standard Lean axioms:
+The main theorem `hodge_conjecture_data` depends only on the three standard Lean axioms:
 - `propext` (propositional extensionality)
 - `Classical.choice` (axiom of choice)
 - `Quot.sound` (quotient soundness)
 
-There is no `sorryAx` in the *kernel dependency cone* of `hodge_conjecture'`.
+There is no `sorryAx` in the *kernel dependency cone* of `hodge_conjecture_data`.
 
 ### Important clarification (unconditional vs. "proof-track assumptions")
 
 `#print axioms` only reports **kernel axioms** used by the theorem definition. It does **not**
-list typeclass assumptions that appear in the statement of `hodge_conjecture'`.
+list typeclass assumptions that appear in the statement of `hodge_conjecture_data`.
 
 ### Phase 7 Update (2026-02-01) — SEMANTIC RESTORATION
 
-`hodge_conjecture'` NOW HAS deep typeclass binders in its statement:
-- `[CycleClass.PoincareDualFormExists n X p]` - Poincaré dual form existence
-- `[SpineBridgeData n X p]` - Bridge between geometric class and representing form
+`hodge_conjecture_data` NOW HAS deep typeclass binders in its statement:
+- `[CycleClass.PoincareDualityFromCurrentsData n X p]` - Poincaré dual form from currents
+- `[SpineBridgeData_data n X p]` - Bridge between geometric class and representing form
 
-**Why this change**: The semantic restoration (Phase 7) fixed `cycleClass_geom` to use the
-**real** `FundamentalClassSet(support)` definition instead of being an alias of `cycleClass`.
+**Why this change**: The semantic restoration (Phase 7) fixed `cycleClass_geom_data` to use the
+**real** `FundamentalClassSet_data(support)` definition instead of being an alias of `cycleClass`.
 This breaks the `rfl` tautology and makes the deep mathematical content **explicit**.
 
 The deep content is:
-1. **PoincareDualFormExists**: For any set Z, there exists a closed form η_Z representing its
+1. **PoincareDualityFromCurrentsData**: For any closed submanifold data, there exists a closed form η_Z representing its
    Poincaré dual (requires de Rham representability theorem)
-2. **SpineBridgeData**: For spine-produced cycles, the fundamental class equals the representing
+2. **SpineBridgeData_data**: For spine-produced cycles, the fundamental class equals the representing
    form in cohomology (requires Harvey-Lawson calibration theory)
 
 To make the development "unconditional" in the *no-gotchas* sense:
@@ -95,8 +107,8 @@ The two remaining “universal-instance blockers” have been removed:
 
 - `Hodge/Kahler/Main.lean`: `AutomaticSYRData.universal` no longer contains a `sorry`
   (it uses a proof-track-safe zero-current placeholder sequence).
-- `Hodge/Classical/GAGA.lean`: `SpineBridgeData.universal` no longer relies on a custom axiom
-  (the proof-track `cycleClass_geom` is now an alias of `cycleClass`).
+- `Hodge/Classical/GAGA.lean`: `SpineBridgeData_data.universal` no longer relies on a custom axiom
+  (the proof-track `cycleClass_geom_data` is now computed from `FundamentalClassSet_data`; no alias).
 
 **Note**: This makes `Hodge/Main.lean:hodge_conjecture` *statement-level unconditional*
 (no extra proof-track typeclass binders), but the universal instances are still *Phase 0 stubs*
@@ -108,13 +120,13 @@ Verified:
 
 ```text
 'AutomaticSYRData.universal' depends on axioms: [propext, Classical.choice, Quot.sound]
-'SpineBridgeData.universal' depends on axioms: [propext, Classical.choice, Quot.sound]
-'hodge_conjecture' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpineBridgeData_data.universal' depends on axioms: [propext, Classical.choice, Quot.sound]
+'hodge_conjecture_data depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
 ## Update (2026-01-28) - Key fixes and current status
 
-1. **`CycleClass.PoincareDualFormExists.universal`**: Implemented a non-trivial choice:
+1. **Legacy `CycleClass.PoincareDualFormFromCurrentData.universal`**: Implemented a non-trivial choice:
    - `Z = ∅` ↦ `0`
    - `Z ≠ ∅` ↦ `ω^p` (Kähler power)
 
@@ -124,7 +136,7 @@ Verified:
 3. **`AutomaticSYRData.universal`**: Uses `microstructureSequence` (not the zero current),
    but still has a `sorry` for the calibration defect convergence.
 
-4. **`SpineBridgeData.universal`**: Present, but still a `sorry` (this is essentially the
+4. **`SpineBridgeData_data.universal`**: Present, but still a `sorry` (this is essentially the
    core bridge theorem of the TeX spine).
 
 5. **Fixed `HarveyLawsonReal.lean`** variable declarations (added `MetricSpace`, `BorelSpace`)
@@ -134,9 +146,10 @@ Verified:
 - Replaced remaining `sorry` stubs in `Hodge/Classical/HarveyLawson.lean` and
   `Hodge/Classical/CycleClass.lean` with explicit typeclass interfaces:
   - `HarveyLawsonKingData` + `FlatLimitCycleData` now carry the decomposition/cycle limit inputs.
-  - `CycleClass.PoincareDualFormExists` now provides Poincaré dual form data (no universal instance).
-- `cycleClass_geom` and `FundamentalClassSet` now require `PoincareDualFormExists`,
-  propagated to `hodge_conjecture'`, `hodge_conjecture`, `tex_spine_full`, and
+  - `CycleClass.PoincareDualityFromCurrentsData` now provides the PD‑from‑currents interface
+    (yielding `PoincareDualFormFromCurrentData` via instance).
+- `cycleClass_geom_data` and `FundamentalClassSet_data` now require `PoincareDualityFromCurrentsData`,
+  propagated to `hodge_conjecture_data`, `hodge_conjecture`, `tex_spine_full`, and
   `hodge_conjecture_tex_faithful`.
 
 ### Full Verification Suite (2026-01-21)
@@ -158,8 +171,8 @@ $ ./scripts/audit_stubs.sh --full
 ⚠ Found 2 sorry usage(s) [both off-track, quarantined]
 
 $ lake env lean Hodge/Utils/DependencyCheck.lean
-'hodge_conjecture' depends on axioms: [propext, Classical.choice, Quot.sound]
-'hodge_conjecture'' depends on axioms: [propext, Classical.choice, Quot.sound]
+'hodge_conjecture_data depends on axioms: [propext, Classical.choice, Quot.sound]
+'hodge_conjecture_data' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
 ### Interpretation
@@ -177,7 +190,7 @@ $ lake env lean Hodge/Utils/DependencyCheck.lean
 | Custom axioms | 0 | ✅ None remaining |
 | sorry statements | 0 | ✅ None remaining |
 
-**🎉 PROOF TRACK COMPLETE!** The main theorem `hodge_conjecture'` is fully proved
+**🎉 PROOF TRACK COMPLETE!** The main theorem `hodge_conjecture_data` is fully proved
 with no custom axioms or sorry statements.
 
 ---
@@ -185,7 +198,7 @@ with no custom axioms or sorry statements.
 ## Quarantined Sorries (Off-Track)
 
 The following sorries exist in the codebase but are **NOT** on the proof track for
-`hodge_conjecture'`. They are in "off-track" infrastructure files:
+`hodge_conjecture_data`. They are in "off-track" infrastructure files:
 
 ### 1. `Hodge/Analytic/Currents.lean:1007`
 
@@ -248,8 +261,8 @@ $ ./scripts/audit_stubs.sh --full
 ⚠ Found 2 sorry usage(s) [both off-track]
 
 $ lake env lean Hodge/Utils/DependencyCheck.lean
-'hodge_conjecture' depends on axioms: [propext, Classical.choice, Quot.sound]
-'hodge_conjecture'' depends on axioms: [propext, Classical.choice, Quot.sound]
+'hodge_conjecture_data depends on axioms: [propext, Classical.choice, Quot.sound]
+'hodge_conjecture_data' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
 ### Stub Elimination Status (Round 10+)
@@ -303,7 +316,7 @@ $ lake env lean Hodge/Utils/DependencyCheck.lean
 
 ## Recent Progress
 
-### ✅ `FundamentalClassSet_represents_class` - ELIMINATED
+### ✅ `FundamentalClassSet_data_represents_class` - ELIMINATED
 
 **Date**: 2026-01-12
 
@@ -345,7 +358,7 @@ The replacement statement is mathematically CORRECT (Stokes / normal currents).
 
 `Current.boundary_bound` is now a **field on the `Current` structure** (a “normality-style”
 hypothesis) rather than a global `axiom`. This removes `Current.boundary_bound` from the
-kernel proof-track axioms for `hodge_conjecture'`.
+kernel proof-track axioms for `hodge_conjecture_data`.
 
 ---
 
@@ -455,8 +468,8 @@ is now fully proved.
 ```bash
 $ lake env lean Hodge/Utils/DependencyCheck.lean
 
-'hodge_conjecture' depends on axioms: [propext, Classical.choice, Quot.sound]
-'hodge_conjecture'' depends on axioms: [propext, Classical.choice, Quot.sound]
+'hodge_conjecture_data depends on axioms: [propext, Classical.choice, Quot.sound]
+'hodge_conjecture_data' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
 That means:

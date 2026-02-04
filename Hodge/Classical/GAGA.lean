@@ -3,6 +3,7 @@ import Hodge.Classical.Bergman
 import Hodge.Classical.SerreVanishing
 -- NOTE: Lefschetz.lean moved to archive - not on proof track for hodge_conjecture'
 import Hodge.Classical.CycleClass
+import Hodge.Classical.PoincareDualityFromCurrents
 import Hodge.Analytic.Currents
 import Hodge.Classical.AlgebraicSets
 
@@ -318,7 +319,7 @@ def FundamentalClassSet_impl_data : (n : ℕ) → (X : Type u) →
     [MeasurableSpace X] → [BorelSpace X] → [Nonempty X] →
     (p : ℕ) →
     [Hodge.GMT.CurrentRegularizationData n X (2 * p)] →
-    [CycleClass.PoincareDualFormFromCurrentData n X p] →
+    [CycleClass.PoincareDualityFromCurrentsData n X p] →
     ClosedSubmanifoldData n X (2 * p) → SmoothForm n X (2 * p) :=
   fun n X _ _ _ _ _ _ _ _ _ p _ _ data =>
     fundamentalClassImpl_data n X p data
@@ -345,7 +346,7 @@ noncomputable def FundamentalClassSet_data (n : ℕ) (X : Type u)
     [MeasurableSpace X] [BorelSpace X] [Nonempty X]
     (p : ℕ)
     [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
-    [CycleClass.PoincareDualFormFromCurrentData n X p]
+    [CycleClass.PoincareDualityFromCurrentsData n X p]
     (data : ClosedSubmanifoldData n X (2 * p)) : SmoothForm n X (2 * p) :=
   FundamentalClassSet_impl_data n X p data
 
@@ -372,7 +373,7 @@ theorem FundamentalClassSet_data_isClosed (p : ℕ)
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [MeasurableSpace X] [BorelSpace X] [Nonempty X]
     [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
-    [CycleClass.PoincareDualFormFromCurrentData n X p]
+    [CycleClass.PoincareDualityFromCurrentsData n X p]
     (data : ClosedSubmanifoldData n X (2 * p)) :
     IsFormClosed (FundamentalClassSet_data n X p data) := by
   show IsFormClosed (FundamentalClassSet_impl_data n X p data)
@@ -730,7 +731,7 @@ noncomputable def SignedAlgebraicCycle.cycleClass_geom_data {p : ℕ}
     [MeasurableSpace X] [BorelSpace X] [Nonempty X]
     [SignedAlgebraicCycleSupportData n X p]
     [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
-    [CycleClass.PoincareDualFormFromCurrentData n X p]
+    [CycleClass.PoincareDualityFromCurrentsData n X p]
     (Z : SignedAlgebraicCycle n X p) : DeRhamCohomologyClass n X (2 * p) :=
   ofForm
       (FundamentalClassSet_data n X p
@@ -856,7 +857,7 @@ class SpineBridgeData_data (n : ℕ) (X : Type u) (p : ℕ)
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [MeasurableSpace X] [BorelSpace X] [Nonempty X]
     [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
-    [CycleClass.PoincareDualFormFromCurrentData n X p]
+    [CycleClass.PoincareDualityFromCurrentsData n X p]
     [SignedAlgebraicCycleSupportData n X p] : Prop where
   /-- For spine-produced cycles, the data-first geometric class equals the class of the
       carried representing form. -/
@@ -887,7 +888,7 @@ theorem SignedAlgebraicCycle.cycleClass_geom_eq_representingForm_data {p : ℕ}
     [ProjectiveComplexManifold n X] [KahlerManifold n X]
     [MeasurableSpace X] [BorelSpace X] [Nonempty X]
     [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
-    [CycleClass.PoincareDualFormFromCurrentData n X p]
+    [CycleClass.PoincareDualityFromCurrentsData n X p]
     [AlgebraicSubvarietyClosedSubmanifoldData n X]
     [SignedAlgebraicCycleSupportCodimData n X p]
     [SpineBridgeData_data n X p]

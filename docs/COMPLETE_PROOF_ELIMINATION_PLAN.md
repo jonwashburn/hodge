@@ -18,7 +18,7 @@
 | 3 | `isSmoothAlternating_wedge` | axiom | 🟡 Medium | 4-8 hours |
 | 4 | `smoothExtDeriv_extDeriv` | axiom | 🔴 Hard | 16-32 hours |
 | 5 | `smoothExtDeriv_wedge` | axiom | 🔴 Hard | 16-32 hours |
-| 6 | `CurrentRegularizationData` / `PoincareDualFormFromCurrentData` | binder | 🔴 Very Hard | 40-80 hours |
+| 6 | `CurrentRegularizationData` / `PoincareDualityFromCurrentsData` | binder | 🔴 Very Hard | 40-80 hours |
 | 7 | `SpineBridgeData_data` (data‑first bridge) | binder | 🔴 Very Hard | 40-80 hours |
 | 8 | `SignedAlgebraicCycle.lefschetz_lift` | axiom | 🔴 Hard | 24-48 hours |
 | 9 | `omega_pow_algebraic` | sorry | 🔴 Hard | 16-32 hours |
@@ -171,7 +171,7 @@ These are the hardest tasks, requiring significant GMT infrastructure.
 ### Task 6: PD Regularization (Current → Smooth Form)
 **File**: `Hodge/Classical/CycleClass.lean`, `Hodge/Classical/PoincareDualityFromCurrents.lean`,
 `Hodge/GMT/HeatKernelRegularization.lean`, `Hodge/GMT/RegularizationLemmas.lean`
-**Current**: `PoincareDualFormFromCurrentData` is an explicit binder  
+**Current**: `PoincareDualityFromCurrentsData` is an explicit binder  
 **Target**: Construct from integration currents + regularization
 
 **Mathematical Content**:
@@ -311,7 +311,7 @@ Build on `ProjectiveComplexManifold` which already provides embedding into ℙ�
 
 | Agent | Task | Dependencies | Deliverable |
 |-------|------|--------------|-------------|
-| 2A | PD regularization | Phase 1 | `CurrentRegularizationData` + `PoincareDualFormFromCurrentData` instance |
+| 2A | PD regularization | Phase 1 | `CurrentRegularizationData` + `PoincareDualityFromCurrentsData` instance |
 | 2B | Data‑first bridge | Task 2A | `SpineBridgeData_data` (geometric class = representing form) |
 
 ### Phase 3: Lefschetz (Week 2-3, parallel with Phase 2)
@@ -363,7 +363,7 @@ ACCEPTANCE:
 ### Prompt for Agent 2A: PD Regularization (Current → Form)
 
 ```
-TASK: Construct `CurrentRegularizationData` and discharge `PoincareDualFormFromCurrentData`
+TASK: Construct `CurrentRegularizationData` and discharge `PoincareDualityFromCurrentsData`
 
 FILES: Hodge/GMT/HeatKernelRegularization.lean, Hodge/GMT/RegularizationLemmas.lean,
        Hodge/Classical/PoincareDualityFromCurrents.lean
@@ -425,10 +425,10 @@ lake build Hodge.Kahler.Main
 
 # 2. Check main theorem axioms
 echo 'import Hodge.Kahler.Main
-#print axioms hodge_conjecture'\'' | lake env lean --stdin
+#print axioms hodge_conjecture_data | lake env lean --stdin
 
 # Expected output:
-# 'hodge_conjecture'' depends on axioms: [propext, Classical.choice, Quot.sound]
+# 'hodge_conjecture_data' depends on axioms: [propext, Classical.choice, Quot.sound]
 
 # 3. Count remaining custom axioms
 grep -rn "^axiom" Hodge/ --include="*.lean" | grep -v ".lake" | wc -l

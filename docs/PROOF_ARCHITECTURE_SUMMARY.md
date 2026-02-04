@@ -12,7 +12,7 @@ This document provides a final summary of the Lean 4 formalization of the Hodge 
 ## Main Theorem
 
 ```lean
-theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p)) 
+theorem hodge_conjecture_data {p : ℕ} (γ : SmoothForm n X (2 * p)) 
     (h_closed : IsFormClosed γ)
     (h_rational : isRationalClass (DeRhamCohomologyClass.ofForm γ h_closed)) 
     (h_p_p : isPPForm' n X p γ) :
@@ -30,8 +30,8 @@ theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p))
 
 ```bash
 $ lake env lean Hodge/Utils/DependencyCheck.lean
-'hodge_conjecture' depends on axioms: [propext, Classical.choice, Quot.sound]
-'hodge_conjecture'' depends on axioms: [propext, Classical.choice, Quot.sound]
+'hodge_conjecture_data depends on axioms: [propext, Classical.choice, Quot.sound]
+'hodge_conjecture_data' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
 | Axiom | Type | Status |
@@ -96,7 +96,7 @@ Verify that the fundamental class of the resulting signed algebraic cycle repres
 Hodge/
 ├── Main.lean                    ← Entry point
 ├── Kahler/
-│   ├── Main.lean               ← hodge_conjecture' theorem
+│   ├── Main.lean               ← hodge_conjecture_data theorem
 │   ├── Microstructure.lean     ← SYR construction (1200+ lines)
 │   ├── HardLefschetz.lean      ← Lefschetz operator
 │   ├── HodgeDecomposition.lean ← Hodge decomposition
@@ -232,4 +232,4 @@ lake build Hodge.Tests.MasterTests
 
 ## Conclusion
 
-The Hodge Conjecture formalization is complete at the proof-track level. The main theorem `hodge_conjecture'` is machine-verified and depends only on Lean's three standard axioms. The proof follows the calibration-theoretic approach, bridging geometric measure theory and algebraic geometry through the Harvey-Lawson structure theorem and Serre's GAGA.
+The Hodge Conjecture formalization is complete at the proof-track level. The main theorem `hodge_conjecture_data` is machine-verified and depends only on Lean's three standard axioms. The proof follows the calibration-theoretic approach, bridging geometric measure theory and algebraic geometry through the Harvey-Lawson structure theorem and Serre's GAGA.

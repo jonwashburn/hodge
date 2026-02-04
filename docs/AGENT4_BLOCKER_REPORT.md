@@ -7,7 +7,7 @@
 - `Hodge/Classical/GAGA.lean`
 
 **Downstream proof-track dependencies**:
-- `Hodge/Kahler/Main.lean` (`harvey_lawson_fundamental_class` → `cone_positive_represents` → `hodge_conjecture'`)
+- `Hodge/Kahler/Main.lean` (spine chain → `hodge_conjecture_data`)
 
 ---
 
@@ -16,14 +16,14 @@
 **Update (2026-02-03)**:
 - The proof spine is now **data‑first**: `poincareDualForm_data` is defined as
   `regularizeCurrentToForm (integrationCurrent_data …)`.
-- The set‑based `PoincareDualFormExists` remains **compatibility‑only**; the real blocker
+- The set‑based `PoincareDualFormFromCurrentData` remains **compatibility‑only**; the real blocker
   is now `CurrentRegularizationData` / `PoincareDualFormFromCurrentData`.
 - The bridge target is `SpineBridgeData_data` (data‑first), not the legacy
-  `FundamentalClassSet_represents_class`.
+  `FundamentalClassSet_data_represents_class`.
 
 **Target axioms to remove** (per `docs/PROOF_COMPLETION_PLAN.md`, Agent 4 charter):
 - `CycleClass.poincareDualFormExists` (`Hodge/Classical/CycleClass.lean`)
-- `FundamentalClassSet_represents_class` (`Hodge/Classical/GAGA.lean`)
+- `FundamentalClassSet_data_represents_class` (`Hodge/Classical/GAGA.lean`)
 
 **Current status**: 🟠 **PARTIAL**.
 
@@ -77,12 +77,12 @@ or a current equality). As a result:
 
 ---
 
-## Blocker 2: `FundamentalClassSet_represents_class` is not derivable from current hypotheses
+## Blocker 2: `FundamentalClassSet_data_represents_class` is not derivable from current hypotheses
 
 **Current axiom statement** (in `Hodge/Classical/GAGA.lean`):
 - inputs: `Z` algebraic, `γ` closed and rational,
 - plus `_h_representation : ∃ T, ∃ hl, hl.represents T ∧ Z = ⋃ v ∈ hl.varieties, v.carrier`,
-- conclusion: `⟦FundamentalClassSet(Z)⟧ = ofForm γ`.
+- conclusion: `⟦FundamentalClassSet_data(Z)⟧ = ofForm γ`.
 
 **Core logical problem**: the hypotheses (as currently written) do **not link** `γ` to `Z`.
 The “representation witness” quantifies only over a current `T` and a Harvey–Lawson conclusion `hl`,
@@ -128,4 +128,4 @@ This task is downstream of (at least):
 
 Only after those exist does it make sense to attempt:
 - a nontrivial `poincareDualFormExists`,
-- and then a correct `FundamentalClassSet_represents_class`-replacement theorem.
+- and then a correct `FundamentalClassSet_data_represents_class`-replacement theorem.

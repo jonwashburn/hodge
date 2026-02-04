@@ -46,7 +46,7 @@ variable {n : ℕ} {X : Type*}
 
     **Phase 7 Update (2026-02-01)**: the proof track uses the **data‑first**
     fundamental class `FundamentalClassSet_data(support_data)`. Requires:
-    - `PoincareDualFormFromCurrentData` for the PD form (current → regularize)
+    - `PoincareDualityFromCurrentsData` for the PD form (current → regularize)
     - `SpineBridgeData_data` for the bridge theorem
 
     **Mathematical Content**:
@@ -58,7 +58,7 @@ variable {n : ℕ} {X : Type*}
 theorem hodge_conjecture_data {p : ℕ}
     [AutomaticSYRData n X]
     [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
-    [CycleClass.PoincareDualFormFromCurrentData n X p]
+    [CycleClass.PoincareDualityFromCurrentsData n X p]
     [AlgebraicSubvarietyClosedSubmanifoldData n X]
     [SignedAlgebraicCycleSupportCodimData n X p]
     [SpineBridgeData_data n X p]

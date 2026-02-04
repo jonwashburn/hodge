@@ -153,7 +153,7 @@ theorem hodge_conjecture_tex_faithful {p : ℕ}
     and yields the data-first geometric class `cycleClass_geom_data`.
     It is the preferred formulation when support data is available, and it
     forces the PD form to come from the current-regularization pipeline
-    (`PoincareDualFormFromCurrentData`). -/
+    (via `PoincareDualityFromCurrentsData`). -/
 /-! ## Data‑First (Preferred) -/
 
 theorem hodge_conjecture_tex_faithful_data {p : ℕ}
@@ -162,7 +162,7 @@ theorem hodge_conjecture_tex_faithful_data {p : ℕ}
     [ChowGAGAData n X]
     [SpineBridgeData_data n X]
     [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
-    [CycleClass.PoincareDualFormFromCurrentData n X p]
+    [CycleClass.PoincareDualityFromCurrentsData n X p]
     [AlgebraicSubvarietyClosedSubmanifoldData n X]
     [SignedAlgebraicCycleSupportCodimData n X p]
     -- Input form and hypotheses
@@ -250,7 +250,7 @@ theorem tex_faithful_implies_main_data {p : ℕ}
     [MetricSpace X] [BorelSpace X]
     [ChowGAGAData n X] [SpineBridgeData_data n X]
     [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
-    [CycleClass.PoincareDualFormFromCurrentData n X p]
+    [CycleClass.PoincareDualityFromCurrentsData n X p]
     [AlgebraicSubvarietyClosedSubmanifoldData n X]
     [SignedAlgebraicCycleSupportCodimData n X p]
     (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)

@@ -490,7 +490,7 @@ axiom exists_fundamental_form (W : AlgebraicSubvariety n X) :
 **Strategy:** This is de Rham theory for subvarieties. The fundamental class exists by Poincaré duality.
 
 ```lean
-axiom FundamentalClassSet_empty (p : ℕ) : FundamentalClassSet p (∅ : Set X) = 0
+axiom FundamentalClassSet_data_empty (p : ℕ) : FundamentalClassSet_data p (∅ : Set X) = 0
 ```
 **Strategy:** The empty set has zero fundamental class.
 
@@ -817,7 +817,7 @@ axiom harvey_lawson_fundamental_class {p : ℕ}
     (hγ : isConePositive γplus)
     (hl_concl : HarveyLawsonConclusion n X (2 * (n - p)))
     (h_represents : True) :
-    FundamentalClassSet p (⋃ v ∈ hl_concl.varieties, v.carrier) = γplus
+    FundamentalClassSet_data p (⋃ v ∈ hl_concl.varieties, v.carrier) = γplus
 ```
 **Strategy:** This connects Harvey-Lawson output to the cohomology class. It's the key bridge axiom.
 
@@ -825,7 +825,7 @@ axiom harvey_lawson_fundamental_class {p : ℕ}
 axiom complete_intersection_fundamental_class {p : ℕ}
     (W : AlgebraicSubvariety n X)
     (hW_codim : W.codim = p) :
-    ∃ (c : ℚ), c > 0 ∧ FundamentalClassSet p W.carrier = (c : ℝ) • omegaPow n X p
+    ∃ (c : ℚ), c > 0 ∧ FundamentalClassSet_data p W.carrier = (c : ℝ) • omegaPow n X p
 ```
 **Strategy:** Complete intersections represent rational multiples of ω^p.
 
@@ -833,7 +833,7 @@ axiom complete_intersection_fundamental_class {p : ℕ}
 axiom complete_intersection_represents_class {p : ℕ}
     (γ : SmoothForm n X (2 * p)) (Z : Set X)
     (hZ : isAlgebraicSubvariety n X Z) :
-    FundamentalClassSet p Z = γ
+    FundamentalClassSet_data p Z = γ
 ```
 **Strategy:** This is too strong as stated — it says any algebraic variety represents any class. Needs to be restricted to the case where the class matches.
 
@@ -1255,7 +1255,7 @@ axiom exists_fundamental_form (W : AlgebraicSubvariety n X) :
 **Strategy:** Fundamental class exists by Poincaré duality. Can be constructed via bump functions.
 
 ```lean
-axiom FundamentalClassSet_empty (p : ℕ) : FundamentalClassSet p (∅ : Set X) = 0
+axiom FundamentalClassSet_data_empty (p : ℕ) : FundamentalClassSet_data p (∅ : Set X) = 0
 ```
 **Strategy:** Empty set has zero fundamental class. Should follow from definition.
 
@@ -1265,7 +1265,7 @@ axiom exists_complete_intersection (p : ℕ) :
 ```
 **Strategy:** By Bertini's theorem, generic hyperplane intersections are smooth.
 
-**Remaining axioms:** `FundamentalClass_intersection_power_eq`, `FundamentalClassSet_intersection_power_eq`, `FundamentalClassSet_additive`, etc.
+**Remaining axioms:** `FundamentalClass_intersection_power_eq`, `FundamentalClassSet_data_intersection_power_eq`, `FundamentalClassSet_data_additive`, etc.
 **Strategy:** These are functorial properties of the fundamental class. Some follow from definitions, some need Poincaré duality.
 
 ### 9.3 Lefschetz.lean (2 axioms)

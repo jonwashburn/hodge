@@ -11,7 +11,7 @@ Total files: 32
 ################################################################################
 
      1| import Hodge.Kahler.Main
-     2| #print axioms hodge_conjecture'
+     2| #print axioms hodge_conjecture_data
 
 ################################################################################
 # FILE: Hodge/Analytic/Calibration.lean
@@ -2326,7 +2326,7 @@ Total files: 32
   1041|     - `isRationalClass_smul_rat`: rational multiple of rational class is rational
   1042|     - `zero_is_rational`: the zero class is rational
   1043|     - `omega_pow_is_rational`: powers of the Kähler form are rational
-  1044|     - `FundamentalClassSet_rational`: fundamental classes of algebraic varieties are rational
+  1044|     - `FundamentalClassSet_data_rational`: fundamental classes of algebraic varieties are rational
   1045| 
   1046|     Reference: [C. Voisin, "Hodge Theory and Complex Algebraic Geometry",
   1047|     Vol. I, Cambridge University Press, 2002, Definition 7.1]. -/
@@ -2841,7 +2841,7 @@ Total files: 32
    146| /-! ## Fundamental Class -/
    147| 
    148| -- We define the fundamental class of a structured algebraic subvariety via the set-level
-   149| -- map `FundamentalClassSet` introduced below (so there is no default `0` model).
+   149| -- map `FundamentalClassSet_data` introduced below (so there is no default `0` model).
    150| 
    151| /-! ## Fundamental Class for Sets -/
    152| 
@@ -2851,74 +2851,74 @@ Total files: 32
    156|     a closed (p,p)-form representing the Poincaré dual of the homology class of Z.
    157| 
    158|     This is axiomatized as an opaque function with the following key properties:
-   159|     - `FundamentalClassSet_isClosed`: [Z] is closed (dη = 0)
-   160|     - `FundamentalClassSet_empty`: [∅] = 0
-   161|     - `FundamentalClassSet_additive`: [Z₁ ⊔ Z₂] = [Z₁] + [Z₂] for disjoint Z₁, Z₂
-   162|     - `FundamentalClassSet_codim_match`: [Z] has type (p,p) when Z has codim p
-   163|     - `FundamentalClassSet_omega_pow`: [H^p] = c·ω^p for a complete intersection H^p
+   159|     - `FundamentalClassSet_data_isClosed`: [Z] is closed (dη = 0)
+   160|     - `FundamentalClassSet_data_empty`: [∅] = 0
+   161|     - `FundamentalClassSet_data_additive`: [Z₁ ⊔ Z₂] = [Z₁] + [Z₂] for disjoint Z₁, Z₂
+   162|     - `FundamentalClassSet_data_codim_match`: [Z] has type (p,p) when Z has codim p
+   163|     - `FundamentalClassSet_data_omega_pow`: [H^p] = c·ω^p for a complete intersection H^p
    164| 
    165|     Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry",
    166|     Wiley, 1978, Chapter 1, Section 1]. -/
-   167| opaque FundamentalClassSet (n : ℕ) (X : Type u)
+   167| opaque FundamentalClassSet_data (n : ℕ) (X : Type u)
    168|     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
    169|     [IsManifold (𝓒_complex n) ⊤ X]
    170|     [ProjectiveComplexManifold n X] [KahlerManifold n X]
    171|     (p : ℕ) (Z : Set X) : SmoothForm n X (2 * p)
    172| 
    173| /-- The fundamental class of an algebraic subvariety is closed. -/
-   174| axiom FundamentalClassSet_isClosed (p : ℕ) (Z : Set X) (h : isAlgebraicSubvariety n X Z) :
-   175|     IsFormClosed (FundamentalClassSet n X p Z)
+   174| axiom FundamentalClassSet_data_isClosed (p : ℕ) (Z : Set X) (h : isAlgebraicSubvariety n X Z) :
+   175|     IsFormClosed (FundamentalClassSet_data n X p Z)
    176| 
    177| /-- The fundamental class of the empty set is zero. -/
-   178| axiom FundamentalClassSet_empty_axiom (p : ℕ) :
-   179|     FundamentalClassSet n X p (∅ : Set X) = 0
+   178| axiom FundamentalClassSet_data_empty_axiom (p : ℕ) :
+   179|     FundamentalClassSet_data n X p (∅ : Set X) = 0
    180| 
-   181| theorem FundamentalClassSet_empty (p : ℕ) :
-   182|     FundamentalClassSet n X p (∅ : Set X) = 0 :=
-   183|   FundamentalClassSet_empty_axiom p
+   181| theorem FundamentalClassSet_data_empty (p : ℕ) :
+   182|     FundamentalClassSet_data n X p (∅ : Set X) = 0 :=
+   183|   FundamentalClassSet_data_empty_axiom p
    184| 
    185| /-- The fundamental class is a (p,p)-form. -/
-   186| axiom FundamentalClassSet_is_p_p (p : ℕ) (Z : Set X) (h : isAlgebraicSubvariety n X Z) :
-   187|     isPPForm' n X p (FundamentalClassSet n X p Z)
+   186| axiom FundamentalClassSet_data_is_p_p (p : ℕ) (Z : Set X) (h : isAlgebraicSubvariety n X Z) :
+   187|     isPPForm' n X p (FundamentalClassSet_data n X p Z)
    188| 
    189| /-- For disjoint algebraic sets, fundamental classes are additive. -/
-   190| axiom FundamentalClassSet_additive_axiom {p : ℕ} (Z₁ Z₂ : Set X) (h_disjoint : Disjoint Z₁ Z₂)
+   190| axiom FundamentalClassSet_data_additive_axiom {p : ℕ} (Z₁ Z₂ : Set X) (h_disjoint : Disjoint Z₁ Z₂)
    191|     (h1 : isAlgebraicSubvariety n X Z₁) (h2 : isAlgebraicSubvariety n X Z₂) :
-   192|     FundamentalClassSet n X p (Z₁ ∪ Z₂) = FundamentalClassSet n X p Z₁ + FundamentalClassSet n X p Z₂
+   192|     FundamentalClassSet_data n X p (Z₁ ∪ Z₂) = FundamentalClassSet_data n X p Z₁ + FundamentalClassSet_data n X p Z₂
    193| 
    194| /-- The fundamental class of a complete intersection of codim p is a positive multiple of ω^p. -/
-   195| axiom FundamentalClassSet_complete_intersection (p : ℕ) (W : AlgebraicSubvariety n X)
+   195| axiom FundamentalClassSet_data_complete_intersection (p : ℕ) (W : AlgebraicSubvariety n X)
    196|     (hW : W.codim = p) :
-   197|     ∃ (c : ℝ), c > 0 ∧ FundamentalClassSet n X p W.carrier = c • omegaPow n X p
+   197|     ∃ (c : ℝ), c > 0 ∧ FundamentalClassSet_data n X p W.carrier = c • omegaPow n X p
    198| 
    199| /-- The fundamental class represents a rational cohomology class. -/
-   200| axiom FundamentalClassSet_rational (p : ℕ) (Z : Set X) (h : isAlgebraicSubvariety n X Z) :
-   201|     isRationalClass (DeRhamCohomologyClass.ofForm (FundamentalClassSet n X p Z)
-   202|       (FundamentalClassSet_isClosed (n := n) (X := X) p Z h))
+   200| axiom FundamentalClassSet_data_rational (p : ℕ) (Z : Set X) (h : isAlgebraicSubvariety n X Z) :
+   201|     isRationalClass (DeRhamCohomologyClass.ofForm (FundamentalClassSet_data n X p Z)
+   202|       (FundamentalClassSet_data_isClosed (n := n) (X := X) p Z h))
    203| 
    204| theorem exists_fundamental_form_set (p : ℕ) (Z : Set X) (h : isAlgebraicSubvariety n X Z) :
    205|     ∃ (η : SmoothForm n X (2 * p)), IsFormClosed η :=
-   206|   ⟨FundamentalClassSet n X p Z, FundamentalClassSet_isClosed p Z h⟩
+   206|   ⟨FundamentalClassSet_data n X p Z, FundamentalClassSet_data_isClosed p Z h⟩
    207| 
    208| /-! ## Fundamental Class for Structured Algebraic Subvarieties -/
    209| 
-   210| /-- The fundamental class of an algebraic subvariety, defined via `FundamentalClassSet`. -/
+   210| /-- The fundamental class of an algebraic subvariety, defined via `FundamentalClassSet_data`. -/
    211| noncomputable def FundamentalClass (W : AlgebraicSubvariety n X) : SmoothForm n X (2 * W.codim) :=
-   212|   FundamentalClassSet n X W.codim W.carrier
+   212|   FundamentalClassSet_data n X W.codim W.carrier
    213| 
    214| theorem FundamentalClass_isClosed (W : AlgebraicSubvariety n X) :
    215|     IsFormClosed (FundamentalClass (n := n) (X := X) W) := by
    216|   have hW : isAlgebraicSubvariety n X W.carrier := ⟨W, rfl⟩
    217|   simpa [FundamentalClass] using
-   218|     (FundamentalClassSet_isClosed (n := n) (X := X) (p := W.codim) (Z := W.carrier) hW)
+   218|     (FundamentalClassSet_data_isClosed (n := n) (X := X) (p := W.codim) (Z := W.carrier) hW)
    219| 
    220| theorem exists_fundamental_form (W : AlgebraicSubvariety n X) :
    221|     ∃ (η : SmoothForm n X (2 * W.codim)), IsFormClosed η :=
    222|   ⟨FundamentalClass (n := n) (X := X) W, FundamentalClass_isClosed (n := n) (X := X) W⟩
    223| 
-   224| /-- Coherence lemma: on algebraic subvarieties, `FundamentalClassSet` agrees with `FundamentalClass`. -/
-   225| @[simp] theorem FundamentalClassSet_eq_FundamentalClass (W : AlgebraicSubvariety n X) :
-   226|     FundamentalClassSet n X W.codim W.carrier = FundamentalClass (n := n) (X := X) W := by
+   224| /-- Coherence lemma: on algebraic subvarieties, `FundamentalClassSet_data` agrees with `FundamentalClass`. -/
+   225| @[simp] theorem FundamentalClassSet_data_eq_FundamentalClass (W : AlgebraicSubvariety n X) :
+   226|     FundamentalClassSet_data n X W.codim W.carrier = FundamentalClass (n := n) (X := X) W := by
    227|   rfl
    228| 
    229| /-! ## ω^p is Algebraic (Complete Intersections) -/
@@ -2993,10 +2993,10 @@ Total files: 32
    298| 
    299| /-! ## Functoriality of Fundamental Class -/
    300| 
-   301| theorem FundamentalClassSet_additive' {p : ℕ} (Z₁ Z₂ : Set X) (h_disjoint : Disjoint Z₁ Z₂)
+   301| theorem FundamentalClassSet_data_additive' {p : ℕ} (Z₁ Z₂ : Set X) (h_disjoint : Disjoint Z₁ Z₂)
    302|     (h1 : isAlgebraicSubvariety n X Z₁) (h2 : isAlgebraicSubvariety n X Z₂) :
-   303|     FundamentalClassSet n X p Z₁ + FundamentalClassSet n X p Z₂ = FundamentalClassSet n X p (Z₁ ∪ Z₂) := by
-   304|   rw [← FundamentalClassSet_additive_axiom Z₁ Z₂ h_disjoint h1 h2]
+   303|     FundamentalClassSet_data n X p Z₁ + FundamentalClassSet_data n X p Z₂ = FundamentalClassSet_data n X p (Z₁ ∪ Z₂) := by
+   304|   rw [← FundamentalClassSet_data_additive_axiom Z₁ Z₂ h_disjoint h1 h2]
    305| 
    306| /-! ## Signed Algebraic Cycles -/
    307| 
@@ -3012,7 +3012,7 @@ Total files: 32
    317| /-- The fundamental class map into de Rham cohomology. -/
    318| noncomputable def SignedAlgebraicCycle.fundamentalClass (p : ℕ)
    319|     (Z : SignedAlgebraicCycle n X) : SmoothForm n X (2 * p) :=
-   320|   FundamentalClassSet n X p Z.pos - FundamentalClassSet n X p Z.neg
+   320|   FundamentalClassSet_data n X p Z.pos - FundamentalClassSet_data n X p Z.neg
    321| 
    322| /-- **Theorem: fundamentalClass of a signed cycle is closed.** -/
    323| axiom SignedAlgebraicCycle.fundamentalClass_isClosed (p : ℕ) (Z : SignedAlgebraicCycle n X) :
@@ -3645,7 +3645,7 @@ Total files: 32
     97|     (hl_concl : HarveyLawsonConclusion n X (2 * (n - p)))
     98|     (T_limit : Current n X (2 * (n - p)))
     99|     (h_represents : hl_concl.represents T_limit) :
-   100|     ⟦FundamentalClassSet n X p (⋃ v ∈ hl_concl.varieties, v.carrier), (FundamentalClassSet_isClosed p _ (harvey_lawson_union_is_algebraic hl_concl))⟧ = ⟦γplus, hplus⟧
+   100|     ⟦FundamentalClassSet_data n X p (⋃ v ∈ hl_concl.varieties, v.carrier), (FundamentalClassSet_data_isClosed p _ (harvey_lawson_union_is_algebraic hl_concl))⟧ = ⟦γplus, hplus⟧
    101| 
    102| /-- **Theorem: Cone Positive Represents Class** (Harvey-Lawson + GAGA).
    103|     This theorem provides the link between cone-positive forms and algebraic cycles.
@@ -3659,8 +3659,8 @@ Total files: 32
    111|     (h_rational : isRationalClass (DeRhamCohomologyClass.ofForm γ h_closed))
    112|     (h_cone : isConePositive γ) :
    113|     ∃ (Z : Set X), isAlgebraicSubvariety n X Z ∧
-   114|     ∃ (hZ : IsFormClosed (FundamentalClassSet n X p Z)),
-   115|     ⟦FundamentalClassSet n X p Z, hZ⟧ = DeRhamCohomologyClass.ofForm γ h_closed := by
+   114|     ∃ (hZ : IsFormClosed (FundamentalClassSet_data n X p Z)),
+   115|     ⟦FundamentalClassSet_data n X p Z, hZ⟧ = DeRhamCohomologyClass.ofForm γ h_closed := by
    116|   -- Step 1: Use the Automatic SYR Theorem to find a calibrated current
    117|   let ψ := KählerCalibration (n := n) (X := X) (p := n - p)
    118|   obtain ⟨T_seq, T_limit, h_cycles, h_flat_conv, h_calib⟩ := microstructure_approximation γ h_cone ψ
@@ -3681,7 +3681,7 @@ Total files: 32
    133|   · exact harvey_lawson_union_is_algebraic hl_concl
    134|   · -- Step 4: Use the bridge axiom to show the fundamental class is correct
    135|     let h_alg := harvey_lawson_union_is_algebraic hl_concl
-   136|     let hZ_closed : IsFormClosed (FundamentalClassSet n X p Z) := FundamentalClassSet_isClosed p Z h_alg
+   136|     let hZ_closed : IsFormClosed (FundamentalClassSet_data n X p Z) := FundamentalClassSet_data_isClosed p Z h_alg
    137|     use hZ_closed
    138|     -- Representation witness from Harvey-Lawson theorem
    139|     have h_rep := harvey_lawson_represents hyp
@@ -3690,8 +3690,8 @@ Total files: 32
    142| /-- **Rational Multiple of Kähler Power is Algebraic** (Griffiths-Harris, 1978). -/
    143| axiom omega_pow_represents_multiple {p : ℕ} (c : ℚ) (hc : c > 0) :
    144|     ∃ (Z : Set X), isAlgebraicSubvariety n X Z ∧
-   145|     ∃ (hZ : IsFormClosed (FundamentalClassSet n X p Z)),
-   146|       ⟦FundamentalClassSet n X p Z, hZ⟧ =
+   145|     ∃ (hZ : IsFormClosed (FundamentalClassSet_data n X p Z)),
+   146|       ⟦FundamentalClassSet_data n X p Z, hZ⟧ =
    147|         (c : ℝ) • ⟦omegaPow n X p, omega_pow_isClosed (n := n) (X := X) p⟧
    148| 
    149| /-- **Lefschetz Lift for Signed Cycles** (Voisin, 2002). -/
@@ -3721,7 +3721,7 @@ Total files: 32
    173|     Proc. Int. Cong. Math. 1950, Vol. 1, 182-191].
    174|     Reference: [J. Carlson, A. Jaffe, and A. Wiles, "The Millennium Prize Problems",
    175|     Clay Mathematics Institute, 2006]. -/
-   176| theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
+   176| theorem hodge_conjecture_data {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
    177|     (h_rational : isRationalClass (DeRhamCohomologyClass.ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :
    178|     ∃ (Z : SignedAlgebraicCycle n X), Z.RepresentsClass (DeRhamCohomologyClass.ofForm γ h_closed) := by
    179|   by_cases h_range : p ≤ n / 2
@@ -3755,37 +3755,37 @@ Total files: 32
    207|     -- The cycle class is [Zplus] - [Zminus]
    208|     -- Use the `ofForm_sub` axiom to turn this into subtraction in cohomology.
    209|     have hsub :
-   210|         ⟦FundamentalClassSet n X p Zplus - FundamentalClassSet n X p Zminus,
+   210|         ⟦FundamentalClassSet_data n X p Zplus - FundamentalClassSet_data n X p Zminus,
    211|           isFormClosed_sub (n := n) (X := X) (k := 2 * p)
-   212|             (FundamentalClassSet n X p Zplus) (FundamentalClassSet n X p Zminus)
-   213|             (FundamentalClassSet_isClosed (n := n) (X := X) p Zplus hZplus_alg)
-   214|             (FundamentalClassSet_isClosed (n := n) (X := X) p Zminus hZminus_alg)⟧
+   212|             (FundamentalClassSet_data n X p Zplus) (FundamentalClassSet_data n X p Zminus)
+   213|             (FundamentalClassSet_data_isClosed (n := n) (X := X) p Zplus hZplus_alg)
+   214|             (FundamentalClassSet_data_isClosed (n := n) (X := X) p Zminus hZminus_alg)⟧
    215|           =
-   216|         ⟦FundamentalClassSet n X p Zplus, FundamentalClassSet_isClosed (n := n) (X := X) p Zplus hZplus_alg⟧
+   216|         ⟦FundamentalClassSet_data n X p Zplus, FundamentalClassSet_data_isClosed (n := n) (X := X) p Zplus hZplus_alg⟧
    217|           -
-   218|         ⟦FundamentalClassSet n X p Zminus, FundamentalClassSet_isClosed (n := n) (X := X) p Zminus hZminus_alg⟧ := by
+   218|         ⟦FundamentalClassSet_data n X p Zminus, FundamentalClassSet_data_isClosed (n := n) (X := X) p Zminus hZminus_alg⟧ := by
    219|       simpa using (ofForm_sub (n := n) (X := X) (k := 2 * p)
-   220|         (FundamentalClassSet n X p Zplus) (FundamentalClassSet n X p Zminus)
-   221|         (FundamentalClassSet_isClosed (n := n) (X := X) p Zplus hZplus_alg)
-   222|         (FundamentalClassSet_isClosed (n := n) (X := X) p Zminus hZminus_alg))
+   220|         (FundamentalClassSet_data n X p Zplus) (FundamentalClassSet_data n X p Zminus)
+   221|         (FundamentalClassSet_data_isClosed (n := n) (X := X) p Zplus hZplus_alg)
+   222|         (FundamentalClassSet_data_isClosed (n := n) (X := X) p Zminus hZminus_alg))
    223| 
    224|     -- `cycleClass` uses an arbitrary closedness witness for the difference; switch it to the one used in `ofForm_sub`.
    225|     have hcycle_witness :
-   226|         ⟦FundamentalClassSet n X p Zplus - FundamentalClassSet n X p Zminus,
+   226|         ⟦FundamentalClassSet_data n X p Zplus - FundamentalClassSet_data n X p Zminus,
    227|             SignedAlgebraicCycle.fundamentalClass_isClosed (n := n) (X := X) p Z⟧
    228|           =
-   229|         ⟦FundamentalClassSet n X p Zplus - FundamentalClassSet n X p Zminus,
+   229|         ⟦FundamentalClassSet_data n X p Zplus - FundamentalClassSet_data n X p Zminus,
    230|             isFormClosed_sub (n := n) (X := X) (k := 2 * p)
-   231|               (FundamentalClassSet n X p Zplus) (FundamentalClassSet n X p Zminus)
-   232|               (FundamentalClassSet_isClosed (n := n) (X := X) p Zplus hZplus_alg)
-   233|               (FundamentalClassSet_isClosed (n := n) (X := X) p Zminus hZminus_alg)⟧ := by
+   231|               (FundamentalClassSet_data n X p Zplus) (FundamentalClassSet_data n X p Zminus)
+   232|               (FundamentalClassSet_data_isClosed (n := n) (X := X) p Zplus hZplus_alg)
+   233|               (FundamentalClassSet_data_isClosed (n := n) (X := X) p Zminus hZminus_alg)⟧ := by
    234|       simpa using (ofForm_proof_irrel (n := n) (X := X) (k := 2 * p)
-   235|         (FundamentalClassSet n X p Zplus - FundamentalClassSet n X p Zminus)
+   235|         (FundamentalClassSet_data n X p Zplus - FundamentalClassSet_data n X p Zminus)
    236|         (SignedAlgebraicCycle.fundamentalClass_isClosed (n := n) (X := X) p Z)
    237|         (isFormClosed_sub (n := n) (X := X) (k := 2 * p)
-   238|           (FundamentalClassSet n X p Zplus) (FundamentalClassSet n X p Zminus)
-   239|           (FundamentalClassSet_isClosed (n := n) (X := X) p Zplus hZplus_alg)
-   240|           (FundamentalClassSet_isClosed (n := n) (X := X) p Zminus hZminus_alg)))
+   238|           (FundamentalClassSet_data n X p Zplus) (FundamentalClassSet_data n X p Zminus)
+   239|           (FundamentalClassSet_data_isClosed (n := n) (X := X) p Zplus hZplus_alg)
+   240|           (FundamentalClassSet_data_isClosed (n := n) (X := X) p Zminus hZminus_alg)))
    241| 
    242|     -- Rewrite the left side using `SignedAlgebraicCycle.fundamentalClass` and `Z`
    243|     -- then apply representation equalities for plus/minus parts.
@@ -3793,29 +3793,29 @@ Total files: 32
    245|     -- Start from `Z.cycleClass p` and compute.
    246|     calc
    247|       Z.cycleClass p
-   248|           = ⟦FundamentalClassSet n X p Zplus - FundamentalClassSet n X p Zminus,
+   248|           = ⟦FundamentalClassSet_data n X p Zplus - FundamentalClassSet_data n X p Zminus,
    249|               SignedAlgebraicCycle.fundamentalClass_isClosed (n := n) (X := X) p Z⟧ := by
    250|                 rfl
-   251|       _ = ⟦FundamentalClassSet n X p Zplus - FundamentalClassSet n X p Zminus,
+   251|       _ = ⟦FundamentalClassSet_data n X p Zplus - FundamentalClassSet_data n X p Zminus,
    252|               isFormClosed_sub (n := n) (X := X) (k := 2 * p)
-   253|                 (FundamentalClassSet n X p Zplus) (FundamentalClassSet n X p Zminus)
-   254|                 (FundamentalClassSet_isClosed (n := n) (X := X) p Zplus hZplus_alg)
-   255|                 (FundamentalClassSet_isClosed (n := n) (X := X) p Zminus hZminus_alg)⟧ := hcycle_witness
-   256|       _ = ⟦FundamentalClassSet n X p Zplus, FundamentalClassSet_isClosed (n := n) (X := X) p Zplus hZplus_alg⟧
-   257|             - ⟦FundamentalClassSet n X p Zminus, FundamentalClassSet_isClosed (n := n) (X := X) p Zminus hZminus_alg⟧ := hsub
+   253|                 (FundamentalClassSet_data n X p Zplus) (FundamentalClassSet_data n X p Zminus)
+   254|                 (FundamentalClassSet_data_isClosed (n := n) (X := X) p Zplus hZplus_alg)
+   255|                 (FundamentalClassSet_data_isClosed (n := n) (X := X) p Zminus hZminus_alg)⟧ := hcycle_witness
+   256|       _ = ⟦FundamentalClassSet_data n X p Zplus, FundamentalClassSet_data_isClosed (n := n) (X := X) p Zplus hZplus_alg⟧
+   257|             - ⟦FundamentalClassSet_data n X p Zminus, FundamentalClassSet_data_isClosed (n := n) (X := X) p Zminus hZminus_alg⟧ := hsub
    258|       _ = ⟦sd.γplus, sd.h_plus_closed⟧
-   259|             - ⟦FundamentalClassSet n X p Zminus, FundamentalClassSet_isClosed (n := n) (X := X) p Zminus hZminus_alg⟧ := by
+   259|             - ⟦FundamentalClassSet_data n X p Zminus, FundamentalClassSet_data_isClosed (n := n) (X := X) p Zminus hZminus_alg⟧ := by
    260|             -- rewrite the + part using the representation equality
    261|             -- first align the closedness witness for `[Zplus]`
    262|             have hw_plus :
-   263|                 ⟦FundamentalClassSet n X p Zplus, FundamentalClassSet_isClosed (n := n) (X := X) p Zplus hZplus_alg⟧
-   264|                   = ⟦FundamentalClassSet n X p Zplus, hZplus_closed⟧ := by
+   263|                 ⟦FundamentalClassSet_data n X p Zplus, FundamentalClassSet_data_isClosed (n := n) (X := X) p Zplus hZplus_alg⟧
+   264|                   = ⟦FundamentalClassSet_data n X p Zplus, hZplus_closed⟧ := by
    265|               simpa using (ofForm_proof_irrel (n := n) (X := X) (k := 2 * p)
-   266|                 (FundamentalClassSet n X p Zplus)
-   267|                 (FundamentalClassSet_isClosed (n := n) (X := X) p Zplus hZplus_alg)
+   266|                 (FundamentalClassSet_data n X p Zplus)
+   267|                 (FundamentalClassSet_data_isClosed (n := n) (X := X) p Zplus hZplus_alg)
    268|                 hZplus_closed)
    269|             -- now rewrite using `hZplus_rep`
-   270|             have : ⟦FundamentalClassSet n X p Zplus, FundamentalClassSet_isClosed (n := n) (X := X) p Zplus hZplus_alg⟧
+   270|             have : ⟦FundamentalClassSet_data n X p Zplus, FundamentalClassSet_data_isClosed (n := n) (X := X) p Zplus hZplus_alg⟧
    271|                 = ⟦sd.γplus, sd.h_plus_closed⟧ := by
    272|               exact hw_plus.trans hZplus_rep
    273|             simpa [this]
@@ -3882,25 +3882,25 @@ Total files: 32
    334|               simpa using h_eq_class.trans h_smul
    335|             -- Now use the ω^p representation for Zminus.
    336|             have hZminus_class :
-   337|                 ⟦FundamentalClassSet n X p Zminus, FundamentalClassSet_isClosed (n := n) (X := X) p Zminus hZminus_alg⟧
+   337|                 ⟦FundamentalClassSet_data n X p Zminus, FundamentalClassSet_data_isClosed (n := n) (X := X) p Zminus hZminus_alg⟧
    338|                   = (sd.N : ℝ) • ⟦omegaPow n X p, omega_pow_isClosed (n := n) (X := X) p⟧ := by
    339|               -- First align the closedness witness for `[Zminus]`.
    340|               have hw_minus :
-   341|                   ⟦FundamentalClassSet n X p Zminus, FundamentalClassSet_isClosed (n := n) (X := X) p Zminus hZminus_alg⟧
-   342|                     = ⟦FundamentalClassSet n X p Zminus, hZminus_closed⟧ := by
+   341|                   ⟦FundamentalClassSet_data n X p Zminus, FundamentalClassSet_data_isClosed (n := n) (X := X) p Zminus hZminus_alg⟧
+   342|                     = ⟦FundamentalClassSet_data n X p Zminus, hZminus_closed⟧ := by
    343|                 simpa using (ofForm_proof_irrel (n := n) (X := X) (k := 2 * p)
-   344|                   (FundamentalClassSet n X p Zminus)
-   345|                   (FundamentalClassSet_isClosed (n := n) (X := X) p Zminus hZminus_alg)
+   344|                   (FundamentalClassSet_data n X p Zminus)
+   345|                   (FundamentalClassSet_data_isClosed (n := n) (X := X) p Zminus hZminus_alg)
    346|                   hZminus_closed)
    347|               exact hw_minus.trans hZminus_rep_omega
    348|             -- Finish by rewriting the fundamental class term to `⟦sd.γminus⟧`.
    349|             -- From hZminus_class and h_gamma_minus_class we get equality to ⟦sd.γminus⟧.
    350|             -- We use symmetry of h_gamma_minus_class.
-   351|             have : ⟦FundamentalClassSet n X p Zminus, FundamentalClassSet_isClosed (n := n) (X := X) p Zminus hZminus_alg⟧
+   351|             have : ⟦FundamentalClassSet_data n X p Zminus, FundamentalClassSet_data_isClosed (n := n) (X := X) p Zminus hZminus_alg⟧
    352|                 = ⟦sd.γminus, sd.h_minus_closed⟧ := by
    353|               -- chain equalities through (N:ℝ)•⟦ω^p⟧
    354|               calc
-   355|                 ⟦FundamentalClassSet n X p Zminus, FundamentalClassSet_isClosed (n := n) (X := X) p Zminus hZminus_alg⟧
+   355|                 ⟦FundamentalClassSet_data n X p Zminus, FundamentalClassSet_data_isClosed (n := n) (X := X) p Zminus hZminus_alg⟧
    356|                     = (sd.N : ℝ) • ⟦omegaPow n X p, omega_pow_isClosed (n := n) (X := X) p⟧ := hZminus_class
    357|                 _ = ⟦sd.γminus, sd.h_minus_closed⟧ := by simpa using h_gamma_minus_class.symm
    358|             -- apply it
@@ -3956,7 +3956,7 @@ Total files: 32
    408| 
    409|     -- Apply the theorem recursively to η (note: `p' = n - p ≤ n/2`).
    410|     obtain ⟨Z_η, hZ_η_rep⟩ :=
-   411|       hodge_conjecture' (p := n - p) η hη_closed hη_rat hη_hodge
+   411|       hodge_conjecture_data (p := n - p) η hη_closed hη_rat hη_hodge
    412| 
    413|     -- Lift back to degree 2p using the (axiomatized) Lefschetz lift on cycles.
    414|     obtain ⟨Z, hZ_rep⟩ :=
@@ -4604,7 +4604,7 @@ Total files: 32
     24| theorem hodge_conjecture {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
     25|     (h_rational : isRationalClass (DeRhamCohomologyClass.ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :
     26|     ∃ (Z : SignedAlgebraicCycle n X), Z.RepresentsClass (DeRhamCohomologyClass.ofForm γ h_closed) :=
-    27|   hodge_conjecture' γ h_closed h_rational h_p_p
+    27|   hodge_conjecture_data γ h_closed h_rational h_p_p
     28| 
     29| end
 
@@ -4631,7 +4631,7 @@ Total files: 32
     16| set_option pp.universes true
     17| 
     18| -- Axiom dependency report for the main theorem.
-    19| #print axioms hodge_conjecture'
+    19| #print axioms hodge_conjecture_data
 
 ################################################################################
 # FILE: Hodge/Utils/BaranyGrinberg.lean

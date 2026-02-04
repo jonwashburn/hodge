@@ -577,7 +577,7 @@ Clay Mathematics Institute in 2000, with a prize of $1,000,000 for a correct sol
 
     - **Data-first track**: `cycleClass_geom_data` is the REAL geometric class from
       `FundamentalClassSet_data(support_data)`, built from explicit `ClosedSubmanifoldData`.
-    - Requires `PoincareDualFormFromCurrentData` for the PD form (current → regularize).
+    - Requires `PoincareDualityFromCurrentsData` for the PD form (current → regularize).
     - Requires `SpineBridgeData_data` for the bridge theorem (fundamental class = representing form).
     - The data-first proof no longer uses `rfl`; it uses the spine bridge theorem.
 
@@ -653,7 +653,7 @@ theorem hodge_conjecture' {p : ℕ}
 /-- **Hodge Conjecture (Data-First Spine Bridge)**.
 
     This variant uses the data-first PD/spine bridge assumptions:
-    `PoincareDualFormFromCurrentData`, algebraic support data
+    `PoincareDualityFromCurrentsData`, algebraic support data
     (`AlgebraicSubvarietyClosedSubmanifoldData` + `SignedAlgebraicCycleSupportCodimData`),
     and `SpineBridgeData_data`.
 
@@ -661,7 +661,7 @@ theorem hodge_conjecture' {p : ℕ}
 theorem hodge_conjecture'_data {p : ℕ}
     [AutomaticSYRData n X]
     [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
-    [CycleClass.PoincareDualFormFromCurrentData n X p]
+    [CycleClass.PoincareDualityFromCurrentsData n X p]
     [AlgebraicSubvarietyClosedSubmanifoldData n X]
     [SignedAlgebraicCycleSupportCodimData n X p]
     [SpineBridgeData_data n X p]

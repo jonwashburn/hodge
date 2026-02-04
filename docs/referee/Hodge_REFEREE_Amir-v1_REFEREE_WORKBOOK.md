@@ -65,7 +65,7 @@ The Lean formalization in this repository provides a type-checked skeleton of th
 
 | TeX Result | Lean Declaration | File | Status |
 |------------|------------------|------|--------|
-| `thm:main-hodge` | `hodge_conjecture'` | `Hodge/Kahler/Main.lean` | ✅ Proven |
+| `thm:main-hodge` | `hodge_conjecture_data` | `Hodge/Main.lean` | ✅ Proven |
 | Hard Lefschetz reduction | `lefschetz_lift_signed_cycle` | `Hodge/Kahler/Main.lean` | ✅ Proven |
 | `lem:signed-decomp` | `signed_decomposition` | `Hodge/Kahler/SignedDecomp.lean` | ✅ Proven |
 | `thm:automatic-syr` | `automatic_syr` | `Hodge/Kahler/Main.lean` | ✅ Proven |
@@ -2671,4 +2671,3 @@ The TeX results in this block (glue scaling, B\'ar\'any--Grinberg rounding, inte
   - 
 - **Questions / potential gaps**:
   - 
-

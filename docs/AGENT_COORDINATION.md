@@ -48,8 +48,8 @@ These are starting points for agent work; they must be refined as we discover ex
 
 `lake env lean Hodge/Utils/DependencyCheck.lean`:
 ```
-'hodge_conjecture' depends on axioms: [propext, Classical.choice, Quot.sound]
-'hodge_conjecture'' depends on axioms: [propext, Classical.choice, Quot.sound]
+'hodge_conjecture_data depends on axioms: [propext, Classical.choice, Quot.sound]
+'hodge_conjecture_data' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
 This is **necessary but not sufficient** for the plan’s “no hidden assumptions / no toy geometry”
@@ -60,10 +60,10 @@ unconditionality.
 ## Quick Status
 
 ```
-hodge_conjecture' depends on:
+hodge_conjecture_data depends on:
   ✅ propext, Classical.choice, Quot.sound (standard Lean - OK)
   ✅ No custom axioms on the proof track
-  ✅ FundamentalClassSet_represents_class (ELIMINATED - Agent 3)
+  ✅ FundamentalClassSet_data_represents_class (ELIMINATED - Agent 3)
   ✅ KahlerManifold type class axioms (ELIMINATED - Agent 4)
   ✅ BUILD PASSING (no compilation errors)
   ✅ No `sorryAx` on the proof track
@@ -76,7 +76,7 @@ Total: 0 sorries on the proof track
 
 **Recent Progress**: 
 - ✅ **Proof track now sorry-free** (2026-01-18)
-  - `hodge_conjecture'` depends only on standard Lean axioms (`propext`, `Classical.choice`, `Quot.sound`)
+  - `hodge_conjecture_data` depends only on standard Lean axioms (`propext`, `Classical.choice`, `Quot.sound`)
 - ✅ **`shuffle_bijection_left` COMPLETE** (2026-01-18)
   - General case k≥1 closed (graded Leibniz sign + reindexing)
 - ✅ **Microstructure Stokes transport COMPLETE** (2026-01-18)
@@ -110,12 +110,12 @@ Total: 0 sorries on the proof track
   - New axiom is mathematically TRUE for currents used in proof
 - ✅ `Current.boundary_bound` removed from the kernel axiom list (Agent 2)
   - No longer a global `axiom`; it is now a field on the `Current` structure
-- ✅ **`FundamentalClassSet_represents_class` ELIMINATED** (Agent 3 - 2026-01-12)
+- ✅ **`FundamentalClassSet_data_represents_class` ELIMINATED** (Agent 3 - 2026-01-12)
   - Restructured `SignedAlgebraicCycle` to carry its cohomology class directly
   - The cycle now carries `representingForm` as a field
 - ✅ **KahlerManifold type class axioms ELIMINATED** (Agent 4 - 2026-01-12)
   - Discovered that `lefschetz_bijective`, `rational_lefschetz_iff`, `pp_lefschetz_iff`
-    are NOT on the proof track for `hodge_conjecture'`
+    are NOT on the proof track for `hodge_conjecture_data`
   - Removed these fields from `KahlerManifold` class
   - Moved `Lefschetz.lean` to archive
 
@@ -133,7 +133,7 @@ The proof track is protected against introducing new axioms or sorries:
 ### Protection Layers
 
 1. **`Hodge/AxiomGuard.lean`** — Compile-time check
-   - Uses Lean meta-programming to verify `hodge_conjecture'` only uses allowed axioms
+   - Uses Lean meta-programming to verify `hodge_conjecture_data` only uses allowed axioms
    - **Fails the build** if any custom axiom is introduced
    - Runs automatically when `Hodge.AxiomGuard` is built
 
@@ -340,7 +340,7 @@ grep -rn 'sorry' Hodge/ --include='*.lean'
 **Difficulty**: 12% relative to full formalization (3-6 months combined)
 **Prerequisites**: Riemannian metric infrastructure (Agent 5)
 
-**Previous Task**: ✅ COMPLETED - FundamentalClassSet_represents_class eliminated
+**Previous Task**: ✅ COMPLETED - FundamentalClassSet_data_represents_class eliminated
 
 **What was implemented** (lines 233-420):
 
@@ -555,7 +555,7 @@ The Hodge star implementation has type errors. Agent 4 can help by:
 **KahlerManifold Type Class Axioms**: ✅ ELIMINATED
 - Removed `lefschetz_bijective`, `rational_lefschetz_iff`, `pp_lefschetz_iff`
 - Moved `Lefschetz.lean` to archive
-- These were NOT on the proof track for `hodge_conjecture'`
+- These were NOT on the proof track for `hodge_conjecture_data`
 
 ---
 
@@ -581,7 +581,7 @@ Those are fine for architecture, but **not Clay-grade**.
   - Ensure the Lean objects match the TeX definitions (topologies, continuity, norms, etc.).
 
 **Success criteria for Agent 5**: not “no sorries”, but “no placeholders affecting mathematical meaning”
-in the dependency cone of `hodge_conjecture'`.
+in the dependency cone of `hodge_conjecture_data`.
 
 ---
 
@@ -798,7 +798,7 @@ Agent 5 (3 Stokes) ────────────────────�
 Agent 3 (available) ─────────────────────────────────► Can assist any agent
 ```
 
-**Key Insight**: Agent 1's 3 sorries in LeibnizRule.lean are the ONLY blockers for `hodge_conjecture'` being kernel-clean. All other sorries are in supporting infrastructure.
+**Key Insight**: Agent 1's 3 sorries in LeibnizRule.lean are the ONLY blockers for `hodge_conjecture_data` being kernel-clean. All other sorries are in supporting infrastructure.
 
 **What was proven** (2026-01-11):
 - `stage1_lemma`: Shows that the alternatizeUncurryFin expansion gives (k+1) copies via cycleRange reindexing
@@ -851,7 +851,7 @@ Files that multiple agents might touch:
 For a truly unconditional proof that could satisfy Clay Institute requirements:
 
 ```
-hodge_conjecture' depends on axioms: [propext, Classical.choice, Quot.sound]
+hodge_conjecture_data depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
 That means:
@@ -890,7 +890,7 @@ Hodge/
 ├── Cohomology/
 │   └── Basic.lean               # de Rham cohomology, KahlerManifold [AGENT 4]
 ├── Kahler/
-│   ├── Main.lean                # hodge_conjecture' theorem
+│   ├── Main.lean                # hodge_conjecture_data theorem
 │   ├── Manifolds.lean           # Kähler manifold properties
 │   ├── TypeDecomposition.lean   # (p,q)-decomposition
 │   └── Cone.lean                # Kähler cone
@@ -948,11 +948,11 @@ On a smooth projective complex algebraic variety X, every rational (p,p)-cohomol
 - **isPPForm' n X p ω**: Form ω has Hodge type (p,p)
 - **isRationalClass c**: Cohomology class c lies in rational cohomology
 - **SignedAlgebraicCycle n X p**: Formal difference of algebraic subvarieties + representing form
-- **FundamentalClassSet n X p Z**: The fundamental class (Poincaré dual) of set Z
+- **FundamentalClassSet_data n X p Z**: The fundamental class (Poincaré dual) of set Z
 
 ### Main Theorem Statement
 ```lean
-theorem hodge_conjecture' {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
+theorem hodge_conjecture_data {p : ℕ} (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
     (h_rational : isRationalClass (ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :
     ∃ (Z : SignedAlgebraicCycle n X p), Z.RepresentsClass (ofForm γ h_closed)
 ```
@@ -964,7 +964,7 @@ that didn't appear in `#print axioms` output:
 - `rational_lefschetz_iff`  
 - `pp_lefschetz_iff`
 
-**These have been REMOVED** because they were not on the proof track for `hodge_conjecture'`.
+**These have been REMOVED** because they were not on the proof track for `hodge_conjecture_data`.
 The Lefschetz theorems are only used in `archive/Hodge/Classical/Lefschetz.lean`, which
 is not imported by the main theorem.
 

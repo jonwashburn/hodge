@@ -1,4 +1,5 @@
 import Hodge.Classical.CycleClass
+import Hodge.Classical.PoincareDualityFromCurrents
 import Hodge.GMT.CurrentToForm
 import Hodge.GMT.IntegrationCurrent
 
@@ -154,7 +155,7 @@ noncomputable def gmt_cycle_to_cohomology_path (p : ℕ) [CycleClass.PoincareDua
 
 /-- Data-first cohomology class associated to explicit `ClosedSubmanifoldData`. -/
 noncomputable def gmt_cycle_to_cohomology_path_data (p : ℕ)
-    [CycleClass.PoincareDualFormFromCurrentData n X p]
+    [CycleClass.PoincareDualityFromCurrentsData n X p]
     (data : ClosedSubmanifoldData n X (2 * p)) :
     DeRhamCohomologyClass n X (2 * p) :=
   Hodge.ofForm (CycleClass.poincareDualForm_data n X p data)
@@ -171,7 +172,7 @@ theorem gmt_cycle_to_cohomology_empty (p : ℕ) [CycleClass.PoincareDualFormExis
 /-! ### Data-first empty-set compatibility -/
 
 theorem gmt_cycle_to_cohomology_empty_data (p : ℕ)
-    [CycleClass.PoincareDualFormFromCurrentData n X p]
+    [CycleClass.PoincareDualityFromCurrentsData n X p]
     (data : ClosedSubmanifoldData n X (2 * p)) (h : data.carrier = ∅) :
     gmt_cycle_to_cohomology_path_data (n := n) (X := X) p data =
       Hodge.ofForm 0 (isFormClosed_zero (n := n) (X := X) (k := 2 * p)) := by

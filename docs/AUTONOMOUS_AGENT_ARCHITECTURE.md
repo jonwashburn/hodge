@@ -159,7 +159,7 @@ lake env lean Hodge/Utils/DependencyCheck.lean
 | Semantic stubs | ~25 | 0 |
 | `IsAnalyticSet := IsClosed` | Yes | No (real definition) |
 | `SubmanifoldIntegration.integral := 0` | Yes | No (real integration) |
-| `cycleClass_geom := cycleClass` | Yes | No (geometric definition) |
+| `cycleClass_geom_data := cycleClass` | Yes | No (geometric definition) |
 
 ---
 

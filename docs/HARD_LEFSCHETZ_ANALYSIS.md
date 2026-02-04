@@ -2,7 +2,7 @@
 
 ## Current Status
 
-The Hard Lefschetz theorem is **intentionally off the proof track** for `hodge_conjecture'`.
+The Hard Lefschetz theorem is **intentionally off the proof track** for `hodge_conjecture_data`.
 
 | Component | Location | Status |
 |-----------|----------|--------|
@@ -12,7 +12,7 @@ The Hard Lefschetz theorem is **intentionally off the proof track** for `hodge_c
 
 ### Why Off-Track?
 
-Hard Lefschetz is **not used** in the proof of `hodge_conjecture'`. The main proof uses:
+Hard Lefschetz is **not used** in the proof of `hodge_conjecture_data`. The main proof uses:
 - Rationality of Kähler form (given)
 - (p,p)-form structure
 - Integration theory

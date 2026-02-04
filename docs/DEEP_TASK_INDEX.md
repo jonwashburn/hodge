@@ -99,7 +99,7 @@ Agents should work through these in dependency order.
 ## Priority 6: Poincaré Duality (Fundamental Class)
 
 **File**: `Hodge/Deep/Pillars/PoincareDuality.lean`
-**Replaces**: `SpineBridgeData.universal`
+**Replaces**: `SpineBridgeData_data.universal`
 
 | Goal | Type | Dependencies |
 |------|------|--------------|
@@ -107,7 +107,7 @@ Agents should work through these in dependency order.
 | `integrationCurrent_isCycle` | theorem | Goal 1.1 |
 | `poincare_dual_form_exists` | theorem | Goals 1.1-1.2 |
 | `spine_bridge` | theorem | Harvey-Lawson, GAGA |
-| `SpineBridgeData.real` | instance | All above |
+| `SpineBridgeData_data.real` | instance | All above |
 
 ---
 

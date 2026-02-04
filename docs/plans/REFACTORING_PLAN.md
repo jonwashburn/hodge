@@ -381,7 +381,7 @@ After completing all phases:
 2. All former interface axioms are now **theorems**
 3. Only **6 classical pillars** remain as axioms
 4. `lake build Hodge` passes
-5. `#print axioms hodge_conjecture'` shows only:
+5. `#print axioms hodge_conjecture_data` shows only:
    - `propext`, `Classical.choice`, `Quot.sound`
    - 6 classical pillar axioms
 
@@ -405,4 +405,3 @@ git add -A && git commit -m "Concrete: replace opaque smoothExtDeriv"
 ```
 
 **Step 4:** Once all Tier 1 complete, merge and continue to Tier 2.
-

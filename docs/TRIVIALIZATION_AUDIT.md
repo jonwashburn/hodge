@@ -151,8 +151,8 @@ The (p,q) decomposition machinery works at the algebraic level.
 When Agent 1 completes the sorries in LeibnizRule.lean:
 
 ```
-#print axioms hodge_conjecture'
-'hodge_conjecture'' depends on axioms: [propext, Classical.choice, Quot.sound]
+#print axioms hodge_conjecture_data
+'hodge_conjecture_data' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
 This means:

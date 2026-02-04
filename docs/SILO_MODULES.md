@@ -1,7 +1,7 @@
 # Siloed / Off‑Track Modules
 
 This document records Lean modules that are **intentionally not required** for the main theorem
-(`hodge_conjecture_data` / legacy `hodge_conjecture'`) and therefore may contain:
+(`hodge_conjecture_data` / legacy `hodge_conjecture_data`) and therefore may contain:
 
 - `sorry` statements
 - additional “Classical Pillar” axioms

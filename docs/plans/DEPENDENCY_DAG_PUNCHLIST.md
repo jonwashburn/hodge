@@ -259,7 +259,7 @@ lemma boundary_bound_of_integration (T : Current n X (k+1)) (hT : IsIntegrationC
 
 ## The 9 Classical Axioms (Lean baseline)
 
-These are the only axioms currently in the repository (and the only ones `hodge_conjecture'` uses):
+These are the only axioms currently in the repository (and the only ones `hodge_conjecture_data` uses):
 
 | # | Axiom | File | TeX / Meaning |
 |---|------|------|---------------|
@@ -278,7 +278,7 @@ These are the only axioms currently in the repository (and the only ones `hodge_
 ## TeX Proof Chain → Lean Mapping
 
 ### Main Theorem: `thm:main-hodge` (Hodge Conjecture)
-**Lean**: `hodge_conjecture'` in `Hodge/Kahler/Main.lean`
+**Lean**: `hodge_conjecture_data` in `Hodge/Main.lean`
 
 ```
 Thm main-hodge

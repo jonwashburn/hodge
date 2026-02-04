@@ -8,7 +8,7 @@ then check it off.
 ### Proof-track finished (Lean kernel dependencies) ✅
 
 The main theorem is considered finished when Lean’s kernel reports **no custom axioms** and **no
-`sorryAx`** in the dependency cone of `hodge_conjecture'`.
+`sorryAx`** in the dependency cone of `hodge_conjecture_data`.
 
 Reproduce:
 
@@ -35,7 +35,7 @@ objects are defined by **semantic stubs** (e.g. returning `∅` or carrying the 
 This checklist is therefore prioritized as:
 
 1) **MUST‑HAVE**: eliminate semantic stubs that currently trivialize the *meaning* of
-   `hodge_conjecture'` (the real gaps).
+   `hodge_conjecture_data` (the real gaps).
 2) **NICE‑TO‑HAVE**: build out the analytic Hodge operator library (⋆/δ/Δ/Hodge decomposition).
 3) **DELETE‑LATER**: legacy/skeleton modules that are not needed (handled in another session).
 
@@ -65,7 +65,7 @@ These are the items that currently bypass the geometric content and make the mai
 
 - [x] Remove/refactor `Hodge/Classical/GAGA.lean:SignedAlgebraicCycle.representingForm`
   - **DONE (2026-01-24)**: Added `represents_witness` field requiring proof that [form] = [cycle]
-  - `cycleClass` now computed via `FundamentalClassSet`, not carried form
+  - `cycleClass` now computed via `FundamentalClassSet_data`, not carried form
   - **Remaining**: Two witness axioms must be proved (see P1, P2 below)
 
 ### M4. Currents/integration bridge needed by M1–M3
@@ -85,19 +85,19 @@ These are the **only** custom axioms blocking a fully axiom-free proof:
 ### P1. Prove `harveyLawson_represents_witness`
 
 - [ ] Eliminate `Hodge/Kahler/Main.lean:harveyLawson_represents_witness`
-  - **Statement**: `[γ] = [FundamentalClassSet Zpos]` when Zpos comes from Harvey-Lawson
+  - **Statement**: `[γ] = [FundamentalClassSet_data Zpos]` when Zpos comes from Harvey-Lawson
   - **Mathematical content**: Integration currents over algebraic varieties represent cohomology classes
   - **See**: `prompts/P1_HARVEY_LAWSON_WITNESS.md`
 
 ### P2. Prove `combined_cycle_represents_witness`
 
 - [ ] Eliminate `Hodge/Kahler/Main.lean:combined_cycle_represents_witness`
-  - **Statement**: `[γ] = [FundamentalClassSet (Z_pos ∪ Z_neg)]` for signed cycle
+  - **Statement**: `[γ] = [FundamentalClassSet_data (Z_pos ∪ Z_neg)]` for signed cycle
   - **Mathematical content**: Linearity of fundamental class map
   - **Depends on**: P1
   - **See**: `prompts/P2_COMBINED_CYCLE_WITNESS.md`
 
-**When P1 and P2 are theorems, `hodge_conjecture'` depends ONLY on `propext`, `Classical.choice`, `Quot.sound`.**
+**When P1 and P2 are theorems, `hodge_conjecture_data` depends ONLY on `propext`, `Classical.choice`, `Quot.sound`.**
 
 ---
 
@@ -112,7 +112,7 @@ For the *analytic* Hodge theory operator stack, “finished” means we have:
 - A **kernel characterization**: `Δω = 0 ↔ dω = 0 ∧ δω = 0`
 - (Optionally, later) **Hodge decomposition** and **finite-dimensionality** of harmonic space
 
-These are **NOT needed** for semantic validity of `hodge_conjecture'` (as currently architected),
+These are **NOT needed** for semantic validity of `hodge_conjecture_data` (as currently architected),
 but they’re valuable for a real Hodge theory library and for future refactors.
 
 ### Current implementation status (definitions) ✅
@@ -122,7 +122,7 @@ but they’re valuable for a real Hodge theory library and for future refactors.
 - [x] **L2Inner** — `Hodge/Analytic/Integration/L2Inner.lean`
 - [x] **hodgeStar** — `Hodge/Analytic/HodgeStar/FiberStar.lean`
 
-**Archived (off-track, not needed for `hodge_conjecture'`):**
+**Archived (off-track, not needed for `hodge_conjecture_data`):**
 - [x] codifferential, laplacian, harmonic predicate — `archive/Hodge/Analytic/Laplacian/*`
 
 ### Remaining work (analytic theorems — all ARCHIVED / off-track)

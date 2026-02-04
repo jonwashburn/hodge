@@ -117,7 +117,7 @@ grep -L "^\/-!" Hodge/**/*.lean
 
 # Verify proof track axioms
 lake env lean Hodge/Utils/DependencyCheck.lean
-# Expected: hodge_conjecture' depends on [propext, Classical.choice, Quot.sound]
+# Expected: hodge_conjecture_data depends on [propext, Classical.choice, Quot.sound]
 ```
 
 ## Conclusion

@@ -14,7 +14,7 @@
 
 ### Kernel Status
 ```
-'hodge_conjecture' depends on axioms: [propext, Classical.choice, Quot.sound]
+'hodge_conjecture_data' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 ✅ **KERNEL-CLEAN** - Only standard Lean axioms
 
@@ -40,8 +40,8 @@
 
 | Instance | Status | Implementation |
 |----------|--------|----------------|
-| **PoincareDualFormExists.universal** | ✅ Non-trivial | Returns `ω^p` for non-empty sets |
-| **SpineBridgeData.universal** | ⚠️ 1 sorry | Bridge theorem structure provided |
+| **PoincareDualityFromCurrentsData.universal** | ✅ Non-trivial | Returns `ω^p` for non-empty sets |
+| **SpineBridgeData_data.universal** | ⚠️ 1 sorry | Bridge theorem structure provided |
 | **HarveyLawsonKingData.universal** | ✅ Non-trivial | Extracts `Current.support` from calibrated current |
 | **AutomaticSYRData.universal** | ✅ **Now uses full infrastructure** | Uses `microstructureSequence` → `RawSheetSum.toIntegralCurrent` |
 | **SheetUnionStokesData.universal** | ⚠️ 1 sorry | Stokes on sheet unions |
@@ -80,7 +80,7 @@ The support is `Set.univ` (full manifold), not `∅`. **Critic's complaint addre
 ### Hodge/Classical/GAGA.lean (1 sorry)
 | Line | Issue | Type |
 |------|-------|------|
-| 636 | `SpineBridgeData.universal.fundamental_eq_representing` | Bridge theorem |
+| 636 | `SpineBridgeData_data.universal.fundamental_eq_representing` | Bridge theorem |
 
 ### Hodge/Analytic/Currents.lean (1 sorry)
 | Line | Issue | Type |
@@ -90,7 +90,7 @@ The support is `Set.univ` (full manifold), not `∅`. **Critic's complaint addre
 ### Hodge/Classical/GAGA.lean (1 sorry)
 | Line | Theorem | Mathematical Content |
 |------|---------|---------------------|
-| 619 | `SpineBridgeData.fundamental_eq_representing` | Fundamental class = representing form |
+| 619 | `SpineBridgeData_data.fundamental_eq_representing` | Fundamental class = representing form |
 
 ### Hodge/Analytic/Currents.lean (1 sorry)
 | Line | Theorem | Mathematical Content |
@@ -129,11 +129,11 @@ To make `AutomaticSYRData` truly non-trivial, need to implement:
    - Convert `RawSheetSum` to `IntegralCurrent` via `toIntegralCurrent`
    - Requires `SheetUnionStokesData` and `RawSheetSumIntegralityData`
 
-### 2. SpineBridgeData.fundamental_eq_representing
+### 2. SpineBridgeData_data.fundamental_eq_representing
 
 Prove that for an algebraic cycle Z:
 ```
-FundamentalClassSet(Z.support) = [Z.representingForm] in H^{2p}(X,ℝ)
+FundamentalClassSet_data(Z.support) = [Z.representingForm] in H^{2p}(X,ℝ)
 ```
 
 This connects:
@@ -159,7 +159,7 @@ cone_positive_produces_cycle
 SignedAlgebraicCycle Z represents γ
     |
     v
-SpineBridgeData: cycleClass_geom Z = [γ]
+SpineBridgeData_data: cycleClass_geom_data Z = [γ]
 ```
 
 **What's proven**:

@@ -2,7 +2,7 @@
 
 **Total: 44 custom axioms** (excluding Lean system axioms: propext, Classical.choice, Quot.sound)
 
-These are the ONLY axioms that appear in the proof of `hodge_conjecture'`. Every one of these must either be:
+These are the ONLY axioms that appear in the proof of `hodge_conjecture_data`. Every one of these must either be:
 1. **PROVEN** as a theorem
 2. **DOCUMENTED** as a classical pillar (deep theorem from literature)
 
@@ -152,4 +152,3 @@ These define algebraic structure on forms and cohomology:
    - Quotient operations (P6): Use `Quotient.lift₂`
    - Flat norm properties (P3): Prove from opaque definition
    - Rational class closure (P7): Basic closure properties
-

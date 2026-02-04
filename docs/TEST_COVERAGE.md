@@ -166,7 +166,7 @@ lake build Hodge.Tests.MasterTests
 
 # Full axiom check
 lake env lean Hodge/Utils/DependencyCheck.lean
-# Expected: 'hodge_conjecture'' depends on axioms: [propext, Classical.choice, Quot.sound]
+# Expected: 'hodge_conjecture_data' depends on axioms: [propext, Classical.choice, Quot.sound]
 
 # Stub audit
 ./scripts/audit_stubs.sh --full

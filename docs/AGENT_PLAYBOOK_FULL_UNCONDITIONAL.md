@@ -64,8 +64,8 @@ grep -RIn --include="*.lean" -E '^[[:space:]]*opaque\\b' Hodge/
 
 Only the integrator should do these because they touch many files and are easy to “solve” incorrectly:
 - Restore real meanings for:
-  - `SignedAlgebraicCycle.cycleClass_geom`;
-  - `FundamentalClassSet` / Poincaré duality;
+  - `SignedAlgebraicCycle.cycleClass_geom_data`;
+  - `FundamentalClassSet_data` / Poincaré duality;
   - `SubmanifoldIntegration`;
   - analytic vs algebraic notions;
   - SYR microstructure sequence (non-constant, real sheets + gluing + defect → 0);
@@ -96,8 +96,8 @@ Do **not**:
 - redefine:
   - `IsAnalyticSet := IsClosed`,
   - `IsAlgebraicSet := IsClosed`,
-  - `cycleClass_geom := cycleClass`,
-  - `FundamentalClassSet := ω^p` or any other fixed placeholder;
+  - `cycleClass_geom_data := cycleClass`,
+  - `FundamentalClassSet_data := ω^p` or any other fixed placeholder;
 - delete/move pillars to quarantine to bypass dependencies.
 
 Allowed axioms in final dependency output: `propext`, `Classical.choice`, `Quot.sound` only.
@@ -168,7 +168,7 @@ These are designed to be **useful** for the TeX spine work you’re currently re
 
 - **Files**: add `docs/SEMANTIC_GOTCHAS_INDEX.md` (new)
 - **Goal**: produce a “clickable” index of the remaining **semantic** blockers, with file+line references:
-  - `cycleClass_geom` alias location(s);
+  - `cycleClass_geom_data` alias location(s);
   - `Chow/GAGA` closedness approximations;
   - `SubmanifoldIntegration.universal` and any other `:= 0` integration stubs;
   - `microstructureSequence_real := zero_int` location;
@@ -188,7 +188,7 @@ These are designed to be **useful** for the TeX spine work you’re currently re
 ## Integrator next-step checklist (semantic restoration order)
 
 When the integrator starts the next phase, the safest dependency order is:
-1. Replace `cycleClass_geom` alias with the **support/fundamental-class definition**, keep compilation by updating bridge lemmas.
+1. Replace `cycleClass_geom_data` alias with the **support/fundamental-class definition**, keep compilation by updating bridge lemmas.
 2. Replace “analytic/algebraic = closed” with real definitions (even if proofs are initially missing, do **not** replace them with `True`).
 3. Replace `SubmanifoldIntegration.universal` and `SubmanifoldIntegration.real` (currently still zero-integral) with genuine integration theory.
 4. Replace `microstructureSequence_real := zero_int` with an actual sheet/gluing construction and prove defect→0 using the GMT spine lemmas.

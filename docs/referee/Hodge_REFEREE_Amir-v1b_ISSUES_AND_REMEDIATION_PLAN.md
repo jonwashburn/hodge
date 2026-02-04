@@ -17,7 +17,7 @@ This document has two goals:
 **Progress update (2026-01-10)**: The following items have been completed:
 - ✅ **Phase 0**: Audit infrastructure (`AuditAxioms.lean`, `AuditOpaque.lean`, `scripts/audit_faithfulness.sh`)
 - ✅ **Phase 0**: All `opaque` constants replaced with `def := 0` stubs (auditable)
-- ✅ **Phase 1A**: All `FundamentalClassSet_*` axioms converted to theorems (stub-level)
+- ✅ **Phase 1A**: All `FundamentalClassSet_data_*` axioms converted to theorems (stub-level)
 - ✅ **Phase 2A**: `ChartExtDeriv.lean` build break fixed
 - ✅ **Phase 2C**: `sorry` blocks in `Advanced/*` eliminated or documented
 - ✅ **Phase E**: `unitForm` is now the real constant-1 form (not 0)
@@ -30,7 +30,7 @@ This document has two goals:
 - ✅ No `sorry` statements
 - ⚠️ **3 semantic-stub blocker categories remain**:
   1. `extDerivLinearMap := 0` (exterior derivative)
-  2. `FundamentalClassSet_impl := 0` (cycle class)
+  2. `FundamentalClassSet_data_impl := 0` (cycle class)
   3. `integration_current := 0` (integration current)
   4. Kähler/Hodge operators := 0 (hodge star, adjoint, laplacian)
 
@@ -39,8 +39,8 @@ This document has two goals:
 **Original status (for reference)**:
 
 - **Current Lean status**: The project builds and `AuditAxioms` can be made to report only core axioms (e.g. `propext`, `Classical.choice`, `Quot.sound`) depending on the current branch state; however **the proof path still relies on non-Clay-standard mechanisms**:
-  - ~~**`opaque` black boxes** (e.g. `FundamentalClassSet_impl`, `integration_current`) that conceal missing constructions.~~ (Resolved: now `def := 0`)
-  - ~~**Axiomatized properties of fundamental classes** (`FundamentalClassSet_isClosed`, `..._rational`, etc.).~~ (Resolved: converted to theorems)
+  - ~~**`opaque` black boxes** (e.g. `FundamentalClassSet_data_impl`, `integration_current`) that conceal missing constructions.~~ (Resolved: now `def := 0`)
+  - ~~**Axiomatized properties of fundamental classes** (`FundamentalClassSet_data_isClosed`, `..._rational`, etc.).~~ (Resolved: converted to theorems)
   - **Placeholder/stub analytic operators** (e.g. `extDerivLinearMap := 0`, Kähler/Hodge operators `:= 0`) that collapse de Rham/Hodge theory to a degenerate model.
   - ~~**Isolated `sorry` blocks** in `Hodge/Analytic/Advanced/*` (not on the main proof path today, but they block an unconditional upgrade).~~ (Resolved: eliminated)
 
@@ -55,14 +55,14 @@ This document has two goals:
 #### A. Explicit axioms and opaque constants on/near the main proof path
 
 - **`Hodge/Classical/GAGA.lean`**
-  - **`opaque FundamentalClassSet_impl`**: a black-box implementation behind `FundamentalClassSet`.
+  - **`opaque FundamentalClassSet_data_impl`**: a black-box implementation behind `FundamentalClassSet_data`.
   - **Axioms about fundamental classes**:
-    - `axiom FundamentalClassSet_isClosed ...`
-    - `axiom FundamentalClassSet_empty ...`
-    - `axiom FundamentalClassSet_is_p_p ...`
-    - `axiom FundamentalClassSet_additive ...`
-    - `axiom FundamentalClassSet_rational ...`
-  - **Why this is blocking**: the proof uses `FundamentalClassSet` as the cycle class map / Poincaré dual of an algebraic subvariety. Clay-standard requires a *construction* and proofs of these properties from that construction, not axioms.
+    - `axiom FundamentalClassSet_data_isClosed ...`
+    - `axiom FundamentalClassSet_data_empty ...`
+    - `axiom FundamentalClassSet_data_is_p_p ...`
+    - `axiom FundamentalClassSet_data_additive ...`
+    - `axiom FundamentalClassSet_data_rational ...`
+  - **Why this is blocking**: the proof uses `FundamentalClassSet_data` as the cycle class map / Poincaré dual of an algebraic subvariety. Clay-standard requires a *construction* and proofs of these properties from that construction, not axioms.
 
 - **`Hodge/Analytic/Currents.lean`**
   - **`opaque integration_current`**: another hidden dependency for the current/form pairing story.
@@ -83,7 +83,7 @@ This document has two goals:
 
 #### C. “AuditAxioms” blind spots
 
-- `Hodge/Utils/AuditAxioms.lean` prints explicit axioms of `hodge_conjecture'`, but:
+- `Hodge/Utils/AuditAxioms.lean` prints explicit axioms of `hodge_conjecture_data`, but:
   - **Does not report** dependencies on `opaque` constants.
   - **Does not flag** placeholder definitions that make statements “true for the wrong reason”.
 
@@ -147,7 +147,7 @@ This is a staged plan designed to keep the project building while progressively 
 #### Phase 0 — Make “hidden assumptions” visible (1–2 weeks)
 
 - **Add an “opaque audit”**:
-  - New file: `Hodge/Utils/AuditOpaque.lean` (or a small script + CI check) that flags any `opaque` constants in the transitive dependency closure of `hodge_conjecture'`.
+  - New file: `Hodge/Utils/AuditOpaque.lean` (or a small script + CI check) that flags any `opaque` constants in the transitive dependency closure of `hodge_conjecture_data`.
   - Add `grep`-style CI checks for:
     - `^axiom` anywhere in `Hodge/` (except an explicitly whitelisted `Advanced/` sandbox),
     - `opaque` usage,
@@ -159,9 +159,9 @@ This is a staged plan designed to keep the project building while progressively 
   - **No proof-first stubs** that trivialize intended content (e.g. `d := 0`).
   - Core Lean axioms like `propext` / `Classical.choice` are acceptable (Clay does not require constructivism), but should be explicitly documented.
 
-#### Phase 1 — Replace `FundamentalClassSet` axioms with a real cycle class interface (1–2 months)
+#### Phase 1 — Replace `FundamentalClassSet_data` axioms with a real cycle class interface (1–2 months)
 
-- **Goal**: remove `FundamentalClassSet_*` axioms by constructing `FundamentalClassSet` and proving:
+- **Goal**: remove `FundamentalClassSet_data_*` axioms by constructing `FundamentalClassSet_data` and proving:
   - closedness,
   - (p,p)-type (as needed),
   - additivity,
@@ -247,5 +247,4 @@ This is a staged plan designed to keep the project building while progressively 
 - `lake build Hodge` succeeds.
 - `lake env lean Hodge/Utils/AuditAxioms.lean` shows only acceptable core axioms (`propext`, `Classical.choice`, `Quot.sound`, etc.).
 - A “semantic audit” document explains that the Lean objects coincide with their mathematical counterparts (not just typecheck under a degenerate model).
-
 

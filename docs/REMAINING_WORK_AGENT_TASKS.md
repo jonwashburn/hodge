@@ -67,7 +67,7 @@ Each agent task below is self-contained. To assign work:
 
 | Component | Location | Status | Implementation |
 |-----------|----------|--------|----------------|
-| `FundamentalClassSet_impl` | `GAGA.lean` | ✅ Fixed | Uses `poincareDualForm` axiom |
+| `FundamentalClassSet_data_impl` | `GAGA.lean` | ✅ Fixed | Uses `poincareDualForm` axiom |
 | `hodgeStarLinearMap` | `Manifolds.lean` | ✅ Fixed | Uses `fiberHodgeStar` axiom |
 | `adjointDerivLinearMap` | `Manifolds.lean` | ✅ Fixed | Uses `fiberAdjointDeriv` axiom |
 | `laplacianLinearMap` | `Manifolds.lean` | ✅ Fixed | Uses real construction |
@@ -95,7 +95,7 @@ Each agent task below is self-contained. To assign work:
 
 ### Summary of Changes
 
-The fundamental class map `FundamentalClassSet_impl` has been replaced with a non-trivial
+The fundamental class map `FundamentalClassSet_data_impl` has been replaced with a non-trivial
 axiomatized construction using Poincaré dual forms. The implementation:
 
 1. **CycleClass.lean**: New infrastructure for integration currents and Poincaré duality
@@ -109,14 +109,14 @@ axiomatized construction using Poincaré dual forms. The implementation:
 | `poincareDualForm_isPP` | CycleClass.lean:171 | (p,p)-type property of fundamental classes |
 | `poincareDualForm_isRational` | CycleClass.lean:194 | Rationality of fundamental classes |
 | `poincareDualForm_additive` | CycleClass.lean:215 | Additivity for disjoint sets |
-| `FundamentalClassSet_represents_class` | GAGA.lean:366 | Harvey-Lawson bridge theorem |
+| `FundamentalClassSet_data_represents_class` | GAGA.lean:366 | Harvey-Lawson bridge theorem |
 | `SignedAlgebraicCycle.lefschetz_lift` | GAGA.lean:502 | Lefschetz lift for signed cycles |
 
 ### Verification
 
 - ✅ `lake build Hodge.Main` succeeds
-- ✅ `FundamentalClassSet Z` is NOT definitionally `0` for non-empty Z
-- ✅ All theorems compile without `FundamentalClassSet_stub_zero`
+- ✅ `FundamentalClassSet_data Z` is NOT definitionally `0` for non-empty Z
+- ✅ All theorems compile without `FundamentalClassSet_data_stub_zero`
 - ✅ Axioms are documented with mathematical references
 
 ---
@@ -127,7 +127,7 @@ axiomatized construction using Poincaré dual forms. The implementation:
 You are working on a Lean 4 formalization of the Hodge Conjecture at:
 `/Users/jonathanwashburn/Projects/hodge`
 
-The fundamental class map `FundamentalClassSet_impl` previously returned `0` for all inputs.
+The fundamental class map `FundamentalClassSet_data_impl` previously returned `0` for all inputs.
 This has been replaced with an axiomatized construction using Poincaré dual forms.
 
 ## Mathematical Background
@@ -145,7 +145,7 @@ T_Z(ω) = ∫_Z ω
 
 ## Files to Modify
 
-- `Hodge/Classical/GAGA.lean` - Replace `FundamentalClassSet_impl`
+- `Hodge/Classical/GAGA.lean` - Replace `FundamentalClassSet_data_impl`
 - `Hodge/Classical/CycleClass.lean` - May need to create/extend
 - `Hodge/Analytic/IntegralCurrents.lean` - Integration current construction
 
@@ -153,7 +153,7 @@ T_Z(ω) = ∫_Z ω
 
 Replace the stub definition:
 ```lean
-def FundamentalClassSet_impl : ... :=
+def FundamentalClassSet_data_impl : ... :=
   fun _n _X _ _ _ _ _ _p _Z => 0
 ```
 
@@ -164,10 +164,10 @@ With a real construction that:
 
 ## Key Theorems to Prove
 
-1. `FundamentalClassSet_isClosed` - Should follow from integration current being d-closed
-2. `FundamentalClassSet_is_p_p` - Should follow from calibration by ω^p
-3. `FundamentalClassSet_rational` - Should follow from integral homology
-4. `FundamentalClassSet_additive` - Should follow from additivity of integration
+1. `FundamentalClassSet_data_isClosed` - Should follow from integration current being d-closed
+2. `FundamentalClassSet_data_is_p_p` - Should follow from calibration by ω^p
+3. `FundamentalClassSet_data_rational` - Should follow from integral homology
+4. `FundamentalClassSet_data_additive` - Should follow from additivity of integration
 
 ## Reality Check
 
@@ -179,8 +179,8 @@ Mathlib has limited Geometric Measure Theory. Options:
 ## Acceptance Criteria
 
 - [ ] `lake build Hodge.Main` succeeds
-- [ ] `FundamentalClassSet Z` is NOT definitionally `0` for non-empty Z
-- [ ] All theorems currently using `FundamentalClassSet_stub_zero` still compile
+- [ ] `FundamentalClassSet_data Z` is NOT definitionally `0` for non-empty Z
+- [ ] All theorems currently using `FundamentalClassSet_data_stub_zero` still compile
 - [ ] Document any remaining axiomatized interfaces
 
 ## Verification Commands
@@ -188,7 +188,7 @@ Mathlib has limited Geometric Measure Theory. Options:
 ```bash
 cd /Users/jonathanwashburn/Projects/hodge
 lake build Hodge.Main
-grep -rn "FundamentalClassSet_impl" Hodge/
+grep -rn "FundamentalClassSet_data_impl" Hodge/
 grep -rn ":= 0" Hodge/Classical/GAGA.lean
 ```
 
@@ -1492,7 +1492,7 @@ bash scripts/generate_lean_source.sh
 | No `opaque` constants | ✅ | None on main path |
 | No semantic stubs (`:= 0`) | ⚠️ | `lefschetz_inverse_cohomology := 0` remains (Task 4H) |
 | Hard Lefschetz is theorem | ❌ | Still typeclass field (Tasks 4A-4G) |
-| `FundamentalClassSet Z ≠ 0` | ✅ | Uses axiomatized construction |
+| `FundamentalClassSet_data Z ≠ 0` | ✅ | Uses axiomatized construction |
 | `isRationalClass [ω]` for Kähler | ✅ | Via `IsRationalFormWitness` |
 | `isPPForm' n X 1 ω` for Kähler | ✅ | Via `jInvariant` constructor |
 
@@ -1511,11 +1511,11 @@ bash scripts/generate_lean_source.sh
 ## When ALL tasks are complete, the proof will be Clay-standard if:
 
 1. ✅ `lake build Hodge.Main` succeeds
-2. ⚠️ `#print axioms hodge_conjecture'` shows only core axioms + documented Classical Pillars
+2. ⚠️ `#print axioms hodge_conjecture_data` shows only core axioms + documented Classical Pillars
 3. ✅ No `sorry` statements on the main proof path
 4. ✅ No `opaque` constants on the main proof path
 5. ⚠️ No semantic stubs (`:= 0` for non-trivial objects) - one remains: `lefschetz_inverse_cohomology`
 6. ❌ Hard Lefschetz is a theorem, not an assumption
-7. ✅ `FundamentalClassSet Z ≠ 0` for non-empty algebraic Z
+7. ✅ `FundamentalClassSet_data Z ≠ 0` for non-empty algebraic Z
 8. ✅ `isRationalClass [ω]` holds for the Kähler class
 9. ✅ `isPPForm' n X 1 ω` holds for non-zero Kähler form

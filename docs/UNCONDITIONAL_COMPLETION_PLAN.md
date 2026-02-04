@@ -10,8 +10,8 @@ requiring proof-track typeclass assumptions like:
 - `FlatLimitCycleData`
 - `HarveyLawsonKingData`
 - `ChowGAGAData`
-- `CycleClass.PoincareDualFormExists`
-- `SpineBridgeData`
+- `CycleClass.PoincareDualityFromCurrentsData` (yields `PoincareDualFormFromCurrentData`)
+- `SpineBridgeData_data`
 
 In other words: `hodge_conjecture` should have only the ambient manifold hypotheses (the ones already
 in `Hodge/Main.lean`’s `variable` block) and Lean should fill in everything else via **universal
@@ -24,10 +24,10 @@ explicitly called out in `docs/PROOF_TRACK_STATUS.md`):
 
 1. **`Hodge/Kahler/Main.lean`**: `AutomaticSYRData.universal` contains a `sorry` (reported as
    `sorryAx` when instantiated).
-2. **`Hodge/Classical/GAGA.lean`**: `SpineBridgeData.universal` is implemented via a global `axiom`
+2. **`Hodge/Classical/GAGA.lean`**: `SpineBridgeData_data.universal` is implemented via a global `axiom`
    (`fundamental_eq_representing_axiom`).
 
-Additionally, to actually *use* `hodge_conjecture'` without assumptions, we need missing universal
+Additionally, to actually *use* `hodge_conjecture_data` without assumptions, we need missing universal
 instances:
 
 3. **`Hodge/Analytic/Integration/HausdorffMeasure.lean`**: no concrete
@@ -48,7 +48,7 @@ instances:
 
 - Must be replaced by a **real microstructure construction** (no zero‑current shortcut).
 
-### C. Remove the custom axiom from `SpineBridgeData.universal`
+### C. Remove the custom axiom from `SpineBridgeData_data.universal`
 
 - Prove the real bridge (fundamental class equals representing form) via
   de Rham representability + Harvey–Lawson (no axioms, no aliases).
@@ -57,7 +57,7 @@ instances:
 
 - Edit `Hodge/Main.lean`:
   - Remove all proof-track typeclass binders from `theorem hodge_conjecture`.
-  - Leave the proof as a direct call to `hodge_conjecture'`; universal instances should resolve.
+  - Leave the proof as a direct call to `hodge_conjecture_data`; universal instances should resolve.
 
 ## Verification checklist
 

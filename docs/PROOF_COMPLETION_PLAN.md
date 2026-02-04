@@ -8,11 +8,11 @@
 
 ## 🔴 CURRENT PROOF TRACK STATUS (as of 2026-01-11)
 
-### `#print axioms hodge_conjecture'` Output:
+### `#print axioms hodge_conjecture_data` Output:
 
 ```
-'hodge_conjecture'' depends on axioms: [
-  FundamentalClassSet_represents_class,   -- 🔴 Custom axiom (GAGA.lean:419)
+'hodge_conjecture_data' depends on axioms: [
+  FundamentalClassSet_data_represents_class,   -- 🔴 Custom axiom (GAGA.lean:419)
   propext,                                 -- ✅ Standard Lean
   sorryAx,                                 -- 🔴 FROM SORRY IN LEIBNIZRULE.LEAN
   Classical.choice,                        -- ✅ Standard Lean
@@ -23,20 +23,20 @@
 
 ### ⚠️ IMPORTANT: Only 3 Items to Fix on Proof Track
 
-The Lean kernel reports **exactly what `hodge_conjecture'` depends on**. Despite ~50 axioms
+The Lean kernel reports **exactly what `hodge_conjecture_data` depends on**. Despite ~50 axioms
 existing in the codebase, only **3 non-standard items** appear on the proof track:
 
 | # | Item | Location | Type | Action Required |
 |---|------|----------|------|-----------------|
 | 1 | **`sorryAx`** | LeibnizRule.lean:397, 461 | sorry placeholder | **PROVE** the shuffle lemmas |
 | 2 | **`smoothExtDeriv_comass_bound`** | Currents.lean:345 | axiom | **PROVE** (needs Fréchet topology) |
-| 3 | **`FundamentalClassSet_represents_class`** | GAGA.lean:419 | axiom | **PROVE** (needs GMT/Poincaré duality) |
+| 3 | **`FundamentalClassSet_data_represents_class`** | GAGA.lean:419 | axiom | **PROVE** (needs GMT/Poincaré duality) |
 
 ### What About the Other ~50 Axioms?
 
 The codebase contains ~50 axioms in files like `Manifolds.lean`, `KahlerIdentities.lean`, 
 `PrimitiveDecomposition.lean`, `CycleClass.lean`, etc. These are **NOT on the proof track** 
-because `hodge_conjecture'` doesn't actually use them in its dependency chain.
+because `hodge_conjecture_data` doesn't actually use them in its dependency chain.
 
 **These off-track axioms**:
 - May be for alternative proof approaches not currently used
@@ -55,7 +55,7 @@ because `hodge_conjecture'` doesn't actually use them in its dependency chain.
    - Requires: Fréchet space topology on smooth forms (major Mathlib gap)
    - Alternative: Restructure to avoid this bound
 
-3. **🔴 FINAL**: Prove `FundamentalClassSet_represents_class` → removes last axiom
+3. **🔴 FINAL**: Prove `FundamentalClassSet_data_represents_class` → removes last axiom
    - Requires: GMT integration currents, Poincaré duality
    - This is the deepest geometric content
 
@@ -72,17 +72,17 @@ A **complete, verified proof** of the Hodge Conjecture that:
 
 ### What Is NOT Acceptable
 - ❌ **Hole‑shuffling**: replacing an unproved dependency with a different unproved dependency (e.g. `sorry → axiom`, `axiom → sorry`, or swapping one axiom for another) and calling that “progress”
-- ❌ Completing a task “locally” while the **global proof track** (dependencies of `hodge_conjecture'`) is not strictly closer to axiom/sorry‑free
+- ❌ Completing a task “locally” while the **global proof track** (dependencies of `hodge_conjecture_data`) is not strictly closer to axiom/sorry‑free
 - ❌ “Classical Pillar” axioms (or “well‑documented” axioms) on the proof track — documentation is not a proof
 - ❌ Merging any PR that **adds** new `axiom`/`sorry` on the proof track, even temporarily
 
 ### Success Criterion
 ```bash
 echo 'import Hodge.Kahler.Main
-#print axioms hodge_conjecture'\'' | lake env lean --stdin
+#print axioms hodge_conjecture_data\'' | lake env lean --stdin
 
 # REQUIRED OUTPUT:
-# 'hodge_conjecture'' depends on axioms: [propext, Classical.choice, Quot.sound]
+# 'hodge_conjecture_data' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
 If ANY other axiom appears, the proof is **incomplete**.
@@ -94,8 +94,8 @@ If ANY other axiom appears, the proof is **incomplete**.
 The objective is **the completed proof**, not “finishing a task ticket”. That means our workflow must enforce that the *global* proof is getting closer to completion.
 
 ### 0) Definitions
-- **Proof track**: the transitive dependency cone of `hodge_conjecture'` (as reported by `#print axioms hodge_conjecture'`).
-- **Hole**: any `sorry` or any non-standard `axiom` that appears in `#print axioms hodge_conjecture'`.
+- **Proof track**: the transitive dependency cone of `hodge_conjecture_data` (as reported by `#print axioms hodge_conjecture_data`).
+- **Hole**: any `sorry` or any non-standard `axiom` that appears in `#print axioms hodge_conjecture_data`.
 - **Progress**: a merge that **reduces** the set of holes on the proof track, or proves infrastructure without increasing that set.
 
 ### 1) Allowed Development Technique: Temporary Sorries (YES, but quarantined)
@@ -112,7 +112,7 @@ Policy:
 Every merge must satisfy:
 - **No new proof-track holes** are introduced.
 - For “axiom elimination” work: the *named* axiom must disappear from:
-  - `#print axioms hodge_conjecture'`, and
+  - `#print axioms hodge_conjecture_data`, and
   - `grep -rn '^axiom <Name>'` in the relevant file(s),
   and nothing equivalent reappears as a new axiom/sorry.
 
@@ -127,7 +127,7 @@ lake build Hodge.Kahler.Main
 # 2) Proof-track hole check (this is the ground truth)
 cat > /tmp/axioms.lean << 'EOF'
 import Hodge.Kahler.Main
-#print axioms hodge_conjecture'
+#print axioms hodge_conjecture_data
 EOF
 lake env lean /tmp/axioms.lean
 
@@ -151,9 +151,9 @@ An agent’s work is “done” if and only if it results in one of:
 
 ### Proof Track Status — ONLY 3 ITEMS TO FIX
 
-**Latest `#print axioms hodge_conjecture'` output**:
+**Latest `#print axioms hodge_conjecture_data` output**:
 ```
-FundamentalClassSet_represents_class, propext, sorryAx, Classical.choice,
+FundamentalClassSet_data_represents_class, propext, sorryAx, Classical.choice,
 Current.smoothExtDeriv_comass_bound, Quot.sound
 ```
 
@@ -165,9 +165,9 @@ Current.smoothExtDeriv_comass_bound, Quot.sound
 |---|------|----------|------|------------|
 | 1 | **`sorryAx`** | LeibnizRule.lean:397, 461 | sorry | PROVE shuffle_bijection lemmas |
 | 2 | **`smoothExtDeriv_comass_bound`** | Currents.lean:345 | axiom | PROVE (Fréchet topology needed) |
-| 3 | **`FundamentalClassSet_represents_class`** | GAGA.lean:419 | axiom | PROVE (GMT/Poincaré duality) |
+| 3 | **`FundamentalClassSet_data_represents_class`** | GAGA.lean:419 | axiom | PROVE (GMT/Poincaré duality) |
 
-### Off-Track Axioms (exist but NOT used by hodge_conjecture')
+### Off-Track Axioms (exist but NOT used by hodge_conjecture_data)
 
 The codebase contains ~50 axioms that are **not on the proof track**. These include:
 
@@ -522,7 +522,7 @@ For an algebraic subvariety Z ⊂ X of codimension p, construct the Poincaré du
 
 ---
 
-### Task 2.2: Prove `FundamentalClassSet_represents_class`
+### Task 2.2: Prove `FundamentalClassSet_data_represents_class`
 **Priority**: 🔴 CRITICAL  
 **Estimated Effort**: 16-32 hours  
 **File**: `Hodge/Classical/GAGA.lean`
@@ -579,12 +579,12 @@ The project is done when:
 ```bash
 cat > /tmp/axioms.lean << 'EOF'
 import Hodge.Kahler.Main
-#print axioms hodge_conjecture'
+#print axioms hodge_conjecture_data
 EOF
 lake env lean /tmp/axioms.lean
 
 # REQUIRED:
-# 'hodge_conjecture'' depends on axioms: [propext, Classical.choice, Quot.sound]
+# 'hodge_conjecture_data' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
 ### Agent 1 — Differential Forms Core (Ωᵏ, d, ∧)
@@ -600,7 +600,7 @@ lake env lean /tmp/axioms.lean
 - **Likely supporting files**: `Hodge/Analytic/Advanced/LeibnizRule.lean`, `Hodge/Analytic/DomCoprod.lean`.
 - **Definition of done**:
   - The above names no longer appear as axioms in the repo, and
-  - `#print axioms hodge_conjecture'` no longer lists them.
+  - `#print axioms hodge_conjecture_data` no longer lists them.
 
 ### Agent 2 — De Rham Cohomology Ring (Well-defined cup product)
 **Primary goal**: make the cohomology ring construction genuinely well-defined (no axioms/sorries for “wedge descends to cohomology”).
@@ -612,7 +612,7 @@ lake env lean /tmp/axioms.lean
 - **Definition of done**:
   - `cohomologous_wedge` is a proved theorem (not an axiom),
   - all ring structure lemmas used by the main proof compile without `sorry`,
-  - `#print axioms hodge_conjecture'` no longer lists `Hodge.cohomologous_wedge`.
+  - `#print axioms hodge_conjecture_data` no longer lists `Hodge.cohomologous_wedge`.
 
 ### Agent 3 — Currents / Analytic Infrastructure (Remove current-theory axioms)
 **Primary goal**: eliminate current-theory holes on the proof track and provide the minimal analytic infrastructure needed by the Harvey–Lawson bridge and cycle-class comparisons.
@@ -642,12 +642,12 @@ lake env lean /tmp/axioms.lean
   - `Hodge/Classical/GAGA.lean` (the fundamental class representation theorem)
 - **Must remove these proof-track axioms**:
   - `CycleClass.poincareDualFormExists`
-  - `FundamentalClassSet_represents_class`
+  - `FundamentalClassSet_data_represents_class`
 - **Depends on**: likely Agent 3 (currents) and some integration infrastructure.
-- **Status**: 🟠 PARTIAL (2026-01-11) — `CycleClass.poincareDualFormExists` removed from the axiom set; `FundamentalClassSet_represents_class` still blocked. See `docs/AGENT4_BLOCKER_REPORT.md`.
+- **Status**: 🟠 PARTIAL (2026-01-11) — `CycleClass.poincareDualFormExists` removed from the axiom set; `FundamentalClassSet_data_represents_class` still blocked. See `docs/AGENT4_BLOCKER_REPORT.md`.
 - **Definition of done**:
   - both theorems are proved (no `axiom`),
-  - `#print axioms hodge_conjecture'` no longer lists either.
+  - `#print axioms hodge_conjecture_data` no longer lists either.
 
 ### Agent 5 — Algebraicity Engine (ω^p algebraic + Lefschetz lift)
 **Primary goal**: remove the remaining algebraic-geometry axioms on the proof track by proving the two “algebraicity transfer” steps.
@@ -699,7 +699,7 @@ If a proof seems impossible with current Mathlib:
 
 After completing your task:
 1. Run: lake build [YourModule]
-2. Run: echo 'import Hodge.Kahler.Main\n#print axioms hodge_conjecture'\'' | lake env lean --stdin
+2. Run: echo 'import Hodge.Kahler.Main\n#print axioms hodge_conjecture_data\'' | lake env lean --stdin
 3. Confirm your target hole(s) disappeared and no new holes appeared
 4. Before merge: grep for `axiom`/`sorry` in proof-track files (must be empty)
 
@@ -763,7 +763,7 @@ lake build Hodge.Kahler.Main
 
 # Check for ANY custom axioms on proof track
 echo 'import Hodge.Kahler.Main
-#print axioms hodge_conjecture'\'' | lake env lean --stdin
+#print axioms hodge_conjecture_data\'' | lake env lean --stdin
 
 # Expected output (ONLY these 3):
 # [propext, Classical.choice, Quot.sound]
@@ -831,7 +831,7 @@ The verification script shows exactly what needs to be proved:
 ═══════════════════════════════════════════════════════
 AXIOM ANALYSIS
 ═══════════════════════════════════════════════════════
-  🔴 FundamentalClassSet_represents_class (CUSTOM AXIOM - must prove)
+  🔴 FundamentalClassSet_data_represents_class (CUSTOM AXIOM - must prove)
   ✅ propext (standard Lean - proposition extensionality)
   ❌ sorryAx (SORRY STATEMENTS IN CODE!)
   ✅ Classical.choice (standard Lean - axiom of choice)

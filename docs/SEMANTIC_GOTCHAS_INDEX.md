@@ -13,7 +13,7 @@ The intent is to make it easy for the integrator (and bounded agents) to find an
   - Location: `Hodge/Classical/GAGA.lean:522-555`
   - Change: `cycleClass_geom_data` is defined using `FundamentalClassSet_data(support_data)`, NOT as `Z.cycleClass`.
   - The proof spine uses `SpineBridgeData_data` (data‑first), not `rfl`.
-  - **REMAINING**: The theorem `hodge_conjecture'` requires typeclass parameters:
+  - **REMAINING**: The theorem `hodge_conjecture_data` requires typeclass parameters:
     - `[CycleClass.PoincareDualFormFromCurrentData n X p]` - Poincaré dual form from integration current
     - `[SpineBridgeData_data n X]` - Bridge between geometric class and representing form
   - These encode **real mathematical content** that requires de Rham representability + Harvey-Lawson.
@@ -24,7 +24,7 @@ The intent is to make it easy for the integrator (and bounded agents) to find an
   - Status: The interface is correct; no `.universal` stub exists.
   - `PoincareDualFormData` no longer carries stub fields (`nonzero_possible`, `geometric_characterization`).
   - **Data-first update**: `poincareDualForm_data` is **definitionally** the regularization of
-    `integrationCurrent_data`. The set-based `PoincareDualFormExists` remains only as a compatibility wrapper.
+    `integrationCurrent_data`. The set-based `PoincareDualFormFromCurrentData` remains only as a compatibility wrapper.
   - **Subvariety data-first bridge**: analytic/algebraic subvarieties now have
     explicit interfaces (`AnalyticSubvarietyClosedSubmanifoldData`,
     `AlgebraicSubvarietyClosedSubmanifoldData`) producing `ClosedSubmanifoldData`.
@@ -35,7 +35,7 @@ The intent is to make it easy for the integrator (and bounded agents) to find an
     1. De Rham representability theorem (every closed current is cohomologous to a smooth form)
     2. Harvey-Lawson bridge theorem (for calibrated currents, the form equals the calibration)
   - These are deep results not in Mathlib - would need to be built from scratch.
-- **`PoincareDualFormExists` (set‑based) still uses a Kähler‑power placeholder**
+- **`PoincareDualFormFromCurrentData` (set‑based) still uses a Kähler‑power placeholder**
   - Location: `Hodge/Classical/CycleClass.lean:140-210` (`omegaPower` + `poincareDualFormData_of_set`)
   - Status: Compatibility‑only; not used on the data‑first proof spine.
   - **REMAINING**: Replace with real integration-current construction and de Rham representability.
@@ -236,10 +236,10 @@ This change is deep and will require a staged migration (new `FiberAltR` / `Smoo
 
 **Current state (2026-02-02)**:
 
-- `hodge_conjecture'` DOES use deep typeclass parameters (NOT hidden):
+- `hodge_conjecture_data` DOES use deep typeclass parameters (NOT hidden):
   - `[AutomaticSYRData n X]`
-  - `[CycleClass.PoincareDualFormExists n X p]`
-  - `[SpineBridgeData n X p]`
+  - `[CycleClass.PoincareDualFormFromCurrentData n X p]`
+  - `[SpineBridgeData_data n X p]`
   - `[CalibratedCurrentRegularityData n X (2*(n-p))]`
   - `[HarveyLawsonKingData n X (2*(n-p))]`
   - `[ChowGAGAData n X]`
@@ -247,10 +247,10 @@ This change is deep and will require a staged migration (new `FiberAltR` / `Smoo
   - **No `.universal` instances exist for these** - intentionally kept as open requirements
 
 - `FlatLimitCycleData` is now treated as a proved infrastructure lemma (an `instance` exists),
-  and it has been removed from the statement of `hodge_conjecture'` and its downstream theorems.
+  and it has been removed from the statement of `hodge_conjecture_data` and its downstream theorems.
 
-- The proof of `hodge_conjecture'` now uses `SpineBridgeData.fundamental_eq_representing` (NOT `rfl`):
-  - `Hodge/Kahler/Main.lean:642` uses `SignedAlgebraicCycle.cycleClass_geom_eq_representingForm`
+- The proof of `hodge_conjecture_data` now uses `SpineBridgeData_data.fundamental_eq_representing` (NOT `rfl`):
+  - `Hodge/Kahler/Main.lean:642` uses `SignedAlgebraicCycle.cycleClass_geom_data_eq_representingForm`
 
 **What remains to eliminate deep typeclass binders**:
 1. **De Rham representability**: Prove that closed currents are cohomologous to smooth forms. Requires: Sobolev spaces on manifolds, elliptic regularity, Hodge theory. NOT in Mathlib.

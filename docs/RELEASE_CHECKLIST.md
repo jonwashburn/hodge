@@ -62,7 +62,7 @@ lake env lean Hodge/Utils/DependencyCheck.lean
 
 **Expected output:**
 ```
-Axioms used by hodge_conjecture':
+Axioms used by hodge_conjecture_data:
   - propext
   - Classical.choice
   - Quot.sound
@@ -291,7 +291,7 @@ Once all items above pass:
 # Create annotated tag
 git tag -a v1.0.0-rc1 -m "Hodge Conjecture Formalization v1.0.0-rc1
 
-Main theorem: hodge_conjecture' in Hodge/Kahler/Main.lean
+Main theorem: hodge_conjecture_data in Hodge/Kahler/Main.lean
 
 Axioms: [propext, Classical.choice, Quot.sound] (standard Lean/Mathlib only)
 

@@ -220,7 +220,7 @@ The test file `Hodge/Kahler/Lefschetz/LefschetzTests.lean` verifies:
 
 ## Usage in Main Proof
 
-The main theorem `hodge_conjecture'` does **not** directly use Hard Lefschetz:
+The main theorem `hodge_conjecture_data` does **not** directly use Hard Lefschetz:
 
 - Hard Lefschetz is part of the background Kähler geometry infrastructure
 - The main proof path uses GMT (currents, calibrations) rather than Hodge theory

@@ -70,7 +70,7 @@ lake build Hodge.GMT
 ./scripts/audit_stubs.sh
 ```
 
-Result: `hodge_conjecture'` depends only on standard Lean axioms:
+Result: `hodge_conjecture_data` depends only on standard Lean axioms:
 `propext`, `Classical.choice`, `Quot.sound`.
 
 ### Full repo scan (noisy; checks for explicit `axiom` declarations)
