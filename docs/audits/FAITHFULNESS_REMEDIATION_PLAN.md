@@ -2,6 +2,15 @@
 
 Last updated: 2025-12-30
 
+**Update (2026-02-04)**: The PD pipeline is now **data‑first** via
+`PoincareDualityFromCurrentsData` → `PoincareDualFormFromCurrentData`. The legacy
+set‑based PD interface is compatibility‑only. Any remaining references to
+`FundamentalClassSet_data` axioms should be read as **explicit typeclass binders**
+in the current codebase.
+**Bundling note (2026-02-04)**: The set‑based theorem `hodge_conjecture'` now takes
+`HodgeConjectureAssumptions n X p`, which packages (but does not remove) the deep
+assumptions used in the compatibility spine.
+
 This file originally described a phased roadmap to make the Lean artifact **faithful to the classical Hodge Conjecture statement**, while allowing *standard/classical theorems* to remain axioms.
 
 **Current status**: ✅ **Implemented + building + mechanically audited**
@@ -169,4 +178,3 @@ This is considered acceptable under the project goal (“faithful modulo classic
 In particular:
 - there are **no** hidden holes (`sorry`/`admit`),
 - the only assumptions are those enumerated by `#print axioms hodge_conjecture_data`.
-

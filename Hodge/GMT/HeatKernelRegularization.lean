@@ -45,7 +45,7 @@ class HeatKernelRegularizationData (n : ℕ) (X : Type*) (k : ℕ)
     [IsManifold (𝓒_complex n) ⊤ X]
     [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
     [MeasurableSpace X] [BorelSpace X]
-    extends CurrentRegularizationData n X k : Type where
+    extends CurrentRegularizationData n X k where
   params : HeatKernelParams
 
 /-- Build heat‑kernel regularization data from an explicit regularization operator

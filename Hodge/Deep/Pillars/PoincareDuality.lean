@@ -5,6 +5,7 @@ Authors: Deep Track Formalization
 -/
 import Hodge.Classical.CycleClass
 import Hodge.Classical.GAGA
+import Hodge.Classical.PoincareDualityFromCurrents
 
 /-!
 # Deep Pillar: Poincaré duality / fundamental class / spine bridge (stub-free)
@@ -15,8 +16,8 @@ This module is the semantic landing pad for the “PD/GMT bridge” pillar in th
 (`= 0`, `True`, or `rfl`). Instead, the proof spine already has explicit interfaces for the
 missing theorems:
 
-- `CycleClass.PoincareDualFormExists` (PD / fundamental class existence as a form);
-- `SpineBridgeData` (comparison of the geometric fundamental class with the spine’s representing form).
+- `CycleClass.PoincareDualityFromCurrentsData` (PD via integration currents);
+- `SpineBridgeData_data` (comparison of the geometric fundamental class with the spine’s representing form).
 
 To make the development mathematically unconditional, the next real work here is:
 
@@ -47,20 +48,24 @@ variable {n : ℕ} {X : Type u}
 The two core interfaces that must eventually be discharged by real proofs:
 -/
 
-abbrev PoincareDualFormExists (p : ℕ) : Prop := CycleClass.PoincareDualFormExists n X p
-abbrev SpineBridge : Prop := SpineBridgeData n X
+abbrev PoincareDualityFromCurrents (p : ℕ) : Prop := CycleClass.PoincareDualityFromCurrentsData n X p
+abbrev SpineBridge : Prop := SpineBridgeData_data n X
 
 /-!
 ## Re-export (current proof-spine bridge hook)
 
-This is the exact bridge lemma the proof spine will need once `cycleClass_geom` is no longer aliased.
-It is *not* proved here; it is assumed via the `SpineBridgeData` interface.
+This is the exact bridge lemma the proof spine needs on the **data‑first** pipeline.
+It is *not* proved here; it is assumed via the `SpineBridgeData_data` interface.
 -/
 
-theorem cycleClass_geom_eq_representingForm {p : ℕ} [SpineBridgeData n X]
+theorem cycleClass_geom_eq_representingForm_data {p : ℕ}
+    [CycleClass.PoincareDualityFromCurrentsData n X p]
+    [AlgebraicSubvarietyClosedSubmanifoldData n X]
+    [SignedAlgebraicCycleSupportCodimData n X p]
+    [SpineBridgeData_data n X p]
     (Z : SignedAlgebraicCycle n X p) :
-    Z.cycleClass_geom = ofForm Z.representingForm Z.representingForm_closed :=
-  SignedAlgebraicCycle.cycleClass_geom_eq_representingForm (n := n) (X := X) (Z := Z)
+    Z.cycleClass_geom_data = ofForm Z.representingForm Z.representingForm_closed :=
+  SignedAlgebraicCycle.cycleClass_geom_eq_representingForm_data (n := n) (X := X) (Z := Z)
 
 end Hodge.Deep.PoincareDuality
 

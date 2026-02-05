@@ -10,6 +10,7 @@ import Hodge.Classical.AlgebraicSets
 noncomputable section
 
 open Classical Hodge
+open CycleClass
 open Hodge.AlgGeom
 
 set_option autoImplicit false
@@ -278,39 +279,6 @@ theorem isAlgebraicSubvariety_intersection {Z₁ Z₂ : Set X}
 
 /-! ## Fundamental Class for Sets -/
 
-/-- **The Fundamental Class Map** (Griffiths-Harris, 1978).
-
-    The fundamental class `[Z]` of an algebraic subvariety Z of codimension p is
-    a closed (p,p)-form representing the Poincaré dual of the homology class of Z.
-
-    **Mathematical Content**: For an algebraic subvariety Z ⊂ X of codimension p:
-    1. Z defines a homology class [Z] ∈ H_{2n-2p}(X, ℤ)
-    2. Poincaré duality gives PD([Z]) ∈ H^{2p}(X, ℤ)
-    3. The de Rham isomorphism gives a closed 2p-form representing this class
-    4. On a Kähler manifold, this form is of type (p,p)
-
-    **Implementation**: Uses the axiomatized Poincaré dual form from CycleClass.lean.
-    This is NOT the trivial zero stub - the form is:
-    - Zero for empty sets (by `fundamentalClassImpl_empty`)
-    - Potentially non-zero for non-empty algebraic sets (via axiomatized construction)
-
-    Properties are proved from the axiomatized interface:
-    - Closedness: `fundamentalClassImpl_isClosed`
-    - (p,p)-type: `fundamentalClassImpl_isPP`
-    - Rationality: `fundamentalClassImpl_isRational`
-    - Additivity: `fundamentalClassImpl_additive`
-
-    Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry",
-    Wiley, 1978, Chapter 1, Section 1]. -/
-def FundamentalClassSet_impl : (n : ℕ) → (X : Type u) →
-    [TopologicalSpace X] → [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] →
-    [IsManifold (𝓒_complex n) ⊤ X] → [HasLocallyConstantCharts n X] →
-    [ProjectiveComplexManifold n X] → [KahlerManifold n X] →
-    [MeasurableSpace X] → [Nonempty X] →
-    (p : ℕ) → [CycleClass.PoincareDualFormExists n X p] →
-    Set X → SmoothForm n X (2 * p) :=
-  fun n X _ _ _ _ _ _ _ _ p _ Z => fundamentalClassImpl n X p Z
-
 /-- Data-first fundamental class implementation (ClosedSubmanifoldData). -/
 def FundamentalClassSet_impl_data : (n : ℕ) → (X : Type u) →
     [MetricSpace X] → [ChartedSpace (EuclideanSpace ℂ (Fin n)) X] →
@@ -322,20 +290,7 @@ def FundamentalClassSet_impl_data : (n : ℕ) → (X : Type u) →
     [CycleClass.PoincareDualityFromCurrentsData n X p] →
     ClosedSubmanifoldData n X (2 * p) → SmoothForm n X (2 * p) :=
   fun n X _ _ _ _ _ _ _ _ _ p _ _ data =>
-    fundamentalClassImpl_data n X p data
-
-/-- The fundamental class map from algebraic subvarieties to closed (p,p)-forms.
-
-Compatibility wrapper: prefer `FundamentalClassSet_data` when explicit
-`ClosedSubmanifoldData` is available. -/
-noncomputable def FundamentalClassSet (n : ℕ) (X : Type u)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [Nonempty X]
-    (p : ℕ) [CycleClass.PoincareDualFormExists n X p]
-    (Z : Set X) : SmoothForm n X (2 * p) :=
-  FundamentalClassSet_impl n X p Z
+    CycleClass.fundamentalClassImpl_data_fromCurrents n X p data
 
 /-! ### Data-first fundamental class (ClosedSubmanifoldData) -/
 
@@ -350,21 +305,6 @@ noncomputable def FundamentalClassSet_data (n : ℕ) (X : Type u)
     (data : ClosedSubmanifoldData n X (2 * p)) : SmoothForm n X (2 * p) :=
   FundamentalClassSet_impl_data n X p data
 
-/-- **Theorem: The fundamental class of an algebraic subvariety is closed.**
-    This is a fundamental property from Hodge theory: integration currents over
-    closed analytic submanifolds are d-closed.
-
-    **Proof**: Follows from the axiomatized property `fundamentalClassImpl_isClosed`
-    which is a mathematical consequence of the cycle having no boundary.
-
-    Reference: [Griffiths-Harris, 1978, Chapter 1]. -/
-theorem FundamentalClassSet_isClosed (p : ℕ) (Z : Set X) (_h : isAlgebraicSubvariety n X Z)
-    [CycleClass.PoincareDualFormExists n X p] :
-    IsFormClosed (FundamentalClassSet n X p Z) := by
-  show IsFormClosed (FundamentalClassSet_impl n X p Z)
-  simp only [FundamentalClassSet_impl]
-  exact fundamentalClassImpl_isClosed p Z
-
 /-! ### Data-first closedness -/
 
 theorem FundamentalClassSet_data_isClosed (p : ℕ)
@@ -377,24 +317,26 @@ theorem FundamentalClassSet_data_isClosed (p : ℕ)
     (data : ClosedSubmanifoldData n X (2 * p)) :
     IsFormClosed (FundamentalClassSet_data n X p data) := by
   show IsFormClosed (FundamentalClassSet_impl_data n X p data)
-  simp only [FundamentalClassSet_impl_data]
-  exact fundamentalClassImpl_data_isClosed (n := n) (X := X) (p := p) data
+  simp only [FundamentalClassSet_impl_data, CycleClass.fundamentalClassImpl_data_fromCurrents]
+  exact CycleClass.fundamentalClassImpl_data_isClosed_ofCurrents (n := n) (X := X) (p := p) data
 
-/-- **Theorem: The fundamental class of the empty set is zero.**
-    The empty subvariety carries no homology class, hence its Poincaré dual is 0.
+/-! ### Data-first empty-set property -/
 
-    **Proof**: Follows from `fundamentalClassImpl_empty`.
-
-    Reference: [Griffiths-Harris, 1978, Chapter 1]. -/
-theorem FundamentalClassSet_empty (p : ℕ)
-    [CycleClass.PoincareDualFormExists n X p] :
-    FundamentalClassSet n X p (∅ : Set X) = 0 := by
-  simp only [FundamentalClassSet, FundamentalClassSet_impl]
-  exact fundamentalClassImpl_empty p
+theorem FundamentalClassSet_data_empty (p : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
+    [CycleClass.PoincareDualityFromCurrentsData n X p]
+    (data : ClosedSubmanifoldData n X (2 * p)) (h : data.carrier = ∅) :
+    FundamentalClassSet_data n X p data = 0 := by
+  show FundamentalClassSet_impl_data n X p data = 0
+  simp only [FundamentalClassSet_impl_data, CycleClass.fundamentalClassImpl_data_fromCurrents]
+  exact CycleClass.fundamentalClassImpl_data_empty_ofCurrents (n := n) (X := X) (p := p) data h
 
 /-!
-NOTE: FundamentalClassSet_is_p_p, FundamentalClassSet_additive, FundamentalClassSet_rational
-were archived with their underlying axioms. They are NOT needed for hodge_conjecture'.
+NOTE: The data-first pipeline replaces the set-based fundamental-class lemmas.
 -/
 
 /-!
@@ -423,23 +365,6 @@ References:
 - [Serre, "GAGA", Ann. Inst. Fourier, 1956] (analytic = algebraic)
 - [Harvey-Lawson, "Calibrated Geometries", Acta Math. 148, 1982, Thm 5.2]
 -/
-
-/-! ## Fundamental Class for Structured Algebraic Subvarieties -/
-
-/-- The fundamental class of an algebraic subvariety, defined via `FundamentalClassSet`. -/
-noncomputable def FundamentalClass (W : AlgebraicSubvariety n X)
-    [CycleClass.PoincareDualFormExists n X W.codim] : SmoothForm n X (2 * W.codim) :=
-  FundamentalClassSet n X W.codim W.carrier
-
-theorem FundamentalClass_isClosed (W : AlgebraicSubvariety n X)
-    [CycleClass.PoincareDualFormExists n X W.codim] :
-    IsFormClosed (FundamentalClass (n := n) (X := X) W) :=
-  FundamentalClassSet_isClosed W.codim W.carrier ⟨W, rfl⟩
-
-theorem exists_fundamental_form (W : AlgebraicSubvariety n X)
-    [CycleClass.PoincareDualFormExists n X W.codim] :
-    ∃ (η : SmoothForm n X (2 * W.codim)), IsFormClosed η :=
-  ⟨FundamentalClass (n := n) (X := X) W, FundamentalClass_isClosed (n := n) (X := X) W⟩
 
 /-! ## Hyperplane sections and complete intersections (algebraic) -/
 
@@ -774,80 +699,6 @@ The Lefschetz-lift statement for signed cycles is proved later as a corollary of
 main theorem (`hodge_conjecture'`) in `Hodge/Kahler/Main.lean`. We keep the algebraic
 cycle infrastructure here (fundamental classes, signed cycles, intersections). -/
 
-/-! ## Geometric Cycle Class (Phase 7)
-
-This section defines the geometric cycle class computed from the support,
-and the `SpineBridgeData` typeclass that bridges geometry to cohomology.
--/
-
-/-- The support of a signed algebraic cycle is `pos ∪ neg`. -/
-def SignedAlgebraicCycle.support' {p : ℕ} (Z : SignedAlgebraicCycle n X p) : Set X :=
-  Z.pos ∪ Z.neg
-
-/-- The support of a signed algebraic cycle is algebraic. -/
-theorem SignedAlgebraicCycle.support'_alg {p : ℕ} (Z : SignedAlgebraicCycle n X p) :
-    isAlgebraicSubvariety n X (SignedAlgebraicCycle.support' Z) := by
-  obtain ⟨W₁, hW₁⟩ := Z.pos_alg
-  obtain ⟨W₂, hW₂⟩ := Z.neg_alg
-  refine ⟨⟨Z.support', max W₁.codim W₂.codim, ?_⟩, rfl⟩
-  unfold SignedAlgebraicCycle.support'
-  apply IsAlgebraicSet_union
-  · rw [← hW₁]; exact W₁.is_algebraic
-  · rw [← hW₂]; exact W₂.is_algebraic
-
-/-- **Geometric cycle class** computed from the support (set‑based compatibility).
-
-    This is the *set‑based* geometric definition: the cohomology class is the class of
-    the fundamental class of the support \(Z.pos ∪ Z.neg\).
-
-    **Proof‑track guidance**: prefer the **data‑first** definition
-    `SignedAlgebraicCycle.cycleClass_geom_data`, which computes the class from explicit
-    `ClosedSubmanifoldData` via the current‑regularization pipeline.
-
-    This set‑based definition **breaks the cycle‑class tautology** and forces the deep
-    comparison theorem onto the proof track via `SpineBridgeData`. Concretely, the
-    bridge asserts (for spine‑produced cycles) that:
-    \[
-      [\mathrm{FundamentalClassSet}(\mathrm{support}(Z))] = [\mathrm{representingForm}(Z)].
-    \]
-
-    **Phase 7 Update (2026-02-01)**: Definition uses `FundamentalClassSet` from the support.
-    Requires `PoincareDualFormExists` for the fundamental class construction. -/
-noncomputable def SignedAlgebraicCycle.cycleClass_geom {p : ℕ}
-    [CycleClass.PoincareDualFormExists n X p]
-    (Z : SignedAlgebraicCycle n X p) : DeRhamCohomologyClass n X (2 * p) :=
-  ofForm (FundamentalClassSet n X p Z.support')
-         (FundamentalClassSet_isClosed p Z.support' Z.support'_alg)
-
-/-- **Spine Bridge Data**: the deep bridge between geometry and cohomology.
-
-    This encodes the TeX spine statement that for *spine-produced* cycles, the
-    fundamental class of the support represents the same cohomology class as the
-    carried `representingForm`.
-
-    In the fully unconditional project, this should be *proved* from GMT + Stokes + PD
-    (ultimately Harvey–Lawson / calibrated current theory + GAGA).
-    For now we keep it explicit as a typeclass assumption.
-
-    **Phase 7 Update**: Requires `PoincareDualFormExists` because `cycleClass_geom`
-    is defined using `FundamentalClassSet`.
-
-    **Proof‑track guidance**: prefer `SpineBridgeData_data` (data‑first). -/
-class SpineBridgeData (n : ℕ) (X : Type u) (p : ℕ)
-    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
-    [ProjectiveComplexManifold n X] [KahlerManifold n X]
-    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
-    [CycleClass.PoincareDualFormExists n X p] : Prop where
-  /-- For spine-produced cycles, the geometric class from support equals the class of the
-      carried representing form. -/
-  fundamental_eq_representing :
-    ∀ (Z : SignedAlgebraicCycle n X p),
-      Z.cycleClass_geom = ofForm Z.representingForm Z.representingForm_closed
-
--- Compatibility note: `SpineBridgeData` is the set-based bridge; prefer
--- `SpineBridgeData_data` when explicit `ClosedSubmanifoldData` is available.
-
 /-- **Data-first Spine Bridge Data** (ClosedSubmanifoldData).
 
 This is the data-first variant of the bridge, using explicit support data. -/
@@ -866,19 +717,13 @@ class SpineBridgeData_data (n : ℕ) (X : Type u) (p : ℕ)
       Z.cycleClass_geom_data = ofForm Z.representingForm Z.representingForm_closed
 
 /-!
-## Note: no `SpineBridgeData.universal`
+## Note: no `.universal`
 
-`SpineBridgeData` is intended to be discharged by the real PD/GMT bridge (integration current + de Rham).
-We intentionally do **not** provide a trivial `.universal` constructor here, because that would reintroduce
-the "cycle class tautology" gotcha on the main proof spine.
+`SpineBridgeData_data` is intended to be discharged by the real PD/GMT bridge
+(integration current + de Rham). We intentionally do **not** provide a trivial
+`.universal` constructor here, because that would reintroduce the "cycle class
+tautology" gotcha on the main proof spine.
 -/
-
-/-- The geometric class equals the representing form class (by the spine bridge). -/
-theorem SignedAlgebraicCycle.cycleClass_geom_eq_representingForm {p : ℕ}
-    [CycleClass.PoincareDualFormExists n X p] [SpineBridgeData n X p]
-    (Z : SignedAlgebraicCycle n X p) :
-    Z.cycleClass_geom = ofForm Z.representingForm Z.representingForm_closed :=
-  SpineBridgeData.fundamental_eq_representing (n := n) (X := X) (p := p) (Z := Z)
 
 /-! ### Data-first bridge corollary -/
 
@@ -900,13 +745,5 @@ by
     instSignedAlgebraicCycleSupportData_ofAlgebraic (n := n) (X := X) (p := p)
   exact SpineBridgeData_data.fundamental_eq_representing
     (n := n) (X := X) (p := p) (Z := Z)
-
-/-- The geometric class equals the shortcut class (via the bridge). -/
-theorem SignedAlgebraicCycle.cycleClass_geom_eq_cycleClass {p : ℕ}
-    [CycleClass.PoincareDualFormExists n X p] [SpineBridgeData n X p]
-    (Z : SignedAlgebraicCycle n X p) :
-    Z.cycleClass_geom = Z.cycleClass := by
-  rw [cycleClass_geom_eq_representingForm (n := n) (X := X) (Z := Z),
-    cycleClass_eq_representingForm (n := n) (X := X) (Z := Z)]
 
 end

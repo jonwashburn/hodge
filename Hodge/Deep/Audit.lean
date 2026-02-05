@@ -49,9 +49,9 @@ open Lean Meta Elab Command
 #print axioms Hodge.Deep.Microstructure.AutomaticSYRData.real'
 #print axioms Hodge.Deep.HarveyLawson.HarveyLawsonKingData.real
 #print axioms Hodge.Deep.FedererFleming.FlatLimitCycleData.real'
--- PD / fundamental class / spine bridge is currently represented by the explicit interface
--- `SpineBridgeData` (see `Hodge/Classical/GAGA.lean`), re-exported in the deep pillar:
-#print axioms Hodge.Deep.PoincareDuality.cycleClass_geom_eq_representingForm
+-- PD / fundamental class / spine bridge is currently represented by the explicit data-first interface
+-- `SpineBridgeData_data` (see `Hodge/Classical/GAGA.lean`), re-exported in the deep pillar:
+#print axioms Hodge.Deep.PoincareDuality.cycleClass_geom_eq_representingForm_data
 
 -- ═══════════════════════════════════════════════════════════════════════════
 -- SORRY COUNT: Deep Track Pillars

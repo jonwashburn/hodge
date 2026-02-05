@@ -28,6 +28,9 @@ abbrev DeRhamCurrent (n : ℕ) (X : Type*) (k : ℕ)
 
 /-- Boundary operator on currents, phrased using `Nat.sub` on degrees.
 
+Compatibility-only: this mirrors `Current.boundary` with a `Nat`-based degree shift.
+Prefer using `Current.boundary` directly on the proof track.
+
 For `k = 0`, the boundary is defined to be `0` (since `k - 1 = 0` in `Nat`).
 For `k = k' + 1`, this is `Current.boundary`. -/
 def DeRhamCurrent.boundary {n : ℕ} {X : Type*}
@@ -44,7 +47,9 @@ def DeRhamCurrent.boundary {n : ℕ} {X : Type*}
     -- Nat.sub: (k'+1) - 1 = k'
     simpa [DeRhamCurrent, Nat.succ_sub_one] using (Current.boundary (k := k') T)
 
-/-- Linearity of evaluation: `T(c • ω₁ + ω₂) = c*T(ω₁) + T(ω₂)`. -/
+/-- Linearity of evaluation: `T(c • ω₁ + ω₂) = c*T(ω₁) + T(ω₂)`.
+
+Compatibility-only: prefer the linearity lemmas on `Current` directly. -/
 theorem current_eval_linear {n : ℕ} {X : Type*} {k : ℕ}
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]

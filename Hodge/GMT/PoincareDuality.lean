@@ -36,7 +36,7 @@ The Poincaré duality interface now documents the **full mathematical pipeline**
    `IntegrationData` → `Current`
 
 2. **Poincaré dual form** (`Hodge.Classical.CycleClass`): ⚠️ Deep interface
-   `PoincareDualFormExists` (no universal instance). The mathematical pipeline is
+   `PoincareDualityFromCurrentsData` (no universal instance). The mathematical pipeline is
    documented but the actual form construction requires the current→form regularization.
 
 3. **Cohomology class**: ✅ Correctly constructed from the PD form using `ofForm`
@@ -84,8 +84,9 @@ abbrev poincareDualForm := CycleClass.poincareDualForm
 
 This is the *current* bridge used by the proof-track development.
 
-**Status**: Requires an explicit `PoincareDualFormExists` instance (no universal placeholder).
+**Status**: Requires an explicit `PoincareDualityFromCurrentsData` instance (no universal placeholder).
 See `Hodge.Classical.CycleClass` for the interface. -/
+-- Compatibility-only: this uses the legacy set-based PD interface.
 abbrev poincareDualForm_construct_cycleClass := CycleClass.poincareDualForm
 
 /-- Poincaré dual form constructed from the (integration current) → (regularization) pipeline.
@@ -146,7 +147,9 @@ produces a well-typed de Rham class.
 
 **Mathematical Content**: This is the cycle class `[Z] ∈ H^{2p}(X, ℝ)`.
 
-**Implementation**: Uses `ofForm` with the PD form and its closedness proof. -/
+**Implementation**: Uses `ofForm` with the PD form and its closedness proof.
+
+Compatibility-only: proof track uses `gmt_cycle_to_cohomology_path_data`. -/
 -- Compatibility wrapper: prefer `gmt_cycle_to_cohomology_path_data` with
 -- explicit `ClosedSubmanifoldData` when available.
 noncomputable def gmt_cycle_to_cohomology_path (p : ℕ) [CycleClass.PoincareDualFormExists n X p] (Z : Set X) :
@@ -159,9 +162,11 @@ noncomputable def gmt_cycle_to_cohomology_path_data (p : ℕ)
     (data : ClosedSubmanifoldData n X (2 * p)) :
     DeRhamCohomologyClass n X (2 * p) :=
   Hodge.ofForm (CycleClass.poincareDualForm_data n X p data)
-    (CycleClass.poincareDualForm_data_isClosed n X p data)
+    (CycleClass.poincareDualForm_data_isClosed_ofCurrents n X p data)
 
-/-- The cycle class of the empty set is the zero cohomology class. -/
+/-- The cycle class of the empty set is the zero cohomology class.
+
+Compatibility-only: proof track uses `gmt_cycle_to_cohomology_empty_data`. -/
 theorem gmt_cycle_to_cohomology_empty (p : ℕ) [CycleClass.PoincareDualFormExists n X p] :
     gmt_cycle_to_cohomology_path (n := n) (X := X) p ∅ =
       Hodge.ofForm 0 (isFormClosed_zero (n := n) (X := X) (k := 2 * p)) := by
@@ -179,7 +184,7 @@ theorem gmt_cycle_to_cohomology_empty_data (p : ℕ)
   unfold gmt_cycle_to_cohomology_path_data
   -- Reduce to the empty-carrier property from the data-first PD form interface.
   congr 1
-  exact CycleClass.poincareDualForm_data_empty n X p data h
+  exact CycleClass.poincareDualForm_data_empty_ofCurrents n X p data h
 
 /-! ## The Full Poincaré Duality Pipeline (Documentation)
 
@@ -204,7 +209,8 @@ cohomology classes. This is the "M4 bridge" that connects:
 
 The data-first bridge now defines `poincareDualForm_data` **explicitly** as
 regularization of the integration current. Closedness/empty-carrier properties
-are tracked via `PoincareDualFormFromCurrentData`. The set-based interface
+are tracked via `PoincareDualityFromCurrentsData` (which yields
+`PoincareDualFormFromCurrentData`). The set-based interface
 `PoincareDualFormExists` remains a compatibility layer for legacy call sites.
 
 This keeps the proof track honest while the regularization machinery is under

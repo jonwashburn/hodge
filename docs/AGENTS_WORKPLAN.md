@@ -5,10 +5,15 @@ To parallelize anyway, we’ll run a **manual multi‑agent workflow** where eac
 separate Codex/Cursor session) picks a tightly scoped task, follows the playbook, and checks in
 with a short report.
 
+## Autonomy Override (2026-02-04)
+
+Long‑session autonomy is active. Default behavior is **no check‑ins** and continuous execution
+until blocked. The check‑in template below is only used if explicitly requested.
+
 ## Primary Reference (paper)
 
-- **Newest proof narrative**: `final-1-15-milan-05.tex` (Jan 15, 2026).
-- **Secondary prompt file**: `JA_hodge_approach_with_added_refs_blueCites.tex`.
+- **Primary proof narrative**: `JA_hodge_approach_with_added_refs_blueCites.tex`.
+- **Additional narrative**: `final-1-15-milan-05.tex` (Jan 15, 2026).
 
 Any proof‑spine decisions should cite these.
 
@@ -49,4 +54,3 @@ Notes / blockers:
 ## Task Queue
 
 See `docs/AGENTS_TASKS.md`.
-

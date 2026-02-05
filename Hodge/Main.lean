@@ -15,11 +15,6 @@ The full proof logic is contained in `Hodge/Kahler/Main.lean`.
 
 2. **`hodge_conjecture_kernel`** (kernel-only): Uses definitional shortcut
    `cycleClass := ofForm representingForm`. No custom axioms, but not TeX-faithful.
-
-## Compatibility Section
-
-The set-based `hodge_conjecture` is kept only for legacy call sites; the proof track
-should prefer `hodge_conjecture_data`.
 -/
 
 noncomputable section
@@ -56,36 +51,10 @@ variable {n : ℕ} {X : Type*}
 
     See `hodge_conjecture_kernel` for the kernel-only version. -/
 theorem hodge_conjecture_data {p : ℕ}
-    [AutomaticSYRData n X]
-    [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
-    [CycleClass.PoincareDualityFromCurrentsData n X p]
-    [AlgebraicSubvarietyClosedSubmanifoldData n X]
-    [SignedAlgebraicCycleSupportCodimData n X p]
-    [SpineBridgeData_data n X p]
-    [CalibratedCurrentRegularityData n X (2 * (n - p))]
-    [HarveyLawsonKingData n X (2 * (n - p))]
-    [ChowGAGAData n X]
+    [HodgeConjectureAssumptions n X p]
     (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
     (h_rational : isRationalClass (ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :
     ∃ (Z : SignedAlgebraicCycle n X p), Z.cycleClass_geom_data = ofForm γ h_closed :=
-  hodge_conjecture'_data γ h_closed h_rational h_p_p
-
-/-! ## Compatibility (Set‑Based) -/
-
-/-- **The Hodge Conjecture** (set‑based compatibility wrapper).
-
-    This theorem keeps the legacy set‑based `cycleClass_geom` interface for
-    external call sites. It is not the preferred proof‑track entry point.
-    Use `hodge_conjecture_data` for the data‑first pipeline. -/
-theorem hodge_conjecture {p : ℕ}
-    [AutomaticSYRData n X]
-    [CycleClass.PoincareDualFormExists n X p] [SpineBridgeData n X p]
-    [CalibratedCurrentRegularityData n X (2 * (n - p))]
-    [HarveyLawsonKingData n X (2 * (n - p))]
-    [ChowGAGAData n X]
-    (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
-    (h_rational : isRationalClass (ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :
-    ∃ (Z : SignedAlgebraicCycle n X p), Z.cycleClass_geom = ofForm γ h_closed :=
   hodge_conjecture' γ h_closed h_rational h_p_p
 
 end

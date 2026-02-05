@@ -1,4 +1,16 @@
-# Operational Plan: Full Hodge Proof (5 Parallel Agents)
+# Operational Plan: Unconditional Hodge Proof (Autonomy Mode)
+
+## Autonomy Override (2026-02-04)
+
+This file now serves as historical context only. The active operational plan is:
+- `docs/AUTONOMY_RUNWAY.md`
+- `docs/PROOF_COMPLETION_PLAN_FULL_UNCONDITIONAL.md`
+
+Key updates:
+- Proof track is **data‑first only**.
+- Compatibility wrappers are legacy‑only and must not appear on the proof spine.
+- Long sessions proceed without check‑ins; stop only if blocked by permissions
+  or by no‑gotchas constraints.
 
 **Last Updated**: 2026-01-21  
 **Goal**: Replace all stub definitions with real mathematical implementations  

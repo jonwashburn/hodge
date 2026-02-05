@@ -2,6 +2,16 @@
 
 Last updated: 2025-12-29 (Faithfulness remediation complete)
 
+**Update (2026-02-04)**: The proof track is now **data‑first** and routes PD through
+`PoincareDualityFromCurrentsData` → `PoincareDualFormFromCurrentData`. The legacy
+set‑based PD interface (`PoincareDualFormExists`) is compatibility‑only. Any mention
+below of “axioms” for `FundamentalClassSet_data` should now be read as **typeclass
+obligations** (explicit binders) rather than hidden axioms.
+
+**Bundling note (2026-02-04)**: The set‑based theorem `hodge_conjecture'` now takes a
+single `HodgeConjectureAssumptions n X p` bundle. This does **not** remove any deep
+assumptions; it only packages them to keep the statement clean.
+
 This document is a **red-team checklist** for the repo. It records everything that could make the “proof” not a complete and correct proof **(even assuming the classical/standard mathematical theorems cited)**.
 
 Scope:
@@ -418,4 +428,3 @@ The following modifications were made to `Hodge-v6-w-Jon-Update-MERGED.tex` to e
 - Explicitly marks it as an external input with references
 - Added `Remark \ref{rem:integer-rounding-external}` after Proposition `prop:global-coherence-all-labels`
 - Explicitly marks integer rounding as relying on Barvinok and flags adversarial concern about correction vectors
-

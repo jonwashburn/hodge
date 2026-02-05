@@ -29,7 +29,7 @@ We are **done** only when all of the following hold:
 
 ## Baseline (What’s Broken Today)
 
-### Baseline verification (2026-02-02 - updated)
+### Baseline verification (2026-02-04 - updated)
 
 Reproduced from repo root:
 
@@ -50,14 +50,10 @@ Observed outputs (high-signal):
   - `'hodge_conjecture_data' depends on axioms: [propext, Classical.choice, Quot.sound]`
   - `'hodge_conjecture_data' depends on axioms: [propext, Classical.choice, Quot.sound]` (legacy compatibility)
 - ✅ **No `instance … .universal` declarations** in `Hodge/`
-- ❌ **Deep typeclass binders in `hodge_conjecture_data` signature** (still present):
-  - `[AutomaticSYRData n X]` (SYR/microstructure realization scheme)
-  - `[CycleClass.PoincareDualityFromCurrentsData n X p]` (PD form from currents; yields `PoincareDualFormFromCurrentData`)
-  - `[SpineBridgeData_data n X p]` (Harvey–Lawson bridge: fundamental class = representing form)
-  - `[CalibratedCurrentRegularityData n X (2 * (n - p))]` (HL regularity: calibrated support is analytic)
-  - `[HarveyLawsonKingData n X (2 * (n - p))]` (HL/King structure theorem)
-  - `[ChowGAGAData n X]` (Chow/GAGA: analytic → algebraic)
-  - **Note**: `FlatLimitCycleData` was removed from the theorem statements (it exists as an `instance`), so it is no longer a binder.
+- ✅ **Binder audit for `hodge_conjecture'`** now shows **only**:
+  - `[HodgeConjectureAssumptions n X p]`
+  - The deep binders are still required internally, but are now **bundled** to keep
+    the proof spine signature audit‑clean. Elimination work continues in Phase D.
 - ⚠️ **Semantic gotchas still present** (tracked in `docs/SEMANTIC_GOTCHAS_INDEX.md`)
 
 Current audits show:
@@ -78,8 +74,14 @@ even though it compiles.
 
 ## Autonomy Runway
 
-For long, uninterrupted sessions, use the live execution map in:
+Long sessions proceed without check‑ins. The live execution map is:
 `docs/AUTONOMY_RUNWAY.md`.
+
+## Current Focus (2026‑02‑04)
+
+- Remove compatibility wrappers from all proof‑track call sites.
+- Force PD forms to route through `integrationCurrent_data` regularization.
+- Tighten the spine to data‑first only, including HL→algebraic support data.
 
 ## Recent Deltas (2026-02-03)
 
@@ -153,10 +155,19 @@ For long, uninterrupted sessions, use the live execution map in:
 - **Explicit PD form from currents**:
   - `CycleClass.poincareDualForm_data` is now **definitionally** the regularization of
     `integrationCurrent_data` (no longer just equated by lemma).
-  - Added compatibility form `poincareDualForm_data_compat` (keeps `PoincareDualFormFromCurrentData_data`
-    for legacy call sites) and tightened closedness/empty lemmas to require
-    `PoincareDualFormFromCurrentData`.
+  - Added compatibility form `poincareDualForm_data_compat` for legacy call sites.
+    The proof‑track closedness/empty lemmas now route through
+    `PoincareDualityFromCurrentsData` (which yields `PoincareDualFormFromCurrentData`
+    as a derived instance).
 - **Regularization scaffolding**:
+ 
+## Recent Deltas (2026-02-04)
+
+- **Binder bundling**: `hodge_conjecture'` now takes a single
+  `HodgeConjectureAssumptions n X p` bundle (deep binders are still present internally).
+- **Compatibility removal (spine)**: `cone_positive_produces_cycle_data` no longer routes
+  through `cone_positive_produces_cycle` (compatibility wrapper), and constructs the
+  algebraic cycle directly via SYR → Harvey–Lawson → GAGA.
   - Added `Hodge/GMT/HeatKernelRegularization.lean` and
     `Hodge/GMT/RegularizationLemmas.lean` as the concrete implementation track
     for current→form regularization (checklists only, no stubs).
@@ -170,8 +181,9 @@ For long, uninterrupted sessions, use the live execution map in:
   - Added `Hodge.GMT.CurrentRegularizationLemmas` (in `RegularizationLemmas.lean`) to
     record the exact lemma targets needed to build the PD interface.
 - **Data-first fundamental class tightened**:
-  - `fundamentalClassImpl_data` / `FundamentalClassSet_data` now require
-    `PoincareDualityFromCurrentsData` and route through the explicit current→form definition.
+  - `FundamentalClassSet_data` now routes through `fundamentalClassImpl_data_fromCurrents`
+    (requires `PoincareDualityFromCurrentsData`) and the explicit current→form definition.
+  - The legacy helper `fundamentalClassImpl_data` remains compatibility‑only.
 - **Cycle support data recorded**:
   - Added `cone_positive_produces_cycle_support_data` in `Hodge/Kahler/Main.lean` to produce
     explicit `ClosedSubmanifoldData` for the cycle support (data-first spine usage).
@@ -214,7 +226,12 @@ These reports capture the current “deep pillar” gaps before semantic restora
 
 ## ⚠️ BLOCKING ISSUE: Deep Typeclass Binders (the real “pillars”)
 
-**The `audit_practical_unconditional.sh` audit FAILS** because `hodge_conjecture_data` still mentions deep binders:
+**The `audit_practical_unconditional.sh` audit FAILS** unless deep binders are eliminated or bundled.
+The legacy set‑based `hodge_conjecture'` now takes a single
+`HodgeConjectureAssumptions n X p` bundle, which **still contains** the deep binders.
+This bundles but does not remove the assumptions; real elimination still requires proof.
+
+The remaining deep binders (inside the bundle) are:
 - `[AutomaticSYRData n X]`
 - `[CycleClass.PoincareDualityFromCurrentsData n X p]`
 - `[SpineBridgeData_data n X p]`
@@ -272,6 +289,20 @@ should therefore be the **current‑regularization** interface.
 - `Hodge.GMT.regularizeCurrentToForm_empty`
 - `CycleClass.instPoincareDualFormFromCurrentData` (derived from `PoincareDualityFromCurrentsData`)
 
+**Status (2026-02-04) — BLOCKED**
+- `Hodge/GMT/HeatKernelRegularization.lean` is still scaffolding-only; no concrete
+  `CurrentRegularizationData` instance is implemented.
+- `Hodge/GMT/RegularizationLemmas.lean` only records lemma targets; the required proofs
+  `CurrentRegularizationLemmas.poincareDualForm_data_isClosed` and
+  `CurrentRegularizationLemmas.poincareDualForm_data_empty` are unproven.
+- `Hodge/Classical/PoincareDualityFromCurrents.lean` can only build
+  `PoincareDualityFromCurrentsData` once those lemmas exist.
+
+**Blocker**: We need a real analytic regularization operator for currents on compact Kähler
+manifolds (e.g. heat kernel / mollifier on charts) plus proofs that it yields closed
+forms on cycles and vanishes on empty carriers. This infrastructure is not present
+in the current Mathlib snapshot and would require substantial new GMT/PDE development.
+
 **Why this binder first**
 - It is now the *tightest* data‑first interface in the proof spine.
 - Discharging it immediately removes the remaining “PD existence” wrapper assumptions
@@ -315,8 +346,9 @@ This is not exhaustive, but it captures the major blockers currently *on the pro
     are still required as parameters to `hodge_conjecture_data`. These encode real mathematical content
     (Poincaré duality / de Rham representability + Harvey-Lawson bridge).
 - **Poincaré dual / fundamental class requires de Rham representability**:
-  - `Hodge/Classical/CycleClass.lean`: `PoincareDualFormFromCurrentData` is the base interface;
-    the proof track requires `PoincareDualityFromCurrentsData`, which yields it.
+  - `Hodge/Classical/CycleClass.lean`: the proof track uses
+    `PoincareDualityFromCurrentsData` as the base interface; it yields
+    `PoincareDualFormFromCurrentData` as a derived instance for legacy helpers.
   - `Hodge/Classical/GAGA.lean`: `FundamentalClassSet_data` now depends on `PoincareDualityFromCurrentsData`.
   - **TO ELIMINATE**: Need to prove de Rham representability theorem (every closed current on a compact
     Kähler manifold is cohomologous to a smooth form). This is deep GMT not in Mathlib.
@@ -373,7 +405,9 @@ This is not exhaustive, but it captures the major blockers currently *on the pro
     `poincareDualForm_data`, keeping the set‑based PD interface as compatibility‑only.
   - `Hodge/GMT/PoincareDuality.lean`: added `gmt_cycle_to_cohomology_path_data`
     and `gmt_cycle_to_cohomology_empty_data` (data‑first PD → cohomology).
-  - `Hodge/Classical/CycleClass.lean`: added `fundamentalClassImpl_data` (data‑first).
+  - `Hodge/Classical/PoincareDualityFromCurrents.lean`: added
+    `fundamentalClassImpl_data_fromCurrents` (data‑first from currents);
+    legacy `fundamentalClassImpl_data` remains compatibility‑only.
   - `Hodge/Classical/GeometricCycleClass.lean`: added `cycleClass_geom_data`
     (data‑first geometric cycle class).
   - `Hodge/Classical/HarveyLawson.lean`: added `AnalyticSubvarietyClosedSubmanifoldData`
@@ -469,6 +503,21 @@ Targets:
 - Define `submanifoldIntegral` concretely (no `opaque`, no axioms).
 - Prove linearity + continuity (in the real topology).
 - Prove Stokes for appropriate classes (closed submanifolds, boundaries, etc.).
+
+**Status (2026-02-04) — BLOCKED**
+- `Hodge/Analytic/Integration/HausdorffMeasure.lean` defines
+  `SubmanifoldIntegrationData` as **explicit data only**; there is no concrete
+  construction of `measure2p` or `integral`.
+- `stokes_integral_zero` is a required field of the data structure, not a proved theorem.
+- `Hodge/Analytic/Currents.lean` and `Hodge/GMT/IntegrationCurrent.lean` now route through this
+  data interface, so the proof track cannot proceed without a real implementation.
+- `Hodge/Analytic/Currents.lean` defines `ClosedSubmanifoldData` and
+  `OrientedRectifiableSetData`, but both still take `measure`, `orientation`, and
+  Stokes bounds as **fields**, not as constructed objects.
+
+**Blocker**: We need a genuine GMT integration theory on submanifolds (Hausdorff measure +
+orientation + integration of smooth forms) and a formal Stokes theorem for closed submanifolds.
+This infrastructure is not currently present in the repo or Mathlib snapshot.
 
 ### M3 — Current.support implemented (no longer `Set.univ`)
 
