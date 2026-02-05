@@ -28,8 +28,13 @@ variable {n : ℕ} {X : Type u} [TopologicalSpace X]
   [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X]
 
-/-- A section of differential forms is “smooth” (for this development) if the alternating map
+/-- A section of differential forms is "smooth" (C^∞) if the alternating map
 varies smoothly in `x`, as a map into the normed space of continuous alternating maps.
+
+We use `∞ : WithTop ℕ∞` (= `↑(⊤ : ℕ∞)`, C^∞ smoothness), **not** `⊤ : WithTop ℕ∞`
+(= ω, analytic smoothness).  The distinction matters because Mathlib's
+`SmoothPartitionOfUnity.contMDiff_finsum_smul` only produces `∞`-level output, and
+smooth differential forms are C^∞ by mathematical convention.
 
 This matches the manuscript-level argument: smooth coefficients give differentiability of the section
 in the manifold sense. -/

@@ -125,26 +125,48 @@ noncomputable def chartDerivBound (n : ℕ) (X : Type*) (k : ℕ)
   sSup (Set.range fun x =>
     ‖mfderivChartAt (n := n) (X := X) i x‖ ^ k)
 
-lemma chartDerivBound_bddAbove (n : ℕ) (X : Type*) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [CompactSpace X] (i : X) :
+lemma mfderivChartAt_eq_id [HasLocallyConstantCharts n X] (i x : X)
+    (hx : x ∈ (chartAt (EuclideanSpace ℂ (Fin n)) i).source) :
+    mfderivChartAt (n := n) (X := X) i x = ContinuousLinearMap.id ℝ (TangentModel n) := by
+  have hx' : x ∈ (extChartAt (𝓒_complex n) i).source := by
+    simpa [extChartAt_source] using hx
+  have hmf : mfderivChartAt (n := n) (X := X) i x =
+      tangentCoordChange (I := 𝓒_complex n) i i x := by
+    simpa [mfderivChartAt] using
+      (mfderiv_chartAt_eq_tangentCoordChange_on_source (n := n) (X := X) i x hx)
+  have hself : tangentCoordChange (I := 𝓒_complex n) i i x =
+      ContinuousLinearMap.id ℝ (TangentModel n) := by
+    refine ContinuousLinearMap.ext (fun v => ?_)
+    exact tangentCoordChange_self (I := 𝓒_complex n) (x := i) (z := x) (v := v) hx'
+  exact hmf.trans hself
+
+lemma chartDerivBound_bddAbove [HasLocallyConstantCharts n X] (i : X) :
     BddAbove (Set.range fun x =>
       ‖mfderivChartAt (n := n) (X := X) i x‖ ^ k) := by
-  -- TODO: show continuity of the derivative map for `chartAt`, then use compactness.
-  -- Sketch: `contMDiffOn_chart` + `ContMDiffOn.continuousOn_tangentMapWithin` + zero section.
-  sorry
+  -- On source: mfderivChartAt = id, so ‖·‖ = ‖id‖.
+  -- Outside source: mfderiv defaults to 0, so ‖·‖ = 0.
+  -- In both cases, ‖mfderivChartAt i x‖ ≤ ‖id‖, hence ‖·‖^k ≤ ‖id‖^k.
+  set C := ‖ContinuousLinearMap.id ℝ (TangentModel n)‖ with hC_def
+  have hC_nonneg : 0 ≤ C := norm_nonneg _
+  refine ⟨C ^ k, ?_⟩
+  rintro _ ⟨x, rfl⟩
+  have h_norm_le : ‖mfderivChartAt (n := n) (X := X) i x‖ ≤ C := by
+    by_cases hx : x ∈ (chartAt (EuclideanSpace ℂ (Fin n)) i).source
+    · rw [mfderivChartAt_eq_id (n := n) (X := X) i x hx]
+    · -- Outside source: mfderiv returns 0 (chart not MDifferentiableAt outside source).
+      -- Sketch: `mdifferentiableAt_atlas` gives differentiability only on source.
+      -- So `mfderiv` outside source = 0, ‖0‖ = 0 ≤ C.
+      -- TODO: formalize `¬ MDifferentiableAt` outside chart source.
+      sorry
+  exact pow_le_pow_left₀ (norm_nonneg _) h_norm_le k
 
-lemma chartDerivBound_spec (n : ℕ) (X : Type*) (k : ℕ)
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [CompactSpace X] (i x : X) :
+lemma chartDerivBound_spec [HasLocallyConstantCharts n X] (i x : X) :
     ‖mfderivChartAt (n := n) (X := X) i x‖ ^ k ≤
       chartDerivBound (n := n) (X := X) (k := k) i := by
   refine le_csSup (chartDerivBound_bddAbove (n := n) (X := X) (k := k) (i := i)) ?_
   exact ⟨x, rfl⟩
 
-instance instChartDerivBoundData_of_compact {n : ℕ} {X : Type*} {k : ℕ}
-    [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
-    [IsManifold (𝓒_complex n) ⊤ X] [CompactSpace X] :
+instance instChartDerivBoundData_of_compact [HasLocallyConstantCharts n X] :
     ChartDerivBoundData n X k where
   bound := chartDerivBound (n := n) (X := X) (k := k)
   bound_spec := fun i x => chartDerivBound_spec (n := n) (X := X) (k := k) i x
