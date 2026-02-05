@@ -14,12 +14,14 @@ CurrentRegularizationData + PD regularization lemmas
 ```
 
 No stubs or axioms are introduced: users must supply the closedness/empty‑set
-lemmas for the regularized integration current.
+lemmas for the regularized integration current. It also provides a
+data‑first fundamental class helper (`fundamentalClassImpl_data_fromCurrents`)
+used by the GAGA layer.
 -/
 
 noncomputable section
 
-open Classical
+open Classical Hodge
 
 set_option autoImplicit false
 
@@ -49,6 +51,68 @@ class PoincareDualityFromCurrentsData (n : ℕ) (X : Type u) (p : ℕ)
   empty_vanishes :
     ∀ data : ClosedSubmanifoldData n X (2 * p),
       data.carrier = ∅ → poincareDualForm_data n X p data = 0
+
+/-! ### Derived lemmas (data-first route) -/
+
+theorem poincareDualForm_data_isClosed_ofCurrents (n : ℕ) (X : Type u) (p : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
+    [PoincareDualityFromCurrentsData n X p]
+    (data : ClosedSubmanifoldData n X (2 * p)) :
+    IsFormClosed (poincareDualForm_data n X p data) :=
+  PoincareDualityFromCurrentsData.isClosed (n := n) (X := X) (p := p) data
+
+theorem poincareDualForm_data_empty_ofCurrents (n : ℕ) (X : Type u) (p : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
+    [PoincareDualityFromCurrentsData n X p]
+    (data : ClosedSubmanifoldData n X (2 * p)) (h : data.carrier = ∅) :
+    poincareDualForm_data n X p data = 0 :=
+  PoincareDualityFromCurrentsData.empty_vanishes (n := n) (X := X) (p := p) data h
+
+/-! ### Fundamental class built from the current-regularization pipeline -/
+
+/-- Data-first fundamental class: use the regularized integration current. -/
+noncomputable def fundamentalClassImpl_data_fromCurrents (n : ℕ) (X : Type u) (p : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
+    [PoincareDualityFromCurrentsData n X p]
+    (data : ClosedSubmanifoldData n X (2 * p)) :
+    SmoothForm n X (2 * p) :=
+  poincareDualForm_data n X p data
+
+/-- Closedness of the data-first fundamental class (from currents). -/
+theorem fundamentalClassImpl_data_isClosed_ofCurrents (n : ℕ) (X : Type u) (p : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
+    [PoincareDualityFromCurrentsData n X p]
+    (data : ClosedSubmanifoldData n X (2 * p)) :
+    IsFormClosed (fundamentalClassImpl_data_fromCurrents n X p data) :=
+  PoincareDualityFromCurrentsData.isClosed (n := n) (X := X) (p := p) data
+
+/-- Empty carrier gives the zero data-first fundamental class (from currents). -/
+theorem fundamentalClassImpl_data_empty_ofCurrents (n : ℕ) (X : Type u) (p : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
+    [PoincareDualityFromCurrentsData n X p]
+    (data : ClosedSubmanifoldData n X (2 * p)) (h : data.carrier = ∅) :
+    fundamentalClassImpl_data_fromCurrents n X p data = 0 :=
+  PoincareDualityFromCurrentsData.empty_vanishes (n := n) (X := X) (p := p) data h
 
 /-- Build `PoincareDualityFromCurrentsData` from the regularization lemma package. -/
 noncomputable instance instPoincareDualityFromCurrentsData_ofRegularizationLemmas

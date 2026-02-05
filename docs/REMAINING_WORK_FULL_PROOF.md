@@ -1,5 +1,10 @@
 # Remaining Work for a Full Hodge Proof (No Stubs)
 
+**Autonomy Update (2026-02-04)**: Long-session autonomy is active. The proof track is
+**data‑first only**; compatibility wrappers are legacy‑only. This document is historical
+and should be reconciled with `docs/PROOF_COMPLETION_PLAN_FULL_UNCONDITIONAL.md` for
+current priorities.
+
 **Last Updated**: 2026-01-21 (by Agent 3, R10-A3-VERIFY)  
 **Status**: The proof-track for `hodge_conjecture_data` is currently **sorry-free and axiom-free** (only depends on `propext`, `Classical.choice`, `Quot.sound`).  
 **Goal**: Replace all stub definitions with real mathematical implementations.

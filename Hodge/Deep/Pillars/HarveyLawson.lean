@@ -4,6 +4,7 @@ Released under Apache 2.0 license.
 Authors: Deep Track Formalization
 -/
 import Hodge.Classical.HarveyLawson
+import Hodge.Classical.GAGA
 import Hodge.Deep.Pillars.Stokes
 
 /-!
@@ -108,7 +109,7 @@ theorem king_algebraicity {p : ℕ}
     (hcal : isCalibrated T.toFun ψ)
     [CalibratedCurrentRegularityData n X (2 * (n - p))]
     [ChowGAGAData n X] :
-    IsAlgebraicSet n X (Current.support T.toFun) := by
+    AlgGeom.IsAlgebraicSet n X (Current.support T.toFun) := by
   have hAnalytic :
       IsAnalyticSet (n := n) (X := X) (Current.support T.toFun) :=
     (CalibratedCurrentRegularityData.support_is_analytic_zero_locus

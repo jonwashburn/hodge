@@ -4,6 +4,7 @@ Released under Apache 2.0 license.
 Authors: Deep Track Formalization
 -/
 import Hodge.Classical.GAGA
+import Hodge.Classical.AlgebraicSets
 import Hodge.AnalyticSets
 
 /-!
@@ -94,12 +95,12 @@ The key result: on a projective variety, analytic = algebraic.
 theorem chow_theorem_strong (Z : Set X)
     (hZ : Hodge.AlgGeom.IsAnalyticSetZeroLocus (n := n) (X := X) Z)
     [ChowGAGAData n X] :
-    IsAlgebraicSet n X Z := by
+    Hodge.AlgGeom.IsAlgebraicSet n X Z := by
   exact ChowGAGAData.analytic_to_algebraic (n := n) (X := X) Z hZ
 
 /-! ## Goal 4: Real ChowGAGAData Instance
 
-Once Goal 3 is complete, this replaces `ChowGAGAData.universal`.
+    Once Goal 3 is complete, this replaces `ChowGAGAData.universal`.
 -/
 
 /-- **DEEP GOAL 4**: The real ChowGAGAData instance.
@@ -107,7 +108,7 @@ Once Goal 3 is complete, this replaces `ChowGAGAData.universal`.
     **Status**: Depends on Goals 1-3 above. -/
 def ChowGAGAData.real
     (analytic_to_algebraic :
-      ∀ (Z : Set X), IsAnalyticSet (n := n) (X := X) Z → IsAlgebraicSet n X Z) :
+      ∀ (Z : Set X), IsAnalyticSet (n := n) (X := X) Z → Hodge.AlgGeom.IsAlgebraicSet n X Z) :
     ChowGAGAData n X where
   analytic_to_algebraic := analytic_to_algebraic
 

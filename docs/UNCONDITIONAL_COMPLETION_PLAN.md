@@ -1,5 +1,11 @@
 # Unconditional completion plan (no deep typeclass assumptions)
 
+## Autonomy Update (2026-02-04)
+
+Long-session autonomy is active. The proof track is **data‑first** and does **not**
+use compatibility wrappers. Deep binders will be eliminated by **real constructions**,
+not by trivial universal instances.
+
 ## Goal
 
 Make the **public entrypoint** `Hodge/Main.lean:hodge_conjecture` compile and be usable **without**
@@ -10,7 +16,8 @@ requiring proof-track typeclass assumptions like:
 - `FlatLimitCycleData`
 - `HarveyLawsonKingData`
 - `ChowGAGAData`
-- `CycleClass.PoincareDualityFromCurrentsData` (yields `PoincareDualFormFromCurrentData`)
+- `CycleClass.PoincareDualityFromCurrentsData` (proof‑track binder; yields
+  `PoincareDualFormFromCurrentData` as a derived instance)
 - `SpineBridgeData_data`
 
 In other words: `hodge_conjecture` should have only the ambient manifold hypotheses (the ones already

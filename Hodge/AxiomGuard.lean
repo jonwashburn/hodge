@@ -4,13 +4,13 @@ import Hodge
 # Axiom Guard — Compile-Time Regression Protection
 
 This module provides **compile-time enforcement** against introducing new axioms
-or `sorry` statements into the proof track of `hodge_conjecture'`.
+or `sorry` statements into the proof track of `hodge_conjecture_data`.
 
 ## How it works
 
 1. We define the list of **allowed axioms** (standard Lean axioms).
 2. We provide a `#guard_no_custom_axioms` command that runs at compile time.
-3. If `hodge_conjecture'` depends on any **custom** axiom, compilation fails.
+3. If `hodge_conjecture_data` depends on any **custom** axiom, compilation fails.
 
 ## Current Status
 
@@ -22,7 +22,7 @@ When this file compiles without error:
 ## Usage
 
 This file is imported as part of the normal build. If someone introduces a new
-`axiom` declaration that `hodge_conjecture'` depends on, the build will fail here.
+`axiom` declaration that `hodge_conjecture_data` depends on, the build will fail here.
 -/
 
 open Lean Meta Elab Command in
@@ -57,22 +57,20 @@ elab "#guard_no_custom_axioms " declName:ident : command => do
 -- ═══════════════════════════════════════════════════════════════════════════
 
 -- This check runs at compile time and FAILS THE BUILD if custom axioms are found.
-#guard_no_custom_axioms hodge_conjecture'
-#guard_no_custom_axioms hodge_conjecture
+#guard_no_custom_axioms hodge_conjecture_data
 
 -- ═══════════════════════════════════════════════════════════════════════════
 -- INFORMATIONAL OUTPUT (for human review)
 -- ═══════════════════════════════════════════════════════════════════════════
 
-#print axioms hodge_conjecture'
-#print axioms hodge_conjecture
+#print axioms hodge_conjecture_data
 
 /-!
 ## What This Means
 
 If this file compiles successfully:
 
-1. **No custom axioms** in the `hodge_conjecture'` proof track.
+1. **No custom axioms** in the `hodge_conjecture_data` proof track.
 2. The only possible remaining issues are:
    - `sorryAx` — requires completing the `sorry` statements (Agent 1's work)
 

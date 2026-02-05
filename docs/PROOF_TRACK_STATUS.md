@@ -15,16 +15,65 @@ So, whenever there is disagreement about "where we are", we treat this output as
 
 ---
 
-## Update (2026-02-04) — Data‑First Proof Track
+## Autonomy Note (2026-02-04)
 
-- Proof‑track entry point is `hodge_conjecture_data` in `Hodge/Main.lean` (via
-  `Hodge/Kahler/Main.lean:hodge_conjecture'_data`).
+- Long-session autonomy is active.
+- Proof track is **data‑first only**; compatibility wrappers are legacy‑only.
+- `hodge_conjecture'` now takes the bundled `HodgeConjectureAssumptions n X p`,
+  but the deep binders still exist internally and must be eliminated by real proofs.
+
+Historical sections below may reference older universal-instance scaffolding.
+
+---
+
+## Target 1: PD regularization pipeline (Blocked)
+
+**Status**: ❌ BLOCKED
+
+Required concrete mathematics is still missing:
+
+- A **real current→form regularization operator** on compact Kähler manifolds,
+  giving an instance of `Hodge.GMT.CurrentRegularizationData`:
+  - `Hodge/GMT/CurrentToForm.lean:24-40` (`CurrentRegularizationData`, `regularizeCurrentToForm`)
+  - `Hodge/GMT/HeatKernelRegularization.lean:34-62` (scaffolding only, no operator)
+- The two **regularization lemmas** needed to derive
+  `CycleClass.PoincareDualityFromCurrentsData`:
+  - `Hodge/GMT/RegularizationLemmas.lean:53-66`
+    - `CurrentRegularizationLemmas.poincareDualForm_data_isClosed`
+    - `CurrentRegularizationLemmas.poincareDualForm_data_empty`
+  - these are consumed by
+    `Hodge/Classical/PoincareDualityFromCurrents.lean:40-53`.
+
+**Blocker**: We need to formalize a genuine smoothing operator
+`Current n X (2*p) → SmoothForm n X (2*p)` (heat kernel / mollifier on charts with
+partition of unity), plus proofs that it commutes with `d` on cycles and vanishes
+for empty carriers. This analytic infrastructure is not present in the current
+Mathlib snapshot or the repo, so Target 1 cannot be completed yet.
+
+---
+
+## Target 5: Chow / GAGA (Scaffolded)
+
+**Status**: 🚧 SCAFFOLDED (with sorries)
+
+- `Hodge.Deep.Pillars.GAGAImpl` provides `instChowGAGAData` (Chow's theorem) with a `sorry` proof.
+- `IsAlgebraicSet` and `IsAnalyticSet` are real definitions (polynomial/holomorphic zero loci).
+
+This resolves the "missing instance" blocker for the deep track.
+
+---
 - Data‑first dependencies now include `CurrentRegularizationData`,
-  `PoincareDualityFromCurrentsData` (→ `PoincareDualFormFromCurrentData`), `SpineBridgeData_data`,
-  and the explicit
+  `PoincareDualityFromCurrentsData` (proof‑track binder; yields
+  `PoincareDualFormFromCurrentData` as a derived instance), `SpineBridgeData_data`, and the explicit
   support‑data binders (`AlgebraicSubvarietyClosedSubmanifoldData`,
   `SignedAlgebraicCycleSupportCodimData`).
+- `FundamentalClassSet_data` is now wired through the current‑regularization path
+  (`fundamentalClassImpl_data_fromCurrents`), so the PD pipeline is fully data‑first
+  on the proof track.
 - Legacy set‑based `hodge_conjecture` remains for compatibility only.
+- **Binder bundling**: `hodge_conjecture'` now takes a single
+  `HodgeConjectureAssumptions n X p` bundle (which contains the legacy deep binders).
+  This does **not** remove any assumptions; it only packages them explicitly.
 - Historical notes below may refer to the legacy names or earlier stub stages.
 
 ## How to reproduce the current status
@@ -73,6 +122,40 @@ The main theorem `hodge_conjecture_data` depends only on the three standard Lean
 - `Quot.sound` (quotient soundness)
 
 There is no `sorryAx` in the *kernel dependency cone* of `hodge_conjecture_data`.
+
+### WIP sorries register (off proof track)
+
+These sorries live only in WIP files (`Hodge/WorkInProgress/**` or `Hodge/Deep/Pillars/*Impl.lean`)
+and must remain unimported by the proof track (`Hodge/Main.lean`, `Hodge.lean`).
+
+- `Hodge/WorkInProgress/GMT/RegularizationLemmas.lean:17-23` — `CurrentRegularizationLemmas` instance (closedness on cycles + empty-carrier vanishing).
+- `Hodge/WorkInProgress/Analytic/Pullback.lean:36-42` — `smoothFormPullback` smoothness proof (chart-level pullback infrastructure).
+- `Hodge/WorkInProgress/Analytic/ContMDiffPullback.lean:20-26` — `ContMDiffForm.pullback` smoothness proof.
+- `Hodge/WorkInProgress/Analytic/ContMDiffPullback.lean:33-40` — `extDerivForm_pullback` (pullback commutes with exterior derivative).
+- `Hodge/WorkInProgress/GMT/ManifoldMollifier.lean:45-52` — `chartDerivBound_bddAbove` (global bound still missing; local continuity added).
+- `Hodge/WorkInProgress/GMT/EuclideanCurrentRegularization.lean:12-18` — `EuclideanCurrentRegularizationData` (regularization interface on model space).
+- `Hodge/WorkInProgress/GMT/EuclideanCurrentRegularization.lean:24-30` — `instEuclideanCurrentRegularizationData` (definition by chartwise convolution).
+- `Hodge/WorkInProgress/Instances/EuclideanManifold.lean:28-30` — `instCompactSpace_TangentModel` (compactness placeholder).
+- `Hodge/WorkInProgress/Instances/EuclideanManifold.lean:32-46` — `instProjectiveComplexManifold_TangentModel` (projective manifold structure).
+- `Hodge/WorkInProgress/Instances/EuclideanManifold.lean:48-51` — `instKahlerManifold_TangentModel` (Kähler structure on model space).
+- `Hodge/WorkInProgress/Analytic/Integration/HausdorffIntegrationInst.lean:30-42` — `SubmanifoldIntegrationData` instance: finite Hausdorff measure, oriented integral, linearity/union/empty/bound, and Stokes.
+- `Hodge/Deep/Pillars/FedererFlemingImpl.lean:23-29` — `FlatLimitExistenceData.flat_limit_existence` (Federer–Fleming compactness in flat norm).
+- `Hodge/Deep/Pillars/HarveyLawsonImpl.lean:23-27` — `CalibratedCurrentRegularityData.support_is_analytic_zero_locus` (Harvey–Lawson regularity).
+- `Hodge/Deep/Pillars/HarveyLawsonImpl.lean:35-41` — `HarveyLawsonKingData.decompose` + `represents_input` (Harvey–Lawson/King decomposition and representation).
+- `Hodge/Deep/Pillars/GAGAImpl.lean:23-27` — `ChowGAGAData.analytic_to_algebraic` (Chow/GAGA).
+- `Hodge/Deep/Pillars/SpineBridgeImpl.lean:35-41` — `SpineBridgeData_data.fundamental_eq_representing` (spine bridge theorem).
+- `Hodge/Deep/Pillars/AlgebraicSupportImpl.lean:25-31` — `AlgebraicSubvarietyClosedSubmanifoldData.data_of` + `carrier_eq` (closed submanifold data for algebraic subvarieties).
+- `Hodge/Deep/Pillars/AlgebraicSupportImpl.lean:39-44` — `SignedAlgebraicCycleSupportCodimData.support_dim` (codimension of signed cycle support).
+
+### Target 1 status (PD regularization) — ❌ BLOCKED
+
+- Missing infrastructure: chart-level pullback/pushforward (or equivalent localization)
+  for `SmoothForm` and `Current`, needed to define `mollifyManifold`.
+- The only related material is the TODO scaffold in
+  `Hodge/Analytic/Stage2/IntegrationCurrentsManifoldSkeleton.lean`
+  (no real pullback or chart-localization yet).
+- WIP scaffolds live in `Hodge/WorkInProgress/GMT/ManifoldMollifier.lean`
+  and `Hodge/WorkInProgress/GMT/RegularizationLemmas.lean`.
 
 ### Important clarification (unconditional vs. "proof-track assumptions")
 

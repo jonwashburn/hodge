@@ -1,5 +1,11 @@
 # Complete Proof Plan: Eliminating ALL Axioms and Sorries
 
+## Autonomy Update (2026-02-04)
+
+This plan is now aligned to **long-session autonomy** and the **data‑first proof spine**.
+Compatibility wrappers are legacy‑only and must not appear on the proof track.
+See `docs/AUTONOMY_RUNWAY.md` for execution protocol.
+
 **Goal**: Transform the Hodge Conjecture formalization into a complete proof with:
 - ✅ ZERO custom axioms (only `propext`, `Classical.choice`, `Quot.sound`)
 - ✅ ZERO `sorry` statements
@@ -187,7 +193,8 @@ defined as the regularization of the integration current, and should satisfy:
 - Current theory (dual to differential forms)
 - Regularization of currents to smooth forms (heat kernel / mollifier on charts)
 - Implement `Hodge.GMT.CurrentRegularizationLemmas` and use it to build
-  `CycleClass.PoincareDualityFromCurrentsData` (then `PoincareDualFormFromCurrentData`).
+  `CycleClass.PoincareDualityFromCurrentsData` (proof‑track binder; yields
+  `PoincareDualFormFromCurrentData` as a derived instance).
 
 **Approach Options**:
 

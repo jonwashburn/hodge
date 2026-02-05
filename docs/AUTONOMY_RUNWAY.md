@@ -1,54 +1,53 @@
-# Autonomy Runway (Long-Session Plan)
+# Autonomy Runway (Long-Session Mode)
 
-This document is the **live execution map** for long, uninterrupted sessions. It is intended
-to reduce check-ins and allow autonomous progress while preserving the "no-gotchas" constraints.
+This document is the **live execution map** for multi‑hour, uninterrupted sessions.
+It is optimized for maximum autonomy while preserving the no‑gotchas constraints.
 
-## Autonomy Rules (No-Ask Defaults)
+## Autonomy Contract (No Check‑Ins)
 
-I will proceed without asking unless an action:
-1. Changes theorem statements on the proof track.
-2. Introduces any `axiom`/`opaque`/`sorry`.
-3. Modifies audit scripts or relaxes audit criteria.
-4. Performs destructive operations (delete/move large sections of proof-track code).
+I will proceed without asking and keep working until blocked by:
+1. A hard permission error outside the repo.
+2. A conflict with the no‑gotchas rules (new axiom/opaque/sorry, or weakened audits).
+3. A required change to a **proof‑track theorem statement** that would alter meaning.
 
-If any of the above are necessary, I will stop and ask.
+If blocked, I will stop and request input. Otherwise I will keep going.
 
-## Primary Objective (Data-First Proof Spine)
+## Primary Objective (Data‑First Proof Spine Only)
 
-The goal is to make the **data‑first pipeline** the default proof track:
+Make the data‑first pipeline the **only** proof‑track path:
 `ClosedSubmanifoldData → integrationCurrent_data → regularize → PD form → cycle class`.
 
-## Work Phases (Run in Order)
+Compatibility wrappers remain only for legacy call sites and must **not** be used on
+the proof track.
+
+## Long‑Session Phases (Run in Order)
 
 ### Phase A — Data‑First Hygiene
-1. Remove remaining compatibility‑wrapper usage in proof‑track call sites.
-2. Ensure all PD/cycle‑class bridges use `*_data` and explicit `ClosedSubmanifoldData`.
-3. Update any proof‑track docs to use data‑first language.
+1. Remove compatibility wrappers from proof‑track call sites.
+2. Ensure PD/cycle‑class bridges use `*_data` and explicit `ClosedSubmanifoldData`.
+3. Normalize proof‑track docs to data‑first language only.
 
 ### Phase B — PD Regularization Plumbing
-1. Implement `CurrentRegularizationLemmas` instances where possible.
-2. Use `PoincareDualityFromCurrentsData` → `PoincareDualFormFromCurrentData` wiring.
-3. Keep regularization scaffolding fully data‑first; no stubs/axioms.
+1. Wire `PoincareDualityFromCurrentsData → PoincareDualFormFromCurrentData`.
+2. Implement `CurrentRegularizationLemmas` targets in the new scaffolding.
+3. Require the PD form to be obtained by regularizing `integrationCurrent_data`.
 
 ### Phase C — Stokes / Integration Tightening
-1. Thread `ClosedSubmanifoldData` into any remaining Stokes/integration call sites.
-2. Remove any implicit or set‑based Stokes assumptions from proof‑track lemmas.
+1. Thread `ClosedSubmanifoldData` into remaining Stokes/integration sites.
+2. Replace any set‑based Stokes assumptions on the proof spine.
 
-### Phase D — Binder Elimination Scaffolding
-1. Identify the next binder to eliminate (PD regularization or Harvey–Lawson bridge).
-2. Create precise lemma checklists and file scaffolding for that binder.
-3. Record blockers in `docs/PROOF_COMPLETION_PLAN_FULL_UNCONDITIONAL.md`.
+### Phase D — Deep Binder Elimination
+1. Remove one deep binder at a time (priority: PD regularization, HL→algebraic, Chow/GAGA).
+2. Keep a concrete lemma checklist per binder in the proof plan.
 
-## Milestone Checks (Lightweight)
+## Audit Cadence (Auto‑Run)
 
-I will run audits at **phase boundaries** or after large refactors:
+Run at phase boundaries or after significant refactors:
 - `./scripts/audit_practical_unconditional.sh`
 - `./scripts/audit_stubs.sh --full`
 - `lake env lean Hodge/Utils/DependencyCheck.lean`
 
-## Progress Reporting
+## Session Output Policy
 
-Each session will end with:
-1. What changed (files + key lemmas).
-2. What remains (next phase steps).
-3. Any blockers (by file/lemma).
+No intermediate reports. I will only surface a summary if explicitly asked
+or if blocked.

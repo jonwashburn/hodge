@@ -13,7 +13,7 @@ that don't do real mathematical work:
 |---------------|-------------------|----------|
 | `AutomaticSYRData.universal` | Real microstructure: sheets, gluing, defect→0 | `Hodge/Kahler/Main.lean:210` |
 | `ChowGAGAData.universal` | Real Chow/GAGA: analytic→algebraic | `Hodge/Classical/GAGA.lean:141` |
-| `SpineBridgeData.universal` | Real spine: fundamental class = representing form | `Hodge/Classical/GAGA.lean:555` |
+| `SpineBridgeData_data` | Real spine: fundamental class = representing form (data‑first) | `Hodge/Classical/GAGA.lean:860` |
 | `SubmanifoldIntegrationData` (explicit data) | Real Hausdorff integration | `Hodge/Analytic/Integration/HausdorffMeasure.lean:24` |
 | `CubulationExists.universal` | Real cubulation with mesh bounds | `Hodge/Kahler/Microstructure.lean:117` |
 

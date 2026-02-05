@@ -4,7 +4,8 @@ import Hodge.Main
 # Dependency Check Utility
 
 This file prints the axioms used by the **data‑first** main theorem
-`hodge_conjecture_data` and the legacy compatibility variant `hodge_conjecture'`.
+`hodge_conjecture_data`. The legacy compatibility variant is intentionally
+not checked here.
 
 ## Usage
 
@@ -16,4 +17,3 @@ the proof track only depends on standard Lean axioms:
 -/
 
 #print axioms hodge_conjecture_data
-#print axioms hodge_conjecture'

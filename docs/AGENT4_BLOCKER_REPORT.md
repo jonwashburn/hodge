@@ -16,8 +16,9 @@
 **Update (2026-02-03)**:
 - The proof spine is now **data‑first**: `poincareDualForm_data` is defined as
   `regularizeCurrentToForm (integrationCurrent_data …)`.
-- The set‑based `PoincareDualFormFromCurrentData` remains **compatibility‑only**; the real blocker
-  is now `CurrentRegularizationData` / `PoincareDualFormFromCurrentData`.
+- The legacy compatibility layer is `PoincareDualFormExists_data`; the proof spine now
+  targets `CurrentRegularizationData` / `PoincareDualityFromCurrentsData`
+  (which yields `PoincareDualFormFromCurrentData` as a derived instance).
 - The bridge target is `SpineBridgeData_data` (data‑first), not the legacy
   `FundamentalClassSet_data_represents_class`.
 

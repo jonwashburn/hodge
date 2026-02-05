@@ -1,5 +1,10 @@
 # Hodge Conjecture: Remaining Work for Clay-Standard Certification
 
+**Autonomy Update (2026-02-04)**: This document is historical. The active
+data‑first proof spine and long‑session plan live in:
+- `docs/AUTONOMY_RUNWAY.md`
+- `docs/PROOF_COMPLETION_PLAN_FULL_UNCONDITIONAL.md`
+
 **Last Updated**: 2026-01-10  
 **Status**: Tasks 1-3, 5-7 complete. Task 4 (Hard Lefschetz) decomposed into 8 parallel subtasks (4A-4H).
 

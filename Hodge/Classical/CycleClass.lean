@@ -35,9 +35,11 @@ This approach:
 3. Allows the proof-track axiom audit to focus on the remaining genuine gaps
 
 **Data-first update**: the PD interface is now `ClosedSubmanifoldData`-first.
-`PoincareDualFormFromCurrentData` fixes the proof-track PD form to be the
-regularization of `integrationCurrent_data`, while `PoincareDualFormExists_data`
-is retained only as a compatibility layer for legacy call sites.
+`PoincareDualityFromCurrentsData` is the proof‑track binder; it yields
+`PoincareDualFormFromCurrentData` and fixes `poincareDualForm_data` to be the
+regularization of `integrationCurrent_data`. The legacy
+`PoincareDualFormExists_data` interface is retained only as a compatibility layer
+for older call sites.
 
 Reference: [P. Griffiths and J. Harris, "Principles of Algebraic Geometry",
 Wiley, 1978, Chapter 1].
@@ -242,7 +244,9 @@ compatibility wrapper for legacy call sites.
 
 **Tightening**: `PoincareDualFormFromCurrentData` strengthens this interface by
 requiring the PD form to be obtained from `integrationCurrent_data` via
-regularization. -/
+regularization. The proof track now prefers the stronger
+`PoincareDualityFromCurrentsData` (see `Hodge/Classical/PoincareDualityFromCurrents.lean`),
+which yields `PoincareDualFormFromCurrentData` as an instance. -/
 
 section DataFirst
 
@@ -274,8 +278,9 @@ structure PoincareDualFormData_data (n : ℕ) (X : Type u) (p : ℕ)
 
 /-- **Poincaré Dual Form Existence** (data-first).
 
-Compatibility-only: the proof track should prefer `PoincareDualFormFromCurrentData`
-which forces the PD form to be obtained from `integrationCurrent_data`. -/
+Compatibility-only: the proof track should prefer `PoincareDualityFromCurrentsData`
+(which yields `PoincareDualFormFromCurrentData`) to force the PD form to be obtained
+from `integrationCurrent_data`. -/
 class PoincareDualFormExists_data (n : ℕ) (X : Type u) (p : ℕ)
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
@@ -356,7 +361,8 @@ noncomputable def poincareDualForm_data (n : ℕ) (X : Type u) (p : ℕ)
 
 This strengthens `PoincareDualFormExists_data` by requiring the PD form to be obtained by
 regularizing the integration current `integrationCurrent_data`.
-This is the tightened pipeline used on the proof track. -/
+The proof track assumes `PoincareDualityFromCurrentsData`, which yields this interface
+as a derived instance. -/
 class PoincareDualFormFromCurrentData (n : ℕ) (X : Type u) (p : ℕ)
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
@@ -384,6 +390,12 @@ theorem poincareDualForm_data_compat_eq (n : ℕ) (X : Type u) (p : ℕ)
       poincareDualForm_data n X p data := by
   simpa [poincareDualForm_data] using
     (PoincareDualFormFromCurrentData.from_current (n := n) (X := X) (p := p) data)
+
+/-! Compatibility-only closedness/empty lemmas.
+
+These require `PoincareDualFormFromCurrentData` directly. The proof track instead
+uses `PoincareDualityFromCurrentsData` and the derived lemmas in
+`Hodge/Classical/PoincareDualityFromCurrents.lean`. -/
 
 theorem poincareDualForm_data_isClosed (n : ℕ) (X : Type u) (p : ℕ)
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
@@ -505,7 +517,11 @@ theorem fundamentalClassImpl_isClosed (p : ℕ) (Z : Set X)
 
 section DataFirstFundamental
 
-/-- Data-first fundamental class form, built from explicit `ClosedSubmanifoldData`. -/
+/-- Data-first fundamental class form, built from explicit `ClosedSubmanifoldData`.
+
+Compatibility-only: the proof spine prefers `FundamentalClassSet_data`
+(in `Hodge/Classical/GAGA.lean`), which requires `PoincareDualityFromCurrentsData`
+and routes through the current‑regularization pipeline. -/
 def fundamentalClassImpl_data (n : ℕ) (X : Type u)
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
@@ -518,7 +534,7 @@ def fundamentalClassImpl_data (n : ℕ) (X : Type u)
     SmoothForm n X (2 * p) :=
   CycleClass.poincareDualForm_data n X p data
 
-/-- Data-first fundamental class is closed. -/
+/-- Data-first fundamental class is closed (compatibility-only). -/
 theorem fundamentalClassImpl_data_isClosed (n : ℕ) (X : Type u) (p : ℕ)
     [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]

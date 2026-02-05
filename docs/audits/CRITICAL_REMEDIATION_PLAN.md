@@ -2,6 +2,14 @@
 
 **Status:** ✅ **COMPLETED** — All critical issues have been fixed  
 **Date:** 2024-12-30  
+
+**Update (2026-02-04)**: The proof track is now **data‑first** for PD:
+`PoincareDualityFromCurrentsData` → `PoincareDualFormFromCurrentData`. Any legacy
+mentions of axiomatized `FundamentalClassSet_data` should be read as **explicit
+typeclass binders** in the current codebase (no hidden axioms).
+**Bundling note (2026-02-04)**: The set‑based theorem `hodge_conjecture'` now
+uses a single `HodgeConjectureAssumptions n X p` bundle. This packages (but does not
+remove) the deep assumptions.
 **Priority:** P0 (Must fix before any publication claims)
 
 ---

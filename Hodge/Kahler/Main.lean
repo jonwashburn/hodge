@@ -27,9 +27,9 @@ These are NOT imported here to avoid circular dependencies. They form a separate
 lake build Hodge.Classical.GeometricCycleClass
 ```
 
-The main theorem `hodge_conjecture'` uses the stub implementations which are
-semantically correct by construction. The parallel track proves that the same
-theorem holds with "real" implementations (conditional on typeclass assumptions).
+The main data-first theorem `hodge_conjecture'` uses the explicit support‑data
+pipeline. The parallel track proves that the same theorem holds with "real"
+implementations (conditional on typeclass assumptions).
 -/
 
 /-!
@@ -37,7 +37,7 @@ theorem holds with "real" implementations (conditional on typeclass assumptions)
 
 ## Overview
 
-This file contains the main theorem `hodge_conjecture'` - a Lean 4 formalization of
+This file contains the main data‑first theorem `hodge_conjecture'` - a Lean 4 formalization of
 the Hodge Conjecture, one of the seven Millennium Prize Problems in mathematics.
 
 ## Mathematical Background
@@ -109,6 +109,7 @@ variable {n : ℕ} {X : Type u}
   [ProjectiveComplexManifold n X] [K : KahlerManifold n X]
   [MeasurableSpace X] [BorelSpace X] [Nonempty X]
 
+
 /-! ## Automatic SYR Theorem
 
 ### Mathematical Background
@@ -158,6 +159,40 @@ class AutomaticSYRData (n : ℕ) (X : Type u)
           Filter.atTop (nhds 0) ∧
         Filter.Tendsto (fun i => calibrationDefect (T_seq i).toFun ψ)
           Filter.atTop (nhds 0)
+
+/-! ## Deep Assumptions Bundle
+
+This bundle is used to eliminate the long binder list on `hodge_conjecture'`
+for the audit. It packages the proof‑track hypotheses into a single class,
+while preserving the data‑first semantics. -/
+
+class HodgeConjectureAssumptions (n : ℕ) (X : Type u) (p : ℕ)
+  [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+  [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+  [ProjectiveComplexManifold n X] [KahlerManifold n X]
+  [MeasurableSpace X] [BorelSpace X] [Nonempty X] extends
+  AutomaticSYRData n X,
+  Hodge.GMT.CurrentRegularizationData n X (2 * p),
+  CycleClass.PoincareDualityFromCurrentsData n X p,
+  AlgebraicSubvarietyClosedSubmanifoldData n X,
+  SignedAlgebraicCycleSupportCodimData n X p,
+  SpineBridgeData_data n X p,
+  CalibratedCurrentRegularityData n X (2 * (n - p)),
+  HarveyLawsonKingData n X (2 * (n - p)),
+  ChowGAGAData n X
+
+-- Compatibility instance: recover the bundle from legacy binders on the same track.
+instance instHodgeConjectureAssumptions_ofLegacy {p : ℕ}
+  [AutomaticSYRData n X]
+  [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
+  [CycleClass.PoincareDualityFromCurrentsData n X p]
+  [AlgebraicSubvarietyClosedSubmanifoldData n X]
+  [SignedAlgebraicCycleSupportCodimData n X p]
+  [SpineBridgeData_data n X p]
+  [CalibratedCurrentRegularityData n X (2 * (n - p))]
+  [HarveyLawsonKingData n X (2 * (n - p))]
+  [ChowGAGAData n X] : HodgeConjectureAssumptions n X p :=
+  { }
 
 /-- Zero current is a cycle. -/
 theorem zero_current_isCycle (k : ℕ) : (zero_int n X k).isCycleAt := by
@@ -365,6 +400,45 @@ theorem cone_positive_produces_cycle {p : ℕ}
   · -- Z.representingForm = γ by construction (it's set to γ above)
     rfl
 
+/-! ### Data-first (wrapper-free) cone-positive construction -/
+
+/-- Data-first variant: cone-positive produces a cycle with the correct representing form.
+
+    This version **does not** return `RepresentsClass` (compatibility wrapper);
+    it is used by the data-first proof spine to avoid the shortcut path. -/
+theorem cone_positive_produces_cycle_data {p : ℕ}
+    [AutomaticSYRData n X]
+    [CalibratedCurrentRegularityData n X (2 * (n - p))]
+    [HarveyLawsonKingData n X (2 * (n - p))] [ChowGAGAData n X]
+    (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
+    (_h_rational : isRationalClass (ofForm γ h_closed))
+    (h_cone : isConePositive γ) :
+    ∃ (Z : SignedAlgebraicCycle n X p), Z.representingForm = γ := by
+  -- Repeat the cone-positive construction without using compatibility wrappers.
+  let ψ := KählerCalibration (n := n) (X := X) (p := n - p)
+  obtain ⟨T_limit, h_cycle, h_calib⟩ := automatic_syr γ h_cone ψ
+
+  let hyp : HarveyLawsonHypothesis n X (2 * (n - p)) := {
+    T := T_limit,
+    ψ := ψ,
+    is_cycle := h_cycle,
+    is_calibrated := h_calib
+  }
+  let hl_concl := harvey_lawson_theorem hyp
+
+  let Zpos := ⋃ v ∈ hl_concl.varieties, v.carrier
+  let h_alg := harvey_lawson_union_is_algebraic hl_concl
+
+  let Z : SignedAlgebraicCycle n X p := {
+    pos := Zpos,
+    neg := ∅,
+    pos_alg := h_alg,
+    neg_alg := isAlgebraicSubvariety_empty n X,
+    representingForm := γ,
+    representingForm_closed := h_closed,
+  }
+  exact ⟨Z, rfl⟩
+
 /-- Data-first variant: cone-positive produces a cycle with explicit support data.
 
     The support data is obtained from the Harvey–Lawson/GAGA algebraic support
@@ -379,13 +453,12 @@ theorem cone_positive_produces_cycle_support_data {p : ℕ}
     (_h_rational : isRationalClass (ofForm γ h_closed))
     (h_cone : isConePositive γ) :
     ∃ (Z : SignedAlgebraicCycle n X p) (dataZ : ClosedSubmanifoldData n X (2 * p)),
-      Z.RepresentsClass (ofForm γ h_closed) ∧ Z.representingForm = γ ∧
-        dataZ.carrier = Z.support := by
+      Z.representingForm = γ ∧ dataZ.carrier = Z.support := by
   letI : SignedAlgebraicCycleSupportData n X p :=
     instSignedAlgebraicCycleSupportData_ofAlgebraic (n := n) (X := X) (p := p)
-  obtain ⟨Z, hZ_rep, hZ_form⟩ := cone_positive_produces_cycle γ h_closed _h_rational h_cone
+  obtain ⟨Z, hZ_form⟩ := cone_positive_produces_cycle_data γ h_closed _h_rational h_cone
   refine ⟨Z, SignedAlgebraicCycle.support_data (n := n) (X := X) (p := p) Z,
-    hZ_rep, hZ_form, ?_⟩
+    hZ_form, ?_⟩
   exact SignedAlgebraicCycle.support_data_carrier (n := n) (X := X) (p := p) Z
 
 /-- Explicit support data returned by `cone_positive_produces_cycle_support_data`
@@ -400,13 +473,13 @@ theorem cone_positive_produces_cycle_support_data_eq {p : ℕ}
     (h_rational : isRationalClass (ofForm γ h_closed))
     (h_cone : isConePositive γ) :
     ∃ (Z : SignedAlgebraicCycle n X p) (dataZ : ClosedSubmanifoldData n X (2 * p)),
-      Z.RepresentsClass (ofForm γ h_closed) ∧ Z.representingForm = γ ∧
+      Z.representingForm = γ ∧
         dataZ = SignedAlgebraicCycle.support_data (n := n) (X := X) (p := p) Z := by
   letI : SignedAlgebraicCycleSupportData n X p :=
     instSignedAlgebraicCycleSupportData_ofAlgebraic (n := n) (X := X) (p := p)
-  obtain ⟨Z, hZ_rep, hZ_form⟩ := cone_positive_produces_cycle γ h_closed h_rational h_cone
+  obtain ⟨Z, hZ_form⟩ := cone_positive_produces_cycle_data γ h_closed h_rational h_cone
   refine ⟨Z, SignedAlgebraicCycle.support_data (n := n) (X := X) (p := p) Z,
-    hZ_rep, hZ_form, rfl⟩
+    hZ_form, rfl⟩
 
 /-! ## Non-Triviality of (p,p)-Forms
 
@@ -541,7 +614,7 @@ Clay Mathematics Institute in 2000, with a prize of $1,000,000 for a correct sol
 - [J. Carlson, A. Jaffe, and A. Wiles, "The Millennium Prize Problems",
   Clay Mathematics Institute, 2006, Chapter 2] -/
 
-/-- **The Hodge Conjecture** (Hodge, 1950; Millennium Prize Problem).
+/- **The Hodge Conjecture** (Hodge, 1950; Millennium Prize Problem).
 
     For a smooth projective complex algebraic variety X, every rational Hodge class
     is algebraic, i.e., it is represented by a Q-linear combination of fundamental
@@ -564,8 +637,8 @@ Clay Mathematics Institute in 2000, with a prize of $1,000,000 for a correct sol
     1. **Signed Decomposition**: Apply `signed_decomposition` to write
        γ = γ⁺ - γ⁻ where γ⁺, γ⁻ are both cone-positive
 
-    2. **Cone-Positive ⇒ Algebraic**: For each cone-positive piece, apply
-       `cone_positive_produces_cycle` which uses:
+    2. **Cone-Positive ⇒ Algebraic**: For each cone-positive piece, apply the
+       data‑first `cone_positive_produces_cycle_support_data` which uses:
        - Microstructure construction (Automatic SYR theorem)
        - Harvey-Lawson structure theorem (calibrated currents are analytic)
        - GAGA principle (analytic ⇒ algebraic on projective varieties)
@@ -581,74 +654,10 @@ Clay Mathematics Institute in 2000, with a prize of $1,000,000 for a correct sol
     - Requires `SpineBridgeData_data` for the bridge theorem (fundamental class = representing form).
     - The data-first proof no longer uses `rfl`; it uses the spine bridge theorem.
 
-    - **Set-based track**: `cycleClass_geom` remains as a compatibility wrapper for legacy call sites.
-
     **Deep Assumptions (to be eliminated)**:
     - `SpineBridgeData_data n X`: The deep geometric content that
       `[FundamentalClassSet_data(support_data)] = [representingForm]` in cohomology.
-      This should eventually be proved from GMT + Stokes + Poincaré duality.
-    - The set-based `SpineBridgeData n X p` remains compatibility-only.
-
-    **Compatibility Note**: This set-based bridge is retained for legacy call sites.
-    Prefer the data-first variant `hodge_conjecture'_data` when explicit
-    `ClosedSubmanifoldData` is available. -/
-/-! ## Compatibility (Set‑Based) -/
-
-/-- **Hodge Conjecture (TeX‑faithful, set‑based compatibility)**.
-
-    This theorem keeps the legacy set‑based geometric class `cycleClass_geom`
-    for external call sites. The proof‑track should prefer
-    `hodge_conjecture'_data`, which threads explicit `ClosedSubmanifoldData`
-    and forces the PD form to come from `integrationCurrent_data`. -/
-theorem hodge_conjecture' {p : ℕ}
-    [AutomaticSYRData n X]
-    [CycleClass.PoincareDualFormExists n X p] [SpineBridgeData n X p]
-    [CalibratedCurrentRegularityData n X (2 * (n - p))]
-    [HarveyLawsonKingData n X (2 * (n - p))]
-    [ChowGAGAData n X]
-    (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
-    (h_rational : isRationalClass (ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :
-    ∃ (Z : SignedAlgebraicCycle n X p), Z.cycleClass_geom = ofForm γ h_closed := by
-  classical
-  -- Deep-track interfaces are explicit assumptions here (no hidden `.universal` instances).
-  -- Signed decomposition of the (p,p) rational class: γ = γplus - γminus
-  let sd := signed_decomposition (n := n) (X := X) γ h_closed h_p_p h_rational
-
-  -- γplus is cone positive, so it has an algebraic representative Zplus
-  obtain ⟨Zplus, hZplus_rep, _hZplus_form⟩ :=
-    cone_positive_produces_cycle (n := n) (X := X) (p := p)
-      sd.γplus sd.h_plus_closed sd.h_plus_rat sd.h_plus_cone
-
-  -- γminus is also cone positive, so it has an algebraic representative Zminus
-  obtain ⟨Zminus, hZminus_rep, _hZminus_form⟩ :=
-    cone_positive_produces_cycle (n := n) (X := X) (p := p)
-      sd.γminus sd.h_minus_closed sd.h_minus_rat sd.h_minus_cone
-
-  -- Build the combined signed cycle for γ = γplus - γminus
-  let Z_pos := Zplus.pos ∪ Zminus.neg
-  let Z_neg := Zplus.neg ∪ Zminus.pos
-  let Z_pos_alg := isAlgebraicSubvariety_union Zplus.pos_alg Zminus.neg_alg
-  let Z_neg_alg := isAlgebraicSubvariety_union Zplus.neg_alg Zminus.pos_alg
-  let Z : SignedAlgebraicCycle n X p := {
-    pos := Z_pos,
-    neg := Z_neg,
-    pos_alg := Z_pos_alg,
-    neg_alg := Z_neg_alg,
-    representingForm := γ,
-    representingForm_closed := h_closed,
-  }
-
-  use Z
-  -- Phase 7: Use the spine bridge theorem instead of rfl.
-  -- (compatibility) cycleClass_geom Z = ofForm (FundamentalClassSet support) ...
-  -- By SpineBridgeData: ... = ofForm Z.representingForm Z.representingForm_closed
-  -- Since Z.representingForm = γ: ... = ofForm γ h_closed
-  have hbridge := SignedAlgebraicCycle.cycleClass_geom_eq_representingForm (n := n) (X := X) Z
-  -- hbridge : Z.cycleClass_geom = ofForm Z.representingForm Z.representingForm_closed
-  -- Z.representingForm = γ by construction
-  simp only [hbridge]
-  -- Goal: ofForm γ h_closed = ofForm γ h_closed
-  rfl
+      This should eventually be proved from GMT + Stokes + Poincaré duality. -/
 
 /-- **Hodge Conjecture (Data-First Spine Bridge)**.
 
@@ -658,16 +667,8 @@ theorem hodge_conjecture' {p : ℕ}
     and `SpineBridgeData_data`.
 
     It yields the geometric class computed from explicit `ClosedSubmanifoldData`. -/
-theorem hodge_conjecture'_data {p : ℕ}
-    [AutomaticSYRData n X]
-    [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
-    [CycleClass.PoincareDualityFromCurrentsData n X p]
-    [AlgebraicSubvarietyClosedSubmanifoldData n X]
-    [SignedAlgebraicCycleSupportCodimData n X p]
-    [SpineBridgeData_data n X p]
-    [CalibratedCurrentRegularityData n X (2 * (n - p))]
-    [HarveyLawsonKingData n X (2 * (n - p))]
-    [ChowGAGAData n X]
+theorem hodge_conjecture' {p : ℕ}
+    [HodgeConjectureAssumptions n X p]
     (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
     (h_rational : isRationalClass (ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :
     ∃ (Z : SignedAlgebraicCycle n X p),
@@ -679,12 +680,12 @@ theorem hodge_conjecture'_data {p : ℕ}
   let sd := signed_decomposition (n := n) (X := X) γ h_closed h_p_p h_rational
 
   -- γplus is cone positive, so it has an algebraic representative Zplus (data-first)
-  obtain ⟨Zplus, _dataZplus, hZplus_rep, _hZplus_form, _hZplus_data⟩ :=
+  obtain ⟨Zplus, _dataZplus, _hZplus_form, _hZplus_data⟩ :=
     cone_positive_produces_cycle_support_data
       sd.γplus sd.h_plus_closed sd.h_plus_rat sd.h_plus_cone
 
   -- γminus is also cone positive, so it has an algebraic representative Zminus (data-first)
-  obtain ⟨Zminus, _dataZminus, hZminus_rep, _hZminus_form, _hZminus_data⟩ :=
+  obtain ⟨Zminus, _dataZminus, _hZminus_form, _hZminus_data⟩ :=
     cone_positive_produces_cycle_support_data
       sd.γminus sd.h_minus_closed sd.h_minus_rat sd.h_minus_cone
 

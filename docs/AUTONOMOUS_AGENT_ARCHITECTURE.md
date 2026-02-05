@@ -1,8 +1,15 @@
 # Autonomous Agent Architecture for Full-Unconditional Completion
 
+## Autonomy Update (2026-02-04)
+
+We are running in a **single long‑session Codex** mode. This document now serves as
+an optional parallelization blueprint only if external sessions are manually spawned.
+The proof track remains **data‑first only**, and compatibility wrappers are legacy‑only.
+
 ## Overview
 
-This document describes a scalable architecture for completing the Hodge Conjecture formalization using autonomous agents managed by a coordinating AI (the "Integrator").
+This document describes a scalable architecture for completing the Hodge Conjecture formalization using autonomous agents managed by a coordinating AI (the "Integrator"). In the current
+mode, the **Integrator and worker are the same session**, and work proceeds without check‑ins.
 
 ## Architecture Layers
 

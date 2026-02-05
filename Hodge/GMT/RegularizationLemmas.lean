@@ -5,7 +5,8 @@ import Hodge.Classical.CycleClass
 # Regularization Lemmas (Checklist)
 
 This file collects the **lemmas** required to discharge
-`CycleClass.PoincareDualFormFromCurrentData` from a concrete regularization.
+`CycleClass.PoincareDualityFromCurrentsData` (and hence
+`CycleClass.PoincareDualFormFromCurrentData`) from a concrete regularization.
 
 No stubs or axioms are introduced here; this is a checklist and placeholder
 namespace for the eventual proofs.
@@ -23,13 +24,14 @@ namespace for the eventual proofs.
 
 3. **Compatibility with integration current**
    - `poincareDualForm_data_eq_regularizeCurrent` is already definitional,
-     but use these lemmas to build a `PoincareDualFormFromCurrentData` instance.
+     but use these lemmas to build a `PoincareDualityFromCurrentsData` instance
+     (which yields `PoincareDualFormFromCurrentData`).
 
 4. **Support control (optional, but useful)**
    - Regularization does not enlarge support beyond a controlled neighborhood.
 
 These lemmas should live in `Hodge/GMT/RegularizationLemmas.lean` and be used
-to instantiate `CycleClass.PoincareDualFormFromCurrentData`.
+to instantiate `CycleClass.PoincareDualityFromCurrentsData`.
 -/
 
 noncomputable section

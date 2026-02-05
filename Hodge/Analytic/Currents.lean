@@ -59,8 +59,8 @@ structure Current (n : ℕ) (X : Type*) (k : ℕ)
   /-- **Boundary boundedness** (normality-style hypothesis): for `k = k' + 1`, the functional
       `ω ↦ T(dω)` is bounded with respect to the comass seminorm on `k'`-forms.
 
-      This is exactly what is needed to define the boundary current `∂T` as a `Current`.
-      For `k = 0` there is no boundary, so we record `True`. -/
+  This is exactly what is needed to define the boundary current `∂T` as a `Current`.
+  For `k = 0` there is no boundary, so we record `True`. -/
   boundary_bound :
     match k with
     | 0 => True
@@ -754,7 +754,7 @@ def boundary (T : Current n X (k + 1)) : Current n X k where
           -- T(d(r•ω)) = r * T(dω)
           simp [smoothExtDeriv_smul_real, map_smul] }
     have hbound : ∃ M : ℝ, ∀ ω : SmoothForm n X k, ‖f ω‖ ≤ M * ‖ω‖ := by
-      -- This is exactly the `boundary_bound` field of `T` (since `k+1` is a successor).
+    -- This is exactly the `boundary_bound` field of `T` (since `k+1` is a successor).
       obtain ⟨M, hM⟩ := (T.boundary_bound : ∃ M : ℝ, ∀ ω : SmoothForm n X k, |T.toFun (smoothExtDeriv ω)| ≤ M * ‖ω‖)
       refine ⟨M, ?_⟩
       intro ω
