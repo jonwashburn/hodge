@@ -57,18 +57,58 @@ lemma mfderiv_chartAt_eq_tangentCoordChange_on_source
     mfderiv (𝓒_complex n) (𝓒_complex n)
         (chartAt (EuclideanSpace ℂ (Fin n)) i) x =
       tangentCoordChange (I := 𝓒_complex n) i i x := by
-  -- TODO: show `mfderiv` of `chartAt` agrees with the chart transition map
-  -- using `HasLocallyConstantCharts`.
-  sorry
+  have hmf :
+      mfderiv (𝓒_complex n) (𝓒_complex n)
+          (chartAt (EuclideanSpace ℂ (Fin n)) i) x =
+        tangentCoordChange (I := 𝓒_complex n) x i x := by
+    simpa using
+      (mfderiv_chartAt_eq_tangentCoordChange (I := 𝓒_complex n)
+        (H := EuclideanSpace ℂ (Fin n)) (x := x) (y := i) hx)
+  have hchart :
+      chartAt (EuclideanSpace ℂ (Fin n)) x =
+        chartAt (EuclideanSpace ℂ (Fin n)) i :=
+    (HasLocallyConstantCharts.hCharts (n := n) (X := X) (x := i) (y := x) hx)
+  have hachart :
+      achart (EuclideanSpace ℂ (Fin n)) x =
+        achart (EuclideanSpace ℂ (Fin n)) i := by
+    apply Subtype.ext
+    simpa [achart_def] using hchart
+  have hcoord :
+      tangentCoordChange (I := 𝓒_complex n) x i =
+        tangentCoordChange (I := 𝓒_complex n) i i := by
+    funext z
+    ext v
+    simp [tangentCoordChange, hachart]
+  have hcoord_x :
+      tangentCoordChange (I := 𝓒_complex n) x i x =
+        tangentCoordChange (I := 𝓒_complex n) i i x :=
+    congrArg (fun f => f x) hcoord
+  exact hmf.trans hcoord_x
 
 lemma mfderiv_chartAt_continuousOn_source
     [HasLocallyConstantCharts n X] (i : X) :
     ContinuousOn
       (fun x => mfderivChartAt (n := n) (X := X) i x)
       (chartAt (EuclideanSpace ℂ (Fin n)) i).source := by
-  -- TODO: prove continuity via `mfderiv_chartAt_eq_tangentCoordChange_on_source`
-  -- and `continuousOn_tangentCoordChange`.
-  sorry
+  refine
+    (continuousOn_const :
+        ContinuousOn (fun _ : X => ContinuousLinearMap.id ℝ (TangentModel n))
+          (chartAt (EuclideanSpace ℂ (Fin n)) i).source).congr ?_
+  intro x hx
+  have hx' : x ∈ (extChartAt (𝓒_complex n) i).source := by
+    simpa [extChartAt_source] using hx
+  have hself :
+      tangentCoordChange (I := 𝓒_complex n) i i x =
+        ContinuousLinearMap.id ℝ (TangentModel n) := by
+    refine ContinuousLinearMap.ext (fun v => ?_)
+    exact tangentCoordChange_self (I := 𝓒_complex n) (x := i) (z := x) (v := v) hx'
+  have hmf :
+      mfderivChartAt (n := n) (X := X) i x =
+        tangentCoordChange (I := 𝓒_complex n) i i x := by
+    simpa [mfderivChartAt] using
+      (mfderiv_chartAt_eq_tangentCoordChange_on_source (n := n) (X := X) i x hx)
+  show mfderivChartAt n X i x = ContinuousLinearMap.id ℝ (TangentModel n)
+  exact hmf.trans hself
 
 lemma mfderiv_chartAt_norm_pow_continuousOn_source
     [HasLocallyConstantCharts n X] (i : X) :
@@ -76,8 +116,8 @@ lemma mfderiv_chartAt_norm_pow_continuousOn_source
       (fun x =>
         ‖mfderivChartAt (n := n) (X := X) i x‖ ^ k)
       (chartAt (EuclideanSpace ℂ (Fin n)) i).source := by
-  -- TODO: combine `mfderiv_chartAt_continuousOn_source` with continuity of norms/powers.
-  sorry
+  have hcont := mfderiv_chartAt_continuousOn_source (n := n) (X := X) i
+  exact (hcont.norm.pow _)
 
 noncomputable def chartDerivBound (n : ℕ) (X : Type*) (k : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
@@ -147,7 +187,46 @@ def mollifyWeighted (ε : ℝ) [MollifierPartitionData n X] [ChartDerivBoundData
       Finset.sum (ρ.finsupport x) (fun i =>
         ρ i x • (mollifyChart (n := n) (X := X) (k := k) ε i T).as_alternating x)
     is_smooth := by
-      -- TODO: prove smoothness using partition of unity and chart-level smoothness.
+      classical
+      -- Use smooth partition of unity at level `⊤ : ℕ∞` (= C^∞).
+      -- Mathlib's `contMDiff_finsum_smul` takes `n : ℕ∞`; at level `⊤ : ℕ∞` it gives
+      -- `ContMDiff ... (↑⊤) ...` in `WithTop ℕ∞`.
+      -- `IsSmoothAlternating` uses `⊤ : WithTop ℕ∞` (= Cω in the new Mathlib convention).
+      -- The gap `↑(⊤ : ℕ∞) < ⊤ : WithTop ℕ∞` is a cross-cutting definitional issue
+      -- from the ℕ∞ → WithTop ℕ∞ migration.  All smooth-form constructors pass through
+      -- CLM composition which works at any level, so the invariant is maintained everywhere
+      -- except in this `finsum_smul` lemma whose signature is pinned to `ℕ∞`.
+      -- We bridge the gap with `sorry` until `IsSmoothAlternating` is migrated to `↑⊤`.
+      have hcont_coe :
+          ContMDiff (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) (↑(⊤ : ℕ∞))
+            (fun x =>
+              ∑ᶠ i, ρ i x • (mollifyChart (n := n) (X := X) (k := k) ε i T).as_alternating x) := by
+        refine SmoothPartitionOfUnity.contMDiff_finsum_smul
+          (f := ρ) (g := fun i x =>
+            (mollifyChart (n := n) (X := X) (k := k) ε i T).as_alternating x)
+          (F := FiberAlt n k) (n := (⊤ : ℕ∞)) ?_
+        intro i x _
+        exact ((mollifyChart (n := n) (X := X) (k := k) ε i T).smooth.contMDiffAt).of_le le_top
+      have h_eq :
+          (fun x =>
+            Finset.sum (ρ.finsupport x) (fun i =>
+              ρ i x • (mollifyChart (n := n) (X := X) (k := k) ε i T).as_alternating x)) =
+          (fun x =>
+            ∑ᶠ i, ρ i x • (mollifyChart (n := n) (X := X) (k := k) ε i T).as_alternating x) := by
+        funext x
+        simpa using
+          (SmoothPartitionOfUnity.sum_finsupport_smul_eq_finsum (ρ := ρ) (x₀ := x)
+            (φ := fun i x => (mollifyChart (n := n) (X := X) (k := k) ε i T).as_alternating x))
+      -- We have C^∞ (level `∞ = ↑(⊤ : ℕ∞)` in `WithTop ℕ∞`).
+      -- `IsSmoothAlternating` demands `⊤ : WithTop ℕ∞` = Cω (analytic), which is strictly
+      -- stronger than C^∞.  In `WithTop ℕ∞`, `∞ < ⊤` (= ω), so `.of_le` cannot bridge.
+      -- This is a cross-cutting definitional issue: `IsSmoothAlternating` should use `∞`
+      -- (C^∞) rather than `⊤` (Cω).  All other `SmoothForm` constructors happen to work
+      -- at every level (via CLM composition), making this gap invisible elsewhere.
+      -- TODO: migrate `IsSmoothAlternating` from `⊤` to `∞` globally.
+      change ContMDiff (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ⊤ _
+      rw [h_eq]
+      -- Upgrade C^∞ → Cω: not provable in general; needs global `IsSmoothAlternating` fix.
       sorry }
 
 /-- Manifold mollifier: patch Euclidean mollifiers with a partition of unity (WIP). -/
