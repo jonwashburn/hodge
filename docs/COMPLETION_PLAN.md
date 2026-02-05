@@ -8,12 +8,27 @@
 
 ## Current State
 
-The theorem `hodge_conjecture_data` compiles and type-checks.  It depends on:
-- A bundled typeclass `HodgeConjectureAssumptions n X p` containing deep binders.
-- 6 "Deep Pillar" implementation files with `sorry` goals.
-- A WIP mollifier/regularization pipeline with `sorry` goals.
+**CRITICAL FINDING**: `#print axioms hodge_conjecture_data` already reports ONLY:
+```
+propext, Classical.choice, Quot.sound
+```
+No `sorryAx`! The main theorem proof is **complete modulo typeclass assumptions**.
 
-**Total active `sorry` count on proof track: ~36** (excluding comments, docs, archived files).
+The theorem takes `[HodgeConjectureAssumptions n X p]` which bundles 9 deep typeclasses:
+1. `AutomaticSYRData n X` — SYR microstructure
+2. `CurrentRegularizationData n X (2*p)` — regularization operator
+3. `PoincareDualityFromCurrentsData n X p` — PD form from currents
+4. `AlgebraicSubvarietyClosedSubmanifoldData n X` — alg → submanifold
+5. `SignedAlgebraicCycleSupportCodimData n X p` — support codimension
+6. `SpineBridgeData_data n X p` — fundamental class bridge
+7. `CalibratedCurrentRegularityData n X (2*(n-p))` — Harvey-Lawson regularity
+8. `HarveyLawsonKingData n X (2*(n-p))` — Harvey-Lawson structure
+9. `ChowGAGAData n X` — Chow/GAGA
+
+The `sorry`s are in the **instance implementations** (Deep Pillars), not the theorem.
+The WIP `sorry`s are in the mollifier infrastructure that builds instance #2.
+
+**Total active `sorry` count on proof track: ~26** (in instance implementations).
 
 ---
 
