@@ -1,6 +1,7 @@
 import Hodge.Analytic.Currents
 import Hodge.Analytic.Forms
 import Hodge.WorkInProgress.GMT.EuclideanMollifier
+import Hodge.WorkInProgress.Instances.EuclideanManifold
 
 noncomputable section
 

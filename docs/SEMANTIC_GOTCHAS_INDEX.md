@@ -14,7 +14,6 @@ and must remain unimported by the proof track (`Hodge/Main.lean`, `Hodge.lean`).
 - `Hodge/WorkInProgress/GMT/RegularizationLemmas.lean:17-23` — `CurrentRegularizationLemmas` instance (closedness on cycles + empty-carrier vanishing).
 - `Hodge/WorkInProgress/Analytic/Pullback.lean:36-42` — `smoothFormPullback` smoothness proof (chart-level pullback infrastructure).
 - `Hodge/WorkInProgress/Analytic/ContMDiffPullback.lean:20-26` — `ContMDiffForm.pullback` smoothness proof.
-- `Hodge/WorkInProgress/Analytic/ContMDiffPullback.lean:33-40` — `extDerivForm_pullback` (pullback commutes with exterior derivative).
 - `Hodge/WorkInProgress/GMT/ManifoldMollifier.lean:45-52` — `chartDerivBound_bddAbove` (global bound still missing; local continuity added).
 - `Hodge/WorkInProgress/GMT/EuclideanCurrentRegularization.lean:12-18` — `EuclideanCurrentRegularizationData` (regularization interface on model space).
 - `Hodge/WorkInProgress/GMT/EuclideanCurrentRegularization.lean:24-30` — `instEuclideanCurrentRegularizationData` (definition by chartwise convolution).
