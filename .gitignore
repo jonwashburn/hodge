@@ -22,3 +22,10 @@
 
 
 .cursor_tmp*.lean
+
+# SSH / secret keys — never commit
+lambda-b200-private-key
+lambda-b200-public-key.pub
+*.pem
+*-private-key
+*-private-key.*
