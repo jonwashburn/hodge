@@ -31,7 +31,7 @@ Reference: [de Rham, "Variétés Différentiables", Ch. III (1955)],
 [Federer, "Geometric Measure Theory", §4.1 (1969)].
 -/
 axiom current_regularization_exists {k : ℕ} :
-    ∀ (T : Current n X k), SmoothForm n X k
+    ∀ (_ : Current n X k), SmoothForm n X k
 
 /--
 **Current Regularization Instance**
