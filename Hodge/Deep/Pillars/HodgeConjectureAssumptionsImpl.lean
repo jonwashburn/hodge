@@ -6,7 +6,6 @@ import Hodge.Deep.Pillars.HarveyLawsonImpl
 import Hodge.Deep.Pillars.GAGAImpl
 import Hodge.Deep.Pillars.SpineBridgeImpl
 import Hodge.Deep.Pillars.CurrentRegularizationImpl
-import Hodge.Analytic.Integration.HausdorffIntegrationInst
 import Hodge.Classical.PoincareDualityFromCurrents
 import Hodge.Deep.Pillars.AlgebraicSupportImpl
 

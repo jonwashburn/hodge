@@ -49,7 +49,9 @@ elab "#guard_no_custom_axioms " declName:ident : command => do
     `Hodge.Deep.FedererFleming.federer_fleming_compactness,
     `Hodge.Deep.Pillars.spine_bridge_cohomology_eq,
     `Hodge.Deep.Microstructure.microstructure_syr_existence,
-    `Hodge.Deep.CurrentRegularization.current_regularization_exists
+    `Hodge.Deep.CurrentRegularization.current_regularization_exists,
+    `Hodge.Deep.CurrentRegularization.regularized_integration_current_closed,
+    `Hodge.Deep.CurrentRegularization.regularized_integration_current_empty
   ]
   -- Check for any unrecognized custom axioms
   let mut customAxioms : List Name := []
@@ -89,9 +91,16 @@ If this file compiles successfully:
    - `chow_theorem_algebraicity` — Chow's theorem / GAGA
    - `federer_fleming_compactness` — Federer-Fleming compactness
    - `spine_bridge_cohomology_eq` — spine bridge cohomology identity
+   - `microstructure_syr_existence` — microstructure SYR construction
+   - `current_regularization_exists` — current regularization to smooth forms
+   - `regularized_integration_current_closed` — closedness of regularized forms
+   - `regularized_integration_current_empty` — empty carrier vanishing
 
 ## Historical Notes
 
+- **2026-02-06**: Cleaned up WIP dependencies from critical path. Removed sorry-containing
+  WIP imports (MollifierRegularization, HausdorffIntegrationInst) from critical path.
+  Added axiom-based `PoincareDualityFromCurrentsData` instance. Total: 10 deep axioms.
 - **2026-02-06**: Fixed AxiomGuard meta-programming for Lean 4.27 API.
   `hodge_conjecture_data` now depends only on `[propext, Classical.choice, Quot.sound]`.
   Zero sorry, zero custom axioms in the critical path.
