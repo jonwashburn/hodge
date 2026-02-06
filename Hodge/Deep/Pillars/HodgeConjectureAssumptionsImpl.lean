@@ -1,11 +1,11 @@
 import Hodge.Kahler.Main
 import Hodge.Kahler.Microstructure
+import Hodge.Deep.Pillars.MicrostructureImpl
 import Hodge.Deep.Pillars.FedererFlemingImpl
 import Hodge.Deep.Pillars.HarveyLawsonImpl
 import Hodge.Deep.Pillars.GAGAImpl
 import Hodge.Deep.Pillars.SpineBridgeImpl
-import Hodge.GMT.MollifierRegularization
-import Hodge.Analytic.Integration.HausdorffIntegrationInst
+import Hodge.Deep.Pillars.CurrentRegularizationImpl
 import Hodge.Classical.PoincareDualityFromCurrents
 import Hodge.Deep.Pillars.AlgebraicSupportImpl
 
@@ -30,7 +30,7 @@ This allows `hodge_conjecture'` to be used without explicit arguments.
 -/
 instance instHodgeConjectureAssumptions {p : ℕ} : HodgeConjectureAssumptions n X p :=
   {
-    toAutomaticSYRData := AutomaticSYRData.universal
+    toAutomaticSYRData := inferInstance
     toCurrentRegularizationData := inferInstance
     toPoincareDualityFromCurrentsData := inferInstance
     toAlgebraicSubvarietyClosedSubmanifoldData := inferInstance
