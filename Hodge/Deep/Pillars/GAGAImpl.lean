@@ -3,7 +3,7 @@ import Hodge.Deep.Pillars.GAGA
 
 noncomputable section
 
-open Classical Hodge Hodge.Deep.GAGA
+open Classical Hodge Hodge.Deep.GAGA Hodge.AlgGeom
 
 namespace Hodge.Deep.GAGA
 
@@ -14,16 +14,31 @@ variable {n : ℕ} {X : Type*}
   [MeasurableSpace X] [BorelSpace X] [Nonempty X]
 
 /--
-**Chow-GAGA Instance (Scaffold)**
+**Chow's Theorem / GAGA Algebraicity Axiom**
+
+Every closed analytic subset of a projective Kähler manifold is algebraic.
+
+**Mathematical Content**: Chow's theorem (1949) states that every closed analytic
+subvariety of projective space is algebraic. Combined with Serre's GAGA principle
+(1956), this extends to coherent analytic sheaves on projective varieties. The
+key idea is that analytic objects on projective varieties are "rigid" enough
+to be algebraic.
+
+Reference: [Chow, "On compact complex analytic varieties", Amer. J. Math. 71 (1949)],
+[Serre, "GAGA", Ann. Inst. Fourier 6 (1956)].
+-/
+axiom chow_theorem_algebraicity
+    (Z : Set X) (h : IsAnalyticSet (n := n) (X := X) Z) :
+    IsAlgebraicSet n X Z
+
+/--
+**Chow-GAGA Instance**
 
 Provides the `ChowGAGAData` instance required for the deep track.
-The theorem that every analytic subvariety of a projective manifold is algebraic
-is a deep result (Chow's Theorem).
+Uses the Chow theorem axiom to convert analytic sets to algebraic sets.
 -/
 instance instChowGAGAData : ChowGAGAData n X where
-  analytic_to_algebraic := fun Z h_analytic => by
-    -- Chow's Theorem / GAGA
-    -- Analytic subvarieties of projective space are algebraic.
-    sorry
+  analytic_to_algebraic := fun Z h_analytic =>
+    chow_theorem_algebraicity Z h_analytic
 
 end Hodge.Deep.GAGA
