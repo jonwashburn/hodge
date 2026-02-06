@@ -44,10 +44,12 @@ elab "#guard_no_custom_axioms " declName:ident : command => do
     -- deep infrastructure beyond the current Lean/Mathlib libraries.
     `Hodge.Deep.Pillars.algebraic_subvariety_admits_closed_submanifold_data,
     `Hodge.Deep.Pillars.algebraic_codimension_of_cycle_support,
-    `Hodge.Deep.HarveyLawson.calibrated_support_locally_zero_locus,
+    `Hodge.Deep.HarveyLawson.calibrated_support_is_analytic,
     `Hodge.Deep.GAGA.chow_theorem_algebraicity,
     `Hodge.Deep.FedererFleming.federer_fleming_compactness,
-    `Hodge.Deep.Pillars.spine_bridge_cohomology_eq
+    `Hodge.Deep.Pillars.spine_bridge_cohomology_eq,
+    `Hodge.Deep.Microstructure.microstructure_syr_existence,
+    `Hodge.Deep.CurrentRegularization.current_regularization_exists
   ]
   -- Check for any unrecognized custom axioms
   let mut customAxioms : List Name := []
@@ -83,7 +85,7 @@ If this file compiles successfully:
 3. The allowed deep theorem axioms are:
    - `algebraic_subvariety_admits_closed_submanifold_data` — closed submanifold structure
    - `algebraic_codimension_of_cycle_support` — codimension uniqueness
-   - `calibrated_support_locally_zero_locus` — Harvey-Lawson regularity
+   - `calibrated_support_is_analytic` — Harvey-Lawson regularity
    - `chow_theorem_algebraicity` — Chow's theorem / GAGA
    - `federer_fleming_compactness` — Federer-Fleming compactness
    - `spine_bridge_cohomology_eq` — spine bridge cohomology identity
