@@ -1,7 +1,6 @@
 import Hodge.Classical.GAGA
 import Hodge.Classical.GeometricCycleClass
 import Hodge.Deep.Pillars.HarveyLawsonImpl
-import Hodge.GMT.MollifierRegularization
 
 noncomputable section
 
