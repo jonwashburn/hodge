@@ -60,8 +60,7 @@ It is *not* proved here; it is assumed via the `SpineBridgeData_data` interface.
 
 theorem cycleClass_geom_eq_representingForm_data {p : ℕ}
     [CycleClass.PoincareDualityFromCurrentsData n X p]
-    [AlgebraicSubvarietyClosedSubmanifoldData n X]
-    [SignedAlgebraicCycleSupportCodimData n X p]
+    [SignedAlgebraicCycleSupportData n X p]
     [SpineBridgeData_data n X p]
     (Z : SignedAlgebraicCycle n X p) :
     Z.cycleClass_geom_data = ofForm Z.representingForm Z.representingForm_closed :=

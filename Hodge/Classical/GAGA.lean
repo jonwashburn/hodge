@@ -610,6 +610,48 @@ noncomputable instance instSignedAlgebraicCycleSupportData_ofAlgebraic {p : ℕ}
     SignedAlgebraicCycleSupportData n X p :=
   signedAlgebraicCycleSupportData_ofAlgebraic (n := n) (X := X) (p := p)
 
+/-- Construct `ClosedSubmanifoldData` for a signed algebraic cycle's support
+    directly from `AlgebraicSubvarietyClosedSubmanifoldData` and `p ≤ n`,
+    without requiring `SignedAlgebraicCycleSupportCodimData`.
+
+    The key idea: construct an `AlgebraicSubvariety` with `codim := n - p`,
+    get submanifold data at degree `2 * (n - (n - p))`, and cast via `Nat.sub_sub_self`.
+    This eliminates the former `algebraic_codimension_of_cycle_support` axiom. -/
+noncomputable def algebraic_cycle_support_data_direct {p : ℕ}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [AlgebraicSubvarietyClosedSubmanifoldData n X]
+    (hp : p ≤ n) (Z : SignedAlgebraicCycle n X p) :
+    { d : ClosedSubmanifoldData n X (2 * p) // d.carrier = Z.support } := by
+  classical
+  have h_exist := SignedAlgebraicCycle.support_is_algebraic (n := n) (X := X) (p := p) Z
+  have h_alg : IsAlgebraicSet n X Z.support := by
+    let W_any := Classical.choose h_exist
+    have hW_any : W_any.carrier = Z.support := Classical.choose_spec h_exist
+    rw [← hW_any]; exact W_any.is_algebraic
+  let W : AlgebraicSubvariety n X := ⟨Z.support, n - p, h_alg⟩
+  let dataW := AlgebraicSubvarietyClosedSubmanifoldData.data_of (n := n) (X := X) W
+  have hcarrierW : dataW.carrier = Z.support :=
+    AlgebraicSubvarietyClosedSubmanifoldData.carrier_eq (n := n) (X := X) W
+  have hdeg : 2 * (n - (n - p)) = 2 * p := by congr 1; exact Nat.sub_sub_self hp
+  exact ⟨ClosedSubmanifoldData.cast (n := n) (X := X) hdeg dataW, by
+    rw [ClosedSubmanifoldData.cast_carrier]; exact hcarrierW⟩
+
+/-- Direct instance: `SignedAlgebraicCycleSupportData` from `AlgebraicSubvarietyClosedSubmanifoldData`
+    + `Fact (p ≤ n)`, bypassing the former `SignedAlgebraicCycleSupportCodimData` entirely. -/
+noncomputable instance instSignedAlgebraicCycleSupportData_direct {p : ℕ}
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X] [HasLocallyConstantCharts n X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X]
+    [MeasurableSpace X] [BorelSpace X] [Nonempty X]
+    [AlgebraicSubvarietyClosedSubmanifoldData n X]
+    [Fact (p ≤ n)] :
+    SignedAlgebraicCycleSupportData n X p where
+  data := fun Z => (algebraic_cycle_support_data_direct (Fact.out) Z).val
+  carrier_eq := fun Z => (algebraic_cycle_support_data_direct (Fact.out) Z).property
+
 /-- The cohomology class represented by a signed algebraic cycle.
 
     **Definition**: The cycle class is defined as the de Rham cohomology class of
@@ -734,15 +776,11 @@ theorem SignedAlgebraicCycle.cycleClass_geom_eq_representingForm_data {p : ℕ}
     [MeasurableSpace X] [BorelSpace X] [Nonempty X]
     [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
     [CycleClass.PoincareDualityFromCurrentsData n X p]
-    [AlgebraicSubvarietyClosedSubmanifoldData n X]
-    [SignedAlgebraicCycleSupportCodimData n X p]
+    [SignedAlgebraicCycleSupportData n X p]
     [SpineBridgeData_data n X p]
     (Z : SignedAlgebraicCycle n X p) :
     Z.cycleClass_geom_data = ofForm Z.representingForm Z.representingForm_closed :=
 by
-  -- Derive support data from algebraic subvariety data.
-  letI : SignedAlgebraicCycleSupportData n X p :=
-    instSignedAlgebraicCycleSupportData_ofAlgebraic (n := n) (X := X) (p := p)
   exact SpineBridgeData_data.fundamental_eq_representing
     (n := n) (X := X) (p := p) (Z := Z)
 

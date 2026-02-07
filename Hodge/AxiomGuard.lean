@@ -43,7 +43,6 @@ elab "#guard_no_custom_axioms " declName:ident : command => do
     -- Each encodes a well-known theorem whose full formalization requires
     -- deep infrastructure beyond the current Lean/Mathlib libraries.
     `Hodge.Deep.Pillars.algebraic_subvariety_admits_closed_submanifold_data,
-    `Hodge.Deep.Pillars.algebraic_codimension_of_cycle_support,
     `Hodge.Deep.HarveyLawson.calibrated_support_is_analytic,
     `Hodge.Deep.GAGA.chow_theorem_algebraicity,
     `Hodge.Deep.FedererFleming.federer_fleming_compactness,
@@ -82,9 +81,8 @@ If this file compiles successfully:
 
 1. **No sorry** in the `hodge_conjecture_data` proof track.
 2. **No unrecognized axioms** — only standard Lean axioms and named deep theorems.
-3. The allowed deep theorem axioms are (8 total):
+3. The allowed deep theorem axioms are (7 total):
    - `algebraic_subvariety_admits_closed_submanifold_data` — closed submanifold structure
-   - `algebraic_codimension_of_cycle_support` — codimension uniqueness
    - `calibrated_support_is_analytic` — Harvey-Lawson regularity
    - `chow_theorem_algebraicity` — Chow's theorem / GAGA
    - `federer_fleming_compactness` — Federer-Fleming compactness
@@ -94,6 +92,10 @@ If this file compiles successfully:
 
 ## Historical Notes
 
+- **2026-02-07**: Reduced from 8 to 7 deep axioms. Eliminated `algebraic_codimension_of_cycle_support`
+  by constructing `ClosedSubmanifoldData` directly for cycle support via explicit
+  `AlgebraicSubvariety` with `codim := n - p` and `Nat.sub_sub_self` cast.
+  Replaced `SignedAlgebraicCycleSupportCodimData` with `Fact (p ≤ n)` throughout.
 - **2026-02-07**: Reduced from 10 to 8 deep axioms. Proved both `regularized_integration_current_empty`
   and `regularized_integration_current_closed` as theorems from `current_regularization_bundle`
   (which bundles the regularization function with zero-preservation and closedness for

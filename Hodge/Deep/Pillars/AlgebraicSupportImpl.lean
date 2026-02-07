@@ -4,7 +4,7 @@ import Hodge.Analytic.Currents
 
 noncomputable section
 
-open Classical Hodge MeasureTheory
+open Classical Hodge Hodge.AlgGeom MeasureTheory
 
 namespace Hodge.Deep.Pillars
 
@@ -42,6 +42,10 @@ axiom algebraic_subvariety_admits_closed_submanifold_data
 Provides `AlgebraicSubvarietyClosedSubmanifoldData`.
 Every algebraic subvariety is equipped with closed submanifold data via
 the axiom `algebraic_subvariety_admits_closed_submanifold_data`.
+
+Combined with `instSignedAlgebraicCycleSupportData_direct` (in GAGA.lean)
+and `Fact (p ≤ n)`, this also provides `SignedAlgebraicCycleSupportData`,
+eliminating the former `algebraic_codimension_of_cycle_support` axiom.
 -/
 instance instAlgebraicSubvarietyClosedSubmanifoldData :
     AlgebraicSubvarietyClosedSubmanifoldData n X where
@@ -49,38 +53,5 @@ instance instAlgebraicSubvarietyClosedSubmanifoldData :
     (algebraic_subvariety_admits_closed_submanifold_data V).choose
   carrier_eq := fun V =>
     (algebraic_subvariety_admits_closed_submanifold_data V).choose_spec
-
-/--
-**Algebraic Codimension Uniqueness Axiom**
-
-If W is an algebraic subvariety whose carrier equals the support of a
-signed algebraic cycle of parameter p, then n − W.codim = p.
-
-**Mathematical Content**: The codimension of an algebraic set is an intrinsic
-invariant (determined by the Krull dimension of the local ring). The support
-of a codimension-p algebraic cycle is a union of irreducible algebraic sets
-of codimension p. Any algebraic subvariety structure on this union must
-record the correct codimension.
-
-The statement is strong (applies to ALL algebraic subvariety structures on
-the support), reflecting the fact that algebraic codimension is uniquely
-determined by the carrier.
-
-Reference: [Hartshorne, "Algebraic Geometry", Ch. I, §1].
--/
-axiom algebraic_codimension_of_cycle_support
-    {p : ℕ} (Z : SignedAlgebraicCycle n X p) (W : AlgebraicSubvariety n X)
-    (hW : W.carrier = Z.support) : n - W.codim = p
-
-/--
-**Signed Cycle Support Codimension Data Instance**
-
-Provides `SignedAlgebraicCycleSupportCodimData`.
-Uses the codimension uniqueness axiom.
--/
-instance instSignedAlgebraicCycleSupportCodimData {p : ℕ} :
-    SignedAlgebraicCycleSupportCodimData n X p where
-  support_dim := fun Z W hW =>
-    algebraic_codimension_of_cycle_support Z W hW
 
 end Hodge.Deep.Pillars

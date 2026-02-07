@@ -7,7 +7,7 @@ You are an autonomous agent working on the Lean 4 formalization of the Hodge Con
 The main theorem `hodge_conjecture_data` compiles with:
 - **Zero sorry** on the critical path
 - **Zero custom axioms** — depends only on `[propext, Classical.choice, Quot.sound]`
-- **8 deep theorem axioms** in `Hodge/Deep/Pillars/*Impl.lean`
+- **7 deep theorem axioms** in `Hodge/Deep/Pillars/*Impl.lean`
 
 The AxiomGuard at `Hodge/AxiomGuard.lean` verifies this at compile time.
 
@@ -16,38 +16,35 @@ The AxiomGuard at `Hodge/AxiomGuard.lean` verifies this at compile time.
 Reduce the axiom count by replacing axioms with real proofs. Each axiom you eliminate
 strengthens the formalization.
 
-## The 8 Axioms (ranked by difficulty)
+## The 7 Axioms (ranked by difficulty)
 
 ### Medium difficulty
-1. `algebraic_codimension_of_cycle_support` (AlgebraicSupportImpl.lean)
-   — Codimension uniqueness. AlgebraicSubvariety.codim is a free data field; axiom
-   constrains it to equal n - p. Structural enrichment not recommended (6 constructor sites).
-
-2. `algebraic_subvariety_admits_closed_submanifold_data` (AlgebraicSupportImpl.lean)
+1. `algebraic_subvariety_admits_closed_submanifold_data` (AlgebraicSupportImpl.lean)
    — Algebraic subvarieties have closed submanifold structure.
 
 ### Hard but well-defined
-3. `spine_bridge_cohomology_eq` (SpineBridgeImpl.lean)
+2. `spine_bridge_cohomology_eq` (SpineBridgeImpl.lean)
    — Geometric cycle class = representing form class. Requires Poincaré duality.
 
-4. `current_regularization_bundle` (CurrentRegularizationImpl.lean)
+3. `current_regularization_bundle` (CurrentRegularizationImpl.lean)
    — Current → smooth form with zero-preservation + closedness for integration currents.
    Requires mollifier/convolution infrastructure.
 
 ### Deep theorems (require major infrastructure)
-5. `microstructure_syr_existence` (MicrostructureImpl.lean)
+4. `microstructure_syr_existence` (MicrostructureImpl.lean)
    — SYR microstructure construction. Requires cubulation + calibration.
 
-6. `calibrated_support_is_analytic` (HarveyLawsonImpl.lean)
+5. `calibrated_support_is_analytic` (HarveyLawsonImpl.lean)
    — Harvey-Lawson 1982. Calibrated geometry regularity.
 
-7. `chow_theorem_algebraicity` (GAGAImpl.lean)
+6. `chow_theorem_algebraicity` (GAGAImpl.lean)
    — Chow's theorem 1949 / Serre GAGA 1956.
 
-8. `federer_fleming_compactness` (FedererFlemingImpl.lean)
+7. `federer_fleming_compactness` (FedererFlemingImpl.lean)
    — Federer-Fleming 1960. Flat norm compactness for integral currents.
 
 ### Previously proved (no longer axioms)
+- `algebraic_codimension_of_cycle_support` — eliminated via direct support data with `Fact (p ≤ n)` + `Nat.sub_sub_self`
 - `regularized_integration_current_empty` — proved from bundle (zero-preservation)
 - `regularized_integration_current_closed` — proved from bundle (closedness property)
 - `current_regularization_exists` — replaced by `current_regularization_bundle`
@@ -99,6 +96,14 @@ grep -r "sorry" Hodge/ --include="*.lean" | grep -v WorkInProgress | grep -v arc
 | `Hodge/Classical/*.lean` | Typeclass interfaces (GAGA, CycleClass, etc.) |
 | `Hodge/Cohomology/Basic.lean` | `DeRhamCohomologyClass`, `ofForm` |
 | `Hodge/Analytic/*.lean` | Forms, currents, calibration |
+
+## Key Lessons
+
+- `theorem` in Lean 4 must return `Prop`. Use `def` for `Type`-valued results.
+- `extends Fact (p ≤ n)` works for classes. Provides `[Fact (p ≤ n)]` via typeclass resolution.
+- `instSignedAlgebraicCycleSupportData_direct` (GAGA.lean) provides support data from
+  `[AlgebraicSubvarietyClosedSubmanifoldData n X]` + `[Fact (p ≤ n)]`.
+- `Nat.sub_sub_self` (not `Nat.sub_sub_cancel`): `p ≤ n → n - (n - p) = p`
 
 ## Context Window Tips
 
