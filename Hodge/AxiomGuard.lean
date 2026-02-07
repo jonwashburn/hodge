@@ -49,9 +49,8 @@ elab "#guard_no_custom_axioms " declName:ident : command => do
     `Hodge.Deep.FedererFleming.federer_fleming_compactness,
     `Hodge.Deep.Pillars.spine_bridge_cohomology_eq,
     `Hodge.Deep.Microstructure.microstructure_syr_existence,
-    `Hodge.Deep.CurrentRegularization.current_regularization_exists,
-    `Hodge.Deep.CurrentRegularization.regularized_integration_current_closed,
-    `Hodge.Deep.CurrentRegularization.regularized_integration_current_empty
+    `Hodge.Deep.CurrentRegularization.current_regularization_bundle,
+    `Hodge.Deep.CurrentRegularization.regularized_integration_current_closed
   ]
   -- Check for any unrecognized custom axioms
   let mut customAxioms : List Name := []
@@ -84,7 +83,7 @@ If this file compiles successfully:
 
 1. **No sorry** in the `hodge_conjecture_data` proof track.
 2. **No unrecognized axioms** — only standard Lean axioms and named deep theorems.
-3. The allowed deep theorem axioms are:
+3. The allowed deep theorem axioms are (9 total):
    - `algebraic_subvariety_admits_closed_submanifold_data` — closed submanifold structure
    - `algebraic_codimension_of_cycle_support` — codimension uniqueness
    - `calibrated_support_is_analytic` — Harvey-Lawson regularity
@@ -92,12 +91,15 @@ If this file compiles successfully:
    - `federer_fleming_compactness` — Federer-Fleming compactness
    - `spine_bridge_cohomology_eq` — spine bridge cohomology identity
    - `microstructure_syr_existence` — microstructure SYR construction
-   - `current_regularization_exists` — current regularization to smooth forms
+   - `current_regularization_bundle` — current regularization to smooth forms (with zero-preservation)
    - `regularized_integration_current_closed` — closedness of regularized forms
-   - `regularized_integration_current_empty` — empty carrier vanishing
 
 ## Historical Notes
 
+- **2026-02-07**: Reduced from 10 to 9 deep axioms. Proved `regularized_integration_current_empty`
+  as a theorem from `current_regularization_bundle` (which bundles the regularization function
+  with its zero-preservation property). The proof shows that the integration current of an
+  empty carrier is zero, then applies zero-preservation of regularization.
 - **2026-02-06**: Cleaned up WIP dependencies from critical path. Removed sorry-containing
   WIP imports (MollifierRegularization, HausdorffIntegrationInst) from critical path.
   Added axiom-based `PoincareDualityFromCurrentsData` instance. Total: 10 deep axioms.
