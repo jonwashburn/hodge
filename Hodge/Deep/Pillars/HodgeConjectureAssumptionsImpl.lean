@@ -28,13 +28,13 @@ This provides the `HodgeConjectureAssumptions` instance globally,
 using the scaffolded deep pillars.
 This allows `hodge_conjecture'` to be used without explicit arguments.
 -/
-instance instHodgeConjectureAssumptions {p : ℕ} : HodgeConjectureAssumptions n X p :=
+instance instHodgeConjectureAssumptions {p : ℕ} [Fact (p ≤ n)] : HodgeConjectureAssumptions n X p :=
   {
     toAutomaticSYRData := inferInstance
     toCurrentRegularizationData := inferInstance
     toPoincareDualityFromCurrentsData := inferInstance
     toAlgebraicSubvarietyClosedSubmanifoldData := inferInstance
-    toSignedAlgebraicCycleSupportCodimData := inferInstance
+    toFact := inferInstance
     toSpineBridgeData_data := inferInstance
     toCalibratedCurrentRegularityData := inferInstance
     toHarveyLawsonKingData := inferInstance
