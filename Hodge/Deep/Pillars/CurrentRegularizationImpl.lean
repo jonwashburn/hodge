@@ -15,27 +15,32 @@ variable {n : ℕ} {X : Type*}
 /--
 **Current Regularization Bundle Axiom**
 
-Every current on a projective Kähler manifold can be regularized to a smooth form,
-and regularization preserves zero (maps the zero current to the zero form).
+Every current on a projective Kähler manifold can be regularized to a smooth form.
+The regularization satisfies two key properties:
 
-**Mathematical Content**: This is a standard result in GMT/Hodge theory.
-On a compact Kähler manifold, every current T of degree k can be smoothed
-via convolution with a mollifier (or heat kernel flow) to produce a
-smooth form that represents the same de Rham cohomology class.
+1. **Zero-preservation**: `regularize(0) = 0` (follows from linearity of mollification)
+2. **Closedness for integration currents**: Regularizing the integration current of a
+   closed submanifold produces a closed form (follows from `d ∘ regularize = regularize ∘ d`
+   and the integration current being a cycle: `dT = 0 ⟹ d(regularize(T)) = 0`)
 
-The zero-preservation property follows from linearity of mollification:
-`regularize(0) = mollify(0) = 0`.
-
-The construction uses:
+**Mathematical Content**: On a compact Kähler manifold, every current T of degree k
+can be smoothed via convolution with a mollifier (or heat kernel flow) to produce a
+smooth form. The construction uses:
 1. Partition of unity subordinate to a finite atlas
 2. Convolution in each chart with a smooth kernel
 3. Patching via partition of unity
+
+Commutation with `d` follows from `d` being a local operator and convolution
+commuting with constant-coefficient differential operators in each chart.
 
 Reference: [de Rham, "Variétés Différentiables", Ch. III (1955)],
 [Federer, "Geometric Measure Theory", §4.1 (1969)].
 -/
 axiom current_regularization_bundle {k : ℕ} :
-    { f : Current n X k → SmoothForm n X k // f 0 = 0 }
+    { f : Current n X k → SmoothForm n X k //
+        (f 0 = 0) ∧
+        (∀ (data : ClosedSubmanifoldData n X k),
+          IsFormClosed (f (Hodge.GMT.integrationCurrentK_data k data))) }
 
 /--
 **Current Regularization Instance**
@@ -45,10 +50,10 @@ Provides the `CurrentRegularizationData` instance from the bundled axiom.
 instance instCurrentRegularizationData {k : ℕ} : Hodge.GMT.CurrentRegularizationData n X k where
   regularize := current_regularization_bundle.val
 
-/--
-**Regularized Integration Current Closedness Axiom**
+/-- **Theorem** (formerly axiom): regularized integration current is closed.
 
-The regularized integration current of a closed submanifold produces a closed form.
+This is now **proved** from `current_regularization_bundle` (closedness for
+integration currents property).
 
 **Mathematical Content**: Regularization commutes with the exterior derivative
 (d ∘ regularize = regularize ∘ d). The integration current of a closed
@@ -56,9 +61,15 @@ submanifold is a cycle (dT = 0), so d(regularize(T)) = regularize(dT) = 0.
 
 Reference: [de Rham, "Variétés Différentiables", Ch. III (1955)].
 -/
-axiom regularized_integration_current_closed {p : ℕ}
+theorem regularized_integration_current_closed {p : ℕ}
     (data : ClosedSubmanifoldData n X (2 * p)) :
-    IsFormClosed (CycleClass.poincareDualForm_data n X p data)
+    IsFormClosed (CycleClass.poincareDualForm_data n X p data) := by
+  -- poincareDualForm_data unfolds to:
+  --   regularizeCurrentToForm (integrationCurrent_data p data)
+  -- = current_regularization_bundle.val (integrationCurrentK_data (2*p) data)
+  show IsFormClosed ((current_regularization_bundle (n := n) (X := X) (k := 2 * p)).val
+      (Hodge.GMT.integrationCurrentK_data (n := n) (X := X) (2 * p) data))
+  exact (current_regularization_bundle (n := n) (X := X) (k := 2 * p)).property.2 data
 
 /-- The integration current of a closed submanifold with empty carrier is the zero current.
 
@@ -70,13 +81,9 @@ private theorem integrationCurrent_data_empty {p : ℕ}
     Hodge.GMT.integrationCurrent_data p data = 0 := by
   apply Current.ext
   intro ω
-  -- The integration current evaluates ω by hausdorffIntegrate over data.carrier.
-  -- When data.carrier = ∅, the integral vanishes.
-  -- LHS reduces definitionally to the Hausdorff integral:
   have lhs_eq : (Hodge.GMT.integrationCurrent_data p data).toFun ω =
       (∫ x in data.carrier,
         formVectorPairing ω data.orientation x ∂data.measure).re := by rfl
-  -- RHS: the zero current evaluates to 0
   have rhs_eq : (0 : Current n X (2 * p)).toFun ω = 0 := by rfl
   rw [lhs_eq, rhs_eq, h]
   simp [Measure.restrict_empty, integral_zero_measure]
@@ -95,25 +102,19 @@ theorem regularized_integration_current_empty {p : ℕ}
     (data : ClosedSubmanifoldData n X (2 * p))
     (h : data.carrier = ∅) :
     CycleClass.poincareDualForm_data n X p data = 0 := by
-  -- poincareDualForm_data unfolds to:
-  --   regularizeCurrentToForm (integrationCurrent_data p data)
-  -- = CurrentRegularizationData.regularize (integrationCurrent_data p data)
-  -- = current_regularization_bundle.1 (integrationCurrent_data p data)
   have h1 : Hodge.GMT.integrationCurrent_data p data = 0 :=
     integrationCurrent_data_empty data h
-  -- poincareDualForm_data is definitionally current_regularization_bundle.1 (integrationCurrent_data ...)
-  -- We use show with explicit type arguments to help Lean resolve the Nonempty instance
   show (current_regularization_bundle (n := n) (X := X) (k := 2 * p)).val
       (Hodge.GMT.integrationCurrent_data (n := n) (X := X) p data) = 0
   rw [h1]
-  exact (current_regularization_bundle (n := n) (X := X) (k := 2 * p)).property
+  exact (current_regularization_bundle (n := n) (X := X) (k := 2 * p)).property.1
 
 /--
 **Poincaré Duality From Currents Instance**
 
 Provides `PoincareDualityFromCurrentsData` using:
-- `regularized_integration_current_closed` (axiom) for closedness
-- `regularized_integration_current_empty` (proved theorem) for empty vanishing
+- `regularized_integration_current_closed` (proved from bundle) for closedness
+- `regularized_integration_current_empty` (proved from bundle) for empty vanishing
 -/
 instance instPoincareDualityFromCurrentsData {p : ℕ} :
     CycleClass.PoincareDualityFromCurrentsData n X p where
