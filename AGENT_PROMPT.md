@@ -7,7 +7,7 @@ You are an autonomous agent working on the Lean 4 formalization of the Hodge Con
 The main theorem `hodge_conjecture_data` compiles with:
 - **Zero sorry** on the critical path
 - **Zero custom axioms** — depends only on `[propext, Classical.choice, Quot.sound]`
-- **9 deep theorem axioms** in `Hodge/Deep/Pillars/*Impl.lean`
+- **8 deep theorem axioms** in `Hodge/Deep/Pillars/*Impl.lean`
 
 The AxiomGuard at `Hodge/AxiomGuard.lean` verifies this at compile time.
 
@@ -16,41 +16,41 @@ The AxiomGuard at `Hodge/AxiomGuard.lean` verifies this at compile time.
 Reduce the axiom count by replacing axioms with real proofs. Each axiom you eliminate
 strengthens the formalization.
 
-## The 9 Axioms (ranked by difficulty)
+## The 8 Axioms (ranked by difficulty)
 
-### Most likely provable
+### Medium difficulty
 1. `algebraic_codimension_of_cycle_support` (AlgebraicSupportImpl.lean)
-   — Codimension uniqueness. May follow from `SignedAlgebraicCycle` structure.
+   — Codimension uniqueness. AlgebraicSubvariety.codim is a free data field; axiom
+   constrains it to equal n - p. Structural enrichment not recommended (6 constructor sites).
 
-2. `regularized_integration_current_closed` (CurrentRegularizationImpl.lean)
-   — Regularized form is closed. Requires showing regularization commutes with d.
-
-### Hard but well-defined
-3. `algebraic_subvariety_admits_closed_submanifold_data` (AlgebraicSupportImpl.lean)
+2. `algebraic_subvariety_admits_closed_submanifold_data` (AlgebraicSupportImpl.lean)
    — Algebraic subvarieties have closed submanifold structure.
 
-4. `spine_bridge_cohomology_eq` (SpineBridgeImpl.lean)
+### Hard but well-defined
+3. `spine_bridge_cohomology_eq` (SpineBridgeImpl.lean)
    — Geometric cycle class = representing form class. Requires Poincaré duality.
 
-5. `current_regularization_bundle` (CurrentRegularizationImpl.lean)
-   — Current → smooth form with zero-preservation. Requires mollifier/convolution infrastructure.
+4. `current_regularization_bundle` (CurrentRegularizationImpl.lean)
+   — Current → smooth form with zero-preservation + closedness for integration currents.
+   Requires mollifier/convolution infrastructure.
 
 ### Deep theorems (require major infrastructure)
-6. `microstructure_syr_existence` (MicrostructureImpl.lean)
+5. `microstructure_syr_existence` (MicrostructureImpl.lean)
    — SYR microstructure construction. Requires cubulation + calibration.
 
-7. `calibrated_support_is_analytic` (HarveyLawsonImpl.lean)
+6. `calibrated_support_is_analytic` (HarveyLawsonImpl.lean)
    — Harvey-Lawson 1982. Calibrated geometry regularity.
 
-8. `chow_theorem_algebraicity` (GAGAImpl.lean)
+7. `chow_theorem_algebraicity` (GAGAImpl.lean)
    — Chow's theorem 1949 / Serre GAGA 1956.
 
-9. `federer_fleming_compactness` (FedererFlemingImpl.lean)
+8. `federer_fleming_compactness` (FedererFlemingImpl.lean)
    — Federer-Fleming 1960. Flat norm compactness for integral currents.
 
 ### Previously proved (no longer axioms)
-- `regularized_integration_current_empty` — proved from `current_regularization_bundle`
-  (zero-preservation) + integration current of empty carrier = 0.
+- `regularized_integration_current_empty` — proved from bundle (zero-preservation)
+- `regularized_integration_current_closed` — proved from bundle (closedness property)
+- `current_regularization_exists` — replaced by `current_regularization_bundle`
 
 ## How to Work
 

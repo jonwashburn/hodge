@@ -8,26 +8,25 @@
 `hodge_conjecture_data` compiles with:
 - **Zero sorry** on critical path
 - **Zero custom axioms** — depends only on `[propext, Classical.choice, Quot.sound]`
-- **9 deep theorem axioms** in Impl files (named mathematical results)
+- **8 deep theorem axioms** in Impl files (named mathematical results)
 - AxiomGuard compile-time verification passes
 
 ## Goal
 
-Replace the 9 axioms with real proofs, making the formalization fully unconditional.
+Replace the 8 axioms with real proofs, making the formalization fully unconditional.
 
-## The 9 Axioms
+## The 8 Axioms
 
 | # | Axiom | File | Difficulty | Status |
 |---|-------|------|-----------|--------|
-| 1 | `algebraic_codimension_of_cycle_support` | AlgebraicSupportImpl | EASY | OPEN |
-| 2 | `regularized_integration_current_closed` | CurrentRegularizationImpl | MEDIUM | OPEN |
-| 3 | `algebraic_subvariety_admits_closed_submanifold_data` | AlgebraicSupportImpl | MEDIUM | OPEN |
-| 4 | `spine_bridge_cohomology_eq` | SpineBridgeImpl | HARD | OPEN |
-| 5 | `current_regularization_bundle` | CurrentRegularizationImpl | HARD | OPEN |
-| 6 | `microstructure_syr_existence` | MicrostructureImpl | VERY HARD | OPEN |
-| 7 | `calibrated_support_is_analytic` | HarveyLawsonImpl | VERY HARD | OPEN |
-| 8 | `chow_theorem_algebraicity` | GAGAImpl | VERY HARD | OPEN |
-| 9 | `federer_fleming_compactness` | FedererFlemingImpl | VERY HARD | OPEN |
+| 1 | `algebraic_codimension_of_cycle_support` | AlgebraicSupportImpl | MEDIUM | OPEN |
+| 2 | `algebraic_subvariety_admits_closed_submanifold_data` | AlgebraicSupportImpl | MEDIUM | OPEN |
+| 3 | `spine_bridge_cohomology_eq` | SpineBridgeImpl | HARD | OPEN |
+| 4 | `current_regularization_bundle` | CurrentRegularizationImpl | HARD | OPEN |
+| 5 | `microstructure_syr_existence` | MicrostructureImpl | VERY HARD | OPEN |
+| 6 | `calibrated_support_is_analytic` | HarveyLawsonImpl | VERY HARD | OPEN |
+| 7 | `chow_theorem_algebraicity` | GAGAImpl | VERY HARD | OPEN |
+| 8 | `federer_fleming_compactness` | FedererFlemingImpl | VERY HARD | OPEN |
 
 ## Completed Work
 
@@ -38,6 +37,7 @@ Replace the 9 axioms with real proofs, making the formalization fully unconditio
 | 2026-02-06 | claude-session | Remove WIP imports from critical path | Zero WIP deps in critical path |
 | 2026-02-06 | claude-session | Add PoincareDualityFromCurrentsData via axioms | Clean instance chain |
 | 2026-02-07 | claude-session | Prove `regularized_integration_current_empty` as theorem | 10 → 9 axioms |
+| 2026-02-07 | claude-session | Bundle closedness into `current_regularization_bundle` | 9 → 8 axioms |
 
 ## Failed Approaches (DO NOT REPEAT)
 
@@ -61,6 +61,6 @@ Instances provided by Hodge/Deep/Pillars/*Impl.lean:
   FedererFlemingImpl      → 1 axiom  (compactness)
   MicrostructureImpl      → 1 axiom  (SYR construction)
   SpineBridgeImpl         → 1 axiom  (cohomology bridge)
-  CurrentRegularizationImpl → 2 axioms (regularization bundle, closedness) + 1 proved theorem (empty)
+  CurrentRegularizationImpl → 1 axiom (regularization bundle w/ zero + closedness) + 2 proved theorems
   HodgeConjectureAssumptionsImpl → assembles all instances
 ```
