@@ -926,9 +926,14 @@ structure OrientingKVector (n : ℕ) (X : Type*) (k : ℕ)
       Represented as a map to k-tuples of tangent vectors.
       The value at x represents v₁ ∧ ... ∧ vₖ. -/
   orientation : X → (Fin k → TangentModel n)
-  /-- The orientation is unit at points in the support.
-      (Norm definition for k-vectors would go here). -/
-  unit_norm : ∀ x ∈ support, ‖orientation x‖ = 1
+  /-- Each component of the orientation has norm at most 1 in the support.
+      This implies ‖orientation x‖ ≤ 1 (via Pi norm) and, together with
+      the product bound on alternating maps, ensures ‖⟨ω, τ⟩‖ ≤ comass ω.
+
+      The componentwise formulation (rather than ‖orientation x‖ = 1) avoids
+      a definitional obstruction at degree k = 0, where the Pi norm of any
+      element of `Fin 0 → E` is 0, making ‖·‖ = 1 unsatisfiable. -/
+  unit_norm : ∀ x ∈ support, ∀ i : Fin k, ‖(orientation x) i‖ ≤ 1
 
 /-- **Form-Vector Pairing** (Federer, 1969).
     The canonical pairing of a k-form ω with a k-vector τ at a point x.
@@ -1385,17 +1390,13 @@ noncomputable def ClosedSubmanifoldData.toOrientedData {n : ℕ} {X : Type*} {k 
             -- same proof as `pairing_le_comass` below, specialized to this ω and x
             have hx' : x ∈ data.orientation.support := by
               simpa [data.orientation_support] using hx
-            have hun : ‖data.orientation.orientation x‖ = 1 := data.orientation.unit_norm x hx'
             have hop :
                 ‖(ω.as_alternating x) (data.orientation.orientation x)‖ ≤
                   ‖ω.as_alternating x‖ * ∏ i : Fin k, ‖data.orientation.orientation x i‖ := by
               simpa using
                 (ContinuousAlternatingMap.le_opNorm (ω.as_alternating x) (data.orientation.orientation x))
-            have hcomp : ∀ i : Fin k, ‖data.orientation.orientation x i‖ ≤ 1 := by
-              intro i
-              have hi : ‖data.orientation.orientation x i‖ ≤ ‖data.orientation.orientation x‖ :=
-                norm_le_pi_norm (data.orientation.orientation x) i
-              simpa [hun] using hi
+            have hcomp : ∀ i : Fin k, ‖data.orientation.orientation x i‖ ≤ 1 :=
+              data.orientation.unit_norm x hx'
             have hprod : (∏ i : Fin k, ‖data.orientation.orientation x i‖) ≤ (1 : ℝ) := by
               classical
               simpa using (Finset.prod_le_one (s := (Finset.univ : Finset (Fin k)))
@@ -1423,7 +1424,6 @@ noncomputable def ClosedSubmanifoldData.toOrientedData {n : ℕ} {X : Type*} {k 
     -- Bound by the operator norm, then by `comass` via `le_csSup`.
     have hx' : x ∈ data.orientation.support := by
       simpa [data.orientation_support] using hx
-    have hun : ‖data.orientation.orientation x‖ = 1 := data.orientation.unit_norm x hx'
 
     have hop :
         ‖(ω.as_alternating x) (data.orientation.orientation x)‖ ≤
@@ -1431,11 +1431,8 @@ noncomputable def ClosedSubmanifoldData.toOrientedData {n : ℕ} {X : Type*} {k 
       simpa using
         (ContinuousAlternatingMap.le_opNorm (ω.as_alternating x) (data.orientation.orientation x))
 
-    have hcomp : ∀ i : Fin k, ‖data.orientation.orientation x i‖ ≤ 1 := by
-      intro i
-      have hi : ‖data.orientation.orientation x i‖ ≤ ‖data.orientation.orientation x‖ :=
-        norm_le_pi_norm (data.orientation.orientation x) i
-      simpa [hun] using hi
+    have hcomp : ∀ i : Fin k, ‖data.orientation.orientation x i‖ ≤ 1 :=
+      data.orientation.unit_norm x hx'
 
     have hprod : (∏ i : Fin k, ‖data.orientation.orientation x i‖) ≤ (1 : ℝ) := by
       classical

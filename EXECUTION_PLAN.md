@@ -4,7 +4,7 @@
 Eliminate ALL 7 custom axioms from the Lean 4 formalization of the Hodge Conjecture, producing a fully unconditional proof that depends only on `[propext, Classical.choice, Quot.sound]`.
 
 ## Current State (2026-02-08)
-- `hodge_conjecture_data` compiles with 7 custom axioms
+- `hodge_conjecture_data` compiles with 6 custom axioms (down from 7)
 - Branch: `claude/hodge-conjecture-proof-VSeH8`
 - Written proof: `Hodge_REFEREE_Amir-v1.tex` (8270 lines)
 - Build system: `~/.elan/bin/lake build Hodge.AxiomGuard` for full verification
@@ -13,7 +13,7 @@ Eliminate ALL 7 custom axioms from the Lean 4 formalization of the Hodge Conject
 
 | # | Axiom | File | Category | Status |
 |---|-------|------|----------|--------|
-| 1 | `algebraic_subvariety_admits_closed_submanifold_data` | AlgebraicSupportImpl.lean | Structural artifact | TODO |
+| 1 | `algebraic_subvariety_admits_closed_submanifold_data` | AlgebraicSupportImpl.lean | Structural artifact | **DONE** |
 | 6 | `spine_bridge_cohomology_eq` | SpineBridgeImpl.lean | Structural bridge | TODO |
 | 7 | `current_regularization_bundle` | CurrentRegularizationImpl.lean | Structural/classical | TODO |
 | 5 | `microstructure_syr_existence` | MicrostructureImpl.lean | Novel proof | TODO |
@@ -233,4 +233,4 @@ After eliminating each axiom:
 | Chow/GAGA | needs axiom 3 | TODO |
 | Regularization | needs axiom 7 | TODO |
 | Spine bridge | needs axiom 6 | TODO |
-| Algebraic support data | needs axiom 1 | TODO |
+| Algebraic support data | `AlgebraicSupportImpl.lean` (theorem) | **DONE** |
