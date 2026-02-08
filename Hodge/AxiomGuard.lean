@@ -42,7 +42,8 @@ elab "#guard_no_custom_axioms " declName:ident : command => do
     -- Deep theorem axioms: named mathematical results from the literature.
     -- Each encodes a well-known theorem whose full formalization requires
     -- deep infrastructure beyond the current Lean/Mathlib libraries.
-    `Hodge.Deep.Pillars.algebraic_subvariety_admits_closed_submanifold_data,
+    -- NOTE: algebraic_subvariety_admits_closed_submanifold_data was proved
+    -- (no longer an axiom) — removed from allowed list.
     `Hodge.Deep.HarveyLawson.calibrated_support_is_analytic,
     `Hodge.Deep.GAGA.chow_theorem_algebraicity,
     `Hodge.Deep.FedererFleming.federer_fleming_compactness,
@@ -81,8 +82,7 @@ If this file compiles successfully:
 
 1. **No sorry** in the `hodge_conjecture_data` proof track.
 2. **No unrecognized axioms** — only standard Lean axioms and named deep theorems.
-3. The allowed deep theorem axioms are (7 total):
-   - `algebraic_subvariety_admits_closed_submanifold_data` — closed submanifold structure
+3. The allowed deep theorem axioms are (6 total):
    - `calibrated_support_is_analytic` — Harvey-Lawson regularity
    - `chow_theorem_algebraicity` — Chow's theorem / GAGA
    - `federer_fleming_compactness` — Federer-Fleming compactness
