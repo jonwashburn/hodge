@@ -601,9 +601,9 @@ theorem mfderiv_wedge_apply {k l : ℕ} (ω : ContMDiffForm n X k) (η : ContMDi
 
   -- Step 1: Get differentiability hypotheses
   have hω_diff : MDifferentiableAt (𝓒_complex n) 𝓘(ℝ, Alt n k) ω.as_alternating x :=
-    ω.smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
+    ω.smooth'.mdifferentiableAt (by simpa using formSmoothness_ne_zero)
   have hη_diff : MDifferentiableAt (𝓒_complex n) 𝓘(ℝ, Alt n l) η.as_alternating x :=
-    η.smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
+    η.smooth'.mdifferentiableAt (by simpa using formSmoothness_ne_zero)
 
   -- Step 2: Define the bilinear wedge map on the product
   let B : Alt n k × Alt n l → Alt n (k + l) :=

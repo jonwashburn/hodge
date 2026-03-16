@@ -42,7 +42,7 @@ structure ContMDiffForm (n : ℕ) (X : Type u) (k : ℕ)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X] where
   as_alternating : X → FiberAlt n k
-  smooth' : ContMDiff (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ⊤ as_alternating
+  smooth' : ContMDiff (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) formSmoothness as_alternating
 
 namespace ContMDiffForm
 
@@ -111,10 +111,10 @@ theorem mfderivInTangentCoordinates_eq (ω : ContMDiffForm n X k) (x₀ x : X)
 /-- Smoothness of the tangent-coordinate expression of the derivative.
     This follows from `ContMDiffAt.mfderiv_const` (since the fiber bundle for values is trivial). -/
 theorem contMDiffAt_mfderivInTangentCoordinates (ω : ContMDiffForm n X k) (x₀ : X) :
-    ContMDiffAt (𝓒_complex n) 𝓘(ℝ, TangentModel n →L[ℝ] FiberAlt n k) ⊤
+    ContMDiffAt (𝓒_complex n) 𝓘(ℝ, TangentModel n →L[ℝ] FiberAlt n k) formSmoothness
       (mfderivInTangentCoordinates (n := n) (X := X) (k := k) ω x₀) x₀ := by
   -- ω.as_alternating is smooth
-  have hf : ContMDiffAt (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ⊤ ω.as_alternating x₀ :=
+  have hf : ContMDiffAt (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) formSmoothness ω.as_alternating x₀ :=
     ω.smooth' x₀
   -- Use Mathlib's `ContMDiffAt.mfderiv_const`.
   simpa [mfderivInTangentCoordinates] using
@@ -133,19 +133,19 @@ noncomputable def extDerivInTangentCoordinates (ω : ContMDiffForm n X k) (x₀ 
       (mfderivInTangentCoordinates (n := n) (X := X) (k := k) ω x₀ x)
 
 theorem contMDiffAt_extDerivInTangentCoordinates (ω : ContMDiffForm n X k) (x₀ : X) :
-    ContMDiffAt (𝓒_complex n) 𝓘(ℝ, FiberAlt n (k + 1)) ⊤
+    ContMDiffAt (𝓒_complex n) 𝓘(ℝ, FiberAlt n (k + 1)) formSmoothness
       (extDerivInTangentCoordinates (n := n) (X := X) (k := k) ω x₀) x₀ := by
   -- Compose the `ContMDiffAt` derivative-in-coordinates map with the (smooth) alternatization CLM.
   let L :=
     ContinuousAlternatingMap.alternatizeUncurryFinCLM ℝ (TangentModel n) ℂ (n := k)
-  have hL : ContDiff ℝ (⊤ : WithTop ℕ∞) ⇑L :=
+  have hL : ContDiff ℝ formSmoothness ⇑L :=
     ContinuousLinearMap.contDiff (𝕜 := ℝ)
       (E := (TangentModel n) →L[ℝ] FiberAlt n k)
       (F := FiberAlt n (k + 1))
-      (n := ⊤)
+      (n := formSmoothness)
       L
   have hm :
-      ContMDiffAt (𝓒_complex n) 𝓘(ℝ, TangentModel n →L[ℝ] FiberAlt n k) ⊤
+      ContMDiffAt (𝓒_complex n) 𝓘(ℝ, TangentModel n →L[ℝ] FiberAlt n k) formSmoothness
         (mfderivInTangentCoordinates (n := n) (X := X) (k := k) ω x₀) x₀ :=
     contMDiffAt_mfderivInTangentCoordinates (n := n) (X := X) (k := k) ω x₀
   -- Use the general `ContDiff.comp_contMDiffAt`.
@@ -381,14 +381,17 @@ noncomputable def omegaInChart (ω : ContMDiffForm n X k) (x₀ : X) :
   fun u => ω.as_alternating ((chartAt (EuclideanSpace ℂ (Fin n)) x₀).symm u)
 
 theorem contDiffOn_omegaInChart (ω : ContMDiffForm n X k) (x₀ : X) :
-    ContDiffOn ℝ ⊤ (omegaInChart ω x₀) ((chartAt (EuclideanSpace ℂ (Fin n)) x₀).target) := by
-  apply ContMDiffOn.contDiffOn
-  have h1 : ContMDiffOn (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ⊤ ω.as_alternating Set.univ :=
+    ContDiffOn ℝ formSmoothness (omegaInChart ω x₀) ((chartAt (EuclideanSpace ℂ (Fin n)) x₀).target) := by
+  have h1 : ContMDiffOn (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) formSmoothness ω.as_alternating Set.univ :=
     ω.smooth'.contMDiffOn
-  have h2 : ContMDiffOn (𝓒_complex n) (𝓒_complex n) ⊤
+  have h2 : ContMDiffOn (𝓒_complex n) (𝓒_complex n) formSmoothness
       (chartAt (EuclideanSpace ℂ (Fin n)) x₀).symm (chartAt (EuclideanSpace ℂ (Fin n)) x₀).target :=
-    contMDiffOn_chart_symm (I := 𝓒_complex n)
-  exact h1.comp h2 (fun _ _ => Set.mem_univ _)
+    (contMDiffOn_chart_symm (I := 𝓒_complex n)).of_le le_top
+  have hcomp :
+      ContMDiffOn 𝓘(ℝ, TangentModel n) 𝓘(ℝ, FiberAlt n k) formSmoothness
+        (omegaInChart ω x₀) ((chartAt (EuclideanSpace ℂ (Fin n)) x₀).target) := by
+    simpa [omegaInChart, 𝓒_complex] using h1.comp h2 (fun _ _ => Set.mem_univ _)
+  exact hcomp.contDiffOn
 
 /-- On the diagonal (x = x₀), `extDerivAt` matches the chart derivative.
 
@@ -408,7 +411,7 @@ theorem extDerivAt_eq_chart_extDeriv (ω : ContMDiffForm n X k) (x : X) :
   -- Goal: mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ω.as_alternating x
   --     = fderiv ℝ (omegaInChart ω x) (chartAt _ x x)
   have hω_diff : MDifferentiableAt (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ω.as_alternating x :=
-    ω.smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
+    ω.smooth'.mdifferentiableAt (by simpa using formSmoothness_ne_zero)
   -- Unfold mfderiv using its definition, simplify the if
   simp only [mfderiv, hω_diff, ↓reduceIte]
   -- Key: for model-space target, writtenInExtChartAt simplifies
@@ -462,7 +465,7 @@ theorem extDerivAt_eq_chart_extDeriv_general (ω : ContMDiffForm n X k) (x y : X
   -- Goal: mfderiv (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ω.as_alternating y
   --     = fderiv ℝ (omegaInChart ω x) ((chartAt x) y)
   have hω_diff : MDifferentiableAt (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ω.as_alternating y :=
-    ω.smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
+    ω.smooth'.mdifferentiableAt (by simpa using formSmoothness_ne_zero)
   -- Unfold mfderiv using its definition
   simp only [mfderiv, hω_diff, ↓reduceIte]
   -- For model-space target, writtenInExtChartAt simplifies
@@ -594,9 +597,9 @@ theorem extDerivAt_add (ω η : ContMDiffForm n X k) (x : X) :
   have h_add : (ω + η).as_alternating = ω.as_alternating + η.as_alternating := rfl
   rw [h_add]
   have hω : MDifferentiableAt (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ω.as_alternating x :=
-    ω.smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
+    ω.smooth'.mdifferentiableAt (by simpa using formSmoothness_ne_zero)
   have hη : MDifferentiableAt (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) η.as_alternating x :=
-    η.smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
+    η.smooth'.mdifferentiableAt (by simpa using formSmoothness_ne_zero)
   have hmf :=
     mfderiv_add (I := (𝓒_complex n)) (E' := FiberAlt n k)
       (f := ω.as_alternating) (g := η.as_alternating) (z := x) hω hη
@@ -615,7 +618,7 @@ theorem extDerivAt_smul (c : ℂ) (ω : ContMDiffForm n X k) (x : X) :
   let f : X → FiberAlt n k := ω.as_alternating
   let g : FiberAlt n k → FiberAlt n k := fun z => c • z
   have hf : MDifferentiableAt (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) f x :=
-    ω.smooth'.mdifferentiableAt (by simp : (⊤ : WithTop ℕ∞) ≠ 0)
+    ω.smooth'.mdifferentiableAt (by simpa using formSmoothness_ne_zero)
   have hg : MDifferentiableAt 𝓘(ℝ, FiberAlt n k) 𝓘(ℝ, FiberAlt n k) g (f x) := by
     -- `g` is (real-)differentiable on the vector space `FiberAlt n k`.
     have : DifferentiableAt ℝ (fun z : FiberAlt n k => c • z) (f x) := by
@@ -734,7 +737,7 @@ noncomputable def extDerivForm (ω : ContMDiffForm n X k)
     -- `contMDiffAt_extDerivInTangentCoordinates`.
     intro x₀
     have h_smooth :
-        ContMDiffAt (𝓒_complex n) 𝓘(ℝ, FiberAlt n (k + 1)) ⊤
+        ContMDiffAt (𝓒_complex n) 𝓘(ℝ, FiberAlt n (k + 1)) formSmoothness
           (extDerivInTangentCoordinates (n := n) (X := X) (k := k) ω x₀) x₀ :=
       contMDiffAt_extDerivInTangentCoordinates (n := n) (X := X) (k := k) ω x₀
     have h_eq :
@@ -837,10 +840,11 @@ theorem extDeriv_extDeriv (ω : ContMDiffForm n X k)
   -- omegaInChart (extDerivForm ω) x = (extDerivForm ω).as_alternating ∘ (chartAt x).symm
   --                                 = extDeriv ω ∘ (chartAt x).symm
   -- Since extDerivForm ω is smooth (its as_alternating is ContMDiff), the chart representation is smooth.
-  have h_smooth_dω : ContDiffAt ℝ ⊤ (omegaInChart (extDerivForm ω hCharts) x)
+  have h_smooth_dω : ContDiffAt ℝ formSmoothness (omegaInChart (extDerivForm ω hCharts) x)
       ((chartAt (EuclideanSpace ℂ (Fin n)) x) x) := by
-    have h_on : ContDiffOn ℝ ⊤ (omegaInChart (extDerivForm ω hCharts) x)
-        ((chartAt (EuclideanSpace ℂ (Fin n)) x).target) := contDiffOn_omegaInChart (extDerivForm ω hCharts) x
+    have h_on : ContDiffOn ℝ formSmoothness (omegaInChart (extDerivForm ω hCharts) x)
+        ((chartAt (EuclideanSpace ℂ (Fin n)) x).target) :=
+      contDiffOn_omegaInChart (extDerivForm ω hCharts) x
     have h_mem : (chartAt (EuclideanSpace ℂ (Fin n)) x) x ∈
         (chartAt (EuclideanSpace ℂ (Fin n)) x).target :=
       OpenPartialHomeomorph.map_source _ (mem_chart_source _ x)
@@ -856,9 +860,9 @@ theorem extDeriv_extDeriv (ω : ContMDiffForm n X k)
   --
   -- The chart cocycle identity (relating mfderiv at varying basepoints to fderiv in a fixed chart)
   -- is technically involved. For now, we use the structural smoothness argument.
-  have h_minSmoothness : minSmoothness ℝ 2 ≤ ⊤ := by
-    simp only [minSmoothness_of_isRCLikeNormedField]
-    exact le_top
+  have h_minSmoothness : minSmoothness ℝ 2 ≤ formSmoothness := by
+    rw [minSmoothness_of_isRCLikeNormedField]
+    exact (WithTop.coe_le_coe).2 (by simp : (2 : ℕ∞) ≤ ⊤)
   -- Key insight: We don't need full functional equality. At the specific evaluation point
   -- u₀ = (chartAt x) x, we have (chartAt x).symm u₀ = x, so chartAt ((chartAt x).symm u₀) = chartAt x.
   -- This makes the chart-based and fixed-chart computations agree at u₀.
@@ -915,8 +919,8 @@ theorem extDeriv_extDeriv (ω : ContMDiffForm n X k)
   --
   -- For the extDeriv at u₀, we need the first derivatives to also match at u₀.
   -- This follows from the definition of extDerivAt and the chain rule.
-  have h_smooth : ContDiffAt ℝ ⊤ (omegaInChart ω x) ((chartAt (EuclideanSpace ℂ (Fin n)) x) x) := by
-    have h_on : ContDiffOn ℝ ⊤ (omegaInChart ω x) ((chartAt (EuclideanSpace ℂ (Fin n)) x).target) :=
+  have h_smooth : ContDiffAt ℝ formSmoothness (omegaInChart ω x) ((chartAt (EuclideanSpace ℂ (Fin n)) x) x) := by
+    have h_on : ContDiffOn ℝ formSmoothness (omegaInChart ω x) ((chartAt (EuclideanSpace ℂ (Fin n)) x).target) :=
       contDiffOn_omegaInChart ω x
     have h_mem : (chartAt (EuclideanSpace ℂ (Fin n)) x) x ∈ (chartAt (EuclideanSpace ℂ (Fin n)) x).target :=
       OpenPartialHomeomorph.map_source _ (mem_chart_source _ x)

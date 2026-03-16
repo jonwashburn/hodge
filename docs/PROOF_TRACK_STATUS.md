@@ -44,11 +44,48 @@ Required concrete mathematics is still missing:
   - these are consumed by
     `Hodge/Classical/PoincareDualityFromCurrents.lean:40-53`.
 
-**Blocker**: We need to formalize a genuine smoothing operator
-`Current n X (2*p) → SmoothForm n X (2*p)` (heat kernel / mollifier on charts with
-partition of unity), plus proofs that it commutes with `d` on cycles and vanishes
-for empty carriers. This analytic infrastructure is not present in the current
-Mathlib snapshot or the repo, so Target 1 cannot be completed yet.
+**Groundwork update (2026-03-16)**:
+
+- The WIP pullback/regularization scaffolding no longer treats arbitrary maps as smooth:
+  - `Hodge/WorkInProgress/Analytic/ContMDiffPullback.lean`
+  - `Hodge/WorkInProgress/Analytic/Pullback.lean`
+  - `Hodge/WorkInProgress/GMT/CurrentPushforward.lean`
+  - `Hodge/WorkInProgress/GMT/ManifoldMollifier.lean`
+- These files now require an explicit `hf : ContMDiff (𝓒_complex n) (𝓒_complex n) ⊤ f`
+  to form pullbacks / pushforwards. This fixes a semantic bug in the scaffolding:
+  the old API bundled a "smooth pullback" along an arbitrary map `f : X → Y`.
+- That pullback smoothness blocker is now discharged:
+  - `Hodge/WorkInProgress/Analytic/ContMDiffPullback.lean` proves
+    `ContMDiffForm.pullback.smooth'` by reducing to chart-level `ContDiffAt`
+    pullback lemmas on alternating maps and a local `fChart` smoothness theorem.
+  - `Hodge/WorkInProgress/Analytic/Pullback.lean` now defines
+    `smoothFormPullback` by converting through `ContMDiffForm.pullback`, so the
+    duplicate WIP `sorry` is gone.
+- The chart-model localization blocker is now fixed in WIP code:
+  - `Hodge/WorkInProgress/GMT/LocalCurrents.lean` defines
+    `TestForm.comass`, `TestForm.smoothExtDeriv`, and `LocalCurrent` on compactly
+    supported smooth forms, so model-space currents no longer reuse the global
+    `SmoothForm` norm or `Current n (TangentModel n) k`.
+  - `Hodge/WorkInProgress/GMT/CurrentPushforward.lean` now pushes global currents
+    to `LocalCurrent` via pullback on compactly supported test forms.
+  - `Hodge/WorkInProgress/GMT/EuclideanCurrentRegularization.lean` now exposes only
+    the honest interface `ModelCurrent n k → SmoothForm n (TangentModel n) k`.
+  - `Hodge/WorkInProgress/Instances/EuclideanManifold.lean` was deleted; the fake
+    `CompactSpace` / `ProjectiveComplexManifold` / `KahlerManifold` instances on
+    `TangentModel n` are no longer part of the scaffold.
+- The source-level modeling issue that forced this refactor was:
+  1. `Hodge/Analytic/Currents.lean:52-67` defines `Current` only on ambient spaces carrying
+     `ProjectiveComplexManifold` / `KahlerManifold` / measurable structure, so
+     `Current n (TangentModel n) k` forces impossible global geometry onto `ℂ^n`.
+  2. `Hodge/Analytic/Norms.lean:117-160` defines `comass` and the norm on `SmoothForm`
+     only under `[CompactSpace X]`, so the existing continuous-linear pullback / pushforward
+     API cannot even be instantiated honestly on the noncompact model chart.
+
+**Blocker**: the remaining gap is now narrower and purely analytic/infrastructural:
+we still need a concrete Euclidean smoothing operator
+`ModelCurrent n k → SmoothForm n (TangentModel n) k`, then the manifold chart-gluing
+construction, and finally proofs that the resulting regularization commutes with `d`
+on cycles and vanishes on empty carriers. The modeling bug is no longer the blocker.
 
 ---
 
@@ -64,9 +101,16 @@ This resolves the "missing instance" blocker for the deep track.
 ---
 - Data‑first dependencies now include `CurrentRegularizationData`,
   `PoincareDualityFromCurrentsData` (proof‑track binder; yields
-  `PoincareDualFormFromCurrentData` as a derived instance), `SpineBridgeData_data`, and the explicit
-  support‑data binders (`AlgebraicSubvarietyClosedSubmanifoldData`,
-  `SignedAlgebraicCycleSupportCodimData`).
+  `PoincareDualFormFromCurrentData` as a derived instance), `SpineBridgeData_data`, and
+  the direct support-data binder `SignedAlgebraicCycleSupportData`.
+- Update (2026-03-16): `HodgeConjectureAssumptions`, `hodge_conjecture'`, and the
+  data-first spine corollaries now depend on `SignedAlgebraicCycleSupportData`
+  directly rather than reconstructing it on the proof spine from
+  `AlgebraicSubvarietyClosedSubmanifoldData` plus
+  `SignedAlgebraicCycleSupportCodimData`.
+- The codimension-based algebraic-support route remains in `Hodge/Classical/GAGA.lean`
+  and `Hodge/Deep/Pillars/AlgebraicSupportImpl.lean` as an off-spine derivation path,
+  but it is no longer part of the active proof-spine binder chain.
 - `FundamentalClassSet_data` is now wired through the current‑regularization path
   (`fundamentalClassImpl_data_fromCurrents`), so the PD pipeline is fully data‑first
   on the proof track.
@@ -129,14 +173,8 @@ These sorries live only in WIP files (`Hodge/WorkInProgress/**` or `Hodge/Deep/P
 and must remain unimported by the proof track (`Hodge/Main.lean`, `Hodge.lean`).
 
 - `Hodge/WorkInProgress/GMT/RegularizationLemmas.lean:17-23` — `CurrentRegularizationLemmas` instance (closedness on cycles + empty-carrier vanishing).
-- `Hodge/WorkInProgress/Analytic/Pullback.lean:36-42` — `smoothFormPullback` smoothness proof (chart-level pullback infrastructure).
-- `Hodge/WorkInProgress/Analytic/ContMDiffPullback.lean:20-26` — `ContMDiffForm.pullback` smoothness proof.
 - `Hodge/WorkInProgress/GMT/ManifoldMollifier.lean:45-52` — `chartDerivBound_bddAbove` (global bound still missing; local continuity added).
-- `Hodge/WorkInProgress/GMT/EuclideanCurrentRegularization.lean:12-18` — `EuclideanCurrentRegularizationData` (regularization interface on model space).
-- `Hodge/WorkInProgress/GMT/EuclideanCurrentRegularization.lean:24-30` — `instEuclideanCurrentRegularizationData` (definition by chartwise convolution).
-- `Hodge/WorkInProgress/Instances/EuclideanManifold.lean:28-30` — `instCompactSpace_TangentModel` (compactness placeholder).
-- `Hodge/WorkInProgress/Instances/EuclideanManifold.lean:32-46` — `instProjectiveComplexManifold_TangentModel` (projective manifold structure).
-- `Hodge/WorkInProgress/Instances/EuclideanManifold.lean:48-51` — `instKahlerManifold_TangentModel` (Kähler structure on model space).
+- `Hodge/WorkInProgress/GMT/ManifoldMollifier.lean:202-252` — `mollifyWeighted` smoothness proof (current `IsSmoothAlternating` uses analytic `⊤`, while the partition-of-unity lemma only yields `C^∞`).
 - `Hodge/WorkInProgress/Analytic/Integration/HausdorffIntegrationInst.lean:30-42` — `SubmanifoldIntegrationData` instance: finite Hausdorff measure, oriented integral, linearity/union/empty/bound, and Stokes.
 - `Hodge/Deep/Pillars/FedererFlemingImpl.lean:23-29` — `FlatLimitExistenceData.flat_limit_existence` (Federer–Fleming compactness in flat norm).
 - `Hodge/Deep/Pillars/HarveyLawsonImpl.lean:23-27` — `CalibratedCurrentRegularityData.support_is_analytic_zero_locus` (Harvey–Lawson regularity).
@@ -148,11 +186,22 @@ and must remain unimported by the proof track (`Hodge/Main.lean`, `Hodge.lean`).
 
 ### Target 1 status (PD regularization) — ❌ BLOCKED
 
-- Missing infrastructure: chart-level pullback/pushforward (or equivalent localization)
-  for `SmoothForm` and `Current`, needed to define `mollifyManifold`.
+- `SmoothForm` / `ContMDiffForm` pullback smoothness is now implemented in
+  `Hodge/WorkInProgress/Analytic/ContMDiffPullback.lean` and
+  `Hodge/WorkInProgress/Analytic/Pullback.lean`.
+- The honest local-current refactor is now in place:
+  `Hodge/WorkInProgress/GMT/LocalCurrents.lean` defines the compactly supported
+  chart test-form comass and `LocalCurrent`, `CurrentPushforward.lean` builds the
+  chart pushforward into that interface, and `ManifoldMollifier.lean` now requires
+  an explicit `EuclideanCurrentRegularizationData n k` instead of fake model-space
+  geometry on `TangentModel n`.
+- Missing infrastructure is now more specific: a concrete Euclidean regularizer,
+  the chartwise-to-global mollifier construction built from it, the derivative-bound
+  proof still marked `sorry` in `chartDerivBound_bddAbove`, and the regularization
+  lemmas `poincareDualForm_data_isClosed` / `poincareDualForm_data_empty`.
 - The only related material is the TODO scaffold in
   `Hodge/Analytic/Stage2/IntegrationCurrentsManifoldSkeleton.lean`
-  (no real pullback or chart-localization yet).
+  (no real current localization / mollifier construction yet).
 - WIP scaffolds live in `Hodge/WorkInProgress/GMT/ManifoldMollifier.lean`
   and `Hodge/WorkInProgress/GMT/RegularizationLemmas.lean`.
 
@@ -166,6 +215,9 @@ list typeclass assumptions that appear in the statement of `hodge_conjecture_dat
 `hodge_conjecture_data` NOW HAS deep typeclass binders in its statement:
 - `[CycleClass.PoincareDualityFromCurrentsData n X p]` - Poincaré dual form from currents
 - `[SpineBridgeData_data n X p]` - Bridge between geometric class and representing form
+
+The active proof spine also now uses direct signed-cycle support data internally:
+- `SignedAlgebraicCycleSupportData n X p`
 
 **Why this change**: The semantic restoration (Phase 7) fixed `cycleClass_geom_data` to use the
 **real** `FundamentalClassSet_data(support)` definition instead of being an alias of `cycleClass`.

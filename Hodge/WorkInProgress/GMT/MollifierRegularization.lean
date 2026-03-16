@@ -14,6 +14,7 @@ variable {n : ℕ} {X : Type*} [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ
   [MollifierPartitionData n X]
 variable {k : ℕ}
 variable [ChartDerivBoundData n X k] [ChartSmoothData n X]
+  [EuclideanCurrentRegularizationData n k]
 
 /-- Mollifier regularization built from the manifold patching layer. -/
 def mollify (ε : ℝ) (T : Current n X k) : SmoothForm n X k :=

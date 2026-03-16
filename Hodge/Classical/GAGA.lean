@@ -734,15 +734,11 @@ theorem SignedAlgebraicCycle.cycleClass_geom_eq_representingForm_data {p : ℕ}
     [MeasurableSpace X] [BorelSpace X] [Nonempty X]
     [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
     [CycleClass.PoincareDualityFromCurrentsData n X p]
-    [AlgebraicSubvarietyClosedSubmanifoldData n X]
-    [SignedAlgebraicCycleSupportCodimData n X p]
+    [SignedAlgebraicCycleSupportData n X p]
     [SpineBridgeData_data n X p]
     (Z : SignedAlgebraicCycle n X p) :
     Z.cycleClass_geom_data = ofForm Z.representingForm Z.representingForm_closed :=
 by
-  -- Derive support data from algebraic subvariety data.
-  letI : SignedAlgebraicCycleSupportData n X p :=
-    instSignedAlgebraicCycleSupportData_ofAlgebraic (n := n) (X := X) (p := p)
   exact SpineBridgeData_data.fundamental_eq_representing
     (n := n) (X := X) (p := p) (Z := Z)
 
