@@ -12,14 +12,8 @@ These sorries live only in WIP files (`Hodge/WorkInProgress/**` or `Hodge/Deep/P
 and must remain unimported by the proof track (`Hodge/Main.lean`, `Hodge.lean`).
 
 - `Hodge/WorkInProgress/GMT/RegularizationLemmas.lean:17-23` — `CurrentRegularizationLemmas` instance (closedness on cycles + empty-carrier vanishing).
-- `Hodge/WorkInProgress/Analytic/Pullback.lean:36-42` — `smoothFormPullback` smoothness proof (chart-level pullback infrastructure).
-- `Hodge/WorkInProgress/Analytic/ContMDiffPullback.lean:20-26` — `ContMDiffForm.pullback` smoothness proof.
 - `Hodge/WorkInProgress/GMT/ManifoldMollifier.lean:45-52` — `chartDerivBound_bddAbove` (global bound still missing; local continuity added).
-- `Hodge/WorkInProgress/GMT/EuclideanCurrentRegularization.lean:12-18` — `EuclideanCurrentRegularizationData` (regularization interface on model space).
-- `Hodge/WorkInProgress/GMT/EuclideanCurrentRegularization.lean:24-30` — `instEuclideanCurrentRegularizationData` (definition by chartwise convolution).
-- `Hodge/WorkInProgress/Instances/EuclideanManifold.lean:28-30` — `instCompactSpace_TangentModel` (compactness placeholder).
-- `Hodge/WorkInProgress/Instances/EuclideanManifold.lean:32-46` — `instProjectiveComplexManifold_TangentModel` (projective manifold structure).
-- `Hodge/WorkInProgress/Instances/EuclideanManifold.lean:48-51` — `instKahlerManifold_TangentModel` (Kähler structure on model space).
+- `Hodge/WorkInProgress/GMT/ManifoldMollifier.lean:202-252` — `mollifyWeighted` smoothness proof (current `IsSmoothAlternating` uses analytic `⊤`, while the partition-of-unity lemma only yields `C^∞`).
 - `Hodge/WorkInProgress/Analytic/Integration/HausdorffIntegrationInst.lean:30-42` — `SubmanifoldIntegrationData` instance: finite Hausdorff measure, oriented integral, linearity/union/empty/bound, and Stokes.
 - `Hodge/Deep/Pillars/FedererFlemingImpl.lean:23-29` — `FlatLimitExistenceData.flat_limit_existence` (Federer–Fleming compactness in flat norm).
 - `Hodge/Deep/Pillars/HarveyLawsonImpl.lean:23-27` — `CalibratedCurrentRegularityData.support_is_analytic_zero_locus` (Harvey–Lawson regularity).
@@ -60,6 +54,10 @@ and must remain unimported by the proof track (`Hodge/Main.lean`, `Hodge.lean`).
   - **Signed cycle support data**: `SignedAlgebraicCycleSupportData` provides
     `ClosedSubmanifoldData` for the support of a signed algebraic cycle, enabling
     data‑first `cycleClass_geom_data` and `SpineBridgeData_data`.
+  - Update (2026-03-16): the active proof spine now depends on
+    `SignedAlgebraicCycleSupportData` directly. The weaker route through
+    `AlgebraicSubvarietyClosedSubmanifoldData` plus
+    `SignedAlgebraicCycleSupportCodimData` is no longer part of the main binder chain.
   - **REMAINING**: Need to provide global instances by proving:
     1. De Rham representability theorem (every closed current is cohomologous to a smooth form)
     2. Harvey-Lawson bridge theorem (for calibrated currents, the form equals the calibration)
@@ -78,9 +76,42 @@ and must remain unimported by the proof track (`Hodge/Main.lean`, `Hodge.lean`).
   - Missing lemmas:
     - `CurrentRegularizationLemmas.poincareDualForm_data_isClosed`
     - `CurrentRegularizationLemmas.poincareDualForm_data_empty`
-  - Blocker: requires a genuine current‑regularization operator (heat kernel/mollifier on charts
-    with partition of unity) plus **chart‑level pullback/pushforward for forms/currents** and
-    proofs of closedness on cycles and empty‑carrier vanishing.
+  - Update (2026-03-16): the form-side pullback infrastructure is now in place:
+    `ContMDiffForm.pullback.smooth'` is proved in
+    `Hodge/WorkInProgress/Analytic/ContMDiffPullback.lean`, and
+    `smoothFormPullback` now delegates through that result in
+    `Hodge/WorkInProgress/Analytic/Pullback.lean`.
+  - Update (2026-03-16): the chart-domain modeling blocker is now fixed in WIP code:
+    - `Hodge/WorkInProgress/GMT/LocalCurrents.lean` introduces compactly supported
+      chart test forms with their own comass and the honest `LocalCurrent` interface.
+    - `Hodge/WorkInProgress/GMT/CurrentPushforward.lean` now pushes global currents
+      to `LocalCurrent` rather than to the impossible type `Current n (TangentModel n) k`.
+    - `Hodge/WorkInProgress/GMT/EuclideanCurrentRegularization.lean` is now only an
+      interface on `ModelCurrent`; the fake `EuclideanManifold` placeholder file was deleted.
+  - Source-level modeling blocker that forced this refactor:
+    - `Hodge/Analytic/Currents.lean:52-67` hard-codes `Current` to ambient spaces with
+      `ProjectiveComplexManifold` / `KahlerManifold` / measurable structure, so the WIP
+      type `Current n (TangentModel n) k` only exists by way of placeholder instances.
+    - `Hodge/Analytic/Norms.lean:117-160` hard-codes the `SmoothForm` comass norm to
+      `[CompactSpace X]`, so the current pullback/pushforward API cannot be instantiated
+      honestly on the noncompact Euclidean model chart.
+  - Blocker: still requires a genuine Euclidean current‑regularization operator
+    `ModelCurrent n k → SmoothForm n (TangentModel n) k`, then the chartwise gluing
+    construction and proofs of closedness on cycles and empty‑carrier vanishing.
+
+- **Algebraic-support derivation path still has a modeling gap**
+  - Locations:
+    - `Hodge/Classical/GAGA.lean:31-37` (`AlgebraicSubvariety`)
+    - `Hodge/Classical/GAGA.lean:536-599` (`SignedAlgebraicCycleSupportCodimData`,
+      `support_data_of_algebraic`, `instSignedAlgebraicCycleSupportData_ofAlgebraic`)
+    - `Hodge/Deep/Pillars/AlgebraicSupportImpl.lean:35-84`
+  - Blocker type: `modeling gap`
+  - Source issue: `AlgebraicSubvariety.codim` is unconstrained metadata, so the carrier
+    does not determine codimension, while the off-spine derivation of
+    `SignedAlgebraicCycleSupportData` still relies on that codimension being intrinsic.
+  - Consequence: `algebraic_subvariety_admits_closed_submanifold_data` and
+    `algebraic_codimension_of_cycle_support` are not honest next theorem targets under
+    the current algebraic-subvariety model. They need a modeling refactor before proof work.
 - **Legacy set-based PD placeholder (`omegaPower`)**
   - Location: `Hodge/Classical/CycleClass.lean:140-210` (`omegaPower`)
   - Status: Compatibility‑only (no universal instance is provided; not used on the data‑first spine).
@@ -282,6 +313,33 @@ This change is deep and will require a staged migration (new `FiberAltR` / `Smoo
 - **Deep GAGA pillar stubs removed**
   - File: `Hodge/Deep/Pillars/GAGA.lean`
     - Removed `IsAlgebraicSetStrong` placeholder and `True` stubs; now uses `ChowGAGAData`.
+
+- **Algebraic support codimension is NOT determined by the current `AlgebraicSubvariety` definition**
+  - Status: ❌ MODELING BLOCKER (source-grounded, 2026-03-16)
+  - Location: `Hodge/Classical/GAGA.lean:31-38` (`structure AlgebraicSubvariety`)
+  - Problem:
+    - `AlgebraicSubvariety` currently stores
+      - `carrier : Set X`
+      - `codim : ℕ`
+      - `is_algebraic : IsAlgebraicSet n X carrier`
+    - The `codim` field is **free metadata**: it is not constrained by the carrier or by any
+      dimension theorem.
+    - This is reflected elsewhere in source:
+      - `serre_gaga` can build `carrier := V.carrier, codim := V.codim`
+      - `isAlgebraicSubvariety_union` sets `codim := min W1.codim W2.codim`
+      - `empty_set_is_algebraic` picks `codim := n`
+  - Consequence:
+    - `Hodge.Deep.Pillars.AlgebraicSupportImpl.algebraic_codimension_of_cycle_support`
+      is **not derivable from the current definitions alone**.
+    - Likewise, `AlgebraicSubvarietyClosedSubmanifoldData` currently asks for data in degree
+      `2 * (n - V.codim)`, so even the target degree depends on unconstrained metadata.
+  - Minimal real fix:
+    1. Refactor `AlgebraicSubvariety` so codimension is not arbitrary metadata.
+    2. Either make codimension a carrier-derived invariant, or store an explicit geometric
+       witness tying the chosen degree/codimension to the carrier.
+    3. Only after that does it make sense to try to prove
+       `algebraic_subvariety_admits_closed_submanifold_data` /
+       `algebraic_codimension_of_cycle_support`.
 
 ---
 

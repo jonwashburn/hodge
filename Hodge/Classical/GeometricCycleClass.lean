@@ -96,16 +96,13 @@ theorem spine_bridge_data
     [ChowGAGAData n X] {p : ℕ}
     [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
     [CycleClass.PoincareDualityFromCurrentsData n X p]
-    [AlgebraicSubvarietyClosedSubmanifoldData n X]
-    [SignedAlgebraicCycleSupportCodimData n X p]
+    [SignedAlgebraicCycleSupportData n X p]
     [SpineBridgeData_data n X p]
     (γ : SmoothForm n X (2 * p)) (hγ_closed : IsFormClosed γ)
     (_hγ_cone : isConePositive γ)
     (Z : SignedAlgebraicCycle n X p)
     (h_from_spine : Z.representingForm = γ) :
     Z.cycleClass_geom_data = ofForm γ hγ_closed := by
-  letI : SignedAlgebraicCycleSupportData n X p :=
-    instSignedAlgebraicCycleSupportData_ofAlgebraic (n := n) (X := X) (p := p)
   -- By data-first spine bridge: cycleClass_geom_data = ofForm representingForm
   have h1 := SpineBridgeData_data.fundamental_eq_representing
     (n := n) (X := X) (p := p) (Z := Z)
@@ -118,8 +115,7 @@ theorem spine_bridge_data_with_data
     [ChowGAGAData n X] {p : ℕ}
     [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
     [CycleClass.PoincareDualityFromCurrentsData n X p]
-    [AlgebraicSubvarietyClosedSubmanifoldData n X]
-    [SignedAlgebraicCycleSupportCodimData n X p]
+    [SignedAlgebraicCycleSupportData n X p]
     [SpineBridgeData_data n X p]
     (γ : SmoothForm n X (2 * p)) (hγ_closed : IsFormClosed γ)
     (_hγ_cone : isConePositive γ)
@@ -146,8 +142,7 @@ theorem tex_spine_full_data
     [ChowGAGAData n X] {p : ℕ}
     [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
     [CycleClass.PoincareDualityFromCurrentsData n X p]
-    [AlgebraicSubvarietyClosedSubmanifoldData n X]
-    [SignedAlgebraicCycleSupportCodimData n X p]
+    [SignedAlgebraicCycleSupportData n X p]
     [SpineBridgeData_data n X p]
     [CalibratedCurrentRegularityData n X (2 * (n - p))]
     [HarveyLawsonKingData n X (2 * (n - p))]
@@ -156,8 +151,6 @@ theorem tex_spine_full_data
     (hγ_cone : isConePositive γ) :
     ∃ (Z : SignedAlgebraicCycle n X p),
       Z.cycleClass_geom_data = ofForm γ hγ_closed := by
-  letI : SignedAlgebraicCycleSupportData n X p :=
-    instSignedAlgebraicCycleSupportData_ofAlgebraic (n := n) (X := X) (p := p)
   -- Use the data-first cone-positive construction (returns explicit support data).
   obtain ⟨Z, dataZ, hZ_form, hdataZ⟩ :=
     cone_positive_produces_cycle_support_data_eq

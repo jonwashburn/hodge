@@ -33,8 +33,7 @@ instance instHodgeConjectureAssumptions {p : ℕ} : HodgeConjectureAssumptions n
     toAutomaticSYRData := inferInstance
     toCurrentRegularizationData := inferInstance
     toPoincareDualityFromCurrentsData := inferInstance
-    toAlgebraicSubvarietyClosedSubmanifoldData := inferInstance
-    toSignedAlgebraicCycleSupportCodimData := inferInstance
+    toSignedAlgebraicCycleSupportData := inferInstance
     toSpineBridgeData_data := inferInstance
     toCalibratedCurrentRegularityData := inferInstance
     toHarveyLawsonKingData := inferInstance

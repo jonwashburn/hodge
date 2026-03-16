@@ -48,8 +48,15 @@ variable {n : ℕ} {X : Type u}
 The two core interfaces that must eventually be discharged by real proofs:
 -/
 
-abbrev PoincareDualityFromCurrents (p : ℕ) : Prop := CycleClass.PoincareDualityFromCurrentsData n X p
-abbrev SpineBridge : Prop := SpineBridgeData_data n X
+abbrev PoincareDualityFromCurrents (p : ℕ)
+    [Hodge.GMT.CurrentRegularizationData n X (2 * p)] :=
+  CycleClass.PoincareDualityFromCurrentsData n X p
+
+abbrev SpineBridge (p : ℕ)
+    [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
+    [CycleClass.PoincareDualityFromCurrentsData n X p]
+    [SignedAlgebraicCycleSupportData n X p] :=
+  SpineBridgeData_data n X p
 
 /-!
 ## Re-export (current proof-spine bridge hook)
@@ -59,13 +66,13 @@ It is *not* proved here; it is assumed via the `SpineBridgeData_data` interface.
 -/
 
 theorem cycleClass_geom_eq_representingForm_data {p : ℕ}
+    [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
     [CycleClass.PoincareDualityFromCurrentsData n X p]
-    [AlgebraicSubvarietyClosedSubmanifoldData n X]
-    [SignedAlgebraicCycleSupportCodimData n X p]
+    [SignedAlgebraicCycleSupportData n X p]
     [SpineBridgeData_data n X p]
     (Z : SignedAlgebraicCycle n X p) :
     Z.cycleClass_geom_data = ofForm Z.representingForm Z.representingForm_closed :=
-  SignedAlgebraicCycle.cycleClass_geom_eq_representingForm_data (n := n) (X := X) (Z := Z)
+  SpineBridgeData_data.fundamental_eq_representing (n := n) (X := X) (p := p) (Z := Z)
 
 end Hodge.Deep.PoincareDuality
 

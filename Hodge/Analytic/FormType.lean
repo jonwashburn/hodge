@@ -28,6 +28,14 @@ variable {n : ℕ} {X : Type u} [TopologicalSpace X]
   [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
   [IsManifold (𝓒_complex n) ⊤ X]
 
+/-- The smoothness order used for differential forms: `C^∞`, represented in
+`WithTop ℕ∞` as the inclusion of `⊤ : ℕ∞`. -/
+abbrev formSmoothness : WithTop ℕ∞ :=
+  (↑(⊤ : ℕ∞) : WithTop ℕ∞)
+
+@[simp] theorem formSmoothness_ne_zero : formSmoothness ≠ (0 : WithTop ℕ∞) := by
+  simp [formSmoothness]
+
 /-- A section of differential forms is "smooth" (C^∞) if the alternating map
 varies smoothly in `x`, as a map into the normed space of continuous alternating maps.
 
@@ -42,7 +50,7 @@ def IsSmoothAlternating (n : ℕ) (X : Type u)
     [TopologicalSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
     [IsManifold (𝓒_complex n) ⊤ X]
     (k : ℕ) (f : X → FiberAlt n k) : Prop :=
-  ContMDiff (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ⊤ f
+  ContMDiff (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) formSmoothness f
 
 @[ext]
 structure SmoothForm (n : ℕ) (X : Type u) (k : ℕ)
@@ -59,7 +67,7 @@ variable {n : ℕ} {X : Type u} [TopologicalSpace X]
 
 /-- The underlying `ContMDiff` smoothness proof from a `SmoothForm`. -/
 theorem smooth (ω : SmoothForm n X k) :
-    ContMDiff (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) ⊤ ω.as_alternating :=
+    ContMDiff (𝓒_complex n) 𝓘(ℝ, FiberAlt n k) formSmoothness ω.as_alternating :=
   ω.is_smooth
 
 end SmoothForm

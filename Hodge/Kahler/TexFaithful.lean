@@ -88,8 +88,7 @@ theorem hodge_conjecture_tex_faithful_data {p : ℕ}
     [SpineBridgeData_data n X]
     [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
     [CycleClass.PoincareDualityFromCurrentsData n X p]
-    [AlgebraicSubvarietyClosedSubmanifoldData n X]
-    [SignedAlgebraicCycleSupportCodimData n X p]
+    [SignedAlgebraicCycleSupportData n X p]
     -- Input form and hypotheses
     (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
     (h_rational : isRationalClass (ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :
@@ -97,8 +96,6 @@ theorem hodge_conjecture_tex_faithful_data {p : ℕ}
       cycleClass_geom_data (n := n) (X := X)
         (data := SignedAlgebraicCycle.support_data (n := n) (X := X) (p := p) Z) =
         ofForm γ h_closed := by
-  letI : SignedAlgebraicCycleSupportData n X p :=
-    instSignedAlgebraicCycleSupportData_ofAlgebraic (n := n) (X := X) (p := p)
   -- Use the signed decomposition
   let sd := signed_decomposition (n := n) (X := X) γ h_closed h_p_p h_rational
 
@@ -135,13 +132,10 @@ theorem tex_faithful_implies_main_data {p : ℕ}
     [ChowGAGAData n X] [SpineBridgeData_data n X]
     [Hodge.GMT.CurrentRegularizationData n X (2 * p)]
     [CycleClass.PoincareDualityFromCurrentsData n X p]
-    [AlgebraicSubvarietyClosedSubmanifoldData n X]
-    [SignedAlgebraicCycleSupportCodimData n X p]
+    [SignedAlgebraicCycleSupportData n X p]
     (γ : SmoothForm n X (2 * p)) (h_closed : IsFormClosed γ)
     (h_rational : isRationalClass (ofForm γ h_closed)) (h_p_p : isPPForm' n X p γ) :
     ∃ (Z : SignedAlgebraicCycle n X p), Z.RepresentsClass (ofForm γ h_closed) := by
-  letI : SignedAlgebraicCycleSupportData n X p :=
-    instSignedAlgebraicCycleSupportData_ofAlgebraic (n := n) (X := X) (p := p)
   obtain ⟨Z, hZ_geom⟩ :=
     hodge_conjecture_tex_faithful_data (n := n) (X := X)
       γ h_closed h_rational h_p_p
