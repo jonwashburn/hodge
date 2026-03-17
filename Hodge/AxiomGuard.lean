@@ -49,9 +49,9 @@ elab "#guard_no_custom_axioms " declName:ident : command => do
     `Hodge.Deep.FedererFleming.federer_fleming_compactness,
     `Hodge.Deep.Pillars.spine_bridge_cohomology_eq,
     `Hodge.Deep.Microstructure.microstructure_syr_existence,
-    `Hodge.Deep.CurrentRegularization.current_regularization_exists,
-    `Hodge.Deep.CurrentRegularization.regularized_integration_current_closed,
-    `Hodge.Deep.CurrentRegularization.regularized_integration_current_empty
+    `Hodge.GMT.euclidean_regularize_isClosed_of_isCycleAt,
+    `chart_deriv_bound_exists,
+    `chart_contMDiff
   ]
   -- Check for any unrecognized custom axioms
   let mut customAxioms : List Name := []

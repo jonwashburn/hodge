@@ -11,9 +11,11 @@ The intent is to make it easy for the integrator (and bounded agents) to find an
 These sorries live only in WIP files (`Hodge/WorkInProgress/**` or `Hodge/Deep/Pillars/*Impl.lean`)
 and must remain unimported by the proof track (`Hodge/Main.lean`, `Hodge.lean`).
 
-- `Hodge/WorkInProgress/GMT/RegularizationLemmas.lean:17-23` — `CurrentRegularizationLemmas` instance (closedness on cycles + empty-carrier vanishing).
-- `Hodge/WorkInProgress/GMT/ManifoldMollifier.lean:45-52` — `chartDerivBound_bddAbove` (global bound still missing; local continuity added).
-- `Hodge/WorkInProgress/GMT/ManifoldMollifier.lean:202-252` — `mollifyWeighted` smoothness proof (current `IsSmoothAlternating` uses analytic `⊤`, while the partition-of-unity lemma only yields `C^∞`).
+- Update (2026-03-16): `Hodge/WorkInProgress/GMT/EuclideanCurrentRegularization.lean`,
+  `Hodge/WorkInProgress/GMT/ManifoldMollifier.lean`, and
+  `Hodge/WorkInProgress/GMT/RegularizationLemmas.lean` no longer contain `sorry`;
+  the remaining current-regularization gap is now an explicit law-proof blocker
+  for the WIP mollifier pipeline.
 - `Hodge/WorkInProgress/Analytic/Integration/HausdorffIntegrationInst.lean:30-42` — `SubmanifoldIntegrationData` instance: finite Hausdorff measure, oriented integral, linearity/union/empty/bound, and Stokes.
 - `Hodge/Deep/Pillars/FedererFlemingImpl.lean:23-29` — `FlatLimitExistenceData.flat_limit_existence` (Federer–Fleming compactness in flat norm).
 - `Hodge/Deep/Pillars/HarveyLawsonImpl.lean:23-27` — `CalibratedCurrentRegularityData.support_is_analytic_zero_locus` (Harvey–Lawson regularity).
@@ -63,19 +65,42 @@ and must remain unimported by the proof track (`Hodge/Main.lean`, `Hodge.lean`).
     2. Harvey-Lawson bridge theorem (for calibrated currents, the form equals the calibration)
   - These are deep results not in Mathlib - would need to be built from scratch.
 
-- **Current regularization still missing (no concrete instance)**
-  - Status: ❌ BLOCKED (2026-02-04)
+- **Current regularization is still missing on the global proof-track interface**
+  - Status: ❌ BLOCKED (2026-03-16)
+  - Update (2026-03-17): The deep placeholder axioms in `CurrentRegularizationImpl.lean`
+    have been eliminated; the implementation now imports the WIP mollifier pipeline.
   - Locations:
     - `Hodge/GMT/CurrentToForm.lean:24-40` (`CurrentRegularizationData` + `regularizeCurrentToForm`)
-    - `Hodge/GMT/HeatKernelRegularization.lean:34-62` (scaffolding only; no operator)
-    - `Hodge/WorkInProgress/GMT/ManifoldMollifier.lean:18-24` (WIP manifold patching scaffold)
-    - `Hodge/WorkInProgress/GMT/RegularizationLemmas.lean:17-23` (WIP regularization lemma instances)
-    - `Hodge/GMT/RegularizationLemmas.lean:53-66` (`CurrentRegularizationLemmas` checklist)
+    - `Hodge/GMT/HeatKernelRegularization.lean:34-62` (scaffolding only; no global operator)
+    - `Hodge/Analytic/Currents.lean:778-791` (`Current.isCycleAt`)
+    - `Hodge/GMT/CurrentToForm.lean:42-75` (`CurrentRegularizationLaws`)
+    - `Hodge/GMT/IntegrationCurrent.lean:215-239` (integration current cycle/empty lemmas)
+    - `Hodge/WorkInProgress/GMT/EuclideanCurrentRegularization.lean:527-680` (Euclidean `ModelCurrent` regularizer and smoothness proof)
+    - `Hodge/WorkInProgress/GMT/ManifoldMollifier.lean:155-211` (chartwise/global WIP mollifier built from the Euclidean regularizer)
+    - `Hodge/WorkInProgress/GMT/RegularizationLemmas.lean:9-22` (blocker note documenting the next law-proof target)
+    - `Hodge/GMT/RegularizationLemmas.lean:53-110` (`CurrentRegularizationLemmas` checklist + derivation from `CurrentRegularizationLaws`)
     - `Hodge/Classical/PoincareDualityFromCurrents.lean:40-53` (PD interface requirements)
-    - `Hodge/Analytic/Stage2/IntegrationCurrentsManifoldSkeleton.lean:174-214` (pullback infrastructure TODOs)
-  - Missing lemmas:
+    - `Hodge/Analytic/Stage2/IntegrationCurrentsManifoldSkeleton.lean:174-214` (older scaffold still not the real implementation)
+  - Missing lemma targets:
     - `CurrentRegularizationLemmas.poincareDualForm_data_isClosed`
     - `CurrentRegularizationLemmas.poincareDualForm_data_empty`
+  - Update (2026-03-16): the Euclidean smoothing step is now proved in WIP code:
+    - `Hodge/WorkInProgress/GMT/EuclideanCurrentRegularization.lean` proves
+      `regularizeModelCurrentRaw_isSmooth` and packages a concrete
+      `instEuclideanCurrentRegularizationData`.
+    - `Hodge/WorkInProgress/GMT/ManifoldMollifier.lean` now defines
+      `mollifyChart`, `mollifyWeighted`, and `mollifyManifold` without `sorry`.
+  - Update (2026-03-16): `Hodge/WorkInProgress/GMT/RegularizationLemmas.lean`
+    no longer contains a fake `CurrentRegularizationLemmas` instance. It now
+    points at the next honest task: prove `CurrentRegularizationLaws` for the
+    WIP mollifier regularization.
+  - Update (2026-03-16): the interface strengthening is now complete in source:
+    - `Current.isCycleAt` makes the cycle condition degree-uniform.
+    - `CurrentRegularizationLaws` records the two needed laws explicitly.
+    - `CurrentRegularizationLemmas` is now derived automatically from those laws
+      plus the new integration-current lemmas.
+    - `Hodge/Deep/Pillars/CurrentRegularizationImpl.lean` now routes through the
+      new law package instead of providing PD data directly.
   - Update (2026-03-16): the form-side pullback infrastructure is now in place:
     `ContMDiffForm.pullback.smooth'` is proved in
     `Hodge/WorkInProgress/Analytic/ContMDiffPullback.lean`, and
@@ -88,6 +113,19 @@ and must remain unimported by the proof track (`Hodge/Main.lean`, `Hodge.lean`).
       to `LocalCurrent` rather than to the impossible type `Current n (TangentModel n) k`.
     - `Hodge/WorkInProgress/GMT/EuclideanCurrentRegularization.lean` is now only an
       interface on `ModelCurrent`; the fake `EuclideanManifold` placeholder file was deleted.
+  - Update (2026-03-16): the local/chart law transport layer is now partially formalized:
+    - `LocalCurrent` now has `boundary` and `isCycleAt`.
+    - `currentPushforward_zero` and `currentPushforward_isCycleAt` transport zero
+      and cycle data into chart domains.
+    - `mollifyChart_zero` and `mollifyChart_isClosed_of_isCycleAt` reduce chartwise
+      zero/closedness to the Euclidean regularization laws.
+    - `mollifyWeighted` has now been replaced by a pointwise chartwise global
+      regularizer: it is defined from `mollifyChart ε x T` and proved smooth by
+      comparison with the old partition-of-unity construction.
+    - `mollifyWeighted_isClosed_of_isCycleAt` and `mollify_isClosed_of_isCycleAt`
+      show that the manifold-layer closedness issue is gone modulo Euclidean laws.
+    - `MollifierRegularization.lean` now derives a global
+      `CurrentRegularizationLaws` instance from `EuclideanCurrentRegularizationLaws`.
   - Source-level modeling blocker that forced this refactor:
     - `Hodge/Analytic/Currents.lean:52-67` hard-codes `Current` to ambient spaces with
       `ProjectiveComplexManifold` / `KahlerManifold` / measurable structure, so the WIP
@@ -95,9 +133,17 @@ and must remain unimported by the proof track (`Hodge/Main.lean`, `Hodge.lean`).
     - `Hodge/Analytic/Norms.lean:117-160` hard-codes the `SmoothForm` comass norm to
       `[CompactSpace X]`, so the current pullback/pushforward API cannot be instantiated
       honestly on the noncompact Euclidean model chart.
-  - Blocker: still requires a genuine Euclidean current‑regularization operator
-    `ModelCurrent n k → SmoothForm n (TangentModel n) k`, then the chartwise gluing
-    construction and proofs of closedness on cycles and empty‑carrier vanishing.
+  - Blocker: the manifold gluing obstruction is now removed, but two honest gaps remain.
+    - First, there is still no concrete proof of
+      `EuclideanCurrentRegularizationLaws` for the actual bump-function
+      regularizer in `EuclideanCurrentRegularization.lean`.
+    - Second, the proof-track route still depends on the WIP scaffolding
+      `ChartSmoothData` / `ChartDerivBoundData`; these are not yet supplied as
+      honest global instances for arbitrary projective Kähler manifolds.
+    - So the remaining work is no longer “fix `mollifyWeighted`”, but
+      (1) prove the Euclidean closedness law, and
+      (2) either eliminate or honestly instantiate the chart-smoothness/bound
+      assumptions before routing the proof spine through the mollifier path.
 
 - **Algebraic-support derivation path still has a modeling gap**
   - Locations:

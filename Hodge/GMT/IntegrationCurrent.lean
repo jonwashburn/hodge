@@ -212,4 +212,33 @@ theorem integration_descends_to_cohomology (k : ℕ) (Z : Set X)
     (integration_descends_to_cohomology_data (n := n) (X := X) (k := k)
       (data := ClosedSubmanifoldStokesData.data (n := n) (X := X) (k := k + 1) (Z := Z)) η)
 
+/-- A closed-submanifold integration current is a cycle in every degree. -/
+theorem integrationCurrent_data_isCycleAt (p : ℕ)
+    (data : ClosedSubmanifoldData n X (2 * p)) :
+    (integrationCurrent_data (n := n) (X := X) p data).isCycleAt := by
+  cases p with
+  | zero =>
+      trivial
+  | succ p =>
+      have hdeg : 2 * Nat.succ p = (2 * p + 1) + 1 := by
+        omega
+      have hboundary :
+          Current.boundary (integrationCurrent_data (n := n) (X := X) (Nat.succ p) data) = 0 := by
+        ext ω
+        have h :=
+          integration_descends_to_cohomology_data (n := n) (X := X) (k := 2 * p + 1)
+            (data := hdeg ▸ data) ω
+        simpa [integrationCurrent_data, integrationCurrentK_data, Current.boundary_toFun] using h
+      simpa [Current.isCycleAt] using hboundary
+
+/-- If the carrier is empty, the integration current is the zero current. -/
+theorem integrationCurrent_data_eq_zero_of_carrier_eq_empty (p : ℕ)
+    (data : ClosedSubmanifoldData n X (2 * p)) (h : data.carrier = ∅) :
+    integrationCurrent_data (n := n) (X := X) p data = 0 := by
+  ext ω
+  change (integrationCurrentReal_data (n := n) (X := X) (k := 2 * p) data).toFun ω = 0
+  rw [integrationCurrentReal_data_toFun_eq]
+  simp [ClosedSubmanifoldData.toIntegrationData, ClosedSubmanifoldData.toOrientedData,
+    hausdorffIntegrate, h]
+
 end Hodge.GMT

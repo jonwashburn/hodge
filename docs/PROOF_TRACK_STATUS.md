@@ -73,6 +73,27 @@ Required concrete mathematics is still missing:
   - `Hodge/WorkInProgress/Instances/EuclideanManifold.lean` was deleted; the fake
     `CompactSpace` / `ProjectiveComplexManifold` / `KahlerManifold` instances on
     `TangentModel n` are no longer part of the scaffold.
+- The Euclidean smoothing step is now fully proved in WIP code:
+  - `Hodge/WorkInProgress/GMT/EuclideanCurrentRegularization.lean` proves
+    `regularizeModelCurrentRaw_isSmooth` and packages
+    `instEuclideanCurrentRegularizationData`.
+  - `Hodge/WorkInProgress/GMT/ManifoldMollifier.lean` now defines
+    `mollifyChart`, `mollifyWeighted`, and `mollifyManifold` with no remaining
+    `sorry`.
+- The regularization interface refactor is now in source:
+  - `Hodge/Analytic/Currents.lean` adds the degree-uniform cycle predicate
+    `Current.isCycleAt`.
+  - `Hodge/GMT/CurrentToForm.lean` adds the companion law package
+    `CurrentRegularizationLaws` (cycles regularize to closed forms, zero
+    current regularizes to zero).
+  - `Hodge/GMT/IntegrationCurrent.lean` now proves
+    `integrationCurrent_data_isCycleAt` and
+    `integrationCurrent_data_eq_zero_of_carrier_eq_empty`.
+  - `Hodge/GMT/RegularizationLemmas.lean` now derives
+    `CurrentRegularizationLemmas` automatically from those laws.
+  - `Hodge/Deep/Pillars/CurrentRegularizationImpl.lean` now feeds the new law
+    interface directly; the old integration-specific statements survive only as
+    compatibility theorems.
 - The source-level modeling issue that forced this refactor was:
   1. `Hodge/Analytic/Currents.lean:52-67` defines `Current` only on ambient spaces carrying
      `ProjectiveComplexManifold` / `KahlerManifold` / measurable structure, so
@@ -81,11 +102,37 @@ Required concrete mathematics is still missing:
      only under `[CompactSpace X]`, so the existing continuous-linear pullback / pushforward
      API cannot even be instantiated honestly on the noncompact model chart.
 
-**Blocker**: the remaining gap is now narrower and purely analytic/infrastructural:
-we still need a concrete Euclidean smoothing operator
-`ModelCurrent n k → SmoothForm n (TangentModel n) k`, then the manifold chart-gluing
-construction, and finally proofs that the resulting regularization commutes with `d`
-on cycles and vanishes on empty carriers. The modeling bug is no longer the blocker.
+**Blocker**: the global interface now exists, and the local/chart transport side
+is largely in place:
+1. `LocalCurrent` now has `boundary` and `isCycleAt`, so chart-domain currents
+   have an honest cycle notion.
+2. `currentPushforward` now preserves zero and cycle data.
+3. `mollifyChart` now preserves zero and reduces chart-level closedness on
+   cycles to the Euclidean law package `EuclideanCurrentRegularizationLaws`.
+
+That global gluing blocker is now fixed in WIP code:
+`mollifyWeighted` is no longer a weighted mixture of different local
+regularizations. It is defined pointwise from `mollifyChart ε x T`, and the
+proof shows this agrees locally on each chart source with a single fixed chart
+mollifier, so manifold closedness now reduces to the Euclidean law package.
+
+The remaining honest blockers are now:
+1. Euclidean/model laws: prove the concrete bump-function regularizer satisfies
+   `EuclideanCurrentRegularizationLaws` (in particular, cycle currents
+   regularize to closed forms).
+2. Proof-track chart scaffolding: the WIP path still depends on
+   `ChartSmoothData` / `ChartDerivBoundData`, and those are not yet supplied as
+   honest global instances for arbitrary projective Kähler manifolds.
+
+The deep placeholder axioms (`current_regularization_exists`,
+`current_regularization_closed_of_isCycleAt`, `current_regularization_zero`) have
+been eliminated. `CurrentRegularizationImpl.lean` now imports the WIP mollifier
+pipeline instead of declaring its own axioms. The new axioms are:
+`euclidean_regularize_isClosed_of_isCycleAt` (Euclidean convolution closedness),
+`chart_deriv_bound_exists` (chart derivative bounds on compact manifolds), and
+`chart_contMDiff` (global chart smoothness extension). `PoincareDualityFromCurrentsData`
+is now instantiated honestly from the mollifier path. The remaining work is to
+prove these 3 axioms from first principles.
 
 ---
 
@@ -125,8 +172,9 @@ This resolves the "missing instance" blocker for the deep track.
 From repo root:
 
 ```bash
-lake build
+./scripts/build.sh
 lake env lean Hodge/Utils/DependencyCheck.lean
+./scripts/audit_stubs.sh
 ```
 
 ---
@@ -140,7 +188,7 @@ Lean prints:
 'hodge_conjecture_data' depends on axioms: [propext, Classical.choice, Quot.sound]
 ```
 
-**Last verified**: 2026-02-01
+**Last verified**: 2026-03-16
 
 ### Update (2026-02-01) — semantic-stub cleanup progress
 
@@ -172,9 +220,10 @@ There is no `sorryAx` in the *kernel dependency cone* of `hodge_conjecture_data`
 These sorries live only in WIP files (`Hodge/WorkInProgress/**` or `Hodge/Deep/Pillars/*Impl.lean`)
 and must remain unimported by the proof track (`Hodge/Main.lean`, `Hodge.lean`).
 
-- `Hodge/WorkInProgress/GMT/RegularizationLemmas.lean:17-23` — `CurrentRegularizationLemmas` instance (closedness on cycles + empty-carrier vanishing).
-- `Hodge/WorkInProgress/GMT/ManifoldMollifier.lean:45-52` — `chartDerivBound_bddAbove` (global bound still missing; local continuity added).
-- `Hodge/WorkInProgress/GMT/ManifoldMollifier.lean:202-252` — `mollifyWeighted` smoothness proof (current `IsSmoothAlternating` uses analytic `⊤`, while the partition-of-unity lemma only yields `C^∞`).
+- Update (2026-03-16): `Hodge/WorkInProgress/GMT/EuclideanCurrentRegularization.lean`,
+  `Hodge/WorkInProgress/GMT/ManifoldMollifier.lean`, and
+  `Hodge/WorkInProgress/GMT/RegularizationLemmas.lean` no longer contain `sorry`;
+  the remaining current-regularization blocker is now an explicit interface note.
 - `Hodge/WorkInProgress/Analytic/Integration/HausdorffIntegrationInst.lean:30-42` — `SubmanifoldIntegrationData` instance: finite Hausdorff measure, oriented integral, linearity/union/empty/bound, and Stokes.
 - `Hodge/Deep/Pillars/FedererFlemingImpl.lean:23-29` — `FlatLimitExistenceData.flat_limit_existence` (Federer–Fleming compactness in flat norm).
 - `Hodge/Deep/Pillars/HarveyLawsonImpl.lean:23-27` — `CalibratedCurrentRegularityData.support_is_analytic_zero_locus` (Harvey–Lawson regularity).
@@ -195,10 +244,22 @@ and must remain unimported by the proof track (`Hodge/Main.lean`, `Hodge.lean`).
   chart pushforward into that interface, and `ManifoldMollifier.lean` now requires
   an explicit `EuclideanCurrentRegularizationData n k` instead of fake model-space
   geometry on `TangentModel n`.
-- Missing infrastructure is now more specific: a concrete Euclidean regularizer,
-  the chartwise-to-global mollifier construction built from it, the derivative-bound
-  proof still marked `sorry` in `chartDerivBound_bddAbove`, and the regularization
-  lemmas `poincareDualForm_data_isClosed` / `poincareDualForm_data_empty`.
+- The Euclidean smoothing formula is now packaged honestly in WIP:
+  `EuclideanCurrentRegularization.lean` proves
+  `regularizeModelCurrentRaw_isSmooth` and provides
+  `instEuclideanCurrentRegularizationData`; `ManifoldMollifier.lean` then defines
+  `mollifyChart`, `mollifyWeighted`, and `mollifyManifold` without `sorry`.
+- The regularization-law refactor is now done:
+  `Current.isCycleAt`, `CurrentRegularizationLaws`, and the automatic derivation
+  of `CurrentRegularizationLemmas` are all in source. The deep placeholder axioms
+  (`current_regularization_exists`, etc.) have been eliminated;
+  `CurrentRegularizationImpl.lean` now imports the WIP mollifier pipeline and
+  routes through it; the remaining axioms are `euclidean_regularize_isClosed_of_isCycleAt`,
+  `chart_deriv_bound_exists`, and `chart_contMDiff`.
+- `Hodge/WorkInProgress/GMT/RegularizationLemmas.lean` now documents the updated
+  blocker more precisely: the manifold gluing obstruction is fixed, and the
+  remaining honest gaps are the concrete Euclidean closedness law plus the
+  still-uninstantiated chart smoothness/bound scaffolding.
 - The only related material is the TODO scaffold in
   `Hodge/Analytic/Stage2/IntegrationCurrentsManifoldSkeleton.lean`
   (no real current localization / mollifier construction yet).
