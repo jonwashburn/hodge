@@ -147,4 +147,70 @@ noncomputable def currentPushforward (f : X → Y) (C : ℝ)
             _ ≤ |M| * (TestForm.comass ω * C') := habs
             _ = |M| * C' * TestForm.comass ω := by ring }
 
+theorem currentPushforward_congr (f g : X → Y) (hfg : f = g)
+    (C D : ℝ)
+    (hC : ∀ x, ‖mfderiv (𝓒_complex n) (𝓒_complex n) f x‖ ^ k ≤ C)
+    (hD : ∀ x, ‖mfderiv (𝓒_complex n) (𝓒_complex n) g x‖ ^ k ≤ D)
+    (hf : ContMDiff (𝓒_complex n) (𝓒_complex n) ⊤ f)
+    (hg : ContMDiff (𝓒_complex n) (𝓒_complex n) ⊤ g)
+    (T : Current n X k) :
+    currentPushforward (n := n) (k := k) (f := f) C hC hf T =
+      currentPushforward (n := n) (k := k) (f := g) D hD hg T := by
+  subst hfg
+  apply LocalCurrent.ext
+  intro ω
+  change T.toFun (TestForm.pullbackToSmooth (n := n) (k := k) f hf ω) =
+    T.toFun (TestForm.pullbackToSmooth (n := n) (k := k) f hg ω)
+  rw [Hodge.TestForm.pullbackToSmooth_congr (n := n) (k := k) (f := f) (g := f) rfl hf hg ω]
+
+@[simp] theorem currentPushforward_zero (f : X → Y) (C : ℝ)
+    (hC : ∀ x, ‖mfderiv (𝓒_complex n) (𝓒_complex n) f x‖ ^ k ≤ C)
+    (hf : ContMDiff (𝓒_complex n) (𝓒_complex n) ⊤ f) :
+    currentPushforward (n := n) (k := k) (f := f) C hC hf (0 : Current n X k) = 0 := by
+  ext ω
+  change (0 : Current n X k).toFun
+      (TestForm.pullbackToSmooth (n := n) (k := k) (f := f) hf ω) = 0
+  simpa using
+    (Current.zero_toFun (n := n) (X := X) (k := k)
+      (ω := TestForm.pullbackToSmooth (n := n) (k := k) (f := f) hf ω))
+
+theorem currentPushforward_isCycleAt (f : X → Y) (C : ℝ)
+    (hC : ∀ x, ‖mfderiv (𝓒_complex n) (𝓒_complex n) f x‖ ^ k ≤ C)
+    (hf : ContMDiff (𝓒_complex n) (𝓒_complex n) ⊤ f)
+    (T : Current n X k) (hT : T.isCycleAt) :
+    (currentPushforward (n := n) (k := k) (f := f) C hC hf T).isCycleAt := by
+  cases k with
+  | zero =>
+      trivial
+  | succ k' =>
+      have hcycle : Current.boundary T = 0 := by
+        simpa [Current.isCycleAt] using hT
+      rw [LocalCurrent.isCycleAt_succ_iff]
+      ext ω
+      have hcomm :
+          TestForm.pullbackToSmooth (n := n) (k := k' + 1) (f := f) hf
+              (Hodge.TestForm.smoothExtDeriv ω) =
+            _root_.smoothExtDeriv
+              (TestForm.pullbackToSmooth (n := n) (k := k') (f := f) hf ω) := by
+        simpa using
+          (Hodge.TestForm.pullbackToSmooth_smoothExtDeriv (n := n) (k := k') (f := f) hf ω)
+      calc
+        (LocalCurrent.boundary
+            (currentPushforward (n := n) (k := k' + 1) (f := f) C hC hf T)).toLinear ω
+            = T.toFun
+                (TestForm.pullbackToSmooth (n := n) (k := k' + 1) (f := f) hf
+                  (Hodge.TestForm.smoothExtDeriv ω)) := rfl
+        _ = T.toFun
+              (_root_.smoothExtDeriv
+                (TestForm.pullbackToSmooth (n := n) (k := k') (f := f) hf ω)) := by
+              rw [hcomm]
+        _ = (Current.boundary T).toFun
+              (TestForm.pullbackToSmooth (n := n) (k := k') (f := f) hf ω) := by
+              rw [Current.boundary_toFun]
+        _ = 0 := by
+              rw [hcycle]
+              simpa using
+                (Current.zero_toFun (n := n) (X := X) (k := k')
+                  (ω := TestForm.pullbackToSmooth (n := n) (k := k') (f := f) hf ω))
+
 end Hodge.GMT

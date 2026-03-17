@@ -65,4 +65,45 @@ class CurrentRegularizationLemmas (n : ℕ) (X : Type*) (p : ℕ)
     ∀ data : ClosedSubmanifoldData n X (2 * p),
       data.carrier = ∅ → CycleClass.poincareDualForm_data n X p data = 0
 
+theorem poincareDualForm_data_isClosed_of_regularizationLaws (n : ℕ) (X : Type*) (p : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X]
+    [CurrentRegularizationData n X (2 * p)]
+    [CurrentRegularizationLaws n X (2 * p)]
+    (data : ClosedSubmanifoldData n X (2 * p)) :
+    IsFormClosed (CycleClass.poincareDualForm_data n X p data) := by
+  rw [CycleClass.poincareDualForm_data_eq_regularizeCurrent]
+  exact regularizeCurrentToForm_isClosed_of_isCycleAt
+    (n := n) (X := X) (k := 2 * p)
+    (T := integrationCurrent_data (n := n) (X := X) p data)
+    (integrationCurrent_data_isCycleAt (n := n) (X := X) p data)
+
+theorem poincareDualForm_data_empty_of_regularizationLaws (n : ℕ) (X : Type*) (p : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X]
+    [CurrentRegularizationData n X (2 * p)]
+    [CurrentRegularizationLaws n X (2 * p)]
+    (data : ClosedSubmanifoldData n X (2 * p))
+    (h : data.carrier = ∅) :
+    CycleClass.poincareDualForm_data n X p data = 0 := by
+  rw [CycleClass.poincareDualForm_data_eq_regularizeCurrent]
+  rw [integrationCurrent_data_eq_zero_of_carrier_eq_empty (n := n) (X := X) (p := p) data h]
+  simpa using (regularizeCurrentToForm_zero (n := n) (X := X) (k := 2 * p))
+
+noncomputable instance instCurrentRegularizationLemmas_of_regularizationLaws
+    (n : ℕ) (X : Type*) (p : ℕ)
+    [MetricSpace X] [ChartedSpace (EuclideanSpace ℂ (Fin n)) X]
+    [IsManifold (𝓒_complex n) ⊤ X]
+    [ProjectiveComplexManifold n X] [KahlerManifold n X] [Nonempty X]
+    [MeasurableSpace X] [BorelSpace X]
+    [CurrentRegularizationData n X (2 * p)]
+    [CurrentRegularizationLaws n X (2 * p)] :
+    CurrentRegularizationLemmas n X p where
+  poincareDualForm_data_isClosed := poincareDualForm_data_isClosed_of_regularizationLaws n X p
+  poincareDualForm_data_empty := poincareDualForm_data_empty_of_regularizationLaws n X p
+
 end Hodge.GMT

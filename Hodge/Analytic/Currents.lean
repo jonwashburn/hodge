@@ -777,6 +777,19 @@ def boundary (T : Current n X (k + 1)) : Current n X k where
 
 def isCycle (T : Current n X (k + 1)) : Prop := T.boundary = 0
 
+/-- Degree-uniform cycle predicate for currents.
+
+For degree `0`, there is no boundary operator, so every `0`-current is treated as a cycle.
+For positive degree, this agrees with `Current.isCycle`. -/
+def isCycleAt : {k : ℕ} → Current n X k → Prop
+  | 0, _ => True
+  | _ + 1, T => Current.isCycle T
+
+@[simp] theorem isCycleAt_zero (T : Current n X 0) : T.isCycleAt := trivial
+
+@[simp] theorem isCycleAt_succ_iff (T : Current n X (k + 1)) :
+    T.isCycleAt ↔ Current.boundary T = 0 := Iff.rfl
+
 /-- ∂∂ = 0: boundary of boundary is zero. -/
 theorem boundary_boundary (T : Current n X (k + 2)) : (boundary (boundary T)) = 0 := by
   ext ω; show T.toFun (smoothExtDeriv (smoothExtDeriv ω)) = 0

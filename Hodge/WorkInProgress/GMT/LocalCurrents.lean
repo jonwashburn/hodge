@@ -249,6 +249,26 @@ noncomputable def smoothExtDeriv (ω : TestForm n X k) : TestForm n X (k + 1) :=
     ((smoothExtDeriv ω : TestForm n X (k + 1)) : SmoothForm n X (k + 1)) =
       _root_.smoothExtDeriv (ω : SmoothForm n X k) := rfl
 
+@[simp] theorem smoothExtDeriv_zero :
+    smoothExtDeriv (0 : TestForm n X k) = 0 := by
+  apply Subtype.ext
+  simp [smoothExtDeriv]
+
+@[simp] theorem smoothExtDeriv_add (ω η : TestForm n X k) :
+    smoothExtDeriv (ω + η) = smoothExtDeriv ω + smoothExtDeriv η := by
+  apply Subtype.ext
+  simp [smoothExtDeriv, _root_.smoothExtDeriv_add]
+
+@[simp] theorem smoothExtDeriv_smul_real (r : ℝ) (ω : TestForm n X k) :
+    smoothExtDeriv (r • ω) = r • smoothExtDeriv ω := by
+  apply Subtype.ext
+  simp [smoothExtDeriv, _root_.smoothExtDeriv_smul_real]
+
+@[simp] theorem smoothExtDeriv_extDeriv (ω : TestForm n X k) :
+    smoothExtDeriv (smoothExtDeriv ω) = 0 := by
+  apply Subtype.ext
+  simp [smoothExtDeriv, _root_.smoothExtDeriv_extDeriv]
+
 variable {Y : Type v} [TopologicalSpace Y]
   [ChartedSpace (EuclideanSpace ℂ (Fin n)) Y]
   [IsManifold (𝓒_complex n) ⊤ Y] [HasLocallyConstantCharts n Y]
@@ -285,6 +305,16 @@ noncomputable def pullbackToSmooth [CompactSpace X]
   simpa [pullbackToSmooth, smoothExtDeriv] using
     (smoothExtDeriv_pullback (n := n) (f := f)
       (ω := (ω : SmoothForm n Y k)) hf)
+
+theorem pullbackToSmooth_congr [CompactSpace X]
+    (f g : X → Y) (hfg : f = g)
+    (hf : ContMDiff (𝓒_complex n) (𝓒_complex n) ⊤ f)
+    (hg : ContMDiff (𝓒_complex n) (𝓒_complex n) ⊤ g)
+    (ω : TestForm n Y k) :
+    pullbackToSmooth (n := n) f hf ω = pullbackToSmooth (n := n) g hg ω := by
+  subst hfg
+  simpa [pullbackToSmooth] using
+    (SmoothForm.pullback_congr (n := n) (f := f) (g := f) rfl hf hg (ω : SmoothForm n Y k))
 
 /-- Pullback from a compact source has comass bounded by the source derivative bound. -/
 theorem pullbackToSmooth_norm_le [CompactSpace X] [Nonempty X]
@@ -379,6 +409,93 @@ noncomputable def toContinuousLinearMap (T : LocalCurrent n X k) :
 @[simp] theorem toContinuousLinearMap_apply (T : LocalCurrent n X k) (ω : Hodge.TestForm n X k) :
     T.toContinuousLinearMap ω = T.toLinear ω := by
   simp [toContinuousLinearMap, LinearMap.mkContinuousOfExistsBound_apply]
+
+end LocalCurrent
+
+namespace LocalCurrent
+
+@[ext] theorem ext {S T : LocalCurrent n X k} (h : ∀ ω, S.toLinear ω = T.toLinear ω) :
+    S = T := by
+  cases S with
+  | mk Sto Scom Sbd =>
+      cases T with
+      | mk Tto Tcom Tbd =>
+          have hto : Sto = Tto := by
+            ext ω
+            exact h ω
+          subst hto
+          have hcom : Scom = Tcom := by
+            apply Subsingleton.elim
+          subst hcom
+          have hbd : Sbd = Tbd := by
+            apply Subsingleton.elim
+          subst hbd
+          rfl
+
+instance : Zero (LocalCurrent n X k) where
+  zero :=
+    { toLinear := 0
+      comass_bound := by
+        refine ⟨0, ?_⟩
+        intro ω
+        simp [Hodge.TestForm.comass_nonneg]
+      boundary_bound := by
+        cases k with
+        | zero =>
+            trivial
+        | succ k' =>
+            refine ⟨0, ?_⟩
+            intro ω
+            simp [Hodge.TestForm.comass_nonneg] }
+
+@[simp] theorem zero_toLinear (ω : Hodge.TestForm n X k) :
+    (0 : LocalCurrent n X k).toLinear ω = 0 := rfl
+
+/-- Boundary of a local current, defined using compactly supported test forms. -/
+def boundary (T : LocalCurrent n X (k + 1)) : LocalCurrent n X k where
+  toLinear :=
+    { toFun := fun ω => T.toLinear (Hodge.TestForm.smoothExtDeriv ω)
+      map_add' := by
+        intro ω₁ ω₂
+        simp
+      map_smul' := by
+        intro r ω
+        simp }
+  comass_bound := by
+    simpa using T.boundary_bound
+  boundary_bound := by
+    cases k with
+    | zero =>
+        trivial
+    | succ k' =>
+        refine ⟨0, ?_⟩
+        intro ω
+        simp [Hodge.TestForm.comass_nonneg]
+
+@[simp] theorem boundary_toLinear (T : LocalCurrent n X (k + 1)) (ω : Hodge.TestForm n X k) :
+    (boundary T).toLinear ω = T.toLinear (Hodge.TestForm.smoothExtDeriv ω) := rfl
+
+/-- Positive-degree local currents with vanishing boundary. -/
+def isCycle (T : LocalCurrent n X (k + 1)) : Prop := boundary T = 0
+
+/-- Degree-uniform cycle predicate for local currents. -/
+def isCycleAt : {k : ℕ} → LocalCurrent n X k → Prop
+  | 0, _ => True
+  | _ + 1, T => isCycle T
+
+@[simp] theorem isCycleAt_zero (T : LocalCurrent n X 0) : T.isCycleAt := trivial
+
+@[simp] theorem isCycleAt_succ_iff (T : LocalCurrent n X (k + 1)) :
+    T.isCycleAt ↔ LocalCurrent.boundary T = 0 := Iff.rfl
+
+@[simp] theorem boundary_zero : boundary (0 : LocalCurrent n X (k + 1)) = 0 := by
+  ext ω
+  simp [boundary]
+
+theorem boundary_boundary (T : LocalCurrent n X (k + 2)) :
+    boundary (boundary T) = 0 := by
+  ext ω
+  simp [boundary]
 
 end LocalCurrent
 

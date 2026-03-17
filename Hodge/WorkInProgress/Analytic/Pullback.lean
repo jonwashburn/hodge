@@ -116,4 +116,22 @@ variable [HasLocallyConstantCharts n X] [HasLocallyConstantCharts n Y]
   simp [fiberPullback,
     ContinuousAlternatingMap.compContinuousLinearMap_apply]
 
+theorem pullback_congr (f g : X → Y)
+    (hfg : f = g)
+    (hf : ContMDiff (𝓒_complex n) (𝓒_complex n) ⊤ f)
+    (hg : ContMDiff (𝓒_complex n) (𝓒_complex n) ⊤ g)
+    (ω : SmoothForm n Y k) :
+    smoothFormPullback (n := n) f hf ω = smoothFormPullback (n := n) g hg ω := by
+  subst hfg
+  ext x v
+  rfl
+
+theorem isFormClosed_pullback (f : X → Y) (ω : SmoothForm n Y k)
+    (hf : ContMDiff (𝓒_complex n) (𝓒_complex n) ⊤ f) (hω : IsFormClosed ω) :
+    IsFormClosed (smoothFormPullback (n := n) f hf ω) := by
+  unfold IsFormClosed at *
+  rw [← smoothExtDeriv_pullback (n := n) (f := f) (ω := ω) hf]
+  rw [hω]
+  simpa using (pullback_zero (n := n) (f := f) (k := k + 1) hf)
+
 end SmoothForm
