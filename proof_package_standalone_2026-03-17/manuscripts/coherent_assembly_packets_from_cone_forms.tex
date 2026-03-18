@@ -1,0 +1,816 @@
+\documentclass[11pt]{article}
+
+\usepackage{amsmath,amssymb,amsthm,mathtools,geometry}
+\geometry{margin=1in}
+
+\title{Coherent discretization of strongly positive forms\\by vertex-prefix face balancing}
+\author{Jonathan Washburn\\
+Recognition Science\\
+Recognition Physics Institute\\
+Austin, Texas, USA\\
+\texttt{jon@recognitionphysics.org}}
+\date{March 2026}
+
+\numberwithin{equation}{section}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\DeclareMathOperator{\Mass}{Mass}
+\DeclareMathOperator{\spt}{spt}
+\DeclareMathOperator{\diam}{diam}
+\DeclareMathOperator{\PD}{PD}
+\DeclareMathOperator{\HS}{HS}
+\DeclareMathOperator{\Gr}{Gr}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\mhol}{m_{\mathrm{hol}}}
+\newcommand{\calQ}{\mathcal{Q}}
+\newcommand{\calA}{\mathcal{A}}
+\newcommand{\calF}{\mathcal{F}}
+\newcommand{\calH}{\mathcal{H}}
+\newcommand{\calO}{\mathcal{O}}
+\newcommand{\calV}{\mathcal{V}}
+\newcommand{\Defcal}{\mathrm{Def}_{\mathrm{cal}}}
+\newcommand{\Bary}{\operatorname{Bar}}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Let $\beta$ be a smooth closed uniformly positive strongly positive $(p,p)$-form with rational cohomology class on a smooth complex projective manifold.  We construct, on any sufficiently fine cubical mesh, a coherent assembly packet: a fractional bookkeeping current built from holomorphic complete-intersection atoms, satisfying cube-wise mass and barycenter estimates, a global boundary flat-norm bound uniform over all marginal on/off choices, and a marginal period bound.  The construction has three layers: a Carath\'eodory decomposition with Lipschitz-stable globally labeled weights; a local realization step that splits each direction budget over the vertices of the cube and feeds the resulting repeated-parameter lists into the local manufacturing theorem of Paper~I~\cite[Thm.~1.1]{Washburn26I}; and a global coherence mechanism based on shared vertex prefixes and explicit edge bookkeeping on the faces.  On each interior face the common prefix at every shared vertex cancels exactly, while the unmatched tail is an $O(h)$ fraction of the total face mass by slow variation of the rounded vertex counts.  Edge-capped model cycles convert that tail bound into a flat-norm estimate.  The exported packet satisfies three quantitative axioms for all $1\le p<n$ under the scale regime $s=h^\alpha$ with $\alpha>2n/(2n-2p)$.  This paper does not by itself construct closed cycles, does not perform exact-class locking, and does not prove the Hodge conjecture; it exports the packet consumed by Papers~III and~IV.
+\end{abstract}
+
+\section{Introduction}
+
+Fix a smooth complex projective manifold $X$ of complex dimension $n$, an ample line bundle $L\to X$ with curvature form $\omega$, and an integer $p$ with $1\le p<n$.  Write
+\[
+k:=2n-2p,
+\qquad
+\psi:=\frac{\omega^{n-p}}{(n-p)!}.
+\]
+Let $\beta$ be a smooth closed strongly positive $(p,p)$-form with rational cohomology class, and assume there exists $\tau_\beta>0$ such that
+\[
+\langle\beta(x),\psi_x\rangle\ge \tau_\beta
+\qquad (x\in X).
+\]
+Choose $m\ge 1$ so that $m[\beta]\in H^{2p}(X,\Z)$ modulo torsion, and set
+\[
+A:=\PD(m[\beta])\in H_k(X,\Z)/\mathrm{tors},
+\qquad
+c_0:=m\int_X \beta\wedge\psi.
+\]
+
+Paper~I of this series~\cite[Thm.~1.1]{Washburn26I} manufactures, on any single coordinate cube, holomorphic complete-intersection pieces that realize prescribed calibrated directions and mass fractions.  Paper~III~\cite[Thm.~1.1]{Washburn26III} takes a coherent assembly packet---a mesh of such local pieces satisfying three quantitative axioms---and produces closed integral cycles in the target homology class modulo torsion with vanishing calibration defect.  Neither paper constructs the packet from $\beta$.  That is the job of the present paper.
+
+The construction proceeds in three layers.
+
+\smallskip\noindent
+\textbf{Layer 1: Carath\'eodory decomposition and Lipschitz weights.}
+At each point $x\in X$, the cone-valued form $\beta(x)$ is decomposed as a convex combination of at most $N(n,p)$ extremal rays of the strongly positive cone.  Because $\langle\beta,\psi\rangle$ stays uniformly positive, the normalized direction field is smooth; a finite $\eps$-net of calibrated directions then provides a globally labeled dictionary, and a regularized projection onto the probability simplex produces weights that vary by $O(h)$ between adjacent mesh cells.
+
+\smallskip\noindent
+\textbf{Layer 2: Local realization via Paper~1.}
+On each cube $Q$, the Carath\'eodory data provide the direction list, weights, and mass budget required by Paper~1.  Each direction budget is split evenly among the vertices of $Q$, and each vertex family is realized by repeating one vertex-anchored corner-exit parameter.  Integer rounding of those vertex budgets then produces a fractional bookkeeping current with at most one fractional sheet on each vertex-direction family.
+
+\smallskip\noindent
+\textbf{Layer 3: Global coherence via vertex prefixes.}
+Adjacent cubes compare their data face-by-face.  Only the vertices of the shared face can contribute there, and at each such vertex both cubes use prefixes of the same ordered corner-exit family.  The common prefix therefore cancels exactly.  The unmatched tail is controlled by the $O(h)$ slow variation of the rounded vertex counts, and explicit edge caps turn the corresponding face traces into cycles of diameter $O(s)$.  This yields a boundary flat norm tending to zero once $s=h^\alpha$ is chosen with $\alpha>2n/k$.
+
+\medskip
+
+The main theorem is the following.
+
+\medskip
+
+\noindent\textbf{What this paper does not prove.}
+It does not construct closed cycles, does not impose exact-class locking, does not extract a calibrated limit, and does not prove algebraicity or the Hodge conjecture.  Its sole role is to produce the assembly packet imported by Paper~III and then by the capstone paper~\cite{Washburn26IV}.
+
+\medskip
+
+\noindent\textbf{Notation for the theorem.}
+Here $\calF$ denotes the Federer--Fleming flat norm, $\Bary$ is the normalized tangent barycenter of the per-cube fractional current, and $\|\cdot\|_{\HS}$ is the Hilbert--Schmidt norm in the fixed local tensor model used on each cube.
+
+\begin{theorem}[Assembly packet existence]\label{thm:main}
+Let $\beta$ be a smooth closed strongly positive $(p,p)$-form on $X$ with rational cohomology class, and assume there exists $\tau_\beta>0$ such that
+\[
+\langle\beta(x),\psi_x\rangle\ge \tau_\beta
+\qquad (x\in X).
+\]
+Fix smooth closed $k$-forms $\Theta_1,\dots,\Theta_b$ representing an integral basis of the free part of $H^k(X,\Z)$.
+
+Then for every sufficiently small mesh size $h>0$ there exists an assembly packet at scale $h$ for $\beta$ satisfying the three hypotheses imported as Paper~II, Theorem~1.1 in Paper~III~\cite[Thm.~1.1]{Washburn26III}, unconditionally for all $1\le p<n$.  Explicitly:
+\begin{enumerate}
+\item[\textnormal{(A1)}] There is a mesh $\calQ_h$ of coordinate cubes, a choice of basepoint $x_Q\in Q$ for each cube, and a fractional bookkeeping current
+\[
+S_h^{\mathrm{frac}}=S_h^0+\sum_{\alpha\in\calA_h} a_{\alpha,h} Z_{\alpha,h},
+\qquad
+0\le a_{\alpha,h}<1,
+\]
+where $S_h^0$ is integral and each $Z_{\alpha,h}$ is an integral $\psi$-calibrated current supported in one cube, with cube-wise mass and barycenter estimates
+\[
+\sum_{Q\in\calQ_h} e_{Q,h}\longrightarrow 0,
+\qquad
+\sup_{Q\in\calQ_h}\eta_{Q,h}\longrightarrow 0
+\qquad (h\downarrow 0).
+\]
+
+\item[\textnormal{(A2)}] The packet is globally coherent across labels: there exists $\delta_h\downarrow 0$ such that for every choice of on/off variables $\varepsilon_{\alpha,h}\in\{0,1\}$ the raw integral current $S_h(\varepsilon)$ satisfies
+\[
+\calF\bigl(\partial S_h(\varepsilon)\bigr)\le \delta_h.
+\]
+
+\item[\textnormal{(A3)}] Every marginal current $Z_{\alpha,h}$ satisfies
+\[
+\max_{1\le \ell\le b}\left|\int_{Z_{\alpha,h}}\Theta_\ell\right|\le C_0 h^k
+\]
+for a constant $C_0$ independent of $h$.
+\end{enumerate}
+\end{theorem}
+
+\begin{remark}
+The lower bound on $\langle\beta,\psi\rangle$ is exactly the regime used by the capstone paper: after signed decomposition one replaces an arbitrary Hodge class by a representative of the form $\alpha+N\omega^p$, which is uniformly separated from the boundary of the strongly positive cone on the compact manifold $X$.
+\end{remark}
+
+Theorem~\ref{thm:main} is the exact input required by Paper~III~\cite[Thm.~1.1]{Washburn26III}, which then produces the closed almost-calibrated cycles consumed by the capstone paper~\cite{Washburn26IV}.
+
+\section{Carath\'eodory decomposition}\label{sec:caratheodory}
+
+\subsection{Strongly positive cones and extremal rays}
+
+At each $x\in X$, let $\calV_x:=\Lambda^{p,p}(T_x^*X)_{\R}$ be the real vector space of real $(p,p)$-forms, and let $K_p(x)\subset \calV_x$ be the closed convex cone of strongly positive $(p,p)$-forms.  Each complex $(n-p)$-plane $P\subset T_xX$ determines an extremal ray of $K_p(x)$; let $\xi_P\in K_p(x)$ denote the generator normalized so that $\langle \xi_P,\psi_x\rangle=1$.
+
+Define
+\[
+t(x):=\langle \beta(x),\psi_x\rangle.
+\]
+By hypothesis there exists $\tau_\beta>0$ such that $t(x)\ge \tau_\beta$ on $X$.  We therefore set
+\[
+\widehat\beta(x):=\frac{\beta(x)}{t(x)},
+\]
+so $\widehat\beta$ is a smooth normalized strongly positive tensor field satisfying $\langle \widehat\beta(x),\psi_x\rangle=1$ everywhere.
+
+\begin{lemma}[Uniform Carath\'eodory decomposition]\label{lem:caratheodory}
+Set $D:=\dim_{\R}(\calV_x)=\binom{n}{p}^2$ and $N:=D+1$.  For every $x\in X$ with $\beta(x)\ne 0$, there exist complex $(n-p)$-planes $P_{x,1},\dots,P_{x,N}\subset T_xX$ and weights $\theta_{x,j}\ge 0$ with $\sum_{j=1}^N \theta_{x,j}=1$ such that
+\[
+\beta(x)=t(x)\sum_{j=1}^N \theta_{x,j}\,\xi_{P_{x,j}}.
+\]
+\end{lemma}
+
+\begin{proof}
+The normalized form $\widehat\beta(x)$ lies in the affine hyperplane $H_x:=\{v\in\calV_x:\langle v,\psi_x\rangle=1\}$.  The strongly positive cone intersected with $H_x$ is the convex hull of the set $\{\xi_P:P\in \Gr_{n-p}(T_xX)\}$; see Demailly~\cite[\S~III.1]{Demailly12} for the structure of the strongly positive cone.  Since $\dim(H_x)=D-1$, Carath\'eodory's theorem~\cite{Schneider14} yields a convex representation using at most $D$ vertices.  Padding with zero weights gives a representation with at most $N=D+1$ terms.  Multiplying by $t(x)$ recovers the decomposition of $\beta(x)$.
+\end{proof}
+
+\begin{remark}
+In the construction we only apply this decomposition at the finitely many cube basepoints $x_Q$, so no global measurable-selection or continuity-in-$x$ statement is needed.
+\end{remark}
+
+\subsection{Direction dictionary via an $\eps$-net}
+
+Fix a holomorphic atlas on $X$.  In each chart, calibrated directions are complex $(n-p)$-planes, and the calibrated Grassmannian $G_\C(n-p,n)$ is compact.
+
+\begin{definition}[Direction dictionary]\label{def:dictionary}
+For a scale parameter $\eps_h\ll h$, choose an $\eps_h$-net $\{P_1,\dots,P_M\}\subset G_\C(n-p,n)$ in each chart, with $M=M(\eps_h,n,p)$ uniformly bounded over the finite atlas.  The net is the \emph{direction dictionary}.
+
+After fixing the chartwise trivialization used for all later tensor comparisons,
+each dictionary element $P_i$ determines a fixed normalized tensor $\xi_i$ in one
+common finite-dimensional Hermitian model space for that chart.
+\end{definition}
+
+\begin{lemma}[Convex-hull approximation from an $\eps$-net]\label{lem:convex-net}
+Let $E$ be a compact subset of a normed vector space $V$, and let $D\subset E$ be an $\eps$-net for $E$.  Then every point $v\in \mathrm{conv}(E)$ admits a point $v_D\in \mathrm{conv}(D)$ such that
+\[
+\|v-v_D\|\le \eps.
+\]
+\end{lemma}
+
+\begin{proof}
+Write
+\[
+v=\sum_{a=1}^N \lambda_a e_a,
+\qquad
+\lambda_a\ge 0,
+\qquad
+\sum_{a=1}^N \lambda_a=1,
+\]
+with $e_a\in E$.  For each $a$, choose $d_a\in D$ with $\|e_a-d_a\|\le \eps$.  Set
+\[
+v_D:=\sum_{a=1}^N \lambda_a d_a\in \mathrm{conv}(D).
+\]
+Then
+\[
+\|v-v_D\|
+\le
+\sum_{a=1}^N \lambda_a\|e_a-d_a\|
+\le
+\eps\sum_{a=1}^N \lambda_a
+=
+\eps.
+\]
+\end{proof}
+
+By choosing $\eps_h$ small enough relative to $h$, every Carath\'eodory direction at a basepoint $x_Q$ is within $\eps_h$ of some dictionary entry.  The mesh will be chosen so fine that every closed face star lies in one holomorphic chart, and on each such face star the same chartwise dictionary is used.  In particular, adjacent cubes compare the same direction labels on their shared faces.
+
+\section{Lipschitz weights and stable labeling}\label{sec:lipschitz}
+
+The crucial requirement for global coherence is that adjacent cubes assign similar weights to each direction label.  Raw Carath\'eodory decompositions do not have this property, because the decomposition is not unique.  We force stability by a regularized projection.
+
+\begin{lemma}[Lipschitz weights from regularized simplex projection]\label{lem:lipschitz}
+Let $V$ be a finite-dimensional real inner-product space and let $\xi_1,\dots,\xi_M\in V$.  Let $\Delta_M$ be the probability simplex in $\R^M$.  Fix $\lambda>0$.  For each $b\in V$ define
+\[
+w(b):=\arg\min_{w\in\Delta_M}\;\frac12\Bigl\|\sum_{i=1}^M w_i\xi_i-b\Bigr\|^2+\frac{\lambda}{2}\|w\|^2.
+\]
+Then:
+\begin{enumerate}
+\item[\textnormal{(i)}] The minimizer $w(b)$ exists and is unique.
+\item[\textnormal{(ii)}] The map $b\mapsto w(b)$ is Lipschitz: writing $A:\R^M\to V$ for $Ae_i:=\xi_i$,
+\[
+\|w(b)-w(b')\|\le \frac{\|A\|_{\mathrm{op}}}{\lambda}\,\|b-b'\|
+\qquad\text{for all }b,b'\in V.
+\]
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+The objective is continuous and the simplex is compact, so a minimizer exists.  The objective is $\lambda$-strongly convex in $w$, so the minimizer is unique.
+
+Let $w=w(b)$ and $w'=w(b')$.  The first-order optimality conditions read
+\[
+0\in A^\top(Aw-b)+\lambda w + N_{\Delta_M}(w),
+\qquad
+0\in A^\top(Aw'-b')+\lambda w' + N_{\Delta_M}(w'),
+\]
+where $N_{\Delta_M}$ is the normal cone.  Choose subgradients $\nu\in N_{\Delta_M}(w)$ and $\nu'\in N_{\Delta_M}(w')$ realizing these inclusions.  Subtract and pair with $w-w'$:
+\[
+\langle A^\top A(w-w'),w-w'\rangle + \lambda\|w-w'\|^2 + \langle \nu-\nu',w-w'\rangle
+= \langle A^\top(b-b'),w-w'\rangle.
+\]
+Since $A^\top A$ is positive semidefinite and $N_{\Delta_M}$ is monotone, both extra terms on the left are nonneg\-ative.  Hence
+\[
+\lambda\|w-w'\|^2 \le \|A\|_{\mathrm{op}}\|b-b'\|\,\|w-w'\|.
+\]
+Cancel $\|w-w'\|$ (trivial if zero).
+\end{proof}
+
+\begin{proposition}[Globally labeled per-cube weights]\label{prop:global-weights}
+Fix a mesh-$h$ cubulation $\calQ_h$ subordinate to the holomorphic atlas, fine enough that every closed face star is contained in a single chart.  In each chart, fix a direction dictionary $\{P_1,\dots,P_M\}$ and the associated fixed tensors $\xi_1,\dots,\xi_M$ in the chartwise model space.  Apply Lemma~\ref{lem:lipschitz} in that fixed model space with $b(x)=\widehat\beta(x)$.
+
+Then for each cube $Q$ with basepoint $x_Q$, the weight vector $w_Q:=w(\widehat\beta(x_Q))\in\Delta_M$ satisfies:
+\begin{enumerate}
+\item[\textnormal{(i)}] $\|\sum_{i=1}^M (w_Q)_i\,\xi_i-\widehat\beta(x_Q)\|\le C\eps_h$ (approximation quality from the $\eps_h$-net);
+\item[\textnormal{(ii)}] for adjacent cubes $Q\sim Q'$, $\|w_Q-w_{Q'}\|\le C_L h$ where $C_L$ depends only on the Lipschitz constant of $\widehat\beta$ and the regularization parameter $\lambda$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+For part~(i), let
+\[
+E_Q:=\{\xi_P:P\in G_\C(n-p,n)\}
+\]
+inside the fixed chartwise model space.
+By Lemma~\ref{lem:caratheodory}, the normalized tensor $\widehat\beta(x_Q)$ lies in $\mathrm{conv}(E_Q)$.  The dictionary gives an $\eps_h$-net in the calibrated Grassmannian, hence in the fixed chartwise model space it gives a $C\eps_h$-net in $E_Q$ for a chart-dependent constant $C$.  Lemma~\ref{lem:convex-net} therefore produces a convex combination of dictionary generators within $C\eps_h$ of $\widehat\beta(x_Q)$.  Since $w_Q$ is the minimizer of the regularized least-squares functional over the simplex, its approximation error is no worse than that of this comparison convex combination.  Thus
+\[
+\Bigl\|\sum_{i=1}^M (w_Q)_i\,\xi_i-\widehat\beta(x_Q)\Bigr\|\le C\eps_h.
+\]
+Part~(ii) now follows directly from the Lipschitz bound in Lemma~\ref{lem:lipschitz}, because the operator $A$ determined by the fixed chartwise dictionary is the same for adjacent cubes in one face star.  Since $\widehat\beta$ is smooth, $\|\widehat\beta(x_Q)-\widehat\beta(x_{Q'})\|\le C_\beta h$ for adjacent cubes of side $h$, and the constant is uniform on the finite atlas.
+\end{proof}
+
+\begin{definition}[Per-cube target data]\label{def:target}
+For each cube $Q$ and direction label $i$, define the per-cube mass budget
+\[
+M_{Q,i}:=(w_Q)_i\cdot M_Q,
+\qquad
+M_Q:=m\int_Q \beta\wedge\psi,
+\]
+and the per-cube direction list $\{P_i:i\text{ with }(w_Q)_i>0\}$ with weights $\theta_{Q,i}:=(w_Q)_i$.  This is exactly the local target data required by Paper~I~\cite[Thm.~1.1]{Washburn26I}.
+\end{definition}
+
+\section{Local realization and fractional bookkeeping}\label{sec:local}
+
+\subsection{Feeding local data into Paper~1}
+
+The coherence mechanism will live at the vertices of the mesh.  We therefore split each per-cube direction budget evenly over the vertices of the cube and realize the corresponding sheets by vertex-anchored corner-exit templates.
+
+\begin{definition}[Per-cube per-vertex budgets]\label{def:vertex-budget}
+For each cube $Q$, direction label $i$, and vertex $v\in\mathrm{Vert}(Q)$, set
+\[
+M_{Q,v,i}:=2^{-2n}M_{Q,i}.
+\]
+Then
+\[
+\sum_{v\in\mathrm{Vert}(Q)} M_{Q,v,i}=M_{Q,i},
+\qquad
+\sum_{i=1}^M\sum_{v\in\mathrm{Vert}(Q)} M_{Q,v,i}=M_Q.
+\]
+\end{definition}
+
+\begin{lemma}[Vertex-anchored corner-exit families]\label{lem:vertex-template}
+Assume the mesh is fine enough that every closed vertex star lies in a single holomorphic chart.  Fix a mesh vertex $v$, a cube $Q\ni v$ inside that star, and a direction label $i$ from the chart dictionary.
+
+Then one may choose a distinguished translation parameter $t_{v,i}^\star$ with the following properties:
+\begin{enumerate}
+\item[\textnormal{(i)}] the flat footprint
+\[
+E_{Q,v,i}:=(P_i+v+t_{v,i}^\star)\cap Q
+\]
+is a corner-exit $k$-simplex contained in $B(v,c_0h)$;
+\item[\textnormal{(ii)}] $E_{Q,v,i}$ meets exactly the same set of $k+1$ codimension-$1$ faces of $Q$ through $v$ and no other codimension-$1$ faces;
+\item[\textnormal{(iii)}] for every face $F\subset\partial Q$, the model face current is the translated flat facet cut out by the chosen corner-exit template inside $F$, hence is independent of the multiplicity index; if $Q,Q'$ share an interior face $F$ with $v\in\mathrm{Vert}(F)$, then the two flat facets induced on $F$ coincide as currents on $F$, viewed with opposite boundary orientation from the two cubes.
+\end{enumerate}
+Repeated use of the same parameter is allowed.
+\end{lemma}
+
+\begin{proof}
+Paper~1 proves two ingredients used here directly: a concrete corner-exit simplex in the model cube and a direction-adapted version for every label in the finite dictionary.  The flat geometry is arranged by transporting the corner-exit model to the mesh vertex $v$ and choosing the same repeated parameter $t_{v,i}^\star$ throughout the $v$-anchored family.  Because the designated face combinatorics are unchanged under repetition, every multiplicity copy has the same flat facet on each designated face.
+
+If $Q$ and $Q'$ share a face $F$ through $v$, the two cubes differ only in the one orthant coordinate normal to $F$.  The corner-exit footprints are cut out near $v$ by the same tangential orthant inequalities together with the same slanted affine inequality attached to the chosen parameter $t_{v,i}^\star$.  Restricting from $Q$ or $Q'$ to the face $F$ simply sets the normal coordinate to zero, so the tangential inequalities defining the facet on $F$ are identical on both sides.  Hence the two cubes induce the same flat facet current on $F$, with opposite boundary orientation.
+\end{proof}
+
+For each cube $Q\in\calQ_h$, the per-cube target data of Definition~\ref{def:target} and the vertex budgets of Definition~\ref{def:vertex-budget} provide the input to the local holomorphic microstructure theorem (Paper~I, Theorem~1.1~\cite{Washburn26I}): a finite list of calibrated directions, nonneg\-ative weights summing to $1$, a local mass budget, and a repeated-parameter list indexed by the vertices of the cube.
+
+\begin{proposition}[Per-cube realization in multiplicity form]\label{prop:per-cube}
+Fix $\delta\in(0,1)$.  Choose the holomorphic scale parameter $s\ll h$, the dictionary scale $\eps_h\le \delta$, and the local graph tolerance $\eps_{\mathrm{hol}}\le \delta$ so that the reference sheet mass $A_i(s)\asymp s^k$ satisfies
+\[
+\sum_{i=1}^M\sum_{v\in\mathrm{Vert}(Q)} A_i(s)\le \frac{\delta}{2}\max\{M_Q,h^{2n}\}
+\]
+for every cube $Q$.  For each $Q$ and each active direction $i$ (with $\theta_{Q,i}>0$), set
+\[
+N_{Q,v,i}:=\left\lfloor\frac{M_{Q,v,i}}{A_i(s)}\right\rceil
+\qquad
+(v\in\mathrm{Vert}(Q)).
+\]
+Apply Paper~1 at scale $s$ using, for each direction label $i$, the repeated parameter list obtained by repeating the vertex-anchored parameter $t_{v,i}^\star$ exactly $N_{Q,v,i}$ times for every vertex $v\in\mathrm{Vert}(Q)$.  Denote the resulting sheets by $S_{Q,v,i}^{(a)}$.
+
+Define
+\[
+S_Q:=\sum_{i=1}^M\sum_{v\in\mathrm{Vert}(Q)}\sum_{a=1}^{N_{Q,v,i}} [S_{Q,v,i}^{(a)}].
+\]
+Then $S_Q$ is $\psi$-calibrated and satisfies
+\[
+|\Mass(S_Q)-M_Q|\le \delta\max\{M_Q,h^{2n}\},
+\qquad
+\|\Bary(S_Q)-\widehat\beta(x_Q)\|_{\HS}\le C\delta.
+\]
+\end{proposition}
+
+\begin{proof}
+The mass estimate follows from nearest-integer rounding:
+\[
+|N_{Q,v,i}A_i(s)-M_{Q,v,i}|\le \frac12 A_i(s).
+\]
+Summing over all active labels and vertices gives total error
+\[
+\le \sum_{i=1}^M\sum_{v\in\mathrm{Vert}(Q)} A_i(s)\le \frac\delta2\max\{M_Q,h^{2n}\}.
+\]
+The per-sheet mass deviation from Paper~1 contributes at most $C\eps_{\mathrm{hol}}M_{Q,v,i}$ on each vertex family, hence at most $C\eps_{\mathrm{hol}}M_Q$ in total, which is absorbed into $\delta$ because $\eps_{\mathrm{hol}}\le\delta$.
+
+The barycenter estimate is unchanged by the vertex split: every copy in the $(v,i)$th family has tangent planes within $\eps_{\mathrm{hol}}$ of the prescribed direction $P_i$, and the realized direction masses differ from $M_{Q,i}$ by at most $C\delta\max\{M_Q,h^{2n}\}$.  The triangle inequality gives
+\[
+\|\Bary(S_Q)-\widehat\beta(x_Q)\|_{\HS}\le C(\delta+\eps_{\mathrm{hol}}+\eps_h)\le C'\delta.
+\]
+\end{proof}
+
+\subsection{Fractional bookkeeping current}
+
+\begin{definition}[Fractional bookkeeping current]\label{def:fractional}
+For each direction $i$, cube $Q$, and vertex $v\in\mathrm{Vert}(Q)$, write
+\[
+n_{Q,v,i}:=\frac{M_{Q,v,i}}{A_i(s)},
+\qquad
+B_{Q,v,i}:=\lfloor n_{Q,v,i}\rfloor,
+\qquad
+a_{Q,v,i}:=n_{Q,v,i}-B_{Q,v,i}\in[0,1).
+\]
+The \emph{base current} is
+\[
+S_h^0:=\sum_{Q}\sum_{i}\sum_{v\in\mathrm{Vert}(Q)}\sum_{a=1}^{B_{Q,v,i}} [S_{Q,v,i}^{(a)}].
+\]
+For each triple $(Q,v,i)$ with $a_{Q,v,i}>0$, the \emph{marginal current} is
+\[
+Z_{Q,v,i}:=[S_{Q,v,i}^{(B_{Q,v,i}+1)}],
+\]
+with marginal coefficient $a_{Q,v,i}$.  The \emph{fractional bookkeeping current} is
+\[
+S_h^{\mathrm{frac}}:=S_h^0+\sum_{(Q,v,i)\in\calA_h} a_{Q,v,i}\,Z_{Q,v,i}.
+\]
+Here
+\[
+\calA_h:=\{(Q,v,i):a_{Q,v,i}>0\},
+\]
+so $\calA_h$ records exactly one possible marginal sheet for each vertex-direction family.
+\end{definition}
+
+\begin{definition}[Raw rounded counts]\label{def:rounded-counts}
+For a choice of on/off variables
+\[
+\varepsilon=(\varepsilon_{Q,v,i})_{(Q,v,i)\in\calA_h}\in\{0,1\}^{\calA_h},
+\]
+set
+\[
+\widetilde N_{Q,v,i}(\varepsilon):=B_{Q,v,i}+\varepsilon_{Q,v,i},
+\]
+with the convention $\varepsilon_{Q,v,i}=0$ when $(Q,v,i)\notin\calA_h$.  The associated raw rounded current is
+\[
+S_h(\varepsilon):=\sum_Q S_Q(\varepsilon),
+\]
+\[
+S_Q(\varepsilon):=\sum_{i=1}^M\sum_{v\in\mathrm{Vert}(Q)}\sum_{a=1}^{\widetilde N_{Q,v,i}(\varepsilon)} [S_{Q,v,i}^{(a)}].
+\]
+This is exactly the integral current obtained from $S_h^{\mathrm{frac}}$ by turning each marginal sheet fully off or fully on.
+\end{definition}
+
+\begin{proposition}[Cube-wise estimates for the fractional current]\label{prop:cube-estimates}
+With $\delta=\delta(h)\to 0$ chosen so that the scale condition in Proposition~\ref{prop:per-cube} holds for every cube $Q$ and all sufficiently small $h$ (for example, after fixing $s=h^\alpha$ with $\alpha>2n/k$, choose any exponent $0<\beta_\ast<\alpha k-2n$ and set $\delta(h):=h^{\beta_\ast}$, then choose $\eps_h:=h\delta(h)$ and $\eps_{\mathrm{hol}}\le \delta(h)$), the cube-wise restrictions $S_{Q,h}^{\mathrm{frac}}$ satisfy
+\[
+e_{Q,h}:=|\Mass(S_{Q,h}^{\mathrm{frac}})-M_Q|\le C\delta(h)\max\{M_Q,h^{2n}\},
+\]
+\[
+\eta_{Q,h}:=\|\Bary(S_{Q,h}^{\mathrm{frac}})-\widehat\beta(x_Q)\|_{\HS}\le C\delta(h).
+\]
+In particular,
+\[
+\sum_{Q\in\calQ_h} e_{Q,h}\le C\delta(h)(c_0+1)\longrightarrow 0,
+\qquad
+\sup_{Q\in\calQ_h}\eta_{Q,h}\le C\delta(h)\longrightarrow 0.
+\]
+This verifies axiom \textnormal{(A1)}.
+\end{proposition}
+
+\begin{proof}
+The fractional current $S_{Q,h}^{\mathrm{frac}}$ differs from the fully rounded current $S_Q$ by at most one sheet on each vertex-direction family, contributing mass $O(A_i(s))$ per family.  The total over all labels and vertices is
+\[
+\sum_{i=1}^M\sum_{v\in\mathrm{Vert}(Q)} A_i(s)\le \frac\delta2\max\{M_Q,h^{2n}\}
+\]
+by the scale choice.  The barycenter is affected by at most $O(\delta)$ because adding or removing one sheet changes the realized direction masses by at most this same amount.  Summing over all cubes and using $\sum_Q M_Q=c_0$ gives the global estimates.
+\end{proof}
+
+\begin{lemma}[Stability under bounded marginal roundoff]\label{lem:roundoff-stable}
+For every triple $(Q,v,i)$ and every on/off choice $\varepsilon$ one has
+\[
+\bigl|\widetilde N_{Q,v,i}(\varepsilon)-N_{Q,v,i}\bigr|\le 1.
+\]
+Consequently Lemmas~\ref{lem:slow-variation} and~\ref{lem:tail-mass}, as well as Proposition~\ref{prop:face-mismatch}, remain valid after replacing the nearest-integer counts $N_{Q,v,i}$ by the raw rounded counts $\widetilde N_{Q,v,i}(\varepsilon)$, with constants independent of $\varepsilon$.
+\end{lemma}
+
+\begin{proof}
+Nearest-integer rounding gives
+\[
+N_{Q,v,i}\in\{B_{Q,v,i},B_{Q,v,i}+1\},
+\]
+while $\widetilde N_{Q,v,i}(\varepsilon)$ is by definition one of those same two integers.  Hence the first bound.
+
+The slow-variation estimate changes only by an additive constant, which is absorbed by the existing ``$+1$'' term in Lemma~\ref{lem:slow-variation}.  Therefore the unmatched tail length on any face-label family changes by at most $O(1)$, contributing at most $O(s^{k-1})$ to the tail mass.  That size is already present in Lemma~\ref{lem:tail-mass}.  Since each face has only finitely many shared vertices and the direction dictionary is finite, the constants in Proposition~\ref{prop:face-mismatch} remain uniform over all choices of $\varepsilon$.
+\end{proof}
+
+\section{Global coherence via vertex-prefix bookkeeping}\label{sec:coherence}
+
+This section establishes axiom~(A2) by importing the genuine face-balancing bookkeeping from the long manuscript.  Each direction family is distributed over the vertices of each cube.  On an interior face $F=Q\cap Q'$, only the vertices of $F$ can contribute model traces on $F$; at each such shared vertex the two cubes use prefixes of the same ordered family, so the common prefix cancels exactly and only the unmatched tail remains.  The tail is an $O(h)$ fraction of the total face mass by slow variation of the vertex counts.  To convert that mass bound into flat control, we repair each designated model facet by a fixed edge cap inside the face, obtaining cycles of diameter $O(s)$.  Because the final raw roundoff changes each family length by at most one sheet, the same estimates remain valid uniformly over all on/off choices by Lemma~\ref{lem:roundoff-stable}.
+
+\subsection{Shared vertex prefixes on a face}
+
+\begin{lemma}[Only shared vertices contribute on a face]\label{lem:face-vertices}
+Let $F=Q\cap Q'$ be an interior face and fix a direction label $i$.
+\begin{enumerate}
+\item[\textnormal{(i)}] If $v\notin\mathrm{Vert}(F)$, then the $v$-anchored model footprint in either cube misses $F$, and Paper~1 supplies only an error trace of flat norm $O(\eps_{\mathrm{hol}}s^{k-1})$ on $F$.
+\item[\textnormal{(ii)}] If $v\in\mathrm{Vert}(F)$, then every $v$-anchored copy meeting $F$ has the same translated model face trace
+\[
+\widetilde R_{v,i,F}:=(P_i+v+t_{v,i}^\star)\cap F
+\]
+on $F$, independent of the multiplicity index and of whether it is viewed from $Q$ or $Q'$.
+\item[\textnormal{(iii)}] For $v\in\mathrm{Vert}(F)$, the model trace mass satisfies
+\[
+\Mass(\widetilde R_{v,i,F})\asymp s^{k-1}.
+\]
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+Part~\textnormal{(i)} is the corner-localization statement of Lemma~\ref{lem:vertex-template} combined with the face-trace approximation exported by Paper~1: if the footprint misses $F$, the model trace vanishes and only the $O(\eps_{\mathrm{hol}}s^{k-1})$ flat-norm error remains.  Part~\textnormal{(ii)} is the flat shared-face matching built into Lemma~\ref{lem:vertex-template}.  Part~\textnormal{(iii)} follows because the flat facet geometry is fixed across multiplicity copies, and Paper~1's small-graph distortion changes $(k-1)$-dimensional masses only by the factor $1+O(\eps_{\mathrm{hol}}^2)$.
+\end{proof}
+
+\begin{lemma}[Edge-capped model cycles]\label{lem:face-cycles}
+Fix an interior face $F$, a shared vertex $v\in\mathrm{Vert}(F)$, and a direction label $i$ for which the $v$-anchored family meets $F$.  Then there exists an integral $(k-1)$-cycle
+\[
+\Sigma^{\mathrm{mod}}_{v,i,F}\subset F
+\]
+such that
+\[
+\diam(\spt \Sigma^{\mathrm{mod}}_{v,i,F})\le Cs,
+\qquad
+\Mass(\Sigma^{\mathrm{mod}}_{v,i,F})\le C s^{k-1}.
+\]
+Moreover, for every realized copy $S_{Q,v,i}^{(a)}$ meeting $F$,
+\[
+\calF\!\Bigl((\partial[S_{Q,v,i}^{(a)}])\llcorner F-\Sigma^{\mathrm{mod}}_{v,i,F}\Bigr)
+\le C\,\eps_{\mathrm{hol}}\,s^{k-1}.
+\]
+\end{lemma}
+
+\begin{proof}
+Take the translated flat facet current $\widetilde R_{v,i,F}$ from Lemma~\ref{lem:face-vertices} and fill its boundary inside $F$ by a fixed cone cap $K_{v,i,F}$ taken from a point in the relative interior of the facet.  Because $\partial \widetilde R_{v,i,F}$ has size $O(s^{k-2})$ and the cone diameter is $O(s)$, the cap has mass $O(s^{k-1})$.  Define
+\[
+\Sigma^{\mathrm{mod}}_{v,i,F}:=\widetilde R_{v,i,F}+K_{v,i,F}.
+\]
+This is a cycle, is supported in a set of diameter $O(s)$, and has mass $O(s^{k-1})$.
+
+Paper~1 now exports the actual face trace as flat-norm close to the translated model facet, with error $O(\eps_{\mathrm{hol}}s^{k-1})$.  Applying the same cone construction to the actual boundary inside the face chart changes the cap by flat norm at most $C\eps_{\mathrm{hol}}s^{k-1}$.  Hence the actual trace differs from the fixed model cycle by that same flat amount.
+\end{proof}
+
+\begin{lemma}[Slow variation of vertex counts]\label{lem:slow-variation}
+Let $Q\sim Q'$ be adjacent cubes and let $v\in Q\cap Q'$ be a shared vertex.  For every direction label $i$,
+\[
+|N_{Q,v,i}-N_{Q',v,i}|\le C h\cdot \max\{N_{Q,v,i},N_{Q',v,i}\}+1.
+\]
+\end{lemma}
+
+\begin{proof}
+Because $M_{Q,v,i}=2^{-2n}M_{Q,i}$, the real target counts
+\[
+r_{Q,v,i}:=\frac{M_{Q,v,i}}{A_i(s)}
+\]
+inherit the same $O(h)$ relative variation as the direction budgets $M_{Q,i}$ from Proposition~\ref{prop:global-weights}.  Nearest-integer rounding adds at most $1$ to the absolute difference.
+\end{proof}
+
+\begin{lemma}[Vertex-tail mass bound on one face]\label{lem:tail-mass}
+Fix an interior face $F=Q\cap Q'$, a shared vertex $v\in\mathrm{Vert}(F)$, and a direction label $i$.  Let
+\[
+N_{\min}:=\min\{N_{Q,v,i},N_{Q',v,i}\},
+\qquad
+r:=|N_{Q,v,i}-N_{Q',v,i}|.
+\]
+Then the unmatched tail mass on $F$ from the $v$-anchored $i$th family satisfies
+\[
+\Mass(B^{\mathrm{un}}_{F,v,i})
+\le
+C h\Bigl(\Mass(\partial S_Q\llcorner F)+\Mass(\partial S_{Q'}\llcorner F)\Bigr)+C s^{k-1}.
+\]
+\end{lemma}
+
+\begin{proof}
+Each unmatched copy contributes one model face cycle of mass $O(s^{k-1})$ by Lemmas~\ref{lem:face-vertices} and~\ref{lem:face-cycles}.  Hence
+\[
+\Mass(B^{\mathrm{un}}_{F,v,i})\le C r\,s^{k-1}.
+\]
+If $N_{\min}=0$, Lemma~\ref{lem:slow-variation} gives $r\le C_*$ for $h$ sufficiently small, so the right-hand side is $O(s^{k-1})$.
+
+Assume now $N_{\min}\ge 1$.  Since every matched copy has the same face mass up to a fixed constant, the common-prefix mass on $F$ from this vertex family is comparable to $N_{\min}s^{k-1}$.  Lemma~\ref{lem:slow-variation} gives
+\[
+r\le Ch\,N_{\min}+1,
+\]
+hence
+\[
+r\,s^{k-1}\le C h\,(N_{\min}s^{k-1})+C s^{k-1}.
+\]
+Summing over the finitely many shared vertices of $F$ and comparing with the total face boundary mass yields the stated estimate.
+\end{proof}
+
+\begin{proposition}[Per-face mismatch estimate]\label{prop:face-mismatch}
+For each interior face $F=Q\cap Q'$ and each direction label $i$,
+\[
+\mathcal F(B_{F,i})
+\le
+C\,s\!\left[
+h\Bigl(\Mass(\partial S_Q\llcorner F)+\Mass(\partial S_{Q'}\llcorner F)\Bigr)+s^{k-1}
+\right]
+\]
+\[
+\qquad
++\;C\,\eps_{\mathrm{hol}}\Bigl(\Mass(\partial S_Q\llcorner F)+\Mass(\partial S_{Q'}\llcorner F)\Bigr).
+\]
+\end{proposition}
+
+\begin{proof}
+Decompose $B_{F,i}$ into the contributions of the shared vertices of $F$.  By Lemma~\ref{lem:face-vertices}, vertices not lying on $F$ contribute only the $O(\eps_{\mathrm{hol}}s^{k-1})$ graph error and are absorbed into the final term.
+
+Fix a shared vertex $v\in\mathrm{Vert}(F)$.  The two sides use prefixes of the same ordered $v$-anchored family.  By Lemma~\ref{lem:vertex-template}, the common prefix has exactly the same model face trace on both sides, with opposite boundary orientations.  Replacing the actual face traces by that common model cycle introduces only the standard $O(\eps_{\mathrm{hol}}s^{k-1})$ flat-norm errors from Paper~1.  The resulting discrepancy is bounded by
+\[
+C\,\eps_{\mathrm{hol}}\,N_{\min}s^{k-1},
+\]
+which is controlled by the total face boundary mass via Lemma~\ref{lem:face-vertices}.
+
+The unmatched tail consists of $r$ edge-capped cycles supported in diameter $O(s)$.  By the cone estimate for cycles supported in a set of diameter $D$,
+\[
+\calF(B^{\mathrm{un}}_{F,v,i})\le C s\,\Mass(B^{\mathrm{un}}_{F,v,i}).
+\]
+Lemma~\ref{lem:tail-mass} then gives
+\[
+\calF(B^{\mathrm{un}}_{F,v,i})
+\le
+C\,s\!\left[
+h\Bigl(\Mass(\partial S_Q\llcorner F)+\Mass(\partial S_{Q'}\llcorner F)\Bigr)+s^{k-1}
+\right].
+\]
+Summing over the finitely many shared vertices of $F$ proves the claim.
+\end{proof}
+
+\subsection{Global flat-norm estimate}
+
+\begin{theorem}[Global coherence in the vertex-prefix model]\label{thm:coherence}
+Assume $1\le p<n$.  Choose an exponent $\alpha>2n/k$, set $s:=h^\alpha$, and choose the graph tolerance so that $\eps_{\mathrm{hol}}=o(s)$.  Then
+\[
+\calF(\partial S_h(\varepsilon))\longrightarrow 0
+\qquad (h\downarrow 0),
+\]
+uniformly over all on/off choices $\varepsilon_{\alpha,h}\in\{0,1\}$.
+\end{theorem}
+
+\begin{proof}
+Fix an on/off choice $\varepsilon$.  By Lemma~\ref{lem:roundoff-stable}, Proposition~\ref{prop:face-mismatch} remains valid after replacing the nearest-integer counts by the raw rounded counts in $S_h(\varepsilon)$.  Summing that estimate over all interior faces and all direction labels and then using subadditivity of $\calF$ gives
+\[
+\calF(\partial S_h(\varepsilon))
+\le
+C(s h+\eps_{\mathrm{hol}})
+\sum_F\Bigl(\Mass(\partial S_Q(\varepsilon)\llcorner F)+\Mass(\partial S_{Q'}(\varepsilon)\llcorner F)\Bigr)
+\;+\;
+C\,h^{-(2n-1)}s^k.
+\]
+Each local sheet has mass $\asymp s^k$ and each designated face contribution has mass $\asymp s^{k-1}$.  Since every corner-exit sheet meets only $O(1)$ faces,
+\[
+\sum_F\Bigl(\Mass(\partial S_Q(\varepsilon)\llcorner F)+\Mass(\partial S_{Q'}(\varepsilon)\llcorner F)\Bigr)\le C\frac{c_0}{s}.
+\]
+Therefore
+\[
+\calF(\partial S_h(\varepsilon))
+\le
+C\left(h+\frac{\eps_{\mathrm{hol}}}{s}\right)c_0
+\;+\;
+C\,h^{-(2n-1)}s^k.
+\]
+Choosing $\eps_{\mathrm{hol}}=o(s)$ makes the first term tend to zero.  Since $s=h^\alpha$ with $\alpha>2n/k$, the second term also tends to zero.
+\end{proof}
+
+\iffalse
+\subsection{Borderline case $p=n/2$}
+
+The middle-dimensional case requires stronger confinement: we set $\varrho=h$, so matched displacements are $O(h^3)$ while the unmatched tail remains supported in diameter $O(h^2+s)$.
+
+\begin{theorem}[Global coherence: $p=n/2$]\label{thm:coherence-borderline}
+Assume $p=n/2$ (equivalently $k=n$).  Set $\varrho:=h$.  Choose any exponent $\alpha$ with
+\[
+2<\alpha<3,
+\]
+set $s:=h^\alpha$, and choose $\eps_{\mathrm{hol}}=o(s)$.  Then
+\[
+\calF(\partial S_h(\varepsilon))\longrightarrow 0
+\qquad (h\downarrow 0),
+\]
+uniformly over all on/off choices $\varepsilon_{\alpha,h}\in\{0,1\}$.
+\end{theorem}
+
+\begin{proof}
+\noindent
+Remark~\ref{rem:atom-availability} guarantees that the confined template still contains enough atoms for every required prefix length.
+
+\[
+\calF(\partial S_h(\varepsilon))
+\le
+C(\varrho h^2+h(\varrho h+s)+\eps_{\mathrm{hol}})\frac{c_0}{s}
+\;+\;
+C(\varrho h+s)h^{-2n}s^{n-1}.
+\]
+With $\varrho=h$ this becomes
+\[
+\calF(\partial S_h(\varepsilon))
+\le
+C\left(\frac{h^3}{s}+h+\frac{\eps_{\mathrm{hol}}}{s}\right)c_0
+\;+\;
+C(h^2+s)h^{-2n}s^{n-1}.
+\]
+\iffalse
+= C\varrho\, c_0^{(n-1)/n}
+= C\eps^2\,c_0^{(n-1)/n}.
+\]
+\fi
+Now $s=h^\alpha$ with $2<\alpha<3$, so the first group tends to zero.  The final term splits as
+\[
+(h^2+s)h^{-2n}s^{n-1}
+=
+h^{2-2n+\alpha(n-1)}+h^{-2n+\alpha n},
+\]
+and both exponents are positive because $\alpha>2$.  Hence the whole right-hand side tends to zero.
+
+\end{proof}
+\fi
+
+Theorem~\ref{thm:coherence} verifies axiom~(A2) unconditionally for all $1\le p<n$ in the vertex-prefix packet model.
+
+\section{Marginal period bound}\label{sec:period}
+
+\begin{proposition}[Marginal period bound]\label{prop:period-bound}
+For each marginal current $Z_{\alpha,h}$ and each $\ell=1,\dots,b$,
+\[
+\left|\int_{Z_{\alpha,h}}\Theta_\ell\right|\le C_0 h^k,
+\]
+where $C_0$ depends only on $\max_\ell\|\Theta_\ell\|_{C^0}$ and the ambient geometry.
+\end{proposition}
+
+\begin{proof}
+By Paper~1, each marginal sheet $Z_{\alpha,h}$ is a $C^1$ graph over a template footprint of diameter $\asymp s$ inside a cube of side $h$.  Its mass satisfies $\Mass(Z_{\alpha,h})\le C s^k$.  Since $s\le h/100$, we have $\Mass(Z_{\alpha,h})\le C h^k$.  Therefore
+\[
+\left|\int_{Z_{\alpha,h}}\Theta_\ell\right|\le \|\Theta_\ell\|_{C^0}\cdot\Mass(Z_{\alpha,h})\le C_0 h^k.
+\]
+\end{proof}
+
+This verifies axiom~(A3).
+
+\section{Parameter schedule}\label{sec:parameters}
+
+We record the non-circular order of parameter choices.
+
+\begin{enumerate}
+\item Fix the cohomology clearing integer $m\ge 1$ so that $m[\beta]\in H^{2p}(X,\Z)$ modulo torsion.
+\item Fix the Lipschitz regularization parameter $\lambda>0$.
+\item Choose the mesh size $h>0$ small enough that every closed face star and every closed vertex star lies in a single chart, $\widehat\beta$ varies by $O(h)$ on each cube, and the global estimates of Sections~\ref{sec:coherence}--\ref{sec:period} apply.
+\item Choose exponents $\alpha>2n/k$ and $0<\beta_\ast<\alpha k-2n$.  Set the footprint scale to be $s:=h^\alpha$ and the bookkeeping error scale to be $\delta(h):=h^{\beta_\ast}$.  Set the dictionary scale to be $\eps_h:=h\,\delta(h)$, so $\eps_h=o(h)$ and $\eps_h\le \delta(h)$ for all sufficiently small $h$.  Then $s^k=h^{\alpha k}=o(\delta(h)h^{2n})$, so the sheet-size hypothesis in Proposition~\ref{prop:per-cube} holds for all sufficiently small $h$.
+\item Choose the holomorphic tensor power $\mhol\gg 1$ and the local graph tolerance $\eps_{\mathrm{hol}}$ so that $s=\sigma\mhol^{-1/2}$, $s\le h/100$, $\eps_{\mathrm{hol}}=o(s)$, and $\eps_{\mathrm{hol}}\le \delta(h)$, while Paper~1's Bergman-scale manufacturing applies.
+\end{enumerate}
+
+No parameter depends circularly on any later choice.  First fix $\lambda$; then choose $h$; then define $s$, $\delta(h)$, and $\eps_h$ from $h$; finally choose $\mhol$ and $\eps_{\mathrm{hol}}$ to realize that scale with $\eps_{\mathrm{hol}}\le\delta(h)$.
+
+\section{Proof of the main theorem}\label{sec:proof}
+
+\begin{proof}[Proof of Theorem~\ref{thm:main}]
+Fix a mesh size $h$ and carry out the parameter schedule of Section~\ref{sec:parameters}.  At each cube $Q$, the Lipschitz weight vector $w_Q$ from Proposition~\ref{prop:global-weights} provides the direction list, weights $\theta_{Q,i}$, and mass budget $M_Q$.  Definition~\ref{def:vertex-budget} splits those direction budgets over the vertices of the cube, Proposition~\ref{prop:per-cube} constructs the corresponding vertex-anchored holomorphic sheets using Paper~1 with the scale choice encoded by $\delta(h)$, and Definition~\ref{def:fractional} organizes the output into a fractional bookkeeping current.
+
+Proposition~\ref{prop:cube-estimates} verifies axiom~(A1): the cube-wise mass errors sum to zero and the barycenter errors tend uniformly to zero.
+
+The coherence section runs the vertex-prefix face-balancing argument: only shared vertices contribute on a shared face, the common prefix cancels exactly there, and the unmatched tail is an $O(h)$ fraction of the face mass by slow variation of the rounded vertex counts.  The coherence theorem of Section~\ref{sec:coherence} then verifies axiom~(A2) for all $1\le p<n$ once $s=h^\alpha$ is chosen with $\alpha>2n/k$.
+
+Proposition~\ref{prop:period-bound} verifies axiom~(A3): each marginal current pairs with every integral test form at scale $O(h^k)$.
+\end{proof}
+
+\section{What this paper exports}\label{sec:exports}
+
+The result can be summarized as follows.
+
+\begin{itemize}
+\item A smooth closed strongly positive $(p,p)$-form $\beta$ with rational class and $\langle\beta,\psi\rangle\ge \tau_\beta>0$ determines, on any sufficiently fine mesh, a coherent assembly packet satisfying all three axioms (A1)--(A3) of Paper~3.
+\item The packet is built from the local holomorphic sheets of Paper~1, organized by Carath\'eodory directions with Lipschitz-stable globally labeled weights, an equal vertex split of each direction budget, and vertex-anchored corner-exit prefixes.
+\item Global coherence (A2) is established by real face-balancing bookkeeping: on each shared face the common vertex-prefix cancels exactly, while the unmatched tail is an $O(h)$ fraction of the total face mass and is converted to flat control by edge-capped face cycles of diameter $O(s)$.
+\item The exported scale regime is
+\[
+\alpha>2n/k,
+\qquad
+\delta(h)=h^{\beta_\ast}\ \text{for any }0<\beta_\ast<\alpha k-2n,
+\qquad
+s=h^\alpha,
+\qquad
+\eps_{\mathrm{hol}}=o(s).
+\]
+\end{itemize}
+
+That is the exact interface between Paper~I~\cite{Washburn26I} and Paper~III~\cite{Washburn26III}.  Paper~I manufactures the local atoms.  This paper organizes them into a global packet.  Paper~III turns that packet into closed cycles in the target class modulo torsion with vanishing calibration defect.  The capstone paper then takes the calibrated limit and derives the final Hodge conclusion~\cite{Washburn26IV}.
+
+\begin{thebibliography}{99}
+
+\bibitem{Demailly12}
+J.-P.~Demailly.
+\newblock {\em Complex Analytic and Differential Geometry}.
+\newblock Lecture notes, 2012.
+
+\bibitem{Washburn26I}
+J.~Washburn.
+\newblock {\em Bergman-scale holomorphic complete intersections with prescribed
+  tangent directions and face traces}.
+\newblock Preprint, 2026.
+
+\bibitem{MaMarinescu07}
+X.~Ma and G.~Marinescu.
+\newblock {\em Holomorphic Morse Inequalities and Bergman Kernels}.
+\newblock Progress in Mathematics 254, Birkh\"auser, 2007.
+
+\bibitem{Washburn26III}
+J.~Washburn.
+\newblock {\em Exact-class integral cycles from coherent calibrated packets via
+  period-first rounding}.
+\newblock Preprint, 2026.
+
+\bibitem{Schneider14}
+R.~Schneider.
+\newblock {\em Convex Bodies: The Brunn--Minkowski Theory}.
+\newblock 2nd ed., Cambridge University Press, 2014.
+
+\bibitem{Washburn26IV}
+J.~Washburn.
+\newblock {\em Calibrated holomorphic limits and algebraic realization of
+  cone-positive rational $(p,p)$-classes}.
+\newblock Preprint, 2026.
+
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,883 @@
+
+\documentclass[11pt]{article}
+
+\usepackage{amsmath,amssymb,amsthm,mathtools,geometry}
+\geometry{margin=1in}
+
+\title{Bergman-scale holomorphic complete intersections\\with prescribed tangent directions and template-controlled face traces}
+\author{Jonathan Washburn\\
+Recognition Science\\
+Recognition Physics Institute\\
+Austin, Texas, USA\\
+\texttt{jon@recognitionphysics.org}}
+\date{March 2026}
+
+\numberwithin{equation}{section}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\DeclareMathOperator{\Mass}{Mass}
+\DeclareMathOperator{\spt}{spt}
+\DeclareMathOperator{\diam}{diam}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\mhol}{m_{\mathrm{hol}}}
+\newcommand{\calH}{\mathcal{H}}
+\newcommand{\calF}{\mathcal{F}}
+\newcommand{\calO}{\mathcal{O}}
+\newcommand{\HS}{\mathrm{HS}}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+On a coordinate cube inside a compact K\"ahler manifold, and for a finite list of calibrated complex $(n{-}p)$-directions with prescribed nonnegative mass fractions, we construct holomorphic complete-intersection pieces at the Bergman scale whose tangent planes follow the chosen directions, whose per-piece masses are controlled in sheet-sized quanta, and whose boundary traces on the cube faces decompose as translated reference templates plus a quantitative error of order $O(\varepsilon_{\mathrm{hol}}\,s^{k-1})$.  The construction uses peak-section methods from the Ma--Marinescu Bergman-kernel framework and a concrete corner-exit template geometry that rigidifies the face combinatorics.  We also prove a shared-face coherent reuse theorem: if two adjacent cubes share a matched flat facet on their common face, the local sheets on both sides can be realized as restrictions of a single global complete intersection.  This paper does not realize arbitrary face data, does not close boundaries, does not perform global transport, and does not impose cohomological matching.  Its output is the local manufacturing layer used downstream in the series.
+\end{abstract}
+
+\section{Introduction}
+
+Fix a smooth complex projective manifold $X$ of complex dimension $n$, an ample line bundle $L \to X$ with a Hermitian metric of curvature form $\omega$, and an integer $p$ with $1 \le p \le n$.  Write
+\[
+k := 2n-2p,
+\qquad
+\psi := \frac{\omega^{n-p}}{(n-p)!}.
+\]
+Complex analytic subsets of complex dimension $n-p$ are $\psi$-calibrated on their regular loci~\cite{HL82}, so they give the basic local atoms.
+
+The aim of this paper is local and only local.  We take a small chart cube $Q \subset X$, a finite family of complex $(n-p)$-planes $\Pi_1,\dots,\Pi_J$, a list of nonnegative weights $\theta_1,\dots,\theta_J$ with $\sum_j \theta_j = 1$, and a local mass budget $M \ge 0$.  The goal is to realize this data by holomorphic complete-intersection pieces inside $Q$ so that:
+\begin{itemize}
+\item each piece follows one of the prescribed directions with quantitative tangent control,
+\item each family carries the required fraction of the local mass up to the unavoidable one-sheet rounding scale, and
+\item each face trace is a translated reference slice plus a controlled error term.
+\end{itemize}
+
+The paper does not close boundaries, transport traces between neighboring cubes, or impose any global integrality constraint.  Those are separate problems.  The output here is the local package: sheets, masses, and template-controlled face traces.
+
+\medskip
+
+\noindent\textbf{What this paper does not prove.}
+It does not realize arbitrary boundary data on cube faces, does not guarantee global disjointness or embeddedness of the resulting sheets, allows repeated parameters as a bookkeeping device for multiplicity, and only proves cross-cube coherence in the matched shared-face setting of Proposition~\ref{prop:shared-face}.  All global closure, transport, and cohomological matching statements belong to later papers in the series.
+
+\medskip
+
+\noindent\textbf{Main theorem in plain language.}
+Given finitely many calibrated directions and target mass fractions on a small chart cube, one can realize them by holomorphic complete-intersection pieces at the Bergman scale.  The pieces are quantitatively close to the chosen directions, their masses occur in controllable sheet-sized quanta, and their boundary traces on each cube face are translated template traces up to an error of order $O(\eps_{\mathrm{hol}} s^{k-1})$.
+
+\medskip
+
+The precise statement is as follows.
+
+\begin{theorem}[Local holomorphic microstructure theorem]\label{thm:main}
+Let $Q \subset X$ be a cube of side length $h$ contained in a normal holomorphic coordinate chart.  Fix calibrated directions $\Pi_1,\dots,\Pi_J$ in that chart, nonnegative weights $\theta_1,\dots,\theta_J$ with $\sum_{j=1}^J \theta_j = 1$, and a local mass budget $M \ge 0$.
+
+For every tangent tolerance $\eps_{\mathrm{hol}} \in (0,1)$ there exist:
+\begin{itemize}
+\item a holomorphic scale $s \in (0,h/100]$,
+\item a tensor power $\mhol \gg 1$ with $s \asymp \mhol^{-1/2}$,
+\item integers $N_1,\dots,N_J \in \Z_{\ge 0}$,
+\item global complete intersections $Y_j^{(a)} \subset X$ of complex codimension $p$ for $1 \le j \le J$ and $1 \le a \le N_j$,
+\end{itemize}
+and connected components $S_j^{(a)} \subset Y_j^{(a)} \cap Q$ such that, writing
+\[
+S_Q := \sum_{j=1}^J \sum_{a=1}^{N_j} [S_j^{(a)}],
+\]
+the following hold.  Here the face currents $R_{j,F}$ are the model facet currents
+coming from the chosen corner-exit template family in direction-adapted coordinates,
+and $\tau_{t_{j,a}}$ denotes translation by the transverse parameter $t_{j,a}$ in those
+coordinates.
+
+\begin{enumerate}
+\item[\textnormal{(i)}] \textbf{Tangent control.}  
+For each $(j,a)$, the set $S_j^{(a)}$ is a $C^1$ graph over a translate of $\Pi_j$ on a neighborhood of diameter $\asymp s$, and
+\[
+\angle(T_y S_j^{(a)},\Pi_j) \le \eps_{\mathrm{hol}}
+\qquad
+\text{for all } y \in S_j^{(a)}.
+\]
+
+\item[\textnormal{(ii)}] \textbf{Per-piece mass scale.}
+For each direction label $j$ there is a reference mass $A_j(s)$ with
+\[
+A_j(s) \asymp s^k,
+\]
+such that every sheet in the $j$-family satisfies
+\[
+\bigl|\Mass(S_j^{(a)}) - A_j(s)\bigr|
+\le C\,\eps_{\mathrm{hol}}\,s^k.
+\]
+
+\item[\textnormal{(iii)}] \textbf{Mass-fraction control.}
+For each $j$,
+\[
+\left|
+\sum_{a=1}^{N_j} \Mass(S_j^{(a)}) - \theta_j M
+\right|
+\le C\,A_j(s) + C\,\eps_{\mathrm{hol}}\,\theta_j M.
+\]
+Consequently,
+\[
+\left|
+\Mass(S_Q) - M
+\right|
+\le C \sum_{j=1}^J A_j(s) + C\,\eps_{\mathrm{hol}}\,M.
+\]
+
+\item[\textnormal{(iv)}] \textbf{Face traces.}
+For every codimension-$1$ face $F \subset \partial Q$ and each $(j,a)$ there is a fixed reference current
+\[
+R_{j,F}
+\subset F \cap (\Pi_j \times \{0\}),
+\]
+depending only on the direction label and on the chosen flat template such that
+\[
+\calF\!\Bigl((\partial [S_j^{(a)}])\llcorner F-(\tau_{t_{j,a}})_\# R_{j,F}\Bigr)
+\le C\,\eps_{\mathrm{hol}}\,s^{k-1}.
+\]
+If the flat template for $(j,a)$ does not meet $F$, then $R_{j,F}=0$ and the whole face trace has flat norm $O(\eps_{\mathrm{hol}}s^{k-1})$.
+
+\item[\textnormal{(v)}] \textbf{Local barycenter control.}
+If $M>0$ and $S_Q \neq 0$, define
+\[
+\vartheta_j := \frac{\sum_{a=1}^{N_j} \Mass(S_j^{(a)})}{\Mass(S_Q)}.
+\]
+Then
+\[
+\left|
+\vartheta_j - \theta_j
+\right|
+\le
+C\,\frac{A_j(s)}{\max\{M,\sum_{\ell=1}^J A_\ell(s)\}}
++
+C\,\eps_{\mathrm{hol}},
+\]
+and the tangent-plane barycenter of $S_Q$ is within $C\eps_{\mathrm{hol}}$ of $\sum_j \vartheta_j \xi_{\Pi_j}$ in Hilbert--Schmidt norm.
+\end{enumerate}
+
+All constants depend only on the ambient geometry, the fixed finite direction dictionary, and the model template geometry.
+\end{theorem}
+
+\begin{remark}
+The rounding term $A_j(s)$ is not an artifact.  A local mass fraction can only be realized in quanta of one sheet.  The theorem is quantitative because the holomorphic scale lets one force $A_j(s) \asymp s^k$ to be as small as needed relative to any fixed positive local budget.
+\end{remark}
+
+The proof is organized in three layers.
+
+First, high tensor powers of $L$ produce complete intersections whose tangent planes track any chosen complex $(n-p)$-plane on a ball of radius $\asymp \mhol^{-1/2}$.  Second, a concrete corner-exit model supplies local footprints with fixed face combinatorics and uniform mass scale.  Third, integer rounding converts a desired mass fraction into a number of sheets, while the shared footprint model controls all face traces.
+
+\section{Setup and local target data}
+
+\subsection{Ambient geometry}
+
+Throughout the paper:
+\begin{itemize}
+\item $X$ is a smooth complex projective manifold of complex dimension $n$;
+\item $L \to X$ is an ample line bundle with a Hermitian metric whose curvature form is $\omega$;
+\item $1 \le p \le n$ is fixed;
+\item $k := 2n-2p$ and $\psi := \omega^{n-p}/(n-p)!$.
+\end{itemize}
+
+A \emph{calibrated direction} means a complex $(n-p)$-plane.  In a holomorphic chart we identify such a direction with its underlying real $k$-plane.  If $\Pi$ is a calibrated direction, $\xi_\Pi$ denotes the corresponding normalized tangent tensor, viewed as a unit vector in a fixed Hilbert--Schmidt model space.
+
+\subsection{Cubes, faces, and currents}
+
+Let $Q$ be a coordinate cube of side length $h$ inside a normal holomorphic chart.  A \emph{face} of $Q$ always means a codimension-$1$ face.  For an integral current $T$ supported in $Q$ and a face $F \subset \partial Q$, the face trace is
+\[
+(\partial T)\llcorner F.
+\]
+
+The mass of a rectifiable current $T$ is denoted by $\Mass(T)$.  If $T \neq 0$ is $k$-rectifiable, its normalized tangent barycenter is
+\[
+\mathsf{Bar}(T)
+:=
+\frac{1}{\Mass(T)}
+\int \xi_{T_yT}\, d\|T\|(y).
+\]
+
+\subsection{Local target data}
+
+The local input on one cube is:
+\begin{enumerate}
+\item a finite list of calibrated directions $\Pi_1,\dots,\Pi_J$;
+\item nonnegative weights $\theta_1,\dots,\theta_J$ with $\sum_j \theta_j = 1$;
+\item a local mass budget $M \ge 0$.
+\end{enumerate}
+
+The goal is to replace this abstract convex data by actual holomorphic pieces.  Each direction label $j$ will come with a small model footprint of diameter $\asymp s$, a list of transverse translation parameters $t_{j,a}$, and a corresponding family of complete intersections whose local components inside $Q$ serve as the sheet atoms.
+
+\section{Projective tangential approximation}
+
+\subsection{A Bergman-scale manufacturing lemma}
+
+The analytic input is the usual rescaled Bergman picture: on balls of radius $\asymp \mhol^{-1/2}$, sections of $L^{\mhol}$ can be chosen so that their first derivatives are uniformly close to prescribed linear data.
+
+\begin{proposition}[Bergman-scale $C^1$ manufacturing]\label{prop:bergman}
+For every $\eps>0$ there exist a constant $c>0$ and an integer $m_{\mathrm{hol},0}(\eps)$ with the following property.  Let $x \in X$ and let $\lambda_1,\dots,\lambda_p \in T_x^{*(1,0)}X$.  Then for every $\mhol \ge m_{\mathrm{hol},0}(\eps)$ there exist sections
+\[
+s_1,\dots,s_p \in H^0(X,L^{\mhol})
+\]
+such that
+\[
+s_i(x)=0,
+\qquad
+ds_i(x)=\lambda_i,
+\]
+and
+\[
+\|ds_i(y)-\lambda_i\|
+\le
+\eps \max_{1\le r \le p}\|\lambda_r\|
+\qquad
+\text{for all } y \in B_{c\,\mhol^{-1/2}}(x).
+\]
+\end{proposition}
+
+\begin{proof}
+Set $M:=\max_{1\le r\le p}\|\lambda_r\|$.  If $M=0$, take $s_i\equiv 0$.  Otherwise normalize $\lambda_i\mapsto\lambda_i/M$ and multiply the resulting sections by $M$ at the end.
+
+Choose normal holomorphic coordinates $z=(z^1,\dots,z^n)$ centered at $x$ and a local unitary frame $e_L$ of $L$ over a geodesic ball $B_r(x)$ with $r<\operatorname{inj}(X)$, so that $|e_L|^2_{\mathrm{met}}=e^{-\phi}$ with $\phi(0)=0$ and $d\phi(0)=0$.  Let $P_{{\mhol}}(z,z')$ be the Bergman kernel of $(L^{{\mhol}},h^{{\mhol}})$ in this frame.  Set rescaled variables $Z=\sqrt{{\mhol}}\,z$, $Z'=\sqrt{{\mhol}}\,z'$.
+
+By the near off-diagonal Bergman kernel expansion (Ma--Marinescu~\cite[Thm~4.2.1]{MaMarinescu07}; see also~\cite[Thm~1.1]{MaMarinescu13OffDiag} for the $C^2$ control), for each fixed $\sigma>0$ there exists $C_{\mathrm{BK}}>0$ such that for all large ${\mhol}$, uniformly for $|Z|,|Z'|\le\sigma$,
+\[
+\max_{|\alpha|+|\beta|\le 2}\Bigl|
+\partial_Z^\alpha\partial_{\overline{Z'}}^\beta\Bigl(
+{\mhol}^{-n}e^{-\frac{{\mhol}}{2}(\phi(z)+\phi(z'))}\,P_{{\mhol}}(z,z')-P_{\mathrm{BF}}(Z,Z')
+\Bigr)\Bigr|
+\le C_{\mathrm{BK}}\,{\mhol}^{-1/2},
+\]
+where $P_{\mathrm{BF}}$ is the Bargmann--Fock kernel on $\C^n$.
+
+For each $a=1,\dots,n$ define the holomorphic section
+\[
+u_{a,{\mhol}}(z):=\frac{1}{\pi}{\mhol}^{-(n+1)/2}\,\partial_{\overline{z'_a}}P_{{\mhol}}(z,z')\Big|_{z'=0}.
+\]
+Differentiating the expansion at $z'=0$ and using $d\phi(0)=0$ gives the local Taylor control on the ${\mhol}^{-1/2}$-ball:
+\[
+du_{a,{\mhol}}(z)=dz^a+O(|z|)+O({\mhol}^{-1/2}),
+\]
+uniformly for $|z|\le\sigma{\mhol}^{-1/2}$.  Set $c:=\sigma/2$.  For $y\in B_{c{\mhol}^{-1/2}}(x)$ one has $|z(y)|\le c{\mhol}^{-1/2}$, so
+\[
+\|du_{a,{\mhol}}(y)-du_{a,{\mhol}}(x)\|\le C'(X,\omega)\,{\mhol}^{-1/2}.
+\]
+Also $du_{a,{\mhol}}(x)=dz^a+O({\mhol}^{-1/2})$, so for ${\mhol}$ large the matrix $A_{{\mhol}}:=(du_{a,{\mhol}}(x))_{a=1}^n$ is invertible with $\|A_{{\mhol}}^{-1}\|$ uniformly bounded.
+
+Write $\lambda_i=\sum_a \lambda_{i,a}\,dz^a$ with $|\lambda_{i,a}|\le 1$.  Define $c_i:=A_{{\mhol}}^{-1}(\lambda_{i,1},\dots,\lambda_{i,n})^\top$ and set
+\[
+s_i:=\sum_{a=1}^n c_{i,a}\,u_{a,{\mhol}}\in H^0(X,L^{{\mhol}}).
+\]
+Then $s_i(x)=0$ and $ds_i(x)=\lambda_i$.  For $y\in B_{c{\mhol}^{-1/2}}(x)$,
+\[
+\|ds_i(y)-\lambda_i\|\le \sum_a |c_{i,a}|\,\|du_{a,{\mhol}}(y)-du_{a,{\mhol}}(x)\|\le C''{\mhol}^{-1/2}.
+\]
+Taking ${\mhol}\ge m_{\mathrm{hol},0}(\eps)$ so that $C''{\mhol}^{-1/2}\le\eps$ proves the claim for normalized data.  Rescaling by $M$ completes the proof.
+\end{proof}
+
+\subsection{From derivative control to a single graph sheet}
+
+\begin{lemma}[Graph control from uniform differential control]\label{lem:graph}
+Let $U \subset \C^n$ be a ball.  Let $\lambda_1,\dots,\lambda_p \in (\C^n)^*$ have linearly independent real and imaginary parts, and let
+\[
+\Pi := \bigcap_{i=1}^p \ker(\lambda_i),
+\]
+so $\Pi$ is a complex $(n-p)$-plane.  Let $f_1,\dots,f_p : U \to \C$ be holomorphic and suppose
+\[
+f_i(0)=0,
+\qquad
+\sup_{y \in U}\|df_i(y)-\lambda_i\| \le \eps
+\qquad
+(1\le i \le p),
+\]
+for $\eps$ sufficiently small.  Then the common zero set
+\[
+Y := \{f_1=\cdots=f_p=0\}\cap U
+\]
+is a smooth complex submanifold, and on a concentric subball it is a $C^1$ graph over $\Pi$ with slope $O(\eps)$.  In particular,
+\[
+\sup_{y \in Y}\angle(T_yY,\Pi) \le C\eps.
+\]
+\end{lemma}
+
+\begin{proof}
+Write $F=(f_1,\dots,f_p):U \to \C^p$.  The differential $dF$ is uniformly close to the constant surjective map $\Lambda=(\lambda_1,\dots,\lambda_p)$, so for $\eps$ small enough every $dF(y)$ is still surjective.  Hence $Y=F^{-1}(0)$ is a smooth complex submanifold.
+
+Choose the orthogonal splitting $\C^n = \Pi \oplus \Pi^\perp$ and coordinates $(u,w)$ adapted to it.  The map $\partial_w F$ is uniformly close to $\partial_w \Lambda$, which is invertible.  The holomorphic implicit function theorem therefore gives, on a smaller concentric ball, a graph representation
+\[
+Y = \{(u,g(u))\}
+\]
+for some $C^1$ map $g$.  Differentiating $F(u,g(u))=0$ yields
+\[
+Dg = -(\partial_w F)^{-1}\partial_u F,
+\]
+so the same smallness estimate gives $\|Dg\| \le C\eps$.  This proves the angle bound.
+\end{proof}
+
+\begin{proposition}[Projective tangential approximation with $C^1$ control]\label{prop:tangent}
+Let $x \in X$ and let $\Pi \subset T_xX$ be a complex $(n-p)$-plane.  For every $\eps>0$ there exist $\mhol \gg 1$ and global sections
+\[
+s_1,\dots,s_p \in H^0(X,L^{\mhol})
+\]
+such that the complete intersection
+\[
+Y := \{s_1=0\}\cap\cdots\cap\{s_p=0\}
+\]
+contains $x$, is smooth on $B_{c\,\mhol^{-1/2}}(x)$, and satisfies
+\[
+\angle(T_yY,\Pi) < \eps
+\qquad
+\text{for all } y \in Y \cap B_{c\,\mhol^{-1/2}}(x).
+\]
+Moreover, $Y$ is $\psi$-calibrated on its regular locus.
+\end{proposition}
+
+\begin{proof}
+Choose unitary holomorphic coordinates $(w,u)\in \C^p\times\C^{n-p}$ centered at $x$ so that $\Pi=\{w=0\}$.  Apply Proposition~\ref{prop:bergman} with the target covectors $\lambda_i = dw_i$ and tolerance $\eps/C$, where $C$ is the constant from Lemma~\ref{lem:graph}.  Then the common zero set of the resulting sections is a smooth complete intersection on $B_{c\,\mhol^{-1/2}}(x)$, and Lemma~\ref{lem:graph} gives the angle bound.  Since $Y$ is complex analytic, its regular locus is calibrated by $\psi$.
+\end{proof}
+
+\subsection{Finite local template families}
+
+The previous proposition is pointwise.  This paper needs a finite family of nearby sheets with the same model direction and controlled separation in the transverse variable.
+
+\begin{proposition}[Realizing a finite translation template locally]\label{prop:finite-template}
+Fix a holomorphic chart $U \subset X$ with coordinates $z=(u,w)\in \C^{n-p}\times\C^p$ and let
+\[
+P := \{w=0\}.
+\]
+Fix $\eps \in (0,1)$ and choose $\mhol$ so large that Proposition~\ref{prop:tangent} applies at tolerance $\eps$ for every point in a given finite set.  Let $x_1,\dots,x_N \in U$ be finitely many points and set $t_a := w(x_a)$.
+
+Then for each $a$ there exists a global complete intersection $Y^{(a)} \subset X$ of codimension $p$ such that on a ball
+\[
+B_{r}(x_a),
+\qquad
+r \asymp \mhol^{-1/2},
+\]
+the set $Y^{(a)}$ is a $C^1$ graph over the affine plane $\{w=t_a\}$ with slope $\le C\eps$.  Moreover,
+\[
+\Mass\bigl([Y^{(a)}\cap B_r(x_a)]\bigr)
+=
+\bigl(1+O(\eps)\bigr)\,\calH^{k}(P\cap B_r(0)).
+\]
+\end{proposition}
+
+\begin{proof}
+Apply Proposition~\ref{prop:tangent} at each anchor point $x_a$ with tangent plane equal to the translate of $P$ through $x_a$.  Since the anchor set is finite, a single large tensor power $\mhol$ works for all of them.  The graph statement is immediate from the conclusion of Proposition~\ref{prop:tangent}.  The mass estimate follows from the area formula for a small-slope graph.
+\end{proof}
+
+\begin{proposition}[One global sheet on finitely many balls of one translate]\label{prop:multi-ball}
+Fix a holomorphic chart $U\subset X$ with coordinates $z=(u,w)\in\C^{n-p}\times\C^p$ and let
+\[
+P:=\{w=0\}.
+\]
+Fix a translation parameter $t\in\C^p$ and a finite set of points
+\[
+x_1,\dots,x_N\in (P+t)\cap U.
+\]
+Assume these points are pairwise distinct.
+Fix $\eps\in(0,1)$.  Then for all sufficiently large $\mhol$ there exists a single global complete intersection
+\[
+Y^{(t)}\subset X
+\]
+of complex codimension $p$ such that on every ball
+\[
+B_r(x_a),
+\qquad
+r\asymp \mhol^{-1/2},
+\]
+the set $Y^{(t)}$ is a $C^1$ graph over the affine plane $P+t$ with slope $\le C\eps$.  Moreover,
+\[
+\Mass\bigl([Y^{(t)}\cap B_r(x_a)]\bigr)
+=
+\bigl(1+O(\eps)\bigr)\,\calH^k(P\cap B_r(0))
+\]
+uniformly in $a$.
+\end{proposition}
+
+\begin{proof}
+For each $a$ and each $i=1,\dots,p$, Proposition~\ref{prop:bergman} supplies
+peak sections whose values vanish and whose differentials equal $dw_i$ at $x_a$,
+with $C^1$ control on $B_{c\,\mhol^{-1/2}}(x_a)$.  Since the anchor set is finite
+and the points are distinct, for all sufficiently large $\mhol$ the Bergman balls
+$B_{2c\,\mhol^{-1/2}}(x_a)$ are pairwise disjoint.  Standard off-diagonal Bergman
+decay then implies that, for the family $\{x_a\}$, the combined first-jet evaluation
+matrix is block diagonal up to an exponentially small error once $\mhol$ is large;
+see Ma--Marinescu~\cite{MaMarinescu07,MaMarinescu13OffDiag}.  The diagonal blocks
+are the invertible one-point jet matrices already produced by Proposition~\ref{prop:bergman}.
+Hence the full finite jet matrix is invertible for all sufficiently large $\mhol$,
+so one can solve simultaneously for global sections
+\[
+s_1,\dots,s_p\in H^0(X,L^{\mhol})
+\]
+whose common zero set $Y^{(t)}$ has the prescribed first-order model at every $x_a$.
+
+Applying Lemma~\ref{lem:graph} on each ball $B_{c\,\mhol^{-1/2}}(x_a)$ gives the claimed graph representation over $P+t$ with slope $O(\eps)$.  The mass estimate on each ball then follows from the area formula exactly as in Proposition~\ref{prop:finite-template}.
+\end{proof}
+
+\section{Template geometry and face traces}
+
+\subsection{A concrete corner-exit template}
+
+The local bookkeeping becomes rigid once the flat footprint geometry is rigid.  We therefore fix a concrete template in the model cube.
+
+\begin{lemma}[Concrete complex corner-exit template]\label{lem:corner}
+Work in $\C^n=\C^{n-p}\times\C^p$ with coordinates $z=(u,w)$ and identify $\C^n \cong \R^{2n}$.  Let
+\[
+Q:=[0,h]^{2n},
+\qquad
+0<c_0<1,
+\qquad
+0<s\le c_0 h/100.
+\]
+Define a complex $(n-p)$-plane $P_\ast$ by
+\[
+w_1 = -(1-i)\sum_{r=1}^{n-p} u_r,
+\qquad
+w_2=\cdots=w_p=0.
+\]
+For a translation parameter $t=(t_1,\dots,t_p)\in\C^p$, set
+\[
+P_t := P_\ast + t.
+\]
+Assume
+\[
+\Re t_1=s,
+\qquad
+2s \le \Im t_1 \le 3s,
+\qquad
+2s \le \Re t_j,\Im t_j \le 3s
+\quad (2\le j \le p).
+\]
+Then $E(t):=P_t\cap Q$ is a $k$-simplex satisfying:
+\begin{enumerate}
+\item[\textnormal{(i)}] $E(t)\subset B(0,c_0h)$ and $\diam(E(t))\asymp s$;
+\item[\textnormal{(ii)}] $E(t)$ meets exactly the $k+1$ ``near'' faces
+\[
+\{\Re u_r=0\},
+\quad
+\{\Im u_r=0\}
+\quad (1\le r\le n-p),
+\qquad
+\{\Re w_1=0\},
+\]
+and meets no other codimension-$1$ faces of $Q$;
+\item[\textnormal{(iii)}] throughout the admissible parameter box, the footprint geometry is identical, so $\calH^k(E(t))$ and all facet masses are independent of $t$.
+\end{enumerate}
+In particular, for every $\delta>0$ the admissible parameter box contains finite
+$\delta$-separated families of translation parameters with identical footprint
+geometry.  Downstream multiplicities may be encoded by repeating parameters, so
+no infinite separated family is required here.
+\end{lemma}
+
+\begin{proof}
+Write $u_r=x_r+iy_r$.  On $P_t$ one has
+\[
+\Re w_1
+=
+s-\sum_{r=1}^{n-p}(x_r+y_r).
+\]
+Thus the constraints $x_r\ge 0$, $y_r\ge 0$, and $\Re w_1\ge 0$ cut out the standard simplex
+\[
+x_r\ge 0,\quad y_r\ge 0,\quad \sum_{r=1}^{n-p}(x_r+y_r)\le s
+\]
+in the $k=2(n-p)$ real variables $(x_1,y_1,\dots,x_{n-p},y_{n-p})$.
+
+The interior margin conditions on the imaginary part of $w_1$ and on $w_2,\dots,w_p$ force all other coordinates to stay strictly away from the far faces of the cube, because every such coordinate varies by at most $O(s)$.  Since $s\ll h$, the footprint stays inside $B(0,c_0h)$ and meets only the listed near faces.  The defining inequalities in the $(x_r,y_r)$ variables do not depend on the remaining components of $t$, so the simplex geometry is unchanged throughout the parameter box.
+\end{proof}
+
+\begin{corollary}[Direction-adapted corner-exit templates]\label{cor:corner-adapted}
+Fix a finite family of calibrated directions $\Pi_1,\dots,\Pi_J$ in one holomorphic chart.  For each $j$ there is a unitary linear change of coordinates carrying $\Pi_j$ to the model plane underlying Lemma~\ref{lem:corner}.  Transporting the model template by this change of coordinates gives a corner-exit template family for $\Pi_j$ with the same scale bounds and the same face combinatorics up to chart-dependent constants.  Since the direction family is finite, all constants may be chosen uniformly in $j$.
+\end{corollary}
+
+\begin{proof}
+Apply a unitary linear map carrying $\Pi_j$ to the model plane and transport the construction of Lemma~\ref{lem:corner}.  Uniformity follows because the family of directions is finite.
+\end{proof}
+
+\subsection{Small graph distortion}
+
+\begin{lemma}[Small-graph distortion]\label{lem:distortion}
+Let $E\subset \R^k$ be measurable and let $G:E\to \R^q$ be $C^1$ with
+\[
+\|DG\|_{L^\infty(E)} \le \eps,
+\qquad
+0<\eps\le 1.
+\]
+Write $\Gamma(x):=(x,G(x))$.  Then
+\[
+1 \le J_\Gamma(x) \le 1 + C_k\eps^2,
+\]
+hence
+\[
+\calH^k(E)\le \calH^k(\Gamma(E)) \le (1+C_k\eps^2)\calH^k(E).
+\]
+The same estimate holds on $(k-1)$-dimensional faces:
+\[
+\calH^{k-1}(F)\le \calH^{k-1}(\Gamma(F)) \le (1+C_k\eps^2)\calH^{k-1}(F).
+\]
+\end{lemma}
+
+\begin{proof}
+The Jacobian is
+\[
+J_\Gamma(x)
+=
+\sqrt{\det(I+(DG)^TDG)}.
+\]
+The symmetric matrix $(DG)^TDG$ is positive semidefinite with operator norm at most $\eps^2$, so all eigenvalues lie in $[0,\eps^2]$.  Therefore
+\[
+1\le J_\Gamma(x)\le (1+\eps^2)^{k/2}\le 1 + C_k\eps^2.
+\]
+The area formula then gives the stated $k$- and $(k-1)$-dimensional estimates.
+\end{proof}
+
+\subsection{Face-trace decomposition}
+
+\begin{proposition}[Face traces for a corner-exit graph sheet]\label{prop:face}
+Fix one direction label $j$ and work in a splitting adapted to $\Pi_j$.  Let
+$E_{j,a}\subset Q$ be one of the flat corner-exit footprints from
+Corollary~\ref{cor:corner-adapted} at scale $s$, with translation parameter
+$t_{j,a}$, and suppose that on a neighborhood of $E_{j,a}$ inside the affine
+translate $\Pi_j+t_{j,a}$ the local sheet $S_j^{(a)}\subset Q$ is a $C^1$ graph
+with slope at most $\eps_{\mathrm{hol}}$.
+
+Then for every face $F\subset \partial Q$ there is a fixed reference current $R_{j,F}$ in
+\[
+F \cap (\Pi_j\times\{0\})
+\]
+such that
+\[
+\calF\!\Bigl((\partial [S_j^{(a)}])\llcorner F-(\tau_{t_{j,a}})_\#R_{j,F}\Bigr)
+\le C\,\eps_{\mathrm{hol}}\,s^{k-1},
+\]
+where $R_{j,F}=0$ if the flat footprint $E_{j,a}$ does not meet $F$.  When
+$R_{j,F}\neq 0$, its mass is $\asymp s^{k-1}$.
+\end{proposition}
+
+\begin{proof}
+The flat footprint has fixed face combinatorics by
+Corollary~\ref{cor:corner-adapted}.  On each designated face, the boundary trace
+of the graph sheet is itself a small graph over the corresponding flat facet of
+$E_{j,a}$.  Let $R_{j,F}$ be the integral current carried by that flat facet in
+the untranslated model.  Translation in the transverse variable by $t_{j,a}$
+carries it to the flat slice for the sheet $E_{j,a}$.
+
+The graph over the facet has $C^0$ displacement $O(\eps_{\mathrm{hol}}s)$ inside
+$F$ and $(k-1)$-dimensional size $\asymp s^{k-1}$.  Filling the straight-line
+homotopy between the translated flat facet and the actual graph facet inside $F$
+therefore gives a prism current of mass $O(\eps_{\mathrm{hol}}s^{k-1})$, which
+is exactly the desired flat-norm bound.  If $E_{j,a}$ misses $F$, then
+$R_{j,F}=0$, and the same homotopy estimate gives
+$\calF((\partial [S_j^{(a)}])\llcorner F)\le C\eps_{\mathrm{hol}}s^{k-1}$.
+\end{proof}
+
+\section{Local multi-sheet construction}
+
+\subsection{Holomorphic sheets at the local scale}
+
+\begin{definition}[Holomorphic scale]
+Fix $\sigma \in (0,1)$.  For a tensor power $\mhol$ we define the associated holomorphic scale by
+\[
+s:=\sigma \mhol^{-1/2}.
+\]
+In the applications below, $\sigma$ is chosen once and for all so that the Bergman ball from Proposition~\ref{prop:bergman} contains the entire footprint neighborhood.
+\end{definition}
+
+\begin{theorem}[Local multi-sheet construction]\label{thm:local-sheets}
+Let $Q\subset X$ be a cube of side length $h$ inside a normal holomorphic chart.  Fix $\eps_{\mathrm{hol}}\in(0,1)$.  Let
+\[
+s=\sigma \mhol^{-1/2}
+\]
+with $\sigma$ fixed and $\mhol$ so large that $s\le h/100$.
+
+For each direction label $j\in\{1,\dots,J\}$, choose a finite list of translation parameters
+\[
+t_{j,1},\dots,t_{j,N_j}
+\]
+inside the admissible box of a direction-adapted corner-exit family at scale $s$.
+
+Then there exist global complete intersections
+\[
+Y_j^{(a)}\subset X
+\qquad
+(1\le j\le J,\ 1\le a\le N_j)
+\]
+of complex codimension $p$ such that each $Y_j^{(a)}\cap Q$ contains a connected component $S_j^{(a)}$ with the following properties:
+\begin{enumerate}
+\item[\textnormal{(i)}] on a neighborhood containing the flat footprint
+$E_{j,a}$ determined by $t_{j,a}$, the set $S_j^{(a)}$ is a $C^1$ graph over
+the affine translate $\Pi_j+t_{j,a}$, and
+\[
+\angle(T_yS_j^{(a)},\Pi_j)\le \eps_{\mathrm{hol}}
+\qquad
+\text{for all }y\in S_j^{(a)}.
+\]
+\item[\textnormal{(ii)}] There is a reference mass $A_j(s)\asymp s^k$, independent of $a$, such that
+\[
+\bigl|\Mass(S_j^{(a)})-A_j(s)\bigr|
+\le
+C\,\eps_{\mathrm{hol}}\,s^k.
+\]
+\item[\textnormal{(iii)}] The face-trace approximation of
+Proposition~\ref{prop:face} holds for every face of $Q$.
+\end{enumerate}
+No disjointness is required.  Repeated parameters are allowed and simply encode multiplicity.
+\end{theorem}
+
+\begin{proof}
+Fix $(j,a)$.  Choose the direction-adapted coordinates from Corollary~\ref{cor:corner-adapted} so that $\Pi_j$ is the base plane and $E_{j,a}$ is the chosen flat footprint of size $\asymp s$.  Let $x_{j,a}$ be the barycenter of $E_{j,a}$.
+
+Because $\diam(E_{j,a})\asymp s\asymp \mhol^{-1/2}$, Proposition~\ref{prop:tangent} applies at $x_{j,a}$ with tangent plane $\Pi_j$ and tolerance $\eps_{\mathrm{hol}}$.  It produces a complete intersection $Y_j^{(a)}$ whose zero set is a $C^1$ graph over the affine plane through $x_{j,a}$ with direction $\Pi_j$ on a ball containing the entire footprint neighborhood.  Taking the connected component meeting $x_{j,a}$ gives $S_j^{(a)}$.
+
+The mass estimate follows from Lemma~\ref{lem:distortion} and the fact that all flat footprints in one direction family are identical up to transverse translation.  Proposition~\ref{prop:face} then gives the face-trace decomposition.  Since every $(j,a)$ is handled independently and the family is finite, one may choose a single large $\mhol$ that works for the entire list.
+\end{proof}
+
+\subsection{Shared-face coherent reuse of one sheet}
+
+\begin{proposition}[Shared-face coherent reuse of one local sheet]\label{prop:shared-face}
+Let $Q,Q'$ be adjacent cubes of side length $h$ contained in one normal holomorphic chart and sharing an interior face $F$.  Fix a direction label $j$, a translation parameter $t$, and flat corner-exit footprints
+\[
+E_Q(t)\subset Q,
+\qquad
+E_{Q'}(t)\subset Q'
+\]
+for the same affine translate of $\Pi_j$, both at scale
+\[
+s=\sigma \mhol^{-1/2}\le h/100.
+\]
+Assume:
+\begin{enumerate}
+\item[\textnormal{(a)}] both footprints are contained in $B(v,c_0h)$ for some shared vertex $v\in\mathrm{Vert}(F)$;
+\item[\textnormal{(b)}] the two flat facets on the common face agree as currents on $F$, i.e.
+\[
+E_Q(t)\cap F=E_{Q'}(t)\cap F;
+\]
+\item[\textnormal{(c)}] $x_Q\in E_Q(t)$ and $x_{Q'}\in E_{Q'}(t)$ are anchor points on the common affine translate.
+\end{enumerate}
+Then for every tangent tolerance $\eps_{\mathrm{hol}}\in(0,1)$ and all sufficiently large $\mhol$ there exists a \emph{single} global complete intersection
+\[
+Y_{j,t}\subset X
+\]
+whose zero set is a $C^1$ graph over that affine translate on neighborhoods of both footprint neighborhoods.  Consequently there are connected components
+\[
+S_Q\subset Y_{j,t}\cap Q,
+\qquad
+S_{Q'}\subset Y_{j,t}\cap Q'
+\]
+such that:
+\begin{enumerate}
+\item[\textnormal{(i)}] $S_Q$ and $S_{Q'}$ are the local sheets attached to the same global object $Y_{j,t}$;
+\item[\textnormal{(ii)}] on the shared face $F$ one has
+\[
+\calF\!\Bigl((\partial[S_Q])\llcorner F-(\tau_t)_\#R_{j,F}\Bigr)
+\le C\,\eps_{\mathrm{hol}}\,s^{k-1},
+\]
+\[
+\calF\!\Bigl((\partial[S_{Q'}])\llcorner F+(\tau_t)_\#R_{j,F}\Bigr)
+\le C\,\eps_{\mathrm{hol}}\,s^{k-1},
+\]
+\item[\textnormal{(iii)}] if the same parameter $t$ is repeated, every repeated copy has the same model face current on $F$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+Apply Proposition~\ref{prop:multi-ball} to the finite anchor set
+$\{x_Q,x_{Q'}\}$ on the common affine translate.  This gives a single global
+complete intersection $Y_{j,t}$ that is a $C^1$ graph over $\Pi_j+t$ on
+Bergman-scale balls around both anchors.  Since each footprint has diameter
+$\asymp s$ and the scale parameter $\sigma$ was fixed so that every footprint
+neighborhood fits inside one Bergman-scale ball, those balls contain the full
+footprint neighborhoods in the two cubes.  Taking the connected components
+meeting the two footprints gives $S_Q$ and $S_{Q'}$.
+
+Apply Proposition~\ref{prop:face} in each cube.  Hypothesis~\textnormal{(b)}
+says that the flat facet on $F$ is the same translated reference current from
+both sides.  The only difference between the two model traces is the induced
+boundary orientation of $F$ inside $\partial Q$ and $\partial Q'$, which
+contributes the sign change.  The flat-norm error bounds are exactly those from
+Proposition~\ref{prop:face}.  Repeated use of the same parameter $t$ clearly
+leaves the model face current unchanged.
+\end{proof}
+
+\subsection{Integer mass matching}
+
+The holomorphic scale supplies the sheet size.  Mass fractions are then obtained by integer rounding.
+
+\begin{proposition}[Mass matching by integer counts]\label{prop:round}
+Assume the setting of Theorem~\ref{thm:local-sheets} for one fixed cube $Q$, and let $M\ge 0$ be the local mass budget.  For each direction $j$, let $A_j(s)$ be the reference sheet mass from Theorem~\ref{thm:local-sheets}.  Define
+\[
+N_j := \left\lfloor \frac{\theta_j M}{A_j(s)} \right\rceil,
+\]
+the nearest integer to $\theta_j M/A_j(s)$.
+
+Then
+\[
+\left|
+N_j A_j(s)-\theta_j M
+\right|
+\le \frac12 A_j(s),
+\]
+and after replacing $A_j(s)$ by the actual sheet masses one gets
+\[
+\left|
+\sum_{a=1}^{N_j}\Mass(S_j^{(a)})-\theta_j M
+\right|
+\le
+C\,A_j(s)+C\,\eps_{\mathrm{hol}}\,\theta_j M.
+\]
+Summing over $j$ gives
+\[
+\left|
+\sum_{j=1}^J\sum_{a=1}^{N_j}\Mass(S_j^{(a)}) - M
+\right|
+\le
+C\sum_{j=1}^J A_j(s)
++
+C\,\eps_{\mathrm{hol}}\,M.
+\]
+\end{proposition}
+
+\begin{proof}
+The nearest-integer bound gives
+\[
+|N_jA_j(s)-\theta_j M| \le \frac12A_j(s).
+\]
+By Theorem~\ref{thm:local-sheets},
+\[
+\Mass(S_j^{(a)}) = A_j(s) + O(\eps_{\mathrm{hol}}\,s^k)
+=
+A_j(s)\bigl(1+O(\eps_{\mathrm{hol}})\bigr),
+\]
+uniformly in $a$.  Therefore
+\[
+\sum_{a=1}^{N_j}\Mass(S_j^{(a)})
+=
+N_jA_j(s) + O(\eps_{\mathrm{hol}}\,N_jA_j(s)).
+\]
+Since $N_jA_j(s)\le \theta_j M + \frac12A_j(s)$, the claimed estimate follows.  Summing over $j$ yields the total-mass bound.
+\end{proof}
+
+\subsection{Barycenter control}
+
+\begin{corollary}[Local barycenter control]\label{cor:bary}
+Assume the setting of Theorem~\ref{thm:local-sheets} and Proposition~\ref{prop:round}, and let
+\[
+S_Q := \sum_{j=1}^J\sum_{a=1}^{N_j}[S_j^{(a)}].
+\]
+If $S_Q\neq 0$, then
+\[
+\left\|
+\mathsf{Bar}(S_Q)
+-
+\sum_{j=1}^J \vartheta_j \xi_{\Pi_j}
+\right\|_{\HS}
+\le
+C\,\eps_{\mathrm{hol}},
+\]
+where
+\[
+\vartheta_j
+:=
+\frac{\sum_{a=1}^{N_j}\Mass(S_j^{(a)})}{\Mass(S_Q)}.
+\]
+Moreover,
+\[
+\left|
+\vartheta_j-\theta_j
+\right|
+\le
+C\,\frac{A_j(s)}{\max\{M,\sum_{\ell=1}^J A_\ell(s)\}}
++
+C\,\eps_{\mathrm{hol}}.
+\]
+\end{corollary}
+
+\begin{proof}
+For each sheet $S_j^{(a)}$, every tangent plane is within $\eps_{\mathrm{hol}}$ of $\Pi_j$.  Therefore the normalized tangent tensor differs from $\xi_{\Pi_j}$ by $O(\eps_{\mathrm{hol}})$ pointwise.  Averaging over the sheet and then over all sheets gives
+\[
+\left\|
+\mathsf{Bar}(S_Q)-\sum_j \vartheta_j \xi_{\Pi_j}
+\right\|_{\HS}
+\le C\eps_{\mathrm{hol}}.
+\]
+
+The weight estimate follows from Proposition~\ref{prop:round} after dividing by $\Mass(S_Q)$.  The denominator is bounded below by a positive multiple of $\max\{M,\sum_\ell A_\ell(s)\}$ up to the same error terms, so the displayed inequality follows.
+\end{proof}
+
+\subsection{Proof of the main theorem}
+
+\begin{proof}[Proof of Theorem~\ref{thm:main}]
+If $M=0$, take all $N_j=0$ and there is nothing to prove.  Assume $M>0$.
+
+Choose a fixed $\sigma>0$ small enough that a footprint of diameter $\asymp \sigma \mhol^{-1/2}$ fits inside the Bergman ball from Proposition~\ref{prop:bergman}.  For each direction label $j$, choose a direction-adapted corner-exit template family from Corollary~\ref{cor:corner-adapted}.  Let $A_j(s)$ be the corresponding reference sheet mass.
+
+Set
+\[
+N_j := \left\lfloor \frac{\theta_j M}{A_j(s)} \right\rceil.
+\]
+Theorem~\ref{thm:local-sheets} produces the required complete intersections and local components.  Proposition~\ref{prop:round} gives the mass-fraction estimate and the total-mass estimate, while Proposition~\ref{prop:face} gives the face-trace decomposition.  Corollary~\ref{cor:bary} gives the barycenter bound.  This is exactly the claimed package.
+\end{proof}
+
+\section{What this paper exports}
+
+Before summarizing the exports, we isolate the exact downstream contract.
+
+\begin{corollary}[Paper~I interface theorem]\label{cor:paper1-export}
+Under the hypotheses of Theorem~\ref{thm:main}, the local manufacturing layer
+produces holomorphic sheet families with:
+\begin{enumerate}
+\item[\textnormal{(i)}] prescribed calibrated directions and local mass fractions up to one-sheet rounding,
+\item[\textnormal{(ii)}] template-controlled face traces in flat norm with error $O(\eps_{\mathrm{hol}}s^{k-1})$, and
+\item[\textnormal{(iii)}] shared-face coherent reuse across adjacent cubes in the matched-facet setting of Proposition~\ref{prop:shared-face}.
+\end{enumerate}
+No claim is made here about arbitrary face-data realization, global closure,
+cohomological matching, or algebraicity of a global cycle.
+\end{corollary}
+
+\begin{proof}
+Combine Theorem~\ref{thm:main} with Proposition~\ref{prop:shared-face}.
+\end{proof}
+
+The local result can be summarized as follows.
+
+\begin{itemize}
+\item A finite local direction dictionary $\{\Pi_j\}$ can be converted into actual holomorphic sheet families.
+\item Each family comes with a sheet mass $A_j(s)\asymp s^k$ at the holomorphic scale.
+\item Prescribed local mass fractions are realized by integer counts, with only the one-sheet rounding loss.
+\item On each cube face, every sheet trace is flat-norm close to a translated reference slice from the fixed corner-exit template family, with error $O(\eps_{\mathrm{hol}}s^{k-1})$.
+\item If two adjacent cubes are assigned flat corner-exit templates with the same facet on their common face, the two local sheets can be realized as restrictions of a single global complete intersection, so their face traces are flat-norm close to opposite orientations of the same model face current with error $O(\eps_{\mathrm{hol}}s^{k-1})$.
+\end{itemize}
+
+That is the whole point of this paper.  Nothing global is solved here.  In particular, this paper does not close boundaries, does not realize arbitrary face data, does not enforce global transport compatibility beyond the matched shared-face reuse setting, and does not impose cohomological constraints.  The value is that the local manufacturing layer is now explicit, quantitative, and modular.
+
+\begin{thebibliography}{99}
+
+\bibitem{MaMarinescu07}
+X.~Ma and G.~Marinescu.
+\newblock {\em Holomorphic Morse Inequalities and Bergman Kernels}.
+\newblock Progress in Mathematics 254, Birkh\"auser, 2007.
+
+\bibitem{MaMarinescu13OffDiag}
+X.~Ma and G.~Marinescu.
+\newblock Remark on the off-diagonal expansion of the Bergman kernel on compact K\"ahler manifolds.
+\newblock {\em Comm.\ Math.\ Stat.}, 1:37--41, 2013.
+
+\bibitem{HL82}
+R.~Harvey and H.~B.~Lawson, Jr.
+\newblock Calibrated geometries.
+\newblock {\em Acta Mathematica}, 148:47--157, 1982.
+
+\end{thebibliography}
+
+\end{document}
