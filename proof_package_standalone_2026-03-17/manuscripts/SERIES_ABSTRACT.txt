@@ -1,0 +1,23 @@
+Series title:
+
+  Calibrated discretization and algebraic realization of rational (p,p)-classes
+
+Series abstract:
+
+  This four-paper series develops a machine that converts smooth closed
+  uniformly positive strongly positive (p,p)-forms on a smooth complex
+  projective manifold into algebraic cycles representing their cohomology
+  classes.  Paper I constructs holomorphic complete-intersection pieces at
+  the Bergman scale with quantitative tangent, mass, and face-trace control.
+  Paper II organizes those pieces into coherent assembly packets via
+  Caratheodory decomposition, Lipschitz-stable direction labeling, and a
+  vertex-prefix face-balancing mechanism that yields a global boundary
+  flat-norm bound.  Paper III converts such packets into closed integral
+  cycles in an exact prescribed homology class with vanishing calibration
+  defect, using a period-first rounding principle that separates
+  cohomological locking from geometric closure.  Paper IV passes to a
+  calibrated holomorphic limit via Federer--Fleming compactness and
+  identifies the result as an algebraic cycle by the Harvey--Lawson/King
+  structure theorem and Chow/GAGA.  A signed decomposition then extends the
+  conclusion from cone-positive classes to all rational (p,p)-Hodge classes,
+  for all 1 <= p < n.

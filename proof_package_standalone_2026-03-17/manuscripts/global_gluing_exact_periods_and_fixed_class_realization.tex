@@ -1,0 +1,892 @@
+\documentclass[11pt]{article}
+
+\usepackage{amsmath,amssymb,amsthm,mathtools,geometry}
+\geometry{margin=1in}
+
+\title{Fixed-class integral cycles modulo torsion from coherent calibrated packets\\via period-first rounding}
+\author{Jonathan Washburn\\
+Recognition Science\\
+Recognition Physics Institute\\
+Austin, Texas, USA\\
+\texttt{jon@recognitionphysics.org}}
+\date{March 2026}
+
+\numberwithin{equation}{section}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\DeclareMathOperator{\Mass}{Mass}
+\DeclareMathOperator{\spt}{spt}
+\DeclareMathOperator{\supp}{supp}
+\DeclareMathOperator{\Lip}{Lip}
+\DeclareMathOperator{\HS}{HS}
+\DeclareMathOperator{\PD}{PD}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\calF}{\mathcal{F}}
+\newcommand{\calQ}{\mathcal{Q}}
+\newcommand{\calA}{\mathcal{A}}
+\newcommand{\calH}{\mathcal{H}}
+\newcommand{\Defcal}{\mathrm{Def}_{\mathrm{cal}}}
+\newcommand{\Bary}{\operatorname{Bar}}
+\newcommand{\marg}{\mathrm{marg}}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Given a coherent assembly packet of local calibrated pieces on a compact K\"ahler manifold---the packet exported by Paper~II~\cite[Thm.~1.1]{Washburn26II} from the local manufacturing theorem of Paper~I~\cite[Thm.~1.1]{Washburn26I}---we produce closed integral $k$-cycles in the prescribed homology class modulo torsion with vanishing calibration defect.  The construction separates two approximation problems that are easy to conflate: geometric closure (filling face mismatches by vanishing-mass currents) and cohomological locking (forcing the final closed current to pair exactly with an integral cohomology basis).  The key new ingredient is a period-first rounding principle: one first proves that cube-wise mass and barycenter control force the fractional current to approximate the target period vector, and only then applies fixed-dimensional discrepancy to round the marginal sheets.  An integer trap then locks the class modulo torsion.  This paper does not construct the packet itself, does not extract the calibrated limit, and does not prove algebraicity or the Hodge conjecture; it exports the exact-class almost-calibrated sequence consumed by the capstone paper~\cite{Washburn26IV}.
+\end{abstract}
+
+\section{Introduction}
+
+Fix a compact K"ahler manifold $(X,\omega)$ of complex dimension $n$ and an integer $p$ with $1\le p<n$.  Write
+\[
+k:=2n-2p,
+\qquad
+\psi:=\frac{\omega^{n-p}}{(n-p)!}.
+\]
+Let $\beta$ be a smooth closed strongly positive $(p,p)$--form whose cohomology class is rational, and assume there exists $\tau_\beta>0$ such that
+\[
+\langle\beta(x),\psi_x\rangle\ge \tau_\beta
+\qquad (x\in X).
+\]
+Choose an integer $m\ge 1$ such that $m[\beta]$ is integral modulo torsion, and set
+\[
+A:=\PD(m[\beta])\in H_k(X,\Z)/\mathrm{tors},
+\qquad
+c_0:=m\int_X \beta\wedge\psi.
+\]
+Paper~I~\cite[Thm.~1.1]{Washburn26I} produces, cube by cube, holomorphic complete-intersection pieces with prescribed direction weights, controlled face traces, and controlled local tangent barycenters.  Paper~II~\cite[Thm.~1.1]{Washburn26II} converts a smooth closed uniformly positive cone-valued form into a coherent assembly packet by choosing globally labeled directions, Lipschitz-stable weights, and a vertex-prefix local model with explicit face balancing.  None of that closes the current globally, and none of it forces the target class modulo torsion.  This paper does those two jobs.
+
+The main point is not subtle but it is easy to blur in a long manuscript.  Two different approximation problems appear:
+\begin{enumerate}
+\item geometric closure, meaning that the face mismatches can be filled by a current of vanishing mass, and
+\item cohomological locking, meaning that after the final $0$--$1$ roundoff the resulting closed current pairs \emph{exactly} with an integral cohomology basis.
+\end{enumerate}
+The old vulnerable route mixed these.  The repaired route does not.  First one proves global coherence across labels, which gives small boundary flat norm.  Separately one proves that local mass and barycenter control force the fractional bookkeeping current to have periods close to the target period vector.  Only then does one use fixed-dimensional discrepancy to round the final marginal sheets.  The target class modulo torsion is recovered by an integer trap: after gluing, every period differs from the target integer by less than $\tfrac12$, hence equality is forced.
+
+\medskip
+
+\noindent\textbf{Main theorem in plain language.}
+Suppose a mesh of local calibrated pieces has three quantitative features: globally coherent traces across faces, cube-wise control of mass, and cube-wise control of tangent-plane barycenter.  Then one can choose the final on/off decisions for the marginal sheets so that the resulting raw current has the right periods up to a tiny error; after a vanishing-mass gluing correction it becomes a closed integral cycle in the exact target class; and because the correction mass tends to zero, the calibration defect also tends to zero.
+
+\medskip
+
+The precise statement is below.  The terms appearing in it are defined in Section~\ref{sec:setup}.
+
+\medskip
+
+\noindent\textbf{What this paper does not prove.}
+It does not construct the assembly packet, does not produce the calibrated limit, and does not prove algebraicity or the Hodge conjecture.  Its role in the series is to convert the packet of Paper~II into closed cycles in the target class modulo torsion with vanishing calibration defect.
+
+\medskip
+
+\noindent\textbf{Notation for the theorem.}
+Here $\calF$ denotes the integral Federer--Fleming flat norm, i.e. the flat norm
+defined using integral decompositions only, and every comparison
+$\|\Bary(S_{Q,h}^{\mathrm{frac}})-\widehat\beta(x_Q)\|_{\HS}$ is taken in the fixed
+chartwise trivialization chosen on the cube $Q$.
+
+\begin{theorem}[Global assembly theorem]\label{thm:main}
+Let $(X,\omega)$ be a compact K"ahler manifold of complex dimension $n$, let $1\le p<n$, and set $k:=2n-2p$ and $\psi:=\omega^{n-p}/(n-p)!$.  Let $\beta$ be a smooth closed strongly positive $(p,p)$--form with rational cohomology class, and assume there exists $\tau_\beta>0$ such that
+\[
+\langle\beta(x),\psi_x\rangle\ge \tau_\beta
+\qquad (x\in X).
+\]
+Choose $m\ge 1$ so that $m[\beta]\in H^{2p}(X,\Z)$ modulo torsion, and set
+\[
+A:=\PD(m[\beta])\in H_k(X,\Z)/\mathrm{tors},
+\qquad
+c_0:=m\int_X \beta\wedge\psi.
+\]
+Fix smooth closed $k$--forms $\Theta_1,\dots,\Theta_b$ representing an integral basis of the free part of $H^k(X,\Z)$.
+
+Assume that for each sufficiently small mesh size $h>0$ there is an \emph{assembly packet at scale $h$} with the following properties.
+\begin{enumerate}
+\item[\textnormal{(A1)}] There is a mesh $\calQ_h$ by coordinate cubes, a choice of basepoint $x_Q\in Q$ for each cube, and a fractional bookkeeping current
+\[
+S_h^{\mathrm{frac}}=S_h^0+\sum_{\alpha\in\calA_h} a_{\alpha,h} Z_{\alpha,h},
+\qquad
+0\le a_{\alpha,h}<1,
+\]
+where $S_h^0$ is integral and each $Z_{\alpha,h}$ is an integral $\psi$--calibrated current supported in a single cube.  Writing
+\[
+S_h^{\mathrm{frac}}=\sum_{Q\in\calQ_h} S_{Q,h}^{\mathrm{frac}},
+\qquad
+M_{Q,h}:=m\int_Q \beta\wedge\psi,
+\]
+one has cube-wise bounds
+\[
+\bigl|\Mass(S_{Q,h}^{\mathrm{frac}})-M_{Q,h}\bigr|\le e_{Q,h},
+\qquad
+\bigl\|\Bary(S_{Q,h}^{\mathrm{frac}})-\widehat\beta(x_Q)\bigr\|_{\HS}\le \eta_{Q,h},
+\]
+with
+\[
+\sum_{Q\in\calQ_h} e_{Q,h}\longrightarrow 0,
+\qquad
+\sup_{Q\in\calQ_h}\eta_{Q,h}\longrightarrow 0
+\qquad (h\downarrow 0).
+\]
+
+\item[\textnormal{(A2)}] The packet is globally coherent across labels: there is a number $\delta_h\downarrow 0$ such that for every choice of on/off variables $\varepsilon_{\alpha,h}\in\{0,1\}$ the raw integral current
+\[
+S_h(\varepsilon):=S_h^0+\sum_{\alpha\in\calA_h}\varepsilon_{\alpha,h} Z_{\alpha,h}
+\]
+satisfies
+\[
+\calF\bigl(\partial S_h(\varepsilon)\bigr)\le \delta_h.
+\]
+
+\item[\textnormal{(A3)}] There is a constant $C_0$ independent of $h$ such that every marginal current $Z_{\alpha,h}$ satisfies
+\[
+\max_{1\le \ell\le b}\left|\int_{Z_{\alpha,h}}\Theta_\ell\right|\le C_0 h^k.
+\]
+\end{enumerate}
+Then for all sufficiently small $h$ one can choose $\varepsilon_{\alpha,h}\in\{0,1\}$ so that, if
+\[
+S_h:=S_h^0+\sum_{\alpha\in\calA_h}\varepsilon_{\alpha,h} Z_{\alpha,h},
+\]
+there exists an integral current $U_h$ with
+\[
+\partial U_h=\partial S_h,
+\qquad
+\Mass(U_h)\le \delta_h+C_X\,\delta_h^{\frac{k}{k-1}},
+\]
+where $C_X$ depends only on the ambient geometry, and the corrected current
+\[
+T_h:=S_h-U_h
+\]
+satisfies:
+\begin{enumerate}
+\item[\textnormal{(i)}] $T_h$ is a closed integral $k$--cycle.
+\item[\textnormal{(ii)}] $\int_{T_h}\Theta_\ell=m\int_X \beta\wedge\Theta_\ell$ for every $\ell=1,\dots,b$.
+\item[\textnormal{(iii)}] $[T_h]=A$ in $H_k(X,\Z)/\mathrm{tors}$.
+\item[\textnormal{(iv)}] The calibration defect obeys
+\[
+0\le \Defcal(T_h):=\Mass(T_h)-\int_{T_h}\psi\le 2\,\Mass(U_h)\xrightarrow[h\downarrow 0]{}0.
+\]
+\item[\textnormal{(v)}] Consequently,
+\[
+\Mass(T_h)\to c_0.
+\]
+\end{enumerate}
+\end{theorem}
+
+The theorem is the exact export needed by the final synthesis paper.  Its input is a local manufacturing layer plus a coherent trace packet.  Its output is a fixed-class almost-calibrated closed sequence.
+
+\section{Setup and the assembly packet}\label{sec:setup}
+
+\subsection{Ambient data}
+
+Throughout the paper $(X,\omega)$ is a compact K"ahler manifold of complex dimension $n$, and $1\le p<n$ is fixed.  We write
+\[
+k:=2n-2p,
+\qquad
+\psi:=\frac{\omega^{n-p}}{(n-p)!}.
+\]
+The target form is a smooth closed strongly positive $(p,p)$--form $\beta$, and we assume there exists $\tau_\beta>0$ such that
+\[
+\langle\beta(x),\psi_x\rangle\ge \tau_\beta
+\qquad (x\in X).
+\]
+Choose $m\ge 1$ such that $m[\beta]$ is integral modulo torsion and define
+\[
+A:=\PD(m[\beta])\in H_k(X,\Z)/\mathrm{tors},
+\qquad
+c_0:=m\int_X \beta\wedge\psi.
+\]
+Fix smooth closed $k$--forms $\Theta_1,\dots,\Theta_b$ representing an integral basis of the free part of $H^k(X,\Z)$.  For later use write
+\[
+I_\ell:=\int_X \beta\wedge\Theta_\ell,
+\qquad
+mI_\ell\in\Z.
+\]
+
+\subsection{Normalized local target tensors}
+
+Set
+\[
+t(x):=\langle\beta(x),\psi_x\rangle.
+\]
+The uniform lower bound on $t$ lets us define the normalized tensor $\widehat\beta(x)$ on all of $X$ by
+\[
+\beta(x)=t(x)\widehat\beta(x),
+\qquad
+\langle \widehat\beta(x),\psi_x\rangle=1.
+\]
+On a small coordinate cube $Q$, after fixing a smooth local trivialization of the tangent bundle and of the calibrated cone, we view these tensors inside a common finite-dimensional Hermitian vector space $V_Q$ of normalized calibrated $k$-tensors.  The barycenter $\Bary(S_Q)$ and the normalized target tensor $\widehat\beta(x_Q)$ are compared inside this same space, and every closed $k$-form $\Theta_\ell(x_Q)$ acts on $V_Q$ by the natural bilinear pairing.  All $O(h)$ errors below absorb the choice of this trivialization.
+
+\subsection{Positive currents and barycenters}
+
+A normal $k$--current $S$ supported in one coordinate cube is called \emph{$\psi$--positive} if it is a finite nonnegative combination of rectifiable $\psi$--calibrated pieces.  Such a current admits a measurable tangent tensor field $\xi_S(y)$ with $\|\xi_S(y)\|_{\HS}=1$ for $\|S\|$--almost every $y$.  We define the mass-normalized tangent barycenter by
+\[
+\Bary(S):=
+\begin{cases}
+\displaystyle \frac{1}{\Mass(S)}\int \xi_S(y)\,d\|S\|(y), & S\ne 0,\\[1.2ex]
+0, & S=0.
+\end{cases}
+\]
+Because all local pieces come from calibrated sheets, this is the natural barycenter exported by Papers~1 and~2.
+
+\subsection{Fractional bookkeeping currents}
+
+At scale $h$, Paper~2 organizes the local holomorphic sheets from Paper~1 into a fractional bookkeeping current.  In each cube $Q\in\calQ_h$ there is a finite family of calibrated local pieces grouped by direction labels.  The final marginal sheet in a direction family may appear with a coefficient in $[0,1)$ before the last integral roundoff.  Collecting all those fractional pieces gives a current of the form
+\[
+S_h^{\mathrm{frac}}=S_h^0+\sum_{\alpha\in\calA_h} a_{\alpha,h} Z_{\alpha,h},
+\qquad 0\le a_{\alpha,h}<1,
+\]
+where $S_h^0$ is integral and every $Z_{\alpha,h}$ is an integral $\psi$--calibrated current supported in one cube.
+
+The index set $\calA_h$ is purely combinatorial.  It records exactly the last sheet in each local family.  Choosing $\varepsilon_{\alpha,h}\in\{0,1\}$ turns those last sheets off or on and produces a raw integral current
+\[
+S_h(\varepsilon):=S_h^0+\sum_{\alpha\in\calA_h}\varepsilon_{\alpha,h} Z_{\alpha,h}.
+\]
+The entire global problem is to choose these binary variables so that the resulting raw current can be glued to a closed cycle in the target class modulo torsion.
+
+\subsection{The scale-$h$ assembly packet}
+
+The theorem is written so that Papers~1 and~2 are used only through the following interface.
+
+\begin{definition}[Assembly packet at scale $h$]
+An \emph{assembly packet at scale $h$} consists of the data just listed together with:
+\begin{enumerate}
+\item a cube-wise mass estimate
+\[
+\bigl|\Mass(S_{Q,h}^{\mathrm{frac}})-M_{Q,h}\bigr|\le e_{Q,h},
+\qquad
+M_{Q,h}:=m\int_Q \beta\wedge\psi,
+\]
+\item a cube-wise barycenter estimate
+\[
+\bigl\|\Bary(S_{Q,h}^{\mathrm{frac}})-\widehat\beta(x_Q)\bigr\|_{\HS}\le \eta_{Q,h},
+\]
+\item a globally coherent face-trace packet, stable under the bounded marginal roundoff,
+\item a marginal period bound
+\[
+\max_{1\le \ell\le b}\left|\int_{Z_{\alpha,h}}\Theta_\ell\right|\le C_0 h^k.
+\]
+\end{enumerate}
+\end{definition}
+
+The rest of the paper shows how that packet is converted into a closed cycle in the target class modulo torsion.
+
+\section{Global coherence across labels}\label{sec:coherence}
+
+This section records one convenient geometric mechanism that implies the abstract coherence axiom (A2).  Paper~II now exports A2 directly in its packet theorem~\cite[Thm.~1.1]{Washburn26II}, so the results of the present paper do not depend on the specific model below.  The point of this section is only to isolate a reusable transport estimate for translated face slices.
+
+\subsection{Weighted transport on one face}
+
+\begin{proposition}[Weighted transport gives flat control on one face]\label{prop:weighted-transport}
+Let $F$ be an interior face.  Assume that for each transverse parameter $u$ in a face chart there is an integral slice current $\Sigma(u)$ supported in $F$, and that $\Sigma(u)$ is obtained from $\Sigma(0)$ by translation in the face chart.  Given two packets of such slices,
+\[
+S_{Q\to F}:=\sum_{a=1}^N \Sigma(u_a),
+\qquad
+S_{Q'\to F}:=\sum_{a=1}^N \Sigma(u'_a),
+\]
+define the face mismatch
+\[
+B_F:=S_{Q\to F}-S_{Q'\to F}.
+\]
+Then
+\[
+\calF(B_F)
+\le
+\inf_{\sigma\in S_N}
+\sum_{a=1}^N |u_a-u'_{\sigma(a)}|\Bigl(\Mass(\Sigma(u_a))+\Mass(\partial\Sigma(u_a))\Bigr).
+\]
+In particular, if numbers $b_a$ satisfy
+\[
+\Mass(\Sigma(u_a))+\Mass(\partial\Sigma(u_a))\le b_a
+\qquad (1\le a\le N),
+\]
+then
+\[
+\calF(B_F)
+\le
+\inf_{\sigma\in S_N}
+\sum_{a=1}^N |u_a-u'_{\sigma(a)}|\,b_a.
+\]
+\end{proposition}
+
+\begin{proof}
+Fix a permutation $\sigma\in S_N$.  For each $a$, the two slices $\Sigma(u_a)$ and $\Sigma(u'_{\sigma(a)})$ differ by translation in the face chart.  Therefore there are integral currents $R_a$ and $Q_a$ with
+\[
+\Sigma(u_a)-\Sigma(u'_{\sigma(a)})=R_a+\partial Q_a
+\]
+and
+\[
+\Mass(R_a)+\Mass(Q_a)
+\le |u_a-u'_{\sigma(a)}|\Bigl(\Mass(\Sigma(u_a))+\Mass(\partial\Sigma(u_a))\Bigr).
+\]
+Summing over $a$ gives
+\[
+B_F=R+\partial Q,
+\qquad
+R:=\sum_{a=1}^N R_a,
+\qquad
+Q:=\sum_{a=1}^N Q_a,
+\]
+and hence
+\[
+\calF(B_F)\le \Mass(R)+\Mass(Q)
+\le
+\sum_{a=1}^N |u_a-u'_{\sigma(a)}|\Bigl(\Mass(\Sigma(u_a))+\Mass(\partial\Sigma(u_a))\Bigr).
+\]
+Taking the infimum over $\sigma$ proves the claim.
+\end{proof}
+
+\subsection{One sufficient coherence model}
+
+One way to realize axiom (A2) is to give each face-label pair a common ordered packet of transverse parameters, so that adjacent cubes use the same facewise multiplicity data after the balancing step and differ only by the nearby face maps.
+
+\begin{proposition}[Global coherence across labels]\label{prop:global-coherence}
+Fix a mesh size $h$ and an assembly packet.  Assume that for every interior face $F=Q\cap Q'$ and every direction label $i$ there are:
+\begin{enumerate}
+\item an ordered master template $\mathbf y_{F,i}=(y_a)_{a\ge 1}$ contained in a ball of radius $C_0 h$ in the transverse parameter space,
+\item a common prefix length $N_{F,i}\ge 0$,
+\item face maps $\Phi_{Q,F,i}$ and $\Phi_{Q',F,i}$ with
+\[
+|\Phi_{Q,F,i}(y)-\Phi_{Q',F,i}(y)|\le C_1 h^2
+\qquad
+\text{for all template atoms } y=y_a,\ 1\le a\le N_{F,i},
+\]
+\item slice currents $\Sigma_{F,i,a}$ with
+\[
+\Mass(\Sigma_{F,i,a})+\Mass(\partial\Sigma_{F,i,a})\le b_{F,i,a}.
+\]
+\end{enumerate}
+Assume further that these data remain valid after any bounded marginal roundoff, meaning after any choice of turning the final marginal sheet in each family on or off.
+
+Then for every raw rounded current $S_h(\varepsilon)$ and every face-label pair $(F,i)$ the associated mismatch current $B_{F,i}(\varepsilon)$ satisfies
+\[
+\calF\bigl(B_{F,i}(\varepsilon)\bigr)
+\le C_1 h^2\sum_{a=1}^{N_{F,i}} b_{F,i,a}.
+\]
+Consequently,
+\[
+\calF\bigl(\partial S_h(\varepsilon)\bigr)
+\le
+\delta_h:=C_1 h^2\sum_{F}\sum_i\sum_{a=1}^{N_{F,i}} b_{F,i,a}.
+\]
+In particular, if $\delta_h\to 0$ along the chosen parameter schedule, then the raw boundary flat norm tends to zero uniformly over all final $0$--$1$ roundoff choices.
+\end{proposition}
+
+\begin{proof}
+Fix $(F,i)$.  The two packets on the two sides of the face use the same ordered prefix $y_1,\dots,y_{N_{F,i}}$.  Therefore the transport plan that pairs the $a$th atom on one side with the $a$th atom on the other side has cost at most
+\[
+\sum_{a=1}^{N_{F,i}} |\Phi_{Q,F,i}(y_a)-\Phi_{Q',F,i}(y_a)|\,b_{F,i,a}
+\le C_1 h^2\sum_{a=1}^{N_{F,i}} b_{F,i,a}.
+\]
+Proposition~\ref{prop:weighted-transport} gives the same bound for the face mismatch current $B_{F,i}(\varepsilon)$.  Summing over all interior faces and labels gives the estimate for $\partial S_h(\varepsilon)$.  Stability under bounded marginal roundoff is part of the coherence hypothesis, so the same estimate holds for every final on/off choice.
+\end{proof}
+
+\begin{remark}
+This is the geometric part of the repair.  It controls the size of the gluing current.  It does \emph{not} say anything yet about the target cohomology class.  That second task is separated on purpose and handled in Sections~\ref{sec:periods} and \ref{sec:cohomology}.
+\end{remark}
+
+\section{Period from local barycenter}\label{sec:periods}
+
+This section supplies the missing bridge from local geometry to global cohomology.  The key estimate says that if on each cube the realized mass is close to the target cube mass and the tangent-plane barycenter is close to the normalized target tensor, then the period of the local current against any fixed closed test form is close to the target period contributed by that cube.
+
+\begin{lemma}[Cube-wise mass and barycenter control imply period control]\label{lem:period-control}
+There exists a constant $C_\Theta>0$, depending only on the ambient geometry and on the $C^1$ norms of $\beta$, $\psi$, and $\Theta_1,\dots,\Theta_b$, with the following property.
+
+Let $\calQ_h$ be a mesh-$h$ cubulation with basepoints $x_Q\in Q$.  For each cube $Q$ let $S_Q$ be a $\psi$--positive normal $k$--current supported in $Q$, and set
+\[
+M_Q:=m\int_Q \beta\wedge\psi,
+\qquad
+e_Q:=\bigl|\Mass(S_Q)-M_Q\bigr|,
+\qquad
+\eta_Q:=\bigl\|\Bary(S_Q)-\widehat\beta(x_Q)\bigr\|_{\HS}.
+\]
+Then for each $\ell=1,\dots,b$ one has
+\[
+\left|\int_{S_Q}\Theta_\ell - m\int_Q \beta\wedge\Theta_\ell\right|
+\le
+C_\Theta\Bigl(h\max\{M_Q,h^{2n}\}+\eta_Q M_Q+e_Q\Bigr).
+\]
+Consequently,
+\[
+\left|\sum_{Q\in\calQ_h}\int_{S_Q}\Theta_\ell - mI_\ell\right|
+\le
+C_\Theta\Bigl(h+\sum_{Q\in\calQ_h} e_Q + (\sup_Q \eta_Q)\sum_{Q\in\calQ_h} M_Q\Bigr).
+\]
+\end{lemma}
+
+\begin{proof}
+Fix a cube $Q$ and an index $\ell$.  Let $\xi(y)$ denote the normalized calibrated tangent tensor of $S_Q$ in the chosen trivialization.  By definition,
+\[
+\int_{S_Q}\Theta_\ell
+=
+\int \Theta_\ell(y)\bigl(\xi(y)\bigr)\,d\|S_Q\|(y).
+\]
+Because $\Theta_\ell$ is $C^1$ and the diameter of $Q$ is $O(h)$,
+\[
+\Theta_\ell(y)=\Theta_\ell(x_Q)+O(h)
+\qquad (y\in Q),
+\]
+with a uniform operator norm bound.  Therefore
+\[
+\begin{aligned}
+\int_{S_Q}\Theta_\ell
+&=
+\Theta_\ell(x_Q)\left(\int \xi(y)\,d\|S_Q\|(y)\right)+O\bigl(h\Mass(S_Q)\bigr) \\
+&=
+\Mass(S_Q)\,\Theta_\ell(x_Q)\bigl(\Bary(S_Q)\bigr)+O\bigl(h\Mass(S_Q)\bigr).
+\end{aligned}
+\]
+The point of the chosen trivialization is that the tensors $\xi(y)$, $\Bary(S_Q)$,
+and $\widehat\beta(x_Q)$ all live in the same fixed finite-dimensional space
+$V_Q$, while $\Theta_\ell(x_Q)$ acts on $V_Q$ as a bounded linear functional.
+Now compare $\Mass(S_Q)\Bary(S_Q)$ with $M_Q\widehat\beta(x_Q)$.  The bilinear pairing between $k$--forms and normalized calibrated tensors is uniformly bounded, so
+\[
+\Mass(S_Q)\,\Theta_\ell(x_Q)\bigl(\Bary(S_Q)\bigr)
+=
+M_Q\,\Theta_\ell(x_Q)\bigl(\widehat\beta(x_Q)\bigr)+O(e_Q+\eta_Q M_Q).
+\]
+Combining the last two displays gives
+\[
+\int_{S_Q}\Theta_\ell
+=
+M_Q\,\Theta_\ell(x_Q)\bigl(\widehat\beta(x_Q)\bigr)
++O\Bigl(h\max\{M_Q,h^{2n}\}+\eta_Q M_Q+e_Q\Bigr).
+\]
+On the other hand, since $\beta=t\widehat\beta$ and all coefficients vary by $O(h)$ on $Q$,
+\[
+m\int_Q \beta\wedge\Theta_\ell
+=
+M_Q\,\Theta_\ell(x_Q)\bigl(\widehat\beta(x_Q)\bigr)
++O\bigl(h\max\{M_Q,h^{2n}\}\bigr).
+\]
+Subtracting proves the local estimate.
+
+Summing over all cubes yields
+\[
+\left|\sum_Q\int_{S_Q}\Theta_\ell - mI_\ell\right|
+\le
+C_\Theta\left(\sum_Q h\max\{M_Q,h^{2n}\}+\sum_Q e_Q + (\sup_Q\eta_Q)\sum_Q M_Q\right).
+\]
+Since $\sum_Q M_Q=m\int_X \beta\wedge\psi=c_0$ is fixed and $\sum_Q h\,h^{2n}=O(h)$, the stated global estimate follows.
+\end{proof}
+
+\begin{remark}
+This lemma is the missing cohomological approximation step.  It is exactly the part that the older shortcut lacked.  Without it, discrepancy rounding can only control the difference between the fractional bookkeeping current and the rounded current.  It says nothing about the distance from either one to the target period vector.
+\end{remark}
+
+\section{Integral cohomology constraints}\label{sec:cohomology}
+
+The local-to-global period estimate from Section~\ref{sec:periods} still produces a \emph{fractional} current.  This section performs the last integral roundoff and then locks the exact cohomology class.
+
+\subsection{Two integer facts}
+
+The first fact is the standard bounded-dimension discrepancy principle~\cite{BaranyGrinberg81}.
+
+\begin{lemma}[Fixed-dimensional discrepancy roundoff]\label{lem:discrepancy}
+For each dimension $b\ge 1$ there is a constant $C_b$ with the following property.  Let $v_1,\dots,v_N\in\R^b$ satisfy $\|v_j\|_{\ell^\infty}\le \kappa$, and let $a_1,\dots,a_N\in[0,1)$.  Then there exist $\varepsilon_1,\dots,\varepsilon_N\in\{0,1\}$ such that
+\[
+\left\|\sum_{j=1}^N (\varepsilon_j-a_j)v_j\right\|_{\ell^\infty}
+\le C_b\kappa.
+\]
+\end{lemma}
+
+\begin{remark}
+This is the only purely finite-dimensional combinatorial input in the paper.  The important point is that the error bound depends only on the dimension $b$, not on the number of marginals being rounded.
+\end{remark}
+
+The second fact is an integer-valued pairing statement.
+
+\begin{lemma}[Integral periods of closed integral cycles]\label{lem:integral-periods}
+Let $T$ be a closed integral $k$--cycle on $X$, and let $\Theta$ be a smooth closed $k$--form representing an integral cohomology class.  Then
+\[
+\int_T \Theta\in\Z.
+\]
+\end{lemma}
+
+\begin{proof}
+A closed integral current determines an integral homology class.  An integral cohomology class pairs integrally with integral homology.  Under the de Rham description of the pairing, this integer is exactly $\int_T\Theta$; see, for example, Bott--Tu~\cite{BottTu82}.
+\end{proof}
+
+\begin{lemma}[Integral basis determines homology modulo torsion]\label{lem:free-basis-determines-class}
+Let $A,B\in H_k(X,\Z)$ be homology classes, and let
+$\Theta_1,\dots,\Theta_b$ represent an integral basis of the free part of
+$H^k(X,\Z)$.  If
+\[
+\langle A,[\Theta_\ell]\rangle=\langle B,[\Theta_\ell]\rangle
+\qquad (\ell=1,\dots,b),
+\]
+then $A-B$ is torsion.  Equivalently, $A$ and $B$ determine the same class in
+$H_k(X,\Z)/\mathrm{tors}$.
+\end{lemma}
+
+\begin{proof}
+By the universal coefficient pairing, the free part of $H_k(X,\Z)$ is naturally
+dual to the free part of $H^k(X,\Z)$.  Therefore equality on an integral basis of
+the free part of cohomology determines equality of the induced functional on the
+free part of homology.  It follows that $A-B$ vanishes in the free quotient and is
+therefore torsion; see, for example, Bott--Tu~\cite{BottTu82}.
+\end{proof}
+
+\subsection{Exact period locking}
+
+\begin{proposition}[Integral cohomology constraints]\label{prop:cohomology}
+Let $h$ be small and let
+\[
+S_h^{\mathrm{frac}}=S_h^0+\sum_{\alpha\in\calA_h} a_{\alpha,h} Z_{\alpha,h}
+\qquad (0\le a_{\alpha,h}<1)
+\]
+be the fractional bookkeeping current from the assembly packet.  Assume the cube-wise pieces $S_{Q,h}^{\mathrm{frac}}$ satisfy the hypotheses of Lemma~\ref{lem:period-control}.  Then for all sufficiently small $h$ one can choose $\varepsilon_{\alpha,h}\in\{0,1\}$ so that the rounded raw current
+\[
+S_h:=S_h^0+\sum_{\alpha\in\calA_h}\varepsilon_{\alpha,h} Z_{\alpha,h}
+\]
+satisfies
+\[
+\left|\int_{S_h}\Theta_\ell - mI_\ell\right|<\frac14
+\qquad (\ell=1,\dots,b).
+\]
+Moreover, if $U_h$ is any integral current with
+\[
+\partial U_h=\partial S_h,
+\qquad
+\Mass(U_h)<\frac{1}{4\max_{1\le \ell\le b}\|\Theta_\ell\|_{C^0}},
+\]
+then the corrected current
+\[
+T_h:=S_h-U_h
+\]
+is a closed integral cycle satisfying
+\[
+\int_{T_h}\Theta_\ell = mI_\ell
+\qquad (\ell=1,\dots,b).
+\]
+In particular,
+\[
+[T_h]=A
+\qquad\text{in } H_k(X,\Z)/\mathrm{tors}.
+\]
+\end{proposition}
+
+\begin{proof}
+By Lemma~\ref{lem:period-control},
+\[
+\left|\int_{S_h^{\mathrm{frac}}}\Theta_\ell - mI_\ell\right|
+\le
+C_\Theta\Bigl(h+\sum_Q e_{Q,h} + (\sup_Q\eta_{Q,h})\sum_Q M_{Q,h}\Bigr).
+\]
+Because $\sum_Q e_{Q,h}\to 0$ and $\sup_Q\eta_{Q,h}\to 0$, the right-hand side tends to $0$.  Therefore for all sufficiently small $h$,
+\[
+\left|\int_{S_h^{\mathrm{frac}}}\Theta_\ell - mI_\ell\right|<\frac18
+\qquad (\ell=1,\dots,b).
+\]
+
+For each marginal index $\alpha\in\calA_h$ define the period vector
+\[
+v_{\alpha,h}:=\left(\int_{Z_{\alpha,h}}\Theta_1,\dots,\int_{Z_{\alpha,h}}\Theta_b\right)\in\R^b.
+\]
+Assumption (A3) says $\|v_{\alpha,h}\|_{\ell^\infty}\le C_0 h^k$.  For $h$ small enough this is at most $1/(8C_b)$, where $C_b$ is the constant from Lemma~\ref{lem:discrepancy}.  Apply that lemma to the vectors $v_{\alpha,h}$ and coefficients $a_{\alpha,h}$.  We obtain choices $\varepsilon_{\alpha,h}\in\{0,1\}$ such that
+\[
+\left\|\sum_{\alpha\in\calA_h}(\varepsilon_{\alpha,h}-a_{\alpha,h})v_{\alpha,h}\right\|_{\ell^\infty}\le \frac18.
+\]
+Equivalently,
+\[
+\left|\int_{S_h}\Theta_\ell - \int_{S_h^{\mathrm{frac}}}\Theta_\ell\right|\le \frac18
+\qquad (\ell=1,\dots,b).
+\]
+Combining this with the $\tfrac18$ estimate for $S_h^{\mathrm{frac}}$ gives
+\[
+\left|\int_{S_h}\Theta_\ell - mI_\ell\right|<\frac14
+\qquad (\ell=1,\dots,b).
+\]
+
+Now assume $U_h$ satisfies the stated mass bound and set $T_h:=S_h-U_h$.  Because $\partial U_h=\partial S_h$, the current $T_h$ is closed and integral.  Moreover,
+\[
+\left|\int_{U_h}\Theta_\ell\right|
+\le \|\Theta_\ell\|_{C^0}\,\Mass(U_h)
+< \frac14.
+\]
+Therefore
+\[
+\left|\int_{T_h}\Theta_\ell - mI_\ell\right|<\frac12
+\qquad (\ell=1,\dots,b).
+\]
+By Lemma~\ref{lem:integral-periods}, the number $\int_{T_h}\Theta_\ell$ is an integer.  Since also $mI_\ell\in\Z$, strict distance $<\tfrac12$ forces equality:
+\[
+\int_{T_h}\Theta_\ell = mI_\ell
+\qquad (\ell=1,\dots,b).
+\]
+By Lemma~\ref{lem:free-basis-determines-class}, these equalities determine the homology class of $T_h$ modulo torsion and give $[T_h]=A$ in $H_k(X,\Z)/\mathrm{tors}$.
+\end{proof}
+
+\section{Vanishing gluing mass and almost-calibration}\label{sec:almost}
+
+This section turns small boundary flat norm into an actual gluing current and then records the almost-calibration estimate.  The latter is short but crucial: once the correction mass tends to zero, the mass defect above the cohomological lower bound also tends to zero.
+
+\begin{proposition}[Gluing current from boundary flat norm]\label{prop:glue}
+Let $S$ be an integral $k$--current on $X$ and set
+\[
+R:=\partial S,
+\qquad
+\delta:=\calF(R).
+\]
+Here $\calF(R)$ is the integral flat norm, i.e. the infimum of
+$\Mass(R_0)+\Mass(Q)$ over decompositions $R=R_0+\partial Q$ with
+$R_0,Q$ integral.  Then there exists an integral $k$--current $U$ such that
+\[
+\partial U=R,
+\qquad
+\Mass(U)\le \delta + C_X\,\delta^{\frac{k}{k-1}},
+\]
+where $C_X$ depends only on the ambient geometry.
+\end{proposition}
+
+\begin{proof}
+By the definition of the integral flat norm, for every $\eta>0$ there exist integral currents $R_0$ and $Q$ such that
+\[
+R=R_0+\partial Q,
+\qquad
+\Mass(R_0)+\Mass(Q)\le \delta+\eta.
+\]
+Then $R_0$ is a closed integral $(k-1)$--cycle.  It bounds because
+\[
+R_0=\partial(S+Q).
+\]
+By the standard Federer--Fleming filling inequality on compact manifolds~\cite{FF60,Fed69}, there is an integral $k$--current $Q_0$ with
+\[
+\partial Q_0=R_0,
+\qquad
+\Mass(Q_0)\le C_X\,\Mass(R_0)^{\frac{k}{k-1}}.
+\]
+Set
+\[
+U:=Q+Q_0.
+\]
+Then
+\[
+\partial U=\partial Q+\partial Q_0=R-R_0+R_0=R,
+\]
+and
+\[
+\Mass(U)\le \Mass(Q)+\Mass(Q_0)
+\le (\delta+\eta)+C_X(\delta+\eta)^{\frac{k}{k-1}}.
+\]
+Letting $\eta\downarrow 0$ gives the result.
+\end{proof}
+
+\begin{proposition}[Almost-calibration after vanishing-mass gluing]\label{prop:almost}
+Let $S$ be an integral $k$--current that is a finite sum of $\psi$--calibrated local pieces.  Let $U$ be an integral $k$--current with $\partial U=\partial S$, and set
+\[
+T:=S-U.
+\]
+Assume $[T]=A$ in $H_k(X,\Z)/\mathrm{tors}$.  Then
+\[
+0\le \Defcal(T):=\Mass(T)-\int_T\psi\le 2\,\Mass(U).
+\]
+Consequently,
+\[
+\Mass(T)=c_0+\Defcal(T),
+\qquad
+c_0:=\langle A,[\psi]\rangle,
+\]
+so in particular $\Mass(T)\to c_0$ whenever $\Mass(U)\to 0$.
+\end{proposition}
+
+\begin{proof}
+Because each local piece of $S$ is $\psi$--calibrated,
+\[
+\Mass(S)=\int_S\psi.
+\]
+Because $[T]=A$ and $d\psi=0$,
+\[
+\int_T\psi=\langle A,[\psi]\rangle=c_0.
+\]
+Now
+\[
+\Defcal(T)=\Mass(T)-\int_T\psi\ge 0
+\]
+by the comass inequality.  For the upper bound, use the triangle inequality for mass and again the comass inequality:
+\[
+\begin{aligned}
+\Defcal(T)
+&= \Mass(T)-\int_S\psi+\int_U\psi \\
+&\le \bigl(\Mass(S)+\Mass(U)\bigr)-\Mass(S)+\left|\int_U\psi\right| \\
+&\le 2\,\Mass(U).
+\end{aligned}
+\]
+The mass formula follows from $\Mass(T)=\int_T\psi+\Defcal(T)=c_0+\Defcal(T)$.
+\end{proof}
+
+\section{Proof of the main theorem}\label{sec:proof-main}
+
+We now assemble the repaired quartet.
+
+\begin{proof}[Proof of Theorem~\ref{thm:main}]
+Fix a sufficiently small mesh size $h$ and an assembly packet.
+
+\smallskip\noindent
+\textbf{Step 1: choose the final $0$--$1$ roundoff.}
+Apply Proposition~\ref{prop:cohomology} to the fractional current $S_h^{\mathrm{frac}}$.  This gives on/off variables $\varepsilon_{\alpha,h}\in\{0,1\}$ such that the rounded raw current
+\[
+S_h:=S_h^0+\sum_{\alpha\in\calA_h}\varepsilon_{\alpha,h} Z_{\alpha,h}
+\]
+satisfies
+\[
+\left|\int_{S_h}\Theta_\ell - mI_\ell\right|<\frac14
+\qquad (\ell=1,\dots,b).
+\]
+
+\smallskip\noindent
+\textbf{Step 2: glue the small boundary.}
+Assumption (A2) gives
+\[
+\calF(\partial S_h)\le \delta_h.
+\]
+Apply Proposition~\ref{prop:glue} with $S=S_h$.  There is an integral current $U_h$ satisfying
+\[
+\partial U_h=\partial S_h,
+\qquad
+\Mass(U_h)\le \delta_h + C_X\,\delta_h^{\frac{k}{k-1}}.
+\]
+Since $\delta_h\to 0$, the mass of $U_h$ tends to zero.  For $h$ small enough we also have
+\[
+\Mass(U_h)<\frac{1}{4\max_\ell \|\Theta_\ell\|_{C^0}}.
+\]
+Define
+\[
+T_h:=S_h-U_h.
+\]
+Then $T_h$ is a closed integral cycle.
+
+\smallskip\noindent
+\textbf{Step 3: lock the target class modulo torsion.}
+By Proposition~\ref{prop:cohomology}, the smallness of $U_h$ forces
+\[
+\int_{T_h}\Theta_\ell = mI_\ell
+\qquad (\ell=1,\dots,b).
+\]
+Hence $[T_h]=A$ in $H_k(X,\Z)/\mathrm{tors}$.
+
+\smallskip\noindent
+\textbf{Step 4: almost-calibration.}
+The raw current $S_h$ is a sum of $\psi$--calibrated local pieces, because it is obtained from the fractional bookkeeping current by turning marginal calibrated pieces fully on or off.  Therefore Proposition~\ref{prop:almost} applies and gives
+\[
+0\le \Defcal(T_h)\le 2\,\Mass(U_h)\xrightarrow[h\downarrow 0]{}0.
+\]
+Since $[T_h]=A$, the same proposition yields
+\[
+\Mass(T_h)=c_0+\Defcal(T_h)\to c_0.
+\]
+This proves all conclusions of the theorem.
+\end{proof}
+
+\section{Why the repair is necessary}\label{sec:repair}
+
+This section says plainly what the old vulnerability was.
+
+\begin{proposition}[Why discrepancy alone does not determine the class]\label{prop:why-repair}
+Consider a fractional bookkeeping current
+\[
+S^{\mathrm{frac}}=S^0+\sum_{\alpha} a_\alpha Z_\alpha,
+\qquad 0\le a_\alpha<1,
+\]
+and let
+\[
+v_\alpha:=\left(\int_{Z_\alpha}\Theta_1,\dots,\int_{Z_\alpha}\Theta_b\right).
+\]
+A bounded-dimension discrepancy estimate can choose $\varepsilon_\alpha\in\{0,1\}$ so that
+\[
+\left\|\sum_\alpha (\varepsilon_\alpha-a_\alpha)v_\alpha\right\|_{\ell^\infty}
+\]
+is small.  This controls the rounding error
+\[
+\int_{S}\Theta_\ell-\int_{S^{\mathrm{frac}}}\Theta_\ell,
+\qquad
+S:=S^0+\sum_\alpha \varepsilon_\alpha Z_\alpha.
+\]
+It does \emph{not} control the target error
+\[
+\int_{S^{\mathrm{frac}}}\Theta_\ell-mI_\ell.
+\]
+Therefore exact cohomology cannot be recovered from discrepancy alone.
+\end{proposition}
+
+\begin{proof}
+The displayed rounding error depends only on the marginal vectors $v_\alpha$ and the coefficients $a_\alpha$.  The target error depends on the full fractional current $S^{\mathrm{frac}}$ and on the target class.  Those are logically different quantities.  Smallness of the first says nothing about the second unless one inserts an additional estimate.  In this paper that additional estimate is Lemma~\ref{lem:period-control}.
+\end{proof}
+
+\begin{remark}
+That is the whole repair in one sentence: \emph{approximate the target period vector first, round second}.  The paper is structured to make that order impossible to miss.
+\end{remark}
+
+\section{What this paper exports}\label{sec:exports}
+
+The global result can be summarized as follows.
+
+\begin{itemize}
+\item Transport-compatible face traces and global label coherence give a raw boundary flat norm that goes to zero.
+\item Cube-wise mass and barycenter control force the fractional bookkeeping current to have the correct period vector up to $o(1)$.
+\item Fixed-dimensional discrepancy rounds the final marginal sheets without losing that period control.
+\item A vanishing-mass gluing current turns the raw rounded current into a closed integral cycle in the exact target class.
+\item Because the correction mass vanishes, the calibration defect vanishes as well, so the resulting sequence is almost-calibrated and has mass converging to the cohomological lower bound.
+\end{itemize}
+
+That is the exact interface imported by the capstone paper~\cite{Washburn26IV}.  In particular, the downstream import is Theorem~\ref{thm:main} itself, including the marginal period bound \textnormal{(A3)}.  Paper~I manufactures the local calibrated pieces.  Paper~II organizes them into coherent assembly packets.  This paper assembles those packets into closed cycles in the target class modulo torsion with vanishing calibration defect.  The capstone paper then takes the calibrated limit and derives the final Hodge conclusion.
+
+\begin{thebibliography}{99}
+
+\bibitem{Washburn26I}
+J.~Washburn.
+\newblock {\em Bergman-scale holomorphic complete intersections with prescribed
+  tangent directions and face traces}.
+\newblock Preprint, 2026.
+
+\bibitem{Washburn26II}
+J.~Washburn.
+\newblock {\em Coherent discretization of strongly positive forms by
+  vertex-prefix face balancing}.
+\newblock Preprint, 2026.
+
+\bibitem{Washburn26IV}
+J.~Washburn.
+\newblock {\em Calibrated holomorphic limits and algebraic realization of
+  cone-positive rational $(p,p)$-classes}.
+\newblock Preprint, 2026.
+
+\bibitem{BaranyGrinberg81}
+I.~B\'ar\'any and V.~S.~Grinberg.
+\newblock On some combinatorial questions in finite-dimensional spaces.
+\newblock {\em Linear Algebra Appl.}, 41:1--9, 1981.
+
+\bibitem{BottTu82}
+R.~Bott and L.~W.~Tu.
+\newblock {\em Differential Forms in Algebraic Topology}.
+\newblock Graduate Texts in Mathematics 82. Springer, 1982.
+
+\bibitem{FF60}
+H.~Federer and W.~H.~Fleming.
+\newblock Normal and integral currents.
+\newblock {\em Annals of Mathematics}, 72(3):458--520, 1960.
+
+\bibitem{Fed69}
+H.~Federer.
+\newblock {\em Geometric Measure Theory}.
+\newblock Springer, 1969.
+
+\end{thebibliography}
+
+\end{document}

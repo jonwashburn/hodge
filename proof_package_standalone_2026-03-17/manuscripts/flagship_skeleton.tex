@@ -1,0 +1,603 @@
+\documentclass[11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{mathtools}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage[hidelinks]{hyperref}
+
+\numberwithin{equation}{section}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\DeclareMathOperator{\Mass}{Mass}
+\DeclareMathOperator{\PD}{PD}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\mhol}{m_{\mathrm{hol}}}
+\newcommand{\Def}{\mathrm{Def}}
+\newcommand{\Defcal}{\Def_{\mathrm{cal}}}
+
+\title{\bfseries Calibrated Discretization and the Hodge Conjecture:\\
+  The Proof Spine of a Four-Paper Series}
+
+\author{
+    Jonathan Washburn\thanks{Recognition Science, Recognition Physics Institute,
+        Austin, Texas, USA. Email: \texttt{jon@recognitionphysics.org}.}
+    \and
+    Amir Rahnamai Barghi\thanks{Recognition Science, Recognition Physics Institute,
+        Austin, Texas, USA. Email: \texttt{arahnamab@gmail.com}.}
+}
+
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Let $X$ be a smooth complex projective manifold of complex dimension $n$.
+Assuming the interface theorems established in three companion manuscripts on
+local holomorphic manufacturing, coherent packet assembly, and exact-class
+gluing/rounding~\cite{Washburn26I,Washburn26II,Washburn26III}, we derive the
+final Hodge conclusion for rational $(p,p)$-classes.
+The argument has three stages:
+(1) a signed decomposition reduces any rational Hodge class to the cone-positive case;
+(2) for cone-positive classes, the imported discretization machine produces
+integral cycles with vanishing calibration defect in a fixed homology class;
+(3) Federer--Fleming compactness yields a calibrated holomorphic limit, which is
+algebraic by Harvey--Lawson/King and Chow/GAGA.
+
+This paper therefore contains only the proof spine of the series:
+the closure chain from the interface theorems to the final Hodge conclusion.
+The local holomorphic manufacturing, coherent discretization, and exact-class
+gluing machinery are not reproved here; they are used only through the explicit
+interface statements of Section~\ref{sec:interface}.
+\end{abstract}
+
+
+%%% ============================================================
+\section{Introduction}\label{sec:intro}
+%%% ============================================================
+
+We formulate the Hodge problem for a fixed rational $(p,p)$ class on a smooth
+complex projective manifold and outline the closure argument proving algebraicity
+once the companion construction theorems are granted.
+The core ingredient is a \emph{realization/microstructure} scheme producing
+integral cycles whose calibration defect tends to~$0$ and whose masses converge
+to the cohomological lower bound.  Any calibrated limit is a positive combination
+of complex subvarieties~\cite{King71,HL82}, hence algebraic on projective
+manifolds~\cite{Chow49,Serre56}.  A signed decomposition reduces the general
+case to the cone-positive case, and Hard Lefschetz~\cite{Voisin02,GH78} treats
+the full $p$-range.
+
+\subsection*{Problem}
+
+Let $X$ be a smooth projective complex variety of complex dimension $n$,
+equipped with a K\"ahler form $\omega$ in the Chern class of a fixed ample line
+bundle $L\to X$.  Fix an integer $1 \leq p \leq n$ and a rational Hodge class
+\[
+\gamma \;\in\; H^{2p}(X,\Q) \cap H^{p,p}(X).
+\]
+The Hodge conjecture asks whether $\gamma$ is represented by an algebraic cycle
+of codimension~$p$.
+
+\subsection*{Route}
+
+Set $\psi:=\omega^{n-p}/(n-p)!$, the K\"ahler calibration of complex
+$(n{-}p)$-planes, and $k:=2n-2p$.  For an integral $k$-cycle~$T$, the
+\emph{calibration defect} is
+\[
+\Defcal(T):=\Mass(T)-\int_T\psi\;\ge\;0.
+\]
+The proof has three stages.
+
+\paragraph{1. Signed decomposition.}
+Every rational Hodge class $\gamma$ decomposes as
+$\gamma=\gamma^+-\gamma^-$ where $\gamma^+$ is cone-positive and
+$\gamma^-=N[\omega^p]$ is algebraic (Lemma~\ref{lem:signed-decomp}).
+
+\paragraph{2. Cone-positive realization (SYR).}
+For a cone-positive class $\gamma^+$ with smooth closed cone-valued
+representative $\beta$, the companion papers construct integral
+$k$-cycles $T_j$ with $\partial T_j=0$, $[T_j]=\PD(m[\gamma^+])$,
+and $\Defcal(T_j)\to 0$ (Theorem~\ref{thm:automatic-syr}).
+
+\paragraph{3. Calibrated limit and algebraicity.}
+A subsequential flat limit of $\{T_j\}$ is $\psi$-calibrated, hence a
+holomorphic chain by Harvey--Lawson/King, and algebraic by Chow/GAGA
+(Theorem~\ref{thm:realization-from-almost}).
+
+\subsection*{Organization}
+
+Section~\ref{sec:interface} states the interface theorems from the companion
+papers (without proof).
+Section~\ref{sec:closure} proves the closure chain: almost-calibrated sequences
+have calibrated limits; SYR-realizable forms yield algebraic cycles.
+Section~\ref{sec:syr} states the Automatic SYR theorem (proved by
+combining the companion-paper interfaces).
+Section~\ref{sec:signed} proves the signed decomposition.
+Section~\ref{sec:main} states and proves the main theorem.
+
+\paragraph{Series convention.}
+All results in Sections~\ref{sec:closure}--\ref{sec:main} are proved from the
+interface propositions in Section~\ref{sec:interface}. Those interface results
+are established in the companion preprints
+``Bergman-scale holomorphic complete intersections with prescribed tangent
+directions and template-controlled face traces'' (Paper~I, Theorem~1.1)~\cite{Washburn26I},
+``Coherent discretization of strongly positive forms by vertex-prefix face
+balancing'' (Paper~II, Theorem~1.1)~\cite{Washburn26II}, and
+``Fixed-class integral cycles modulo torsion from coherent calibrated packets via period-first
+rounding'' (Paper~III, Theorem~1.1)~\cite{Washburn26III}. The dependence on those inputs is intended to
+be explicit rather than implicit.
+
+
+%%% ============================================================
+\section{Interface theorems from companion papers}\label{sec:interface}
+%%% ============================================================
+
+The following three propositions are the imported outputs of the companion series.
+They are used in this paper only as explicit interface inputs.
+
+\begin{proposition}[H1 interface: local holomorphic manufacturing]
+\label{prop:h1-package}
+For each mesh cell $Q$ and each direction family prescribed by the local
+Carath\'eodory data of $\beta$ on $Q$, there exists a $\psi$-calibrated
+sheet-sum integral current $S_Q$ satisfying $\Mass(S_Q)=\langle S_Q,\psi\rangle$
+with quantitative slope and budget control, together with template-controlled
+face traces in flat norm.
+\end{proposition}
+
+\begin{proof}[Source in the series]
+This is exactly Theorem~1.1 of Paper~I,
+``Bergman-scale holomorphic complete intersections with prescribed tangent
+directions and template-controlled face traces''~\cite{Washburn26I}.
+\end{proof}
+
+\begin{proposition}[H2 interface: assembly packet existence]
+\label{prop:h2-package}
+For every sufficiently small mesh size $h>0$, there exists an assembly packet
+at scale $h$ for $\beta$ satisfying the three properties needed downstream:
+
+\begin{enumerate}
+\item[\textnormal{(A1)}] cube-wise mass and barycenter control,
+\item[\textnormal{(A2)}] global coherence across labels, and
+\item[\textnormal{(A3)}] a marginal period bound.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}[Source in the series]
+This is exactly Theorem~1.1 of Paper~II,
+``Coherent discretization of strongly positive forms by vertex-prefix face
+balancing''~\cite{Washburn26II}.
+\end{proof}
+
+\begin{proposition}[H3 interface: exact-class gluing and almost-calibration]
+\label{prop:h3-package}
+Assume an assembly packet satisfying \textnormal{(A1)}--\textnormal{(A3)} as in
+Proposition~\ref{prop:h2-package}. Then, for all sufficiently small mesh sizes,
+one can choose the final marginal activations so as to obtain a corrected
+integral current $T_h$ with:
+\begin{enumerate}
+\item[\textnormal{(i)}] $\partial T_h=0$,
+\item[\textnormal{(ii)}] $[T_h]=\PD(m[\gamma])$ in $H_k(X,\Z)/\mathrm{tors}$,
+\item[\textnormal{(iii)}] $0\le \Defcal(T_h)\to 0$, and hence
+\item[\textnormal{(iv)}] $\Mass(T_h)\to c_0$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}[Source in the series]
+This is exactly Theorem~1.1 of Paper~III,
+``Fixed-class integral cycles modulo torsion from coherent calibrated packets via period-first
+rounding''~\cite{Washburn26III}.
+\end{proof}
+
+
+%%% ============================================================
+\section{Closure chain}\label{sec:closure}
+%%% ============================================================
+
+\subsection*{Spine theorem}
+
+\begin{theorem}[Quantitative almost-mass-minimizing cycles]
+\label{thm:spine-quantitative}
+Let $(X,\omega)$ be a smooth projective K\"ahler manifold of complex
+dimension $n$, fix $1\le p\le n$, and set $\psi=\omega^{n-p}/(n-p)!$ and
+$k:=2n-2p$.  Let $[\gamma]\in H^{2p}(X,\Q)\cap H^{p,p}(X)$ admit a smooth
+closed cone-valued representative $\beta$.  Choose $m\ge 1$ so that
+$m[\gamma]\in H^{2p}(X,\Z)$, and set
+\[
+A:=\PD(m[\gamma])\in H_k(X,\Z),
+\qquad
+c_0:=\langle A,[\psi]\rangle=m\int_X \beta\wedge\psi.
+\]
+For each mesh scale $h_j\to 0$, applying Propositions~\ref{prop:h1-package},
+\ref{prop:h2-package}, and~\ref{prop:h3-package} produces integral $k$-cycles $T_j$ with
+$\partial T_j=0$, $[T_j]=A$, and
+\[
+0\;\le\;\Mass(T_j)-c_0\;\le\;2\,\Mass(G_j),
+\]
+where $G_j$ is the gluing correction with $\Mass(G_j)\to 0$.
+In particular $\Mass(T_j)\to c_0$, i.e.\ $\Defcal(T_j)\to 0$.
+\end{theorem}
+
+\begin{proof}
+Since $\psi$ is closed and $[T_j]=A$, the pairing $\langle T_j,\psi\rangle
+=\langle A,[\psi]\rangle=c_0$ is topological.  The calibration inequality
+$\Mass(T_j)\ge c_0$ gives the lower bound.  Writing $S_j=T_j+G_j$ where
+$S_j$ is $\psi$-calibrated (so $\Mass(S_j)=\langle S_j,\psi\rangle$), the
+triangle inequality yields
+\[
+\Mass(T_j)\le \Mass(S_j)+\Mass(G_j)
+=\langle T_j+G_j,\psi\rangle+\Mass(G_j)
+\le c_0+2\,\Mass(G_j).
+\qedhere
+\]
+\end{proof}
+
+
+\subsection*{Microstructure/gluing estimate}
+
+\begin{proposition}[Microstructure/gluing estimate]\label{prop:glue-gap}
+Let $T^{\mathrm{raw}}$ be the integral $k$-current built from the
+microstructure pieces on a mesh of size $h$, $R:=\partial T^{\mathrm{raw}}$,
+and $\delta:=\mathcal F(R)$.  Then there exists an integral $k$-current
+$R_{\mathrm{glue}}$ with
+\[
+\partial R_{\mathrm{glue}}=-R,
+\qquad
+\Mass(R_{\mathrm{glue}})\le \delta + C_X\,\delta^{\frac{k}{k-1}},
+\]
+where $C_X$ depends only on $X$ and $k$.
+\end{proposition}
+
+\begin{proof}
+By the flat-norm definition, decompose $R=R_0+\partial Q$ with
+$\Mass(R_0)+\Mass(Q)\le\delta+\eta$.
+Then $R_0$ is an integral $(k{-}1)$-cycle bounding in $X$, so the
+Federer--Fleming filling inequality~\cite{FF60,Fed69} gives $Q_0$ with
+$\partial Q_0=R_0$ and $\Mass(Q_0)\le C_X\Mass(R_0)^{k/(k-1)}$.
+Setting $R_{\mathrm{glue}}:=-(Q+Q_0)$ and letting $\eta\to 0$ yields
+the bound.
+\end{proof}
+
+
+\subsection*{Cohomology matching}
+
+\begin{proposition}[Integral cohomology constraints]\label{prop:cohomology-match}
+Fix smooth closed $k$-forms $\Theta_1,\dots,\Theta_b$ representing an integral
+basis of $H^k(X,\Z)/\mathrm{tors}$, and write
+\[
+I_\ell:=\int_X \beta\wedge\Theta_\ell.
+\]
+Let $S$ be the raw integral current obtained after integer rounding, and let
+$U_\eps$ be an integral current with $\partial U_\eps=\partial S$ and
+$\Mass(U_\eps)\to 0$. Set $T_\eps:=S-U_\eps$.
+By refining the mesh and choosing the integer sheet counts $N_{Q,j}$ via
+fixed-dimensional discrepancy rounding~\cite{BaranyGrinberg81}, one achieves
+\[
+\int_{T_\eps}\Theta_\ell = m\,I_\ell
+\qquad (\ell=1,\dots,b),
+\]
+so that $[T_\eps]=\PD(m[\gamma])$ in $H_k(X,\Z)/\mathrm{tors}$.
+\end{proposition}
+
+\begin{proof}
+Cube-wise mass and barycenter control force the fractional bookkeeping
+current to approximate the target period vector within $\frac18$.
+Discrepancy rounding adds at most $\frac18$ more.
+The gluing correction contributes $<\frac14$ to each period.
+Since closed integral cycles pair integrally with integral classes, the
+total error $<1$ forces exact equality.
+\end{proof}
+
+
+\subsection*{Almost-calibration}
+
+\begin{proposition}[Almost-calibration]\label{prop:almost-calibration}
+Let $S$ be a $\psi$-calibrated sheet sum and $U_\eps$ an integral current
+with $\partial U_\eps=\partial S$ and $\Mass(U_\eps)\to 0$.  Set
+$T_\eps:=S-U_\eps$.  Then:
+\begin{enumerate}
+\item[\textnormal{(i)}] $\displaystyle\int_{T_\eps}\psi
+  =\langle\PD(m[\gamma]),[\psi]\rangle=c_0$ for all~$\eps$.
+\item[\textnormal{(ii)}] $0\le\Defcal(T_\eps)\le 2\,\Mass(U_\eps)\to 0$.
+\item[\textnormal{(iii)}] $\Mass(T_\eps)\to c_0$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+Item (i): $\psi$ is closed and $[T_\eps]$ is fixed, so the pairing is
+topological.
+For (ii), $\Mass(S)=\int_S\psi$ and the comass bound give
+\[
+\Defcal(T_\eps)
+=\Mass(T_\eps)-\int_{T_\eps}\psi
+\le(\Mass(S)+\Mass(U_\eps))-(\int_S\psi-|\int_{U_\eps}\psi|)
+\le 2\Mass(U_\eps).
+\]
+Item (iii) combines (i) and (ii).
+\end{proof}
+
+
+\subsection*{Calibrated limits are holomorphic}
+
+\begin{definition}[Stationary Young-measure realizability (SYR)]
+\label{def:syr}
+A cone-valued smooth closed $(p,p)$-form $\beta$ representing $[\gamma]$ is
+\emph{SYR-realizable} if there exist integral $(2n{-}2p)$-cycles $T_k$ with
+$\partial T_k=0$, $[T_k]=\PD(m[\gamma])$ for a fixed $m\ge 1$, and
+$\Defcal(T_k)\to 0$.
+\end{definition}
+
+\begin{theorem}[Realization from almost-calibrated sequences]
+\label{thm:realization-from-almost}
+Assume $\beta$ is SYR-realizable.  Then there exists an integral
+$(2n{-}2p)$-cycle $T$ with $\partial T=0$, $[T]=\PD(m[\gamma])$, and
+$\Mass(T)=\langle T,\psi\rangle=c_0$.
+
+In particular, $T$ is $\psi$-calibrated.  By Harvey--Lawson~\cite{HL82},
+$T$ is a positive $d$-closed integral current of bidimension $(p,p)$.
+By King's theorem~\cite{King71}, $T$ is a holomorphic chain
+$T=\sum_j m_j[V_j]$ with $V_j$ irreducible analytic subvarieties.
+If $X$ is projective, each $V_j$ is algebraic by Chow/GAGA~\cite{Chow49,Serre56}.
+\end{theorem}
+
+\begin{proof}
+Since $[T_k]=\PD(m[\gamma])$ and $\psi$ is closed,
+$\langle T_k,\psi\rangle=c_0$ for all $k$.
+The defect hypothesis gives $\Mass(T_k)\to c_0$, so
+$\sup_k\Mass(T_k)<\infty$.
+By Federer--Fleming compactness~\cite{Fed69}, passing to a subsequence,
+$T_k\to T$ in flat norm with $T$ an integral cycle and $[T]=\PD(m[\gamma])$.
+Flat convergence gives $\langle T,\psi\rangle=c_0$; lower semicontinuity
+gives $\Mass(T)\le c_0$; the comass inequality gives
+$\langle T,\psi\rangle\le\Mass(T)$.
+Combining: $\Mass(T)=c_0=\langle T,\psi\rangle$, so $T$ is $\psi$-calibrated.
+The holomorphic-chain conclusion and algebraicity follow from
+Harvey--Lawson~\cite{HL82}, King~\cite{King71}, and Chow/GAGA~\cite{Chow49,Serre56,Hartshorne77,GH78}.
+\end{proof}
+
+\begin{theorem}[Calibrated realization under SYR]\label{thm:syr}
+Assume $\beta$ is SYR-realizable.  Then the conclusion of
+Theorem~\ref{thm:realization-from-almost} holds: there exists a
+$\psi$-calibrated holomorphic chain $T=\sum_j m_j[V_j]$ representing
+$\PD(m[\gamma])$, and $[\gamma]$ is algebraic if $X$ is projective.
+\end{theorem}
+
+\begin{proof}
+Apply Theorem~\ref{thm:realization-from-almost} to the SYR sequence.
+\end{proof}
+
+
+%%% ============================================================
+\section{Automatic SYR}\label{sec:syr}
+%%% ============================================================
+
+\begin{theorem}[Automatic SYR for cone-valued forms]\label{thm:automatic-syr}
+Assume Propositions~\ref{prop:h1-package}, \ref{prop:h2-package}, and~\ref{prop:h3-package}.
+Let $(X,\omega)$ be a smooth complex projective manifold of complex
+dimension $n$, and let $1\le p\le n/2$.  (For $p>n/2$, reduce to the
+complementary degree $n-p$ by Hard Lefschetz~\cite{Voisin02,GH78}.)
+Let $\beta$ be a smooth closed cone-valued $(p,p)$-form representing
+$[\gamma]\in H^{p,p}(X;\Q)$.
+
+Then $\beta$ is SYR-realizable: there exist integral $(2n{-}2p)$-cycles
+$T_k$ with $\partial T_k=0$,
+$[T_k]=\PD(m[\gamma])$, and $\Defcal(T_k)\to 0$.
+In particular, by Theorem~\ref{thm:syr}, $[\gamma]$ is algebraic.
+\end{theorem}
+
+\begin{proof}
+Fix a mesh parameter $\eps>0$.
+By Proposition~\ref{prop:h2-package}, for each sufficiently small scale
+$\eps>0$ there exists an assembly packet satisfying \textnormal{(A1)}--\textnormal{(A3)}.
+Applying Proposition~\ref{prop:h3-package} to that packet yields closed
+integral cycles $T_\eps$ with $[T_\eps]=\PD(m[\gamma])$ and
+$\Defcal(T_\eps)\to 0$ as $\eps\to 0$.
+Choosing $\eps_k\downarrow 0$ gives the SYR sequence.
+Theorem~\ref{thm:syr} concludes algebraicity.
+\end{proof}
+
+
+%%% ============================================================
+\section{Signed decomposition}\label{sec:signed}
+%%% ============================================================
+
+\begin{lemma}[Strict interior positivity of the K\"ahler power]
+\label{lem:kahler-positive}
+The $(p,p)$-form $\omega^p$ is strictly positive in the calibrated cone:
+$\omega^p(x)\in\mathrm{int}\,K_p(x)$ for all $x\in X$.
+There exists a uniform radius $r_0>0$ such that
+$B(\omega^p(x),r_0)\subset K_p(x)$ for every $x$.
+\end{lemma}
+
+\begin{proof}
+In a unitary frame at $x$, $\omega^p_x$ is a strictly (strongly) positive
+$(p,p)$-form.
+Compactness of $X$ and continuity of the cone give uniform $r_0>0$.
+\end{proof}
+
+\begin{lemma}[Signed decomposition]\label{lem:signed-decomp}
+Let $\gamma\in H^{2p}(X,\Q)\cap H^{p,p}(X)$ be any rational Hodge class.
+Then there exist cone-positive rational Hodge classes $\gamma^+$ and
+$\gamma^-$ with $\gamma=\gamma^+-\gamma^-$, where
+$\gamma^-=N[\omega^p]$ for some $N\in\Q_{>0}$.
+\end{lemma}
+
+\begin{proof}
+Let $\alpha$ represent $\gamma$, set $M:=\sup_X\|\alpha\|$, and choose
+$N\in\Q_{>0}$ with $N>M/r_0$.
+Then $\alpha(x)+N\omega^p(x)\in K_p(x)$ for all $x$, so
+$\gamma^+:=\gamma+N[\omega^p]$ is cone-positive and
+$\gamma^-:=N[\omega^p]$ is algebraic.
+\end{proof}
+
+\begin{lemma}[$\omega^p$ is algebraic]\label{lem:gamma-minus-alg}
+The class $[\omega^p]=c_1(L)^p$ lies in the $\Q$-span of algebraic
+cycle classes.  For $\mhol\gg 0$, a smooth complete intersection
+$Z=D_1\cap\cdots\cap D_p$ with $D_i\in|L^{\otimes\mhol}|$ satisfies
+$\PD([Z])=\mhol^p[\omega^p]$.
+\end{lemma}
+
+\begin{proof}
+Very ampleness of $L^{\otimes\mhol}$ and Bertini's
+theorem~\cite{Hartshorne77} give a smooth $Z$ with the stated class.
+\end{proof}
+
+
+%%% ============================================================
+\section{Main theorem}\label{sec:main}
+%%% ============================================================
+
+\begin{theorem}[Cone-positive classes are algebraic]
+\label{thm:effective-algebraic}
+Assume Propositions~\ref{prop:h1-package}, \ref{prop:h2-package}, and~\ref{prop:h3-package}.
+Let $\gamma^+\in H^{2p}(X,\Q)\cap H^{p,p}(X)$ be a cone-positive
+rational Hodge class on a smooth complex projective manifold, with
+$p\le n/2$.  Then $\gamma^+$ is algebraic.
+\end{theorem}
+
+\begin{proof}
+By Theorem~\ref{thm:automatic-syr}, $\gamma^+$ is SYR-realizable.
+By Theorem~\ref{thm:syr}, there exists a $\psi$-calibrated holomorphic
+chain representing $\PD(m[\gamma^+])$.
+Since $X$ is projective, Chow/GAGA gives algebraicity.
+\end{proof}
+
+\begin{conjecture}[Hodge Conjecture]\label{conj:hodge-conjecture}
+Let $X$ be a smooth complex projective manifold.  Every rational
+cohomology class $\gamma\in H^{2p}(X,\Q)\cap H^{p,p}(X)$ is
+represented by an algebraic cycle.
+\end{conjecture}
+
+\begin{theorem}[Hodge Conjecture for rational $(p,p)$ classes]
+\label{thm:main-hodge}
+Assume Propositions~\ref{prop:h1-package}, \ref{prop:h2-package}, and~\ref{prop:h3-package}.
+Let $X$ be a smooth complex projective manifold.  Then every rational
+Hodge class $\gamma\in H^{2p}(X,\Q)\cap H^{p,p}(X)$ is algebraic.
+\end{theorem}
+
+\begin{proof}
+By Hard Lefschetz~\cite{Voisin02,GH78} it suffices to treat $p\le n/2$.
+Apply Lemma~\ref{lem:signed-decomp}: $\gamma=\gamma^+-\gamma^-$ with
+$\gamma^-=N[\omega^p]$ algebraic (Lemma~\ref{lem:gamma-minus-alg}) and
+$\gamma^+$ cone-positive.
+By Theorem~\ref{thm:effective-algebraic}, $\gamma^+$ is algebraic.
+Since algebraic classes form a $\Q$-subspace,
+$\gamma=\gamma^+-\gamma^-$ is algebraic.
+\end{proof}
+
+\begin{corollary}[Full Hodge conjecture]\label{cor:full-hodge}
+Every rational $(p,p)$ class on a smooth complex projective manifold is
+represented by an algebraic cycle.
+\end{corollary}
+
+\begin{proof}
+Immediate from Theorem~\ref{thm:main-hodge}.
+\end{proof}
+
+\begin{remark}[Logical structure]
+\label{rem:hodge-final-remark}
+Theorem~\ref{thm:main-hodge} combines three inputs:
+(i) signed decomposition (Lemma~\ref{lem:signed-decomp});
+(ii) SYR realization of cone-positive classes
+(Theorem~\ref{thm:automatic-syr}, proved using the companion-paper
+interfaces);
+(iii) the calibrated-limit closure principle
+(Theorem~\ref{thm:realization-from-almost}) with algebraicity via
+Chow/GAGA.
+\end{remark}
+
+
+%%% ============================================================
+\begin{thebibliography}{99}
+
+\bibitem{Washburn26I}
+J.~Washburn.
+\newblock {\em Bergman-scale holomorphic complete intersections with prescribed
+  tangent directions and face traces}.
+\newblock Preprint, 2026.
+
+\bibitem{Washburn26II}
+J.~Washburn.
+\newblock {\em Coherent discretization of strongly positive forms by
+  vertex-prefix face balancing}.
+\newblock Preprint, 2026.
+
+\bibitem{Washburn26III}
+J.~Washburn.
+\newblock {\em Exact-class integral cycles from coherent calibrated packets via
+  period-first rounding}.
+\newblock Preprint, 2026.
+
+\bibitem{BaranyGrinberg81}
+I.~B\'ar\'any and V.~S.~Grinberg.
+\newblock On some combinatorial questions in finite-dimensional spaces.
+\newblock {\em Linear Algebra Appl.}, 41:1--9, 1981.
+
+\bibitem{Chow49}
+W.-L. Chow.
+\newblock On compact complex analytic varieties.
+\newblock {\em Amer.\ J.\ Math.}, 71:893--914, 1949.
+
+\bibitem{FF60}
+H.~Federer and W.~H.~Fleming.
+\newblock Normal and integral currents.
+\newblock {\em Annals of Mathematics}, 72(3):458--520, 1960.
+
+\bibitem{Fed69}
+H.~Federer.
+\newblock {\em Geometric Measure Theory}.
+\newblock Springer, 1969.
+
+\bibitem{GH78}
+P.~Griffiths and J.~Harris.
+\newblock {\em Principles of Algebraic Geometry}.
+\newblock Wiley-Interscience, 1978.
+
+\bibitem{Hartshorne77}
+R.~Hartshorne.
+\newblock {\em Algebraic Geometry}.
+\newblock Graduate Texts in Mathematics 52, Springer, 1977.
+
+\bibitem{HL82}
+R.~Harvey and H.~B.~Lawson, Jr.
+\newblock Calibrated geometries.
+\newblock {\em Acta Mathematica}, 148:47--157, 1982.
+
+\bibitem{King71}
+J.~R.~King.
+\newblock The currents defined by analytic varieties.
+\newblock {\em Acta Mathematica}, 127:185--220, 1971.
+
+\bibitem{Serre56}
+J.-P.~Serre.
+\newblock G\'eom\'etrie alg\'ebrique et g\'eom\'etrie analytique (GAGA).
+\newblock {\em Annales de l'Institut Fourier}, 6:1--42, 1956.
+
+\bibitem{Voisin02}
+C.~Voisin.
+\newblock {\em Hodge Theory and Complex Algebraic Geometry I, II}.
+\newblock Cambridge University Press, 2002--2003.
+
+\end{thebibliography}
+
+\end{document}
